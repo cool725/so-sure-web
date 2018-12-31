@@ -501,7 +501,7 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testExportPaymentMonthEdge()
     {
-        $date = new \DateTime('2018-04-01 00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $date = new \DateTime('2018-04-01 00:00', SoSure::getSoSureTimezone());
         $policy = $this->createPolicy('testExportPaymentMonthEdge', $date);
         //print $date->format(\DateTime::ATOM) . PHP_EOL;
 

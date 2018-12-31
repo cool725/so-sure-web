@@ -70,7 +70,7 @@ class JudoPaymentMethodTest extends \PHPUnit\Framework\TestCase
         $judoPaymentMethod = new JudoPaymentMethod();
         $judoPaymentMethod->addCardToken('a', "{\"cardLastfour\":\"7954\",\"endDate\":\"0518\",\"cardType\":11}");
         $this->assertEquals(
-            new \DateTime('2018-06-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-06-01 00:00:00', SoSure::getSoSureTimezone()),
             $judoPaymentMethod->getCardEndDateAsDate()
         );
         $this->assertFalse($judoPaymentMethod->isCardExpired(new \DateTime('2018-05-30 00:00:00')));

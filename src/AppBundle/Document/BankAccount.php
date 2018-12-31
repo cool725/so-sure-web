@@ -546,7 +546,7 @@ class BankAccount
     public function shouldCancelMandate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         // Mandate was never setup or already cancelled
@@ -577,7 +577,7 @@ class BankAccount
     public function getPaymentDate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         $days = 4;
@@ -595,7 +595,7 @@ class BankAccount
     public function getFirstPaymentDate(User $user, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         $useClosestPaymentDate = false;
         $nextPolicyPaymentDate = null;

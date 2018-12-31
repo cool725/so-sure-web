@@ -171,7 +171,7 @@ class JudoPaymentMethod extends PaymentMethod
 
         $date = new \DateTime(
             sprintf('20%s-%s-01', mb_substr($end, 2, 2), mb_substr($end, 0, 2)),
-            new \DateTimeZone(SoSure::TIMEZONE)
+            SoSure::getSoSureTimezone()
         );
 
         $date = $this->endOfMonth($date);

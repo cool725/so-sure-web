@@ -654,7 +654,7 @@ class JudopayServiceTest extends WebTestCase
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $scheduledPayment->setAmount($scheduledPayment->getAmount() + 1);
         $nextMonth = \DateTime::createFromFormat('U', time());
-        $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
+        $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
         self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
@@ -710,7 +710,7 @@ class JudopayServiceTest extends WebTestCase
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $scheduledPayment->setAmount($scheduledPayment->getAmount() + 1);
         $nextMonth = \DateTime::createFromFormat('U', time());
-        $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
+        $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
         self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
@@ -766,7 +766,7 @@ class JudopayServiceTest extends WebTestCase
 
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $nextMonth = \DateTime::createFromFormat('U', time());
-        $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
+        $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
         $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
@@ -814,7 +814,7 @@ class JudopayServiceTest extends WebTestCase
 
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $nextMonth = \DateTime::createFromFormat('U', time());
-        $nextMonth = $this->convertTimezone($nextMonth, new \DateTimeZone(SoSure::TIMEZONE));
+        $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
         $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
@@ -1353,7 +1353,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
 
         $this->assertEquals(
-            new \DateTime('2021-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2021-01-01 00:00:00', SoSure::getSoSureTimezone()),
             $policy->getUser()->getPaymentMethod()->getCardEndDateAsDate()
         );
         $this->assertFalse(self::$judopay->cardExpiringEmail($policy));

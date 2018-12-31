@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Annotation\DataChange;
 use AppBundle\Classes\NoOp;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -50,22 +51,23 @@ class TestCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:test')
-            ->setDescription('Test')
+            ->setDescription('Run tests or conversions')
+            ->addArgument(
+                'method',
+                InputArgument::REQUIRED,
+                'command to run'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // $this->testBirthday();
-        // $this->removeOrphanUsersOnCharges($output);
-        // $this->updateNotes();
-
-        //$this->updatePhoneExcess();
-        //$this->updatePolicyExcess();
-
-        //$this->updateClaimExcess();
-        $this->cancelScheduledPayments($output);
-
+        $method = $input->getArgument('method');
+        if (method_exists($this, $method)) {
+            call_user_func([$this, $method], $output);
+        } else {
+            throw new \Exception(sprintf('Unknown command %s', $method));
+        }
         $output->writeln('Finished');
     }
 
@@ -87,7 +89,7 @@ class TestCommand extends ContainerAwareCommand
         $output->writeln(sprintf("%d updated", $count));
     }
 
-    private function updateClaimExcess()
+    private function updateClaimExcess(OutputInterface $output)
     {
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findAll();
@@ -101,7 +103,7 @@ class TestCommand extends ContainerAwareCommand
         $this->dm->flush();
     }
 
-    private function updatePhoneExcess()
+    private function updatePhoneExcess(OutputInterface $output)
     {
         // technically should compare the price dates to see if pic-sure excess should be set, but it doesn't add
         // any current value and is time consuming
@@ -119,7 +121,7 @@ class TestCommand extends ContainerAwareCommand
         $this->dm->flush();
     }
 
-    private function updatePolicyExcess()
+    private function updatePolicyExcess(OutputInterface $output)
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAll();
@@ -137,7 +139,7 @@ class TestCommand extends ContainerAwareCommand
         $this->dm->flush();
     }
 
-    private function updateNotes()
+    private function updateNotes(OutputInterface $output)
     {
         $repo = $this->dm->getRepository(Policy::class);
         $userRepo = $this->dm->getRepository(User::class);
@@ -190,32 +192,43 @@ class TestCommand extends ContainerAwareCommand
         }
     }
 
-    private function testBirthday()
+    private function birthday(OutputInterface $output)
     {
         $repo = $this->dm->getRepository(User::class);
+        $count = 0;
         foreach ($repo->findAll() as $user) {
             /** @var User $user */
             if ($user->getBirthday()) {
-                if (($user->getBirthday()->format('H') == 0 && $user->getBirthday()->format('P') == "+01:00") ||
-                    $user->getBirthday()->format('H') == 23 && $user->getBirthday()->format('P') == "+00:00") {
+                if (($user->getBirthday()->format('H') == 0 && $user->getBirthday()->format('i') == 0 && $user->getBirthday()->format('P') == "+01:00") ||
+                    $user->getBirthday()->format('H') == 23 && $user->getBirthday()->format('i') == 0 && $user->getBirthday()->format('P') == "+00:00") {
+                    $convertedDate = clone $user->getBirthday();
+                    $convertedDate = $convertedDate->add(new \DateInterval('PT1H'));
                     if (count($user->getValidPolicies(true)) > 0) {
                         print sprintf(
-                            "%s %s 1%s",
+                            "%s %s %s 1%s",
                             $user->getId(),
                             $user->getBirthday()->format(\DateTime::ATOM),
+                            $convertedDate->format(\DateTime::ATOM),
                             PHP_EOL
                         );
                     } else {
                         print sprintf(
-                            "%s %s 0%s",
+                            "%s %s %s 0%s",
                             $user->getId(),
                             $user->getBirthday()->format(\DateTime::ATOM),
+                            $convertedDate->format(\DateTime::ATOM),
                             PHP_EOL
                         );
                     }
+
+                    $user->setBirthday($convertedDate);
+                    $count++;
                 }
             }
         }
+
+        $this->dm->flush();
+        $output->writeln(sprintf('%d records updated', $count));
     }
 
     private function getDataChangeAnnotation($object, $category)

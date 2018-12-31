@@ -747,15 +747,15 @@ class Phone
     public function getSalvaBinderMonthlyPremium(\DateTime $date = null)
     {
         // Initial binder
-        $binder2016 = new \DateTime('2016-09-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $binder2016 = new \DateTime('2016-09-01 00:00:00', SoSure::getSoSureTimezone());
 
         // 2018 binder - prices static, but additional bands £1250 & £1500
-        $binder2018 = new \DateTime('2018-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
         // No binder yet
-        $binder2019 = new \DateTime('2019-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $binder2019 = new \DateTime('2019-01-01 00:00:00', SoSure::getSoSureTimezone());
 
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         if ($date >= $binder2019) {
@@ -1237,7 +1237,7 @@ class Phone
         \DateTime $date = null
     ) {
         if (!$date) {
-            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         // dates must be in the future
         if ($from < $date) {
