@@ -24,13 +24,19 @@ class Lead
     const SOURCE_PURCHASE_FLOW = 'purchase-flow';
     const SOURCE_CONTACT_US = 'contact-us';
 
+    // POS affiliate sources
+    const SOURCE_DETAILS_POS_HELLOZ = 'helloz';
+
     // Lead Source is used in User & Policy
     const LEAD_SOURCE_INVITATION = 'invitation';
     const LEAD_SOURCE_SCODE = 'scode';
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
-    // POS affiliate sources
-    const SOURCE_POS_HELLOZ = 'HelloZ Pos';
+    public static $leadSources = [
+        self::LEAD_SOURCE_AFFILIATE,
+        self::LEAD_SOURCE_INVITATION,
+        self::LEAD_SOURCE_SCODE,
+    ];
 
     /**
      * @MongoDB\Id(strategy="auto")
@@ -77,6 +83,8 @@ class Lead
     protected $phone;
 
     /**
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us",
+     *                 "invitation", "scode", "affiliate"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
@@ -218,7 +226,9 @@ class Lead
     {
         $user->setEmail($this->getEmail());
         $user->setEmailCanonical($this->getEmailCanonical());
-        $user->setLeadSource($this->getSource());
+        if (in_array($this->getSource(), self::$leadSources)) {
+            $user->setLeadSource($this->getSource());
+        }
         $user->setLeadSourceDetails($this->getSourceDetails());
         $user->setCreated($this->getCreated());
         $user->setIntercomId($this->getIntercomId());

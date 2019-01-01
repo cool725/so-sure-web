@@ -19,7 +19,7 @@ class PosController extends BaseController
 {
     // TODO: Move to affiliate company flag
     public static $pos = [
-        'helloz' => Lead::SOURCE_POS_HELLOZ,
+        'helloz' => Lead::SOURCE_DETAILS_POS_HELLOZ,
     ];
 
     /**
