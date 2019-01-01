@@ -224,6 +224,42 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_APPROVED, $policy->getPicSureStatus());
     }
 
+    public function testProcessClaimPicSureClaimNotOverwritten()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimPicSureClaimNotOverwritten', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        static::$dm->persist($claim);
+        $this->assertNull($claim->getProcessed());
+        $this->assertFalse(static::$claimsService->processClaim($claim));
+        $this->assertNull($policy->getPicSureClaimApprovedClaim());
+
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $this->assertTrue(static::$claimsService->processClaim($claim));
+        $this->assertNotNull($policy->getPicSureClaimApprovedClaim());
+        $this->assertEquals($claim, $policy->getPicSureClaimApprovedClaim());
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED, $policy->getPicSureStatus());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        $claimB = new Claim();
+        $claimB->setPolicy($policy);
+        $claimB->setStatus(Claim::STATUS_SETTLED);
+        static::$dm->persist($claimB);
+        $this->assertTrue(static::$claimsService->processClaim($claimB));
+        $this->assertNotNull($policy->getPicSureClaimApprovedClaim());
+        $this->assertEquals($claim, $policy->getPicSureClaimApprovedClaim());
+        $this->assertNotEquals($claimB, $policy->getPicSureClaimApprovedClaim());
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED, $policy->getPicSureStatus());
+    }
+
     public function testProcessClaimRewardConnection()
     {
         $user = static::createUser(
