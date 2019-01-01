@@ -4211,6 +4211,7 @@ class PhonePolicyTest extends WebTestCase
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setProcessed(true);
         $policy->addClaim($claim);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
@@ -4422,6 +4423,7 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
@@ -4497,6 +4499,7 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
@@ -4893,6 +4896,7 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
