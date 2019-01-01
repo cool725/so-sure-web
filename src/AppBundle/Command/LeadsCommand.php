@@ -88,6 +88,10 @@ class LeadsCommand extends ContainerAwareCommand
             }
 
             $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($lead->getEmail())]);
+            $usersMobile = [];
+            if ($lead->getMobileNumber()) {
+                $usersMobile = $userRepo->findBy(['mobileNumber' => $lead->getMobileNumber()]);
+            }
             // user exists, so lead can be removed
             if ($user || in_array(mb_strtolower($lead->getEmail()), $newUsers)) {
                 $output->writeln(sprintf('Deleting lead %s as user exists', $lead->getEmail()));
@@ -97,7 +101,7 @@ class LeadsCommand extends ContainerAwareCommand
                 /** @var User $user */
                 $user = $this->userManager->createUser();
                 $user->setEnabled(true);
-                $lead->populateUser($user);
+                $lead->populateUser($user, count($usersMobile) == 0);
                 $this->dm->persist($user);
                 $newUsers[] = mb_strtolower($lead->getEmail());
             }

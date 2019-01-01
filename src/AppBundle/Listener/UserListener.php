@@ -5,6 +5,7 @@ namespace AppBundle\Listener;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
@@ -131,6 +132,13 @@ class UserListener
                 $user->addReceivedInvitation($invitation);
                 $update = true;
             }
+
+            $leadRepo = $this->dm->getRepository(Lead::class);
+            /** @var Lead $lead */
+            $lead = $leadRepo->findOneBy(['emailCanonical' => $email]);
+            if ($lead) {
+                $lead->populateUser($user);
+            }
         }
 
         if ($mobile) {
@@ -139,6 +147,13 @@ class UserListener
             foreach ($invitations as $invitation) {
                 $user->addReceivedInvitation($invitation);
                 $update = true;
+            }
+
+            $leadRepo = $this->dm->getRepository(Lead::class);
+            /** @var Lead $lead */
+            $lead = $leadRepo->findOneBy(['mobileNumber' => $mobile]);
+            if ($lead) {
+                $lead->populateUser($user);
             }
         }
 

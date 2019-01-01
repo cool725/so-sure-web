@@ -222,17 +222,31 @@ class Lead
         return $this->opts;
     }
 
-    public function populateUser(User $user)
+    public function populateUser(User $user, $setMobileNumber = false)
     {
-        $user->setEmail($this->getEmail());
-        $user->setEmailCanonical($this->getEmailCanonical());
-        if (in_array($this->getSource(), self::$leadSources)) {
+        if (!$user->getEmail()) {
+            $user->setEmail($this->getEmail());
+        }
+
+        // Probably not necessary, but there may be some timing issues with the listeners and doens't really hurt
+        if (!$user->getEmailCanonical()) {
+            $user->setEmailCanonical($this->getEmailCanonical());
+        }
+
+        if (!$user->getLeadSource() && in_array($this->getSource(), self::$leadSources)) {
             $user->setLeadSource($this->getSource());
         }
-        $user->setLeadSourceDetails($this->getSourceDetails());
-        $user->setCreated($this->getCreated());
-        $user->setIntercomId($this->getIntercomId());
-        // Commenting out as could cause duplicate mobile numbers, which could cause login issues
-        // $user->setMobileNumber($this->getMobileNumber());
+        if (!$user->getLeadSourceDetails()) {
+            $user->setLeadSourceDetails($this->getSourceDetails());
+        }
+
+        if (!$user->getIntercomId()) {
+            $user->setIntercomId($this->getIntercomId());
+        }
+
+        // Use caution and check before setting as could cause duplicate mobile numbers, which could cause login issues
+        if (!$user->getMobileNumber() && $setMobileNumber) {
+            $user->setMobileNumber($this->getMobileNumber());
+        }
     }
 }
