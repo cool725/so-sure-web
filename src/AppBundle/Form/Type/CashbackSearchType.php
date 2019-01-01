@@ -44,6 +44,7 @@ class CashbackSearchType extends BaseType
                 'choices' => [
                     Cashback::STATUS_PENDING_CLAIMABLE => Cashback::STATUS_PENDING_CLAIMABLE,
                     Cashback::STATUS_PENDING_PAYMENT => Cashback::STATUS_PENDING_PAYMENT,
+                    Cashback::STATUS_PENDING_WAIT_CLAIM => Cashback::STATUS_PENDING_WAIT_CLAIM,
                     Cashback::STATUS_PAID => Cashback::STATUS_PAID,
                     Cashback::STATUS_CLAIMED => Cashback::STATUS_CLAIMED,
                     Cashback::STATUS_FAILED => Cashback::STATUS_FAILED,
