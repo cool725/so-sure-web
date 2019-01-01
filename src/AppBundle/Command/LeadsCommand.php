@@ -46,7 +46,7 @@ class LeadsCommand extends ContainerAwareCommand
     {
         $this
             ->setName('sosure:leads')
-            ->setDescription('Transform leads to users')
+            ->setDescription('Transform leads to users for users who started purchase flow')
             ->addOption(
                 'process',
                 null,
@@ -66,7 +66,11 @@ class LeadsCommand extends ContainerAwareCommand
         $leadsRepo = $this->dm->getRepository(Lead::class);
         $yesterday = \DateTime::createFromFormat('U', time());
         $yesterday = $yesterday->sub(new \DateInterval(('P1D')));
-        $leads = $leadsRepo->findBy(['email' => ['$ne' => null], 'created' => ['$lte' => $yesterday]]);
+        $leads = $leadsRepo->findBy([
+            'source' => Lead::SOURCE_PURCHASE_FLOW,
+            'email' => ['$ne' => null],
+            'created' => ['$lte' => $yesterday]
+        ]);
         $count = 0;
         $newUsers = [];
         foreach ($leads as $lead) {
