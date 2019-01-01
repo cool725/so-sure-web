@@ -81,6 +81,12 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             }
         });
 
+        modal.find("#process-claim").click(function(){
+            if (confirm('Are you sure you want to (re)-process this claim? Pot values will be updated and emails will be sent to user & connections.')) {
+                $("#process-claim-form").submit();
+            }
+        });
+
         modal.find('.set-replacement-phone').click(function() {
             var id = $('.set-replacement-phone').data('id');
             $('#claims_form_replacementPhone').val(id).prop('selected', true);;
