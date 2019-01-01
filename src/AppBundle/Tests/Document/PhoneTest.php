@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Phone;
@@ -314,8 +315,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     {
         $phone = new Phone();
         $phone->init('Apple', 'PostBinder', 9, static::$policyTerms, 32, ['post-binder'], 1000);
-        $binder2020 = new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
-        $phone->getSalvaBinderMonthlyPremium($binder2020);
+        $phone->getSalvaBinderMonthlyPremium(Salva::getSalvaBinderEndDate());
     }
 
     /**

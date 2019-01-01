@@ -36,6 +36,12 @@ class MonitorCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Detailed output'
             )
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Pretend its date'
+            )
         ;
     }
 
@@ -43,7 +49,14 @@ class MonitorCommand extends ContainerAwareCommand
     {
         $name = $input->getArgument('name');
         $details = true === $input->getOption('details');
-        $message = $this->monitorService->run($name, $details);
+        $date = $input->getOption('date');
+        $params = null;
+        if ($date) {
+            $params = new \DateTime($date);
+        } elseif ($details) {
+            $params = $details;
+        }
+        $message = $this->monitorService->run($name, $params);
         $output->writeln(json_encode($message, JSON_PRETTY_PRINT));
     }
 }

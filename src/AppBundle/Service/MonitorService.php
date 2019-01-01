@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\Connection;
@@ -87,11 +88,11 @@ class MonitorService
         $this->dm = $dm;
     }
 
-    public function run($name, $details = null)
+    public function run($name, $params = null)
     {
         if (method_exists($this, $name)) {
-            if ($details) {
-                return call_user_func([$this, $name], $details);
+            if ($params) {
+                return call_user_func([$this, $name], $params);
             }
 
             return call_user_func([$this, $name]);
@@ -585,6 +586,20 @@ class MonitorService
         foreach ($unpaid as $payment) {
             /** @var BacsPayment $payment */
             throw new MonitorException('There are generated bacs payments waiting: ' . $payment->getId());
+        }
+    }
+
+    public function salvaBinder(\DateTime $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime('now', SoSure::getSoSureTimezone());
+        }
+        $diff = $now->diff(Salva::getSalvaBinderEndDate());
+        if ($diff->days < 15) {
+            throw new MonitorException(sprintf(
+                'Salva Binder renewal needs confirming (expires: %s)',
+                Salva::getSalvaBinderEndDate()->format(\DateTime::ATOM)
+            ));
         }
     }
 
