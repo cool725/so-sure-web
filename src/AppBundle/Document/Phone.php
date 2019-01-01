@@ -752,13 +752,13 @@ class Phone
         // 2018 binder - prices static, but additional bands £1250 & £1500
         $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
         // No binder yet
-        $binder2019 = new \DateTime('2019-01-01 00:00:00', SoSure::getSoSureTimezone());
+        $binder2020 = new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
 
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
-        if ($date >= $binder2019) {
+        if ($date >= $binder2020) {
             throw new \Exception('No binder available');
         }
 
