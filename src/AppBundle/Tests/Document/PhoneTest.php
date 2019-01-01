@@ -314,8 +314,8 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     {
         $phone = new Phone();
         $phone->init('Apple', 'PostBinder', 9, static::$policyTerms, 32, ['post-binder'], 1000);
-        $binder2019 = new \DateTime('2019-01-01 00:00:00', SoSure::getSoSureTimezone());
-        $phone->getSalvaBinderMonthlyPremium($binder2019);
+        $binder2020 = new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
+        $phone->getSalvaBinderMonthlyPremium($binder2020);
     }
 
     /**
