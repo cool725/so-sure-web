@@ -1652,6 +1652,18 @@ abstract class Policy
         return false;
     }
 
+    public function hasUnprocessedMonetaryClaim()
+    {
+        foreach ($this->getClaims() as $claim) {
+            /** @var Claim $claim */
+            if ($claim->isMonetaryClaim() && !$claim->getProcessed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function hasSuspectedFraudulentClaim()
     {
         foreach ($this->getClaims() as $claim) {
@@ -3538,6 +3550,18 @@ abstract class Policy
         return false;
     }
 
+    public function hasUnprocessedMonetaryNetworkClaim()
+    {
+        foreach ($this->getNetworkClaims(true) as $claim) {
+            /** @var Claim $claim */
+            if (!$claim->getProcessed()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getNetworkClaims($monitaryOnly = false, $includeApproved = false)
     {
         $claims = [];
@@ -4174,6 +4198,16 @@ abstract class Policy
 
         if (!in_array($this->getStatus(), [self::STATUS_EXPIRED_CLAIMABLE, self::STATUS_EXPIRED_WAIT_CLAIM])) {
             throw new \Exception('Unable to fully expire a policy if status is not expired-claimable or wait-claim');
+        }
+
+        // If a claim is currently being processed whilst expiration is occurring, the pot might be out of sync
+        // especially if manually updating claim status & then processing
+        // avoid running until the claim is processed
+        if ($this->hasUnprocessedMonetaryClaim() || $this->hasUnprocessedMonetaryNetworkClaim()) {
+            throw new \Exception(sprintf(
+                'There is an unprocessed monetary claim (or network claim) for policy %s (timing issue?)',
+                $this->getId()
+            ));
         }
 
         // If a user themselves already has successfully claimed, then their pot is already 0,

@@ -38,6 +38,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
+use AppBundle\Service\ClaimsService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
@@ -134,7 +135,7 @@ class AdminController extends BaseController
     use ValidatorTrait;
 
     /**
-     * @Route("/claims/delete-claim", name="admin_claims_delete_claim")
+     * @Route("/claims/delete", name="admin_claims_delete_claim")
      * @Method({"POST"})
      */
     public function adminClaimsDeleteClaim(Request $request)
@@ -170,6 +171,39 @@ class AdminController extends BaseController
         $dm->remove($claim);
         $dm->flush();
         $dm->clear();
+
+        return $this->redirectToRoute('admin_claims');
+    }
+
+    /**
+     * @Route("/claims/process", name="admin_claims_process_claim")
+     * @Method({"POST"})
+     */
+    public function adminClaimsProcessClaim(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($request->get('id'));
+        if (!$claim) {
+            throw $this->createNotFoundException('Claim not found');
+        }
+
+        /** @var ClaimsService $claimsService */
+        $claimsService = $this->get('app.claims');
+        if ($claimsService->processClaim($claim)) {
+            $this->addFlash(
+                'success',
+                'Processed claim'
+            );
+        } else {
+            $this->addFlash(
+                'error',
+                'Failed to process claim. Already processed? Or not settled?'
+            );
+        }
 
         return $this->redirectToRoute('admin_claims');
     }

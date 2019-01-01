@@ -577,6 +577,10 @@
                             <button id="delete-claim" type="button" class="btn btn-danger pull-left">
                                 <i class="fa fa-lock" title="Admin only"></i> Delete Claim
                             </button>
+                            <button id="process-claim" type="button" class="btn btn-warning pull-left" {% if claim.status != 'settled' %}disabled="disabled"{% endif %}>
+                                <i class="fa fa-lock" title="Admin only. Consider setting claim status to settled first!"></i>
+                                {% if claim.processed %}Re-{% endif %}Process Claim
+                            </button>
                         {% endif %}
                         {{ form_widget(form.update, {'attr': {'class': 'btn btn-success'}}) }}
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -590,10 +594,15 @@
     </div>
 
     {% if is_granted('ROLE_ADMIN') %}
-    <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
-        <input type="hidden" name="id" value="{{ claim.id }}" />
-        <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-    </form>
+        <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
+            <input type="hidden" name="id" value="{{ claim.id }}" />
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+        </form>
+
+        <form id="process-claim-form" method="POST" action="{{ path('admin_claims_process_claim') }}">
+            <input type="hidden" name="id" value="{{ claim.id }}" />
+            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+        </form>
     {% endif %}
 
 </div>

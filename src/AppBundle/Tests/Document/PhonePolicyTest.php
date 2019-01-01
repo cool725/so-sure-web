@@ -4184,6 +4184,15 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policy->getStatus());
 
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $foundException = false;
+        try {
+            $policy->fullyExpire(new \DateTime("2017-02-30"));
+        } catch (\Exception $e) {
+            $foundException = true;
+        }
+        $this->assertTrue($foundException);
+
+        $claim->setProcessed(true);
         $policy->fullyExpire(new \DateTime("2017-02-30"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
 
@@ -4202,6 +4211,7 @@ class PhonePolicyTest extends WebTestCase
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setProcessed(true);
         $policy->addClaim($claim);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
@@ -4413,6 +4423,7 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
@@ -4488,6 +4499,7 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
@@ -4884,6 +4896,7 @@ class PhonePolicyTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
