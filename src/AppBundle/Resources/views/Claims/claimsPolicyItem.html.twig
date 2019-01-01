@@ -764,22 +764,32 @@
                 <table class="table table-striped">
                     <tr>
                         <th>Date</th>
+                        <th>Name</th>
                         <th>Policy Number</th>
                         <th>Claims Number</th>
                         <th>Claims Type</th>
                         <th>Claims Status</th>
-                        <th>Suspected Fraud</th>
+                        <th>Flags</th>
                         <th>Notes</th>
                     </tr>
                     {% for claim in policy.networkClaims %}
                     <tr>
-                        <td style="width: 20%;">{{ claim.recordedDate|date }}</td>
-                        <td style="width: 10%;">{{ claim.number }}</td>
+                        <td style="width: 10%;">{{ claim.recordedDate|date }}</td>
+                        <td style="width: 10%;">{{ claim.policy.user.name }}</td>
+                        <td style="width: 10%;"><a href="{{ path(policy_route, {'id': claim.policy.id }) }}">{{ claim.policy.policyNumber }}</a></td>
+                        <td style="width: 10%;">
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('admin_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <button type="button" class="btn btn-link" data-route="{{ path('claims_claims_form_policy', {'id': claim.id}) }}" data-toggle="modal" data-target="#claimsModal">
+                                    {% if claim.number %}{{ claim.number }}{% else %}N/A{% endif %}
+                                </button>
+                            {% endif %}
+                        </td>
                         <td style="width: 10%;">{{ claim.type }}</td>
                         <td style="width: 10%;">{{ claim.status }}</td>
-                        <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
-                          {{ claim.crimeRef }}
-                        </td>
                         <td style="width: 10%;" class="{% if claim.initialSuspicion or claim.finalSuspicion or claim.shouldCancelPolicy %}danger{% endif %}">
                             {% if claim.initialSuspicion %}Initial Suspicion;{% endif %}
                             {% if claim.finalSuspicion %}Final Suspicion;{% endif %}

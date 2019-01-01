@@ -1371,6 +1371,7 @@ class AdminController extends BaseController
             $month = $now->format('m');
         }
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $date = $this->startOfDay($date);
         $nextMonth = clone $date;
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
