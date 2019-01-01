@@ -22,6 +22,11 @@ class Salva
 
     const SALVA_TIMEZONE = "Europe/London";
 
+    public static function getSalvaBinderEndDate()
+    {
+        return new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
+    }
+
     public static $refundValidationExclusions = [
         '58341bfc1d255d3f0a6641c9', // should not have been upgrade
         '59d47a1496a9626f3c3b8650', // dispossion, but was cancelled much later than should have been
