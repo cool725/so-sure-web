@@ -326,7 +326,16 @@ class ClaimsService
         // TODO: Should this be approved or just settled. Matching below behaviour for now of settled
         if ($claim->isMonetaryClaim() && $policy->canAdjustPicSureStatusForClaim()) {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
-            $policy->setPicSureClaimApprovedClaim($claim);
+            if (!$policy->getPicSureClaimApprovedClaim()) {
+                $policy->setPicSureClaimApprovedClaim($claim);
+            } else {
+                // @codingStandardsIgnoreStart
+                $this->logger->warning(sprintf(
+                    'Policy %s has transitioned its pic-sure status to claim approved. However, there was a previous claim approved claim recorded on the policy. Verify which claim should be recorded as the pic-sure approved claim',
+                    $policy->getId()
+                ));
+                // @codingStandardsIgnoreEnd
+            }
             $this->dm->flush();
         }
 
