@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\Lead;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class UserListenerTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $userRepo;
+    protected static $leadRepo;
     protected static $invitationRepo;
     protected static $testUser;
     protected static $testUser2;
@@ -48,6 +50,7 @@ class UserListenerTest extends WebTestCase
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
+        self::$leadRepo = self::$dm->getRepository(Lead::class);
         self::$invitationRepo = self::$dm->getRepository(Invitation::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
     }
@@ -83,6 +86,68 @@ class UserListenerTest extends WebTestCase
 
         $user = self::$userRepo->find($user->getId());
         $this->assertTrue($user->hasReceivedInvitations());
+    }
+
+    public function testUserWithLead()
+    {
+        $email = self::generateEmail('testUserWithLead', $this);
+
+        $lead = new Lead();
+        $lead->setEmail($email);
+        $lead->setSource(Lead::LEAD_SOURCE_SCODE);
+        $lead->setSourceDetails('foo');
+        $lead = new Lead();
+        self::$dm->persist($lead);
+        self::$dm->flush();
+
+        $user = new User();
+        // set both - email canonical will get set on flush, but as we're not flushing...
+        $user->setEmail($email);
+        $user->setEmailCanonical(mb_strtolower($email));
+        self::$dm->persist($user);
+
+        $event = new UserEvent($user);
+
+        $listener = $this->getUserListener();
+        $listener->onUserUpdatedEvent($event);
+
+        /** @var User $user */
+        $user = self::$userRepo->find($user->getId());
+        $this->assertEquals($lead->getSource(), $user->getLeadSource());
+        $this->assertEquals($lead->getSourceDetails(), $user->getLeadSourceDetails());
+    }
+
+    public function testUserWithExitingDetailsAndLead()
+    {
+        $email = self::generateEmail('testUserWithExitingDetailsAndLead', $this);
+
+        $lead = new Lead();
+        $lead->setEmail($email);
+        $lead->setSource(Lead::LEAD_SOURCE_SCODE);
+        $lead->setSourceDetails('foo');
+        $lead = new Lead();
+        self::$dm->persist($lead);
+        self::$dm->flush();
+
+        $user = new User();
+        // set both - email canonical will get set on flush, but as we're not flushing...
+        $user->setEmail($email);
+        $user->setEmailCanonical(mb_strtolower($email));
+        $user->setLeadSource(Lead::LEAD_SOURCE_AFFILIATE);
+        $user->setLeadSourceDetails('bar');
+        self::$dm->persist($user);
+
+        $event = new UserEvent($user);
+
+        $listener = $this->getUserListener();
+        $listener->onUserUpdatedEvent($event);
+
+        /** @var User $user */
+        $user = self::$userRepo->find($user->getId());
+        $this->assertNotEquals($lead->getSource(), $user->getLeadSource());
+        $this->assertNotEquals($lead->getSourceDetails(), $user->getLeadSourceDetails());
+        $this->assertEquals(Lead::LEAD_SOURCE_AFFILIATE, $user->getLeadSource());
+        $this->assertEquals('bar', $user->getLeadSourceDetails());
     }
 
     public function testUserWithEmailInvitationActual()
