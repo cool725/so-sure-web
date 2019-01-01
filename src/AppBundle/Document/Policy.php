@@ -4206,7 +4206,7 @@ abstract class Policy
         if ($this->hasUnprocessedMonetaryClaim() || $this->hasUnprocessedMonetaryNetworkClaim()) {
             throw new \Exception(sprintf(
                 'There is an unprocessed monetary claim (or network claim) for policy %s (timing issue?)',
-                $this->getid()
+                $this->getId()
             ));
         }
 
