@@ -5308,6 +5308,18 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertTrue(count($data['quotes']) > 1);
         // Make sure we're not returning all the quotes
         $this->assertTrue(count($data['quotes']) < 10);
+
+        $this->assertCount(4, $data['quotes'][0]['excesses']);
+        $this->assertEquals('theft', $data['quotes'][0]['excesses'][1]['type']);
+        $this->assertEquals('150.00', $data['quotes'][0]['excesses'][1]['amount']);
+        $this->assertEquals('damage', $data['quotes'][0]['excesses'][2]['type']);
+        $this->assertEquals('150.00', $data['quotes'][0]['excesses'][2]['amount']);
+
+        $this->assertCount(4, $data['quotes'][0]['picsure_excesses']);
+        $this->assertEquals('theft', $data['quotes'][0]['picsure_excesses'][1]['type']);
+        $this->assertEquals('70.00', $data['quotes'][0]['picsure_excesses'][1]['amount']);
+        $this->assertEquals('damage', $data['quotes'][0]['picsure_excesses'][2]['type']);
+        $this->assertEquals('50.00', $data['quotes'][0]['picsure_excesses'][2]['amount']);
     }
 
     public function testUserQuoteInvalidUser()

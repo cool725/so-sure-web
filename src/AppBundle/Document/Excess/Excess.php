@@ -21,4 +21,5 @@ abstract class Excess
     abstract public function getValue($type);
 
     abstract public function toApiArray();
+    abstract public function toPriceArray();
 }

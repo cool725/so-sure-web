@@ -520,6 +520,18 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals($connectionValue, $data['quotes'][0]['connection_value']);
         $this->assertEquals($maxConnections, $data['quotes'][0]['max_connections']);
         $this->assertEquals($maxPot, $data['quotes'][0]['max_pot']);
+
+        $this->assertCount(4, $data['quotes'][0]['excesses']);
+        $this->assertEquals('theft', $data['quotes'][0]['excesses'][1]['type']);
+        $this->assertEquals('150.00', $data['quotes'][0]['excesses'][1]['amount']);
+        $this->assertEquals('damage', $data['quotes'][0]['excesses'][2]['type']);
+        $this->assertEquals('150.00', $data['quotes'][0]['excesses'][2]['amount']);
+
+        $this->assertCount(4, $data['quotes'][0]['picsure_excesses']);
+        $this->assertEquals('theft', $data['quotes'][0]['picsure_excesses'][1]['type']);
+        $this->assertEquals('70.00', $data['quotes'][0]['picsure_excesses'][1]['amount']);
+        $this->assertEquals('damage', $data['quotes'][0]['picsure_excesses'][2]['type']);
+        $this->assertEquals('50.00', $data['quotes'][0]['picsure_excesses'][2]['amount']);
     }
 
     public function testQuoteMemoryOptions()

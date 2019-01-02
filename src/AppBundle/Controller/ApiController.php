@@ -275,6 +275,7 @@ class ApiController extends BaseController
 
             $quotes = [];
             foreach ($phones as $phone) {
+                /** @var Phone $phone */
                 if ($quote = $phone->asQuoteApiArray()) {
                     $quotes[] = $quote;
                 }
