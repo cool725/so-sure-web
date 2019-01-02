@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Connection;
 
+use AppBundle\Document\Claim;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -431,20 +432,19 @@ class Connection
     public function getLinkedClaimsDuringPeriod()
     {
         $claims = [];
-        $periodStart = clone $this->getSourcePolicy()->getStart();
-        $periodEnd = clone $this->getSourcePolicy()->getEnd();
         if ($policy = $this->getLinkedPolicyRenewal()) {
             foreach ($policy->getClaims() as $claim) {
-                if ($claim->getLossDate() && $claim->getLossDate() >= $periodStart &&
-                    $claim->getLossDate() < $periodEnd) {
+                /** @var Claim $claim */
+                if ($claim->isDuringPolicyPeriod($this->getSourcePolicy())) {
                     $claims[] = $claim;
                 }
             }
         }
+
         if ($policy = $this->getLinkedPolicy()) {
             foreach ($policy->getClaims() as $claim) {
-                if ($claim->getLossDate() && $claim->getLossDate() >= $periodStart &&
-                    $claim->getLossDate() < $periodEnd) {
+                /** @var Claim $claim */
+                if ($claim->isDuringPolicyPeriod($this->getSourcePolicy())) {
                     $claims[] = $claim;
                 }
             }

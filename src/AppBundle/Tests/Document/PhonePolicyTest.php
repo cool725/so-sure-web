@@ -5304,6 +5304,70 @@ class PhonePolicyTest extends WebTestCase
         $this->assertLessThan(10, $renewed);
     }
 
+    public function testRenewPrevious()
+    {
+        $policyA1 = $this->getPolicy(
+            static::generateEmail('testRenewPrevious', $this, true),
+            new \DateTime('2017-02-01')
+        );
+        $policyA1->setStatus(Policy::STATUS_ACTIVE);
+
+        $policyB1 = $this->getPolicy(
+            static::generateEmail('testRenewPrevious', $this, true),
+            new \DateTime('2017-06-01')
+        );
+        $policyB1->setStatus(Policy::STATUS_ACTIVE);
+
+        $this->createLinkedConnections(
+            $policyA1,
+            $policyB1,
+            2,
+            2,
+            new \DateTime('2017-06-01'),
+            new \DateTime('2017-06-01')
+        );
+
+        $renewalPolicyA1 = $policyA1->createPendingRenewal(
+            $policyA1->getPolicyTerms(),
+            new \DateTime('2018-01-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA1->getStatus());
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy);
+        $renewalPolicyA1->renew(0, true, new \DateTime('2018-02-01'));
+        $renewed = 0;
+        $unrenewed = 0;
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy->getRenewalConnections());
+        foreach ($renewalPolicyA1->getRenewalConnections() as $connection) {
+            if ($connection->getRenew()) {
+                $renewed++;
+            } else {
+                $unrenewed++;
+            }
+        }
+        $this->assertEquals(0, $unrenewed);
+        $this->assertEquals(1, $renewed);
+
+        $renewalPolicyB1 = $policyB1->createPendingRenewal(
+            $policyB1->getPolicyTerms(),
+            new \DateTime('2018-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB1->getStatus());
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy);
+        $renewalPolicyB1->renew(0, true, new \DateTime('2018-06-01'));
+        $renewed = 0;
+        $unrenewed = 0;
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicy->getRenewalConnections());
+        foreach ($renewalPolicyB1->getRenewalConnections() as $connection) {
+            if ($connection->getRenew()) {
+                $renewed++;
+            } else {
+                $unrenewed++;
+            }
+        }
+        $this->assertEquals(0, $unrenewed);
+        $this->assertEquals(1, $renewed);
+    }
+
     public function testGetUnpaidReasonInvalidPolicy()
     {
         $policy = $this->getPolicy(static::generateEmail('testGetUnpaidReason', $this));

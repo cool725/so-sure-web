@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Feature;
 use AppBundle\Document\File\ProofOfLossFile;
 use AppBundle\Document\File\S3ClaimFile;
@@ -347,11 +348,15 @@ class ClaimsService
         $this->dm->flush();
         $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
         foreach ($claim->getPolicy()->getConnections() as $networkConnection) {
+            /** @var Connection $networkConnection */
             if ($networkConnection instanceof RewardConnection) {
                 $networkConnection->clearValue();
                 continue;
             }
             $networkConnection->getLinkedPolicy()->updatePotValue();
+            if ($networkConnection->getLinkedPolicyRenewal()) {
+                $networkConnection->getLinkedPolicyRenewal()->updatePotValue();
+            }
             $this->dm->flush();
             $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
         }
