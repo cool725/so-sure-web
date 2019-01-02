@@ -1001,6 +1001,22 @@ class MonitorService
         }
     }
 
+    public function expiredWaitClaimTooLong()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $tooLong = $this->now();
+        $tooLong = $tooLong->sub(new \DateInterval('P45D'));
+        $policies = $repo->findBy(['status' => Policy::STATUS_EXPIRED_WAIT_CLAIM, 'end' => ['$lt' => $tooLong]]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(sprintf(
+                "Found %d policies w/expired-wait-claim status older than 45 days. First id: %s",
+                count($policies),
+                $policies[0]->getId()
+            ));
+        }
+    }
+
     public function blockedScheduledPayments()
     {
         $repo = $this->dm->getRepository(ScheduledPayment::class);
