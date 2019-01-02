@@ -435,7 +435,7 @@ class Connection
         if ($policy = $this->getLinkedPolicyRenewal()) {
             foreach ($policy->getClaims() as $claim) {
                 /** @var Claim $claim */
-                if ($claim->isDuringPolicyPeriod($policy)) {
+                if ($claim->isDuringPolicyPeriod($this->getSourcePolicy())) {
                     $claims[] = $claim;
                 }
             }
@@ -444,7 +444,7 @@ class Connection
         if ($policy = $this->getLinkedPolicy()) {
             foreach ($policy->getClaims() as $claim) {
                 /** @var Claim $claim */
-                if ($claim->isDuringPolicyPeriod($policy)) {
+                if ($claim->isDuringPolicyPeriod($this->getSourcePolicy())) {
                     $claims[] = $claim;
                 }
             }
