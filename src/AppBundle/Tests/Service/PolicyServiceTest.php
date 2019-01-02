@@ -2626,6 +2626,85 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(10, $renewalPolicyB->getPotValue());
     }
 
+    public function testPolicyRenewalConnectionsMultiYears()
+    {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsMultiYearsA', $this, true),
+            static::generateEmail('testPolicyRenewalConnectionsMultiYearsB', $this, true),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-06-15')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2017-06-10'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-06-15'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        $this->assertNotNull($renewalPolicyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyB->getId(),
+            $renewalPolicyA->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-06-15'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $renewalPolicyAY2 = static::$policyService->createPendingRenewal(
+            $renewalPolicyA,
+            new \DateTime('2017-12-30')
+        );
+        static::$policyService->renew($renewalPolicyA, 12, null, false, new \DateTime('2017-12-31'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyAY2->getStatus());
+
+        static::$policyService->expire($renewalPolicyA, new \DateTime('2018-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $renewalPolicyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyAY2, new \DateTime('2018-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyAY2->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyAY2->getPotValue());
+
+        $renewalPolicyBY2 = static::$policyService->createPendingRenewal(
+            $renewalPolicyB,
+            new \DateTime('2018-06-10')
+        );
+        static::$policyService->renew($renewalPolicyB, 12, null, false, new \DateTime('2018-06-14'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyBY2->getStatus());
+
+        static::$policyService->expire($renewalPolicyB, new \DateTime('2018-06-15'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $renewalPolicyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyBY2, new \DateTime('2018-06-15'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyBY2->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyBY2->getPotValue());
+    }
+
     public function testPolicyRenewalConnectionsSingleReconnect()
     {
         /** @var Policy $policyA */

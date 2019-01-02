@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
+use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
@@ -1548,6 +1549,7 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+            /** @var PolicyService $policyService */
             $policyService = $this->get('app.policy');
             $cashback = null;
             if (isset($data['cashback'])) {

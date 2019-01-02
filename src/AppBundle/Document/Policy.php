@@ -1421,7 +1421,13 @@ abstract class Policy
     public function isConnected(Policy $policy)
     {
         foreach ($this->getStandardConnections() as $connection) {
+            /** @var Connection $connection */
             if ($connection->getLinkedPolicy()->getId() == $policy->getId()) {
+                return true;
+            } elseif ($connection->getLinkedPolicyRenewal() &&
+                $connection->getLinkedPolicyRenewal()->getId() == $policy->getId()) {
+                // Not sure if is required or not - there was an issue with Nick's policy missing connections
+                // which could be resolved by this
                 return true;
             }
         }
