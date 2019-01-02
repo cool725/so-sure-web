@@ -78,6 +78,7 @@ class PolicySearchType extends BaseType
                     'Bacs' => 'bacs',
                 ]
             ])
+            ->add('bacsReference', TextType::class, ['required' => false])
             ->add('sosure', ChoiceType::class, [
                 'required' => false,
                 'choices' => [

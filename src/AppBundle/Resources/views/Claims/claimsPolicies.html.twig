@@ -98,6 +98,11 @@
                 {{ form_errors(form.paymentMethod) }}
                 {{ form_widget(form.paymentMethod) }}
             </div>
+            <div class="form-group col-sm-4">
+                {{ form_label(form.bacsReference, 'Bacs Reference') }}
+                {{ form_errors(form.bacsReference) }}
+                {{ form_widget(form.bacsReference) }}
+            </div>
             <div class="form-group text-center col-sm-4">
                 {{ form_label(form.invalid, 'Include Invalid Policies') }}
                 {{ form_errors(form.invalid) }}
