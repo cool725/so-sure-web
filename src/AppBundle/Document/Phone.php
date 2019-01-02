@@ -1066,6 +1066,12 @@ class Phone
             'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
             'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
             'can_purchase' => $this->getActive(),
+            'excesses' => $currentPhonePrice->getExcess() ?
+                $currentPhonePrice->getExcess()->toApiArray() :
+                [],
+            'picsure_excesses' => $currentPhonePrice->getPicSureExcess() ?
+                $currentPhonePrice->getPicSureExcess()->toApiArray() :
+                [],
         ];
     }
 

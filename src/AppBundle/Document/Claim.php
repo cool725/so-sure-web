@@ -1500,7 +1500,7 @@ class Claim
         // Including inreview to prevent possible multiple claims at the same time
         if ($this->isLostTheft() &&
             in_array($this->getStatus(), [self::STATUS_APPROVED, self::STATUS_SETTLED, self::STATUS_INREVIEW])) {
-                return true;
+            return true;
         }
 
         return false;
@@ -1538,7 +1538,7 @@ class Claim
 
     public function hasIgnoreUserDeclined()
     {
-        return  $this->isIgnoreWarningFlagSet(self::WARNING_FLAG_IGNORE_USER_DECLINED);
+        return $this->isIgnoreWarningFlagSet(self::WARNING_FLAG_IGNORE_USER_DECLINED);
     }
 
     public function getNetwork()
@@ -1729,6 +1729,17 @@ class Claim
     public function setExpectedExcess(Excess $excess)
     {
         $this->expectedExcess = $excess;
+    }
+
+    public function isDuringPolicyPeriod(Policy $policy)
+    {
+        $periodStart = clone $policy->getStart();
+        $periodEnd = clone $policy->getEnd();
+        if ($this->getLossDate() && $this->getLossDate() >= $periodStart && $this->getLossDate() < $periodEnd) {
+            return true;
+        }
+
+        return false;
     }
 
     public static function sumClaims($claims)

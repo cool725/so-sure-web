@@ -631,6 +631,7 @@ class MonitorService
             new \MongoId('5ad5e80e75435e73e152874f'),
             new \MongoId('5bd0381fedc29544427b31ab'),
             new \MongoId('5bd03821edc29544427b31af'),
+            new \MongoId('5c2bb9f6d6c8c6148f38aed4'),
         ];
 
         $commissionValidationPolicyExclusions = [];
@@ -998,6 +999,22 @@ class MonitorService
             throw new MonitorException(
                 "IMEI number Incorrectly detected. https://wearesosure.com/admin/detected-imei"
             );
+        }
+    }
+
+    public function expiredWaitClaimTooLong()
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $tooLong = $this->now();
+        $tooLong = $tooLong->sub(new \DateInterval('P45D'));
+        $policies = $repo->findBy(['status' => Policy::STATUS_EXPIRED_WAIT_CLAIM, 'end' => ['$lt' => $tooLong]]);
+
+        if (count($policies) > 0) {
+            throw new MonitorException(sprintf(
+                "Found %d policies w/expired-wait-claim status older than 45 days. First id: %s",
+                count($policies),
+                $policies[0]->getId()
+            ));
         }
     }
 
