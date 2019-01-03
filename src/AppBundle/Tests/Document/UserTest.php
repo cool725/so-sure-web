@@ -222,11 +222,11 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->addRole('ROLE_ADMIN');
         $user->passwordChange('a', 'b', \DateTime::createFromFormat('U', time()));
-        $this->assertEquals(90, $user->isPasswordChangeRequired(null, true));
+        $this->assertEquals(90, $user->daysLeftUntilPasswordChangeRequired());
 
         $user = new User();
         $user->addRole('ROLE_ADMIN');
-        $this->assertEquals(90, $user->isPasswordChangeRequired(null, true));
+        $this->assertEquals(90, $user->daysLeftUntilPasswordChangeRequired());
 
         $user = new User();
 
@@ -235,7 +235,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
         $user->addRole('ROLE_ADMIN');
         $user->passwordChange('a', 'b', $date);
-        $this->assertEquals(60, $user->isPasswordChangeRequired(null, true));
+        $this->assertEquals(60, $user->daysLeftUntilPasswordChangeRequired());
 
         $user = new User();
 
@@ -244,7 +244,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
         $user->addRole('ROLE_ADMIN');
         $user->passwordChange('a', 'b', $date);
-        $this->assertEquals(-1, $user->isPasswordChangeRequired(null, true));
+        $this->assertEquals(-1, $user->daysLeftUntilPasswordChangeRequired());
     }
 
     public function testHasUnpaidPolicy()

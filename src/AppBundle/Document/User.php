@@ -801,24 +801,27 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->created;
     }
 
-    public function isPasswordChangeRequired(\DateTime $date = null, $returnDaysLeft = null)
+    public function isPasswordChangeRequired(\DateTime $date = null)
+    {
+        if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
+            return false;
+        }
+
+        if ($this->daysLeftUntilPasswordChangeRequired($date) > 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function daysLeftUntilPasswordChangeRequired(\DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
-            return false;
-        }
-
-        $lastPasswordChange = $this->getLastPasswordChange();
         $diff = $date->diff($this->getLastPasswordChange());
-
-        if ($returnDaysLeft) {
-            return 90 - $diff->days;
-        } else {
-            return $diff->days >= 90;
-        }
+        return 90 - $diff->days;
     }
 
     public function hasEmployeeRole()
