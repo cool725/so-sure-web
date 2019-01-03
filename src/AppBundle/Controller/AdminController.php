@@ -145,6 +145,7 @@ class AdminController extends BaseController
         }
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
         $claim = $repo->find($request->get('id'));
         if (!$claim) {
             throw $this->createNotFoundException('Claim not found');
@@ -168,9 +169,18 @@ class AdminController extends BaseController
                 $claim->getId()
             ));
         }
+
+        $claim->getPolicy()->addNoteDetails(
+            sprintf('Manually deleted claim %s, %s', $claim->getNumber(), $claim->getId()),
+            $this->getUser(),
+            sprintf('Deleted claim %s', $claim->getNumber())
+        );
+
         $dm->remove($claim);
         $dm->flush();
         $dm->clear();
+
+        $this->addFlash('success', sprintf('Successfully removed claim number %s', $claim->getNumber()));
 
         return $this->redirectToRoute('admin_claims');
     }

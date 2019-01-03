@@ -685,6 +685,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('claims_form')) {
                 $claimsForm->handleRequest($request);
                 if ($claimsForm->isValid()) {
+                    $claim->getPolicy()->addNoteDetails(
+                        sprintf('Manually updated claim %s', $claim->getNumber()),
+                        $this->getUser(),
+                        sprintf('Updated claim %s', $claim->getNumber())
+                    );
+
                     $dm->flush();
                     $this->addFlash(
                         'success',
