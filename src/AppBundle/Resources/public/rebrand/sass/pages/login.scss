@@ -41,20 +41,37 @@
     &__divider {
         text-align: center;
         margin: 1.8rem -2rem;
-        border-top: 2px solid $pale-cornflower-blue;
+        padding-bottom: 0.3rem;
         position: relative;
+
+        &:after,
+        &:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 37%; height: 2px;
+            border-top: 2px solid $pale-cornflower-blue;
+        }
+
+        &:before {
+            left: 0;
+        }
+
+        &:after {
+            right: 0;
+        }
 
         span {
             width: 100px;
-            background-color: $white;
             position: absolute;
-            top: -12px;
+            top: -10px;
             margin-left: -50px;
         }
 
         @include media-breakpoint-up(lg) {
             margin: 2.4rem -2rem;
         }
+
     }
 
     // Login Types
