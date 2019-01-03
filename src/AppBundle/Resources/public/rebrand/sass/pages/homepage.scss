@@ -21,6 +21,18 @@
 
     &__intro {
 
+        h1 {
+            font-size: 1.4rem;
+
+            @include media-breakpoint-up(ss) {
+                font-size: 1.86rem;
+            }
+
+            @include media-breakpoint-up(sm) {
+                font-size: 2.2rem;
+            }
+        }
+
         @include media-breakpoint-up(lg) {
             padding-top: 4rem;
         }
