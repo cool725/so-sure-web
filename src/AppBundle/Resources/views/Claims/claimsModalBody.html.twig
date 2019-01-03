@@ -561,7 +561,7 @@
 
                         <div class="form-group">
                             <label><i class="fa fa-lock" title="Admin only"></i> Approved Date</label>
-                                {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_widget(form.approvedDate, {'attr': {'class': 'form-control'}}) }}
                         </div>
                         <div class="help-block row">
                             <div class="col-xs-12">
@@ -569,8 +569,8 @@
                             </div>
                         </div>
                     {% else %}
-                        {% do form.status.setRendered %}
-                        {% do form.approvedDate.setRendered %}
+                        {{ form_widget(form.status, {'attr': {'class': 'hidden'}}) }}
+                        {{ form_widget(form.approvedDate, {'attr': {'class': 'hidden'}}) }}
                     {% endif %}
                     <div class="modal-footer">
                         {% if is_granted('ROLE_ADMIN') %}

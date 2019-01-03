@@ -64,7 +64,7 @@ class ClaimInfoType extends AbstractType
                 }
             ])
             ->add('status', ChoiceType::class, [
-                'required' => true,
+                'required' => false,
                 'choices' => [
                     Claim::STATUS_FNOL => Claim::STATUS_FNOL,
                     Claim::STATUS_SUBMITTED => Claim::STATUS_SUBMITTED,
