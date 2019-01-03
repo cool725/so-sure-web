@@ -361,7 +361,6 @@ class ClaimsService
             if ($networkConnection->getLinkedPolicyRenewal()
                 && $claim->isDuringPolicyPeriod($networkConnection->getLinkedPolicyRenewal())) {
                 $this->notifyMonetaryClaim($networkConnection->getLinkedPolicyRenewal(), $claim, false);
-
             } elseif ($claim->isDuringPolicyPeriod($networkConnection->getLinkedPolicyRenewal())) {
                 $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
             } else {
