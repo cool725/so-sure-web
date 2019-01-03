@@ -217,6 +217,36 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($user->isCredentialsNonExpired());
     }
 
+    public function testPasswordChangeRequiredDaysLeft()
+    {
+        $user = new User();
+        $user->addRole('ROLE_ADMIN');
+        $user->passwordChange('a', 'b', \DateTime::createFromFormat('U', time()));
+        $this->assertEquals(90, $user->isPasswordChangeRequired(null, true));
+
+        $user = new User();
+        $user->addRole('ROLE_ADMIN');
+        $this->assertEquals(90, $user->isPasswordChangeRequired(null, true));
+
+        $user = new User();
+
+        $date = \DateTime::createFromFormat('U', time());
+        $date->sub(new \DateInterval('P30D'));
+
+        $user->addRole('ROLE_ADMIN');
+        $user->passwordChange('a', 'b', $date);
+        $this->assertEquals(60, $user->isPasswordChangeRequired(null, true));
+
+        $user = new User();
+
+        $date = \DateTime::createFromFormat('U', time());
+        $date->sub(new \DateInterval('P91D'));
+
+        $user->addRole('ROLE_ADMIN');
+        $user->passwordChange('a', 'b', $date);
+        $this->assertEquals(-1, $user->isPasswordChangeRequired(null, true));
+    }
+
     public function testHasUnpaidPolicy()
     {
         $user = new User();

@@ -801,7 +801,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->created;
     }
 
-    public function isPasswordChangeRequired(\DateTime $date = null)
+    public function isPasswordChangeRequired(\DateTime $date = null, $returnDaysLeft = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -814,23 +814,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $lastPasswordChange = $this->getLastPasswordChange();
         $diff = $date->diff($this->getLastPasswordChange());
 
-        return $diff->days >= 90;
-    }
-
-    public function daysLeftUntilPasswordChangeRequired(\DateTime $date = null)
-    {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+        if ($returnDaysLeft) {
+            return 90 - $diff->days;
+        } else {
+            return $diff->days >= 90;
         }
-
-        if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
-            return false;
-        }
-
-        $lastPasswordChange = $this->getLastPasswordChange();
-        $diff = $date->diff($this->getLastPasswordChange());
-
-        return 90 - $diff->days;
     }
 
     public function hasEmployeeRole()

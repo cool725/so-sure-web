@@ -48,7 +48,7 @@
                         {% if user.isPasswordChangeRequired %}
                             Expired
                         {% else %}
-                            Not Expired ( {{ user.daysLeftUntilPasswordChangeRequired }} days left )
+                            Not Expired ( {{ user.isPasswordChangeRequired(null, true) }} days left )
                         {% endif %}
                     </td>
                     <td>
