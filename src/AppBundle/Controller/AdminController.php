@@ -46,7 +46,7 @@ use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
-use Predis\Collection\Iterator\SetKey;
+use Predis\Collection\Iterator\SortedSetKey;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1664,8 +1664,8 @@ class AdminController extends BaseController
 
             $pattern = '*' . $policy->getId() . '*';
 
-            foreach (new SetKey($redis, 'policy:validation', $pattern) as $key) {
-                $redis->srem('policy:validation', $key);
+            foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
+                $redis->zrem('policy:validation', $member);
             }
 
             $this->addFlash('success', sprintf(
@@ -1677,7 +1677,7 @@ class AdminController extends BaseController
         }
 
         return [
-            'validation' => $redis->smembers('policy:validation'),
+            'validation' => $redis->zrange('policy:validation', 0, -1),
         ];
     }
 }
