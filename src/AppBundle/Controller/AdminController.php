@@ -46,7 +46,7 @@ use AppBundle\Service\SalvaExportService;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
-use Predis\Collection\Iterator\SetKey;
+use Predis\Collection\Iterator\SortedSetKey;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -145,6 +145,7 @@ class AdminController extends BaseController
         }
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
+        /** @var Claim $claim */
         $claim = $repo->find($request->get('id'));
         if (!$claim) {
             throw $this->createNotFoundException('Claim not found');
@@ -168,9 +169,18 @@ class AdminController extends BaseController
                 $claim->getId()
             ));
         }
+
+        $claim->getPolicy()->addNoteDetails(
+            sprintf('Manually deleted claim %s, %s', $claim->getNumber(), $claim->getId()),
+            $this->getUser(),
+            sprintf('Deleted claim %s', $claim->getNumber())
+        );
+
         $dm->remove($claim);
         $dm->flush();
         $dm->clear();
+
+        $this->addFlash('success', sprintf('Successfully removed claim number %s', $claim->getNumber()));
 
         return $this->redirectToRoute('admin_claims');
     }
@@ -1664,8 +1674,8 @@ class AdminController extends BaseController
 
             $pattern = '*' . $policy->getId() . '*';
 
-            foreach (new SetKey($redis, 'policy:validation', $pattern) as $key) {
-                $redis->srem('policy:validation', $key);
+            foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
+                $redis->zrem('policy:validation', $member);
             }
 
             $this->addFlash('success', sprintf(
@@ -1677,7 +1687,7 @@ class AdminController extends BaseController
         }
 
         return [
-            'validation' => $redis->smembers('policy:validation'),
+            'validation' => $redis->zrange('policy:validation', 0, -1),
         ];
     }
 }

@@ -270,11 +270,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $lines = array_merge($lines, $this->header($policy));
                         $lines = array_merge($lines, $validation);
                         $csvData[$policy->getPolicyNumber()] = $validation;
-                        $this->redis->sadd('policy:validation', serialize([
+                        $this->redis->zadd('policy:validation', [serialize([
                             'id' => $policy->getId(),
                             'policyNumber' => $policy->getPolicyNumber(),
                             'issues' => $validation,
-                        ]));
+                        ]) => 0]);
                     }
                 }
 
@@ -540,8 +540,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
         } catch (\Exception $e) {
-            // TODO: May want to swallow some exceptions here
-            throw $e;
+            $lines[] = sprintf('Exception!! Msg; %s', $e->getMessage());
         }
 
         return $lines;
