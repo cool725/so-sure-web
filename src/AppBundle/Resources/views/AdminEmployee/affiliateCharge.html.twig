@@ -48,7 +48,8 @@
                         <tr><td>CPA</td><td>£{{ affiliate.cpa }}</td></tr>
                         <tr><td>Charge Model</td><td>{{ affiliate.chargeModel }}</td></tr>
                         <tr><td>Days</td><td>{{ affiliate.days }}</td></tr>
-                        <tr><td>Renewal Days</td><td>{{ affiliate.renewalDays }}</td></tr>
+                        {% if affiliate.chargeModel == 'ongoing' %}<tr><td>Renewal Days</td><td>{{ affiliate.renewalDays }}</td></tr>{% endif %}
+                        <tr><td>Campaign Name</td><td>{{ affiliate.campaignName }}</td></tr>
                         <tr><td>Campaign Source</td><td>{{ affiliate.campaignSource }}</td></tr>
                         <tr><td>Lead Source</td><td>{{ affiliate.leadSource }}</td></tr>
                         <tr><td>Lead Source Details</td><td>{{ affiliate.leadSourceDetails }}</td></tr>

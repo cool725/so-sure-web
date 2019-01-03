@@ -285,6 +285,16 @@
                         </td>
                 </tr>
                 {% endif %}
+                <tr>
+                    <td>Attribution</td>
+                    <td>{{ user.attribution }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Latest Attribution</td>
+                    <td>{{ user.latestAttribution }}</td>
+                    <td></td>
+                </tr>
             </table>
 </div>
 {% if policy_form is defined %}
