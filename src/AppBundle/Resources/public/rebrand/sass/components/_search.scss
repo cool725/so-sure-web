@@ -44,7 +44,7 @@
             }
         }
 
-        @include media-breakpoint-up(sm) {
+        @include media-breakpoint-up(ss) {
             background-position:  right 20px;
 
             &.valid-select {
