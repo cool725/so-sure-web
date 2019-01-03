@@ -213,7 +213,7 @@ trait UserClassTrait
             // Many tests rely on past dates, so ensure the date is ok for the past
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
-            } else if (!$phone->getCurrentPhonePrice($date) || !$phone->getCurrentPhonePrice($date)->getExcess()) {
+            } elseif (!$phone->getCurrentPhonePrice($date) || !$phone->getCurrentPhonePrice($date)->getExcess()) {
                 $phone = null;
             }
 
