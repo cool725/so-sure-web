@@ -162,6 +162,11 @@ trait DateTrait
         return !in_array((int) $date->format('w'), [0, 6]);
     }
 
+    public static function isWeekendOrBankHoliday(\DateTime $date)
+    {
+        return !static::isWeekDay($date) || static::isBankHoliday($date);
+    }
+
     public function getCurrentOrNextBusinessDay(\DateTime $date, \DateTime $now = null)
     {
         if (!$now) {
@@ -175,7 +180,7 @@ trait DateTrait
             $businessDays = clone $date;
         }
 
-        if (static::isWeekDay($businessDays) && !static::isBankHoliday($businessDays)) {
+        if (!static::isWeekendOrBankHoliday($businessDays)) {
             return $businessDays;
         }
 
@@ -195,7 +200,7 @@ trait DateTrait
             $businessDays = clone $date;
         }
 
-        if (static::isWeekDay($businessDays) && !static::isBankHoliday($businessDays)) {
+        if (!static::isWeekendOrBankHoliday($businessDays)) {
             return $businessDays;
         }
 
@@ -240,9 +245,7 @@ trait DateTrait
             //print $days . PHP_EOL;
             //print $businessDays->format('w') . PHP_EOL;
             //print $businessDays->format(\DateTime::ATOM) . PHP_EOL;
-            if (!static::isWeekDay($businessDays)) {
-                $isBusinessDay = false;
-            } elseif (static::isBankHoliday(($businessDays))) {
+            if (static::isWeekendOrBankHoliday($businessDays)) {
                 $isBusinessDay = false;
             }
             //print $isBusinessDay ? 'true' : 'false' . PHP_EOL;
@@ -261,9 +264,7 @@ trait DateTrait
         while ($days > 0) {
             $isBusinessDay = true;
             $businessDays->sub(new \DateInterval('P1D'));
-            if (!static::isWeekDay($businessDays)) {
-                $isBusinessDay = false;
-            } elseif (static::isBankHoliday(($businessDays))) {
+            if (static::isWeekendOrBankHoliday($businessDays)) {
                 $isBusinessDay = false;
             }
 
@@ -327,7 +328,7 @@ trait DateTrait
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         $time = 'in the next 3 hours';
-        if (!static::isWeekDay($date) || static::isBankHoliday($date)) {
+        if (static::isWeekendOrBankHoliday($date)) {
             $time = 'on the morning of the next working day';
         } elseif ($date->format('G') < 9) {
             $time = 'by 11am';

@@ -109,7 +109,7 @@ trait UserClassTrait
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
 
             // still getting no excess on occasion. if so try resetting the phone
-            $recursionPrevention = 0;
+            $infiniteLoopPrevention = 0;
             while (!$policy->getCurrentExcess()) {
                 /** @var PhonePremium $premium */
                 $premium = $policy->getPremium();
@@ -118,11 +118,14 @@ trait UserClassTrait
                     $premium->clearPicSureExcess();
                 }
 
-                usleep(100);
-                $policy->setPhone(self::getRandomPhone(self::$dm), $date);
-                $recursionPrevention++;
-                if ($recursionPrevention > 25) {
-                    throw new \Exception(sprintf('Excess recursion (%s)', $user->getEmail()));
+                usleep(10 * $infiniteLoopPrevention);
+                $policy->setPhone(self::getRandomPhone(self::$dm, null, $date), $date);
+                $infiniteLoopPrevention++;
+                if ($infiniteLoopPrevention > 50) {
+                    throw new \Exception(sprintf(
+                        'Infitine loop prevention in createUserPolicy (%s)',
+                        $user->getEmail()
+                    ));
                 }
             }
 
@@ -190,7 +193,7 @@ trait UserClassTrait
         return $mobile;
     }
 
-    public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
+    public static function getRandomPhone(DocumentManager $dm, $make = null, \DateTime $date = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
         $query = [
@@ -202,17 +205,24 @@ trait UserClassTrait
         }
         $phones = $phoneRepo->findBy($query);
         $phone = null;
+        $infiniteLoopPrevention = 0;
         while ($phone == null) {
             /** @var Phone $phone */
             $phone = $phones[random_int(0, count($phones) - 1)];
+
             // Many tests rely on past dates, so ensure the date is ok for the past
             if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
                 $phone = null;
-                continue;
-            }
-            if (!$phone->getCurrentPhonePrice() || !$phone->getCurrentPhonePrice()->getExcess()) {
+            } elseif (!$phone->getCurrentPhonePrice($date) || !$phone->getCurrentPhonePrice($date)->getExcess()) {
                 $phone = null;
-                continue;
+            }
+
+            $infiniteLoopPrevention++;
+            if ($infiniteLoopPrevention > 50) {
+                throw new \Exception(sprintf(
+                    'Infinite loop prevention in getRandomPhone (date: %s)',
+                    $date ? $date->format(\DateTime::ATOM) : 'null'
+                ));
             }
         }
 
