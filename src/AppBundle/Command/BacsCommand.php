@@ -137,8 +137,13 @@ class BacsCommand extends ContainerAwareCommand
         $metadata = true === $input->getOption('metadata');
         $prefix = $input->getArgument('prefix');
         $processingDate = null;
+        $now = \DateTime::createFromFormat('U', time());
+        if ($this->isWeekendOrBankHoliday($now)) {
+            throw new \Exception('Unable to run on bank holidays or weekends');
+        }
         if ($date) {
             $processingDate = new \DateTime($date);
+
         } else {
             $processingDate = \DateTime::createFromFormat('U', time());
             $processingDate = $this->addBusinessDays($processingDate, 1);
