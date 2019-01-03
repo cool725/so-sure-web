@@ -156,9 +156,10 @@ class AdminControllerTest extends BaseControllerTest
         $form['link_claim_form[number]'] = $claim->getNumber();
         $form['link_claim_form[note]'] = 'A test justification';
 
-        self::$client->followRedirects();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->expectFlashSuccess($crawler, 'successfully linked');
 
         $dm = $this->getDocumentManager(true);
         $repoPolicy = $dm->getRepository(Policy::class);

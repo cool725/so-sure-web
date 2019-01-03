@@ -3838,6 +3838,7 @@ class PolicyServiceTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $claimB->setType(Claim::TYPE_LOSS);
         $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $claimB->setProcessed(true);
         $policyB->addClaim($claimB);
 
         $paymentA = new JudoPayment();
@@ -3935,6 +3936,7 @@ class PolicyServiceTest extends WebTestCase
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $claimB->setType(Claim::TYPE_LOSS);
         $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $claimB->setProcessed(true);
         $policyB->addClaim($claimB);
 
         $paymentA = new JudoPayment();
@@ -4521,6 +4523,7 @@ class PolicyServiceTest extends WebTestCase
         $claimA = new Claim();
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setProcessed(true);
         $policyA->addClaim($claimA);
 
         $this->assertNotNull($policyA->getNextPolicy());
