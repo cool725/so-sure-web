@@ -89,6 +89,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false)
      */
     protected $leadSourceDetails;
 
@@ -332,6 +333,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @MongoDB\EmbedOne(targetDocument="Attribution")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false)
      */
     protected $attribution;
 
