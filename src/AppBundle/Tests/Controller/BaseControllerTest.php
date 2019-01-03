@@ -315,7 +315,8 @@ class BaseControllerTest extends WebTestCase
 
         $this->assertContains(
             $message,
-            sprintf('%s %s', $rebrand, $oldSite)
+            sprintf('%s %s', $rebrand, $oldSite),
+            $crawler->html()
         );
     }
 
