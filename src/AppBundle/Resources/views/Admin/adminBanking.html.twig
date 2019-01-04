@@ -45,7 +45,7 @@
                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
                         > Lloyds</button>
                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reconciliationModal"
-                        > Reconcile {% if reconcilationFiles|length > 0 %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-clock-o text-warning"></i>{% endif %} </button>
+                        > Reconcile {% if reconciliation.files|length > 0 %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-clock-o text-warning"></i>{% endif %} </button>
                 </div>
             </div>
         </div>
@@ -874,7 +874,7 @@
                     {% endif %}
 
                     {% set lloyds_total = 0 %}
-                    {% for file in lloydsFiles %}
+                    {% for file in lloyds.files %}
                         {% for date,amount in file.dailyBacs %}
                             {% if date[:6] == ym %}
                                 {% set lloyds_total = lloyds_total + amount %}
@@ -971,7 +971,7 @@
                                 {% endif %}
 
                                 {% set foundFileInDate = false %}
-                                {% for lloydsFile in lloydsFiles %}
+                                {% for lloydsFile in lloyds.files %}
                                     {% for item in lloydsFile.getBacsTransactionsByType('bacs', received_date) %}
                                         {% if equal_to_two_dp(amount, item) %}
                                             {% set foundFileInDate = true %}
@@ -1027,7 +1027,7 @@
                                 {% for ref,amount in file.metadata['amounts'] %}
                                     {% set amount = 0 - amount %}
                                     {% set foundFileInDate = false %}
-                                    {% for lloydsFile in lloydsFiles %}
+                                    {% for lloydsFile in lloyds.files %}
                                         {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
                                             {% if equal_to_two_dp(amount, item) %}
                                                 {% set foundFileInDate = true %}
@@ -1083,7 +1083,7 @@
 
                                     {% set amount = 0 - amount %}
                                     {% set foundFileInDate = false %}
-                                    {% for lloydsFile in lloydsFiles %}
+                                    {% for lloydsFile in lloyds.files %}
                                         {% for item in lloydsFile.getBacsTransactionsByType('bacs-ddic', received_date) %}
                                             {% if equal_to_two_dp(amount, item) %}
                                                 {% set foundFileInDate = true %}
@@ -1145,7 +1145,7 @@
                     <hr>
                     <h2>Files</h2>
                     <table width="100%" class="table table-striped">
-                        {% for judoFile in judoFiles %}
+                        {% for judoFile in judo.files %}
                             <tr>
                                 <td>
                                     <a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a>
@@ -1186,7 +1186,7 @@
               <hr>
               <h2>Files</h2>
               <table width="100%" class="table table-striped">
-                  {% for barclaysFile in barclaysFiles %}
+                  {% for barclaysFile in barclays.files %}
                       <tr>
                           <td><a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a>
                               <br><i class="fa fa-plus-circle" title="Created"></i> {{ barclaysFile.created|date() }}
@@ -1266,7 +1266,7 @@
               <hr>
               <h2>Files</h2>
               <table width="100%" class="table table-striped">
-                  {% for lloydsFile in lloydsFiles %}
+                  {% for lloydsFile in lloyds.files %}
                   <tr>
                       <td><a href="{{ s3DownloadLink(lloydsFile.bucket, lloydsFile.key) }}">{{ lloydsFile.fileName }}</a>
                           <br><i class="fa fa-plus-circle" title="Created"></i> {{ lloydsFile.created|date() }}
@@ -1316,7 +1316,7 @@
                     <hr>
                     <h2>Files</h2>
                     <table width="100%" class="table table-striped">
-                        {% for reconcilationFile in reconcilationFiles %}
+                        {% for reconcilationFile in reconciliation.files %}
                             <tr>
                                 <td><a href="{{ s3DownloadLink(reconcilationFile.bucket, reconcilationFile.key) }}">{{ reconcilationFile.fileName }}</a></td>
                                 <td style="word-break:break-all;">
@@ -1343,7 +1343,7 @@
                     <div class="panel-group" id="payments-accordion" role="tablist" aria-multiselectable="true">
                         {% set day = 0 %}
                         {% set firstDay = true %}
-                        {% for payment in payments %}
+                        {% for payment in sosure.payments %}
                             {% set newDay = false  %}
                             {% if payment.date|date('d', 'Europe/London') != day %}
                                 {% set newDay = true  %}
