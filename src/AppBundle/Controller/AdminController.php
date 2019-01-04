@@ -1187,33 +1187,27 @@ class AdminController extends BaseController
         $cashflowsFileRepo = $dm->getRepository(CashflowsFile::class);
 
         $monthlyCashflowFiles = $cashflowsFileRepo->getMonthlyFiles($date);
-        /*
-        $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
-        $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
 
-        $yearlyBarclaysFiles = $barclaysFileRepo->getYearlyFilesToDate($date);
-        $yearlyBarclaysTransaction = BarclaysFile::combineDailyTransactions($yearlyBarclaysFiles);
-        $yearlyBarclaysProcessing = BarclaysFile::combineDailyProcessing($yearlyBarclaysFiles);
+        $monthlyPerDayCashflowsTransaction = CashflowsFile::combineDailyTransactions($monthlyCashflowFiles);
+        $monthlyPerDayCashflowsProcessing = CashflowsFile::combineDailyProcessing($monthlyCashflowFiles);
 
-        $allBarclaysFiles = $barclaysFileRepo->getAllFilesToDate($date);
-        $allBarclaysTransaction = BarclaysFile::combineDailyTransactions($allBarclaysFiles);
-        $allBarclaysProcessing = BarclaysFile::combineDailyProcessing($allBarclaysFiles);
+        $yearlyCashflowFiles = $cashflowsFileRepo->getYearlyFilesToDate($date);
+        $yearlyCashflowsTransaction = CashflowsFile::combineDailyTransactions($yearlyCashflowFiles);
+        $yearlyCashflowsProcessing = CashflowsFile::combineDailyProcessing($yearlyCashflowFiles);
 
-        $barclays = [
-            'dailyTransaction' => $monthlyPerDayBarclaysTransaction,
-            'dailyProcessed' => $monthlyPerDayBarclaysProcessing,
-            'monthlyTransaction' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysTransaction, $year, $month),
-            'monthlyProcessed' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysProcessing, $year, $month),
-            'yearlyTransaction' => BarclaysFile::totalCombinedFiles($yearlyBarclaysTransaction),
-            'yearlyProcessed' => BarclaysFile::totalCombinedFiles($yearlyBarclaysProcessing),
-            'allTransaction' => BarclaysFile::totalCombinedFiles($allBarclaysTransaction),
-            'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysProcessing),
-            'files' => $monthlyBarclaysFiles,
-        ];
+        $allCashflowsFiles = $cashflowsFileRepo->getAllFilesToDate($date);
+        $allCashflowsTransaction = CashflowsFile::combineDailyTransactions($allCashflowsFiles);
+        $allCashflowsProcessing = CashflowsFile::combineDailyProcessing($allCashflowsFiles);
 
-        return $barclays;
-        */
         $cashflows = [
+            'dailyTransaction' => $monthlyPerDayCashflowsTransaction,
+            'dailyProcessed' => $monthlyPerDayCashflowsProcessing,
+            'monthlyTransaction' => CashflowsFile::totalCombinedFiles($monthlyPerDayCashflowsTransaction, $year, $month),
+            'monthlyProcessed' => CashflowsFile::totalCombinedFiles($monthlyPerDayCashflowsProcessing, $year, $month),
+            'yearlyTransaction' => CashflowsFile::totalCombinedFiles($yearlyCashflowsTransaction),
+            'yearlyProcessed' => CashflowsFile::totalCombinedFiles($yearlyCashflowsProcessing),
+            'allTransaction' => CashflowsFile::totalCombinedFiles($allCashflowsTransaction),
+            'allProcessed' => CashflowsFile::totalCombinedFiles($allCashflowsProcessing),
             'files' => $monthlyCashflowFiles,
         ];
 

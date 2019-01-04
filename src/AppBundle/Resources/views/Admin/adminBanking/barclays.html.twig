@@ -156,7 +156,7 @@
                 <th>Cumulative Diff</th>
             </tr>
             {% set cumulative = 0 %}
-            {% for ymd in dates.ymd %}
+            {% for day,ymd in dates.ymd %}
                 {% set color = '' %}
                 {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
                     {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
@@ -166,7 +166,7 @@
                     {% endif %}
                 {% endif %}
                 <tr class='{{ color }}'>
-                    <td>{{ ymd|slice(6,2) }}</td>
+                    <td>{{ day }}</td>
                     <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                     <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                     <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
