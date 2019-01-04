@@ -1140,7 +1140,7 @@ class AdminController extends BaseController
             'lloyds' => $this->getLloydsBanking($date, $year, $month),
             'barclays' => $this->getBarclaysBanking($date, $year, $month),
             'sosure' => $sosure,
-            'reconciliation' => $this->getReconcilationBanking($date, $year, $month),
+            'reconciliation' => $this->getReconcilationBanking($date),
             'salva' => $this->getSalvaBanking($date, $year, $month),
             'judo' => $this->getJudoBanking($date, $year, $month),
             'cashflows' => $this->getCashflowsBanking($date, $year, $month),
@@ -1259,7 +1259,7 @@ class AdminController extends BaseController
         return $sosure;
     }
 
-    private function getReconcilationBanking(\DateTime $date, $year, $month)
+    private function getReconcilationBanking(\DateTime $date)
     {
         $dm = $this->getManager();
 
