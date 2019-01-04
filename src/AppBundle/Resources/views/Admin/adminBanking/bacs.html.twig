@@ -3,7 +3,7 @@
         {% set inputTotal = 0 %}
         {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
             {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-            {% if received_date|date('m') == month %}
+            {% if received_date|date('m') == dates.month %}
                 {% set amount = null %}
                 {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
                     {% set amount = file.metadata['debit-accepted-value'] %}
@@ -25,7 +25,7 @@
         {% set aruddTotal = 0 %}
         {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
             {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-            {% if received_date|date('m') == month %}
+            {% if received_date|date('m') == dates.month %}
                 {% for ref,amount in file.metadata['amounts'] %}
                     {% set amount = 0 - amount %}
                     {% set aruddTotal = aruddTotal + amount %}
@@ -36,7 +36,7 @@
         {% set ddicTotal = 0 %}
         {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-amount'] is defined %}
             {% set received_date = day(file.metadata['refund-date']) %}
-            {% if received_date|date('m') == month %}
+            {% if received_date|date('m') == dates.month %}
                 {% for ref,amount in file.metadata['refund-details'] %}
                     {% set amount = 0 - amount %}
                     {% set ddicTotal = ddicTotal + amount %}
@@ -44,16 +44,10 @@
             {% endif %}
         {% endfor %}
 
-        {% if month < 10 %}
-            {% set ym = year ~ "0" ~ month %}
-        {% else %}
-            {% set ym = year ~ month %}
-        {% endif %}
-
         {% set lloyds_total = 0 %}
         {% for file in lloyds.files %}
             {% for date,amount in file.dailyBacs %}
-                {% if date[:6] == ym %}
+                {% if date[:6] == dates.ym %}
                     {% set lloyds_total = lloyds_total + amount %}
                 {% endif %}
             {% endfor %}
@@ -134,7 +128,7 @@
             {% set subtotal_found = 0 %}
             {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
                 {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-                {% if received_date|date('m') == month %}
+                {% if received_date|date('m') == dates.month %}
                     {% set amount = null %}
                     {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
                         {% set amount = file.metadata['debit-accepted-value'] %}
@@ -200,7 +194,7 @@
             {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
                 {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
 
-                {% if received_date|date('m') == month %}
+                {% if received_date|date('m') == dates.month %}
                     {% for ref,amount in file.metadata['amounts'] %}
                         {% set amount = 0 - amount %}
                         {% set foundFileInDate = false %}
@@ -255,7 +249,7 @@
             {% set subtotal_found = 0 %}
             {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-details'] is defined %}
                 {% set received_date = day(file.metadata['refund-date']) %}
-                {% if received_date|date('m') == month %}
+                {% if received_date|date('m') == dates.month %}
                     {% for ref,amount in file.metadata['refund-details'] %}
 
                         {% set amount = 0 - amount %}

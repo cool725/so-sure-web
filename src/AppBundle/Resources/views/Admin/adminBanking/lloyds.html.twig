@@ -36,7 +36,7 @@
                 <th>Lloyds</th>
             </tr>
             <tr>
-                <td>Month)</td>
+                <td>Month</td>
                 <td>£{{ lloyds['monthlyReceived']|number_format(2, '.', ',') }}</td>
             </tr>
             <tr>
@@ -62,16 +62,7 @@
                 <th>Cumulative Diff</th>
             </tr>
             {% set cumulative = 0 %}
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
+            {% for day,ymd in dates.ymd %}
                 {% set color = '' %}
                 {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
                     {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
@@ -108,14 +99,7 @@
                     </td>
                 </tr>
             {% endfor %}
-            {% for next_month_day in 1..3 %}
-                {% if month == 12 %}
-                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                {% elseif month >= 9 %}
-                    {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                {% else %}
-                    {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                {% endif %}
+            {% for day,ymd in dates.next_ymd %}
                 {% set color = '' %}
                 {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
                     {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
@@ -125,7 +109,7 @@
                     {% endif %}
                 {% endif %}
                 <tr class='{{ color }}'>
-                    <td>{{ next_month_day }}</td>
+                    <td>{{ day }}</td>
                     <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                     <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                     <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
@@ -153,31 +137,15 @@
                 <th>Day of Month</th>
                 <th>Lloyds</th>
             </tr>
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
+            {% for ymd in dates.ymd %}
                 <tr>
-                    <td>{{ day }}</td>
+                    <td>{{ ymd|slice(6,2) }}</td>
                     <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
-            {% for next_month_day in 1..5 %}
-                {% if month == 12 %}
-                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                {% elseif month >= 9 %}
-                    {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                {% else %}
-                    {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                {% endif %}
+            {% for ymd in dates.next_ymd %}
                 <tr>
-                    <td>{{ next_month_day }}</td>
+                    <td>{{ ymd|slice(6,2) }}</td>
                     <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}

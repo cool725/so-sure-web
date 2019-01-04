@@ -1136,9 +1136,7 @@ class AdminController extends BaseController
             'lloydsForm' => $lloydsForm->createView(),
             'reconciliationForm' => $reconciliationForm->createView(),
             'cashflowsForm' => $cashflowsForm->createView(),
-            'year' => $year,
-            'month' => $month,
-            'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
+            'dates' => $this->getYMD($year, $month),
             'lloyds' => $this->getLloydsBanking($date, $year, $month),
             'barclays' => $this->getBarclaysBanking($date, $year, $month),
             'sosure' => $sosure,
@@ -1151,6 +1149,33 @@ class AdminController extends BaseController
             'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
             'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false),
+        ];
+    }
+
+    private function getYMD($year, $month, $daysInNextMonth = 3)
+    {
+        $ymd = [];
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $ymd[$day] = sprintf('%d%02d%02d', $year, $month, $day);
+        }
+
+        $nextMonth = $month + 1;
+        $nextMonthYear = $year;
+        if ($nextMonth > 12) {
+            $nextMonth = 1;
+            $nextMonthYear += 1;
+        }
+        for ($day = 1; $day <= $daysInNextMonth; $day++) {
+            $nextMonthYMD[$day] = sprintf('%d%02d%02d', $nextMonthYear, $nextMonth, $day);
+        }
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'ym' => sprintf('%d%02d', $year, $month),
+            'ymd' => $ymd,
+            'next_ymd' => $nextMonthYMD,
         ];
     }
 

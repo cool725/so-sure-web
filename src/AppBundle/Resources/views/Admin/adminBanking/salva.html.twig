@@ -4,16 +4,7 @@
         {% set sosureTotal = 0 %}
         {% set sosureShiftedTotal = 0 %}
         {% set salvaTotal = 0 %}
-        {% for day in 1..days_in_month %}
-            {% if month < 10 and day < 10 %}
-                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-            {% elseif day < 10 %}
-                {% set ymd = year ~ month ~ "0" ~ day %}
-            {% elseif month < 10 %}
-                {% set ymd = year ~ "0" ~ month ~ day %}
-            {% else %}
-                {% set ymd = year ~ month ~ day %}
-            {% endif %}
+        {% for day,ymd in dates.ymd %}
             {% if sosure['dailyTransaction'][day] is defined %}
                 {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
             {% endif %}
@@ -74,16 +65,7 @@
                 <th>Cumulative Diff</th>
             </tr>
             {% set cumulative = 0 %}
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
+            {% for day,ymd in dates.ymd %}
                 {% set color = '' %}
                 {% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined  %}
                     {% if equal_to_two_dp(sosure['dailyTransaction'][day], salva['dailyTransaction'][ymd]) %}

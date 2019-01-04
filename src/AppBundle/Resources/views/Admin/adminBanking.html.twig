@@ -15,13 +15,13 @@
 
     <div class="row">
         <div class="col-md-4">
-            <h1>Banking {{ month }} / {{ year }}</h1>
+            <h1>Banking {{ dates.month }} / {{ dates.year }}</h1>
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
         <div class="col-md-3">
             <div class="form-group" style="padding-top: 15px;">
                 <div class="input-group date month" data-url="{{ path('admin_banking') }}">
-                    <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
+                    <input name="banking" type='text' class="form-control" value="{{dates.month}}-{{dates.year}}" />
                     <span class="input-group-addon">
                         <span class="fa fa-calendar"></span>
                     </span>

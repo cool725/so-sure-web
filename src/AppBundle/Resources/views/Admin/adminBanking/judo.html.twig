@@ -3,16 +3,7 @@
         <h3>Transaction Date</h3>
         {% set sosureTotal = 0 %}
         {% set judoTotal = 0 %}
-        {% for day in 1..days_in_month %}
-            {% if month < 10 and day < 10 %}
-                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-            {% elseif day < 10 %}
-                {% set ymd = year ~ month ~ "0" ~ day %}
-            {% elseif month < 10 %}
-                {% set ymd = year ~ "0" ~ month ~ day %}
-            {% else %}
-                {% set ymd = year ~ month ~ day %}
-            {% endif %}
+        {% for day,ymd in dates.ymd %}
             {% if sosure['dailyJudoTransaction'][day] is defined %}
                 {% set sosureTotal = sosureTotal + sosure['dailyJudoTransaction'][day] %}
             {% endif %}
@@ -98,16 +89,7 @@
                 <th>Cumulative Diff</th>
             </tr>
             {% set cumulative = 0 %}
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
+            {% for day,ymd in dates.ymd %}
                 {% set color = '' %}
                 {% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
                     {% if equal_to_two_dp(sosure['dailyJudoTransaction'][day], judo['dailyTransaction'][ymd]) %}
