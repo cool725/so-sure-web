@@ -1166,6 +1166,7 @@ class AdminController extends BaseController
             $nextMonth = 1;
             $nextMonthYear += 1;
         }
+        $nextMonthYMD = [];
         for ($day = 1; $day <= $daysInNextMonth; $day++) {
             $nextMonthYMD[$day] = sprintf('%d%02d%02d', $nextMonthYear, $nextMonth, $day);
         }
