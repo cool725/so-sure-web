@@ -473,7 +473,10 @@
                                             {% else %}
                                                 {{ policy.payerOrUser.paymentMethod }}
                                             {% endif %}
-                                            (Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }})
+                                            <br>
+                                            Reference: {{ policy.payerOrUser.paymentMethod.bankAccount.reference }}
+                                            <br>
+                                            Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }}
                                             <br>
                                             Initial date: {{  policy.payerOrUser.paymentMethod.bankAccount.initialNotificationDate| date('d M Y')   }}
                                             <br>
