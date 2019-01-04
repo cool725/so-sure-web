@@ -942,6 +942,7 @@ abstract class BaseController extends Controller
             'postcode' => 'billingAddress.postcode',
             'facebookId' => 'facebookId',
             'paymentMethod' => 'paymentMethod.type',
+            'bacsReference' => 'paymentMethod.bankAccount.reference'
         ];
         foreach ($userFormData as $formField => $dataField) {
             $ids = $this->queryToMongoSearch(
@@ -1005,7 +1006,6 @@ abstract class BaseController extends Controller
         }
 
         return [
-
             'policies' => $pager->getCurrentPageResults(),
             'pager' => $pager,
             'form' => $form->createView(),
