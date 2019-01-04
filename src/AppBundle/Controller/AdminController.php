@@ -9,11 +9,13 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportDdicFile;
 use AppBundle\Document\File\BacsReportInputFile;
+use AppBundle\Document\File\CashflowsFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\PolicyStatusType;
@@ -29,6 +31,7 @@ use AppBundle\Repository\File\BacsReportDdicFileRepository;
 use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
+use AppBundle\Repository\File\CashflowsFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
 use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
@@ -38,6 +41,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
+use AppBundle\Service\CashflowsService;
 use AppBundle\Service\ClaimsService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
@@ -998,6 +1002,10 @@ class AdminController extends BaseController
         $barclaysStatementForm = $this->get('form.factory')
             ->createNamedBuilder('barclays_statement', BarclaysStatementFileType::class, $barclaysStatementFile)
             ->getForm();
+        $cashflowsFile = new CashflowsFile();
+        $cashflowsForm = $this->get('form.factory')
+            ->createNamedBuilder('cashflows', CashflowsFileType::class, $cashflowsFile)
+            ->getForm();
         $lloydsFile = new LloydsFile();
         $lloydsForm = $this->get('form.factory')
             ->createNamedBuilder('lloyds', LloydsFileType::class, $lloydsFile)
@@ -1064,6 +1072,25 @@ class AdminController extends BaseController
                         'month' => $date->format('n'),
                     ]);
                 }
+            } elseif ($request->request->has('cashflows')) {
+                $cashflowsForm->handleRequest($request);
+                if ($cashflowsForm->isSubmitted() && $cashflowsForm->isValid()) {
+                    $dm = $this->getManager();
+                    $cashflowsFile->setBucket('admin.so-sure.com');
+                    $cashflowsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    /** @var CashflowsService $cashflowsService */
+                    $cashflowsService = $this->get('app.cashflows');
+                    $data = $cashflowsService->processCsv($cashflowsFile);
+
+                    $dm->persist($cashflowsFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('n'),
+                    ]);
+                }
             } elseif ($request->request->has('lloyds')) {
                 $lloydsForm->handleRequest($request);
                 if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
@@ -1108,6 +1135,7 @@ class AdminController extends BaseController
             'barclaysStatementForm' => $barclaysStatementForm->createView(),
             'lloydsForm' => $lloydsForm->createView(),
             'reconciliationForm' => $reconciliationForm->createView(),
+            'cashflowsForm' => $cashflowsForm->createView(),
             'year' => $year,
             'month' => $month,
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
@@ -1117,12 +1145,54 @@ class AdminController extends BaseController
             'reconciliation' => $this->getReconcilationBanking($date, $year, $month),
             'salva' => $this->getSalvaBanking($date, $year, $month),
             'judo' => $this->getJudoBanking($date, $year, $month),
+            'cashflows' => $this->getCashflowsBanking($date, $year, $month),
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
             'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
             'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
             'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false),
         ];
+    }
+
+    private function getCashflowsBanking(\DateTime $date, $year, $month)
+    {
+        $dm = $this->getManager();
+
+        /** @var CashflowsFileRepository $cashflowsFileRepo */
+        $cashflowsFileRepo = $dm->getRepository(CashflowsFile::class);
+
+        $monthlyCashflowFiles = $cashflowsFileRepo->getMonthlyFiles($date);
+        /*
+        $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
+        $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
+
+        $yearlyBarclaysFiles = $barclaysFileRepo->getYearlyFilesToDate($date);
+        $yearlyBarclaysTransaction = BarclaysFile::combineDailyTransactions($yearlyBarclaysFiles);
+        $yearlyBarclaysProcessing = BarclaysFile::combineDailyProcessing($yearlyBarclaysFiles);
+
+        $allBarclaysFiles = $barclaysFileRepo->getAllFilesToDate($date);
+        $allBarclaysTransaction = BarclaysFile::combineDailyTransactions($allBarclaysFiles);
+        $allBarclaysProcessing = BarclaysFile::combineDailyProcessing($allBarclaysFiles);
+
+        $barclays = [
+            'dailyTransaction' => $monthlyPerDayBarclaysTransaction,
+            'dailyProcessed' => $monthlyPerDayBarclaysProcessing,
+            'monthlyTransaction' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysTransaction, $year, $month),
+            'monthlyProcessed' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysProcessing, $year, $month),
+            'yearlyTransaction' => BarclaysFile::totalCombinedFiles($yearlyBarclaysTransaction),
+            'yearlyProcessed' => BarclaysFile::totalCombinedFiles($yearlyBarclaysProcessing),
+            'allTransaction' => BarclaysFile::totalCombinedFiles($allBarclaysTransaction),
+            'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysProcessing),
+            'files' => $monthlyBarclaysFiles,
+        ];
+
+        return $barclays;
+        */
+        $cashflows = [
+            'files' => $monthlyCashflowFiles,
+        ];
+
+        return $cashflows;
     }
 
     private function getSoSureBanking(\DateTime $date, $year, $month)

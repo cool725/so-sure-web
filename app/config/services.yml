@@ -143,6 +143,15 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
+    app.cashflows:
+        alias: AppBundle\Service\CashflowsService
+        public: true
+
+    AppBundle\Service\CashflowsService:
+        arguments:
+        - "@doctrine_mongodb.odm.default_document_manager"
+        - "@logger"
+
     app.lloyds:
         alias: AppBundle\Service\LloydsService
         public: true
