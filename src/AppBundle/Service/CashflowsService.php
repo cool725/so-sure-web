@@ -31,8 +31,7 @@ class CashflowsService
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->dm = $dm;
         $this->logger = $logger;
     }

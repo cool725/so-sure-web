@@ -1202,7 +1202,8 @@ class AdminController extends BaseController
         $cashflows = [
             'dailyTransaction' => $monthlyPerDayCashflowsTransaction,
             'dailyProcessed' => $monthlyPerDayCashflowsProcessing,
-            'monthlyTransaction' => CashflowsFile::totalCombinedFiles($monthlyPerDayCashflowsTransaction, $year, $month),
+            'monthlyTransaction' =>
+                CashflowsFile::totalCombinedFiles($monthlyPerDayCashflowsTransaction, $year, $month),
             'monthlyProcessed' => CashflowsFile::totalCombinedFiles($monthlyPerDayCashflowsProcessing, $year, $month),
             'yearlyTransaction' => CashflowsFile::totalCombinedFiles($yearlyCashflowsTransaction),
             'yearlyProcessed' => CashflowsFile::totalCombinedFiles($yearlyCashflowsProcessing),
