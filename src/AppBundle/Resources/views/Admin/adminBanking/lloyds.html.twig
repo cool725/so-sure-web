@@ -1,0 +1,154 @@
+<div class="row">
+    <div class="col-md-6">
+        <h3>Processing Date</h3>
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Barclays</th>
+                <th>Lloyds</th>
+                <th>Diff</th>
+            </tr>
+            <tr>
+                <td>Month</td>
+                <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (barclays['monthlyProcessed'] - lloyds['monthlyProcessed'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (barclays['yearlyProcessed'] - lloyds['yearlyProcessed'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (barclays['allProcessed'] - lloyds['allProcessed'])|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>Received Date</h3>
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Lloyds</th>
+            </tr>
+            <tr>
+                <td>Month</td>
+                <td>£{{ lloyds['monthlyReceived']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>£{{ lloyds['yearlyReceived']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td>£{{ lloyds['allReceived']|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Processing Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>Barclays</th>
+                <th>Lloyds</th>
+                <th>Diff</th>
+                <th>Cumulative Diff</th>
+            </tr>
+            {% set cumulative = 0 %}
+            {% for day,ymd in dates.ymd %}
+                {% set color = '' %}
+                {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                    {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
+                    <td>{{ day }}</td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                            {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% elseif barclays['dailyProcessed'][ymd] is defined %}
+                            {% set diff = barclays['dailyProcessed'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% elseif lloyds['dailyProcessed'][ymd] is defined %}
+                            {% set diff = 0 - lloyds['dailyProcessed'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
+                            £{{ cumulative|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% for day,ymd in dates.next_ymd %}
+                {% set color = '' %}
+                {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                    {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
+                    <td>{{ day }}</td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                            {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
+                            £{{ cumulative|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h2>Received Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>Lloyds</th>
+            </tr>
+            {% for ymd in dates.ymd %}
+                <tr>
+                    <td>{{ ymd|slice(6,2) }}</td>
+                    <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                </tr>
+            {% endfor %}
+            {% for ymd in dates.next_ymd %}
+                <tr>
+                    <td>{{ ymd|slice(6,2) }}</td>
+                    <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>

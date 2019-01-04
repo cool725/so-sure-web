@@ -1,0 +1,219 @@
+<div class="row">
+    <div class="col-md-6">
+        <h3>Transaction Date</h3>
+        {% set sosureTotal = 0 %}
+        {% set cashflowsTotal = 0 %}
+        {% for day,ymd in dates.ymd %}
+            {% if sosure['dailyJudoShiftedTransaction'][day] is defined %}
+                {% set sosureTotal = sosureTotal + sosure['dailyJudoShiftedTransaction'][day] %}
+            {% endif %}
+            {% if cashflows['dailyTransaction'][ymd] is defined %}
+                {% set cashflowsTotal = cashflowsTotal + cashflows['dailyTransaction'][ymd] %}
+            {% endif %}
+        {% endfor %}
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>so-sure  (adj TZ)</th>
+                <th>Cashflows</th>
+                <th>Diff</th>
+            </tr>
+            <tr>
+                <td>Month</td>
+                {% if equal_to_two_dp(sosure['monthlyJudoShiftedTransaction'].total, sosureTotal) %}
+                    {% set color = 'success' %}
+                {% else %}
+                    {% set color = 'danger' %}
+                {% endif %}
+                <td class="{{ color }}">
+                    £{{ sosure['monthlyJudoShiftedTransaction'].total|number_format(2, '.', ',') }}
+                </td>
+                {% if equal_to_two_dp(cashflows['monthlyTransaction'], cashflowsTotal) %}
+                    {% set color = 'success' %}
+                {% else %}
+                    {% set color = 'danger' %}
+                {% endif %}
+                <td class="{{ color }}">
+                    £{{ cashflows['monthlyTransaction']|number_format(2, '.', ',') }}
+                </td>
+                <td>£{{ (sosure['monthlyJudoShiftedTransaction'].total - cashflows['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td></td>
+                <td>£{{ cashflows['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td></td>
+                <td>£{{ cashflows['allTransaction']|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>Processing Date</h3>
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Cashflows</th>
+                <th>Lloyds</th>
+                <th>Diff</th>
+            </tr>
+            <tr>
+                <td>Month</td>
+                <td>£{{ cashflows['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (cashflows['monthlyTransaction'] - lloyds['monthlyProcessed'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>£{{ cashflows['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (cashflows['yearlyProcessed'] - lloyds['yearlyProcessed'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td>£{{ cashflows['allProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (cashflows['allProcessed'] - lloyds['allProcessed'])|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Transaction Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>so-sure (adj TZ)</th>
+                <th>Cashflows</th>
+                <th>Diff</th>
+                <th>Cumulative Diff</th>
+            </tr>
+            {% set cumulative = 0 %}
+            {% for day,ymd in dates.ymd %}
+                {% set color = '' %}
+                {% if sosure['dailyJudoShiftedTransaction'][day] is defined and cashflows['dailyTransaction'][ymd] is defined  %}
+                    {% if equal_to_two_dp(sosure['dailyJudoShiftedTransaction'][day], cashflows['dailyTransaction'][ymd]) %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
+                    <td>{{ day }}</td>
+                    <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined %}
+                            £{{ sosure['dailyJudoShiftedTransaction'][day]|number_format(2, '.', ',') }}
+                        {% else %}-
+                        {% endif %}
+                    </td>
+                    <td>{% if cashflows['dailyTransaction'][ymd] is defined %}
+                            £{{ cashflows['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined and cashflows['dailyTransaction'][ymd] is defined %}
+                            {% set diff = sosure['dailyJudoShiftedTransaction'][day] - cashflows['dailyTransaction'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined and cashflows['dailyTransaction'][ymd] is defined %}
+                            £{{ cumulative|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr class="background-light-grey">
+                <td>SubTotal</td>
+                <td>
+                    £{{ sosureTotal|number_format(2, '.', ',') }}
+                </td>
+                <td>
+                    £{{ cashflowsTotal|number_format(2, '.', ',') }}
+                </td>
+                <td>
+                    £{{ (sosureTotal - cashflowsTotal)|number_format(2, '.', ',') }}
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h2>Processing Date</h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>Cashflows</th>
+                <th>Lloyds</th>
+                <th>Diff</th>
+                <th>Cumulative Diff</th>
+            </tr>
+            {% set cumulative = 0 %}
+            {% for day,ymd in dates.ymd %}
+                {% set color = '' %}
+                {% if cashflows['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                    {% if equal_to_two_dp(cashflows['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
+                    <td>{{ day }}</td>
+                    <td>{% if cashflows['dailyProcessed'][ymd] is defined %}£{{ cashflows['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if cashflows['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                            {% set diff = cashflows['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if cashflows['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                            £{{ cumulative|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% for day,ymd in dates.next_ymd %}
+                {% set color = '' %}
+                {% if cashflows['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                    {% if equal_to_two_dp(cashflows['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
+                    <td>{{ day }}</td>
+                    <td>{% if cashflows['dailyProcessed'][ymd] is defined %}£{{ cashflows['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if cashflows['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                            {% set diff = cashflows['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if cashflows['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                            £{{ cumulative|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>

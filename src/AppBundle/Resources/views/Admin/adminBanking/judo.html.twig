@@ -1,0 +1,146 @@
+<div class="row">
+    <div class="col-md-6">
+        <h3>Transaction Date</h3>
+        {% set sosureTotal = 0 %}
+        {% set judoTotal = 0 %}
+        {% for day,ymd in dates.ymd %}
+            {% if sosure['dailyJudoTransaction'][day] is defined %}
+                {% set sosureTotal = sosureTotal + sosure['dailyJudoTransaction'][day] %}
+            {% endif %}
+            {% if judo['dailyTransaction'][ymd] is defined %}
+                {% set judoTotal = judoTotal + judo['dailyTransaction'][ymd] %}
+            {% endif %}
+        {% endfor %}
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>so-sure</th>
+                <th>Judo</th>
+                <th>Diff</th>
+            </tr>
+            <tr>
+                <td>Month</td>
+                {% set color = '' %}
+                {% if equal_to_two_dp(sosure['monthlyJudoTransaction'].total, sosureTotal) %}
+                    {% set color = 'success' %}
+                {% else %}
+                    {% set color = 'danger' %}
+                {% endif %}
+                <td class="{{ color }}">
+                    £{{ sosure['monthlyJudoTransaction'].total|number_format(2, '.', ',') }}
+                </td>
+                {% if equal_to_two_dp(judo['monthlyTransaction'], judoTotal) %}
+                    {% set color = 'success' %}
+                {% else %}
+                    {% set color = 'danger' %}
+                {% endif %}
+                <td class="{{ color }}">
+                    £{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}
+                </td>
+                <td>
+                    £{{ (sosure['monthlyJudoTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <h3>Reconciliation</h3>
+        <table class="table table-striped">
+            <tr>
+                <th></th>
+                <th>Reconciliation</th>
+                <th>Judo</th>
+                <th>Diff</th>
+            </tr>
+            <tr>
+                <td>Month</td>
+                <td>£{{ reconciliation['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+                <td>£{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (sosure['monthlyJudoTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>£{{ reconciliation['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+                <td>£{{ judo['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (reconciliation['yearlyTransaction'] - judo['yearlyTransaction'])|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td>£{{ reconciliation['allTransaction']|number_format(2, '.', ',') }}</td>
+                <td>£{{ judo['allTransaction']|number_format(2, '.', ',') }}</td>
+                <td>£{{ (reconciliation['allTransaction'] - judo['allTransaction'])|number_format(2, '.', ',') }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Transaction Date
+
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
+            > Payment Details</button>
+        </h2>
+        <table class="table table-striped">
+            <tr>
+                <th>Day of Month</th>
+                <th>so-sure</th>
+                <th>Judo</th>
+                <th>Diff</th>
+                <th>Cumulative Diff</th>
+            </tr>
+            {% set cumulative = 0 %}
+            {% for day,ymd in dates.ymd %}
+                {% set color = '' %}
+                {% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
+                    {% if equal_to_two_dp(sosure['dailyJudoTransaction'][day], judo['dailyTransaction'][ymd]) %}
+                        {% set color = 'success' %}
+                    {% else %}
+                        {% set color = 'danger' %}
+                    {% endif %}
+                {% endif %}
+                <tr class='{{ color }}'>
+                    <td>{{ day }}</td>
+                    <td>{% if sosure['dailyJudoTransaction'][day] is defined %}
+                            £{{ sosure['dailyJudoTransaction'][day]|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if judo['dailyTransaction'][ymd] is defined %}
+                            £{{ judo['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
+                            {% set diff = sosure['dailyJudoTransaction'][day] - judo['dailyTransaction'][ymd] %}
+                            {% set cumulative = cumulative + diff %}
+                            £{{ diff|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
+                            £{{ cumulative|number_format(2, '.', ',') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr class="background-light-grey">
+                <td>SubTotal</td>
+                <td>
+                    £{{ sosureTotal|number_format(2, '.', ',') }}
+                </td>
+                <td>
+                    £{{ judoTotal|number_format(2, '.', ',') }}
+                </td>
+                <td>
+                    £{{ (sosureTotal - judoTotal)|number_format(2, '.', ',') }}
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -15,13 +15,13 @@
 
     <div class="row">
         <div class="col-md-4">
-            <h1>Banking {{ month }} / {{ year }}</h1>
+            <h1>Banking {{ dates.month }} / {{ dates.year }}</h1>
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
         <div class="col-md-3">
             <div class="form-group" style="padding-top: 15px;">
                 <div class="input-group date month" data-url="{{ path('admin_banking') }}">
-                    <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
+                    <input name="banking" type='text' class="form-control" value="{{dates.month}}-{{dates.year}}" />
                     <span class="input-group-addon">
                         <span class="fa fa-calendar"></span>
                     </span>
@@ -36,16 +36,34 @@
         <div class="col-md-5">
             <div class="form-group" style="padding-top: 15px;">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#judoModal"
-                    > Judo</button>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysModal"
-                        > Barclays</button>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysStatementModal"
-                        > B Stmt</button>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
-                        > Lloyds</button>
+                    <div class="btn-group">
+                        <button data-toggle="dropdown" class="btn btn-info dropdown-toggle">
+                            Upload Files <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#judoModal"
+                                > Judo</a>
+                            </li>
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#barclaysModal"
+                                > Barclays</a>
+                            </li>
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#barclaysStatementModal"
+                                > Barclays Statement</a>
+                            </li>
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#cashflowsModal"
+                                > Cashflows</a>
+                            </li>
+                            <li>
+                                <a href="#" data-toggle="modal" data-target="#lloydsModal"
+                                > Lloyds</a>
+                            </li>
+                        </ul>
+                    </div>
                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reconciliationModal"
-                        > Reconcile {% if reconcilationFiles|length > 0 %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-clock-o text-warning"></i>{% endif %} </button>
+                    > Reconcile {% if reconciliation.files|length > 0 %}<i class="fa fa-check text-success"></i>{% else %}<i class="fa fa-clock-o text-warning"></i>{% endif %} </button>
                 </div>
             </div>
         </div>
@@ -56,1071 +74,28 @@
         <li role="presentation" class="active"><a data-toggle="tab" href="#salva">Salva</a></li>
         <li role="presentation"><a data-toggle="tab" href="#judo">Judo</a></li>
         <li role="presentation"><a data-toggle="tab" href="#barclays">Barclays</a></li>
+        <li role="presentation"><a data-toggle="tab" href="#cashflows">Cashflows</a></li>
         <li role="presentation"><a data-toggle="tab" href="#bacs">Bacs</a></li>
         <li role="presentation"><a data-toggle="tab" href="#lloyds">Lloyds</a></li>
     </ul>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="salva">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Transaction Date</h3>
-                    {% set sosureTotal = 0 %}
-                    {% set sosureShiftedTotal = 0 %}
-                    {% set salvaTotal = 0 %}
-                    {% for day in 1..days_in_month %}
-                        {% if month < 10 and day < 10 %}
-                            {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                        {% elseif day < 10 %}
-                            {% set ymd = year ~ month ~ "0" ~ day %}
-                        {% elseif month < 10 %}
-                            {% set ymd = year ~ "0" ~ month ~ day %}
-                        {% else %}
-                            {% set ymd = year ~ month ~ day %}
-                        {% endif %}
-                        {% if sosure['dailyTransaction'][day] is defined %}
-                            {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
-                        {% endif %}
-                        {% if sosure['dailyShiftedTransaction'][day] is defined %}
-                            {% set sosureShiftedTotal = sosureShiftedTotal + sosure['dailyShiftedTransaction'][day] %}
-                        {% endif %}
-                        {% if salva['dailyTransaction'][ymd] is defined %}
-                            {% set salvaTotal = salvaTotal + salva['dailyTransaction'][ymd] %}
-                        {% endif %}
-                    {% endfor %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>so-sure</th>
-                            <th>Salva</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Month</td>
-                            {% set color = '' %}
-                            {% if equal_to_two_dp(sosure['monthlyTransaction'].total, sosureTotal) %}
-                                {% set color = 'success' %}
-                            {% else %}
-                                {% set color = 'danger' %}
-                            {% endif %}
-                            <td class="{{ color }}">
-                                £{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}
-                            </td>
-                            {% if equal_to_two_dp(salva['monthlyTransaction'], salvaTotal) %}
-                                {% set color = 'success' %}
-                            {% else %}
-                                {% set color = 'danger' %}
-                            {% endif %}
-                            <td class="{{ color }}">
-                                £{{ salva['monthlyTransaction']|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ (sosure['monthlyTransaction'].total - salva['monthlyTransaction'])|number_format(2, '.', ',') }}
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Transaction Date
-
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
-                        > Payment Details</button>
-                    </h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>so-sure (tz)</th>
-                            <th>so-sure</th>
-                            <th>Salva</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
-                        </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyTransaction'][day], salva['dailyTransaction'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if sosure['dailyShiftedTransaction'][day] is defined %}
-                                        £{{ sosure['dailyShiftedTransaction'][day]|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyTransaction'][day] is defined %}
-                                        £{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if salva['dailyTransaction'][ymd] is defined %}
-                                        £{{ salva['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined %}
-                                        {% set diff = sosure['dailyTransaction'][day] - salva['dailyTransaction'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <tr class="background-light-grey">
-                            <td>SubTotal</td>
-                            <td>
-                                £{{ sosureShiftedTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ sosureTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ salvaTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ (sosureTotal - salvaTotal)|number_format(2, '.', ',') }}
-                            </td>
-                            <td></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            {% include 'AppBundle::Admin/adminBanking/salva.html.twig' %}
         </div>
         <div role="tabpanel" class="tab-pane" id="judo">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Transaction Date</h3>
-                    {% set sosureTotal = 0 %}
-                    {% set judoTotal = 0 %}
-                    {% for day in 1..days_in_month %}
-                        {% if month < 10 and day < 10 %}
-                            {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                        {% elseif day < 10 %}
-                            {% set ymd = year ~ month ~ "0" ~ day %}
-                        {% elseif month < 10 %}
-                            {% set ymd = year ~ "0" ~ month ~ day %}
-                        {% else %}
-                            {% set ymd = year ~ month ~ day %}
-                        {% endif %}
-                        {% if sosure['dailyJudoTransaction'][day] is defined %}
-                            {% set sosureTotal = sosureTotal + sosure['dailyJudoTransaction'][day] %}
-                        {% endif %}
-                        {% if judo['dailyTransaction'][ymd] is defined %}
-                            {% set judoTotal = judoTotal + judo['dailyTransaction'][ymd] %}
-                        {% endif %}
-                    {% endfor %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>so-sure</th>
-                            <th>Judo</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Month</td>
-                            {% set color = '' %}
-                            {% if equal_to_two_dp(sosure['monthlyJudoTransaction'].total, sosureTotal) %}
-                                {% set color = 'success' %}
-                            {% else %}
-                                {% set color = 'danger' %}
-                            {% endif %}
-                            <td class="{{ color }}">
-                                £{{ sosure['monthlyJudoTransaction'].total|number_format(2, '.', ',') }}
-                            </td>
-                            {% if equal_to_two_dp(judo['monthlyTransaction'], judoTotal) %}
-                                {% set color = 'success' %}
-                            {% else %}
-                                {% set color = 'danger' %}
-                            {% endif %}
-                            <td class="{{ color }}">
-                                £{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ (sosure['monthlyJudoTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h3>Reconciliation</h3>
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>Reconciliation</th>
-                            <th>Judo</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Month</td>
-                            <td>£{{ reconciliation['monthlyTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (sosure['monthlyJudoTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Year</td>
-                            <td>£{{ reconciliation['yearlyTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ judo['yearlyTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (reconciliation['yearlyTransaction'] - judo['yearlyTransaction'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>All time</td>
-                            <td>£{{ reconciliation['allTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ judo['allTransaction']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (reconciliation['allTransaction'] - judo['allTransaction'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Transaction Date
-
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
-                        > Payment Details</button>
-                    </h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>so-sure</th>
-                            <th>Judo</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
-                        </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyJudoTransaction'][day], judo['dailyTransaction'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if sosure['dailyJudoTransaction'][day] is defined %}
-                                        £{{ sosure['dailyJudoTransaction'][day]|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if judo['dailyTransaction'][ymd] is defined %}
-                                        £{{ judo['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
-                                        {% set diff = sosure['dailyJudoTransaction'][day] - judo['dailyTransaction'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
-                                    £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <tr class="background-light-grey">
-                            <td>SubTotal</td>
-                            <td>
-                                £{{ sosureTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ judoTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                    £{{ (sosureTotal - judoTotal)|number_format(2, '.', ',') }}
-                            </td>
-                            <td></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            {% include 'AppBundle::Admin/adminBanking/judo.html.twig' %}
         </div>
         <div role="tabpanel" class="tab-pane" id="barclays">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Transaction Date</h3>
-                    {% set sosureTotal = 0 %}
-                    {% set barclaysTotal = 0 %}
-                    {% for day in 1..days_in_month %}
-                        {% if month < 10 and day < 10 %}
-                            {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                        {% elseif day < 10 %}
-                            {% set ymd = year ~ month ~ "0" ~ day %}
-                        {% elseif month < 10 %}
-                            {% set ymd = year ~ "0" ~ month ~ day %}
-                        {% else %}
-                            {% set ymd = year ~ month ~ day %}
-                        {% endif %}
-                        {% if sosure['dailyJudoShiftedTransaction'][day] is defined %}
-                            {% set sosureTotal = sosureTotal + sosure['dailyJudoShiftedTransaction'][day] %}
-                        {% endif %}
-                        {% if barclays['dailyTransaction'][ymd] is defined %}
-                            {% set barclaysTotal = barclaysTotal + barclays['dailyTransaction'][ymd] %}
-                        {% endif %}
-                    {% endfor %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>so-sure  (adj TZ)</th>
-                            <th>Barclays</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Month</td>
-                            {% if equal_to_two_dp(sosure['monthlyJudoShiftedTransaction'].total, sosureTotal) %}
-                                {% set color = 'success' %}
-                            {% else %}
-                                {% set color = 'danger' %}
-                            {% endif %}
-                            <td class="{{ color }}">
-                                £{{ sosure['monthlyJudoShiftedTransaction'].total|number_format(2, '.', ',') }}
-                            </td>
-                            {% if equal_to_two_dp(barclays['monthlyTransaction'], barclaysTotal) %}
-                                {% set color = 'success' %}
-                            {% else %}
-                                {% set color = 'danger' %}
-                            {% endif %}
-                            <td class="{{ color }}">
-                                £{{ barclays['monthlyTransaction']|number_format(2, '.', ',') }}
-                            </td>
-                            <td>£{{ (sosure['monthlyJudoShiftedTransaction'].total - barclays['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Year</td>
-                            <td></td>
-                            <td>£{{ barclays['yearlyTransaction']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>All time</td>
-                            <td></td>
-                            <td>£{{ barclays['allTransaction']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h3>Processing Date</h3>
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>Barclays</th>
-                            <th>Lloyds</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Month</td>
-                            <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['monthlyTransaction'] - lloyds['monthlyProcessed'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Year</td>
-                            <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['yearlyProcessed'] - lloyds['yearlyProcessed'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>All time</td>
-                            <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['allProcessed'] - lloyds['allProcessed'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Transaction Date</h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>so-sure (adj TZ)</th>
-                            <th>Barclays</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
-                        </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if sosure['dailyJudoShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined  %}
-                                {% if equal_to_two_dp(sosure['dailyJudoShiftedTransaction'][day], barclays['dailyTransaction'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined %}
-                                        £{{ sosure['dailyJudoShiftedTransaction'][day]|number_format(2, '.', ',') }}
-                                    {% else %}-
-                                    {% endif %}
-                                </td>
-                                <td>{% if barclays['dailyTransaction'][ymd] is defined %}
-                                        £{{ barclays['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined %}
-                                        {% set diff = sosure['dailyJudoShiftedTransaction'][day] - barclays['dailyTransaction'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if sosure['dailyJudoShiftedTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <tr class="background-light-grey">
-                            <td>SubTotal</td>
-                            <td>
-                                £{{ sosureTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ barclaysTotal|number_format(2, '.', ',') }}
-                            </td>
-                            <td>
-                                £{{ (sosureTotal - barclaysTotal)|number_format(2, '.', ',') }}
-                            </td>
-                            <td></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h2>Processing Date</h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>Barclays</th>
-                            <th>Lloyds</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
-                        </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
-                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
-                                        {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for next_month_day in 1..3 %}
-                            {% if month == 12 %}
-                                {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                            {% elseif month >= 9 %}
-                                {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                            {% else %}
-                                {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
-                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ next_month_day }}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
-                                        {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
+            {% include 'AppBundle::Admin/adminBanking/barclays.html.twig' %}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="cashflows">
+            {% include 'AppBundle::Admin/adminBanking/cashflows.html.twig' %}
         </div>
         <div role="tabpanel" class="tab-pane" id="lloyds">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Processing Date</h3>
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>Barclays</th>
-                            <th>Lloyds</th>
-                            <th>Diff</th>
-                        </tr>
-                        <tr>
-                            <td>Month</td>
-                            <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['monthlyProcessed'] - lloyds['monthlyProcessed'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Year</td>
-                            <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['yearlyProcessed'] - lloyds['yearlyProcessed'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>All time</td>
-                            <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['allProcessed'] - lloyds['allProcessed'])|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h3>Received Date</h3>
-                    <table class="table table-striped">
-                        <tr>
-                            <th></th>
-                            <th>Lloyds</th>
-                        </tr>
-                        <tr>
-                            <td>Month)</td>
-                            <td>£{{ lloyds['monthlyReceived']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Year</td>
-                            <td>£{{ lloyds['yearlyReceived']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                        <tr>
-                            <td>All time</td>
-                            <td>£{{ lloyds['allReceived']|number_format(2, '.', ',') }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Processing Date</h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>Barclays</th>
-                            <th>Lloyds</th>
-                            <th>Diff</th>
-                            <th>Cumulative Diff</th>
-                        </tr>
-                        {% set cumulative = 0 %}
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
-                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ day }}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
-                                        {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif barclays['dailyProcessed'][ymd] is defined %}
-                                        {% set diff = barclays['dailyProcessed'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% elseif lloyds['dailyProcessed'][ymd] is defined %}
-                                        {% set diff = 0 - lloyds['dailyProcessed'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        {% for next_month_day in 1..3 %}
-                            {% if month == 12 %}
-                                {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                            {% elseif month >= 9 %}
-                                {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                            {% else %}
-                                {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                            {% endif %}
-                            {% set color = '' %}
-                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
-                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                            {% endif %}
-                            <tr class='{{ color }}'>
-                                <td>{{ next_month_day }}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
-                                        {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
-                                        {% set cumulative = cumulative + diff %}
-                                        £{{ diff|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
-                                        £{{ cumulative|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h2>Received Date</h2>
-                    <table class="table table-striped">
-                        <tr>
-                            <th>Day of Month</th>
-                            <th>Lloyds</th>
-                        </tr>
-                        {% for day in 1..days_in_month %}
-                            {% if month < 10 and day < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                            {% elseif day < 10 %}
-                                {% set ymd = year ~ month ~ "0" ~ day %}
-                            {% elseif month < 10 %}
-                                {% set ymd = year ~ "0" ~ month ~ day %}
-                            {% else %}
-                                {% set ymd = year ~ month ~ day %}
-                            {% endif %}
-                            <tr>
-                                <td>{{ day }}</td>
-                                <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                            </tr>
-                        {% endfor %}
-                        {% for next_month_day in 1..5 %}
-                            {% if month == 12 %}
-                                {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                            {% elseif month >= 9 %}
-                                {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                            {% else %}
-                                {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                            {% endif %}
-                            <tr>
-                                <td>{{ next_month_day }}</td>
-                                <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
+            {% include 'AppBundle::Admin/adminBanking/lloyds.html.twig' %}
         </div>
         <div role="tabpanel" class="tab-pane" id="bacs">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    {% set inputTotal = 0 %}
-                    {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
-                        {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-                        {% if received_date|date('m') == month %}
-                            {% set amount = null %}
-                            {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
-                                {% set amount = file.metadata['debit-accepted-value'] %}
-                            {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
-                                {% set amount = 0 - file.metadata['credit-accepted-value'] %}
-                            {% endif %}
-                            {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
-                                {% set amount = amount + file.metadata['debit-rejected-value'] %}
-                            {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
-                                {% set amount = amount - file.metadata['credit-rejected-value'] %}
-                            {% endif %}
-
-                            {% if amount is not null %}
-                                {% set inputTotal = inputTotal + amount %}
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-
-                    {% set aruddTotal = 0 %}
-                    {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
-                        {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-                        {% if received_date|date('m') == month %}
-                            {% for ref,amount in file.metadata['amounts'] %}
-                                {% set amount = 0 - amount %}
-                                {% set aruddTotal = aruddTotal + amount %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-
-                    {% set ddicTotal = 0 %}
-                    {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-amount'] is defined %}
-                        {% set received_date = day(file.metadata['refund-date']) %}
-                        {% if received_date|date('m') == month %}
-                            {% for ref,amount in file.metadata['refund-details'] %}
-                                {% set amount = 0 - amount %}
-                                {% set ddicTotal = ddicTotal + amount %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-
-                    {% if month < 10 %}
-                        {% set ym = year ~ "0" ~ month %}
-                    {% else %}
-                        {% set ym = year ~ month %}
-                    {% endif %}
-
-                    {% set lloyds_total = 0 %}
-                    {% for file in lloydsFiles %}
-                        {% for date,amount in file.dailyBacs %}
-                            {% if date[:6] == ym %}
-                                {% set lloyds_total = lloyds_total + amount %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-
-                    <h3>Overview</h3>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <table class="table table-striped">
-                                <tr>
-                                    <th colspan="2">Bacs Reporting</th>
-                                </tr>
-                                <tr>
-                                    <td>Input</td>
-                                    <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Arudd</td>
-                                    <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>DDIC</td>
-                                    <td>{{ ddicTotal|number_format(2, '.', ',') }}</td>
-                                </tr>
-                                {%  set reporting_net = inputTotal + aruddTotal + ddicTotal %}
-                                {%  set lloyds_net = lloyds_total %}
-                                {% if equal_to_two_dp(reporting_net, lloyds_net) %}
-                                    {% set color = 'success' %}
-                                {% else %}
-                                    {% set color = 'danger' %}
-                                {% endif %}
-                                <tr class="{{ color }}">
-                                    <td>Total</td>
-                                    <td>{{ reporting_net|number_format(2, '.', ',') }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-4">
-                            <table class="table table-striped">
-                                <tr>
-                                    <th colspan="2">Lloyds Export</th>
-                                    <th>Diff</th>
-                                </tr>
-                                <tr>
-                                    <td>Total</td>
-                                    <td>{{ lloyds_total|number_format(2, '.', ',')  }}</td>
-                                    <td>{{ (reporting_net -  lloyds_net)|number_format(2, '.', ',')  }}</td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <div class="col-md-4">
-                            <table class="table table-striped">
-                                <tr>
-                                    <th colspan="2">Manual Bacs Payments Expected</th>
-                                </tr>
-                                <tr>
-                                    <td>Total</td>
-                                    <td>{{ manualBacsPayments.total|number_format(2, '.', ',') }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <h2>Bacs Input Files</h2>
-                    <table class="table">
-                        <tr>
-                            <th>Serial Number</th>
-                            <th>Amount</th>
-                            <th>Processing Date</th>
-                            <th>Expected Received Date</th>
-                            <th>Lloyds</th>
-                        </tr>
-                        {% set subtotal_all = 0 %}
-                        {% set subtotal_found = 0 %}
-                        {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
-                            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-                            {% if received_date|date('m') == month %}
-                                {% set amount = null %}
-                                {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
-                                    {% set amount = file.metadata['debit-accepted-value'] %}
-                                {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
-                                    {% set amount = 0 - file.metadata['credit-accepted-value'] %}
-                                {% endif %}
-                                {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
-                                    {% set amount = amount + file.metadata['debit-rejected-value'] %}
-                                {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
-                                    {% set amount = amount - file.metadata['credit-rejected-value'] %}
-                                {% endif %}
-
-                                {% set foundFileInDate = false %}
-                                {% for lloydsFile in lloydsFiles %}
-                                    {% for item in lloydsFile.getBacsTransactionsByType('bacs', received_date) %}
-                                        {% if equal_to_two_dp(amount, item) %}
-                                            {% set foundFileInDate = true %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-
-                                {% set subtotal_all = subtotal_all + amount %}
-                                {% if foundFileInDate %}
-                                    {% set subtotal_found = subtotal_found + amount %}
-                                {% endif %}
-                                <tr class="{% if amount is null %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
-                                    <td><span title="{{ file.key }}">{{ file.metadata['serial-number'] }}</span></td>
-                                    <td>{{ amount|default('-') }}</td>
-                                    <td>{{ file.metadata['processing-date'] }}</td>
-                                    <td>{{ received_date|date('Y-m-d') }}</td>
-                                    <td>
-                                        {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                        {% set color = 'success' %}
-                        {% if not equal_to_two_dp(inputTotal, subtotal_all) or not equal_to_two_dp(subtotal_all, subtotal_found) %}
-                            {% set color = 'danger' %}
-                        {% endif %}
-                        <tr class="{{ color }}">
-                            <td>Total</td>
-                            <td>{{ subtotal_all }}</td>
-                            <td></td>
-                            <td></td>
-                            <td>{{ subtotal_found }}</td>
-                        </tr>
-
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h2>Bacs Arudd Files</h2>
-                    <table class="table">
-                        <tr>
-                            <th>Reference</th>
-                            <th>Amount</th>
-                            <th>Processing Date</th>
-                            <th>Expected Return Date</th>
-                            <th>Lloyds</th>
-                        </tr>
-                        {% set subtotal_all = 0 %}
-                        {% set subtotal_found = 0 %}
-                        {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
-                            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-
-                            {% if received_date|date('m') == month %}
-                                {% for ref,amount in file.metadata['amounts'] %}
-                                    {% set amount = 0 - amount %}
-                                    {% set foundFileInDate = false %}
-                                    {% for lloydsFile in lloydsFiles %}
-                                        {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
-                                            {% if equal_to_two_dp(amount, item) %}
-                                                {% set foundFileInDate = true %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                    {% set subtotal_all = subtotal_all + amount %}
-                                    {% if foundFileInDate %}
-                                        {% set subtotal_found = subtotal_found + amount %}
-                                    {% endif %}
-                                    <tr class="{% if amount is null %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
-                                        <td><span title="{{ file.key }}">{{ ref }}</span></td>
-                                        <td>{{ amount|default('-') }}</td>
-                                        <td>{{ file.metadata['processing-date'] }}</td>
-                                        <td>{{ received_date|date('Y-m-d') }}</td>
-                                        <td>
-                                            {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-                        {% set color = 'success' %}
-                        {% if not equal_to_two_dp(aruddTotal, subtotal_all) or not equal_to_two_dp(subtotal_all, subtotal_found) %}
-                            {% set color = 'danger' %}
-                        {% endif %}
-                        <tr class="{{ color }}">
-                            <td>Total</td>
-                            <td>{{ subtotal_all }}</td>
-                            <td></td>
-                            <td></td>
-                            <td>{{ subtotal_found }}</td>
-                        </tr>
-
-                    </table>
-                </div>
-                <div class="col-md-6">
-                    <h2>Bacs DDIC Files</h2>
-                    <table class="table">
-                        <tr>
-                            <th>Reference</th>
-                            <th>Amount</th>
-                            <th>Processing Date</th>
-                            <th>Expected Return Date</th>
-                            <th>Lloyds</th>
-                        </tr>
-                        {% set subtotal_all = 0 %}
-                        {% set subtotal_found = 0 %}
-                        {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-details'] is defined %}
-                            {% set received_date = day(file.metadata['refund-date']) %}
-                            {% if received_date|date('m') == month %}
-                                {% for ref,amount in file.metadata['refund-details'] %}
-
-                                    {% set amount = 0 - amount %}
-                                    {% set foundFileInDate = false %}
-                                    {% for lloydsFile in lloydsFiles %}
-                                        {% for item in lloydsFile.getBacsTransactionsByType('bacs-ddic', received_date) %}
-                                            {% if equal_to_two_dp(amount, item) %}
-                                                {% set foundFileInDate = true %}
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                    {% set subtotal_all = subtotal_all + amount %}
-                                    {% if foundFileInDate %}
-                                        {% set subtotal_found = subtotal_found + amount %}
-                                    {% endif %}
-                                    <tr class="{% if amount is null %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
-                                        <td><span title="{{ file.key }}">{{ ref }}</span></td>
-                                        <td>{{ amount|default('-') }}</td>
-                                        <td>{{ file.metadata['refund-date'] }}</td>
-                                        <td>{{ received_date|date('Y-m-d') }}</td>
-                                        <td>
-                                            {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% endif %}
-                        {% endfor %}
-
-                        {% set color = 'success' %}
-                        {% if not equal_to_two_dp(ddicTotal, subtotal_all) or not equal_to_two_dp(subtotal_all, subtotal_found) %}
-                            {% set color = 'danger' %}
-                        {% endif %}
-                        <tr class="{{ color }}">
-                            <td>Total</td>
-                            <td>{{ subtotal_all }}</td>
-                            <td></td>
-                            <td></td>
-                            <td>{{ subtotal_found }}</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            {% include 'AppBundle::Admin/adminBanking/bacs.html.twig' %}
         </div>
     </div>
 
@@ -1144,8 +119,9 @@
                     {{ form_end(judoForm) }}
                     <hr>
                     <h2>Files</h2>
+                    {% if judo.files|length == 0 %}<p>No files</p>{% endif %}
                     <table width="100%" class="table table-striped">
-                        {% for judoFile in judoFiles %}
+                        {% for judoFile in judo.files %}
                             <tr>
                                 <td>
                                     <a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a>
@@ -1185,8 +161,9 @@
             {{ form_end(barclaysForm) }}
               <hr>
               <h2>Files</h2>
+              {% if barclays.files|length == 0 %}<p>No files</p>{% endif %}
               <table width="100%" class="table table-striped">
-                  {% for barclaysFile in barclaysFiles %}
+                  {% for barclaysFile in barclays.files %}
                       <tr>
                           <td><a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a>
                               <br><i class="fa fa-plus-circle" title="Created"></i> {{ barclaysFile.created|date() }}
@@ -1203,6 +180,47 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="modal modal-middle modal-phone fade" id="cashflowsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Cashflows Upload</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(cashflowsForm) }}
+                    <div class="form-group">
+                        {{ form_label(cashflowsForm.file, 'File') }}
+                        {{ form_errors(cashflowsForm.file) }}
+                        {{ form_widget(cashflowsForm.file) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(cashflowsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(cashflowsForm) }}
+                    <hr>
+                    <h2>Files</h2>
+                    {% if cashflows.files|length == 0 %}<p>No files</p>{% endif %}
+                    <table width="100%" class="table table-striped">
+                        {% for cashflowsFile in cashflows.files %}
+                            <tr>
+                                <td><a href="{{ s3DownloadLink(cashflowsFile.bucket, cashflowsFile.key) }}">{{ cashflowsFile.fileName }}</a>
+                                    <br><i class="fa fa-plus-circle" title="Created"></i> {{ cashflowsFile.created|date() }}
+                                    <br><i class="fa fa-pencil" title="Date"></i> {{ cashflowsFile.date|date() }}
+                                </td>
+                                <td style="word-break:break-all;">{{ cashflowsFile.metadata|json_encode }}</td>
+                                <td><button class="delete-file" data-delete-url="{{ path('admin_file_delete', {'id': cashflowsFile.id }) }}">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal modal-middle modal-phone fade" id="barclaysStatementModal" tabindex="-1" role="dialog">
@@ -1225,6 +243,7 @@
             {{ form_end(barclaysStatementForm) }}
               <hr>
               <h2>Files</h2>
+              {% if barclaysStatementFiles|length == 0 %}<p>No files</p>{% endif %}
               <table width="100%" class="table table-striped">
                   {% for barclaysStatementFile in barclaysStatementFiles %}
                       <tr>
@@ -1265,8 +284,9 @@
             {{ form_end(lloydsForm) }}
               <hr>
               <h2>Files</h2>
+              {% if lloyds.files|length == 0 %}<p>No files</p>{% endif %}
               <table width="100%" class="table table-striped">
-                  {% for lloydsFile in lloydsFiles %}
+                  {% for lloydsFile in lloyds.files %}
                   <tr>
                       <td><a href="{{ s3DownloadLink(lloydsFile.bucket, lloydsFile.key) }}">{{ lloydsFile.fileName }}</a>
                           <br><i class="fa fa-plus-circle" title="Created"></i> {{ lloydsFile.created|date() }}
@@ -1315,8 +335,9 @@
                     {{ form_end(reconciliationForm) }}
                     <hr>
                     <h2>Files</h2>
+                    {% if reconciliation.files|length == 0 %}<p>No files</p>{% endif %}
                     <table width="100%" class="table table-striped">
-                        {% for reconcilationFile in reconcilationFiles %}
+                        {% for reconcilationFile in reconciliation.files %}
                             <tr>
                                 <td><a href="{{ s3DownloadLink(reconcilationFile.bucket, reconcilationFile.key) }}">{{ reconcilationFile.fileName }}</a></td>
                                 <td style="word-break:break-all;">
@@ -1343,7 +364,7 @@
                     <div class="panel-group" id="payments-accordion" role="tablist" aria-multiselectable="true">
                         {% set day = 0 %}
                         {% set firstDay = true %}
-                        {% for payment in payments %}
+                        {% for payment in sosure.payments %}
                             {% set newDay = false  %}
                             {% if payment.date|date('d', 'Europe/London') != day %}
                                 {% set newDay = true  %}
