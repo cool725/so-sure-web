@@ -821,6 +821,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         $diff = $date->diff($this->getLastPasswordChange());
+
+        if ($date < $this->getLastPasswordChange()) {
+            throw new \Exception(sprintf(
+                'Last password change is in the future! User ID: %s', $this->getId()
+            ));
+        }
+
         return 90 - $diff->days;
     }
 
