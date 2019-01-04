@@ -988,7 +988,7 @@ class AdminController extends BaseController
             return $payment->isManual();
         });
 
-        $sosure = $this->getSoSureBanking($date, $year, $month);
+        $sosure = $this->getSoSureBanking($date);
 
         $judoFile = new JudoFile();
         $judoForm = $this->get('form.factory')
@@ -1215,7 +1215,7 @@ class AdminController extends BaseController
         return $cashflows;
     }
 
-    private function getSoSureBanking(\DateTime $date, $year, $month)
+    private function getSoSureBanking(\DateTime $date)
     {
         $dm = $this->getManager();
 
