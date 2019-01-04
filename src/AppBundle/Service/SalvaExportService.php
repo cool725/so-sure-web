@@ -53,6 +53,9 @@ class SalvaExportService
     // Policy status is Terminated policy. Only issued policy can be terminated.
     const ERROR_POLICY_TERMINATED = 'webservice.constraint.C1406-05';
 
+    // Policy number must be unique. Another policy with given policy number already
+    const ERROR_POLICY_EXISTS = 'policy.constraint.C1044-11';
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -573,7 +576,11 @@ class SalvaExportService
         }
         $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
         $this->logger->info($response);
-        $responseId = $this->getResponseId($response);
+
+        // occasionally it seems like a create response is lost. When we then try to re-create
+        // there is an already a created response, which we can safely ignore
+        $responseId = $this->getResponseId($response, [self::ERROR_POLICY_EXISTS]);
+
         $phonePolicy->addSalvaPolicyResults($responseId, SalvaPhonePolicy::RESULT_TYPE_CREATE, [
             'ss_phone_base_tariff' => $phonePolicy->getTotalGwp()
         ]);
@@ -871,17 +878,20 @@ class SalvaExportService
 
         $elementList = $xpath->query('//ns1:errorResponse/ns1:errorList/ns1:constraint');
         foreach ($elementList as $element) {
-            if (in_array($element->getAttribute('ns1:code'), $allowedErrors)) {
-                return $element->nodeValue;
-            }
-
+            $allowedError = in_array($element->getAttribute('ns1:code'), $allowedErrors);
             $errMsg = sprintf(
-                "Error sending policy. Response: %s : %s",
+                "Error sending policy. Allowed Error: %s Response: %s : %s",
+                $allowedError ? 'Yes' : 'No',
                 $element->getAttribute('ns1:code'),
                 $element->nodeValue
             );
             $this->logger->error($errMsg);
-            throw new \Exception($errMsg);
+
+            if (!$allowedError) {
+                throw new \Exception($errMsg);
+            }
+
+            return $element->nodeValue;
         }
 
         throw new \Exception('Unable to get response');
