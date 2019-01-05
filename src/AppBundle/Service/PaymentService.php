@@ -218,14 +218,15 @@ class PaymentService
             'bcc-ddnotifications@so-sure.com'
         );
 
-        if ($this->fraudService->getDuplicateBankAccounts($policy) > 0) {
+        if ($this->fraudService->getDuplicateBankAccountsCount($policy) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
                 'tech@so-sure.com',
                 sprintf(
-                    'Check <a href="%s">duplicate bank account</a>, ID: %s',
+                    'Check <a href="%s">duplicate bank account</a>, Policy Id: %s',
                     $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()]),
                     $policy->getId()
+
                 )
             );
         }

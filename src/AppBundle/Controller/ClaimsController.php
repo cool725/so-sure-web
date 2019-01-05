@@ -309,6 +309,7 @@ class ClaimsController extends BaseController
             'note_form' => $noteForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',
+            'user_route' => 'claims_user',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
             'oa' => $oa,
