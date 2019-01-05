@@ -77,6 +77,8 @@ class CashflowsService
 
                     $dateTimeString = sprintf('%s %s', $line['Date'], $line['Time']);
                     $transactionDate = \DateTime::createFromFormat('d/m/Y H:i:s', $dateTimeString);
+                    // cashflows seem to be one day behind
+                    $transactionDate = $transactionDate->sub(new \DateInterval(('P1D')));
                     if (!isset($dailyTransaction[$transactionDate->format('Ymd')])) {
                         $dailyTransaction[$transactionDate->format('Ymd')] = 0;
                     }
