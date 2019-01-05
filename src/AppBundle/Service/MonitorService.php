@@ -273,6 +273,14 @@ class MonitorService
         //$updatedPolicies = $repo->findBy(['id' => '5c30728e52c0ce57a076c5d3']);
         foreach ($updatedPolicies as $policy) {
             /** @var Policy $policy */
+
+            // excluded from intercom checks
+            if (in_array($policy->getId(), [
+                '5c30d44e1862b25ebc501050', // ticket raised with intercom - nothing returned for user
+                ])) {
+                continue;
+            }
+            
             /** @var mixed $intercomUser */
             $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
             if (is_object($intercomUser)) {
