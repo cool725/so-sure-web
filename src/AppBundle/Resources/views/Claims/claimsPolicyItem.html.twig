@@ -914,12 +914,20 @@
             <table class="table table-striped">
             {% for item in user_history %}
               <tr>
-                <td width="10%">{{ item.action }}</td>
-                <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
-                <td width="80%">
-                  {% for key, value in item.data %}
-                    {{ key }} => {{ value|json_encode }}<br />
-                  {% endfor %}
+                <td width="10%"><strong>
+                        {{ item.loggedAt|date('d M Y H:i:s') }}
+                        <hr>
+                        {% if item.action == "create" %}<i class="fa fa-plus" title="{{ item.action }}"></i>
+                        {% elseif item.action == "update" %}<i class="fa fa-pencil" title="{{ item.action }}"></i>
+                        {% elseif item.action == "remove" %}<i class="fa fa-trash" title="{{ item.action }}"></i>
+                        {% else %}{{ item.action }}
+                        {% endif %}
+                        by {{ item.username|default('N/A') }}
+                    </strong></td>
+                <td width="90%">
+                      {% for key, value in item.data %}
+                        {{ key }} => {{ value|json_encode }}<br />
+                      {% endfor %}
                 </td>
               </tr>
             {% endfor %}
@@ -931,11 +939,21 @@
             <table class="table table-striped">
             {% for item in policy_history %}
               <tr>
-                <td width="10%">{{ item.action }}<br />{{ item.username|default("sytem") }}</td>
-                <td width="10%">{{ item.loggedAt|date('F j, Y H:i:s') }}</td>
-                <td width="80%">
-                    {% for key, value in item.data %}{{ key }} => {{ value|json_encode }}<br />{% endfor %}
-                </td>
+                  <td width="10%"><strong>
+                          {{ item.loggedAt|date('d M Y H:i:s') }}
+                          <hr>
+                          {% if item.action == "create" %}<i class="fa fa-plus" title="{{ item.action }}"></i>
+                          {% elseif item.action == "update" %}<i class="fa fa-pencil" title="{{ item.action }}"></i>
+                          {% elseif item.action == "remove" %}<i class="fa fa-trash" title="{{ item.action }}"></i>
+                          {% else %}{{ item.action }}
+                          {% endif %}
+                          by {{ item.username|default('N/A') }}
+                      </strong></td>
+                  <td width="90%">
+                      {% for key, value in item.data %}
+                          {{ key }} => {{ value|json_encode }}<br />
+                      {% endfor %}
+                  </td>
               </tr>
             {% endfor %}
             </table>
