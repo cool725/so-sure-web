@@ -270,6 +270,7 @@ class MonitorService
         $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
         $updatedPolicies = $repo->findAllStatusUpdatedPolicies($oneDay, $tenMinutes);
         $errors = [];
+        //$updatedPolicies = $repo->findBy(['id' => '5c30728e52c0ce57a076c5d3']);
         foreach ($updatedPolicies as $policy) {
             /** @var Policy $policy */
             /** @var mixed $intercomUser */
@@ -278,8 +279,15 @@ class MonitorService
                 /** @var mixed $intercomUser */
                 /** @var mixed $attributes */
                 $attributes = $intercomUser->{'custom_attributes'};
+                //print_r($attributes);
                 // only active/unpaid policies and definitely not cancelled
-                if ($policy->isActive(true) && $attributes->Premium <= 0) {
+                if (!isset($attributes->Premium)) {
+                    $this->intercom->queue($policy->getUser());
+                    $errors[] = sprintf(
+                        'Intercom out of sync: %s is missing a premium attribute. Requeued.',
+                        $policy->getUser()->getEmail()
+                    );
+                } elseif ($policy->isActive(true) && $attributes->Premium <= 0) {
                     $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s has a 0 premium in intercom, yet has a policy. Requeued.',
