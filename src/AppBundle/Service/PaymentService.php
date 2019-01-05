@@ -226,7 +226,6 @@ class PaymentService
                     'Check <a href="%s">duplicate bank account</a>, Policy Id: %s',
                     $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()]),
                     $policy->getId()
-
                 )
             );
         }
