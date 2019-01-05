@@ -1705,6 +1705,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'salva_update_form' => $salvaUpdateForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
+            'user_route' => 'admin_user',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),

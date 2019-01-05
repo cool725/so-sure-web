@@ -595,7 +595,14 @@
                                 </tr>
                                 <tr>
                                     <td>Other Users w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
-                                    <td>{{ fraud.duplicate_bank_accounts }}</td>
+                                    <td>
+                                        <strong>{{ fraud.duplicate_bank_accounts_count }}</strong>
+                                        {% for user in fraud.duplicate_bank_accounts %}
+                                            <a href="{{ path(user_route, {'id': user.id }) }}">
+                                                {{ user.name }}
+                                            </a>;
+                                        {% endfor %}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Other Users w/mobile numbers very close numerically to user</td>

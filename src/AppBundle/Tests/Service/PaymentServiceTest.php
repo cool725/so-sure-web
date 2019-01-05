@@ -159,7 +159,7 @@ class PaymentServiceTest extends WebTestCase
 
         static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
 
-        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccounts($policy));
+        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccountsCount($policy));
     }
 
     public function testConfirmBacsDifferentPayer()
