@@ -115,6 +115,6 @@ class FraudServiceTest extends WebTestCase
         self::$dm->flush();
 
         $data = self::$fraudService->runChecks($policy);
-        $this->assertEquals(1, $data['duplicate_bank_accounts']);
+        $this->assertEquals(1, $data['duplicate_bank_accounts_count']);
     }
 }
