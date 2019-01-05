@@ -6,6 +6,7 @@ use AppBundle\Document\Feature;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
+use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
@@ -1313,6 +1314,11 @@ class PurchaseController extends BaseController
                             $policy->setRequestedCancellationReasonOther($other);
                         }
                         $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
+                        $note = new StandardNote();
+                        $note->setDate(new \DateTime());
+                        $note->setUser($policy->getUser());
+                        $note->setNotes("Policy auto cancelled in cooloff.");
+                        $policy->addNotesList($note);
                         $dm->flush();
                         $flash = "You should receive an email confirming that your policy is now cancelled.";
                         $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
