@@ -217,6 +217,64 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($user->isCredentialsNonExpired());
     }
 
+    public function testDaysLeftUntilPasswordChangeRequired()
+    {
+        $user = new User();
+        $user->addRole('ROLE_ADMIN');
+        $user->passwordChange('a', 'b', \DateTime::createFromFormat('U', time()));
+        $this->assertEquals(90, $user->daysLeftUntilPasswordChangeRequired());
+
+        $user = new User();
+        $user->addRole('ROLE_ADMIN');
+        $this->assertEquals(90, $user->daysLeftUntilPasswordChangeRequired());
+
+        $user = new User();
+
+        $date = \DateTime::createFromFormat('U', time());
+        $date->sub(new \DateInterval('P30D'));
+
+        $user->addRole('ROLE_ADMIN');
+        $user->passwordChange('a', 'b', $date);
+        $this->assertEquals(60, $user->daysLeftUntilPasswordChangeRequired());
+
+        $user = new User();
+
+        $date = \DateTime::createFromFormat('U', time());
+        $date->sub(new \DateInterval('P91D'));
+
+        $user->addRole('ROLE_ADMIN');
+        $user->passwordChange('a', 'b', $date);
+        $this->assertEquals(-1, $user->daysLeftUntilPasswordChangeRequired());
+
+        $user = new User();
+        $user->addRole('ROLE_USER');
+        $this->assertEquals(90, $user->daysLeftUntilPasswordChangeRequired());
+
+        $user = new User();
+
+        $date = \DateTime::createFromFormat('U', time());
+        $date->sub(new \DateInterval('P91D'));
+
+        $user->addRole('ROLE_USER');
+        $user->passwordChange('a', 'b', $date);
+        $this->assertEquals(-1, $user->daysLeftUntilPasswordChangeRequired());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDaysLeftUntilPasswordChangeRequiredFuture()
+    {
+        $user = new User();
+
+        $date = \DateTime::createFromFormat('U', time());
+        $date->add(new \DateInterval('P180D'));
+
+        $user->addRole('ROLE_USER');
+        $user->passwordChange('a', 'b', $date);
+        $user->daysLeftUntilPasswordChangeRequired();
+    }
+
     public function testHasUnpaidPolicy()
     {
         $user = new User();

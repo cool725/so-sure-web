@@ -41,6 +41,21 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% if user.hasEmployeeRole or user.hasClaimsRole %}
+                <tr>
+                    <td>Password expiry</td>
+                    <td>
+                        {% if user.isPasswordChangeRequired %}
+                            Expired
+                        {% else %}
+                            Not Expired ( {{ user.daysLeftUntilPasswordChangeRequired }} days left )
+                        {% endif %}
+                    </td>
+                    <td>
+                        Last changed: {{ user.lastPasswordChange|date }}
+                    </td>
+                </tr>
+                {% endif %}
                 {% if user.confirmationToken is not empty and is_granted('ROLE_EMPLOYEE') %}
                     <tr>
                         <td>Confirmation Link</td>
