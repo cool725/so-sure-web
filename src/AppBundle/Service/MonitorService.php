@@ -270,7 +270,7 @@ class MonitorService
         $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
         $updatedPolicies = $repo->findAllStatusUpdatedPolicies($oneDay, $tenMinutes);
         $errors = [];
-        $updatedPolicies = $repo->findBy(['id' => '5c30728e52c0ce57a076c5d3']);
+        //$updatedPolicies = $repo->findBy(['id' => '5c30728e52c0ce57a076c5d3']);
         foreach ($updatedPolicies as $policy) {
             /** @var Policy $policy */
             /** @var mixed $intercomUser */
