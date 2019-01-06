@@ -304,7 +304,7 @@ class IntercomService
             return $results;
         }
         $this->checkRateLimit();
-        $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
+        $resp = $this->client->leads->getLeads(['emailCanonical' => $user->getEmailCanonical()]);
         $this->storeRateLimit();
 
         $results[] = $resp;
