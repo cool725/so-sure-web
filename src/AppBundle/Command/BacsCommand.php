@@ -33,7 +33,6 @@ use phpseclib\Crypt\RSA;
 class BacsCommand extends ContainerAwareCommand
 {
     use DateTrait;
-    const S3_BUCKET = 'admin.so-sure.com';
 
     /** @var DocumentManager  */
     protected $dm;

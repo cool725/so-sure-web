@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Feature;
 use AppBundle\Document\File\ProofOfLossFile;
@@ -35,7 +36,6 @@ class ClaimsService
 {
     use ValidatorTrait;
 
-    const S3_POLICY_BUCKET = 'policy.so-sure.com';
     const S3_CLAIMS_FOLDER = 'claim-documents';
     const LOGIN_LINK_TOKEN_EXPIRATION = 7200; // 2 hours
 
@@ -130,19 +130,19 @@ class ClaimsService
 
         if ($claimDamage->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
-            $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfUsage->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfUsage->setKey($claimDamage->getProofOfUsage());
             $claim->addFile($proofOfUsage);
         }
         if ($claimDamage->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
-            $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfPurchase->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfPurchase->setKey($claimDamage->getProofOfPurchase());
             $claim->addFile($proofOfPurchase);
         }
         if ($claimDamage->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
-            $pictureOfPhone->setBucket(self::S3_POLICY_BUCKET);
+            $pictureOfPhone->setBucket(SoSure::S3_BUCKET_POLICY);
             $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
             $claim->addFile($pictureOfPhone);
         }
@@ -177,28 +177,28 @@ class ClaimsService
 
         if ($claimTheftLoss->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
-            $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfUsage->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfUsage->setKey($claimTheftLoss->getProofOfUsage());
             $claim->addFile($proofOfUsage);
         }
 
         if ($claimTheftLoss->getProofOfBarring()) {
             $proofOfBarring = new ProofOfBarringFile();
-            $proofOfBarring->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfBarring->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfBarring->setKey($claimTheftLoss->getProofOfBarring());
             $claim->addFile($proofOfBarring);
         }
 
         if ($claimTheftLoss->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
-            $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfPurchase->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfPurchase->setKey($claimTheftLoss->getProofOfPurchase());
             $claim->addFile($proofOfPurchase);
         }
 
         if ($claimTheftLoss->getProofOfLoss()) {
             $proofOfLoss = new ProofOfLossFile();
-            $proofOfLoss->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfLoss->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfLoss->setKey($claimTheftLoss->getProofOfLoss());
             $claim->addFile($proofOfLoss);
         }
@@ -222,7 +222,7 @@ class ClaimsService
         $attachments = [];
         if ($claimUpdate->getProofOfUsage()) {
             $proofOfUsage = new ProofOfUsageFile();
-            $proofOfUsage->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfUsage->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfUsage->setKey($claimUpdate->getProofOfUsage());
             $proofOfUsage->setClaim($claim);
             $claim->addFile($proofOfUsage);
@@ -230,35 +230,35 @@ class ClaimsService
         }
         if ($claimUpdate->getPictureOfPhone()) {
             $pictureOfPhone = new DamagePictureFile();
-            $pictureOfPhone->setBucket(self::S3_POLICY_BUCKET);
+            $pictureOfPhone->setBucket(SoSure::S3_BUCKET_POLICY);
             $pictureOfPhone->setKey($claimUpdate->getPictureOfPhone());
             $claim->addFile($pictureOfPhone);
             $attachments[] = $pictureOfPhone;
         }
         if ($claimUpdate->getProofOfBarring()) {
             $proofOfBarring = new ProofOfBarringFile();
-            $proofOfBarring->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfBarring->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfBarring->setKey($claimUpdate->getProofOfBarring());
             $claim->addFile($proofOfBarring);
             $attachments[] = $proofOfBarring;
         }
         if ($claimUpdate->getProofOfPurchase()) {
             $proofOfPurchase = new ProofOfPurchaseFile();
-            $proofOfPurchase->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfPurchase->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfPurchase->setKey($claimUpdate->getProofOfPurchase());
             $claim->addFile($proofOfPurchase);
             $attachments[] = $proofOfPurchase;
         }
         if ($claimUpdate->getProofOfLoss()) {
             $proofOfLoss = new ProofOfLossFile();
-            $proofOfLoss->setBucket(self::S3_POLICY_BUCKET);
+            $proofOfLoss->setBucket(SoSure::S3_BUCKET_POLICY);
             $proofOfLoss->setKey($claimUpdate->getProofOfLoss());
             $claim->addFile($proofOfLoss);
             $attachments[] = $proofOfLoss;
         }
         if ($claimUpdate->getOther()) {
             $other = new OtherClaimFile();
-            $other->setBucket(self::S3_POLICY_BUCKET);
+            $other->setBucket(SoSure::S3_BUCKET_POLICY);
             $other->setKey($claimUpdate->getOther());
             $claim->addFile($other);
             $attachments[] = $other;

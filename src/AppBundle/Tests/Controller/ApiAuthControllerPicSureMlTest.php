@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\PhonePolicy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -53,7 +54,7 @@ class ApiAuthControllerPicSureMlTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/picsure", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'policy.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_POLICY,
             'key' => 'test/picsure-test.png',
         ]);
         $data = $this->verifyResponse(200);

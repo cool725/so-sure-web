@@ -526,7 +526,7 @@ class BICommand extends ContainerAwareCommand
         $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);
 
         $result = $this->s3->putObject(array(
-            'Bucket' => 'admin.so-sure.com',
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key'    => $s3Key,
             'SourceFile' => $tmpFile,
         ));
