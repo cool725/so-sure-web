@@ -275,11 +275,13 @@ class MonitorService
             /** @var Policy $policy */
 
             // excluded from intercom checks
+            /*
             if (in_array($policy->getId(), [
-                '5c30d44e1862b25ebc501050', // ticket raised with intercom - nothing returned for user
+                '5c30d44e1862b25ebc501050',
                 ])) {
                 continue;
             }
+            */
             
             /** @var mixed $intercomUser */
             $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
