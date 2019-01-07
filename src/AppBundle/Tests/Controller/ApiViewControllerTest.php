@@ -12,6 +12,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
  * @group functional-nonet
+ * AppBundle\\Tests\\Controller\\ApiViewControllerTest
  */
 class ApiViewControllerTest extends BaseApiControllerTest
 {
@@ -129,11 +130,11 @@ class ApiViewControllerTest extends BaseApiControllerTest
 
             $debug = false;
             //$debug = true;
-            $this->verifyTerms($data, $pdf, $versionName, $debug);
+            $this->verifyTerms($data, $pdf, $version, $versionName, $debug);
         }
     }
 
-    private function verifyTerms($data, $pdf, $version, $debug = false)
+    private function verifyTerms($data, $pdf, $version, $versionName, $debug = false)
     {
         $this->assertContains('<body>', $data);
         // remove tags
@@ -150,14 +151,18 @@ class ApiViewControllerTest extends BaseApiControllerTest
         // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
         $pdf = sprintf('so-sure Policy Document%s', $pdf);
         // @codingStandardsIgnoreStart
-        $pdf = sprintf('%s Contact details Address: so-sure Limited, 10 Finsbury Square, London EC2A 1AF Email: support@wearesosure.com', $pdf);
+        if ($version >= 11) {
+            $pdf = sprintf('%s Contact details Address: so-sure Limited, 5 Martin Lane, London EC4R 0DP Email: support@wearesosure.com', $pdf);
+        } else {
+            $pdf = sprintf('%s Contact details Address: so-sure Limited, 10 Finsbury Square, London EC2A 1AF Email: support@wearesosure.com', $pdf);
+        }
         // @codingStandardsIgnoreEnd
 
         // delete extra spaces, and chunk into 200 chars to make comparision easier
         $data = trim(preg_replace('/\s+/', ' ', $data));
         $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
-        $data = sprintf('%s%s', $data, $version);
-        $pdf = sprintf('%s%s', $pdf, $version);
+        $data = sprintf('%s%s', $data, $versionName);
+        $pdf = sprintf('%s%s', $pdf, $versionName);
         $data = chunk_split($data, 200);
         $pdf = chunk_split($pdf, 200);
 
