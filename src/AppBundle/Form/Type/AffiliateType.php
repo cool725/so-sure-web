@@ -17,6 +17,7 @@ class AffiliateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $timeRanges = [
+            "Instant" => 0,
             14 => 14,
             30 => 30,
             60 => 60,
