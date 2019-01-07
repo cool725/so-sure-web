@@ -17,11 +17,19 @@
             {# TODO: Heading area #}
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
                 <h1 class="h2">Detected IMEI</h1>
-                <form id="search-form" action="{{ path('admin_detected_imei_search') }}" method="GET" target="_blank">
-                    <input type="text" name="imei" placeholder="IMEI Search">
-                    <input type="text" name="detected-imei" placeholder="Detected IMEI" class="search-detected-imei">
-                    <button type="submit" class="btn btn-success">Search</button>
-                </form>
+            </div>
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="search-form"
+                          action="{{ path('admin_detected_imei_search') }}"
+                          method="GET"
+                          target="_blank"
+                          class="form-inline">
+                        <input type="text" name="imei" placeholder="IMEI Search" class="form-control mr-md-2">
+                        <input type="text" name="detected-imei" placeholder="Detected IMEI" class="form-control search-detected-imei mr-md-2">
+                        <button type="submit" class="btn btn-success btn-square">Search</button>
+                    </form>
+                </div>
             </div>
             {% if imeis|length == 0 %}
                 <p class="mb-5">No records found</p>
