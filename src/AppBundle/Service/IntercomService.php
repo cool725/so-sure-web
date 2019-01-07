@@ -245,7 +245,7 @@ class IntercomService
      * @return mixed|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getIntercomUser(User $user)
+    public function getIntercomUser(User $user, $useIntercomId = true)
     {
         if (!$user->getIntercomId()) {
             return null;
@@ -256,7 +256,11 @@ class IntercomService
 
         try {
             $this->checkRateLimit();
-            $resp = $this->client->users->getUser($user->getIntercomId());
+            if ($useIntercomId) {
+                $resp = $this->client->users->getUser($user->getIntercomId());
+            } else {
+                $resp = $this->client->users->getUser($user->getEmail());
+            }
             $this->storeRateLimit();
 
             $this->logger->info(sprintf('getUser %s %s', $user->getEmail(), json_encode($resp)));
@@ -271,7 +275,7 @@ class IntercomService
         }
     }
 
-    private function userExists(User $user)
+    private function userExists(User $user, $useIntercomId = true)
     {
         if (!$user->getIntercomId()) {
             return false;
@@ -282,7 +286,11 @@ class IntercomService
 
         try {
             $this->checkRateLimit();
-            $resp = $this->client->users->getUser($user->getIntercomId());
+            if ($useIntercomId) {
+                $resp = $this->client->users->getUser($user->getIntercomId());
+            } else {
+                $resp = $this->client->users->getUser($user->getEmail());
+            }
             $this->storeRateLimit();
 
             $this->logger->info(sprintf('getUser %s %s', $user->getEmail(), json_encode($resp)));
