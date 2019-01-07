@@ -1,98 +1,125 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme promotionForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-promotions' %}
+
+{% block title %}so-sure - Promotions{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-<div class="row">
-    <div class="col-md-8">
-        <h2>Promotions</h2>
-    </div>
-    <div class="col-md-2">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Promotion</button>
-    </div>
-</div>
-<div class="row" style="margin-top: 20px">
-    <div class="col-md-12">
-    <table class="table table-striped" width="100%">
-        <tr>
-            <th>Name</th>
-            <th>Period</th>
-            <th>Invites Required</th>
-            <th>Claims</th>
-            <th>Reward</th>
-        </tr>
-        {% for promotion in promotions %}
-            <tr class="{% if not promotion.active %}warning{% endif %}">
-                <td><a href="{{ path('admin_promotion', {'id': promotion.id }) }}">{{ promotion.name }}</a></td>
-                <td>{{ promotion.conditionPeriod }} days</td>
-                <td>{{ promotion.conditionInvitations }}</td>
-                <td>{% if promotion.conditionAllowClaims %}Allowed{% else %}Not Allowed{% endif %}</td>
-                <td>
-                    <strong>{{ promotion.reward }}</strong>
-                    {% if promotion.reward == 'pot' %} £{{ promotion.rewardAmount }}{% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    </div>
-</div>
 
-    <div class="modal fade" id="companyModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Add Promotion</h4>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Promotions</h1>
             </div>
-        <div class="modal-body">
-            {{ form_start(promotionForm) }}
-                <div class="form-group row">
-                    {{ form_label(promotionForm.name, 'Name', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.name, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.name) }}
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary btn-square"
+                       data-toggle="modal"
+                       data-target="#company_modal">
+                        New Promotion <i class="fal fa-plus fa-fw"></i></a>
                 </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.conditionPeriod, 'Period', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionPeriod, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.conditionPeriod) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.conditionInvitations, 'Required Invitations', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionInvitations, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.conditionInvitations) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.conditionAllowClaims, 'Allow Claims', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.conditionAllowClaims, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.conditionAllowClaims) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.reward, 'Reward', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.reward, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.reward) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_label(promotionForm.rewardAmount, 'Reward Amount', {'label_attr': {'class': 'col-sm-2 col-form-label'}}) }}
-                    <div class="col-sm-10">{{ form_widget(promotionForm.rewardAmount, {'attr': {'class': 'form-control'}}) }}</div>
-                    {{ form_errors(promotionForm.rewardAmount) }}
-                </div>
-                <div class="form-group row">
-                    {{ form_widget(promotionForm.next, {'attr': {'class': 'btn btn-primary'}, 'label': 'Add Promotion'}) }}
-                </div>
-            {{ form_end(promotionForm) }}
-          </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Period</th>
+                            <th>Invites Required</th>
+                            <th>Claims</th>
+                            <th>Reward</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for promotion in promotions %}
+                        <tr class="{% if not promotion.active %}table-warning{% endif %}">
+                            <td><a href="{{ path('admin_promotion', {'id': promotion.id }) }}">{{ promotion.name }}</a></td>
+                            <td>{{ promotion.conditionPeriod }} days</td>
+                            <td>{{ promotion.conditionInvitations }}</td>
+                            <td>{% if promotion.conditionAllowClaims %}Allowed{% else %}Not Allowed{% endif %}</td>
+                            <td>
+                                {{ promotion.reward }}
+                                {% if promotion.reward == 'pot' %} - &pound;{{ promotion.rewardAmount }}{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="company_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="company_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Promotion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(promotionForm) }}
+                        <div class="form-group">
+                            {{ form_label(promotionForm.name, 'Name', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(promotionForm.name, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(promotionForm.name) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(promotionForm.conditionPeriod, 'Period', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(promotionForm.conditionPeriod, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(promotionForm.conditionPeriod) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(promotionForm.conditionInvitations, 'Required Invitations', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(promotionForm.conditionInvitations, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(promotionForm.conditionInvitations) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(promotionForm.conditionAllowClaims, {
+                                'label': 'Allow claims',
+                                'attr': {'class':'custom-control-input'}}
+                            ) }}
+                            <div class="with-errors">{{ form_errors(promotionForm.conditionAllowClaims) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(promotionForm.reward, 'Reward', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(promotionForm.reward, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(promotionForm.reward) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(promotionForm.rewardAmount, 'Reward Amount', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(promotionForm.rewardAmount, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(promotionForm.rewardAmount) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(promotionForm.next, {'attr': {'class': 'btn btn-success btn-square'}, 'label': 'Add Promotion'}) }}
+                        </div>
+                    {{ form_end(promotionForm) }}
+                </div>
+            </div>
+        </div>
     </div>
 
-</div>
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
