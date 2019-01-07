@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\RouterService;
+use Aws\S3\S3Client;
 use FOS\UserBundle\Model\UserManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -82,6 +83,8 @@ class InvitationServicePaidTest extends WebTestCase
         $router = self::$container->get('app.router');
         /** @var MixpanelService $mixpanelService */
         $mixpanelService = self::$container->get('app.mixpanel');
+        /** @var S3Client $s3Client */
+        $s3Client = self::$container->get('aws.s3');
         $mailer = new MailerService(
             new \Swift_Mailer($transport),
             $transport,
@@ -89,7 +92,10 @@ class InvitationServicePaidTest extends WebTestCase
             $router,
             'foo@foo.com',
             'bar',
-            $mixpanelService
+            $mixpanelService,
+            $s3Client,
+            self::$container->getParameter('kernel.environment'),
+            $dm
         );
         /** @var InvitationService invitationService */
         $invitationService = self::$container->get('app.invitation');

@@ -3407,19 +3407,19 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/KEY_NOT_FOUND',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_FILE_NOT_FOUND);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-invalid.txt',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_FILE_INVALID);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid-no-suspected-fraud.png',
         ]);
         $data = $this->verifyResponse(200);
@@ -3431,7 +3431,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertFalse($updatedPolicy->getImeiCircumvention());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid-suspected-fraud.png',
         ]);
         $data = $this->verifyResponse(200);
@@ -3477,7 +3477,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/KEY_NOT_FOUND',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_NOT_FOUND);
@@ -3489,7 +3489,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-invalid.txt',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_INVALID);
@@ -3501,7 +3501,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-valid1.jpg',
         ]);
         $data = $this->verifyResponse(200);
@@ -3514,7 +3514,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertFalse($updatedPolicy->getPicSureCircumvention());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'ops.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_OPS,
             'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-valid2.png',
         ]);
         $data = $this->verifyResponse(200);
@@ -3545,7 +3545,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/picsure", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'policy.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_POLICY,
             'key' => 'test/picsure-test.png',
         ]);
         $data = $this->verifyResponse(200);
@@ -3587,7 +3587,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s/picsure", $policyData['id']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'policy.so-sure.com',
+            'bucket' => SoSure::S3_BUCKET_POLICY,
             'key' => 'test/picsure-test.png',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_DISALLOWED);

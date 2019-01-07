@@ -883,6 +883,28 @@
                 </tr>
             </table>
             {% endif %}
+            <h2>User Files</h2>
+            <table class="table table-striped">
+                {% for file in policy.user.userFiles %}
+                    <tr>
+                        <td>{{ file.fileType }}</td>
+                        <td>
+                            {% if is_granted('ROLE_EMPLOYEE') %}
+                                <a href="{{ path('admin_download_file_attachment', {'id': file.id}) }}">{{ file.fileName }}</a>
+                            {% elseif is_granted('ROLE_CLAIMS') %}
+                                <a href="{{ path('claims_download_file', {'id': file.id}) }}">{{ file.fileName }}</a>
+                            {% endif %}
+                            <br>
+                            (Generated {{ file.created|date }})
+                        </td>
+                        <td>
+                            {% for key, value in file.metadata %}
+                                {{ key }} => {{ value|json_encode }}<br />
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
             {% if is_granted('ROLE_EMPLOYEE') %}

@@ -70,7 +70,6 @@ class PolicyService
     use CurrencyTrait;
     use DateTrait;
 
-    const S3_BUCKET = 'policy.so-sure.com';
     const KEY_POLICY_QUEUE = 'policy:queue';
     const KEY_PREVENT_CANCELLATION = 'policy:prevent-cancellation:%s';
     const CACHE_PREVENT_CANCELLATION = 43200; // 12 hours
@@ -707,7 +706,7 @@ class PolicyService
         $this->uploadS3($tmpFile, $filename, $policy);
 
         $policyTermsFile = new PolicyTermsFile();
-        $policyTermsFile->setBucket(self::S3_BUCKET);
+        $policyTermsFile->setBucket(SoSure::S3_BUCKET_POLICY);
         $policyTermsFile->setKey($this->getS3Key($policy, $filename));
         $policy->addPolicyFile($policyTermsFile);
 
@@ -746,7 +745,7 @@ class PolicyService
         $this->uploadS3($tmpFile, $filename, $policy);
 
         $policyScheduleFile = new PolicyScheduleFile();
-        $policyScheduleFile->setBucket(self::S3_BUCKET);
+        $policyScheduleFile->setBucket(SoSure::S3_BUCKET_POLICY);
         $policyScheduleFile->setKey($this->getS3Key($policy, $filename));
         $policy->addPolicyFile($policyScheduleFile);
 
@@ -767,7 +766,7 @@ class PolicyService
         $s3Key = $this->getS3Key($policy, $filename);
 
         $result = $this->s3->putObject(array(
-            'Bucket' => self::S3_BUCKET,
+            'Bucket' => SoSure::S3_BUCKET_POLICY,
             'Key'    => $s3Key,
             'SourceFile' => $file,
         ));
@@ -1066,7 +1065,7 @@ class PolicyService
             $attachments[] = $this->downloadS3($file);
         }
 
-        $this->newPolicyEmail($policy, $attachments, 'bcc@so-sure.com');
+        return $this->newPolicyEmail($policy, $attachments, 'bcc@so-sure.com');
     }
 
     public function downloadS3(S3File $s3file)
@@ -1116,7 +1115,11 @@ class PolicyService
                 sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
                 ['exception' => $e]
             );
+
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -1159,9 +1162,9 @@ class PolicyService
             $policyNumber = $policy->getPolicyNumber();
             $this->logger->error("Trying to notify policy {$policyNumber} of nonexistent tastecard.");
         } elseif ($this->mailer) {
-            $this->mailer->sendTemplate(
+            $this->mailer->sendTemplateToUser(
                 "Your new Taste Card from So-Sure",
-                $policy->getUser()->getEmail(),
+                $policy->getUser(),
                 'AppBundle:Email:policy/email_new_taste_card.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:policy/email_new_taste_card.txt.twig',

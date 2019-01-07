@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\SoSure;
 use Aws\S3\S3Client;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
@@ -18,8 +19,6 @@ use Symfony\Component\Templating\EngineInterface;
 class InvoiceService
 {
     use CurrencyTrait;
-
-    const S3_BUCKET = 'admin.so-sure.com';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -164,7 +163,7 @@ class InvoiceService
         $this->uploadS3($tmpFile, $filename);
 
         $invoiceFile = new InvoiceFile();
-        $invoiceFile->setBucket(self::S3_BUCKET);
+        $invoiceFile->setBucket(SoSure::S3_BUCKET_ADMIN);
         $invoiceFile->setKey($this->getS3Key($filename));
         $invoice->addInvoiceFile($invoiceFile);
         $this->dm->flush();
@@ -187,7 +186,7 @@ class InvoiceService
         $s3Key = $this->getS3Key($filename);
 
         $result = $this->s3->putObject(array(
-            'Bucket' => self::S3_BUCKET,
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key'    => $s3Key,
             'SourceFile' => $file,
         ));
@@ -207,7 +206,7 @@ class InvoiceService
         }
 
         $result = $this->s3->getObject(array(
-            'Bucket' => self::S3_BUCKET,
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key'    => $invoiceFile->getKey(),
             'SaveAs' => $file,
         ));

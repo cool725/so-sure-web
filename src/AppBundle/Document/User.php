@@ -3,6 +3,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -419,6 +420,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      */
     protected $firstLoginInApp;
+
+    /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\File\S3File",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $userFiles = array();
 
     public function __construct()
     {
@@ -1626,6 +1635,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $policy->setPhoneVerified($identityLog->isSamePhone($policy->getPhone()));
             }
         }
+    }
+
+    public function getUserFiles()
+    {
+        return $this->userFiles;
+    }
+
+    public function addUserFile(S3File $file)
+    {
+        $this->userFiles[] = $file;
     }
 
     /**

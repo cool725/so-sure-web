@@ -115,8 +115,7 @@ class DefaultController extends BaseController
             'page_type' => $pageType,
         );
 
-        // $template = 'AppBundle:Default:index.html.twig';
-        $template = 'AppBundle:Default:indexXmas.html.twig';
+        $template = 'AppBundle:Default:index.html.twig';
 
         return $this->render($template, $data);
     }

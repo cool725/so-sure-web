@@ -1021,7 +1021,7 @@ class AdminController extends BaseController
                 $judoForm->handleRequest($request);
                 if ($judoForm->isSubmitted() && $judoForm->isValid()) {
                     $dm = $this->getManager();
-                    $judoFile->setBucket('admin.so-sure.com');
+                    $judoFile->setBucket(SoSure::S3_BUCKET_ADMIN);
                     $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $judoService = $this->get('app.judopay');
@@ -1039,7 +1039,7 @@ class AdminController extends BaseController
                 $barclaysForm->handleRequest($request);
                 if ($barclaysForm->isSubmitted() && $barclaysForm->isValid()) {
                     $dm = $this->getManager();
-                    $barclaysFile->setBucket('admin.so-sure.com');
+                    $barclaysFile->setBucket(SoSure::S3_BUCKET_ADMIN);
                     $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     /** @var BarclaysService $barclaysService */
@@ -1058,7 +1058,7 @@ class AdminController extends BaseController
                 $barclaysStatementForm->handleRequest($request);
                 if ($barclaysStatementForm->isSubmitted() && $barclaysStatementForm->isValid()) {
                     $dm = $this->getManager();
-                    $barclaysStatementFile->setBucket('admin.so-sure.com');
+                    $barclaysStatementFile->setBucket(SoSure::S3_BUCKET_ADMIN);
                     $barclaysStatementFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $barclaysService = $this->get('app.barclays');
@@ -1076,7 +1076,7 @@ class AdminController extends BaseController
                 $cashflowsForm->handleRequest($request);
                 if ($cashflowsForm->isSubmitted() && $cashflowsForm->isValid()) {
                     $dm = $this->getManager();
-                    $cashflowsFile->setBucket('admin.so-sure.com');
+                    $cashflowsFile->setBucket(SoSure::S3_BUCKET_ADMIN);
                     $cashflowsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     /** @var CashflowsService $cashflowsService */
@@ -1095,7 +1095,7 @@ class AdminController extends BaseController
                 $lloydsForm->handleRequest($request);
                 if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
                     $dm = $this->getManager();
-                    $lloydsFile->setBucket('admin.so-sure.com');
+                    $lloydsFile->setBucket(SoSure::S3_BUCKET_ADMIN);
                     $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     /** @var LloydsService $lloydsService */
@@ -1114,7 +1114,7 @@ class AdminController extends BaseController
                 $reconciliationForm->handleRequest($request);
                 if ($reconciliationForm->isSubmitted() && $reconciliationForm->isValid()) {
                     $dm = $this->getManager();
-                    $reconciliationFile->setBucket('admin.so-sure.com');
+                    $reconciliationFile->setBucket(SoSure::S3_BUCKET_ADMIN);
                     $reconciliationFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
                     $reconciliationFile->setDate($date);
 
