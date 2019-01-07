@@ -295,7 +295,7 @@ class MonitorService
                     // Missing attribute indicates that potentially this is a lead rather than user
                     if ($intercomUser = $this->intercom->getIntercomUser($policy->getUser(), false)) {
                         $attributes = $intercomUser->{'custom_attributes'};
-                        if ($intercomUser->id != $policy->getUser()->getIntercomId())
+                        if ($intercomUser->id != $policy->getUser()->getIntercomId()) {
                             $policy->getUser()->setIntercomId($intercomUser->id);
                             $this->logger->warning(sprintf(
                                 'Adjusting intercom id from lead to user for policy %s & requeuing update',
