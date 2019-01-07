@@ -385,15 +385,11 @@ class ApiAuthController extends BaseController
                 /** @var JudopayService $judopay */
                 $judopay = $this->get('app.judopay');
                 if (!$judopay->multiPay($multiPay, $amount)) {
-                    // TODO: Change to payment declined
-                    throw new \Exception('Failed payment');
-                    /*
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED,
                         'Access denied',
                         422
                     );
-                    */
                 }
                 $multiPay->setStatus(MultiPay::STATUS_ACCEPTED);
             } else {
@@ -403,6 +399,39 @@ class ApiAuthController extends BaseController
             $dm->flush();
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $action, 200);
+        } catch (InvalidPremiumException $e) {
+            $this->get('logger')->error(sprintf(
+                'Invalid premium policy %s in mulitpay.',
+                $id
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT,
+                'Invalid premium paid',
+                422
+            );
+        } catch (ProcessedException $e) {
+            $this->get('logger')->error(sprintf(
+                'Duplicate receipt id for policy %s in multipay',
+                $id
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
+                'Payment not valid',
+                422
+            );
+        } catch (PaymentDeclinedException $e) {
+            $this->get('logger')->info(sprintf(
+                'Payment declined policy %s in multipay.',
+                $id
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED,
+                'Payment Declined',
+                422
+            );
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (NotFoundHttpException $e) {
