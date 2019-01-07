@@ -134,7 +134,7 @@ class DefaultController extends BaseController
         );
 
 
-        $template = 'AppBundle:Default:indexXmas.html.twig';
+        $template = 'AppBundle:Default:indexPromotions.html.twig';
 
         return $this->render($template, $data);
     }
@@ -152,7 +152,7 @@ class DefaultController extends BaseController
             'page_type' => $pageType,
         );
 
-        $template = 'AppBundle:Default:indexXmas.html.twig';
+        $template = 'AppBundle:Default:indexPromotions.html.twig';
 
         return $this->render($template, $data);
     }
