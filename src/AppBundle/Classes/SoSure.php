@@ -18,6 +18,7 @@ class SoSure
 
     const S3_BUCKET_ADMIN = 'admin.so-sure.com';
     const S3_BUCKET_POLICY = 'policy.so-sure.com';
+    const S3_BUCKET_OPS = 'ops.so-sure.com';
 
     public static function getSoSureTimezone()
     {

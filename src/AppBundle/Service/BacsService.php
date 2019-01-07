@@ -47,8 +47,6 @@ class BacsService
     use DateTrait;
     use CurrencyTrait;
 
-    const S3_POLICY_BUCKET = 'policy.so-sure.com';
-    const S3_ADMIN_BUCKET = 'admin.so-sure.com';
     const SUN = '176198';
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
@@ -486,7 +484,7 @@ class BacsService
         $s3Key = $this->getS3Key($filename, $folder);
 
         $repo = $this->dm->getRepository(UploadFile::class);
-        $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
+        $existingFile = $repo->findOneBy(['bucket' => SoSure::S3_BUCKET_ADMIN, 'key' => $s3Key]);
 
         return $existingFile != null;
     }
@@ -510,16 +508,16 @@ class BacsService
         $s3Key = $this->getS3Key($filename, $folder);
 
         if ($this->isS3FilePresent($filename, $folder)) {
-            throw new \Exception(sprintf('File s3://%s/%s already exists', self::S3_ADMIN_BUCKET, $s3Key));
+            throw new \Exception(sprintf('File s3://%s/%s already exists', SoSure::S3_BUCKET_ADMIN, $s3Key));
         }
 
         $this->s3->putObject(array(
-            'Bucket' => self::S3_ADMIN_BUCKET,
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key' => $s3Key,
             'SourceFile' => $encTempFile,
         ));
 
-        $uploadFile->setBucket(self::S3_ADMIN_BUCKET);
+        $uploadFile->setBucket(SoSure::S3_BUCKET_ADMIN);
         $uploadFile->setKey($s3Key);
         $uploadFile->setDate($date);
 
@@ -553,7 +551,7 @@ class BacsService
         //file_put_contents($tempFile, null);
 
         $this->s3->getObject(array(
-            'Bucket' => self::S3_ADMIN_BUCKET,
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key' => $s3File->getKey(),
             'SaveAs' => $encTempFile
         ));
@@ -2139,7 +2137,7 @@ class BacsService
 
         $date = \DateTime::createFromFormat('U', time());
         $ddNotificationFile = new DirectDebitNotificationFile();
-        $ddNotificationFile->setBucket(self::S3_POLICY_BUCKET);
+        $ddNotificationFile->setBucket(SoSure::S3_BUCKET_POLICY);
         $ddNotificationFile->setKeyFormat(
             $this->environment . '/dd-notification/' . $date->format('Y') . '/%s'
         );
@@ -2149,7 +2147,7 @@ class BacsService
 
         if ($this->environment != "test") {
             $result = $this->s3->putObject(array(
-                'Bucket' => self::S3_POLICY_BUCKET,
+                'Bucket' => SoSure::S3_BUCKET_POLICY,
                 'Key' => $ddNotificationFile->getKey(),
                 'SourceFile' => $tmpFile,
             ));

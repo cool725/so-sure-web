@@ -707,6 +707,9 @@ services:
             - "%default_sender_address%"
             - "%default_sender_name%"
             - "@app.mixpanel"
+            - "@aws.s3"
+            - "%kernel.environment%"
+            - "@doctrine_mongodb.odm.default_document_manager"
 
     app.router:
         alias: AppBundle\Service\RouterService

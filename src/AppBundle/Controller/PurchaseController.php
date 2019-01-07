@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\PurchaseStepPayment;
@@ -415,7 +416,7 @@ class PurchaseController extends BaseController
                                 $policy->setPhoneVerified(true);
                                 $imeiUploadFile->setFile($purchase->getFile());
                                 $imeiUploadFile->setPolicy($policy);
-                                $imeiUploadFile->setBucket('policy.so-sure.com');
+                                $imeiUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
                                 $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
                                 $policy->addPolicyFile($imeiUploadFile);
                             }

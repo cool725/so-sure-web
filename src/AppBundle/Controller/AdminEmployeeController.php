@@ -1272,12 +1272,17 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('resend_email_form')) {
                 $resendEmailForm->handleRequest($request);
                 if ($resendEmailForm->isValid()) {
-                    $policyService->resendPolicyEmail($policy);
-                    $this->addFlash(
-                        'success',
-                        'Resent the policy email.'
-                    );
-
+                    if ($policyService->resendPolicyEmail($policy)) {
+                        $this->addFlash(
+                            'success',
+                            'Resent the policy email.'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Failed to resend the policy email.'
+                        );
+                    }
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('bacs_form')) {
@@ -1343,7 +1348,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     // we're assuming that a manaual check is done to verify
                     $policy->setPhoneVerified(true);
                     $imeiUploadFile->setPolicy($policy);
-                    $imeiUploadFile->setBucket('policy.so-sure.com');
+                    $imeiUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
                     $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $policy->addPolicyFile($imeiUploadFile);
@@ -1359,7 +1364,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     // we're assuming that a manaual check is done to verify
                     $policy->setScreenVerified(true);
                     $screenUploadFile->setPolicy($policy);
-                    $screenUploadFile->setBucket('policy.so-sure.com');
+                    $screenUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
                     $screenUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $policy->addPolicyFile($screenUploadFile);
