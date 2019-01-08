@@ -66,6 +66,7 @@ class S3File
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false)
      */
     protected $date;
 
