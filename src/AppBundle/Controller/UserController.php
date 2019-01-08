@@ -1754,14 +1754,20 @@ class UserController extends BaseController
             }
         }
 
-        $old = $this->now()->diff($claim->getNotificationDate())->days;
-        if ($old > 45) {
-            $this->addFlash(
-                'warning-raw',
-                'This appears to be an older claim that was never resolved. Please contact <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
-            );
+        // older unresolved davies claims are problematic. but don't give away too much info in case of fraud
+        // intentions
+        if ($claim->getNotificationDate()) {
+            $old = $this->now()->diff($claim->getNotificationDate())->days;
+            if ($old > 45) {
+                // @codingStandardsIgnoreStart
+                $this->addFlash(
+                    'warning-raw',
+                    'This appears to be an older claim that was never resolved. Please contact <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
+                );
+                // @codingStandardsIgnoreEnd
+            }
         }
-
+        
         $data = [
             'claim' => $claim,
             'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
