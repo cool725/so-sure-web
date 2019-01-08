@@ -164,7 +164,8 @@ class LloydsService
                         } elseif (trim($line['Transaction Description']) == 'BACS') {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $paymentType = self::PAYMENT_TYPE_BACS;
-                        } elseif ($amount < 0 && preg_match('/DDIC[0-9A-Z]{4,20}/', $line['Transaction Description'], $matches)) {
+                        } elseif ($amount < 0 &&
+                            preg_match('/DDIC[0-9A-Z]{4,20}/', $line['Transaction Description'], $matches)) {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $processedDate = $this->startOfDay($processedDate);
                             $paymentType = self::PAYMENT_TYPE_BACS_DDIC;
