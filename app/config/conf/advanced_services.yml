@@ -1,4 +1,6 @@
 # Advanced services
+imports:
+    - { resource: abstract_services.yml }
 
 services:
     # default configuration for services in *this* file
@@ -28,6 +30,7 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../../../src/App/*'
+        exclude: '../../../src/App/Hubspot/HubspotData*'
 
     ## Controllers ####################################################
 
@@ -54,6 +57,10 @@ services:
         arguments:
             $kpi: '@App\Admin\Reports\KpiCached.inner'
     App\Admin\Reports\KpiInterface: '@App\Admin\Reports\KpiCached'
+
+    App\Hubspot\ApiCreateStructures:
+    arguments:
+        $hubspotKey: "%hubspot_app_key%"
 
     ###################################################################
     ## Legacy Aliases for services - to remove after Symfony 4.1 with access to test.container

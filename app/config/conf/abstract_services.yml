@@ -1,0 +1,14 @@
+# In their own file to avoid issues with a _default block
+services:
+    App\Services\DataHash:
+        abstract:  true
+        #public: false
+
+    App\Hubspot\HubspotData:
+        autowire: true
+        parent: App\Services\DataHash
+        arguments:
+            $fieldName: 'hubspotDataHash'
+        #autoconfigure: true
+        #public: false
+        #abstract:  false

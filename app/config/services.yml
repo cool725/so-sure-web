@@ -218,6 +218,13 @@ services:
             - "@app.mailer"
             - "@logger"
 
+    app.hubspot:
+        class: AppBundle\Service\HubspotService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "%hubspot_app_key%"
+            - "@snc_redis.default"
+
     app.bacs:
         alias: AppBundle\Service\BacsService
         public: true
@@ -1129,6 +1136,24 @@ services:
             -  { name: kernel.event_listener, event: event.picsure.approved, method: onPicSureUndamagedEvent }
             -  { name: kernel.event_listener, event: event.picsure.invalid, method: onPicSureInvalidEvent }
             -  { name: kernel.event_listener, event: event.picsure.rejected, method: onPicSureDamagedEvent }
+
+    app.listener.hubspot:
+        class: AppBundle\Listener\HubspotListener
+        tags:
+            -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
+            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+            -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyStartEvent }
+            -  { name: kernel.event_listener, event: event.policy.unpaid, method: onPolicyUnpaidEvent }
+            -  { name: kernel.event_listener, event: event.policy.reactivated, method: onPolicyReactivatedEvent }
+            -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
+            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
+            -  { name: kernel.event_listener, event: event.payment.failed, method: onPaymentFailedEvent }
+            -  { name: kernel.event_listener, event: event.payment.first-problem, method: onPaymentFirstProblemEvent }
+            -  { name: kernel.event_listener, event: event.user.payment.failed, method: onUserPaymentFailedEvent }
 
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
