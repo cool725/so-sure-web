@@ -69,7 +69,8 @@ Encore
             $: "jquery",
             jQuery: "jquery",
             Bloodhound: "corejs-typeahead/dist/bloodhound.js",
-            doT: "dot/doT.js"
+            doT: "dot/doT.js",
+            moment: "moment"
         })
     )
 ;
