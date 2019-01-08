@@ -65,6 +65,12 @@ class IntercomCommand extends ContainerAwareCommand
                 'Requeue the given user (if email param given) or all users'
             )
             ->addOption(
+                'update',
+                null,
+                InputOption::VALUE_NONE,
+                'Update user immediately (requires email param)'
+            )
+            ->addOption(
                 'count-queue',
                 null,
                 InputOption::VALUE_NONE,
@@ -115,7 +121,7 @@ class IntercomCommand extends ContainerAwareCommand
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
         $email = $input->getOption('email');
-        $requeue = $input->getOption('requeue');
+        $requeue = true === $input->getOption('requeue');
         $convertLead = $input->getOption('convert-lead');
         $undelete = true === $input->getOption('undelete');
         $maintenance = true === $input->getOption('maintenance');
@@ -123,6 +129,7 @@ class IntercomCommand extends ContainerAwareCommand
         $userMaintenance = true === $input->getOption('user-maintenance');
         $pendingInvites = true === $input->getOption('pending-invites');
         $countQueue = true === $input->getOption('count-queue');
+        $update = true === $input->getOption('update');
 
         if ($email) {
             $user = $this->getUser($email);
@@ -130,8 +137,16 @@ class IntercomCommand extends ContainerAwareCommand
             if ($requeue) {
                 $resp = $this->intercom->queue($user);
                 $output->writeln(sprintf('User %s was requeued', $user->getId()));
+            } elseif ($update) {
+                $resp = $this->intercom->update($user);
+                $output->writeln(sprintf('User %s was updated. Response:', $user->getId()));
+                $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             } else {
-                $resp = $this->intercom->update($user, true, $undelete);
+                if ($user->getIntercomId()) {
+                    $resp = $this->intercom->getIntercomUser($user);
+                } else {
+                    $resp = $this->intercom->getIntercomUser($user, false);
+                }
                 $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             }
         } elseif ($convertLead) {

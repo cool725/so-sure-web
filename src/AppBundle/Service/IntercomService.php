@@ -247,7 +247,7 @@ class IntercomService
      */
     public function getIntercomUser(User $user, $useIntercomId = true)
     {
-        if (!$user->getIntercomId()) {
+        if ($useIntercomId && !$user->getIntercomId()) {
             return null;
         }
         if (!$user->hasEmail()) {
@@ -259,7 +259,7 @@ class IntercomService
             if ($useIntercomId) {
                 $resp = $this->client->users->getUser($user->getIntercomId());
             } else {
-                $resp = $this->client->users->getUser($user->getEmail());
+                $resp = $this->client->users->getUsers(['email' => $user->getEmailCanonical()]);
             }
             $this->storeRateLimit();
 
