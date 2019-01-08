@@ -92,7 +92,7 @@ class PolicyServiceTest extends WebTestCase
     public function setUp()
     {
         parent::setUp();
-        set_time_limit(240);
+        set_time_limit(480);
     }
 
     public function tearDown()
