@@ -152,6 +152,9 @@ class UserRepository extends DocumentRepository
 
         if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
             $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
+            if (!$accountHash) {
+                $accountHash = ['NotAHash'];
+            }
             $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
         } elseif ($user->getPaymentMethod() instanceof BacsPaymentMethod) {
             $accountHash = $user->getPaymentMethod()->getBankAccount() ?
