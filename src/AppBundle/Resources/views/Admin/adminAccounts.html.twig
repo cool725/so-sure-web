@@ -22,16 +22,20 @@
             {# TODO: Controls area #}
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
-                    <form class="month-form form-inline"
+                    <form id="month_form"
+                          class="form-inline"
                           method="GET"
                           autocomplete="off">
                         <div class="form-group">
+                            <label class="mr-md-2">Choose date:</label>
                             <div class="input-group date"
                                  id="date_time_picker"
-                                 data-target-input="nearest">
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_accounts') }}">
                                 <input type="text"
                                        class="form-control datetimepicker-input"
-                                       data-target="#date_time_picker"/>
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
                                 <div class="input-group-append"
                                      data-target="#date_time_picker"
                                      data-toggle="datetimepicker">

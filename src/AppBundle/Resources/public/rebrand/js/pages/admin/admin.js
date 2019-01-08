@@ -12,15 +12,16 @@ $(function(){
 
     $('[data-toggle="tooltip"]').tooltip();
 
+    // https://tempusdominus.github.io/bootstrap-4/Usage/
     $('#date_time_picker').datetimepicker({
-        format: 'L'
+        format: "MM-YYYY",
     });
 
-    $('#date_time_picker').on('change', function(e) {
+    $('#date_time_picker').on('change.datetimepicker', function(e) {
         let date  = new Date(e.date),
             month = date.getMonth() + 1,
             url   = $(this).data('url') + '/' + date.getFullYear() + '/' + month;
-        $('.month-form').attr('action', url);
+        $('#month_form').attr('action', url);
     });
 
 });

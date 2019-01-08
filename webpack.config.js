@@ -70,7 +70,7 @@ Encore
             jQuery: "jquery",
             Bloodhound: "corejs-typeahead/dist/bloodhound.js",
             doT: "dot/doT.js",
-            moment: "moment"
+            moment: "moment",
         })
     )
 ;
