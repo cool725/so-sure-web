@@ -28,7 +28,7 @@
                           autocomplete="off">
                         <div class="form-group">
                             <label class="mr-md-2">Choose date:</label>
-                            <div class="input-group date"
+                            <div class="input-group date mr-md-2"
                                  id="date_time_picker"
                                  data-target-input="nearest"
                                  data-url="{{ path('admin_accounts') }}">
@@ -43,29 +43,37 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-md-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            {{ form_start(salvaForm) }}
+                                <a class="btn btn-info btn-square mr-md-2" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
+                                    <i class="fa fa-print fa-fw"></i></a>
+                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': "btn btn-warning salva-export btn-square"}}) }}
+                            {{ form_end(salvaForm) }}
+                        </div>
                     </form>
-{#                     <a href="#"
-                       class="btn btn-primary btn-square"
-                       data-toggle="modal"
-                       data-target="#company_modal">
-                        New Promotion <i class="fal fa-plus fa-fw"></i></a> #}
                 </div>
             </div>
 
-            {# {% include 'AppBundle:Admin:adminAccountsData.html.twig' %} #}
-            {# TODO: Content area #}
-{#             <div class="table-responsive-sm mb-5">
-                <table class="table table-striped">
-                    <thead class="thead-light">
-                        <tr>
+            {% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
 
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-            </div> #}
+            {% for file in files %}
+                {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' %}
+                {% set filename = file.filename|split('.') %}
+                {% set file_dates = filename[0]|split('-') %}
+                {% set file_date = file_dates[file_dates|length - 1] %}
+                <h3>{{ file.filename }} [From {{ file_date|date }}]</h3>
+                <ul>
+                    {% for key, value in file.metadata %}
+                        <li>{{ key }}: {{ value }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            {% endfor %}
         </div>
     </section>
 
