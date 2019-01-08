@@ -39,6 +39,10 @@ Encore
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
     .addEntry('detected-imei', './src/AppBundle/Resources/public/rebrand/js/pages/admin/detected-imei.js')
+    .addEntry('accounts', './src/AppBundle/Resources/public/rebrand/js/pages/admin/accounts.js')
+
+    // Admin Extras
+    .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
 
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
