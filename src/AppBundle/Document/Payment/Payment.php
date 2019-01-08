@@ -96,6 +96,7 @@ abstract class Payment
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=false)
      */
     protected $date;
 
