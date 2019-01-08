@@ -89,7 +89,7 @@ class GoCompare
         1446 => ['make' => 'Apple', 'model' => 'iPhone XS Max', 'memory' => 64],
         1447 => ['make' => 'Apple', 'model' => 'iPhone XS Max', 'memory' => 256],
         1448 => ['make' => 'Apple', 'model' => 'iPhone XS Max', 'memory' => 512],
-        1449 => ['make' => 'Samsung', 'model' => 'Galaxy J6 (2018)', 'memory' => 32],
+        1449 => ['make' => 'Samsung', 'model' => 'Galaxy J6', 'memory' => 32],
 
         1450 => ['make' => 'Huawei', 'model' => 'Honor 9', 'memory' => 64],
         //1451 => ['make' => 'Huawei', 'model' => 'Honor 7A', 'memory' => 512],
@@ -104,7 +104,7 @@ class GoCompare
         //1460 => ['make' => 'Sony', 'model' => 'Xperia L1', 'memory' => 512],
         //1461 => ['make' => 'Sony', 'model' => 'Xperia L2', 'memory' => 512],
         1462 => ['make' => 'Sony', 'model' => 'Xperia XZ3', 'memory' => 64],
-        1463 => ['make' => 'Samsung', 'model' => 'A6 (2018)', 'memory' => 32],
+        1463 => ['make' => 'Samsung', 'model' => 'Galaxy A6', 'memory' => 32],
         1464 => ['make' => 'Google', 'model' => 'Pixel 3', 'memory' => 64],
         1465 => ['make' => 'Google', 'model' => 'Pixel 3 XL', 'memory' => 64],
     ];
