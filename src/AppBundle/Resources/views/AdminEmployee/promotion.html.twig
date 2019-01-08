@@ -1,67 +1,82 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-promotion' %}
+
+{% block title %}so-sure - Promotion{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-    <div class="row">
-        <div class="col-md-8">
-            <h2>Promotion - {{ promotion.name }}</h2>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Parameters</h3>
-            <table class="table table-striped">
-                <tr>
-                    <th>Start</th>
-                    <th>Active</th>
-                    <th>Period</th>
-                    <th>Required Invitations</th>
-                    <th>Claims</th>
-                    <th>Reward</th>
-                </tr>
-                <tr>
-                    <td>{{ promotion.start|date("d/m/Y")}}</td>
-                    <td>{{ promotion.active ? 'Active' : 'Inactive'}}</td>
-                    <td>{{ promotion.conditionPeriod }}</td>
-                    <td>{{ promotion.conditionInvitations }}</td>
-                    <td>{{ promotion.conditionAllowClaims ? 'Allowed' : 'Not Allowed' }}</td>
-                    <td>
-                        <strong>{{ promotion.reward }}</strong>
-                        {% if promotion.reward == 'pot' %}£{{ promotion.rewardAmount }}{% endif %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div class="row" style="margin-top: 20px">
-        <div class="col-md-12">
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Promotion - {{ promotion.name }}</h1>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Start</th>
+                            <th>Active</th>
+                            <th>Period</th>
+                            <th>Required Invitations</th>
+                            <th>Claims</th>
+                            <th>Reward</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ promotion.start|date("d/m/Y")}}</td>
+                            <td>{{ promotion.active ? 'Active' : 'Inactive'}}</td>
+                            <td>{{ promotion.conditionPeriod }}</td>
+                            <td>{{ promotion.conditionInvitations }}</td>
+                            <td>{{ promotion.conditionAllowClaims ? 'Allowed' : 'Not Allowed' }}</td>
+                            <td>
+                                <strong>{{ promotion.reward }}</strong>
+                                {% if promotion.reward == 'pot' %}£{{ promotion.rewardAmount }}{% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <h3>Policies</h3>
-            <table class="table table-striped">
-                <tr>
-                    <th>User</th>
-                    <th>Policy</th>
-                    <th>Start</th>
-                    <th>Status</th>
-                </tr>
-                {% for participation in promotion.participating %}
-                    <tr class="{% if not promotion.active %}warning{% endif %}">
-                        <td><a href="{{ path('admin_user', {'id': participation.policy.user.id }) }}">{{ participation.policy.user.name }}</a></td>
-                        <td><a href="{{ path('admin_policy', {'id': participation.policy.id }) }}">{{ participation.policy.policyNumber ?: 'N/A' }}</a></td>
-                        <td>{{ participation.start|date("d/m/Y H:i") }}</td>
-                        <td>{{ participation.status }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Policy</th>
+                            <th>Start</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participation in promotion.participating %}
+                            <tr class="{% if not promotion.active %}warning{% endif %}">
+                                <td><a href="{{ path('admin_user', {'id': participation.policy.user.id }) }}">{{ participation.policy.user.name }}</a></td>
+                                <td><a href="{{ path('admin_policy', {'id': participation.policy.id }) }}">{{ participation.policy.policyNumber ?: 'N/A' }}</a></td>
+                                <td>{{ participation.start|date("d/m/Y H:i") }}</td>
+                                <td>{{ participation.status }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    {# Page Modals #}
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}

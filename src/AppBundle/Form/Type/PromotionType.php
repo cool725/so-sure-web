@@ -30,7 +30,7 @@ class PromotionType extends AbstractType
                 NumberType::class,
                 ['constraints' => [new Assert\Range(['min' => 0, 'max' => 50])], 'data' => 0]
             )
-            ->add('conditionAllowClaims', CheckBoxType::class, ['data' => true, 'required' => false])
+            ->add('conditionAllowClaims', CheckboxType::class, ['data' => false, 'required' => false])
             ->add('reward', ChoiceType::class, ['choices' => Promotion::REWARDS])
             ->add(
                 'rewardAmount',
