@@ -328,7 +328,6 @@ class IntercomService
                     'Lead %s/%s does not match user email %s / %s',
                     $lead->email,
                     $lead->id,
-                    $lead->email,
                     $user->getEmail(),
                     $user->getId()
                 ));
