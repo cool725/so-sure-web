@@ -371,6 +371,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
+    protected $hubspotId;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $digitsId;
 
     /**
@@ -1787,6 +1795,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function getHubspotId()
+    {
+        return $this->hubspotId;
+    }
+
+    public function setHubspotId($hubspotId)
+    {
+        $this->hubspotId = $hubspotId;
     }
 
     public function getDigitsId()

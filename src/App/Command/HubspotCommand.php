@@ -1,8 +1,7 @@
 <?php
 
-namespace AppBundle\Command;
+namespace App\Command;
 
-use App\Hubspot\ApiCreateStructures;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\HubspotService;
@@ -16,32 +15,34 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Doctrine\ODM\MongoDB\DocumentManager;
+
 
 /**
  * Allows control of the hubspot system via commandline.
  */
 class HubspotCommand extends ContainerAwareCommand
 {
-    protected static $defaultName = self::COMMAND_NAME;
     private const COMMAND_NAME = "sosure:hubspot";
+    protected static $defaultName = self::COMMAND_NAME;
     const QUEUE_RATE_DEFAULT = 50;
     /** @var HubspotService */
     private $hubspot;
     /** @var LoggerInterface */
     private $logger;
-    /** @var ApiCreateStructures */
-    private $hubspotApiStructures;
+    /** @var DocumentManager */
+    private $dm;
 
     /**
      * Builds the command object.
-     * @param HubspotService      $hubspot                    is the hubspot service which this command drives.
-     * @param ApiCreateStructures $hubspotCreateApiStructures is used to initialise 
+     * @param HubspotService  $hubspot is the hubspot service which this command drives.
+     * @param DocumentManager $dm      document manager used for accessing repository data.
      */
-    public function __construct(HubspotService $hubspot, ApiCreateStructures $hubspotCreateApiStructures)
+    public function __construct(HubspotService $hubspot, DocumentManager $dm)
     {
-        $this->hubspot = $hubspot;
-        $this->hubspotApiStructures = $hubspotCreateApiStructures;
         parent::__construct();
+        $this->hubspot = $hubspot;
+        $this->dm = $dm;
     }
 
     /**
@@ -158,12 +159,7 @@ class HubspotCommand extends ContainerAwareCommand
                 return 0;
             }
             $responseObj = $hubspot->createOrUpdateContact($user);
-            $output->writeln(sprintf(
-                " %s! (%s) %s",
-                ucfirst($responseObj->action),
-                $responseObj->vid ?: "--",
-                $responseObj->message ?: ""
-            ));
+            $output->writeln("created the contact.");
             return 0;
         } catch (\Exception $e) {
             echo $output->writeln(sprintf("\nException thrown:\n<comment>%s</comment>", $e));
@@ -234,9 +230,9 @@ class HubspotCommand extends ContainerAwareCommand
     public function requeueAllUsers(OutputInterface $output, HubspotService $hubspot)
     {
         $count = 0;
-        $users = $this->getManager()->getRepository(User::class)->findAll();
+        $users = $this->dm->getRepository(User::class)->findAll();
         foreach ($users as $user) {
-            $hubspot->queue($user);
+            $hubspot->queueContact($user);
             $count++;
         }
         $output->writeln(sprintf("Queued %d Users", $count));
@@ -274,7 +270,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     public function propertiesSyncGroup(OutputInterface $output)
     {
-        echo $output->writeln(sprintf('<comment>%s</comment>', $this->hubspotApiStructures->syncGroup()));
+        echo $output->writeln(sprintf('<comment>%s</comment>', $this->hubspot->syncPropertyGroup()));
         return 0;
     }
 
@@ -285,8 +281,8 @@ class HubspotCommand extends ContainerAwareCommand
      */
     public function propertiesSync(OutputInterface $output): int
     {
-        $this->hubspotApiStructures->syncGroup();
-        $actions = $this->hubspotApiStructures->syncProperties();
+        $this->hubspot->syncPropertyGroup();
+        $actions = $this->hubspot->syncProperties();
         foreach ($actions as $action) {
             echo $output->writeln($action);
         }
@@ -301,8 +297,13 @@ class HubspotCommand extends ContainerAwareCommand
      */
     public function process(OutputInterface $output, $max)
     {
-        $counts = $this->hubspot->process($queueProcessMaxCount);
-        $output->writeln(sprintf('Sent %s updates, %s requeued', $counts->processed, $counts->requeued));
+        $counts = $this->hubspot->process($max);
+        $output->writeln(sprintf(
+            'Sent %s updates, %s requeued, %s dropped',
+            $counts["processed"],
+            $counts["requeued"],
+            $counts["dropped"]
+        ));
         return 0;
     }
 
@@ -353,9 +354,9 @@ class HubspotCommand extends ContainerAwareCommand
      * @return User who was just found.
      * @throws \UsernameNotFoundException when the user cannot actually be found.
      */
-    private function getUser($email):User
+    private function getUser($email)
     {
-        $repo = $this->getManager()->getRepository(User::class);
+        $repo = $this->dm->getRepository(User::class);
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if (!$user) {
             throw new UsernameNotFoundException('Unable to find user');

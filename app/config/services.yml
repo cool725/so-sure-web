@@ -222,8 +222,16 @@ services:
         class: AppBundle\Service\HubspotService
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
             - "%hubspot_app_key%"
             - "@snc_redis.default"
+            - "@app.hubspot.data"
+
+    app.hubspot.data:
+        class: App\Hubspot\HubspotData
+        public: false
+        arguments:
+            - "@census.search"
 
     app.bacs:
         alias: AppBundle\Service\BacsService
@@ -1241,7 +1249,7 @@ services:
             -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
-    app.listener.hubspot:
+    app.listener.hubspot.kernel:
         class:   AppBundle\Listener\HubspotKernelListener
         arguments:
             - "@logger"
