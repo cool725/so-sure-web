@@ -589,6 +589,7 @@
                             {% set day = payment.date|date('d', 'Europe/London') %}
                             {% if newDay %}
                                 {% if not firstDay %}
+                                                    </tbody>
                                                 </table>
                                             </div>
                                         </div>
@@ -619,13 +620,15 @@
                                                         <th>Amount</th>
                                                     </tr>
                                                 </thead>
+                                                <tbody>
                             {% endif %}
                                 <tr>
                                     <td>{{ payment.date|date('d M Y H:i', 'Europe/London') }}</td>
                                     <td>&pound;{{ payment.amount|number_format(2, '.', ',') }}</td>
                                 </tr>
                         {% endfor %}
-                                     </table>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
