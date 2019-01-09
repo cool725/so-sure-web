@@ -114,12 +114,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        {% if not equal_to_two_dp(manualBacsPayments.total, 0) %}
+                            {% set color = 'table-warning' %}
+                        {% else %}
+                                {% set color = '' %}
+                        {% endif %}
+                        <tr class="{{ color }}">
                             <td>Total</td>
-                            <td>{{ manualBacsPayments.total|number_format(2, '.', ',') }}</td>
+                            <td>
+                                {{ manualBacsPayments.total|number_format(2, '.', ',') }}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+                <p><strong>Make sure to manually verify if non-zero</strong></p>
             </div>
         </div>
     </div>

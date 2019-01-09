@@ -362,6 +362,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=true, sparse=true)
      */
     protected $intercomId;
 

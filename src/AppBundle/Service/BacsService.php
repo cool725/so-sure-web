@@ -869,6 +869,12 @@ class BacsService
             $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
             $results['refund-details'][$reference] = $amount;
 
+            if (!$reference) {
+                $this->logger->error(sprintf('Unable to locate su reference in ddic. DDIC Ref: %s', $ddicReference));
+
+                continue;
+            }
+
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
