@@ -293,6 +293,7 @@ class MonitorService
                 // only active/unpaid policies and definitely not cancelled
                 if (!isset($attributes->Premium)) {
                     // Missing attribute indicates that potentially this is a lead rather than user
+                    /*
                     if ($intercomUser = $this->intercom->getIntercomUser($policy->getUser(), false)) {
                         $attributes = $intercomUser->{'custom_attributes'};
                         if ($intercomUser->id != $policy->getUser()->getIntercomId()) {
@@ -311,6 +312,11 @@ class MonitorService
                     $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s is missing a premium attribute. Requeued.',
+                        $policy->getUser()->getEmail()
+                    );
+                    */
+                    $errors[] = sprintf(
+                        'Intercom out of sync: %s is missing a premium attribute.',
                         $policy->getUser()->getEmail()
                     );
                 } elseif ($policy->isActive(true) && $attributes->Premium <= 0) {
