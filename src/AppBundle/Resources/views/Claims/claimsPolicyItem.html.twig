@@ -313,6 +313,10 @@
                         </div>
                     {% endif %}
 
+
+
+                    {% if is_granted('ROLE_EMPLOYEE') %}
+
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Files</h3>
@@ -336,6 +340,14 @@
                             </table>
                         </div>
                     </div>
+
+                    {% endif %}
+
+
+
+
+
+
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
@@ -883,6 +895,10 @@
                 </tr>
             </table>
             {% endif %}
+
+            {% if is_granted('ROLE_EMPLOYEE') %}
+
+
             <h2>User Files</h2>
             <table class="table table-striped">
                 {% for file in policy.user.userFiles %}
@@ -905,6 +921,10 @@
                     </tr>
                 {% endfor %}
             </table>
+
+            {% endif %}
+
+
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
             {% if is_granted('ROLE_EMPLOYEE') %}
