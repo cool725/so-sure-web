@@ -6,6 +6,7 @@ require('../../../sass/pages/admin.scss');
 require('bootstrap/js/dist/tooltip');
 require('bootstrap/js/dist/dropdown');
 require('bootstrap/js/dist/tab');
+require('bootstrap/js/dist/collapse');
 
 // Require components
 // require('tempusdominus-bootstrap-4');
