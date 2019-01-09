@@ -1,0 +1,197 @@
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{# {% form_theme promotionForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
+
+{# Set vars #}
+{% set body_class = 'admin-banking' %}
+
+{% block title %}so-sure - Banking {{ dates.month }} / {{ dates.year }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Banking {{ dates.month }} / {{ dates.year }}</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="GET"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_banking') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{dates.month}}-{{dates.year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <div class="dropdown mr-2">
+                                <a class="btn btn-primary btn-square dropdown-toggle"
+                                   href="#" role="button"
+                                   id="upload_files_dropdown"
+                                   data-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false">Upload Files</a>
+                                <div class="dropdown-menu"
+                                     aria-labelledby="upload_files_dropdown">
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       data-toggle="modal"
+                                       data-target="#judo_modal">Judo</a>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       data-toggle="modal"
+                                       data-target="#barclays_modal">Barclays</a>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       data-toggle="modal"
+                                       data-target="#barclays_statement_modal">Barclays Statement</a>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       data-toggle="modal"
+                                       data-target="#cashflows_modal">Cashflows</a>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       data-toggle="modal"
+                                       data-target="#lloyds_modal">Lloyds</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn {% if reconciliation.files|length > 0 %}btn-primary{% else %}btn-danger{% endif %} btn-square"
+                                    data-toggle="modal"
+                                    data-target="#reconciliation_modal">
+                                Reconcile
+                                {% if reconciliation.files|length > 0 %}
+                                    <i class="far fa-check fa-fw"></i>
+                                {% else %}
+                                    <i class="far fa-clock fa-fw"></i>
+                                {% endif %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs" id="banking_tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="salva_tab"
+                       data-toggle="tab"
+                       href="#salva_content"
+                       role="tab"
+                       aria-controls="home_content"
+                       aria-selected="true">Salva</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="judo_tab"
+                       data-toggle="tab"
+                       href="#judo_content"
+                       role="tab"
+                       aria-controls="judo_content"
+                       aria-selected="false">Judo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="barclays_tab"
+                       data-toggle="tab"
+                       href="#barclays_content"
+                       role="tab"
+                       aria-controls="barclays_content"
+                       aria-selected="false">Barclays</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="cashflows_tab"
+                       data-toggle="tab"
+                       href="#cashflows_content"
+                       role="tab"
+                       aria-controls="cashflows_content"
+                       aria-selected="true">Cashflows</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="bacs_tab"
+                       data-toggle="tab"
+                       href="#bacs_content"
+                       role="tab"
+                       aria-controls="bacs_content"
+                       aria-selected="false">Bacs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="lloyds_tab"
+                       data-toggle="tab"
+                       href="#lloyds_content"
+                       role="tab"
+                       aria-controls="lloyds_content"
+                       aria-selected="false">Lloyds</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="banking_tabs_content">
+                <div class="tab-pane fade show active"
+                     id="salva_content"
+                     role="tabpanel"
+                     aria-labelledby="salve_tab">...
+                </div>
+                <div class="tab-pane fade"
+                     id="judo_content"
+                     role="tabpanel"
+                     aria-labelledby="judo_tab">...
+                </div>
+                <div class="tab-pane fade"
+                     id="barclays_content"
+                     role="tabpanel"
+                     aria-labelledby="barclays_tab">...
+                </div>
+                <div class="tab-pane fade"
+                     id="cashflows_content"
+                     role="tabpanel"
+                     aria-labelledby="cashflows_tab">...
+                </div>
+                <div class="tab-pane fade"
+                     id="bacs_content"
+                     role="tabpanel"
+                     aria-labelledby="bacs_tab">...
+                </div>
+                <div class="tab-pane fade"
+                     id="lloyds_content"
+                     role="tabpanel"
+                     aria-labelledby="lloyds_tab">...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
+{% endblock %}
