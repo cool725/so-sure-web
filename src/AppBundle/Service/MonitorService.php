@@ -682,7 +682,7 @@ class MonitorService
         $payments = $repo->findBy([
             'success' => true,
             'totalCommission' => null,
-            'type' => ['$nin' => ['potReward', 'sosurePotReward', 'policyDiscount']],
+            'type' => ['$nin' => ['potReward', 'sosurePotReward', 'policyDiscount', 'policyDiscountRefund']],
             'amount' => ['$gt' => 2], // we may need to take small offsets; if so, there would not be a commission
             'policy.$id' => ['$nin' => $commissionValidationPolicyExclusions],
             '_id' => ['$nin' => $commissionValidationPaymentExclusions],
