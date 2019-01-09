@@ -231,6 +231,7 @@ class IntercomService
 
         try {
             $this->checkRateLimit();
+            // INTERCOM QUERY - DO NOT USE emailCanonical!
             $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
             $this->storeRateLimit();
 
@@ -257,8 +258,10 @@ class IntercomService
         try {
             $this->checkRateLimit();
             if ($useIntercomId) {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getIntercomId());
             } else {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUsers(['email' => $user->getEmailCanonical()]);
             }
             $this->storeRateLimit();
@@ -287,8 +290,10 @@ class IntercomService
         try {
             $this->checkRateLimit();
             if ($useIntercomId) {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getIntercomId());
             } else {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getEmail());
             }
             $this->storeRateLimit();
@@ -312,11 +317,22 @@ class IntercomService
             return $results;
         }
         $this->checkRateLimit();
-        $resp = $this->client->leads->getLeads(['emailCanonical' => $user->getEmailCanonical()]);
+        // INTERCOM QUERY - DO NOT USE emailCanonical!
+        $resp = $this->client->leads->getLeads(['email' => $user->getEmailCanonical()]);
         $this->storeRateLimit();
 
         $results[] = $resp;
         foreach ($resp->contacts as $lead) {
+            if (mb_strtolower($lead->email) != $user->getEmailCanonical()) {
+                throw new \Exception(sprintf(
+                    'Lead %s/%s does not match user email %s / %s',
+                    $lead->email,
+                    $lead->id,
+                    $lead->email,
+                    $user->getEmail(),
+                    $user->getId()
+                ));
+            }
             $data = [
               "contact" => array("id" => $lead->id),
               "user" => array("user_id" => $user->getId()),
@@ -905,7 +921,7 @@ class IntercomService
     private function findLead($email)
     {
         $repo = $this->dm->getRepository(Lead::class);
-        $lead = $repo->findOneBy(['email' => mb_strtolower($email)]);
+        $lead = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $lead;
     }
