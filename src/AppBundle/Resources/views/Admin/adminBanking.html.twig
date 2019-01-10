@@ -351,7 +351,7 @@
                         <p>No Files</p>
                     {% else %}
                         <table class="table table-striped">
-                            {% for barclaysStatementFile in barclaysStatement.files %}
+                            {% for barclaysStatementFile in barclaysStatementFiles %}
                                 <tr>
                                     <td>
                                         <a href="{{ s3DownloadLink(barclaysStatementFile.bucket, barclaysStatementFile.key) }}">{{ barclaysStatementFile.fileName }}</a>
