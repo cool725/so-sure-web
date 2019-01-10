@@ -1063,7 +1063,7 @@ class MonitorService
     public function blockedScheduledPayments()
     {
         $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $twoDays = $this->subBusinessDays($this->now(), 2);
+        $twoDays = $this->startOfDay($this->subBusinessDays($this->now(), 2));
         $blocked = $repo->findBy(['status' => ScheduledPayment::STATUS_SCHEDULED, 'scheduled' => ['$lt' => $twoDays]]);
 
         $blockedItems = [];
