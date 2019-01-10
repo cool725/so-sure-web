@@ -5,50 +5,25 @@
 
 {% block title %}so-sure - Careers{% endblock %}
 {% block meta %}
-{#     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/> #}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/careers.css') }}">
 {% endblock %}
 
 {% block body %}
 
-   <section class="faq">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="faq__main__container">
-                <div class="faq__main px-4 px-lg-5">
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-8">
                     <h5 class="text-zaffre mb-0">Want to work for us?</h5>
                     <h1 class="text-primary mb-4">Careers</h1>
                     <p class="mb-4">We are revolutionising insurance by providing consumers with a better, easier and up to 80% cheaper solution. We call this <strong>Social Insurance</strong>. Starting with mobile phones, so-sure’s ambition is to expand rapidly across consumer lines and geographies over the next few years. If you're keen to help us out, please do send us a note to <a href="mailto:jobs@wearesosure.com">jobs@wearesosure.com</a>.</p>
                     <div class="mb-4"><script data-startup="so-sure" src="https://angel.co/javascripts/embed_jobs.js" id="angellist_embed" async></script></div>
                 </div>
             </div>
-
-            {# Sub Content #}
-            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="faq__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="faq__sub text-center">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
-                    <h2 class="text-dodger-blue mb-5">Careers 🤓</h2>
-                    {# <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
-                </div>
-            </div>
-
         </div>
     </section>
     {# Page Modals #}
