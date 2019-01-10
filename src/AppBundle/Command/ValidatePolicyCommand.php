@@ -14,6 +14,7 @@ use AppBundle\Service\RouterService;
 use Aws\S3\S3Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
+use Predis\Collection\Iterator\SortedSetKey;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -196,7 +197,15 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         } elseif ($resyncPicsureMetadata) {
             $this->resyncPicsureMetadata();
         } elseif ($flushPolicyRedis) {
-            $this->redis->del(['policy:validation']);
+            foreach ($this->redis->zrange('policy:validation', 0, -1) as $member) {
+                $policy = unserialize($member);
+
+                if ($this->redis->sismember('policy:validation:flags', $policy['id'])) {
+                    continue;
+                }
+
+                $this->redis->zrem('policy:validation', $member);
+            }
         } else {
             /** @var PolicyRepository $policyRepo */
             $policyRepo = $this->dm->getRepository(Policy::class);
@@ -246,9 +255,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '';
                 $lines[] = '-------------';
                 $lines[] = '';
-
-                // for now, delete as we're refreshing
-                $this->redis->del(['policy:validation']);
 
                 foreach ($policies as $policy) {
                     if ($prefix && !$policy->hasPolicyPrefix($prefix)) {

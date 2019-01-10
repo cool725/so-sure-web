@@ -26,6 +26,10 @@
                     {% set validate = unserialise(item) %}
                     <tr>
                         <td>
+                            {% if validate.id in flags %}
+                                <i class="fas fa-flag"></i>
+                            {% endif %}
+
                             <a class="mr-auto align-self-center"
                                href="{{ path('admin_policy', {'id': validate.id}) }}">
                                 {{ validate.policyNumber }}
@@ -42,8 +46,18 @@
                             <form method="POST">
                                 <button name="delete-redis-policy"
                                         type="submit"
-                                        class="btn btn-success delete-redis-policy">
+                                        class="btn btn-success delete-redis-policy form-control mb-2">
                                     Remove from list
+                                </button>
+
+                                <button name="flag-redis-policy"
+                                        type="submit"
+                                        class="btn btn-secondary flag-redis-policy form-control">
+                                    {% if validate.id in flags %}
+                                        Remove Flag
+                                    {% else %}
+                                        Flag
+                                    {% endif %}
                                 </button>
 
                                 <input type="hidden" name="id" value="{{ validate.id }}"/>

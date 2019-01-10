@@ -1815,22 +1815,36 @@ class AdminController extends BaseController
                 throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
             }
 
-            $pattern = '*' . $policy->getId() . '*';
+            if ($request->request->has('flag-redis-policy')) {
+                $redis->sadd('policy:validation:flags', $policy->getId());
 
-            foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
-                $redis->zrem('policy:validation', $member);
+                $this->addFlash('success', sprintf(
+                    'Flagged policy %s',
+                    $policy->getPolicyNumber()
+                ));
             }
 
-            $this->addFlash('success', sprintf(
-                'Policy %s removed from redis',
-                $policy->getPolicyNumber()
-            ));
-            
+            if ($request->request->has('delete-redis-policy')) {
+                $pattern = '*' . $policy->getId() . '*';
+
+                foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
+                    $redis->zrem('policy:validation', $member);
+                }
+                
+                $redis->srem('policy:validation:flags', $policy->getId());
+
+                $this->addFlash('success', sprintf(
+                    'Policy %s removed from redis',
+                    $policy->getPolicyNumber()
+                ));
+            }
+
             return $this->redirectToRoute('admin_policy_validation');
         }
 
         return [
             'validation' => $redis->zrange('policy:validation', 0, -1),
+            'flags' => $redis->smembers('policy:validation:flags'),
         ];
     }
 }
