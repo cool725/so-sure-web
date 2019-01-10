@@ -1,57 +1,35 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'careers' %}
 
 {% block title %}so-sure - Careers{% endblock %}
 {% block meta %}
-    <meta name="description" content="Make the Social Insurance Revolution happen by joining our awesome team."/>
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets
-    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/careers.css') }}">
 {% endblock %}
 
 {% block body %}
-{#
-<section class="section--pad jobs">
-    <div class="container text-center">
-        <h1>We're not currently hiring.</h1>
-        <br>
-        <p class="lead">
-            Thanks for checking in with us, but <span class="text-underline">we don't currently have any vacancies</span>.
-        </p><br>
-        <p class="lead">
-            However, if you're keen to help us out, please do send a note to <a href="mailto:jobs@wearesosure.com">jobs@wearesosure.com</a>.
-        </p>
-        <br><br><br>
-    </div>
-</section>
-#}
- <section class="section--pad jobs">
-    <div class="container">
 
-        <h1 class="text-center">We are hiring!</h1>
-        <h2>About so-sure</h2>
-        <p class="lead">Everyone hates insurance. We believe that needs to change.</p>
-        <p>We are revolutionising insurance by providing consumers with a better, easier and up to 80% cheaper solution. We call this <strong>Social Insurance</strong>.</p>
-        <p>Starting with mobile phones, so-sure’s ambition is to expand rapidly across consumer lines and geographies over the next few years.</p>
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="text-zaffre mb-0">Want to work for us?</h5>
+                    <h1 class="text-primary mb-4">Careers</h1>
+                    <p class="mb-4">We are revolutionising insurance by providing consumers with a better, easier and up to 80% cheaper solution. We call this <strong>Social Insurance</strong>. Starting with mobile phones, so-sure’s ambition is to expand rapidly across consumer lines and geographies over the next few years. If you're keen to help us out, please do send us a note to <a href="mailto:jobs@wearesosure.com">jobs@wearesosure.com</a>.</p>
+                    <div class="mb-4"><script data-startup="so-sure" src="https://angel.co/javascripts/embed_jobs.js" id="angellist_embed" async></script></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {# Page Modals #}
 
-        <br><br>
-        <script data-startup="so-sure" src="https://angel.co/javascripts/embed_jobs.js" id="angellist_embed" async></script>
-        {#
-        <script src='https://www.workable.com/assets/embed.js' type='text/javascript'></script>
-        <script type='text/javascript' charset='utf-8'>
-        whr(document).ready(function(){
-        whr_embed(242507, {detail: 'titles', base: 'jobs', zoom: 'city', grouping: 'departments'});
-        });
-        </script>
-        <div id="whr_embed_hook"></div>
-        #}
-        <br><br>
+{% endblock %}
 
-        <a href="https://www.glassdoor.co.uk/Overview/Working-at-so-sure-EI_IE1814792.11,18.htm"><img src="https://www.glassdoor.co.uk/pc/static/img/partnerCenter/badges/eng_CHECK_US_273x90.png" width="200px"></a>
-
-    </div>
-</section>
+{% block javascriptsPage %}
 
 {% endblock %}
