@@ -674,6 +674,7 @@ class MonitorService
             new \MongoId('5bd0381fedc29544427b31ab'),
             new \MongoId('5bd03821edc29544427b31af'),
             new \MongoId('5c2bb9f6d6c8c6148f38aed4'),
+            new \MongoId('5c1bb0f90b967f3da712c163'),
         ];
 
         $commissionValidationPolicyExclusions = [];
