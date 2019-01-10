@@ -53,7 +53,7 @@
         "nexylan/slack-bundle": "^1.0",
         "rollerworks/password-strength-bundle": "^2.0",
         "nelmio/security-bundle": "^2.0",
-        "intercom/intercom-php": "^3.0",
+        "intercom/intercom-php": "^3.2",
         "facebook/graph-sdk": "^5.4",
         "mixpanel/mixpanel-php": "^2.6",
         "ua-parser/uap-php": "^3.4",
