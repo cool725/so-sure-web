@@ -289,8 +289,8 @@ class MonitorService
                 /** @var mixed $intercomUser */
                 /** @var mixed $attributes */
                 $attributes = $intercomUser->{'custom_attributes'};
+                //print_r($intercomUser);
                 //print_r($attributes);
-                // only active/unpaid policies and definitely not cancelled
                 if (!isset($attributes->Premium)) {
                     // Missing attribute indicates that potentially this is a lead rather than user
                     if ($intercomUser = $this->intercom->getIntercomUser($policy->getUser(), false)) {
@@ -303,9 +303,13 @@ class MonitorService
                             ));
                             $this->dm->flush();
                             $this->intercom->queue($policy->getUser());
-
-                            continue;
                         }
+                    } else {
+                        $this->intercom->resetIntercomId($policy->getUser());
+                        $this->logger->warning(sprintf(
+                            'Reset intercom id  user for policy %s & requeuing update',
+                            $policy->getId()
+                        ));
                     }
 
                     $this->intercom->queue($policy->getUser());

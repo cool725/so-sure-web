@@ -310,15 +310,19 @@ class IntercomService
         }
     }
 
-    public function convertLead(User $user)
+    public function convertLead(User $user, $useIntercomId = false)
     {
         $results = [];
         if (!$user->hasEmail()) {
             return $results;
         }
         $this->checkRateLimit();
-        // INTERCOM QUERY - DO NOT USE emailCanonical!
-        $resp = $this->client->leads->getLeads(['email' => $user->getEmailCanonical()]);
+        if ($useIntercomId) {
+            $resp = $this->client->leads->getLead($user->getIntercomUserIdOrId());
+        } else {
+            // INTERCOM QUERY - DO NOT USE emailCanonical!
+            $resp = $this->client->leads->getLeads(['email' => $user->getEmailCanonical()]);
+        }
         $this->storeRateLimit();
 
         $results[] = $resp;
@@ -329,12 +333,12 @@ class IntercomService
                     $lead->email,
                     $lead->id,
                     $user->getEmail(),
-                    $user->getId()
+                    $user->getIntercomUserIdOrId()
                 ));
             }
             $data = [
               "contact" => array("id" => $lead->id),
-              "user" => array("user_id" => $user->getId()),
+              "user" => array("user_id" => $user->getIntercomUserIdOrId()),
             ];
 
             $this->checkRateLimit();
@@ -344,13 +348,13 @@ class IntercomService
                 if ($e->getCode() == 404) {
                     $this->logger->debug(sprintf(
                         'Unable to convert Intercom lead (userid %s) %s (404)',
-                        $user->getId(),
+                        $user->getIntercomUserIdOrId(),
                         json_encode($resp)
                     ));
                 } else {
                     $this->logger->error(sprintf(
                         'Unable to convert Intercom lead (userid %s) %s (%s)',
-                        $user->getId(),
+                        $user->getIntercomUserIdOrId(),
                         json_encode($resp),
                         $e->getCode()
                     ));
@@ -360,16 +364,46 @@ class IntercomService
             }
             $this->storeRateLimit();
 
-            $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
+            $this->logger->debug(sprintf(
+                'Intercom convert lead (userid %s) %s',
+                $user->getIntercomUserIdOrId(),
+                json_encode($resp)
+            ));
             $results[] = $resp;
         }
 
         return $results;
     }
 
+    public function resetIntercomUserId(User $user)
+    {
+        $id = new \MongoId();
+        $user->setIntercomUserId($id->serialize());
+        $this->dm->flush();
+    }
+
+    public function resetIntercomUserIdForLead(Lead $lead)
+    {
+        $id = new \MongoId();
+        $lead->setIntercomUserId($id->serialize());
+        $this->dm->flush();
+    }
+
+    public function resetIntercomId(User $user)
+    {
+        $user->setIntercomId(null);
+        $this->dm->flush();
+    }
+
+    public function resetIntercomIdForLead(Lead $lead)
+    {
+        $lead->setIntercomId(null);
+        $this->dm->flush();
+    }
+
     public function getApiUserHash(User $user = null)
     {
-        if (!$user || !$user->getId()) {
+        if (!$user || !$user->getIntercomUserIdOrId()) {
             return null;
         }
 
@@ -392,8 +426,8 @@ class IntercomService
             throw new \Exception('Unknown secure type');
         }
 
-        if ($user && $user->getId()) {
-            return hash_hmac('sha256', $user->getId(), $secure);
+        if ($user && $user->getIntercomUserIdOrId()) {
+            return hash_hmac('sha256', $user->getIntercomUserIdOrId(), $secure);
         }
 
         return null;
@@ -409,7 +443,7 @@ class IntercomService
             'email' => $user->getEmail(),
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
-            'user_id' => $user->getId(),
+            'user_id' => $user->getIntercomUserIdOrId(),
         );
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
@@ -483,7 +517,7 @@ class IntercomService
 
         $this->logger->debug(sprintf(
             'Intercom create user (userid %s) %s',
-            $user->getId(),
+            $user->getIntercomUserIdOrId(),
             json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)
         ));
 
@@ -522,7 +556,11 @@ class IntercomService
         $resp = $this->client->leads->create($data);
         $this->storeRateLimit();
 
-        $this->logger->debug(sprintf('Intercom create lead (userid %s) %s', $lead->getId(), json_encode($resp)));
+        $this->logger->debug(sprintf(
+            'Intercom create lead (userid %s) %s',
+            $lead->getIntercomUserIdOrId(),
+            json_encode($resp)
+        ));
 
         $lead->setIntercomId($resp->id);
         $this->dm->flush();
@@ -640,7 +678,7 @@ class IntercomService
         $data['event_name'] = $event;
         $data['created_at'] = $date->getTimestamp();
         $data['id'] = $user->getIntercomId();
-        $data['user_id'] = $user->getId();
+        $data['user_id'] = $user->getIntercomUserIdOrId();
 
         $this->checkRateLimit();
         $resp = $this->client->events->create($data);
@@ -658,11 +696,11 @@ class IntercomService
         if ($user) {
             $data['from']['type'] = 'user';
             $data['from']['id'] = $user->getIntercomId();
-            $data['from']['user_id'] = $user->getId();
+            $data['from']['user_id'] = $user->getIntercomUserIdOrId();
         } elseif ($lead) {
             $data['from']['type'] = 'contact';
             $data['from']['id'] = $lead->getIntercomId();
-            $data['from']['user_id'] = $lead->getId();
+            $data['from']['user_id'] = $lead->getIntercomUserIdOrId();
         }
 
         $this->checkRateLimit();
@@ -733,7 +771,7 @@ class IntercomService
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
 
-                    $this->deleteUser($data['additional']['intercomId']);
+                    $this->deleteUser($data['additional']['intercomId'], true);
                 } elseif ($action == self::QUEUE_LEAD_DELETE) {
                     if (!isset($data['additional']) || !isset($data['additional']['intercomId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -925,17 +963,21 @@ class IntercomService
         return $lead;
     }
 
-    private function deleteUser($id)
+    private function deleteUser($id, $permanent = false)
     {
         try {
             $this->checkRateLimit();
-            $this->client->users->deleteUser($id);
+            if ($permanent) {
+                $this->client->users->permanentlyDeleteUser($id);
+            } else {
+                $this->client->users->deleteUser($id);
+            }
             $this->storeRateLimit();
 
             $this->logger->info(sprintf('Deleted intercom user %s', $id));
         } catch (\Exception $e) {
             $this->logger->info(
-                sprintf('Failed to deleted intercom lead %s. Already deleted?', $id),
+                sprintf('Failed to deleted intercom user %s. Already deleted?', $id),
                 ['exception' => $e]
             );
         }
@@ -1232,6 +1274,22 @@ class IntercomService
         $output[] = sprintf('Total Leads Checked: %d', $count);
 
         return $output;
+    }
+
+    public function destroy(User $user)
+    {
+        $intercomId = $user->getIntercomId();
+        $this->resetIntercomUserId($user);
+        $this->resetIntercomId($user);
+        $this->deleteUser($intercomId, true);
+    }
+
+    public function destroyLead(Lead $lead)
+    {
+        $intercomId = $lead->getIntercomId();
+        $this->resetIntercomUserIdForLead($lead);
+        $this->resetIntercomIdForLead($lead);
+        $this->deleteLead($intercomId);
     }
 
     public function usersMaintenance()

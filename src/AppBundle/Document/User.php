@@ -372,6 +372,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
+    protected $intercomUserId;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
     protected $digitsId;
 
     /**
@@ -1788,6 +1796,21 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function getIntercomUserId()
+    {
+        return $this->intercomUserId;
+    }
+
+    public function setIntercomUserId($intercomUserId)
+    {
+        $this->intercomUserId = $intercomUserId;
+    }
+
+    public function getIntercomUserIdOrId()
+    {
+        return $this->getIntercomUserId() ?: $this->getId();
     }
 
     public function getDigitsId()

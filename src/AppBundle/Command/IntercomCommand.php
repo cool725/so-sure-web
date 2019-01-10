@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Lead;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -77,10 +78,16 @@ class IntercomCommand extends ContainerAwareCommand
                 'Count the queue'
             )
             ->addOption(
-                'convert-lead',
+                'convert-lead-by-email',
                 null,
-                InputOption::VALUE_REQUIRED,
-                'Force a lead to user conversion (email address)'
+                InputOption::VALUE_NONE,
+                'Force a lead to user conversion'
+            )
+            ->addOption(
+                'convert-lead-by-id',
+                null,
+                InputOption::VALUE_NONE,
+                'Force a lead to user conversion'
             )
             ->addOption(
                 'undelete',
@@ -112,6 +119,24 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Send events for outstanding pending inbound invitations'
             )
+            ->addOption(
+                'reset-user-id',
+                null,
+                InputOption::VALUE_NONE,
+                'Assign a new intercom user id for a user/lead. Required email.'
+            )
+            ->addOption(
+                'reset-intercom-id',
+                null,
+                InputOption::VALUE_NONE,
+                'Reset the intercom id for a user/lead. Required email.'
+            )
+            ->addOption(
+                'destroy',
+                null,
+                InputOption::VALUE_NONE,
+                'Delete all intercom records & create new ids. Required email.'
+            )
         ;
     }
 
@@ -122,7 +147,8 @@ class IntercomCommand extends ContainerAwareCommand
         $process = $input->getOption('process');
         $email = $input->getOption('email');
         $requeue = true === $input->getOption('requeue');
-        $convertLead = $input->getOption('convert-lead');
+        $convertLeadByEmail = true === $input->getOption('convert-lead-by-email');
+        $convertLeadById = true === $input->getOption('convert-lead-by-id');
         $undelete = true === $input->getOption('undelete');
         $maintenance = true === $input->getOption('maintenance');
         $leadMaintenance = true === $input->getOption('lead-maintenance');
@@ -130,18 +156,57 @@ class IntercomCommand extends ContainerAwareCommand
         $pendingInvites = true === $input->getOption('pending-invites');
         $countQueue = true === $input->getOption('count-queue');
         $update = true === $input->getOption('update');
+        $resetUserId = true === $input->getOption('reset-user-id');
+        $resetIntercomId = true === $input->getOption('reset-intercom-id');
+        $destroy = true === $input->getOption('destroy');
 
         if ($email) {
             $user = $this->getUser($email);
+            $lead = $this->getLead($email);
 
             if ($requeue) {
-                $resp = $this->intercom->queue($user);
-                $output->writeln(sprintf('User %s was requeued', $user->getId()));
+                if (!$user) {
+                    throw new \Exception('Unable to find user for email address');
+                }
+                $this->intercom->queue($user);
+                $output->writeln(sprintf('User %s was requeued.', $user->getId()));
+            } elseif ($convertLeadByEmail || $convertLeadById) {
+                if (!$user) {
+                    throw new \Exception('Unable to find user for email address');
+                }
+                $resp = $this->intercom->convertLead($user, $convertLeadById);
+                $output->writeln(sprintf('Lead %s was converted. Response:', $user->getId()));
+                $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             } elseif ($update) {
+                if (!$user) {
+                    throw new \Exception('Unable to find user for email address');
+                }
                 $resp = $this->intercom->update($user);
                 $output->writeln(sprintf('User %s was updated. Response:', $user->getId()));
                 $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
+            } elseif ($resetUserId) {
+                if ($user) {
+                    $this->intercom->resetIntercomUserId($user);
+                    $output->writeln(sprintf('User %s has a new intercom user id.', $user->getId()));
+                }
+                if ($lead) {
+                    $this->intercom->resetIntercomUserIdForLead($lead);
+                    $output->writeln(sprintf('Lead %s has a new intercom user id.', $lead->getId()));
+                }
+            } elseif ($destroy) {
+                if ($user) {
+                    $this->intercom->destroy($user);
+                    $output->writeln(sprintf('User %s was deleted & has a new intercom user id.', $user->getId()));
+                }
+                if ($lead) {
+                    $this->intercom->destroyLead($lead);
+                    $output->writeln(sprintf('Lead %s was deleted & has a new intercom user id.', $lead->getId()));
+                }
             } else {
+                if (!$user) {
+                    throw new \Exception('Unable to find user for email address');
+                }
+
                 if ($user->getIntercomId()) {
                     $resp = $this->intercom->getIntercomUser($user);
                 } else {
@@ -149,10 +214,17 @@ class IntercomCommand extends ContainerAwareCommand
                 }
                 $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
             }
-        } elseif ($convertLead) {
-            $user = $this->getUser($convertLead);
-            $resp = $this->intercom->convertLead($user);
-            $output->writeln(json_encode($resp, JSON_PRETTY_PRINT));
+
+            if ($resetIntercomId) {
+                if ($user) {
+                    $this->intercom->resetIntercomId($user);
+                    $output->writeln(sprintf('User %s no longer has an associated intercom id.', $user->getId()));
+                }
+                if ($lead) {
+                    $this->intercom->resetIntercomIdForLead($lead);
+                    $output->writeln(sprintf('Lead %s no longer has an associated intercom id.', $lead->getId()));
+                }
+            }
         } elseif ($clear) {
             $this->intercom->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
@@ -208,20 +280,42 @@ class IntercomCommand extends ContainerAwareCommand
         return $repo->findPendingInvitations();
     }
 
+    /**
+     * @param string $email
+     * @return User
+     */
     private function getUser($email)
     {
         $repo = $this->getUserRepository();
+        /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
-        if (!$user) {
-            throw new \Exception('unable to find user');
-        }
 
         return $user;
+    }
+
+    /**
+     * @param string $email
+     * @return Lead
+     */
+    private function getLead($email)
+    {
+        $repo = $this->getLeadRepository();
+        /** @var Lead $lead */
+        $lead = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+
+        return $lead;
     }
 
     private function getUserRepository()
     {
         $repo = $this->dm->getRepository(User::class);
+
+        return $repo;
+    }
+
+    private function getLeadRepository()
+    {
+        $repo = $this->dm->getRepository(Lead::class);
 
         return $repo;
     }
