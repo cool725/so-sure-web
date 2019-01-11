@@ -104,8 +104,7 @@ class HubspotService
                 }
                 $data = unserialize($message);
                 if (!$data || !isset($data["action"])) {
-                    $this->logger->notice("Message in queue has no action.", ["data" => $data]);
-                    throw new UnknownMessage(sprintf('Unknown message in queue %s', json_encode($data)));
+                    throw new UnknownMessage(sprintf('Actionless message in queue %s', json_encode($data)));
                 }
                 if (!$this->ready($data)) {
                     $requeued++;
@@ -118,7 +117,6 @@ class HubspotService
                         $this->processContact($data);
                         break;
                     default:
-                        $this->logger->notice("Message in queue has invalid action.", ["data" => $data]);
                         throw new UnknownMessage(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
                 $processed++;
@@ -267,7 +265,6 @@ class HubspotService
     private function processContact($data)
     {
         if (!isset($data["userId"])) {
-            $this->logger->notice('Hubspot| unknown message in queue, is not action:QUEUE_CONTACT', ['data' => $data]);
             throw new MalformedMessageException(sprintf('malformed contact message %s', json_encode($data)));
         }
         $user = $this->getUserById($data["userId"]);
@@ -354,21 +351,6 @@ class HubspotService
     {
         $repo = $this->dm->getRepository(User::class);
         return $repo->find($id);
-    }
-
-    /**
-     * Throws an exception about a bad http request.
-     * @param Response $response is the http response we are throwing an exception over.
-     * @param string   $message  is a message explaining the problem.
-     * @throws \Exception every time.
-     */
-    private function throwException($response, $message = "")
-    {
-        $responseMessage = json_encode($response, JSON_PRETTY_PRINT);
-        if (!empty($introMessage)) {
-            $responseMessage = $introMessage . ' : ' . $responseMessage;
-        }
-        throw new \Exception($responseMessage);
     }
 
     /**
