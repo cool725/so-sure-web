@@ -4,29 +4,24 @@ namespace AppBundle\Service;
 
 use App\Exceptions\Queue\QueueException;
 use App\Exceptions\Queue\UnknownMessageException;
-use App\Exceptions\Queue\UnknownUserIdException;
-use App\Exceptions\Queue\UserNotFoundException;
+use App\Exceptions\Queue\MalformedMessageException;
 use App\Hubspot\HubspotData;
 use App\Hubspot\Api;
 use AppBundle\Document\User;
 use AppBundle\Exception\RateLimitException;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use GuzzleHttp\Exception\ClientException;
 use Predis\Client as RedisClient;
 use Psr\Log\LoggerInterface;
 use SevenShores\Hubspot\Exceptions\BadRequest;
 use SevenShores\Hubspot\Factory as HubspotFactory;
-use SevenShores\Hubspot\Http\Response;
 use SevenShores\Hubspot\Resources\Contacts;
+use GuzzleHttp\Psr7\Response;
 
 /**
  * Provides the primary hubspot functionality.
  */
 class HubspotService
 {
-    const HUBSPOT_SOSURE_PROPERTY_NAME = "sosure";
-    const HUBSPOT_SOSURE_PROPERTY_DESC = "Custom properties used by SoSure";
-
     const QUEUE_CONTACT = 'contact';
 
     const QUEUE_EVENT_USER_PAYMENT_FAILED = 'userpayment-failed';
@@ -53,7 +48,7 @@ class HubspotService
      * @param LoggerInterface $logger      is the logger.
      * @param string          $hubspotKey  is the hubspot integration API key.
      * @param RedisClient     $redis       is the client for redis.
-     * @param HubspotData     $hubspotData is the hubspot data thingo. TODO: what is that?
+     * @param HubspotData     $hubspotData is the hubspot data formatter.
      */
     public function __construct(
         DocumentManager $dm,
@@ -64,7 +59,7 @@ class HubspotService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
-        $this->client = HubspotFactory::create($hubspotKey);
+        $this->client = new HubspotFactory(["key" => $hubspotKey], null, ['http_errors' => false], false);
         $this->redis = $redis;
         $this->hubspotData = $hubspotData;
     }
@@ -142,7 +137,10 @@ class HubspotService
                 $this->queue($data, true);
             }
         }
-        $this->logger->debug('Hubspot| finish queue process', ["processed" => $processed, "requeued" => $requeued, "dropped" => $dropped]);
+        $this->logger->debug(
+            'Hubspot| finish queue process',
+            ["processed" => $processed, "requeued" => $requeued, "dropped" => $dropped]
+        );
         return ["processed" => $processed, "requeued" => $requeued, "dropped" => $dropped];
     }
 
@@ -174,75 +172,30 @@ class HubspotService
     }
 
     /**
-     * Checks the Hubspot API for the properties that we need and creates any that it cannot find.
-     * @return array Containing messages with all the actions taken.
-     */
-    public function syncProperties()
-    {
-        $actions = [];
-        $soSureProperties = $this->allPropertiesWithGroup();
-        foreach ($soSureProperties as $propertyData) {
-            $propertyName = $propertyData["name"];
-            try {
-                $this->client->contactProperties()->get($propertyName);
-                $actions[] = "<info>$propertyName</info> was found on Hubspot.";
-            } catch (\Exception $e) {
-                $actions[] = "<comment>$propertyName</comment> was not found on Hubspot.";
-                $actions[] = "<info>$propertyName</info> trying to create Hubspot.";
-                array_push($actions, $this->createHubspotProperty($propertyData, $propertyName));
-            }
-        }
-        return $actions;
-    }
-
-    /**
      * Synchronises a property group with hubspot.
-     * NOTE: I massively changed this because it seemed to be completely broken, but there is also the possibility that
-     *       it was right and I had no idea what I was doing. Keep in mind.
      * @param string $groupName is the name of the group to run for.
      * @param string $displayName is the desired display name of the group.
-     * @return string containing messages detailing what it did.
      */
-    public function syncPropertyGroup(
-        $groupName = self::HUBSPOT_SOSURE_PROPERTY_NAME,
-        $displayName = self::HUBSPOT_SOSURE_PROPERTY_DESC
-    ) {
-        $groups = $this->client->contactProperties()->getGroups();
-        foreach ($groups->getData() as $group) {
-            if ($group->name === $groupName) {
-                return "Group named '$groupName' already exists.";
-            }
-        }
-        try {
-            $create = $this->client->contactProperties()->createGroup([
-                "name" => $groupName,
-                "displayName" => $displayName
-            ]);
-            if ($create->getStatusCode() !== 200) {
-                // TODO: use throwException
-                return "Could not create group on Hubspot: ".json_encode($create);
-            }
-            return "Group named '$groupName' created successfully.";
-        } catch (BadRequest $exception) {
-            return "Group named '$groupName' creation failed. ".$exception->getMessage();
-        } catch (ClientException $exception) {
-            return "Group named '$groupName' creation failed. ".$exception->getMessage();
-        }
+    public function syncPropertyGroup($groupName, $displayName)
+    {
+        $response = $this->client->contactProperties()->createGroup(
+            ["name" => $groupName, "displayName" => $displayName]
+        );
+        $this->validateResponse($response, 200);
     }
 
     /**
-     * Attempts to create a property on hubspot.
-     * @param object $propertyData is the content of the property.
-     * @param string $propertyName is the name of the property on hubspot.
-     * @return string with a message detailing the success of the function.
+     * Updates a property on hubspot or creates it if it does not yet exist.
+     * @param array $data is the content of the property to be created.
+     * @return array|null the property if newly created, or nothing if it already existed.
      */
-    private function createHubspotProperty($propertyData, $propertyName)
+    public function syncProperty($data)
     {
         try {
-            $this->client->contactProperties()->create($propertyData);
-            return "<info>$propertyName</info> created on Hubspot.";
+            $this->client->contactProperties()->get($data["name"]);
+            return null;
         } catch (\Exception $e) {
-            return "property: <error>$propertyName</error> could not be created on Hubspot." . $e->getMessage();
+            return $this->client->contactProperties()->create($data);
         }
     }
 
@@ -254,9 +207,7 @@ class HubspotService
     public function getProperties()
     {
         $response = $this->client->contactProperties()->all();
-        if ($response->getStatusCode() !== 200) {
-            $this->throwException($response, 'Could not get properties from Hubspot');
-        }
+        $this->validateResponse($response, 200);
         return $response->getData();
     }
 
@@ -306,16 +257,6 @@ class HubspotService
             }
             $params["vidOffset"] = $response["vid-offset"];
         } while ($response["has-more"]);
-    }
-
-    public function assertHubspotNotRateLimited(Response $response)
-    {
-        // TODO: I reckon this should be removed or at least reworked.
-        // probably better to make a function that takes in the desired response code and then can either fail normally
-        // or throw that rate limit exception. eyeeeaaah.
-        if (429 === $response->getStatusCode()) {
-            throw new RateLimitException('Rate limits exceeded' . json_encode($response));
-        }
     }
 
     /**
@@ -382,12 +323,9 @@ class HubspotService
     private function createNewHubspotContact(User $user, $hubspotUserArray)
     {
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        if ($response->getStatusCode() !== 200) {
-            $this->throwException($response, 'Contact not created on Hubspot');
-        }
+        $this->validateResponse($response, 200);
         if ($response->getData()->isNew) {
             $user->setHubspotId($response->getData()->vid);
-            $this->dm->persist($user); // TODO: not sure if this is needed.
             $this->dm->flush();
         }
         return $response->getData()->vid;
@@ -402,12 +340,8 @@ class HubspotService
     private function updateHubspotContact(User $user, $hubspotUserArray)
     {
         $response = $this->client->contacts()->update($user->getHubspotId(), $hubspotUserArray);
-        $this->hubspotData->update($user, $hubspotUserArray);
+        $this->validateResponse($response, 204);
         $this->dm->persist($user);
-        if ($response->getStatusCode() !== 204) {
-            $this->throwException($response, 'Contact not updated on Hubspot');
-        }
-        $this->assertHubspotNotRateLimited($response);
         return $user->getHubspotId();
     }
 
@@ -438,111 +372,21 @@ class HubspotService
     }
 
     /**
-     * Fields that, if they do not exist, will be created as properties in the 'sosure' group
-     * @return array containing property data formatted for hubspot.
+     * Check if a response has the correct status code, and if it does not then it throws an exception. If the status
+     * code returned denotes rate limiting then it will tell you of this.
+     * @param Response $response is the response that you are checking.
+     * @param int      $desired  is the response code that you want the response to have.
+     * @throws \Exception when $response's status code is not $desired.
      */
-    private function allPropertiesWithGroup()
+    private function validateResponse(Response $response, $desired)
     {
-        return [
-            [
-                "name" => "gender",
-                "label" => "gender",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "enumeration",
-                "fieldType" => "radio",
-                "formField" => false,
-                "displayOrder" => -1,
-                "options" => [
-                    ["label" => "male", "value" => "male"],
-                    ["label" => "female", "value" => "female"],
-                    ["label" => "x/not-known", "value" => "x"]
-                ]
-            ],
-            [
-                "name" => "date_of_birth",
-                "label" => "Date of birth",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "date",
-                "fieldType" => "date",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "facebook",
-                "label" => "Facebook?",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "enumeration",
-                "fieldType" => "checkbox",
-                "formField" => false,
-                "displayOrder" => -1,
-                "options" => [
-                    ["label" => "yes", "value" => "yes"],
-                    ["label" => "no", "value" => "no"]
-                ],
-            ],
-            [
-                "name" => "billing_address",
-                "label" => "Billing address",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "textarea",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "census_subgroup",
-                "label" => "Estimated census_subgroup",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "total_weekly_income",
-                "label" => "Estimated total_weekly_income",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "attribution",
-                "label" => "attribution",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "latestattribution",
-                "label" => "Latest attribution",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "sosure_lifecycle_stage",
-                "label" => "SO-SURE lifecycle stage",
-                "description" => "Current stage in purchase-flow",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "enumeration",
-                "fieldType" => "select",
-                "formField" => true,
-                "displayOrder" => -1,
-                "options" => [
-                    ["label" => Api::QUOTE, "value" => Api::QUOTE],
-                    ["label" => Api::READY_FOR_PURCHASE, "value" => Api::READY_FOR_PURCHASE],
-                    ["label" => Api::PURCHASED, "value" => Api::PURCHASED],
-                    ["label" => Api::RENEWED, "value" => Api::RENEWED],
-                    ["label" => Api::CANCELLED, "value" => Api::CANCELLED],
-                    ["label" => Api::EXPIRED, "value" => Api::EXPIRED]
-                ]
-            ]
-        ];
+        $code = $response->getStatusCode();
+        if ($code === $desired) {
+            return;
+        } elseif ($code === 429) {
+            throw new \Exception("Hubspot rate limited.");
+        } else {
+            throw new \Exception("Hubspot request returned status {$code} instead of {$desired}. ".$response->getBody());
+        }
     }
 }

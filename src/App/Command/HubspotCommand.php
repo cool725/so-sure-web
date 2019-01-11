@@ -5,6 +5,8 @@ namespace App\Command;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\HubspotService;
+use App\Hubspot\HubspotData;
+use App\Hubspot\Api;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -15,6 +17,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use SevenShores\Hubspot\Exceptions\BadRequest;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 
@@ -23,6 +26,9 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  */
 class HubspotCommand extends ContainerAwareCommand
 {
+    const HUBSPOT_SOSURE_PROPERTY_NAME = "sosure";
+    const HUBSPOT_SOSURE_PROPERTY_DESC = "Custom properties used by SoSure";
+
     private const COMMAND_NAME = "sosure:hubspot";
     protected static $defaultName = self::COMMAND_NAME;
     const QUEUE_RATE_DEFAULT = 50;
@@ -77,7 +83,20 @@ class HubspotCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->loggingToConsole($output);
+        try {
+            $this->manage($input, $output);
+            return 0;
+        } catch (BadRequest $e) {
+            $output->writeln("<info>Hubspot returned an error:</info>\n<error>".$e->getMessage()."</error>");
+            return 1;
+        } catch (\Exception $e) {
+            $output->writeln("<info>An error occurred:</info>\n<error>".$e->getMessage()."</error>");
+            return 1;
+        }
+    }
+
+    private function manage(InputInterface $input, OutputInterface $output)
+    {
         $list = true === $input->getOption("list");
         $email = $input->getOption("email");
         $requeue = $input->getOption("requeue");
@@ -89,33 +108,33 @@ class HubspotCommand extends ContainerAwareCommand
         $propertiesGroup = $input->getOption("properties-group");
         $propertiesSync = $input->getOption("properties-sync");
         if ($list) {
-            return $this->showContacts($output, $this->hubspot);
+            $this->showContacts($output, $this->hubspot);
         }
         if ($email) {
-            return $this->requeueUserByEmail($email, $requeue, $output, $this->hubspot);
+            $this->requeueUserByEmail($email, $requeue, $output, $this->hubspot);
         }
         if ($queueCount) {
-            return $this->queueCount($output, $this->hubspot);
+            $this->queueCount($output, $this->hubspot);
         }
         if ($queueShow) {
-            return $this->queueShow($queueProcessMaxCount, $output, $this->hubspot);
+            $this->queueShow($queueProcessMaxCount, $output, $this->hubspot);
         }
         if ($queueClear) {
-            return $this->queueClear($input, $output, $this->hubspot);
+            $this->queueClear($input, $output, $this->hubspot);
         }
         if ($requeue) {
-            return $this->requeueAllUsers($output, $this->hubspot);
+            $this->requeueAllUsers($output, $this->hubspot);
         }
         if ($propertiesList) {
-            return $this->propertiesList($output, $this->hubspot);
+            $this->propertiesList($output, $this->hubspot);
         }
         if ($propertiesGroup) {
-            return $this->propertiesSyncGroup($output);
+            $this->propertiesSyncGroup($output);
         }
         if ($propertiesSync) {
-            return $this->propertiesSync($output);
+            $this->propertiesSync($output);
         }
-        return $this->process($output, $queueProcessMaxCount);
+        $this->process($output, $queueProcessMaxCount);
     }
 
     /**
@@ -266,27 +285,29 @@ class HubspotCommand extends ContainerAwareCommand
     /**
      * Makes sure that the sosure contact property group exists. Should only really need to be run once.
      * @param OutputInterface $output is used to write to the commandline.
-     * @return int 0 (denoting success).
+     * @throws \Exception when something goes wrong in the process.
      */
     public function propertiesSyncGroup(OutputInterface $output)
     {
-        echo $output->writeln(sprintf('<comment>%s</comment>', $this->hubspot->syncPropertyGroup()));
-        return 0;
+        $this->hubspot->syncPropertyGroup(self::HUBSPOT_SOSURE_PROPERTY_NAME, self::HUBSPOT_SOSURE_PROPERTY_DESC);
+        $output->writeln("Successfully synced sosure property group.");
     }
 
     /**
      * Synchronises the list of so-sure properties onto hubspot. Should only really need to be run once.
      * @param OutputInterface $output is used to output to the commandline.
-     * @return int 0 (denoting success).
      */
-    public function propertiesSync(OutputInterface $output): int
+    public function propertiesSync(OutputInterface $output)
     {
-        $this->hubspot->syncPropertyGroup();
-        $actions = $this->hubspot->syncProperties();
-        foreach ($actions as $action) {
-            echo $output->writeln($action);
+        $properties = $this->allPropertiesWithGroup();
+        foreach ($properties as $property) {
+            $name = $property["name"];
+            if ($this->hubspot->syncProperty($property)) {
+                $output->writeln("Created <info>{$name}</info> property.");
+            } else {
+                $output->writeln("Skipped <info>{$name}</info> property.");
+            }
         }
-        return 0;
     }
 
     /**
@@ -362,5 +383,114 @@ class HubspotCommand extends ContainerAwareCommand
             throw new UsernameNotFoundException('Unable to find user');
         }
         return $user;
+    }
+
+    /**
+     * Fields that, if they do not exist, will be created as properties in the 'sosure' group
+     * @return array containing property data formatted for hubspot.
+     */
+    private function allPropertiesWithGroup()
+    {
+        return [
+            [
+                "name" => "gender",
+                "label" => "gender",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "enumeration",
+                "fieldType" => "radio",
+                "formField" => false,
+                "displayOrder" => -1,
+                "options" => [
+                    ["label" => "male", "value" => "male"],
+                    ["label" => "female", "value" => "female"],
+                    ["label" => "x/not-known", "value" => "x"]
+                ]
+            ],
+            [
+                "name" => "date_of_birth",
+                "label" => "Date of birth",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "date",
+                "fieldType" => "date",
+                "formField" => false,
+                "displayOrder" => -1
+            ],
+            [
+                "name" => "facebook",
+                "label" => "Facebook?",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "enumeration",
+                "fieldType" => "checkbox",
+                "formField" => false,
+                "displayOrder" => -1,
+                "options" => [
+                    ["label" => "yes", "value" => "yes"],
+                    ["label" => "no", "value" => "no"]
+                ],
+            ],
+            [
+                "name" => "billing_address",
+                "label" => "Billing address",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "string",
+                "fieldType" => "textarea",
+                "formField" => false,
+                "displayOrder" => -1
+            ],
+            [
+                "name" => "census_subgroup",
+                "label" => "Estimated census_subgroup",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "string",
+                "fieldType" => "text",
+                "formField" => false,
+                "displayOrder" => -1
+            ],
+            [
+                "name" => "total_weekly_income",
+                "label" => "Estimated total_weekly_income",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "string",
+                "fieldType" => "text",
+                "formField" => false,
+                "displayOrder" => -1
+            ],
+            [
+                "name" => "attribution",
+                "label" => "attribution",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "string",
+                "fieldType" => "text",
+                "formField" => false,
+                "displayOrder" => -1
+            ],
+            [
+                "name" => "latestattribution",
+                "label" => "Latest attribution",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "string",
+                "fieldType" => "text",
+                "formField" => false,
+                "displayOrder" => -1
+            ],
+            [
+                "name" => "sosure_lifecycle_stage",
+                "label" => "SO-SURE lifecycle stage",
+                "description" => "Current stage in purchase-flow",
+                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
+                "type" => "enumeration",
+                "fieldType" => "select",
+                "formField" => true,
+                "displayOrder" => -1,
+                "options" => [
+                    ["label" => Api::QUOTE, "value" => Api::QUOTE],
+                    ["label" => Api::READY_FOR_PURCHASE, "value" => Api::READY_FOR_PURCHASE],
+                    ["label" => Api::PURCHASED, "value" => Api::PURCHASED],
+                    ["label" => Api::RENEWED, "value" => Api::RENEWED],
+                    ["label" => Api::CANCELLED, "value" => Api::CANCELLED],
+                    ["label" => Api::EXPIRED, "value" => Api::EXPIRED]
+                ]
+            ]
+        ];
     }
 }
