@@ -84,7 +84,8 @@ class HubspotData
 
     private function getHubspotPolicies(User $user)
     {
-        return [$this->hubspotProperty("policyCount", null)];  // look at the 'Hubspot Deals api' to do anything with policies.
+        // TODO: look at the 'Hubspot Deals api' to do anything with policies.
+        return [$this->hubspotProperty("policyCount", null)];
 
         /** @var Collection<Policy|PhonePolicy> $policies */
         $policies = $user->getAllPolicies() ?? []; // ->getDisplayablePoliciesSorted();

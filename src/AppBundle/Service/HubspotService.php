@@ -113,7 +113,7 @@ class HubspotService
                     continue;
                 }
                 // Only one kind of action right now but it will handle others the same way.
-                switch($data["action"]) {
+                switch ($data["action"]) {
                     case self::QUEUE_CONTACT:
                         $this->processContact($data);
                         break;
@@ -173,7 +173,7 @@ class HubspotService
 
     /**
      * Synchronises a property group with hubspot.
-     * @param string $groupName is the name of the group to run for.
+     * @param string $groupName   is the name of the group to run for.
      * @param string $displayName is the desired display name of the group.
      */
     public function syncPropertyGroup($groupName, $displayName)
@@ -213,7 +213,7 @@ class HubspotService
 
     /**
      * If the given user already exists as a contact then update them, otherwise create them.
-     * @param User $user the user the update will be based off of.
+     * @param User $user        the user the update will be based off of.
      * @param bool $allowSoSure whether to proceed if $user has a so-sure email address. defaults no.
      * @return \stdClass
      * @throws \Exception
@@ -277,7 +277,7 @@ class HubspotService
 
     /**
      * Adds a message to the queue to be processed later.
-     * @param array $data is the content of the message being queued.
+     * @param array   $data  is the content of the message being queued.
      * @param boolean $retry is whether the "attempts" property should be incremented and checked for too many attempts.
      */
     private function queue($data, $retry = false)
@@ -386,7 +386,9 @@ class HubspotService
         } elseif ($code === 429) {
             throw new \Exception("Hubspot rate limited.");
         } else {
-            throw new \Exception("Hubspot request returned status {$code} instead of {$desired}. ".$response->getBody());
+            throw new \Exception(
+                "Hubspot request returned status {$code} instead of {$desired}. ".$response->getBody()
+            );
         }
     }
 }

@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use SevenShores\Hubspot\Exceptions\BadRequest;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
-
 /**
  * Allows control of the hubspot system via commandline.
  */
@@ -260,8 +259,8 @@ class HubspotCommand extends ContainerAwareCommand
 
     /**
      * Outputs a table of all properties in huubspot.
-     * @param OutputInterface $output is used to output to the commandline.
-     * @param HubspotService $hubspot is used to access the list of properties in hubspot.
+     * @param OutputInterface $output  is used to output to the commandline.
+     * @param HubspotService  $hubspot is used to access the list of properties in hubspot.
      * @return int 0 (denoting success).
      */
     public function propertiesList(OutputInterface $output, HubspotService $hubspot)
@@ -329,8 +328,8 @@ class HubspotCommand extends ContainerAwareCommand
     }
 
     /**
-     * Moves some stuff about, TODO: I reckon this is not so good but my mind is not up to removing it right now.
-     * @param \stdClass $property is a thingy with properties.
+     * Moves some stuff about.
+     * @param \stdClass $property  is a thingy with properties.
      * @param boolean   $isVerbose tells whether to pull out the basic set or the big set of properties.
      * @return array containing the properties you chose in the right order and such.
      */
