@@ -1219,9 +1219,8 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td><i class="fa fa-shield" title="Customer Service only"></i> Pay Policy</td>
+                    <td>Pay Policy</td>
                     <td>
                         {% if not policy.payerOrUser.paymentMethod %}
                             Missing payment method
@@ -1239,7 +1238,6 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% endif %}
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                     {% if policy.isPolicy
                         and policy.payerOrUser.paymentMethod
