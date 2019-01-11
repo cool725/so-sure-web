@@ -40,6 +40,8 @@ use AppBundle\Exception\ClaimException;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
  * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy"})
+ * @MongoDB\Index(keys={"policyNumber"="asc","end"="asc"},
+ *     unique="false", sparse="true")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Policy

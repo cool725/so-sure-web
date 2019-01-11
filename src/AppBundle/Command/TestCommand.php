@@ -15,6 +15,7 @@ use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -37,14 +38,18 @@ class TestCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
+    /** @var string */
+    protected $environment;
+
     /** @var Reader */
     protected $reader;
 
-    public function __construct(DocumentManager $dm, Reader $reader)
+    public function __construct(DocumentManager $dm, Reader $reader, $environment)
     {
         parent::__construct();
         $this->dm = $dm;
         $this->reader = $reader;
+        $this->environment = $environment;
     }
 
     protected function configure()
@@ -69,6 +74,24 @@ class TestCommand extends ContainerAwareCommand
             throw new \Exception(sprintf('Unknown command %s', $method));
         }
         $output->writeln('Finished');
+    }
+
+    private function removeTwoFactor(OutputInterface $output)
+    {
+        if (!in_array($this->environment, ['vagrant', 'staging', 'testing'])) {
+            throw new \Exception('Only able to run in vagrant/testing/staging environments');
+        }
+
+        /** @var UserRepository $repo */
+        $repo = $this->dm->getRepository(User::class);
+        $admins = $repo->findUsersInRole(User::ROLE_ADMIN);
+        foreach ($admins as $admin) {
+            /** @var User $admin */
+            $admin->setGoogleAuthenticatorSecret(null);
+        }
+
+        $this->dm->flush();
+        $output->writeln('Removed 2fa for all admins');
     }
 
     private function cancelScheduledPayments(OutputInterface $output)

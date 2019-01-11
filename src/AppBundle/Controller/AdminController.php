@@ -540,11 +540,13 @@ class AdminController extends BaseController
         }
 
         $dm = $this->getManager();
+        /** @var S3FileRepository $s3FileRepo */
         $s3FileRepo = $dm->getRepository(S3File::class);
         /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
 
-        return [
+        // 15 - 18 seconds
+        $data = [
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
@@ -552,11 +554,17 @@ class AdminController extends BaseController
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
-            'files' => $s3FileRepo->getAllFiles($date),
-            'salvaForm' => $salvaForm->createView(),
             'stats' => $reportingService->getStats($date),
             'print' => false,
         ];
+        //throw new \Exception(print_r($data, true));
+
+        $data = array_merge($data, [
+            'files' => $s3FileRepo->getAllFiles($date),
+            'salvaForm' => $salvaForm->createView(),
+        ]);
+
+        return $data;
     }
 
     /**
