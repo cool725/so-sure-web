@@ -198,6 +198,7 @@ class DefaultController extends BaseController
      */
     public function affiliateLanding(Request $request)
     {
+        $data = null;
         if ($request->get('_route') == 'topcashback') {
             $data = [
                 'affiliate_page' => 'topcashback',
