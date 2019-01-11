@@ -198,34 +198,41 @@ class DefaultController extends BaseController
      */
     public function affiliateLanding(Request $request)
     {
-        $page = null;
-        $affiliate = null;
-
         if ($request->get('_route') == 'topcashback') {
-            $page = 'topcashback';
-            $affiliate = 'TopCashback';
+            $data = [
+                'affiliate_page' => 'topcashback',
+                'affiliate_company' => 'TopCashback',
+                'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
+            ];
         } elseif ($request->get('_route') == 'vouchercodes') {
-            $page = 'vouchercodes';
-            $affiliate = 'VoucherCodes';
+            $data = [
+                'affiliate_page' => 'vouchercodes',
+                'affiliate_company' => 'VoucherCodes',
+                'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
+            ];
         } elseif ($request->get('_route') == 'quidco') {
-            $page = 'quidco';
-            $affiliate = 'Quidco';
+            $data = [
+                'affiliate_page' => 'quidco',
+                'affiliate_company' => 'Quidco',
+                'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
+            ];
         } elseif ($request->get('_route') == 'ivip') {
-            $page = 'ivip';
-            $affiliate = 'iVIP';
+            $data = [
+                'affiliate_page' => 'ivip',
+                'affiliate_company' => 'iVIP',
+                'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
+            ];
         } elseif ($request->get('_route') == 'reward_gateway') {
-            $page = 'reward-gateway';
-            $affiliate = 'Reward Gateway';
+            $data = [
+                'affiliate_page' => 'reward-gateway',
+                'affiliate_company' => 'Reward Gateway',
+                'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
+            ];
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => $page
+            'page' => $data['affiliate_page'],
         ]);
-
-        $data = [
-            'affiliate_company' => $affiliate,
-            'affiliate_page' => $page,
-        ];
 
         return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
     }

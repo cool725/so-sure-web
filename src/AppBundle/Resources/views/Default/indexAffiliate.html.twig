@@ -19,17 +19,7 @@
             <div class="hero__intro">
                 <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
                 <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
-                {% if affiliate_page == 'topcashback' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_topcashback_logo.svg" alt="TopCashback" width="220px" class="d-block mb-4 mx-auto">
-                {% elseif affiliate_page == 'vouchercodes' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_vouchercodes_logo.svg" alt="iVIP" width="280px" class="d-block mb-4 mx-auto">
-                {% elseif affiliate_page == 'quidco' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_quidco_logo.svg" alt="Quidco" width="160px" class="d-block mb-4 mx-auto">
-                {% elseif affiliate_page == 'ivip' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ivip_logo.svg" alt="iVIP" width="200px" class="d-block mt-4 mb-5 mx-auto">
-                {% elseif affiliate_page == 'reward-gateway' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_reward_gateway_logo.svg" alt="Reward Gateway" width="300px" class="d-block mt-4 mb-5 mx-auto">
-                {% endif %}
+                <img src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto">
             </div>
             <div class="hero__controls mb-5">
                 <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
