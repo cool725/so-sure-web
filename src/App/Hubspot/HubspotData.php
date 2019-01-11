@@ -47,19 +47,19 @@ class HubspotData
     }
 
     /**
-     * fff
+     * Builds array of user general data.
      */
     private function getHubspotUserDetails(User $user)
     {
         $data = [
-            $this->hubSpotProperty("firstname", $user->getFirstName()),
-            $this->hubSpotProperty("lastname", $user->getLastName()),
-            $this->hubSpotProperty("email", $user->getEmailCanonical()),
-            $this->hubSpotProperty("mobilephone", $user->getMobileNumber()),
-            $this->hubSpotProperty("gender", $user->getGender()),
+            $this->hubspotProperty("firstname", $user->getFirstName()),
+            $this->hubspotProperty("lastname", $user->getLastName()),
+            $this->hubspotProperty("email", $user->getEmailCanonical()),
+            $this->hubspotProperty("mobilephone", $user->getMobileNumber()),
+            $this->hubspotProperty("gender", $user->getGender()),
         ];
         if ($user->getBirthday()) {
-            $data[] = $this->hubSpotProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
+            $data[] = $this->hubspotProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
         }
         return $data;
     }
@@ -71,12 +71,12 @@ class HubspotData
     {
         $data = [];
         if ($user->getBillingAddress()) {
-            $data[] = $this->hubSpotProperty("billing_address", $user->getBillingAddress());
+            $data[] = $this->hubspotProperty("billing_address", $user->getBillingAddress());
             if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->hubSpotProperty("census_subgroup", $census->getSubGroup());
+                $data[] = $this->hubspotProperty("census_subgroup", $census->getSubGroup());
             }
             if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->hubSpotProperty("total_weekly_income", $income->getTotal()->getIncome());
+                $data[] = $this->hubspotProperty("total_weekly_income", $income->getTotal()->getIncome());
             }
         }
         return $data;
@@ -109,9 +109,9 @@ class HubspotData
 
         // policy & claims
         $data = [
-            'policyCount' => $this->hubSpotProperty('policy_count', count($policies)),
-            'claimsCount' => $this->hubSpotProperty('claims_count', count($claims)),
-            'policySummaries' => $this->hubSpotProperty('policy_summaries', $hubspotPolicies),
+            'policyCount' => $this->hubspotProperty('policy_count', count($policies)),
+            'claimsCount' => $this->hubspotProperty('claims_count', count($claims)),
+            'policySummaries' => $this->hubspotProperty('policy_summaries', $hubspotPolicies),
         ];
 
         return $data;
@@ -180,9 +180,9 @@ class HubspotData
             $hasFacebook = true;
         }
         $data = [
-            $this->hubSpotProperty("attribution", $user->getAttribution() ?? ''),
-            $this->hubSpotProperty("latestattribution", $user->getLatestAttribution() ?? ''),
-            $this->hubSpotProperty("facebook", $hasFacebook ? "yes" : "no"),
+            $this->hubspotProperty("attribution", $user->getAttribution() ?? ''),
+            $this->hubspotProperty("latestattribution", $user->getLatestAttribution() ?? ''),
+            $this->hubspotProperty("facebook", $hasFacebook ? "yes" : "no"),
         ];
         if ($hasFacebook) {
             $data['hs_facebookid'] = $this->hubspotProperty("hs_facebookid", $user->getFacebookId());
@@ -190,7 +190,7 @@ class HubspotData
         return $data;
     }
 
-    private function hubSpotProperty(string $fieldName, $value): array
+    private function hubspotProperty(string $fieldName, $value): array
     {
         if ($value !== null) {
             return ['property' => $fieldName, 'value' => $value];

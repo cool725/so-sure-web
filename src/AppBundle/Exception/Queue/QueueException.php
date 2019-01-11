@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\Queues;
+namespace AppBundle\Exception\Queue;
 
 /**
  * Represents an exception coming from a queue.

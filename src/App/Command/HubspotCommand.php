@@ -172,7 +172,7 @@ class HubspotCommand extends ContainerAwareCommand
         try {
             $user = $this->getUser($email);
             if ($requeue) {
-                $hubspot->queue($user);
+                $hubspot->queueContact($user);
                 $output->writeln(sprintf("Added to queue userId: %s", $user->getId()));
                 return 0;
             }
@@ -243,7 +243,6 @@ class HubspotCommand extends ContainerAwareCommand
      * Puts every single user in the database onto the queue.
      * @param OutputInterface $output  is used to output to the commandline.
      * @param HubspotService  $hubspot contains the queue.
-     * @return 0 (denoting success).
      */
     public function requeueAllUsers(OutputInterface $output, HubspotService $hubspot)
     {
@@ -254,14 +253,12 @@ class HubspotCommand extends ContainerAwareCommand
             $count++;
         }
         $output->writeln(sprintf("Queued %d Users", $count));
-        return 0;
     }
 
     /**
      * Outputs a table of all properties in huubspot.
      * @param OutputInterface $output  is used to output to the commandline.
      * @param HubspotService  $hubspot is used to access the list of properties in hubspot.
-     * @return int 0 (denoting success).
      */
     public function propertiesList(OutputInterface $output, HubspotService $hubspot)
     {
@@ -278,7 +275,6 @@ class HubspotCommand extends ContainerAwareCommand
             $table->addRow($tableRow);
         }
         $table->render();
-        return 0;
     }
 
     /**

@@ -242,7 +242,7 @@ class HubspotService
     /**
      * Gets list of all the contacts from Hubspot via generator, since only a limited number can be gotten at a time.
      * @param array params is an optional list of parameters to add to the request.
-     * @return Generator yielding all contacts in hubspot.
+     * @return \Generator yielding all contacts in hubspot.
      */
     public function getAllContacts($params = [])
     {
