@@ -1233,9 +1233,9 @@ class PolicyService
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $connection->getLinkedPolicy()->getUser();
-        $this->mailer->sendTemplateToUser(
+        $this->mailer->sendTemplate(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getUser(),
+            $policy->getUser()->getEmail(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
