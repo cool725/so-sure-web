@@ -353,4 +353,33 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         $now = static::addDays($now, 10);
         $this->assertEquals(-20, static::daysFrom($other, $now));
     }
+
+    public function testNormalizeDate()
+    {
+        $this->assertEquals('30/12/1980', $this->normalizeDate('30/12/1980'));
+        $this->assertEquals('30/12/1980', $this->normalizeDate(' 30/12/1980 '));
+        $this->assertEquals('30/12/1980', $this->normalizeDate(' 30 12 1980 '));
+        $this->assertEquals('30/12/1980', $this->normalizeDate(' 30.12.1980 '));
+        $this->assertEquals('30/12/1980', $this->normalizeDate(' 30-12-1980 '));
+    }
+
+    public function testCreateValidDate()
+    {
+        $this->assertEquals(new \DateTime('12/30/1980'), $this->createValidDate('30/12/1980'));
+        $this->assertEquals(new \DateTime('12/30/1980'), $this->createValidDate(' 30/12/1980 '));
+        $this->assertEquals(new \DateTime('12/30/1980'), $this->createValidDate(' 30 12 1980 '));
+        $this->assertEquals(new \DateTime('12/30/1980'), $this->createValidDate(' 30.12.1980 '));
+        $this->assertEquals(new \DateTime('12/30/1980'), $this->createValidDate(' 30-12-1980 '));
+        $this->assertFalse($this->createValidDate(' abc '));
+    }
+
+    public function testIsValidDate()
+    {
+        $this->assertTrue($this->isValidDate('30/12/1980'));
+        $this->assertTrue($this->isValidDate(' 30/12/1980 '));
+        $this->assertTrue($this->isValidDate(' 30 12 1980 '));
+        $this->assertTrue($this->isValidDate(' 30.12.1980'));
+        $this->assertTrue($this->isValidDate(' 30-12-1980'));
+        $this->assertFalse($this->isValidDate(' abc '));
+    }
 }

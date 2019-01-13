@@ -33,6 +33,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     use PhoneTrait;
     use GravatarTrait;
     use CurrencyTrait;
+    use DateTrait;
 
     const MAX_POLICIES_PER_USER = 2;
 
@@ -52,6 +53,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are active.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
+
+    const DPA_VALIDATION_VALID = 'dpa-valid';
+    const DPA_VALIDATION_NOT_VALID = 'dpa-not-valid';
+    const DPA_VALIDATION_FAIL_DOB = 'dpa-fail-dob';
+    const DPA_VALIDATION_FAIL_LASTNAME = 'dpa-fail-lastname';
+    const DPA_VALIDATION_FAIL_FIRSTNAME = 'dpa-fail-firstname';
+    const DPA_VALIDATION_FAIL_MOBILE = 'dpa-fail-mobile';
 
     /**
      * @MongoDB\Id
@@ -348,6 +356,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $birthday;
 
@@ -2151,5 +2160,29 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         } else {
             return static::AQUISITION_POTENTIAL;
         }
+    }
+
+    public function validateDpa($firstName = null, $lastName = null, $dob = null, $mobile = null)
+    {
+        if (!$firstName || !$lastName || !$dob || !$mobile) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        } elseif (!$this->isValidDate($dob)) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        } elseif (!$this->isValidUkMobile($mobile)) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        }
+
+        if ($this->normalizeUkMobile($mobile) != $this->normalizeUkMobile($this->getMobileNumber())) {
+            return self::DPA_VALIDATION_FAIL_MOBILE;
+        } elseif (!$this->createValidDate($dob) || !$this->getBirthday() ||
+            $this->createValidDate($dob)->diff($this->getBirthday())->days != 0) {
+            return self::DPA_VALIDATION_FAIL_DOB;
+        } elseif (mb_strtolower($lastName) != mb_strtolower($this->getLastName())) {
+            return self::DPA_VALIDATION_FAIL_LASTNAME;
+        } elseif (mb_strtolower($firstName) != mb_strtolower($this->getFirstName())) {
+            return self::DPA_VALIDATION_FAIL_FIRSTNAME;
+        }
+
+        return self::DPA_VALIDATION_VALID;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhoneTrait;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\UserRepository;
 use GuzzleHttp\Exception\ClientException;
@@ -28,6 +30,8 @@ use Symfony\Component\Routing\RouterInterface;
 class IntercomService
 {
     use CurrencyTrait;
+    use PhoneTrait;
+    use DateTrait;
 
     const MAX_SCROLL_RECORDS = 50000;
 
@@ -100,23 +104,33 @@ class IntercomService
     protected $secure;
     protected $secureAndroid;
     protected $secureIOS;
+    protected $dpaAppAdminId;
 
     /** @var MailerService */
     protected $mailer;
 
-    /** @var RouterInterface */
+    /** @var RouterService */
     protected $router;
 
+    /** @var SanctionsService */
+    protected $sanctions;
+
+    /** @var RateLimitService */
+    protected $rateLimit;
+
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param string          $token
-     * @param Client          $redis
-     * @param string          $secure
-     * @param string          $secureAndroid
-     * @param string          $secureIOS
-     * @param MailerService   $mailer
-     * @param RouterInterface $router
+     * @param DocumentManager  $dm
+     * @param LoggerInterface  $logger
+     * @param string           $token
+     * @param Client           $redis
+     * @param string           $secure
+     * @param string           $secureAndroid
+     * @param string           $secureIOS
+     * @param MailerService    $mailer
+     * @param RouterService    $router
+     * @param string           $dpaAppAdminId
+     * @param SanctionsService $sanctions
+     * @param RateLimitService $rateLimitService
      */
     public function __construct(
         DocumentManager $dm,
@@ -127,7 +141,10 @@ class IntercomService
         $secureAndroid,
         $secureIOS,
         MailerService $mailer,
-        RouterInterface $router
+        RouterService $router,
+        $dpaAppAdminId,
+        SanctionsService $sanctions,
+        RateLimitService $rateLimitService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -138,6 +155,9 @@ class IntercomService
         $this->secureIOS = $secureIOS;
         $this->mailer = $mailer;
         $this->router = $router;
+        $this->dpaAppAdminId = $dpaAppAdminId;
+        $this->sanctions = $sanctions;
+        $this->rateLimit = $rateLimitService;
     }
 
     private function storeRateLimit()
@@ -453,9 +473,9 @@ class IntercomService
         }
 
         $analytics = $user->getAnalytics();
-        $data['custom_attributes']['User url'] = $this->router->generate('admin_user', [
-                'id' => $user->getId()
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
+        $data['custom_attributes']['User url'] = $this->router->generateUrl('admin_user', [
+            'id' => $user->getId()
+        ]);
         $data['custom_attributes']['Premium'] = $this->toTwoDp($analytics['annualPremium']);
         $data['custom_attributes']['Displayable Premium'] = (string) sprintf('%.2f', $analytics['annualPremium']);
         $data['custom_attributes']['Monthly Premium'] = $this->toTwoDp($analytics['monthlyPremium']);
@@ -492,9 +512,9 @@ class IntercomService
         }
         if ($user->getFirstPolicy() && $user->getFirstPolicy()->getPhone()) {
             $data['custom_attributes']['First Policy Learn More'] =
-                $this->router->generate('learn_more_phone', [
+                $this->router->generateUrl('learn_more_phone', [
                     'id' => $user->getFirstPolicy()->getPhone()->getId()
-                ], UrlGeneratorInterface::ABSOLUTE_URL);
+                ]);
         }
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
@@ -1404,5 +1424,223 @@ class IntercomService
         $optout->addCategory($category);
         $optout->setEmail($email);
         $this->dm->persist($optout);
+    }
+
+    public function getDpaCard($firstName = null, $lastName = null, $dob = null, $mobile = null, $error = null)
+    {
+        // @codingStandardsIgnoreStart
+        $headline = 'Before we can proceed with your request, we need to securely validate your identity. Please fill in the fields below.';
+        // @codingStandardsIgnoreEnd
+        // for init, all values will be null
+        $init = false;
+        $headline = null;
+        if ($firstName === null && $lastName === null && $dob === null && $mobile === null) {
+            $init = true;
+            // @codingStandardsIgnoreStart
+            $headline = 'Before we can proceed with your request, we need to securely validate your identity. Please fill in the fields below.';
+            // @codingStandardsIgnoreEnd
+        } elseif (!$this->isValidName($firstName) || !$this->isValidName($lastName) ||
+            !$this->isValidDOB($dob) || !$this->isValidMobile($mobile)) {
+            $headline = 'Please review your answers and ensure they are in the correct format';
+        } elseif ($error) {
+            $headline = $error;
+        }
+
+        $response = [];
+        if ($headline) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'text',
+                'text' => $headline,
+            ];
+        }
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'firstName',
+            'label' => 'Your first name (as on your policy)',
+            'value' => $firstName,
+            'save_state' => $init || $this->isValidName($firstName) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'lastName',
+            'label' => 'Your last name (as on your policy)',
+            'value' => $lastName,
+            'save_state' => $init || $this->isValidName($lastName) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'dob',
+            'label' => 'Your birthday (dd/mm/yyyy)',
+            'value' => $dob,
+            'save_state' => $init || $this->isValidDOB($dob) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'mobile',
+            'label' => 'Your mobile number',
+            'value' => $mobile,
+            'save_state' => $init || $this->isValidMobile($mobile) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'button',
+            'id' => 'url_button',
+            'style' => 'primary',
+            'label' => 'Verify me',
+            'action' => ['type' => 'submit'],
+        ];
+
+        return $response;
+    }
+
+    private function getUserByMobile($mobile)
+    {
+        $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['mobileNumber' => $this->normalizeUkMobile($mobile)]);
+
+        return $user;
+    }
+
+    /**
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $dob
+     * @param string $mobile
+     * @return User|array TODO: Would be nicer to throw an exception with the array
+     * @throws \Exception
+     */
+    public function getValidatedDpaUser($firstName, $lastName, $dob, $mobile)
+    {
+        if (!$this->isValidName($firstName) || !$this->isValidName($lastName) ||
+            !$this->isValidDOB($dob) || !$this->isValidMobile($mobile)) {
+            return $this->getDpaCard($firstName, $lastName, $dob, $mobile);
+        }
+
+        $user = $this->getUserByMobile($mobile);
+        if (!$user) {
+            return $this->getDpaCard(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                'We are unable to locate your details in our system'
+            );
+        }
+
+        // To avoid minor issues with typos or misspellings, if name is very close, the accept it
+        if ($this->sanctions->getMinLevenshteinDoupleMetaphoneString($firstName, $user->getFirstName()) == 0) {
+            $firstName = $user->getFirstName();
+        }
+
+        // To avoid minor issues with typos or misspellings, if name is very close, the accept it
+        if ($this->sanctions->getMinLevenshteinDoupleMetaphoneString($lastName, $user->getLastName()) == 0) {
+            $lastName = $user->getLastName();
+        }
+
+        $validate = $user->validateDpa($firstName, $lastName, $dob, $mobile);
+
+        if ($validate == User::DPA_VALIDATION_NOT_VALID) {
+            return $this->getDpaCard($firstName, $lastName, $dob, $mobile);
+        } elseif (in_array($validate, [
+            User::DPA_VALIDATION_FAIL_MOBILE,
+            User::DPA_VALIDATION_FAIL_FIRSTNAME,
+            User::DPA_VALIDATION_FAIL_LASTNAME,
+            User::DPA_VALIDATION_FAIL_DOB,
+        ])) {
+            return $this->getDpaCard(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                'We are unable to validate your details'
+            );
+        }
+
+        // failsafe in case we add a new case and missed above
+        if ($validate != User::DPA_VALIDATION_VALID) {
+            throw new \Exception(sprintf('Validate returned %s, not expected validation', $validate));
+        }
+
+        return $user;
+    }
+
+    public function validateDpa($firstName, $lastName, $dob, $mobile, $conversationId)
+    {
+        $conversation = $this->client->conversations->getConversation($conversationId);
+        $adminId = $conversation->assignee->id;
+        if (!$adminId) {
+            $adminId = $this->dpaAppAdminId;
+        }
+
+        // TODO: Instead of conversation, what about the user/lead id
+        if (!$this->rateLimit->allowedByUserId($conversationId, RateLimitService::DEVICE_TYPE_INTERCOM_DPA)) {
+            $this->client->conversations->replyToConversation($conversationId, [
+                'type' => 'admin',
+                'message_type' => 'note',
+                'admin_id' => $adminId,
+                'body' => 'Unable to validate DPA. Too many failed attempts. Can be retried in 10 minutes.'
+            ]);
+
+            return $this->canvasText(
+                'Sorry, you have too many failed attempts. Please ask us to manually confirm your details.'
+            );
+        }
+
+        $user = $this->getValidatedDpaUser($firstName, $lastName, $dob, $mobile);
+        if (!$user instanceof User) {
+            // user was not validated; should be a card with returned as user
+            return $user;
+        }
+
+        $userLink = $this->router->generateUrl('admin_user', ['id' => $user->getId()]);
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'type' => 'admin',
+            'message_type' => 'note',
+            'admin_id' => $adminId,
+            'body' => sprintf('DPA successfully confirmed for user <a href="%s">%s</a>', $userLink, $user->getName())
+        ]);
+
+        // @codingStandardsIgnoreStart
+        $this->client->conversations->replyToConversation($conversationId, [
+            'type' => 'admin',
+            'message_type' => 'comment',
+            'admin_id' => $adminId,
+            'body' => 'Thanks for confirming your identity. We are looking into your request and will respond as soon as we can.',
+        ]);
+        // @codingStandardsIgnoreEnd
+
+        return $this->canvasText('Thanks for verifying your identity.');
+    }
+
+    private function canvasText($text)
+    {
+        return [
+            'canvas' => [
+                'content' => [
+                    'components' => [
+                        [
+                            'type' => 'text',
+                            'text' => $text,
+                        ],
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    private function isValidName($name)
+    {
+        return mb_strlen(trim($name)) > 0;
+    }
+
+    private function isValidDOB($dob)
+    {
+        return $this->isValidDate($dob);
+    }
+
+    private function isValidMobile($mobile)
+    {
+        return $this->isValidUkMobile($mobile);
     }
 }

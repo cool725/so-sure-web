@@ -292,7 +292,10 @@ services:
             - "%intercom_secure_android%"
             - "%intercom_secure_ios%"
             - "@app.mailer"
-            - "@router"
+            - "@app.router"
+            - '%intercom_dpa_app_admin%'
+            - "@app.sanctions"
+            - "@app.ratelimit"
 
     app.address:
         alias: AppBundle\Service\PCAService
