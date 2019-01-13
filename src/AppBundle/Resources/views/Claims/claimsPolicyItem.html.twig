@@ -1259,8 +1259,22 @@
                         <tr>
                             <td><i class="fa fa-lock" title="Admin only"></i> Refund Bacs</td>
                             <td>
-                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#bacsRefundModal"
-                                >Refund</button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#bacsRefundModal">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
+                            </td>
+                        </tr>
+                    {% elseif policy.isPolicy
+                        and policy.payerOrUser.paymentMethod
+                        and policy.payerOrUser.paymentMethod.type == "judo" %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Refund Judo</td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#judoRefundForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
                             </td>
                         </tr>
                     {% endif %}
@@ -1860,6 +1874,7 @@
     {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
@@ -12,12 +13,14 @@ use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\CashflowsFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Document\Form\JudoRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\JudoRefundType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -43,6 +46,7 @@ use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
 use AppBundle\Service\CashflowsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\JudopayService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
@@ -221,6 +225,80 @@ class AdminController extends BaseController
 
         return $this->redirectToRoute('admin_claims');
     }
+
+    /**
+     * @Route("/judo-refund/{id}", name="judo_refund_form")
+     * @Template
+     */
+    public function judoRefundFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        /** @var Policy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $judoRefund = new JudoRefund();
+        $judoRefund->setPolicy($policy);
+        $judoRefundForm = $this->get('form.factory')
+            ->createNamedBuilder('judo_refund_form', JudoRefundType::class, $judoRefund)
+            ->setAction($this->generateUrl(
+                'judo_refund_form',
+                ['id' => $policy->getId()]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('judo_refund_form')) {
+                $judoRefundForm->handleRequest($request);
+                if ($judoRefundForm->isValid()) {
+                    /** @var JudopayService $judopayService */
+                    $judopayService = $this->get('app.judopay');
+
+                    try {
+                        $judopayService->refund(
+                            $judoRefund->getPayment(),
+                            $judoRefund->getAmount(),
+                            $judoRefund->getTotalCommission(),
+                            $judoRefund->getNotes()
+                        );
+
+                        $policy->addNoteDetails(
+                            $judoRefund->getNotes(),
+                            $this->getUser(),
+                            'Judo Refund'
+                        );
+
+                        $dm->flush();
+
+                        $this->addFlash(
+                            'success',
+                            sprintf('Successfully refunded payment of £%s', $judoRefund->getAmount())
+                        );
+                    } catch (\Exception $e) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Error processing refund: %s', $e)
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'judo_refund_form' => $judoRefundForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
 
     /**
      * @Route("/phone", name="admin_phone_add")
