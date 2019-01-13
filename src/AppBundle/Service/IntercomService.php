@@ -1564,16 +1564,47 @@ class IntercomService
         return $user;
     }
 
-    public function validateDpa($firstName, $lastName, $dob, $mobile, $conversationId)
+    public function getAdminIdForConversationId($conversationId)
     {
         $conversation = $this->client->conversations->getConversation($conversationId);
+
+        return $this->getAdminIdForConversation($conversation);
+    }
+
+    public function getAdminIdForConversation($conversation)
+    {
         $adminId = $conversation->assignee->id;
+        $admin = $this->client->admins->getAdmin($adminId);
+        if ($admin->type != 'admin') {
+            $adminId = null;
+        }
+
         if (!$adminId) {
             $adminId = $this->dpaAppAdminId;
         }
 
-        // TODO: Instead of conversation, what about the user/lead id
-        if (!$this->rateLimit->allowedByUserId($conversationId, RateLimitService::DEVICE_TYPE_INTERCOM_DPA)) {
+        return $adminId;
+    }
+
+    public function getUserIdForConversationId($conversationId)
+    {
+        $conversation = $this->client->conversations->getConversation($conversationId);
+
+        return $this->getUserIdForConversation($conversation);
+    }
+
+    public function getUserIdForConversation($conversation)
+    {
+        return $conversation->user->id;
+    }
+
+    public function validateDpa($firstName, $lastName, $dob, $mobile, $conversationId)
+    {
+        $conversation = $this->client->conversations->getConversation($conversationId);
+        $adminId = $this->getAdminIdForConversation($conversation);
+        $userId = $this->getUserIdForConversation($conversation);
+
+        if (!$this->rateLimit->allowedByUserId($userId, RateLimitService::DEVICE_TYPE_INTERCOM_DPA)) {
             $this->client->conversations->replyToConversation($conversationId, [
                 'type' => 'admin',
                 'message_type' => 'note',
