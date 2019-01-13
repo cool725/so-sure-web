@@ -1123,6 +1123,43 @@ class PolicyService
     }
 
     /**
+     * @param PhonePolicy $policy
+     * @param string      $detectedImei
+     * @param User        $adminUser
+     * @param string      $notes
+     */
+    public function setDetectedImei(PhonePolicy $policy, $detectedImei, User $adminUser, $notes)
+    {
+        $policy->setDetectedImei($detectedImei);
+
+        $policy->addNoteDetails(
+            $notes,
+            $adminUser,
+            'Detected IMEI Update'
+        );
+        $this->dm->flush();
+
+        $this->detectedImeiEmail($policy);
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     */
+    public function detectedImeiEmail(PhonePolicy $policy)
+    {
+        $baseTemplate = 'AppBundle:Email:policy/detectedImei';
+
+        $this->mailer->sendTemplateToUser(
+            sprintf('You can now login to the so-sure app!'),
+            $policy->getUser(),
+            sprintf('%s.html.twig', $baseTemplate),
+            ['policy' => $policy],
+            sprintf('%s.txt.twig', $baseTemplate),
+            ['policy' => $policy]
+        );
+    }
+
+    /**
      * @param Policy $policy
      */
     public function cancelledPolicyEmail(Policy $policy, $baseTemplate = null)

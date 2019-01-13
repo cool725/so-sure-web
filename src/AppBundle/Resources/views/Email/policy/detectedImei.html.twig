@@ -1,0 +1,23 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}You can now login to the so-sure app!{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Hello {{ policy.user.firstName }},
+				<br><br>
+			   Good news! We've resoved the issue with your IMEI number. You can now open the so-sure app and continue setting things up.
+			   <br><br>
+               If you have any questions, please don't hesitate to
+				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+				<br><br>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+    {{ macros.email_button_table(branch_policy_url, "Open the app", "Open the app")}}
+{% endblock %}
