@@ -1758,14 +1758,22 @@ class PolicyService
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
                 $date ? $date : \DateTime::createFromFormat('U', time())
             );
-            $scheduledPayment = new ScheduledPayment();
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-            $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
-            $scheduledPayment->setAmount($outstanding);
-            $scheduledPayment->setNotes(sprintf(
-                'Claw-back applied discount (discount was removed following success claim for previous policy)'
-            ));
-            $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            if ($policy->getUser()->hasJudoPaymentMethod()) {
+                $scheduledPayment = new ScheduledPayment();
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
+                $scheduledPayment->setAmount($outstanding);
+                $scheduledPayment->setNotes(sprintf(
+                    'Claw-back applied discount (discount was removed following success claim for previous policy)'
+                ));
+                $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            } else {
+                $this->logger->warning(sprintf(
+                    'Failed to schedule claw back discount for policy %s as on bacs. Owed %0.2f',
+                    $policy->getId(),
+                    $outstanding
+                ));
+            }
             $this->dm->flush();
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
 
