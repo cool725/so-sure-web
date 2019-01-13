@@ -128,7 +128,7 @@ class RateLimitService
      */
     public function clearByUser(User $user)
     {
-        return $this->clearByUserId($user, self::DEVICE_TYPE_USER_LOGIN);
+        return $this->clearByUserId($user->getId(), self::DEVICE_TYPE_USER_LOGIN);
     }
 
     /**
@@ -248,7 +248,6 @@ class RateLimitService
         }
 
         $userKey = sprintf(self::KEY_FORMAT, $type, $userId);
-
         $userRequests = $this->redis->incr($userKey);
         $maxRequests = self::$maxRequests[$type];
 
