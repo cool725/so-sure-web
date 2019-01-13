@@ -34,7 +34,6 @@ class MailerListener implements Swift_Events_SendListener
             $result = 'Spooled';
         } elseif ($evt->getResult() == Swift_Events_SendEvent::RESULT_SUCCESS) {
             $result = 'Sent';
-            $respool = true;
         } elseif ($evt->getResult() == Swift_Events_SendEvent::RESULT_TENTATIVE) {
             $result = 'Tentative';
         } elseif ($evt->getResult() == Swift_Events_SendEvent::RESULT_FAILED) {
