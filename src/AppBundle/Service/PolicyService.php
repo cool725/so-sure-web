@@ -330,7 +330,10 @@ class PolicyService
                 }
             }
 
-            $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+            $checkmend = null;
+            if (!$user->hasSoSureEmail()) {
+                $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+            }
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
@@ -345,11 +348,12 @@ class PolicyService
             /** @var PolicyTerms $latestTerms */
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
             $policy->init($user, $latestTerms);
-
-            $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
-            $policy->addCheckmendSerialData($checkmend['serialResponse']);
-            // saving final finaly checkmendcert based status
-            $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            if ($checkmend) {
+                $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
+                $policy->addCheckmendSerialData($checkmend['serialResponse']);
+                // saving final finaly checkmendcert based status
+                $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            }
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->logger->warning(
