@@ -141,6 +141,7 @@ class JudopayService
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
            'useProduction' => $environment == 'prod',
+           'apiVersion' => '5.6'
            // endpointUrl is overwriten in Judopay Configuration Constructor
            // 'endpointUrl' => ''
         );
@@ -185,7 +186,7 @@ class JudopayService
                 ['exception' => $e]
             );
         }
-    
+
         return null;
     }
 
@@ -1104,6 +1105,7 @@ class JudopayService
                 'cardToken' => $paymentMethod->getCardToken(),
                 'emailAddress' => $user->getEmail(),
                 'mobileNumber' => $user->getMobileNumber(),
+                'recurringPayment' => true
         );
         // For webpayments, we won't have the customer token, but its optoinal anyway
         if ($paymentMethod->getCustomerToken()) {
@@ -1215,7 +1217,7 @@ class JudopayService
 
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
-        
+
         // TODO: Validate receipt does not set commission on failed payments, but token does
         // make consistent
         $this->setCommission($payment);
@@ -1478,7 +1480,7 @@ class JudopayService
                             $line['ReceiptId']
                         );
                         // @codingStandardsIgnoreEnd
-                        
+
                         $this->mailer->send(
                             sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
                             'developersupport@judopayments.com',

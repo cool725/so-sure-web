@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "185d832bf01525ec21e40d40b828b162",
+    "content-hash": "b17513526ba40980376c949c5db0b53b",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -3124,16 +3124,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "2.0.1.5",
+            "version": "2.0.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/Judo-PHP.git",
-                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9"
+                "reference": "bb3b311fb6df32e275a8daa1669e0e47db4b3df1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/040344788e721476ad7dff1e4eb579e222c3dec9",
-                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9",
+                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/bb3b311fb6df32e275a8daa1669e0e47db4b3df1",
+                "reference": "bb3b311fb6df32e275a8daa1669e0e47db4b3df1",
                 "shasum": ""
             },
             "require": {
@@ -3183,9 +3183,9 @@
                 "payment"
             ],
             "support": {
-                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.5"
+                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.8"
             },
-            "time": "2018-12-12T17:22:28+00:00"
+            "time": "2019-01-14T09:30:57+00:00"
         },
         {
             "name": "knplabs/knp-snappy",
@@ -3482,7 +3482,7 @@
                 {
                     "name": "Luís Otávio Cobucci Oblonczyk",
                     "email": "lcobucci@gmail.com",
-                    "role": "Developer"
+                    "role": "developer"
                 }
             ],
             "description": "A simple library to work with JSON Web Token and JSON Web Signature",
