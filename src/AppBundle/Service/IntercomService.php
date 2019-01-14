@@ -1428,22 +1428,30 @@ class IntercomService
 
     public function getDpaCard($firstName = null, $lastName = null, $dob = null, $mobile = null, $error = null)
     {
-        // @codingStandardsIgnoreStart
-        $headline = 'Before we can proceed with your request, we need to securely validate your identity. Please fill in the fields below.';
-        // @codingStandardsIgnoreEnd
         // for init, all values will be null
         $init = false;
         $headline = null;
+        $secondaryHeadline = null;
+        $headlineError = false;
         if ($firstName === null && $lastName === null && $dob === null && $mobile === null) {
             $init = true;
             // @codingStandardsIgnoreStart
-            $headline = 'Before we can proceed with your request, we need to securely validate your identity. Please fill in the fields below.';
+            $headline = 'For your security, we just need to confirm a few details before we can access your policy.';
+            $secondaryHeadline = 'Please check your name exactly matches your policy document.';
             // @codingStandardsIgnoreEnd
         } elseif (!$this->isValidName($firstName) || !$this->isValidName($lastName) ||
             !$this->isValidDOB($dob) || !$this->isValidMobile($mobile)) {
-            $headline = 'Please review your answers and ensure they are in the correct format';
+            $headlineError = true;
+            // @codingStandardsIgnoreStart
+            $headline = 'Oh no! Something is wrong with the information you provided… ';
+            $secondaryHeadline = 'Please review your answers and check they are in the correct format and exactly match your policy document.';
+            // @codingStandardsIgnoreEnd
         } elseif ($error) {
+            $headlineError = true;
             $headline = $error;
+            // @codingStandardsIgnoreStart
+            $secondaryHeadline = 'Please review your answers and check they are in the correct format and exactly match your policy document.';
+            // @codingStandardsIgnoreEnd
         }
 
         $response = [];
@@ -1451,43 +1459,70 @@ class IntercomService
             $response['canvas']['content']['components'][] = [
                 'type' => 'text',
                 'text' => $headline,
+                'style' => $headlineError ? 'error' : 'paragraph',
             ];
         }
+
+        if ($secondaryHeadline) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'text',
+                'text' => $secondaryHeadline,
+                'style' => $headlineError ? 'error' : 'paragraph',
+            ];
+        }
+
+        if ($headline || $secondaryHeadline) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'spacer',
+                'size' => 'xs',
+            ];
+        }
+
         $response['canvas']['content']['components'][] = [
             'type' => 'input',
             'id' => 'firstName',
-            'label' => 'Your first name (as on your policy)',
+            'label' => 'First Name',
             'value' => $firstName,
-            'save_state' => $init || $this->isValidName($firstName) ? 'unsaved' : 'failed',
+            'save_state' => $init || (!$error && $this->isValidName($firstName)) ? 'unsaved' : 'failed',
         ];
         $response['canvas']['content']['components'][] = [
             'type' => 'input',
             'id' => 'lastName',
-            'label' => 'Your last name (as on your policy)',
+            'label' => 'Last Name',
             'value' => $lastName,
-            'save_state' => $init || $this->isValidName($lastName) ? 'unsaved' : 'failed',
+            'save_state' => $init || (!$error && $this->isValidName($lastName)) ? 'unsaved' : 'failed',
         ];
         $response['canvas']['content']['components'][] = [
             'type' => 'input',
             'id' => 'dob',
-            'label' => 'Your birthday (dd/mm/yyyy)',
+            'label' => 'Date of Birth (dd/mm/yyyy)',
             'value' => $dob,
-            'save_state' => $init || $this->isValidDOB($dob) ? 'unsaved' : 'failed',
+            'save_state' => $init || (!$error && $this->isValidDOB($dob)) ? 'unsaved' : 'failed',
         ];
         $response['canvas']['content']['components'][] = [
             'type' => 'input',
             'id' => 'mobile',
-            'label' => 'Your mobile number',
+            'label' => 'Mobile Number',
             'value' => $mobile,
-            'save_state' => $init || $this->isValidMobile($mobile) ? 'unsaved' : 'failed',
+            'save_state' => $init || (!$error && $this->isValidMobile($mobile)) ? 'unsaved' : 'failed',
         ];
         $response['canvas']['content']['components'][] = [
             'type' => 'button',
-            'id' => 'url_button',
+            'id' => 'verify',
             'style' => 'primary',
             'label' => 'Verify me',
             'action' => ['type' => 'submit'],
         ];
+
+        if ($error) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'button',
+                'id' => 'manual',
+                'style' => 'link',
+                'label' => 'My details above are correct, but verify me does not work',
+                'action' => ['type' => 'submit'],
+            ];
+        }
 
         return $response;
     }
@@ -1523,7 +1558,7 @@ class IntercomService
                 $lastName,
                 $dob,
                 $mobile,
-                'We are unable to locate your details in our system'
+                'Unfortunately, we are unable to locate your details in our system…'
             );
         }
 
@@ -1552,7 +1587,7 @@ class IntercomService
                 $lastName,
                 $dob,
                 $mobile,
-                'We are unable to validate your details'
+                'Unfortunately, we were unable to validate your details.'
             );
         }
 
@@ -1598,6 +1633,34 @@ class IntercomService
         return $conversation->user->id;
     }
 
+    private function getSearchUserUrl($firstName, $lastName, $dob, $mobile)
+    {
+        $searchUrl = $this->router->generateUrl('admin_users', [
+            'user_search[firstname]' => $firstName,
+            'user_search[lastname]' => $lastName,
+            'user_search[mobile]' => $mobile,
+            // TODO: add to user search
+            'user_search[dob]' => $dob,
+        ]);
+
+        return $searchUrl;
+    }
+
+    public function sendSearchUserNote($firstName, $lastName, $dob, $mobile, $conversationId, $prefix, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $searchUrl = $this->getSearchUserUrl($firstName, $lastName, $dob, $mobile);
+
+        $this->addNote(
+            $conversationId,
+            sprintf('%s <a href="%s">Search using provided details</a>', $prefix, $searchUrl),
+            $adminId
+        );
+    }
+
     public function validateDpa($firstName, $lastName, $dob, $mobile, $conversationId)
     {
         $conversation = $this->client->conversations->getConversation($conversationId);
@@ -1605,12 +1668,21 @@ class IntercomService
         $userId = $this->getUserIdForConversation($conversation);
 
         if (!$this->rateLimit->allowedByUserId($userId, RateLimitService::DEVICE_TYPE_INTERCOM_DPA)) {
-            $this->client->conversations->replyToConversation($conversationId, [
-                'type' => 'admin',
-                'message_type' => 'note',
-                'admin_id' => $adminId,
-                'body' => 'Unable to validate DPA. Too many failed attempts. Can be retried in 10 minutes.'
-            ]);
+            $this->addNote(
+                $conversationId,
+                'Unable to validate DPA. Too many failed attempts. Can be retried in 10 minutes.',
+                $adminId
+            );
+
+            $this->sendSearchUserNote(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                $conversationId,
+                'Too many search attempts.',
+                $adminId
+            );
 
             return $this->canvasText(
                 'Sorry, you have too many failed attempts. Please ask us to manually confirm your details.'
@@ -1625,26 +1697,52 @@ class IntercomService
 
         $userLink = $this->router->generateUrl('admin_user', ['id' => $user->getId()]);
 
-        $this->client->conversations->replyToConversation($conversationId, [
-            'type' => 'admin',
-            'message_type' => 'note',
-            'admin_id' => $adminId,
-            'body' => sprintf('DPA successfully confirmed for user <a href="%s">%s</a>', $userLink, $user->getName())
-        ]);
+        $this->addNote(
+            $conversationId,
+            sprintf('DPA successfully confirmed for user <a href="%s">%s</a>', $userLink, $user->getName()),
+            $adminId
+        );
 
         // @codingStandardsIgnoreStart
-        $this->client->conversations->replyToConversation($conversationId, [
-            'type' => 'admin',
-            'message_type' => 'comment',
-            'admin_id' => $adminId,
-            'body' => 'Thanks for confirming your identity. We are looking into your request and will respond as soon as we can.',
-        ]);
+        $this->sendReply(
+            $conversationId,
+            'Thanks for confirming your identity. We will look into your request and soon as possible and respond via this chat or email.',
+            $adminId
+        );
         // @codingStandardsIgnoreEnd
 
         return $this->canvasText('Thanks for verifying your identity.');
     }
 
-    private function canvasText($text)
+    public function sendReply($conversationId, $text, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'type' => 'admin',
+            'message_type' => 'comment',
+            'admin_id' => $adminId,
+            'body' => $text,
+        ]);
+    }
+
+    public function addNote($conversationId, $text, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'type' => 'admin',
+            'message_type' => 'note',
+            'admin_id' => $adminId,
+            'body' => $text,
+        ]);
+    }
+
+    public function canvasText($text)
     {
         return [
             'canvas' => [

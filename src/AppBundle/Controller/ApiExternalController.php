@@ -419,6 +419,7 @@ class ApiExternalController extends BaseController
         $dob = $data['input_values']['dob'];
         $mobile = $data['input_values']['mobile'];
         $conversationId = $data['context']['conversation_id'];
+        $button = $data['component_id'];
 
         /*
         print_r($data);
@@ -430,6 +431,21 @@ class ApiExternalController extends BaseController
 
         /** @var IntercomService $intercom */
         $intercom = $this->get('app.intercom');
+        if ($button == 'manual') {
+            $intercom->sendSearchUserNote(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                $conversationId,
+                'Manual validation requested.'
+            );
+
+            $intercom->sendReply($conversationId, 'One of the team will get back to you soon.');
+
+            return new JsonResponse($intercom->canvasText('🚫'));
+        }
+
         return new JsonResponse($intercom->validateDpa($firstName, $lastName, $dob, $mobile, $conversationId));
     }
 
