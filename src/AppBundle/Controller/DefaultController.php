@@ -232,7 +232,8 @@ class DefaultController extends BaseController
             ];
         }
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => $data['affiliate_page']]);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => $data['affiliate_page']]);
 
         return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
     }
