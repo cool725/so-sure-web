@@ -1,339 +1,261 @@
- {% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
-{% set include_emoji = true %}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/clipboard/clipboard.min.js'
-    'components/jssocials/jssocials.min.js'
-    'components/jquery-circle-progress/circle-progress.min.js'
-    '@AppBundle/Resources/public/js/User/index.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
+{% block title %}so-sure - Welcome back {{ app.user.firstname }}{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    'components/jssocials/jssocials.css'
-    'components/jssocials/jssocials-theme-flat.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{# Set Meta #}
+{% set og_title = 'Sign up and save' %}
+{% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    {% include 'AppBundle:User:userNav.html.twig' %}
-
-    <section class="user-homepage--content section--pad">
+    <section class="hero">
         <div class="container">
-
             <div class="row">
-                <div class="col-sm-7 col-md-8 connections-container">
-                    {% if policy.canInvite %}
-                        <div class="share__box" id="shareBox">
-                            <h2 class="h-nom text-center">💰 Sharing is... rewarding</h2>
-                            <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
-                            <p class="lead">We've made it easy for you to get started, invite via email, share your unique sign-up link below or invite via social.</p>
-                            <div class="row share">
-                                <div class="col-md-6">
-                                    {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
-                                    <h3 class="text-center">✉️ Invite via email</h3>
-                                    {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
-                                        <div class="form-group">
-                                            {{ form_errors(email_form.email) }}
-                                            <div class="input-group">
-                                                {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
-                                                <span class="input-group-btn">
-                                                    {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    {{ form_end(email_form) }}
-                                </div>
-                                <div class="col-md-6">
-                                    <h3 class="text-center">🔗 Share this link</h3>
-                                    <form>
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                                                <span class="input-group-btn">
-                                                    <button class="btn btn-blue btn-pad btn-copy"
-                                                            data-clipboard-target="#scode"
-                                                            data-toggle="tooltip"
-                                                            data-placement="bottom"
-                                                            >Copy</button>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="col-md-12">
-                                    <div id="share-connect"
-                                         class="text-center"
-                                         data-share-link="{{ policy.standardSCode.shareLink }}"
-                                         data-share-text="{{ share_experiment_text }}">
-                                        <h4>Invite via:</h4>
-                                        <div id="share"></div>
+                <div class="col-12 col-lg-5">
+                    <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }} 🎉</h1>
+                    {% if policy is defined and policy %}
+                        {% if policy.user.getValidPolicies(true) | length == 1 %}
+                            <div class="h6">Policy: <u>{{ policy.policyNumber }}</u></div>
+                        {% else %}
+                            <div class="h6">
+                                <div class="dropdown">
+                                    <a href="#"
+                                       class="dropdown-toggle"
+                                       id="dropdown_menu_link"
+                                       data-toggle="dropdown"
+                                       aria-haspopup="true"
+                                       aria-expanded="false">
+                                        Policy: <u>{{ policy.policyNumber }}</u>
+                                        <i class="far fa-chevron-down fa-lg fa-fw ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="dropdown_menu_link">
+                                        {% for policyItem in policy.user.getValidPolicies(true) %}
+                                            <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="dropdown-item">{{ policyItem.defaultName }} <br> <small>({{ policyItem.policyNumber }})</small></a>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
+                        {% endif %}
+                        <div class="h6"><span class="sub">{{ policy.start|date('jS M Y') }} - {{ policy.end|date('jS M Y') }}</span></div>
+                        <div class="h6">📱<span class="sub">{{ policy.phone }}</span></div>
+                    {% endif %}
+                    {% if policy.connections|length > 0 %}
+                        <div class="my-4">
+                            <h5 class="mb-4">My connections</h5>
+                            <div class="d-md-flex flex-wrap align-self-center justify-content-start">
+                                {% for connection in policy.connections %}
+                                    <span>
+                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
+                                             alt="{{ connection.linkedUser.name }}"
+                                             width="50px"
+                                             data-toggle="tooltip"
+                                             data-placement="top"
+                                             title="
+                                                {{ connection.linkedUser.name }} -
+                                                Connected on {{ connection.date|date('dS M') }}
+                                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                                    (£{{ connection.totalValue|number_format(2, '.', ',')  }})
+                                                {% endif %}
+                                             ">
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-12 col-lg-7">
+                    <div class="d-md-flex mb-4">
+                        <h5 class="mb-4">Reward Pot</h5>
+                        <div id="reward_pot_chart"
+                             class="user-chart mb-4 mx-auto"
+                             data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
+                             data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
+                            <div class="user-chart__value">
+                                <span class="text-dodger-blue h3">&pound;{{ policy.potValue|number_format(0, '.', ',') }}</span>
+                                <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(0, '.', ',') }} AVAILABLE</small>
+                            </div>
+                        </div>
+                        {% if policy.getCurrentConnectionValues %}
+                            {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
+                            {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
+                            <h5 class="mb-4">Connection Bonus</h5>
+                            <div id="connection_bonus_chart"
+                                 class="user-chart mb-4  mx-auto"
+                                 data-bonus-days-total="{{ days_total }}"
+                                 data-bonus-days-remaining="{{ days_left }}">
+                                <div class="user-chart__value">
+                                    <span class="text-danger h3">{{ days_left }}</span>
+                                    <br><small class="opacity-50">DAYS</small>
+                                    {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
+                                        <small class="opacity-50">UNTIL BOUNS REDUCED</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if policy.canInvite %}
+                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                            <h5>Earn up to &pound;{{ policy.maxPot|number_format(0, '.', ',') }} cashback by inviting your friends to so-sure</h5>
+                            <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
+                            {% if policy.getCurrentConnectionValues %}
+                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
+                                    <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
+                                {% endif %}
+                                    <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
+                            {% endif %}
+                        {% endif %}
+                        <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                            <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                            {# TODO: Rework icons #}
+                            <div id="onboarding_btn_share"
+                                 data-share-link="{{ policy.standardSCode.shareLink }}"
+                                 data-share-text="Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cashback if we are connected and don't claim! Here's the link to check them out:">
+                            </div>
+                        </div>
+                        <h5 class="text-zaffre">🔗 Share this link</h5>
+                        <div class="custom-input-with-btn mb-4">
+                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cashback if we are connected and don't claim! Here's the link to check them out: {{ policy.standardSCode.shareLink }}</div>
+                            <button class="btn btn-primary btn-copy btn-square btn-sm sosure-track"
+                                data-clipboard-target="#scode_share"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-event="user-welcome-copy-scode">
+                                copy</button>
+                        </div>
+                        <h5 class="text-zaffre">📨 Invite via email</h5>
+                        <form id="invite_form" autocomplete="nope" class="mb-4">
+                            <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                            <div class="custom-input-with-btn mb-4">
+                                <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
+                                <button class="btn btn-success btn-square btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                    Invite</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                    {% if friends %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Here are your facebook friends you can invite</span>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for friend in friends %}
+                                    <li class="list-group-item">
+                                        <div class="d-md-flex align-items-center">
+                                            <img class="d-none d-md-inline rounded-circle mr-2 mr-md-4" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" width="50px" />
+                                            <h6 class="flex-grow-1">
+                                                {{ friend['name'] }} <br>
+                                                <span class="sub mt-2"><a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer">See on facebook</a></span>
+                                            </h6>
+                                            <a href="{{ path('user_invite', {policyId: policy.id, facebookId: friend['id']}) }}" class="btn btn-primary btn-sm">Invite</a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endif %}
                     {% if policy.hasUnconnectedUserPolicies %}
-                    <h3 class="text-grey-blue">Connect with your other policies</h3>
-                    <div class="user-homepage--section">
-                        {{ form_start(unconnected_user_policy_form, {'attr': { 'class': 'form-inline'}}) }}
-                            <ul class="media-list">
-                                {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
-                                <li class="media">
-                                    <div class="media-left">
-                                        <img src="{{ app.user.getImageUrlFallback }}" class="img-circle" alt="{{ unconnectedPolicy.defaultName }}" width="68px">
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="media-heading">
-                                            {{ unconnectedPolicy.defaultName }} <br>
-                                            <small>
-                                                {{ unconnectedPolicy.policyNumber }} <br>
-                                                Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London') }}
-                                            </small>
-                                        </h4>
-                                        <ul class="list-inline">
-                                            <li>{{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-green'}}) }}</li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        {{ form_errors(unconnected_user_policy_form) }}
-                        {{ form_end(unconnected_user_policy_form) }}
-                    </div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Connect with your other policies</span>
+                            </div>
+                            {{ form_start(unconnected_user_policy_form) }}
+                                <ul class="list-group list-group-flush">
+                                    {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
+                                        <li class="list-group-item">
+                                            <div class="d-md-flex align-items-center">
+                                                <img src="{{ app.user.getImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ unconnectedPolicy.defaultName }}" width="50px">
+                                                <h6 class="flex-grow-1">
+                                                    {{ unconnectedPolicy.defaultName }} <br>
+                                                    <span class="sub mt-2">{{ unconnectedPolicy.policyNumber }} <br>Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London') }}</span>
+                                                </h6>
+                                                {{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-outline-primary btn-sm'}}) }}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {{ form_errors(unconnected_user_policy_form) }}
+                            {{ form_end(unconnected_user_policy_form) }}
+                        </div>
                     {% endif %}
                     {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
-                    <h3 class="text-grey-blue">Received invitations</h3>
-                    <div class="user-homepage--section">
-                        {{ form_start(invitation_form, {'attr': { 'class': 'form-inline', 'autocomplete': 'off'}}) }}
-                            <ul class="media-list">
-                                {% for invitation in policy.user.unprocessedReceivedInvitations %}
-                                <li class="media">
-                                    <div class="media-left">
-                                        <img src="{{ invitation.inviter.getImageUrlFallback }}" class="img-circle" alt="{{ invitation.inviter.name }}" width="68px">
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="media-heading">
-                                            {{ invitation.inviter.name }} <br>
-                                            <small>
-                                                Received on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}
-                                            </small>
-                                        </h4>
-                                        <ul class="list-inline">
-                                            <li>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-red'}}) }}</li>
-                                            <li>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-green'}}) }}</li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        {{ form_errors(invitation_form) }}
-                        {{ form_end(invitation_form) }}
-                    </div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Received invitations</span>
+                            </div>
+                            {{ form_start(invitation_form) }}
+                                <ul class="list-group list-group-flush">
+                                    {% for invitation in policy.user.unprocessedReceivedInvitations %}
+                                        <li class="list-group-item">
+                                            <div class="d-md-flex align-items-center">
+                                                <img src="{{ invitation.inviter.getImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviter.name }}" width="50px">
+                                                <h6 class="flex-grow-1">
+                                                    {{ invitation.inviter.name }} <br>
+                                                    <span class="sub mt-2">Received on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
+                                                </h6>
+                                                <ul class="list-inline">
+                                                    <li class="list-inline-item">>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
+                                                    <li class="list-inline-item">>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {{ form_errors(invitation_form) }}
+                            {{ form_end(invitation_form) }}
+                        </div>
                     {% endif %}
                     {% if policy.sentInvitations|length > 0 %}
-                    <h3 class="text-grey-blue">Sent invitations</h3>
-                    <div class="user-homepage--section">
-                        {{ form_start(sent_invitation_form, {'attr': { 'class': 'form-inline', 'autocomplete': 'off'}}) }}
-                            <ul class="media-list">
-                                {% for invitation in policy.sentInvitations %}
-                                <li class="media">
-                                    <div class="media-left">
-                                        <img src="{{ invitation.inviteeImageUrlFallback }}" class="img-circle" alt="{{ invitation.inviteeName }}" width="68px">
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="media-heading">
-                                            {{ invitation.inviteeName }} <br>
-                                            <small>
-                                                Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}
-                                            </small>
-                                        </h4>
-                                        <ul class="list-inline">
-                                            <li>{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-red'}}) }}</li>
-                                            <li>{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-green'}}) }}</li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        {{ form_errors(sent_invitation_form) }}
-                        {{ form_end(sent_invitation_form) }}
-                    </div>
-                    {% endif %}
-                    {% if policy.connections|length > 0 %}
-                    <div class="user-homepage--section">
-                        <h3 class="text-grey-blue">Connections</h3>
-                        <ul class="list-inline">
-                            {% for connection in policy.connections %}
-                            <li>
-                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"
-                                title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
-                                alt="{{ connection.linkedUser.name }}"
-                                class="img-circle coffee-stamp {% if connection.linkedPolicy.hasMonetaryClaimed %}user-has-claimed{% endif %}"
-                                data-container="body"
-                                data-toggle="popover"
-                                data-trigger="hover"
-                                data-placement="top"
-                                data-content="Connected on {{ connection.date|date('dS M') }}
-                                    {# If policy has claimed, pot should be 0, so don't display connection values as confusing #}
-                                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                        (£{{ connection.totalValue|number_format(2, '.', ',')  }})
-                                    {% endif %}
-                                    ">
-                            </li>
-                            {% endfor %}
-{#                             {% if policy.canInvite %}
-                                <li>
-                                    <a id="connect-with" href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
-                                </li>
-                            {% endif %} #}
-                        </ul>
-                    </div>
-                    {% endif %}
-{#                     {% if policy.canInvite %}
-                        <div class="user-homepage--section">
-                            <h3 class="text-grey-blue">Add Connections</h3>
-                            <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. <br> Share the link or click 'Add connection' to get started.</p>
-                            <p class="text-center"><a id="add-connect" href="#" class="btn btn-blue btn-pad " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Sent invitations</span>
+                            </div>
+                            {{ form_start(sent_invitation_form) }}
+                                <ul class="list-group list-group-flush">
+                                    {% for invitation in policy.sentInvitations %}
+                                        <li class="list-group-item">
+                                            <div class="d-md-flex align-items-center">
+                                                <img src="{{ invitation.inviteeImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviteeName }}" width="50px">
+                                                <h6 class="flex-grow-1">
+                                                    {{ invitation.inviteeName }} <br>
+                                                    <span class="sub mt-2">Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
+                                                </h6>
+                                                <ul class="list-inline">
+                                                    <li class="list-inline-item">{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
+                                                    <li class="list-inline-item">{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {{ form_errors(sent_invitation_form) }}
+                            {{ form_end(sent_invitation_form) }}
                         </div>
-                    {% endif %} #}
-
-                    {% if friends %}
-                        <div class="user-homepage--section">
-                            <h3 class="text-grey-blue">Here are your facebook friends you can invite:</h3>
-                            <ul class="media-list">
-                                {% for friend in friends %}
-                                    <li class="media clearfix">
-                                        <div class="media-left">
-                                            <img class="img-circle" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" width="68px" />
-                                        </div>
-                                        <div class="media-body">
-                                            <h4 class="media-heading">
-                                                {{ friend['name'] }}
-                                                <small>
-                                                    <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer"><span class="fa fa-search"></span></a>
-                                                </small>
-                                            </h4>
-                                            <a href="{{ path('user_invite', {policyId: policy.id, facebookId: friend['id']}) }}" class="btn btn-green">Invite this friend</a>
-                                        </div>
-                                    </li>
-                                    <hr>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-sm-5 col-md-4">
-                    {% if policy.canInvite %}
-                        <div id="scode-box" class="box-border-grey text-center">
-                            <h4><strong>
-                                {% if scode and scode.standard %}
-                                    {{ scode.policy.user }} has invited you!
-                                {% else %}
-                                    Already received an invite?
-                                {% endif %}
-                            </strong></h4>
-                            <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
-                            {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
-                                <div class="form-group">
-                                    {{ form_errors(scode_form.scode) }}
-                                    <div class="input-group">
-                                        {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                        <span class="input-group-btn">
-                                            {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
-                                        </span>
-                                    </div>
-                                    <div class="help-block with-errors" id="scode-form-code-err"></div>
-                                </div>
-                            {{ form_end(scode_form) }}
-                        </div>
-{#                         <div id="scode-box" class="box-border-grey text-center">
-                            <h4>Your invite code</h4>
-                            <span class="h2 text-blue">{{ policy.standardSCode.code }}</span>
-                        </div> #}
-                    {% endif %}
-                    <div class="box-border-grey text-center">
-                        <h4><strong>Reward Pot</strong></h4>
-                        <div id="reward-pot-chart" class="circle-chart-container"
-                             data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
-                             data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
-                             <div class="circle-chart--value">
-                                 <span class="h2 text-blue">£{{ policy.potValue|number_format(2, '.', ',') }}</span><br>
-                                 <small>of a max. £{{ policy.maxPot|number_format(2, '.', ',') }}</small>
-                             </div>
-                        </div>
-                    </div>
-                    {% if policy.getCurrentConnectionValues %}
-                        {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
-                        {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
-                    <div class="box-border-grey text-center">
-                        <h4><strong>Connection Bonus</strong></h4>
-                        <div id="connection-bonus-chart" class="circle-chart-container"
-                             data-bonus-days-total="{{ days_total }}"
-                             data-bonus-days-remaining="{{ days_left }}">
-                             <div class="{% if policy.getCurrentConnectionValues['teaser']|length > 0 %}circle-chart--full{% else %}circle-chart--value{% endif %}">
-                                 <span class="h2 text-red">{{ days_left }}</span><br>
-                                 <small class="text-red">days</small><br>
-                                 {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
-                                 <small class="circle-chart--full-value">{{ policy.getCurrentConnectionValues['teaser'] }}</small>
-                                {% endif %}
-                             </div>
-                        </div>
-                        <p>
-                            <small>
-                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
-                                    {{ policy.getCurrentConnectionValues['description'] }}
-                                {% else %}
-                                    Each connection made is worth £10 in the first 2 months and £2 thereafter.
-                                {% endif %}
-                            </small>
-                        </p>
-                    </div>
                     {% endif %}
                 </div>
             </div>
-
         </div>
     </section>
 
-    {# Page Modals #}
-    {# <div class="modal fade"
-         id="inviteModal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="inviteModal"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h3 class="text-center">
-                        Invite friends
-                    </h3>
-                </div>
-                <div id="modal-connect"
-                     class="modal-body text-center"
-                     data-share-link="{{ policy.standardSCode.shareLink }}"
-                     data-share-text="{{ share_experiment_text }}">
-                    <h4>Invite via:</h4>
-                    <div id="share"></div>
-                </div>
-            </div>
-        </div>
-    </div> #}
-    {# End Page Modals #}
+    {# Page Modal #}
 
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
+    <script src="{{ asset('css-js/user-dashboard.js') }}"></script>
 {% endblock %}

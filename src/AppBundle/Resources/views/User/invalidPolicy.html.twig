@@ -1,66 +1,42 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
+{% block title %}so-sure - Welcome back {{ app.user.firstname }}{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
 {% endblock %}
 
 {% block body %}
-  {% if app.user.policies|length > 0 %}
-    {% include 'AppBundle:User:userNav.html.twig' %}
-  {% endif %}
-    <section class="user-homepage--content section--pad">
+
+    <section class="hero">
         <div class="container">
-            <div class="row">
-              {% if app.user.canPurchasePolicy %}
-                <div class="col-md-12">
-                  {% if app.user.policies|length > 0 %}
-                    <h2>You don't have any active polices.</h2>
-                    <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
-                  {% else %}
-                    <h2>Oops! Looks like you haven't purchased a policy with us yet...</h2>
-                    <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
-                  {% endif %}
-                </div>
-                <div class="col-md-6 section--pad">
-                    {# Phone Search #}
-                    {% if device_category() == 'Mobile' %}
-                        {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {'type': 'homepage'})) }}
-                    {% else %}
-                        {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type': 'homepage'})) }}
-                    {% endif %}
-                    {# End Phone Search #}
-                </div>
-              {% elseif app.user.canPurchasePolicy(false) %}
-                  <div class="col-md-12">
-                      <h2>You've reached the maximum number of allowed policies.</h2>
-                      <p class="lead">Contact us for more details.</p>
-                  </div>
-              {% else %}
-                <div class="col-md-12">
-                    <h2>Sorry, but you are not able to purchase a policy.</h2>
-                    <p class="lead">Contact us for more details.</p>
-                </div>
-              {% endif %}
-            </div>
+            {% if app.user.canPurchasePolicy %}
+                {% if app.user.policies|length > 0 %}
+                    <h1 class="h2 mb-4">You don't have any active polices.</h1>
+                {% else %}
+                    <h1 class="h2 mb-4">Oops! Looks like you haven't purchased a policy with us yet...</h1>
+                {% endif %}
+                <p>Head to the <a href="{{ path('homepage') }}">homepage</a> to get a quote.</p>
+            {% elseif app.user.canPurchasePolicy(false) %}
+                <h1 class="h2 mb-4">You've reached the maximum number of allowed policies.</h1>
+                <p><a href="{{ path('about_how_to_contact_so_sure') }}"><u>Contact us</u></a> for more details.</p>
+            {% else %}
+                <h1 class="h2 mb-4">Sorry, but you are not able to purchase a policy.</h1>
+                <p><a href="{{ path('about_how_to_contact_so_sure') }}"><u>Contact us</u></a> for more details.</p>
+            {% endif %}
         </div>
     </section>
+
+    {# Page Modal #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
 {% endblock %}

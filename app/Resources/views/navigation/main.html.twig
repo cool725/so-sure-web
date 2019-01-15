@@ -1,0 +1,108 @@
+{# Set Vars #}
+{% set navbar_class = 'navbar-so-sure fixed-top' %}
+{% if quote_mode is defined and quote_mode == true %}
+    {% set navbar_class = 'navbar-so-sure-quote fixed-top' %}
+{% endif %}
+{% if onboarding_mode is defined and onboarding_mode == true %}
+    {% set navbar_class = 'navbar-so-sure' %}
+{% endif %}
+
+<nav id="main-nav" class="navbar {{ navbar_class }} justify-content-between flex-nowrap flex-row pl-lg-5">
+
+    {# Logo #}
+    <a href="/" class="navbar-brand show-in-nav show-in-quote">
+        <div class="navbar-brand__logo"></div>
+        <span class="sr-only">so-sure</span>
+    </a>
+
+    {# Navs #}
+    {% if admin_mode is defined and admin_mode == true %}
+        {% include '::navigation/admin.html.twig' %}
+    {% elseif quote_mode is defined and quote_mode == true %}
+        {# 🍆 HIDE NAV 🍆 #}
+    {% elseif onboarding_mode is defined and onboarding_mode == true %}
+        {% include '::navigation/onboarding.html.twig' %}
+    {% else %}
+        <ul class="nav navbar-nav flex-row align-items-center">
+            <li class="nav-item d-none d-xl-block pr-xl-5">
+                <a href="{{ path('claim') }}"
+                   class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
+                    Make a Claim
+                </a>
+            </li>
+            <li class="nav-item d-none d-xl-block pr-xl-5">
+                <a href="{{ path('social_insurance') }}"
+                   class="nav-link {{ app.request.get('_route') == 'social_insurance' ? 'nav-active' }}">
+                    Social Insurance
+                </a>
+            </li>
+            <li class="nav-item d-none d-xl-block pr-xl-5">
+                <a href="{{ path('faq') }}"
+                   class="nav-link {{ app.request.get('_route') == 'faq' ? 'nav-active' }}">
+                   FAQs
+                </a>
+            </li>
+            <li class="nav-item d-none d-xl-block pr-xl-5">
+                <a href="https://blog.wearesosure.com"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="nav-link">Blog</a>
+            </li>
+            {% if app.user is not null and app.user %}
+                <li class="nav-item d-none d-xl-block pr-xl-5">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
+                    {% else %}
+                        <a href="{{ path('user_home') }}" class="nav-link user-link">Your account</a>
+                    {% endif %}
+                </li>
+            {% else %}
+                <li class="nav-item d-none-xxs pr-xl-5">
+                    <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote btn-shadow">Get a Quote</a>
+                </li>
+            {% endif %}
+            <li class="nav-item d-none d-xl-block pr-xl-5">
+                {% if app.user is not null and app.user %}
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
+                    {% else %}
+                        <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ path('fos_user_security_login') }}"
+                       class="btn btn-outline-columbia-blue-f btn-sm">Customer log in <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+                {% endif %}
+            </li>
+            <li class="nav-item d-xl-none">
+                <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse" type="button">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
+            </li>
+        </ul>
+
+        {# Get a quote #}
+        {# TODO: If not needed this should not be show, hopefully including here makes sense #}
+        {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
+            {% include 'AppBundle::Search/getQuote.html.twig' %}
+        {% endif %}
+    {% endif %}
+
+    {# User Nav #}
+    {% if user_mode is defined and user_mode == true %}
+        {% include '::navigation/user.html.twig' %}
+    {% endif %}
+
+    {# Mobile Menu #}
+    {% include '::navigation/menu.html.twig' %}
+</nav>
+
+{# User Nav #}
+{# {% if user_mode is defined and user_mode == true %}
+    {% include '::navigation/user.html.twig' %}
+{% endif %} #}

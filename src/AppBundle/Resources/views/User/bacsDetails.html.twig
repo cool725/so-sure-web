@@ -1,44 +1,47 @@
-<section class="user-homepage--content section--pad">
-    <div class="container">
+<h1 class="h2 mb-4">Payment details</h1>
 
-        <h2>Your Payment Details</h2>
-
-        {% if bacs %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Your current payment method:</h4>
-                <p>{% if user.paymentMethod and user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod and user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
-                {% if not bacs_last_payment_in_progress %}
-                    {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
-                    <a href="#tab-card" class="btn btn-blue-hollow" data-toggle="tab">Change to Credit/Debit Card</a>
-                {% endif %}
+<div class="row">
+    {% if bacs %}
+        <div class="col-12 col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Your current payment method</h5>
+                    <p class="card-text mb-4">{% if user.paymentMethod and user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod and user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                    {% if not bacs_last_payment_in_progress %}
+                        {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
+                        <a href="#"
+                           data-tab-to="#payment_card_tab"
+                           class="card-link show-tab"><i class="fal fa-credit-card fa-fw"></i> Change to Credit/Debit Card</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Your direct debit:</h4>
-                <p>{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+    {% endif %}
+    <div class="col-12 col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Your Direct Debit</h5>
+                <p class="card-text mb-4">{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
                 {% if user.canUpdateBacsDetails %}
-                    <a href="#tab-bacs-setup" class="btn btn-blue-hollow" data-toggle="tab">Upate Details</a>
+                    <a href="#"
+                       data-tab-to="#bacs_setup_tab"
+                       class="card-link show-tab"><i class="fal fa-edit fa-fw"></i> Update Account Details</a>
                 {% else %}
-                    <a href="#" class="btn btn-blue-hollow btn-disabled disabled" title="Bacs Payment Pending">Unable to Upate Details</a>
+                    <a class="card-link disabled" title="Bacs Payment Pending">Unable to Update Details</a>
                 {% endif %}
             </div>
         </div>
-        {% if policy.premiumPlan == 'monthly' %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Billing date:</h4>
-                <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }}</p>
-                <p>(or next working day after in the case of weekends/bank holidays)</p>
-                {#
-                <button title="Change" type="button" class="btn btn-blue-hollow"
-                        data-toggle="modal" data-target="#billingModal">
-                    <i class="fa fa-edit"></i> Change</button>
-                 #}
-            </div>
-        </div>
-        {% endif %}
     </div>
-</section>
+    {% if bacs %}
+        {% if policy and policy.premiumPlan == 'monthly' %}
+            <div class="col-12 col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Direct Debit Billing date</h5>
+                        <p class="card-text">Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> <br><small>(or within a few days in the case of weekends/bank holidays)</small></p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>

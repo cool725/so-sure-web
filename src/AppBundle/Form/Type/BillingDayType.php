@@ -24,13 +24,16 @@ class BillingDayType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $enabled = false;
         /** @var Policy $policy */
         $policy = $builder->getData()->getPolicy();
-        if ($policy->getUser()->hasBacsPaymentMethod()) {
-            $enabled = false;
-        } else {
-            $enabled = $policy->isPolicyPaidToDate() &&
-                !$policy->isWithinCooloffPeriod();
+        if ($policy) {
+            if ($policy->getUser()->hasBacsPaymentMethod()) {
+                $enabled = false;
+            } else {
+                $enabled = $policy->isPolicyPaidToDate() &&
+                    !$policy->isWithinCooloffPeriod();
+            }
         }
 
         $days = [];

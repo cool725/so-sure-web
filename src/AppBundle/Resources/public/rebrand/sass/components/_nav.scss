@@ -10,6 +10,7 @@
         .nav-link {
             font-family: $g-medium;
             color: $white;
+            transition: all 0.2s linear;
 
             &:hover {
                 color: $columbia-blue-f;
@@ -22,6 +23,11 @@
                     color: $white;
                 }
             }
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
         }
     }
 }
@@ -129,6 +135,50 @@
 .show-in-nav {
     position: relative;
     z-index: 1080;
+}
+
+// Secondary Nav
+.secondary-nav {
+    width: 100vw;
+    display: block;
+    background-color: $pattens-blue;
+    white-space: nowrap;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+
+    position: absolute;
+    top: 100%; left: 0;
+    z-index: 1079;
+
+    .nav-link {
+        display: inline-block;
+        font-family: $g-medium;
+        color: darken($pattens-blue, 18%);
+        padding: 0.8rem 1rem;
+        transition: all 0.2s linear;
+
+        &:hover {
+            color: $zaffre;
+        }
+
+        &.active {
+            color: $zaffre;
+            border-bottom: 2px solid $zaffre;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        display: flex;
+
+        .nav-link {
+            display: block;
+        }
+    }
+}
+
+.secondary-nav::-webkit-scrollbar {
+    display: none;
 }
 
 // Devbar - non-prod
