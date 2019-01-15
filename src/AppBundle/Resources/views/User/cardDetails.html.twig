@@ -1,34 +1,49 @@
-<section class="user-homepage--content section--pad">
-    <div class="container">
+<h1 class="h2 mb-4">Payment details</h1>
 
-        <h2>Payment Details</h2>
-
-        {% if bacs_feature %}
-        <div class="row">
-            <div class="col-sm-6">
-                <h4>Your current payment method:</h4>
-                <p class="lead">{% if not user.paymentMethod or user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
-                <a href="{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}"
-                   class="btn btn-blue-hollow"
-                   data-toggle="tab">
+<div class="row">
+    {% if bacs_feature %}
+        <div class="col-12 col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Your current payment method</h5>
+                    <p class="card-text">
+                        {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
+                            Credit/Debit Card
+                        {% elseif user.paymentMethod.type == "bacs" %}
+                            Direct Debit
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </p>
                     {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
-                        Change to Direct Debit
-                    {% else %}
-                        Back to Direct Debit
+                        <h6 class="card-title">Why not switch to Direct Debit?</h6>
+                        <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="140px" class="mx-auto mt-2 mb-3">
+                        <p class="card-text">It helps avoid a lot of problems with Debit/Credit Card payments...</p>
+                        <p class="card-text">...and only takes seconds to setup!</p>
                     {% endif %}
-                </a>
-                {% if policy.isDifferentPayer %}
-                    <p><i class="fa fa-warning"></i> You are using multipay. Changing to direct debit will remove your multipay.</p>
-                {% endif %}
+                    <a href="#"
+                       data-tab-to="{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
+                       class="btn {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
+                       >
+                        {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
+                            Switch to Direct Debit
+                        {% else %}
+                            Back to Direct Debit
+                        {% endif %}</a>
+                    {% if policy.isDifferentPayer %}
+                        <p class="card-text"><i class="fa fa-warning"></i> You are using multipay. Changing to direct debit will remove your multipay.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-sm-6">
-                <h4>Your card:</h4>
-                <p class="lead">
-                    {% if policy.isDifferentPayer %}
-                        <i class="fa fa-warning"></i> You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
+    {% endif %}
+    <div class="col-12 col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Your card</h5>
+                <p class="card-text mb-4">
+                    {% if policy and policy.isDifferentPayer %}
+                        You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
                     {% elseif user.paymentMethod and user.paymentMethod.type == "judo" %}
                         {{ user.paymentMethod }}
                     {% else %}
@@ -36,26 +51,26 @@
                     {% endif %}
                 </p>
                 {% if webpay_action and webpay_reference %}
-                <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                    <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                    <input type="submit" class="btn btn-blue-hollow" value="Update your card details">
-                </form>
+                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                        <input type="submit" class="btn btn-outline-primary" value="Update your card details">
+                    </form>
                 {% endif %}
             </div>
         </div>
-        {% if policy.premiumPlan == 'monthly' %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Billing date:</h4>
-                <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
-                <button title="Change"
-                        type="button"
-                        class="btn btn-blue-hollow"
-                        data-toggle="modal"
-                        data-target="#billingModal">
-                    <i class="fa fa-edit"></i> Change</button>
+    </div>
+    {% if policy and policy.premiumPlan == 'monthly' and user.paymentMethod.type == "judo" %}
+        <div class="col-12 col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Billing date</h5>
+                    <p class="card-text mb-4">Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
+                    <a href="#"
+                       class="card-link"
+                       data-toggle="modal"
+                       data-target="#billing_modal"><i class="fal fa-calendar fa-fw mr-2"></i> Change billing date</a>
+                </div>
             </div>
         </div>
-        {% endif %}
-    </div>
-</section>
+    {% endif %}
+</div>

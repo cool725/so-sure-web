@@ -28,17 +28,7 @@
     {% endif %}
 
     <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
-        <label for="bacs_form[accountName]">
-            Name on Account
-            <span class="ml-2 text-dodger-blue">
-                <a href="#"
-                   data-toggle="modal"
-                   data-target="#name_on_account"
-                   role="button">
-                    <i class="fal fa-info-circle"></i>
-                </a>
-            </span>
-        </label>
+        {{ form_label(bacs_form.accountName, 'Name on account') }}
         {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Enter full name', 'class': 'form-control', 'data-hj-suppress': ''}}) }}
         <input type="hidden" value="{{ app.user.name }}" id="policy-holder-name">
         {% if form_errors(bacs_form.accountName) %}
