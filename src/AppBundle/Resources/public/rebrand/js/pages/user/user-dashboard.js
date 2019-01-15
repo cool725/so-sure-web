@@ -151,6 +151,8 @@ $(function() {
                     $('.btn-invite').tooltip('hide')
                                     .removeAttr('disabled', '')
                                     .html('invite');
+                    // Temp solution to reloading page so invute us added to list
+                    location.reload();
                 }, 1500);
 
                 // Clear the input and suggest another one? TODO: Copy
