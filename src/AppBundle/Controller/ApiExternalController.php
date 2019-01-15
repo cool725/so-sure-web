@@ -443,7 +443,7 @@ class ApiExternalController extends BaseController
 
             $intercom->sendReply($conversationId, 'One of the team will get back to you soon.');
 
-            return new JsonResponse($intercom->canvasText('🚫'));
+            return new JsonResponse($intercom->canvasText('DPA Completed (unsuccessfully)'));
         }
 
         return new JsonResponse($intercom->validateDpa($firstName, $lastName, $dob, $mobile, $conversationId));

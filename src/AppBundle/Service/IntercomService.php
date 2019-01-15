@@ -1474,7 +1474,7 @@ class IntercomService
         if ($headline || $secondaryHeadline) {
             $response['canvas']['content']['components'][] = [
                 'type' => 'spacer',
-                'size' => 'xs',
+                'size' => 's',
             ];
         }
 
@@ -1639,7 +1639,6 @@ class IntercomService
             'user_search[firstname]' => $firstName,
             'user_search[lastname]' => $lastName,
             'user_search[mobile]' => $mobile,
-            // TODO: add to user search
             'user_search[dob]' => $dob,
         ]);
 
@@ -1668,9 +1667,9 @@ class IntercomService
         $userId = $this->getUserIdForConversation($conversation);
 
         if (!$this->rateLimit->allowedByUserId($userId, RateLimitService::DEVICE_TYPE_INTERCOM_DPA)) {
-            $this->addNote(
+            $this->sendReply(
                 $conversationId,
-                'Unable to validate DPA. Too many failed attempts. Can be retried in 10 minutes.',
+                'Sorry, we were unable to validate your DPA, but one of the team will get back to you soon.',
                 $adminId
             );
 
@@ -1685,7 +1684,7 @@ class IntercomService
             );
 
             return $this->canvasText(
-                'Sorry, you have too many failed attempts. Please ask us to manually confirm your details.'
+                'DPA Completed (unsuccessfully)'
             );
         }
 
@@ -1711,7 +1710,7 @@ class IntercomService
         );
         // @codingStandardsIgnoreEnd
 
-        return $this->canvasText('Thanks for verifying your identity.');
+        return $this->canvasText('DPA Completed');
     }
 
     public function sendReply($conversationId, $text, $adminId = null)
@@ -1742,7 +1741,7 @@ class IntercomService
         ]);
     }
 
-    public function canvasText($text)
+    public function canvasText($text, $align = 'left')
     {
         return [
             'canvas' => [
@@ -1751,6 +1750,7 @@ class IntercomService
                         [
                             'type' => 'text',
                             'text' => $text,
+                            'align' => $align,
                         ],
                     ]
                 ]

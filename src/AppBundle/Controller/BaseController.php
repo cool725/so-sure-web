@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\Claim;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Form\Type\ClaimSearchType;
@@ -66,10 +67,12 @@ abstract class BaseController extends Controller
     use PhoneTrait;
     use TargetPathTrait;
     use ControllerTrait;
+    use DateTrait;
 
     const MONGO_QUERY_TYPE_REGEX = 'regex';
     const MONGO_QUERY_TYPE_EQUAL = 'equal';
     const MONGO_QUERY_TYPE_ID = 'id';
+    const MONGO_QUERY_TYPE_DAY= 'day';
 
     public function isDataStringPresent($data, $field)
     {
@@ -446,12 +449,20 @@ abstract class BaseController extends Controller
             return null;
         }
 
-        // Escape special chars
-        $data = preg_quote($data, '/');
         if ($queryType == self::MONGO_QUERY_TYPE_REGEX) {
+            // Escape special chars
+            $data = preg_quote($data, '/');
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
         } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_DAY) {
+            if ($this->isValidDate($data)) {
+                $date = $this->createValidDate($data);
+                $qb = $qb->addAnd($qb->expr()->field($mongoField)->gte($this->startOfDay($date)));
+                $qb = $qb->addAnd($qb->expr()->field($mongoField)->lt($this->endOfDay($date)));
+            } else {
+                $this->addFlash('warning', sprintf('Invalid date format %s', $data));
+            }
         } elseif ($queryType == self::MONGO_QUERY_TYPE_ID) {
             if (\MongoId::isValid($data)) {
                 $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
@@ -1039,13 +1050,16 @@ abstract class BaseController extends Controller
             'mobile' => 'mobileNumber',
             'postcode' => 'billingAddress.postcode',
             'facebookId' => 'facebookId',
+            'dob' => 'birthday',
         ];
         foreach ($userFormData as $formField => $dataField) {
             $this->formToMongoSearch(
                 $form,
                 $usersQb,
                 $formField,
-                $dataField
+                $dataField,
+                false,
+                $dataField == 'birthday' ? self::MONGO_QUERY_TYPE_DAY : self::MONGO_QUERY_TYPE_REGEX
             );
         }
         $this->formToMongoSearch(
