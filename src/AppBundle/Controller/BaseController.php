@@ -72,7 +72,8 @@ abstract class BaseController extends Controller
     const MONGO_QUERY_TYPE_REGEX = 'regex';
     const MONGO_QUERY_TYPE_EQUAL = 'equal';
     const MONGO_QUERY_TYPE_ID = 'id';
-    const MONGO_QUERY_TYPE_DAY= 'day';
+    const MONGO_QUERY_TYPE_DAY = 'day';
+    const MONGO_QUERY_TYPE_MOBILE = 'mobile';
 
     public function isDataStringPresent($data, $field)
     {
@@ -404,13 +405,6 @@ abstract class BaseController extends Controller
         return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
     }
 
-    protected function mobileToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
-    {
-        $data = (string) $form->get($formField)->getData();
-
-        return $this->dataToMongoSearch($qb, $this->normalizeUkMobile($data), $mongoField, $run);
-    }
-
     protected function queryToMongoSearch($form, $qb, $formField, $mongoField, $callable)
     {
         if ($data = $this->formToMongoSearch($form, $qb, $formField, $mongoField, true)) {
@@ -455,6 +449,8 @@ abstract class BaseController extends Controller
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
         } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_MOBILE) {
+            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($this->normalizeUkMobile($data)));
         } elseif ($queryType == self::MONGO_QUERY_TYPE_DAY) {
             if ($this->isValidDate($data)) {
                 $date = $this->createValidDate($data);
@@ -1067,17 +1063,24 @@ abstract class BaseController extends Controller
             'firstname' => 'firstName',
             'lastname' => 'lastName',
             'postcode' => 'billingAddress.postcode',
+            'mobile' => 'mobileNumber',
             'facebookId' => 'facebookId',
             'dob' => 'birthday',
         ];
         foreach ($userFormData as $formField => $dataField) {
+            $queryType = self::MONGO_QUERY_TYPE_REGEX;
+            if ($dataField == 'birthday') {
+                $queryType = self::MONGO_QUERY_TYPE_DAY;
+            } elseif ($dataField == 'mobileNumber') {
+                $queryType = self::MONGO_QUERY_TYPE_MOBILE;
+            }
             $this->formToMongoSearch(
                 $form,
                 $usersQb,
                 $formField,
                 $dataField,
                 false,
-                $dataField == 'birthday' ? self::MONGO_QUERY_TYPE_DAY : self::MONGO_QUERY_TYPE_REGEX
+                $queryType
             );
         }
         $this->formToMongoSearch(
@@ -1087,12 +1090,6 @@ abstract class BaseController extends Controller
             '_id',
             false,
             self::MONGO_QUERY_TYPE_ID
-        );
-        $this->dataToMongoSearch(
-            $usersQb,
-            $this->normalizeUkMobile((string) $form->get('mobile')->getData()),
-            'mobileNumber',
-            false
         );
         $allSanctions = $this->getFormBool($form, 'allSanctions');
         $waitingSanctions = $this->getFormBool($form, 'waitingSanctions');
