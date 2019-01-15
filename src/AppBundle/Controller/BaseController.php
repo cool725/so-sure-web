@@ -949,7 +949,6 @@ abstract class BaseController extends Controller
             'email' => 'emailCanonical',
             'firstname' => 'firstName',
             'lastname' => 'lastName',
-            'mobile' => 'mobileNumber',
             'postcode' => 'billingAddress.postcode',
             'facebookId' => 'facebookId',
             'paymentMethod' => 'paymentMethod.type',
@@ -966,6 +965,26 @@ abstract class BaseController extends Controller
                 }
             );
             if ($ids !== null) {
+                $policiesQb->addAnd(
+                    $policiesQb->expr()->addOr(
+                        $policiesQb->expr()->field('user.id')->in($ids),
+                        $policiesQb->expr()->field('namedUser.id')->in($ids)
+                    )
+                );
+            }
+        }
+        $users = $this->dataToMongoSearch(
+            $userRepo->createQueryBuilder(),
+            $this->normalizeUkMobile((string) $form->get('mobile')->getData()),
+            'mobileNumber',
+            true
+        );
+        if ($users) {
+            $ids = [];
+            foreach ($users as $user) {
+                $ids[] = $user->getId();
+            }
+            if (count($ids) > 0) {
                 $policiesQb->addAnd(
                     $policiesQb->expr()->addOr(
                         $policiesQb->expr()->field('user.id')->in($ids),
@@ -1047,7 +1066,6 @@ abstract class BaseController extends Controller
             'email' => 'emailCanonical',
             'firstname' => 'firstName',
             'lastname' => 'lastName',
-            'mobile' => 'mobileNumber',
             'postcode' => 'billingAddress.postcode',
             'facebookId' => 'facebookId',
             'dob' => 'birthday',
@@ -1069,6 +1087,12 @@ abstract class BaseController extends Controller
             '_id',
             false,
             self::MONGO_QUERY_TYPE_ID
+        );
+        $this->dataToMongoSearch(
+            $usersQb,
+            $this->normalizeUkMobile((string) $form->get('mobile')->getData()),
+            'mobileNumber',
+            false
         );
         $allSanctions = $this->getFormBool($form, 'allSanctions');
         $waitingSanctions = $this->getFormBool($form, 'waitingSanctions');
