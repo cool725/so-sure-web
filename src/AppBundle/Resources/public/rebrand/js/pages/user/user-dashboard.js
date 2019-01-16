@@ -7,7 +7,7 @@ require('bootstrap/js/dist/tooltip');
 
 // Require components
 require('jquery-validation');
-require('../../../../js/Default/jqueryValidatorMethods.js');
+require('../../common/validationMethods.js');
 require('jquery-circle-progress');
 require('jssocials');
 
