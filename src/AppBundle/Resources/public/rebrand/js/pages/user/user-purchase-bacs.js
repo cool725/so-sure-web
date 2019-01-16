@@ -59,7 +59,7 @@ sosure.purchaseStepBacs = (function() {
                         }
                     },
                     fullName: true,
-                    equalToIgnoreCase: '#policy_holder_name'
+                    equalToIgnoreCase: '#bacs_form_validateName'
                 },
                 "bacs_form[sortCode]": {
                     required: true,
