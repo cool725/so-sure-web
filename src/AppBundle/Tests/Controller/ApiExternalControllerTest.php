@@ -688,6 +688,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
                 'type' => 'admin',
                 'id' =>' "775999',
             ],
+            'component_id' => 'verify',
             'context' => [
                 'conversation_id' => 20387006809,
             ]
@@ -707,7 +708,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         //print_r($this->getClientResponseContent());
         $data = $this->verifyResponse(200);
         //print_r($data);
-        $this->assertEquals('firstName', $data['canvas']['content']['components'][1]['id']);
+        $this->assertEquals('firstName', $data['canvas']['content']['components'][3]['id']);
     }
 
     public function testIntercomMessengerConfig()
@@ -722,6 +723,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
                 'type' => 'admin',
                 'id' =>' "775999',
             ],
+            'component_id' => 'verify',
             'context' => [
                 'conversation_id' => 20387006809,
             ]
@@ -764,6 +766,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             'context' => [
                 'conversation_id' => 20387006809,
             ],
+            'component_id' => 'verify',
             'input_values' => [
                 'firstName' => 'foo',
                 'lastName' => 'bar',
