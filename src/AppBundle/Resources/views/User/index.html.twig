@@ -102,7 +102,7 @@
                              data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
                             <div class="user-chart__value">
                                 <span class="text-dodger-blue h3">&pound;{{ policy.potValue|number_format(0, '.', ',') }}</span>
-                                <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(0, '.', ',') }} AVAILABLE</small>
+                                <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
                             </div>
                         </div>
                         {% if policy.getCurrentConnectionValues %}
@@ -125,7 +125,7 @@
                     </div>
                     {% if policy.canInvite %}
                         {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                            <h5>Earn up to &pound;{{ policy.maxPot|number_format(0, '.', ',') }} cashback by inviting your friends to so-sure</h5>
+                            <h5>Earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback by inviting your friends to so-sure</h5>
                             <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
                             {% if policy.getCurrentConnectionValues %}
                                 {% if policy.getCurrentConnectionValues['description']|length > 0 %}
