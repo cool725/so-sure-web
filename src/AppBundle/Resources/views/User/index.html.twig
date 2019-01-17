@@ -54,7 +54,7 @@
                         <div class="h6">📱<span class="sub">{{ policy.phone }}</span></div>
                     {% endif %}
                     {% if policy.connections|length > 0 %}
-                        <div class="my-4">
+                        <div class="mt-4">
                             <h5 class="mb-4">My connections</h5>
                             <div class="d-md-flex flex-wrap align-self-center justify-content-start">
                                 {% for connection in policy.connections %}
@@ -77,7 +77,7 @@
                         </div>
                     {% endif %}
                     {% if policy.canInvite %}
-                        <h5 class="mb-4">
+                        <h5 class="mt-4">
                             {% if scode and scode.standard %}
                                 {{ scode.policy.user }} has invited you!
                             {% else %}
