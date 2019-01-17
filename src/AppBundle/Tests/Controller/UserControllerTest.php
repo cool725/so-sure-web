@@ -487,20 +487,20 @@ class UserControllerTest extends BaseControllerTest
             $count = 1;
         }
         //print $crawler->html();
-        $this->assertEquals($count, $crawler->evaluate('count(//div[@id="shareBox"])')[0]);
+        $this->assertEquals($count, $crawler->evaluate('count(//form[@id="invite_form"])')[0]);
     }
 
     private function validateRewardPot($crawler, $amount)
     {
         $this->assertEquals(
             $amount,
-            $crawler->filterXPath('//div[@id="reward-pot-chart"]')->attr('data-pot-value')
+            $crawler->filterXPath('//div[@id="reward_pot_chart"]')->attr('data-pot-value')
         );
     }
 
     private function validateBonus($crawler, $daysRemaining, $daysTotal)
     {
-        $chart = $crawler->filterXPath('//div[@id="connection-bonus-chart"]');
+        $chart = $crawler->filterXPath('//div[@id="connection_bonus_chart"]');
         $actualRemaining = $chart->attr('data-bonus-days-remaining');
         $actualTotal = $chart->attr('data-bonus-days-total');
         if (is_array($daysRemaining)) {
