@@ -25,7 +25,7 @@
     <section class="hero">
         <div class="container">
             <div class="row">
-                <div class="col-12 col-lg-5">
+                <div class="col-12 col-lg-4">
                     <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }} 🎉</h1>
                     {% if policy is defined and policy %}
                         {% if policy.user.getValidPolicies(true) | length == 1 %}
@@ -54,7 +54,7 @@
                         <div class="h6">📱<span class="sub">{{ policy.phone }}</span></div>
                     {% endif %}
                     {% if policy.connections|length > 0 %}
-                        <div class="my-4">
+                        <div class="mt-4">
                             <h5 class="mb-4">My connections</h5>
                             <div class="d-md-flex flex-wrap align-self-center justify-content-start">
                                 {% for connection in policy.connections %}
@@ -76,8 +76,24 @@
                             </div>
                         </div>
                     {% endif %}
+                    {% if policy.canInvite %}
+                        <h5 class="mt-4">
+                            {% if scode and scode.standard %}
+                                {{ scode.policy.user }} has invited you!
+                            {% else %}
+                                Already received an invite?
+                            {% endif %}
+                        </h5>
+                        <p>Enter the unique 8-digit code below to connect.</p>
+                        {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
+                            <div class="custom-input-with-btn mb-4">
+                                {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
+                                {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                            </div>
+                        {{ form_end(scode_form) }}
+                    {% endif %}
                 </div>
-                <div class="col-12 col-lg-7">
+                <div class="col-12 col-lg-7 offset-lg-1">
                     <div class="d-md-flex mb-4">
                         <h5 class="mb-4">Reward Pot</h5>
                         <div id="reward_pot_chart"
