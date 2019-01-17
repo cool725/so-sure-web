@@ -101,7 +101,7 @@
                              data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
                              data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
                             <div class="user-chart__value">
-                                <span class="text-dodger-blue h3">&pound;{{ policy.potValue|number_format(0, '.', ',') }}</span>
+                                <span class="text-dodger-blue h3">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
                                 <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
                             </div>
                         </div>
