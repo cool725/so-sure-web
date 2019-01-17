@@ -208,8 +208,8 @@
                                                     <span class="sub mt-2">Received on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
                                                 </h6>
                                                 <ul class="list-inline">
-                                                    <li class="list-inline-item">>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
-                                                    <li class="list-inline-item">>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
+                                                    <li class="list-inline-item">{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
+                                                    <li class="list-inline-item">{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
                                                 </ul>
                                             </div>
                                         </li>
