@@ -29,7 +29,6 @@ $(function() {
 
     // Trigger by class
     quoteToggle.on('click', function(e) {
-        console.log('clicked');
         e.preventDefault();
         getQuote();
     });
