@@ -85,12 +85,12 @@
                 </button>
             </li>
         </ul>
+    {% endif %}
 
-        {# Get a quote #}
-        {# TODO: If not needed this should not be show, hopefully including here makes sense #}
-        {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
-            {% include 'AppBundle::Search/getQuote.html.twig' %}
-        {% endif %}
+    {# Get a quote #}
+    {# TODO: If not needed this should not be show, hopefully including here makes sense #}
+    {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
+        {% include 'AppBundle::Search/getQuote.html.twig' %}
     {% endif %}
 
     {# User Nav #}
