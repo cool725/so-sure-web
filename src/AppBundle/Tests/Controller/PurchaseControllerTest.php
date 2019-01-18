@@ -1421,24 +1421,6 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
-    public function testPhoneSearchUserInvalidPolicy()
-    {
-        $email = self::generateEmail('testPhoneSearchUserInvalid', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        self::$dm->flush();
-        $crawler = $this->login($email, $password, 'user/invalid');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
-
     /**
      * Tests to make sure that you can request cancellation of your policy, and that in cooloff it will automatically
      * action it.
