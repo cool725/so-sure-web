@@ -2,9 +2,9 @@
 
 namespace AppBundle\Service;
 
-use App\Exceptions\Queue\QueueException;
-use App\Exceptions\Queue\UnknownMessageException;
-use App\Exceptions\Queue\MalformedMessageException;
+use AppBundle\Exception\Queue\QueueException;
+use AppBundle\Exception\Queue\UnknownMessageException;
+use AppBundle\Exception\Queue\MalformedMessageException;
 use App\Hubspot\HubspotData;
 use App\Hubspot\Api;
 use AppBundle\Document\User;
@@ -13,9 +13,9 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client as RedisClient;
 use Psr\Log\LoggerInterface;
 use SevenShores\Hubspot\Exceptions\BadRequest;
+use SevenShores\Hubspot\Http\Response;
 use SevenShores\Hubspot\Factory as HubspotFactory;
 use SevenShores\Hubspot\Resources\Contacts;
-use GuzzleHttp\Psr7\Response;
 
 /**
  * Provides the primary hubspot functionality.
@@ -104,7 +104,7 @@ class HubspotService
                 }
                 $data = unserialize($message);
                 if (!$data || !isset($data["action"])) {
-                    throw new UnknownMessage(sprintf('Actionless message in queue %s', json_encode($data)));
+                    throw new UnknownMessageException(sprintf('Actionless message in queue %s', json_encode($data)));
                 }
                 if (!$this->ready($data)) {
                     $requeued++;
@@ -117,7 +117,7 @@ class HubspotService
                         $this->processContact($data);
                         break;
                     default:
-                        throw new UnknownMessage(sprintf('Unknown message in queue %s', json_encode($data)));
+                        throw new UnknownMessageException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
                 $processed++;
             } catch (QueueException $e) {
@@ -193,7 +193,7 @@ class HubspotService
             $this->client->contactProperties()->get($data["name"]);
             return null;
         } catch (\Exception $e) {
-            return $this->client->contactProperties()->create($data);
+            return $this->client->contactProperties()->create($data)->getData();
         }
     }
 
@@ -213,7 +213,6 @@ class HubspotService
      * If the given user already exists as a contact then update them, otherwise create them.
      * @param User $user        the user the update will be based off of.
      * @param bool $allowSoSure whether to proceed if $user has a so-sure email address. defaults no.
-     * @return \stdClass
      * @throws \Exception
      */
     public function createOrUpdateContact(User $user, $allowSoSure = false)
@@ -241,7 +240,7 @@ class HubspotService
 
     /**
      * Gets list of all the contacts from Hubspot via generator, since only a limited number can be gotten at a time.
-     * @param array params is an optional list of parameters to add to the request.
+     * @param array $params is an optional list of parameters to add to the request.
      * @return \Generator yielding all contacts in hubspot.
      */
     public function getAllContacts($params = [])
@@ -265,11 +264,13 @@ class HubspotService
     private function processContact($data)
     {
         if (!isset($data["userId"])) {
-            throw new MalformedMessageException(sprintf('malformed contact message %s', json_encode($data)));
+            throw new MalformedMessageException(sprintf("malformed contact message %s", json_encode($data)));
         }
         $user = $this->getUserById($data["userId"]);
         $this->logger->debug("Hubspot| createOrUpdateContact", ["user" => $user]);
-        $this->createOrUpdateContact($user);
+        if ($user) {
+            $this->createOrUpdateContact($user);
+        }
     }
 
     /**
@@ -285,8 +286,8 @@ class HubspotService
             }
             if ($data["attempts"] >= self::RETRY_LIMIT) {
                 $this->logger->error(
-                    'Hubspot| Error (retry exceeded) sending message to Hubspot',
-                    ['data'=>$data, $e->getMessage()]
+                    "Hubspot| Error (retry exceeded) sending message to Hubspot",
+                    ["data" => $data]
                 );
                 return;
             }
@@ -350,7 +351,9 @@ class HubspotService
     private function getUserById($id)
     {
         $repo = $this->dm->getRepository(User::class);
-        return $repo->find($id);
+        /** @var User $user */
+        $user = $repo->find($id);
+        return $user;
     }
 
     /**

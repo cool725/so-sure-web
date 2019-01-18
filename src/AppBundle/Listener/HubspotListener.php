@@ -33,10 +33,7 @@ class HubspotListener
 
     public function onUserUpdatedEvent(UserEvent $event)
     {
-        $user = $event->getUser();
-        if ($this->hubspotData->isChanged($user, $this->hubspotData->getHubspotUserArray($user))) {
-            $this->hubspot->queueContact($user);
-        }
+        $this->hubspot->queueContact($event->getUser());
     }
 
     public function onPolicyPotEvent(PolicyEvent $event)
@@ -116,10 +113,13 @@ class HubspotListener
 
     public function onUserPaymentFailedEvent(UserPaymentEvent $event)
     {
-        $this->hubspot->queueUser(
+        /*
+        TODO: this is unimplemented as far as I can see.
+        $this->hubspot->queueContact(
             $event->getUser(),
             HubspotService::QUEUE_EVENT_USER_PAYMENT_FAILED,
             ['reason' => $event->getReason()]
         );
+        */
     }
 }

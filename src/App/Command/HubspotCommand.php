@@ -17,8 +17,8 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use SevenShores\Hubspot\Exceptions\BadRequest;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use SevenShores\Hubspot\Exceptions\BadRequest;
 
 /**
  * Allows control of the hubspot system via commandline.
@@ -373,6 +373,7 @@ class HubspotCommand extends ContainerAwareCommand
     private function getUser($email)
     {
         $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if (!$user) {
             throw new UsernameNotFoundException('Unable to find user');
