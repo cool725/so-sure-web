@@ -1104,9 +1104,11 @@ class JudopayService
                 'currency' => 'GBP',
                 'cardToken' => $paymentMethod->getCardToken(),
                 'emailAddress' => $user->getEmail(),
-                'mobileNumber' => $user->getMobileNumber(),
-                'recurringPayment' => true
+                'mobileNumber' => $user->getMobileNumber()
         );
+        if ($this->featureService->isEnabled(Feature::FEATURE_JUDO_RECURRING)) {
+            $data['recurringPayment'] = true;
+        }
         // For webpayments, we won't have the customer token, but its optoinal anyway
         if ($paymentMethod->getCustomerToken()) {
             $data['consumerToken'] = $paymentMethod->getCustomerToken();
