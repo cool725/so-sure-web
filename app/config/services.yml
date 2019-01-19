@@ -1157,6 +1157,7 @@ services:
             -  { name: kernel.event_listener, event: event.card.updated, method: onCardUpdatedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.payment-method.changed, method: onUserPaymentMethodChangedEvent }
+            -  { name: kernel.event_listener, event: event.policy.payment-method.changed, method: onPolicyPaymentMethodChangedEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener

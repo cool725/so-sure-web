@@ -21,7 +21,7 @@
         {% set active_tab = 'bacs_setup_confirm' %}
     {% elseif app.request.get('_route') == 'user_payment_details_bacs' %}
         {% set active_tab = 'bacs_setup' %}
-    {% elseif user.paymentMethod and user.paymentMethod.type == 'bacs' %}
+    {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
         {% set active_tab = 'payment_bacs' %}
     {% endif %}
 

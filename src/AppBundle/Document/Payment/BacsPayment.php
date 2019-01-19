@@ -242,9 +242,9 @@ class BacsPayment extends Payment
             $this->setCommission();
         }
 
-        if ($this->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+        if ($this->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {
             /** @var BacsPaymentMethod $bacsPaymentMethod */
-            $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
+            $bacsPaymentMethod = $this->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
         }
 

@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\PolicyEvent;
@@ -59,16 +60,27 @@ class BacsListener
     public function onUserNameChangedEvent(UserEvent $event)
     {
         $user = $event->getUser();
-        $paymentMethod = $user->getPaymentMethod();
-        if ($paymentMethod && $paymentMethod->getType() == "bacs") {
-            /** @var BacsPaymentMethod $paymentMethod */
-            $bankAccount = $paymentMethod->getBankAccount();
+        if ($user->hasBacsPaymentMethod()) {
+            $bankAccount = $user->getBacsBankAccount();
             if ($bankAccount && !$this->bankAccountNameValidator->isAccountName(
                 $bankAccount->getAccountName(),
                 $user
             )) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
                 $this->bacsService->notifyMandateCancelledByNameChange($user);
+            }
+        }
+        foreach ($user->getValidPolicies(true) as $policy) {
+            /** @var Policy $policy */
+            if ($policy->hasBacsPaymentMethod()) {
+                $bankAccount = $policy->getBacsBankAccount();
+                if ($bankAccount && !$this->bankAccountNameValidator->isAccountName(
+                    $bankAccount->getAccountName(),
+                    $user
+                )) {
+                    $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+                    $this->bacsService->notifyMandateCancelledByNameChange($user);
+                }
             }
         }
     }
@@ -79,7 +91,7 @@ class BacsListener
     public function onBankAccountChangedEvent(BacsEvent $event)
     {
         $bankAccount = $event->getBankAccount();
-        $this->bacsService->queueCancelBankAccount($bankAccount, $event->getUser()->getId());
+        $this->bacsService->queueCancelBankAccount($bankAccount, $event->getPolicyUserOrUser()->getId());
     }
 
     public function onPolicyBacsCreated(PolicyEvent $event)
@@ -91,7 +103,7 @@ class BacsListener
     public function onPolicyUpdatedPremium(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
-        if ($policy->getUser()->hasBacsPaymentMethod()) {
+        if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
             $this->logger->error(sprintf(
                 'Unexpected premium change for policy %s with Bacs Payment method. Mandate should be invalidated?',
                 $policy->getId()
@@ -102,7 +114,7 @@ class BacsListener
     public function onPolicyUpdatedBilling(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
-        if ($policy->getUser()->hasBacsPaymentMethod()) {
+        if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
             $this->logger->error(sprintf(
                 'Unexpected billing date change for policy %s with Bacs Payment method. Currently not allowed',
                 $policy->getId()

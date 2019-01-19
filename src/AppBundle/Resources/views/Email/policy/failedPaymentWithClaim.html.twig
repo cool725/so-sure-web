@@ -13,7 +13,7 @@
 				Your monthly payment of £{{ policy.premium.monthlyPremiumPrice }} for your {{ policy.phone }} was declined.
 				{% if next %}
 				<br><br>
-				We will attempt to process the payment again{% if policy.user.paymentMethod.cardType is defined %}, using your {{ policy.user.paymentMethod.cardType }} card ending in {{ policy.user.paymentMethod.cardLastFour }}{% endif %}, on {{ next | date('d M Y H:i', 'Europe/London') }}.
+				We will attempt to process the payment again{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardType is defined %}, using your {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardType }} card ending in {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }}{% endif %}, on {{ next | date('d M Y H:i', 'Europe/London') }}.
 			    {% endif %}
 				<br><br>
                 Your policy will be canceled in {{ policy.policyExpirationDateDays }} days if you fail to make payment.

@@ -432,6 +432,16 @@ trait UserClassTrait
         $user->setPaymentMethod($judo);
     }
 
+    public static function setPaymentMethodForPolicy(Policy $policy, $endDate = '1220')
+    {
+        $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
+        $judo = new JudoPaymentMethod();
+        $judo->addCardTokenArray(random_int(1, 999999), $account);
+        $policy->setPaymentMethod($judo);
+
+        return $judo;
+    }
+
     public static function addBacsPayment(
         Policy $policy,
         $amount,
@@ -469,6 +479,25 @@ trait UserClassTrait
         }
         $bacs->setBankAccount($bankAccount);
         $user->setPaymentMethod($bacs);
+    }
+
+    public static function setBacsPaymentMethodForPolicy(
+        Policy $policy,
+        $mandateStatus = BankAccount::MANDATE_SUCCESS,
+        $randomReference = false
+    ) {
+        $bacs = new BacsPaymentMethod();
+        $bankAccount = new BankAccount();
+        $bankAccount->setSortCode('000099');
+        $bankAccount->setAccountNumber('12345678');
+        $bankAccount->setMandateStatus($mandateStatus);
+        if ($randomReference) {
+            $bankAccount->setReference(sprintf('TESTREF-%d', random_int(1, 999999)));
+        }
+        $bacs->setBankAccount($bankAccount);
+        $policy->setPaymentMethod($bacs);
+
+        return $bacs;
     }
 
     public static function getRandomPolicyNumber($prefix)
@@ -861,6 +890,7 @@ trait UserClassTrait
         /** @var DocumentManager $dm */
         $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = $repo->find($id);
         $this->assertNotNull($updatedPolicy);
 

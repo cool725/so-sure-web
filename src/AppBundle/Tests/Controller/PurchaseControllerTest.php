@@ -1050,7 +1050,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         // @codingStandardsIgnoreEnd
         $policyService->setEnvironment('test');
-        $this->assertTrue($user->hasValidPaymentMethod());
+        $this->assertTrue($policy1->hasPolicyOrUserValidPaymentMethod());
 
         $this->login($email, $password, 'user');
 

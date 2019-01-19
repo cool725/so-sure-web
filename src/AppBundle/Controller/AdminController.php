@@ -782,13 +782,7 @@ class AdminController extends BaseController
             } elseif ($request->request->has('mandates')) {
                 $mandatesForm->handleRequest($request);
                 if ($mandatesForm->isSubmitted() && $mandatesForm->isValid()) {
-                    $userId = $mandatesForm->getData()['serialNumber'];
-                    $userRepo = $this->getManager()->getRepository(User::class);
-                    /** @var User $user */
-                    $user = $userRepo->find($userId);
-                    /** @var BacsPaymentMethod $bacsPaymentMethod */
-                    $bacsPaymentMethod = $user->getPaymentMethod();
-                    $serialNumber = $bacsPaymentMethod->getBankAccount()->getMandateSerialNumber();
+                    $serialNumber = $mandatesForm->getData()['serialNumber'];
                     if ($bacs->approveMandates($serialNumber)) {
                         $this->addFlash(
                             'success',
@@ -919,16 +913,26 @@ class AdminController extends BaseController
      */
     public function bacsFileAction($serial)
     {
+        $paymentMethods = [];
+
         $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policies = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => (string) $serial]);
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            $bankAccount = $policy->getBacsBankAccount();
+            if ($bankAccount) {
+                $paymentMethods[] = $bankAccount->toDetailsArray();
+            }
+        }
+
         $repo = $dm->getRepository(User::class);
         $users = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => (string) $serial]);
-        $paymentMethods = [];
         foreach ($users as $user) {
             /** @var User $user */
-            /** @var BacsPaymentMethod $bacs */
-            $bacs = $user->getPaymentMethod();
-            if ($bacs->getBankAccount()) {
-                $paymentMethods[] = $bacs->getBankAccount()->toDetailsArray();
+            $bankAccount = $user->getBacsBankAccount();
+            if ($bankAccount) {
+                $paymentMethods[] = $bankAccount->toDetailsArray();
             }
         }
 

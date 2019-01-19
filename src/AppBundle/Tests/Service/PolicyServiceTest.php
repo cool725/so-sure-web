@@ -514,8 +514,8 @@ class PolicyServiceTest extends WebTestCase
         static::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS, true);
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
         $phone = $policy->getPhone();
-        static::$paymentService->confirmBacs($policy, $user->getBacsPaymentMethod(), $date);
-        $user->getBacsPaymentMethod()->getBankAccount()->setInitialPaymentSubmissionDate($date);
+        static::$paymentService->confirmBacs($policy, $policy->getPolicyOrUserBacsPaymentMethod(), $date);
+        $policy->getPolicyOrUserBacsBankAccount()->setInitialPaymentSubmissionDate($date);
 
         $payment = new BacsPayment();
         $payment->setAmount($phone->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
@@ -528,12 +528,12 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $scheduledPayment = $policy->getScheduledPayments()[1];
-        $scheduledPayment->setScheduled($user->getBacsPaymentMethod()->getBankAccount()->getInitialNotificationDate());
+        $scheduledPayment->setScheduled($policy->getPolicyOrUserBacsBankAccount()->getInitialNotificationDate());
         static::$dm->flush();
 
         $this->assertNotEquals(
             $date,
-            $user->getBacsPaymentMethod()->getBankAccount()->getInitialNotificationDate(),
+            $policy->getPolicyOrUserBacsBankAccount()->getInitialNotificationDate(),
             '',
             1
         );

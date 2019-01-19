@@ -6,7 +6,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Your current payment method</h5>
-                    <p class="card-text mb-4">{% if user.paymentMethod and user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod and user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                    <p class="card-text mb-4">{% if policy.getPolicyOrUserPaymentMethod and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}Credit/Debit Card{% elseif policy.hasPolicyOrUserBacsPaymentMethod %}Direct Debit{% else %}Unknown{% endif %}</p>
                     {% if not bacs_last_payment_in_progress %}
                         {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
                         <a href="#"
@@ -21,8 +21,8 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">Your Direct Debit</h5>
-                <p class="card-text mb-4">{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
-                {% if user.canUpdateBacsDetails %}
+                <p class="card-text mb-4">{% if policy.hasPolicyOrUserBacsPaymentMethod %}{{ policy.getPolicyOrUserBacsPaymentMethod }}{% else %}Not setup{% endif %}</p>
+                {% if policy.canUpdateBacsDetails %}
                     <a href="#"
                        data-tab-to="#bacs_setup_tab"
                        class="card-link show-tab"><i class="fal fa-edit fa-fw"></i> Update Account Details</a>

@@ -7,25 +7,25 @@
                 <div class="card-body">
                     <h5 class="card-title">Your current payment method</h5>
                     <p class="card-text">
-                        {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
+                        {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                             Credit/Debit Card
-                        {% elseif user.paymentMethod.type == "bacs" %}
+                        {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
                             Direct Debit
                         {% else %}
                             Unknown
                         {% endif %}
                     </p>
-                    {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
+                    {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                         <h6 class="card-title">Why not switch to Direct Debit?</h6>
                         <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="140px" class="mx-auto mt-2 mb-3">
                         <p class="card-text">It helps avoid a lot of problems with Debit/Credit Card payments...</p>
                         <p class="card-text">...and only takes seconds to setup!</p>
                     {% endif %}
                     <a href="#"
-                       data-tab-to="{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
-                       class="btn {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
+                       data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
+                       class="btn {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
                        >
-                        {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
+                        {% if not policy.hasPolicyOrUserBacsPaymentMethod %}
                             Switch to Direct Debit
                         {% else %}
                             Back to Direct Debit
@@ -44,8 +44,8 @@
                 <p class="card-text mb-4">
                     {% if policy and policy.isDifferentPayer %}
                         You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
-                    {% elseif user.paymentMethod and user.paymentMethod.type == "judo" %}
-                        {{ user.paymentMethod }}
+                    {% elseif policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
+                        {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
                     {% else %}
                         Not setup
                     {% endif %}
@@ -59,7 +59,7 @@
             </div>
         </div>
     </div>
-    {% if policy and policy.premiumPlan == 'monthly' and user.paymentMethod.type == "judo" %}
+    {% if policy and policy.premiumPlan == 'monthly' and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
         <div class="col-12 col-md-6">
             <div class="card mb-4">
                 <div class="card-body">
