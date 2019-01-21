@@ -199,12 +199,72 @@ class DefaultController extends BaseController
     public function affiliateLanding(Request $request)
     {
         $data = [];
+        $competitor = [
+            'Protect your Bubble' => [
+                'days' => '1 - 5',
+                'cashback' => '<i class="far fa-times fa-2x"></i>',
+                'cover' => '<i class="far fa-times fa-2x"></i>',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '6 months from purchase',
+                'saveexcess' => '<i class="far fa-times fa-2x"></i>',
+                'trustpilot' => 4
+            ],
+            'Gadget Cover' => [
+                'days' => '5 - 7',
+                'cashback' => '<i class="far fa-times fa-2x"></i>',
+                'cover' => '<i class="far fa-times fa-2x"></i>',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '18 months from purchase',
+                'saveexcess' => '<i class="far fa-times fa-2x"></i>',
+                'trustpilot' => 2,
+            ],
+            'Simplesurance' => [
+                'days' => '3 - 5',
+                'cashback' => '<i class="far fa-times fa-2x"></i>',
+                'cover' => '<i class="far fa-times fa-2x"></i>',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '6 months from purchase',
+                'saveexcess' => '<i class="far fa-times fa-2x"></i>',
+                'trustpilot' => 1,
+            ],
+            'CloudCover' => [
+                'days' => '3 - 5',
+                'cashback' => '<i class="far fa-times fa-2x"></i>',
+                'cover' => '<i class="far fa-times fa-2x"></i>',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '6 months from purchase',
+                'saveexcess' => '<i class="far fa-times fa-2x"></i>',
+                'trustpilot' => 3,
+            ],
+            'Endsleigh' => [
+                'days' => '1 - 5',
+                'cashback' => '<i class="far fa-times fa-2x"></i>',
+                'cover' => '<i class="far fa-check fa-2x"></i>',
+                'oldphones' => '<i class="far fa-check fa-2x"></i>',
+                'phoneage' => '3 years from purchase',
+                'saveexcess' => '<i class="far fa-times fa-2x"></i>',
+                'trustpilot' => 1,
+            ],
+            'Loveit coverIt.co.uk' => [
+                'days' => '1 - 5',
+                'cashback' => '<i class="far fa-times fa-2x"></i>',
+                'cover' => '<i class="far fa-times fa-2x"></i>',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '3 years from purchase',
+                'saveexcess' => '<i class="far fa-times fa-2x"></i>',
+                'trustpilot' => 2,
+            ]
+        ];
 
         if ($request->get('_route') == 'topcashback') {
             $data = [
                 'affiliate_page' => 'topcashback',
                 'affiliate_company' => 'TopCashback',
                 'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
+                'competitor' => $competitor,
+                'competitor1' => 'Protect your Bubble',
+                'competitor2' => 'Gadget Cover',
+                'competitor3' => 'Simplesurance',
             ];
         } elseif ($request->get('_route') == 'vouchercodes') {
             $data = [

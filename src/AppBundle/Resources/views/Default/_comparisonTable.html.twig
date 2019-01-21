@@ -446,8 +446,8 @@
         <tr>
             <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
             <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-            <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
             {% if table_content is defined and table_content == 'topcashback' %}
+                <th width="19%" class="b4 bs-l">{{ competitor[data['competitor1']]['name'] }}</th>
                 <th width="19%" class="b4">Gadget <br> Cover</th>
                 <th width="19%" class="b4">Simplesurance</th>
             {% elseif table_content is defined and table_content == 'quidco' %}
@@ -517,7 +517,7 @@
             {% elseif table_content is defined and table_content == 'reward-gateway' %}
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% else %}8
+            {% else %}
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
             {% endif %}
