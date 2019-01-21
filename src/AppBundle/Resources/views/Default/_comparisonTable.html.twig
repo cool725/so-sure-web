@@ -636,16 +636,16 @@
                 <td class="wh">{{ competitor[competitor2]['saveexcess']|raw }}</td>
                 <td class="wh">{{ competitor[competitor3]['saveexcess']|raw }}</td>
             {% elseif affiliate_page is defined and affiliate_page == 'quidco' %}
-                <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">{{ competitor[competitor1]['saveexcess']|raw }}</td>
+                <td class="wh">{{ competitor[competitor2]['saveexcess']|raw }}</td>
+                <td class="wh">{{ competitor[competitor3]['saveexcess']|raw }}</td>
             {% elseif affiliate_page is defined and affiliate_page == 'vouchercodes' %}
-                <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">{{ competitor[competitor1]['saveexcess']|raw }}</td>
+                <td class="wh">{{ competitor[competitor2]['saveexcess']|raw }}</td>
             {% elseif affiliate_page is defined and affiliate_page == 'reward-gateway' %}
-                <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">{{ competitor[competitor1]['saveexcess']|raw }}</td>
+                <td class="wh">{{ competitor[competitor2]['saveexcess']|raw }}</td>
+                <td class="wh">{{ competitor[competitor3]['saveexcess']|raw }}</td>
             {% else %}
                 <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
                 <td class="wh"><i class="far fa-times fa-2x"></i></td>
@@ -660,13 +660,12 @@
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
             </td>
-            <td class="bb1 bs-l">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-            </td>
             {% if affiliate_page is defined and affiliate_page == 'topcashback' %}
+                <td class="bb1 bs-l">
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
+                </td>
                 <td class="bb1">
                     <i class="fas fa-star"></i>
                     <i class="fas fa-star"></i>
@@ -675,6 +674,12 @@
                     <i class="fas fa-star"></i>
                 </td>
             {% elseif affiliate_page is defined and affiliate_page == 'quidco' %}
+                <td class="bb1 bs-l">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
                 <td class="bb1">
                     <i class="fas fa-star"></i>
                     <i class="fas fa-star"></i>
@@ -685,10 +690,22 @@
                     <i class="fas fa-star"></i>
                 </td>
             {% elseif affiliate_page is defined and affiliate_page == 'vouchercodes' %}
+                <td class="bb1 bs-l">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
                 <td class="bb1">
                     <i class="fas fa-star"></i>
                 </td>
             {% elseif affiliate_page is defined and affiliate_page == 'reward-gateway' %}
+                <td class="bb1 bs-l">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
                 <td class="bb1">
                     <i class="fas fa-star"></i>
                 </td>
@@ -696,6 +713,12 @@
                     <i class="fas fa-star"></i>
                 </td>
             {% else %}
+                <td class="bb1 bs-l">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </td>
                 <td class="bb1">
                     <i class="fas fa-star"></i>
                     <i class="fas fa-star"></i>
