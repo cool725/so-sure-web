@@ -667,50 +667,56 @@
                     {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
             {% elseif affiliate_page is defined and affiliate_page == 'quidco' %}
                 <td class="bb1 bs-l">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
             {% elseif affiliate_page is defined and affiliate_page == 'vouchercodes' %}
                 <td class="bb1 bs-l">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
             {% elseif affiliate_page is defined and affiliate_page == 'reward-gateway' %}
                 <td class="bb1 bs-l">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
+                </td>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
-                </td>
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
             {% else %}
                 <td class="bb1 bs-l">
@@ -727,7 +733,7 @@
                     <i class="fas fa-star"></i>
                     <i class="fas fa-star"></i>
                 </td>
-                {% endif %}
+            {% endif %}
         </tr>
     </tbody>
 </table>
