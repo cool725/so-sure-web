@@ -12,11 +12,8 @@
     <section class="d-flex flex-column justify-content-center align-items-center">
         <div class="container">
             <div class="text-center pt-5 pb-3">
-                {% if policy.displayRepurchase %}
-                    <h1 class="h3 mb-4">Pay the Remainder or repurchase your Policy</h1>
-                {% else %}
-                    <h1 class="h2 mb-4">Pay the Remainder of Your Policy Premium</h1>
-                {% endif %}
+                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+                <h1 class="h2 mb-4">Pay the Remainder of Your Policy Premium</h1>
                 {% if webpay_action and webpay_reference and amount > 0 %}
                     <p>Click below to pay for the remainder <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> of your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong>.</p>
                     <form action="{{ webpay_action }}"
