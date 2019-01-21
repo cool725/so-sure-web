@@ -200,95 +200,112 @@ class DefaultController extends BaseController
     {
         $data = [];
         $competitor = [
-            'Protect your Bubble' => [
-                'days' => '1 - 5',
+            'PYB' => [
+                'name' => 'Protect your Bubble',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
                 'cashback' => '<i class="far fa-times fa-2x"></i>',
                 'cover' => '<i class="far fa-times fa-2x"></i>',
                 'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '6 months from purchase',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => '<i class="far fa-times fa-2x"></i>',
                 'trustpilot' => 4
             ],
-            'Gadget Cover' => [
-                'days' => '5 - 7',
+            'GC' => [
+                'name' => 'Gadget<br>Cover',
+                'days' => '<strong>5 - 7</strong> <div>working days</div>',
                 'cashback' => '<i class="far fa-times fa-2x"></i>',
                 'cover' => '<i class="far fa-times fa-2x"></i>',
                 'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '18 months from purchase',
+                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
                 'saveexcess' => '<i class="far fa-times fa-2x"></i>',
                 'trustpilot' => 2,
             ],
-            'Simplesurance' => [
-                'days' => '3 - 5',
+            'SS' => [
+                'name' => 'Simplesurance',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
                 'cashback' => '<i class="far fa-times fa-2x"></i>',
                 'cover' => '<i class="far fa-times fa-2x"></i>',
                 'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '6 months from purchase',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => '<i class="far fa-times fa-2x"></i>',
                 'trustpilot' => 1,
             ],
-            'CloudCover' => [
-                'days' => '3 - 5',
+            'CC' => [
+                'name' => 'CloudCover',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
                 'cashback' => '<i class="far fa-times fa-2x"></i>',
                 'cover' => '<i class="far fa-times fa-2x"></i>',
                 'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '6 months from purchase',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => '<i class="far fa-times fa-2x"></i>',
                 'trustpilot' => 3,
             ],
-            'Endsleigh' => [
-                'days' => '1 - 5',
+            'END' => [
+                'name' => 'Endsleigh',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
                 'cashback' => '<i class="far fa-times fa-2x"></i>',
                 'cover' => '<i class="far fa-check fa-2x"></i>',
                 'oldphones' => '<i class="far fa-check fa-2x"></i>',
-                'phoneage' => '3 years from purchase',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => '<i class="far fa-times fa-2x"></i>',
                 'trustpilot' => 1,
             ],
-            'Loveit coverIt.co.uk' => [
-                'days' => '1 - 5',
+            'LICI' => [
+                'name' => 'Loveit<br>coverIt.co.uk',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
                 'cashback' => '<i class="far fa-times fa-2x"></i>',
                 'cover' => '<i class="far fa-times fa-2x"></i>',
                 'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '3 years from purchase',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => '<i class="far fa-times fa-2x"></i>',
                 'trustpilot' => 2,
             ]
         ];
-
         if ($request->get('_route') == 'topcashback') {
             $data = [
+                'competitor' => $competitor,
                 'affiliate_page' => 'topcashback',
                 'affiliate_company' => 'TopCashback',
                 'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
-                'competitor' => $competitor,
-                'competitor1' => 'Protect your Bubble',
-                'competitor2' => 'Gadget Cover',
-                'competitor3' => 'Simplesurance',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'SS',
             ];
         } elseif ($request->get('_route') == 'vouchercodes') {
             $data = [
+                'competitor' => $competitor,
                 'affiliate_page' => 'vouchercodes',
                 'affiliate_company' => 'VoucherCodes',
                 'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'END',
             ];
         } elseif ($request->get('_route') == 'quidco') {
             $data = [
+                'competitor' => $competitor,
                 'affiliate_page' => 'quidco',
                 'affiliate_company' => 'Quidco',
                 'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'CC',
             ];
         } elseif ($request->get('_route') == 'ivip') {
             $data = [
+                'competitor' => $competitor,
                 'affiliate_page' => 'ivip',
                 'affiliate_company' => 'iVIP',
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [
+                'competitor' => $competitor,
                 'affiliate_page' => 'reward-gateway',
                 'affiliate_company' => 'Reward Gateway',
                 'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
             ];
         }
 
