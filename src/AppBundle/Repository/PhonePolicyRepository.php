@@ -255,6 +255,11 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute();
     }
 
+    public function countAllStartedPolicies($prefix = null, \DateTime $startDate = null, \DateTime $endDate = null)
+    {
+        return count($this->findAllStartedPolicies($prefix, $startDate, $endDate));
+    }
+
     /**
      * All policies that are 'new' (e.g. created) during time period (excluding so-sure test ones)
      */
