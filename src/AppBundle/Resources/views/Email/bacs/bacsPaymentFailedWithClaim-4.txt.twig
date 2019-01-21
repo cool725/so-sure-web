@@ -3,9 +3,11 @@ Action required to keep your phone insured
 
 Your monthly Direct Debit payment failed for the final time and your policy will be automatically cancelled in 7 days.
 
-To avoid losing insurance for your Apple iPhone X (256GB), you need to login to your account and make a payment for the outstanding balance of £9.99
+If you fail to make payment in time, your policy will be cancelled on {{ policy.policyExpirationDate|date('M jS','Europe/London') }}.
 
-Pay outstanding balance:
+To avoid losing insurance for your {{ policy.phone }}, you need to login to your account and make a payment for the outstanding balance of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice }}
+
+Pay outstanding balance: {{ branch_payment_details_url }}
 
 IMPORTANT LEGAL INFORMATION
 
@@ -13,7 +15,8 @@ If you fail to make payment in time, your policy will be cancelled and, as you h
 
 In the unfortunate case that you do not pay the remainder of your policy premium, we will be forced to take legal proceedings against you.
 
-Please login to your account to see your policy T&amp;Cs and review your legal obligations.
+Please login to your account to see your policy T&amp;Cs and review your legal obligations:
+{{ url('user_policy_list_policy', {'id': policy.id}) }}
 
 Have a question or issue? contact us: {{ contact_us_url }}
 
