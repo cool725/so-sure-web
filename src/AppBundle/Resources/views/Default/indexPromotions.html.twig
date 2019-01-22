@@ -11,11 +11,16 @@
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    {% if page_type == 'vdayphonecase' %}
+        <link rel="stylesheet" href="{{ asset('css-js/homepage-vday.css') }}">
+    {% endif %}
 {% endblock %}
 
 {% block body %}
 
-    <div class="snow"></div>
+    {% if page_type == 'vdayphonecase' %}
+        <div class="snow"></div>
+    {% endif %}
 
     <section class="hero">
         <div class="container container-xtra">
@@ -36,6 +41,17 @@
                         {% elseif page_type == 'phonecase' %}
                             <h1 class="mb-4 text-white">Double Protection <br><span class="sub">for your Mobile </span></h1>
                             <h4 class="text-zaffre">We're giving away FREE cases of your choice worth &pound;19 from our partners at <a href="https://www.layercase.co.uk/" target="_blank" rel="noopener noreferrer" class="text-zaffre h4"><u>LayerCase</u></a>. Hurry while stock lasts!</h4>
+                            <p class="mb-4 text-white">
+                                <a href="#"
+                                   class="text-white"
+                                   data-toggle="modal"
+                                   data-target="#page_terms"
+                                   role="button"><small><u>Terms &amp; Conditions</u></small>
+                                </a>
+                           </p>
+                        {% elseif page_type == 'vdayphonecase' %}
+                            <h1 class="mb-4 text-white">Protect the one you love <br><span class="sub">this Valentines Day </span></h1>
+                            <h4 class="text-zaffre">Love is in the air, so we're giving away FREE phone cases worth &pound;19 from our partners at <a href="https://www.layercase.co.uk/" target="_blank" rel="noopener noreferrer" class="text-zaffre h4"><u>LayerCase</u></a>. Hurry while stock lasts!</h4>
                             <p class="mb-4 text-white">
                                 <a href="#"
                                    class="text-white"
@@ -65,12 +81,20 @@
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% if page_type == 'vdayphonecase' %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-vday.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
             </div>
             <div class="hero__illustration  d-block d-lg-none">
-                <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% if page_type == 'vdayphonecase' %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-vday-mobile.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% endif %}
             </div>
         </div>
     </section>
@@ -285,6 +309,10 @@
                         <h5>Terms and conditions</h5>
                         <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</p>
                         <p>Promotion valid from 8th January 2019 until 31st February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
+                    {% elseif page_type == 'vdayphonecase' %}
+                        <h5>Terms and conditions</h5>
+                        <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>
+                        <p>Promotion valid from 23rd January 2019 until 15th February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
                     {% endif %}
                 </div>
             </div>
@@ -294,5 +322,8 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>å
+    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    {% if page_type == 'vdayphonecase' %}
+        <script src="{{ asset('css-js/homepage-vday.js') }}"></script>
+    {% endif %}
 {% endblock %}

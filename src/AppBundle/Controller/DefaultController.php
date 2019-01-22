@@ -95,17 +95,14 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $pageType = 'xmas-homepage';
-
-        // Blackfriday Promo
-        // Start: Friday 23rd November Mighnight
-        // End: Monday 26th November Mighnight
+        // Valentines Day Promo
         $now   = \DateTime::createFromFormat('U', time());
-        $start = new \DateTime('2018-11-23 00:00:00', SoSure::getSoSureTimezone());
-        $end   = new \DateTime('2018-11-26 23:59:59', SoSure::getSoSureTimezone());
+        $start = new \DateTime('2019-02-14 00:00:00', SoSure::getSoSureTimezone());
+        $end   = new \DateTime('2019-02-14 23:59:59', SoSure::getSoSureTimezone());
 
         if ($now >= $start && $now <= $end) {
-            $pageType = 'blackfriday';
+            $pageType = 'vdayphonecase';
+            return $this->redirectToRoute('valentines_day_free_phone_case');
         }
 
         $data = array(
@@ -147,6 +144,24 @@ class DefaultController extends BaseController
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
 
         $pageType = 'phonecase';
+
+        $data = array(
+            'page_type' => $pageType,
+        );
+
+        $template = 'AppBundle:Default:indexPromotions.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/valentines-day-free-phone-case", name="valentines_day_free_phone_case")
+     */
+    public function valentinesDayCase()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'valentinesdayfreephonecase']);
+
+        $pageType = 'vdayphonecase';
 
         $data = array(
             'page_type' => $pageType,
