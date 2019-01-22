@@ -159,7 +159,9 @@ class DefaultController extends BaseController
      */
     public function valentinesDayCase()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'valentinesdayfreephonecase']);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'valentinesdayfreephonecase'
+        ]);
 
         $pageType = 'vdayphonecase';
 
