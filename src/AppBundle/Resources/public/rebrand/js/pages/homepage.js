@@ -12,6 +12,5 @@ let textFit = require('textfit');
 
 $(function() {
     textFit($('.fit')[0]);
-    $('.fit').css('visibility','visible');
 });
 
