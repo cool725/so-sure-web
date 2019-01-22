@@ -3,7 +3,7 @@ Direct Debit failed for a 2nd time!
 
 Oh no! We tried to take your monthly Direct Debit payment of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice }}, but it failed again!
 
-We will attempt to take payment again from your account ending {{ policy.paymentMethod.bankAccount.getDisplayableAccountNumber }}{% if nextScheduledPayment %} on or around {{ nextScheduledPayment.scheduled|date('M jS','Europe/London') }}{% endif %}.
+We will attempt to take payment again from your account {{ policy.paymentMethod.bankAccount.getDisplayableSortCode }} {{ policy.paymentMethod.bankAccount.getDisplayableAccountNumber }}{% if nextScheduledPayment %} on or around {{ nextScheduledPayment.scheduled|date('M jS','Europe/London') }}{% endif %}.
 
 Here's what you need to do to keep your {{ policy.phone }} insured against loss, damage and theft…
 
