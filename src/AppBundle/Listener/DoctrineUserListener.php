@@ -118,7 +118,8 @@ class DoctrineUserListener extends BaseDoctrineListener
             }
 
             $bankAccount = clone $paymentMethod->getBankAccount();
-            $event = new BacsEvent($user, $bankAccount);
+            $event = new BacsEvent($bankAccount);
+            $event->setUser($user);
             $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
         }
 
@@ -191,7 +192,8 @@ class DoctrineUserListener extends BaseDoctrineListener
 
     private function triggerCardEvent(User $user, $eventType)
     {
-        $event = new CardEvent($user);
+        $event = new CardEvent();
+        $event->setUser($user);
         $this->dispatcher->dispatch($eventType, $event);
     }
 }

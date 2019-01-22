@@ -1,0 +1,15 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+You can now login to the so-sure app!
+
+**
+------------------------------------------------------------
+Hello {{ policy.user.firstName }},
+
+Good news! We've resoved the issue with your IMEI number. You can now open the so-sure app and continue setting things up.
+
+Open the so-sure app here:
+{{ branch_policy_url }}
+
+If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+{% endblock body %}

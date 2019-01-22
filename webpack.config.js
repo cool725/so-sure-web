@@ -46,11 +46,14 @@ Encore
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
 
+    // User files
+    .addEntry('user', './src/AppBundle/Resources/public/rebrand/js/pages/user/user.js')
+    .addEntry('user-dashboard', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-dashboard.js')
+    .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
+    .addEntry('user-purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-purchase-bacs.js')
+
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
-
-    // User area files
-    .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

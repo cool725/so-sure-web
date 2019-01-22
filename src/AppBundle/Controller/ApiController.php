@@ -111,6 +111,7 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
+            /** @var RateLimitService $rateLimit */
             $rateLimit = $this->get('app.ratelimit');
             // Success logins should clear the rate limit (further below)
             if (!$rateLimit->allowedByUser($user)) {

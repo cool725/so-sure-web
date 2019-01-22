@@ -1050,7 +1050,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         // @codingStandardsIgnoreEnd
         $policyService->setEnvironment('test');
-        $this->assertTrue($user->hasValidPaymentMethod());
+        $this->assertTrue($policy1->hasPolicyOrUserValidPaymentMethod());
 
         $this->login($email, $password, 'user');
 
@@ -1419,24 +1419,6 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
-    }
-
-    public function testPhoneSearchUserInvalidPolicy()
-    {
-        $email = self::generateEmail('testPhoneSearchUserInvalid', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        self::$dm->flush();
-        $crawler = $this->login($email, $password, 'user/invalid');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
@@ -30,11 +31,13 @@ class FraudService
 
     public function runChecks(Policy $policy)
     {
-        $duplicateAccounts = $this->getDuplicateBankAccounts($policy);
+        $duplicateUserAccounts = $this->getDuplicateUserBankAccounts($policy);
+        $duplicatePolicyAccounts = $this->getDuplicatePolicyBankAccounts($policy);
         $data = [
             'duplicate_postcode' => $this->getDuplicatePostcode($policy),
-            'duplicate_bank_accounts' => $duplicateAccounts,
-            'duplicate_bank_accounts_count' => count($duplicateAccounts),
+            'duplicate_bank_user_accounts' => $duplicateUserAccounts,
+            'duplicate_bank_policy_accounts' => $duplicatePolicyAccounts,
+            'duplicate_bank_accounts_count' => count($duplicateUserAccounts) + count($duplicatePolicyAccounts),
             'network_cancellations' => count($policy->getNetworkCancellations()),
             'near_mobile_numbers' => $this->getNearMobileNumbers($policy)
         ];
@@ -69,7 +72,7 @@ class FraudService
         return $userRepo->getDuplicatePostcodeCount($user);
     }
 
-    public function getDuplicateBankAccounts(Policy $policy)
+    public function getDuplicateUserBankAccounts(Policy $policy)
     {
         try {
             $user = $policy->getUser();
@@ -82,9 +85,27 @@ class FraudService
         }
     }
 
+    public function getDuplicatePolicyBankAccounts(Policy $policy)
+    {
+        try {
+            /** @var PolicyRepository $policyRepo */
+            $policyRepo = $this->dm->getRepository(Policy::class);
+            $policyRepo->findBankAccount($policy);
+
+            $user = $policy->getUser();
+            /** @var UserRepository $userRepo */
+            $userRepo = $this->dm->getRepository(User::class);
+
+            return $userRepo->findBankAccount($user);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
     public function getDuplicateBankAccountsCount(Policy $policy)
     {
-        return count($this->getDuplicateBankAccounts($policy));
+        return count($this->getDuplicatePolicyBankAccounts($policy)) +
+            count($this->getDuplicateUserBankAccounts($policy));
     }
 
     public function getDuplicateIp(Policy $policy)

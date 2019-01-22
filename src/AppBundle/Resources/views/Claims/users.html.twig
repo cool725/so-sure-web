@@ -14,7 +14,12 @@
     {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
     <div class="bg-info" style="border-radius: 4px; padding: 20px;">
       <div class="row">
-        <div class="form-group col-sm-4">
+          <div class="form-group col-sm-2">
+              {{ form_label(form.firstname, 'Firstname') }}
+              {{ form_errors(form.firstname) }}
+              {{ form_widget(form.firstname) }}
+          </div>
+        <div class="form-group col-sm-2">
             {{ form_label(form.lastname, 'Lastname') }}
             {{ form_errors(form.lastname) }}
             {{ form_widget(form.lastname) }}
@@ -36,6 +41,11 @@
             {{ form_errors(form.postcode) }}
             {{ form_widget(form.postcode) }}
         </div>
+          <div class="form-group col-sm-4">
+              {{ form_label(form.dob, 'Birthday (dd/mm/yyyy)') }}
+              {{ form_errors(form.dob) }}
+              {{ form_widget(form.dob) }}
+          </div>
         <div class="form-group text-center col-sm-4" style="padding-top: 10px;">
             {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-primary'}}) }}
         </div>

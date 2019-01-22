@@ -1137,6 +1137,7 @@ class ApiAuthController extends BaseController
             }
 
             $repo = $dm->getRepository(Policy::class);
+            /** @var PhonePolicy $policy */
             $policy = $repo->find($id);
             if (!$policy) {
                 return $this->getErrorJsonResponse(
@@ -1165,14 +1166,14 @@ class ApiAuthController extends BaseController
                     $this->getIdentityLog($request)
                 );
             } elseif ($existingData) {
-                if (!$policy->getUser()->hasValidPaymentMethod()) {
+                if (!$policy->hasPolicyOrUserValidPaymentMethod()) {
                     return $this->getErrorJsonResponse(
                         ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
                         'Invalid payment method for user',
                         422
                     );
                 }
-                $paymentMethod = $policy->getUser()->getPaymentMethod();
+                $paymentMethod = $policy->getPolicyOrPayerOrUserPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
                     $judo = $this->get('app.judopay');
                     if (!$judo->existing($policy, $existingData['amount'])) {

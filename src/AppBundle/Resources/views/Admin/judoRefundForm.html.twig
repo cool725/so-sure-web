@@ -1,0 +1,49 @@
+{% block body %}
+
+    {% set now = "now"|date("m/d/Y") %}
+
+    {{ form_start(judo_refund_form) }}
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-xs-12 form-group">
+                <label>Payment to refund</label>
+                <div class="input-group">
+                    {{ form_widget(judo_refund_form.payment, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="col-xs-12 form-group">
+                <label>Amount</label>
+                <div class="input-group">
+                    <div class="input-group-addon">£</div>
+                    {{ form_widget(judo_refund_form.amount, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                <p class="help-block">Enter positive figure <strong>£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / month or £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} / year</strong></p>
+            </div>
+
+            <div class="col-xs-12 form-group">
+                <label>Total commission</label>
+
+                <div class="input-group">
+                    <div class="input-group-addon">£</div>
+                    {{ form_widget(judo_refund_form.totalCommission, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                <p class="help-block">Enter positive figure <strong>£0.89 / month or £10.72 / year </strong></p>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>Justification</label>
+            {{ form_widget(judo_refund_form.notes, {'attr': {'class': 'form_note form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(judo_refund_form.add, {'label': 'Save Payment', 'attr': {'class': 'btn btn-danger'}}) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(judo_refund_form) }}
+
+{% endblock %}

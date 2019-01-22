@@ -330,7 +330,10 @@ class PolicyService
                 }
             }
 
-            $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+            $checkmend = null;
+            if (!$user->hasSoSureEmail()) {
+                $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+            }
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
@@ -345,11 +348,12 @@ class PolicyService
             /** @var PolicyTerms $latestTerms */
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
             $policy->init($user, $latestTerms);
-
-            $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
-            $policy->addCheckmendSerialData($checkmend['serialResponse']);
-            // saving final finaly checkmendcert based status
-            $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            if ($checkmend) {
+                $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
+                $policy->addCheckmendSerialData($checkmend['serialResponse']);
+                // saving final finaly checkmendcert based status
+                $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            }
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->logger->warning(
@@ -1123,6 +1127,43 @@ class PolicyService
     }
 
     /**
+     * @param PhonePolicy $policy
+     * @param string      $detectedImei
+     * @param User        $adminUser
+     * @param string      $notes
+     */
+    public function setDetectedImei(PhonePolicy $policy, $detectedImei, User $adminUser, $notes)
+    {
+        $policy->setDetectedImei($detectedImei);
+
+        $policy->addNoteDetails(
+            $notes,
+            $adminUser,
+            'Detected IMEI Update'
+        );
+        $this->dm->flush();
+
+        $this->detectedImeiEmail($policy);
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     */
+    public function detectedImeiEmail(PhonePolicy $policy)
+    {
+        $baseTemplate = 'AppBundle:Email:policy/detectedImei';
+
+        $this->mailer->sendTemplateToUser(
+            sprintf('You can now login to the so-sure app!'),
+            $policy->getUser(),
+            sprintf('%s.html.twig', $baseTemplate),
+            ['policy' => $policy],
+            sprintf('%s.txt.twig', $baseTemplate),
+            ['policy' => $policy]
+        );
+    }
+
+    /**
      * @param Policy $policy
      */
     public function cancelledPolicyEmail(Policy $policy, $baseTemplate = null)
@@ -1233,9 +1274,9 @@ class PolicyService
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $connection->getLinkedPolicy()->getUser();
-        $this->mailer->sendTemplateToUser(
+        $this->mailer->sendTemplate(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getUser(),
+            $policy->getUser()->getEmail(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
@@ -1758,14 +1799,22 @@ class PolicyService
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
                 $date ? $date : \DateTime::createFromFormat('U', time())
             );
-            $scheduledPayment = new ScheduledPayment();
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-            $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
-            $scheduledPayment->setAmount($outstanding);
-            $scheduledPayment->setNotes(sprintf(
-                'Claw-back applied discount (discount was removed following success claim for previous policy)'
-            ));
-            $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            if ($policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
+                $scheduledPayment = new ScheduledPayment();
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
+                $scheduledPayment->setAmount($outstanding);
+                $scheduledPayment->setNotes(sprintf(
+                    'Claw-back applied discount (discount was removed following success claim for previous policy)'
+                ));
+                $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            } else {
+                $this->logger->warning(sprintf(
+                    'Failed to schedule claw back discount for policy %s as on bacs. Owed %0.2f',
+                    $policy->getId(),
+                    $outstanding
+                ));
+            }
             $this->dm->flush();
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
 

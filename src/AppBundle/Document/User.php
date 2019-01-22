@@ -33,6 +33,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     use PhoneTrait;
     use GravatarTrait;
     use CurrencyTrait;
+    use DateTrait;
 
     const MAX_POLICIES_PER_USER = 2;
 
@@ -52,6 +53,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are active.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
+
+    const DPA_VALIDATION_VALID = 'dpa-valid';
+    const DPA_VALIDATION_NOT_VALID = 'dpa-not-valid';
+    const DPA_VALIDATION_FAIL_DOB = 'dpa-fail-dob';
+    const DPA_VALIDATION_FAIL_LASTNAME = 'dpa-fail-lastname';
+    const DPA_VALIDATION_FAIL_FIRSTNAME = 'dpa-fail-firstname';
+    const DPA_VALIDATION_FAIL_MOBILE = 'dpa-fail-mobile';
 
     /**
      * @MongoDB\Id
@@ -348,6 +356,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $birthday;
 
@@ -1240,6 +1249,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
+    /**
+     * @deprecated Use same method name in Policy
+     * @return bool
+     */
     public function hasBacsPaymentMethod()
     {
         return $this->getPaymentMethod() instanceof BacsPaymentMethod;
@@ -1247,6 +1260,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * @return BacsPaymentMethod|null
+     * @deprecated Use same method name in Policy
      */
     public function getBacsPaymentMethod()
     {
@@ -1260,12 +1274,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return null;
     }
 
+    /**
+     * @deprecated Use same method name in Policy
+     * @return bool
+     */
     public function hasJudoPaymentMethod()
     {
         return $this->getPaymentMethod() instanceof JudoPaymentMethod;
     }
 
     /**
+     * @deprecated Use same method name in Policy
      * @return JudoPaymentMethod|null
      */
     public function getJudoPaymentMethod()
@@ -1280,6 +1299,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return null;
     }
 
+    /**
+     * @deprecated Use same method name in Policy
+     * @return bool
+     */
     public function canUpdateBacsDetails()
     {
         /** @var BacsPaymentMethod $bacsPaymentMethod */
@@ -1294,6 +1317,20 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return true;
+    }
+
+    /**
+     * @deprecated Use same method name in Policy
+     * @return BankAccount|null
+     */
+    public function getBacsBankAccount()
+    {
+        $bacsPaymentMethod = $this->getBacsPaymentMethod();
+        if ($bacsPaymentMethod) {
+            return $bacsPaymentMethod->getBankAccount();
+        }
+
+        return null;
     }
 
     public function getAnalytics()
@@ -1314,22 +1351,31 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['accountPaidToDate'] = true;
         $data['renewalMonthlyPremiumNoPot'] = 0;
         $data['renewalMonthlyPremiumWithPot'] = 0;
-        $data['paymentMethod'] = $this->getPaymentMethod() ? $this->getPaymentMethod()->getType() : null;
         $data['hasOutstandingPicSurePolicy'] = false;
         $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
-        if ($this->hasBacsPaymentMethod()) {
-            $data['paymentMethod'] = 'bacs';
-        } elseif ($this->hasJudoPaymentMethod()) {
-                $data['paymentMethod'] = 'judo';
-        } else {
-            $data['paymentMethod'] = 'none';
-        }
+
+        $data['paymentMethod'] = 'none';
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var PhonePolicy $policy */
             if (!$policy->isActive()) {
                 continue;
             }
+
+            if ($policy->hasBacsPaymentMethod()) {
+                if ($data['paymentMethod'] == 'judo') {
+                    $data['paymentMethod'] = 'multiple';
+                } elseif ($data['paymentMethod'] == 'none') {
+                    $data['paymentMethod'] = 'bacs';
+                }
+            } elseif ($policy->hasJudoPaymentMethod()) {
+                if ($data['paymentMethod'] == 'bacs') {
+                    $data['paymentMethod'] = 'multiple';
+                } elseif ($data['paymentMethod'] == 'none') {
+                    $data['paymentMethod'] = 'judo';
+                }
+            }
+
             if ($policy->getPolicyTerms()->isPicSureEnabled() && in_array($policy->getPicSureStatus(), [
                 PhonePolicy::PICSURE_STATUS_INVALID,
                 PhonePolicy::PICSURE_STATUS_MANUAL,
@@ -1373,6 +1419,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['accountPaidToDate'] = false;
             }
         }
+
+        // TODO: Eventually remove, but for now if we didn't find anything on the policy, keep using the user
+        if ($data['paymentMethod'] == 'none') {
+            if ($this->hasBacsPaymentMethod()) {
+                $data['paymentMethod'] = 'bacs';
+            } elseif ($this->hasJudoPaymentMethod()) {
+                $data['paymentMethod'] = 'judo';
+            }
+        }
+
         foreach ($this->getPendingRenewalPolicies() as $policy) {
             $data['renewalMonthlyPremiumNoPot'] += $policy->getPremium()->getMonthlyPremiumPrice();
             $data['renewalMonthlyPremiumWithPot'] +=
@@ -1674,11 +1730,19 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return mb_strlen(trim($this->getEmail())) > 0;
     }
 
+    /**
+     * @return bool
+     * @deprecated See same method name in Policy
+     */
     public function hasPaymentMethod()
     {
         return $this->getPaymentMethod() != null;
     }
 
+    /**
+     * @return bool
+     * @deprecated See same method name in Policy
+     */
     public function hasValidPaymentMethod()
     {
         return $this->hasPaymentMethod() && $this->getPaymentMethod()->isValid();
@@ -2151,5 +2215,29 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         } else {
             return static::AQUISITION_POTENTIAL;
         }
+    }
+
+    public function validateDpa($firstName = null, $lastName = null, $dob = null, $mobile = null)
+    {
+        if (!$firstName || !$lastName || !$dob || !$mobile) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        } elseif (!$this->isValidDate($dob)) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        } elseif (!$this->isValidUkMobile($mobile)) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        }
+
+        if ($this->normalizeUkMobile($mobile) != $this->normalizeUkMobile($this->getMobileNumber())) {
+            return self::DPA_VALIDATION_FAIL_MOBILE;
+        } elseif (!$this->createValidDate($dob) || !$this->getBirthday() ||
+            $this->createValidDate($dob)->diff($this->getBirthday())->days != 0) {
+            return self::DPA_VALIDATION_FAIL_DOB;
+        } elseif (mb_strtolower($lastName) != mb_strtolower($this->getLastName())) {
+            return self::DPA_VALIDATION_FAIL_LASTNAME;
+        } elseif (mb_strtolower($firstName) != mb_strtolower($this->getFirstName())) {
+            return self::DPA_VALIDATION_FAIL_FIRSTNAME;
+        }
+
+        return self::DPA_VALIDATION_VALID;
     }
 }

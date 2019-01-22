@@ -205,10 +205,15 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, $password, 'user');
 
         $crawler = self::$client->request('GET', '/user');
+        $this->validateInviteAllowed($crawler, true);
+
+        $csrf = $crawler->filterXPath('//input[@id="email-csrf"]')->attr('value');
+        static::$client->request("POST", "/user/json/invite/email", [
+            'email' => $inviteeEmail,
+            'csrf' => $csrf,
+
+        ]);
         self::verifyResponse(200);
-        $form = $crawler->selectButton('email[submit]')->form();
-        $form['email[email]'] = $inviteeEmail;
-        $crawler = self::$client->submit($form);
 
         $this->login($inviteeEmail, $password, 'user');
         $crawler = self::$client->request('GET', '/user');
@@ -255,10 +260,16 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/user');
         self::verifyResponse(200);
-        $form = $crawler->selectButton('email[submit]')->form();
-        $form['email[email]'] = $inviteeEmail;
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(302);
+
+        $this->validateInviteAllowed($crawler, true);
+
+        $csrf = $crawler->filterXPath('//input[@id="email-csrf"]')->attr('value');
+        static::$client->request("POST", "/user/json/invite/email", [
+            'email' => $inviteeEmail,
+            'csrf' => $csrf,
+
+        ]);
+        self::verifyResponse(422, 1);
     }
 
     public function testUserInviteClaimed()
@@ -302,11 +313,16 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', sprintf('/user/%s', $policy->getId()));
         self::verifyResponse(200);
-        $form = $crawler->selectButton('email[submit]')->form();
-        $form['email[email]'] = $inviteeEmail;
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(302);
-        //print $crawler->html();
+
+        $this->validateInviteAllowed($crawler, true);
+
+        $csrf = $crawler->filterXPath('//input[@id="email-csrf"]')->attr('value');
+        static::$client->request("POST", "/user/json/invite/email", [
+            'email' => $inviteeEmail,
+            'csrf' => $csrf,
+
+        ]);
+        self::verifyResponse(200);
 
         $this->logout();
 
@@ -487,20 +503,20 @@ class UserControllerTest extends BaseControllerTest
             $count = 1;
         }
         //print $crawler->html();
-        $this->assertEquals($count, $crawler->evaluate('count(//div[@id="shareBox"])')[0]);
+        $this->assertEquals($count, $crawler->evaluate('count(//form[@id="invite_form"])')[0]);
     }
 
     private function validateRewardPot($crawler, $amount)
     {
         $this->assertEquals(
             $amount,
-            $crawler->filterXPath('//div[@id="reward-pot-chart"]')->attr('data-pot-value')
+            $crawler->filterXPath('//div[@id="reward_pot_chart"]')->attr('data-pot-value')
         );
     }
 
     private function validateBonus($crawler, $daysRemaining, $daysTotal)
     {
-        $chart = $crawler->filterXPath('//div[@id="connection-bonus-chart"]');
+        $chart = $crawler->filterXPath('//div[@id="connection_bonus_chart"]');
         $actualRemaining = $chart->attr('data-bonus-days-remaining');
         $actualTotal = $chart->attr('data-bonus-days-total');
         if (is_array($daysRemaining)) {
@@ -517,7 +533,7 @@ class UserControllerTest extends BaseControllerTest
 
     private function validateRenewalAllowed($crawler, $exists)
     {
-        $this->validateXPathCount($crawler, '//li[@id="user-homepage--nav-renew"]', $exists);
+        $this->validateXPathCount($crawler, '//a[@id="user-homepage--nav-renew"]', $exists);
     }
 
     private function validateUnpaidJudoForm($crawler, $exists)

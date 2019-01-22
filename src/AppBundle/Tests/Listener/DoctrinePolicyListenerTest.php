@@ -4,7 +4,11 @@ namespace AppBundle\Tests\Listener;
 
 use AppBundle\Classes\Premium;
 use AppBundle\Document\Address;
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Event\BacsEvent;
+use AppBundle\Event\CardEvent;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -204,6 +208,140 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $this->assertPolicyDoesNotExist(self::$container, $policy);
     }
 
+    public function testPreUpdateJudo()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPreUpdateJudo', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        self::setPaymentMethodForPolicy($policy);
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $this->runPreUpdateStatus(
+            $policy,
+            $this->once(),
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_UNPAID]],
+            PhonePolicy::STATUS_ACTIVE
+        );
+        $this->runPreUpdateStatus(
+            $policy,
+            $this->never(),
+            ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_ACTIVE]],
+            PhonePolicy::STATUS_ACTIVE
+        );
+
+        /** @var JudoPaymentMethod $judo */
+        $judo = $policy->getPaymentMethod();
+
+        $listener = $this->createCardListener(
+            $policy,
+            $this->exactly(1),
+            CardEvent::EVENT_UPDATED
+        );
+
+        $updatedJudo = clone $judo;
+        $account = ['type' => '2', 'lastfour' => '1234', 'endDate' => '1225'];
+        $updatedJudo->addCardTokenArray(random_int(1, 999999), $account);
+        $changeSet = ['paymentMethod' => [$judo, $updatedJudo]];
+        $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $changeSet = ['paymentMethod' => [$updatedJudo, $updatedJudo]];
+        $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdateBankAccountSortCodePolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPreUpdateBankAccountSortCodePolicy', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        /** @var BacsPaymentMethod $bacs */
+        $bacs = self::setBacsPaymentMethodForPolicy($policy);
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $listener = $this->createBacsEventListener(
+            $policy,
+            $bacs->getBankAccount(),
+            $this->exactly(1),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setSortCode('000098');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdatePaymentMethodPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPreUpdatePaymentMethodPolicy', $this),
+            'bar'
+        );
+        $judoPolicy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $bacsPolicy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($judoPolicy);
+        static::$policyService->create($bacsPolicy);
+        static::$policyService->setEnvironment('test');
+        $judoPolicy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $bacsPolicy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        /** @var JudoPaymentMethod $judo */
+        $judo = self::setPaymentMethodForPolicy($judoPolicy);
+        /** @var BacsPaymentMethod $bacs */
+        $bacs = self::setBacsPaymentMethodForPolicy($bacsPolicy);
+
+        $listener = $this->createPolicyEventListener(
+            $judoPolicy,
+            $this->exactly(1),
+            PolicyEvent::EVENT_PAYMENT_METHOD_CHANGED,
+            'judo'
+        );
+
+        $changeSet = ['paymentMethod' => [$judo, $bacs]];
+        $events = new PreUpdateEventArgs($judoPolicy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $changeSet = ['paymentMethod' => [$judo, $judo]];
+        $events = new PreUpdateEventArgs($judoPolicy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createPolicyEventListener(
+            $bacsPolicy,
+            $this->exactly(1),
+            PolicyEvent::EVENT_PAYMENT_METHOD_CHANGED,
+            'bacs'
+        );
+
+        $changeSet = ['paymentMethod' => [$bacs, $judo]];
+        $events = new PreUpdateEventArgs($bacsPolicy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $changeSet = ['paymentMethod' => [$bacs, $bacs]];
+        $events = new PreUpdateEventArgs($bacsPolicy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
     private function runPreUpdate($policy, $count, $changeSet)
     {
         $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_POT);
@@ -245,6 +383,73 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $dispatcher->expects($count)
                      ->method('dispatch')
                      ->with($eventType, $event);
+
+        $listener = new DoctrinePolicyListener($dispatcher);
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
+
+        return $listener;
+    }
+
+    private function createCardListener($policy, $count, $eventType)
+    {
+        $event = new CardEvent();
+        $event->setPolicy($policy);
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+            ->setMethods(array('dispatch'))
+            ->getMock();
+        $dispatcher->expects($count)
+            ->method('dispatch')
+            ->with($eventType, $event);
+
+        $listener = new DoctrinePolicyListener($dispatcher);
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
+
+        return $listener;
+    }
+
+    private function createBacsEventListener(Policy $policy, $bankAccount, $count, $eventType)
+    {
+        \AppBundle\Classes\NoOp::ignore([$eventType]);
+        $event = new BacsEvent($bankAccount);
+        $event->setPolicy($policy);
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+            ->setMethods(array('dispatch'))
+            ->getMock();
+        $dispatcher->expects($count)
+            ->method('dispatch')
+            ->with($eventType, $event);
+
+        $listener = new DoctrinePolicyListener($dispatcher);
+        /** @var Reader $reader */
+        $reader = static::$container->get('annotations.reader');
+        $listener->setReader($reader);
+
+        return $listener;
+    }
+
+    private function createPolicyEventListener(
+        Policy $policy,
+        $count,
+        $eventType,
+        $previousPaymentMethod = null
+    ) {
+        $event = new PolicyEvent($policy);
+        if ($previousPaymentMethod) {
+            $event->setPreviousPaymentMethod($previousPaymentMethod);
+        }
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+            ->setMethods(array('dispatch'))
+            ->getMock();
+        $dispatcher->expects($count)
+            ->method('dispatch')
+            ->with($eventType, $event);
 
         $listener = new DoctrinePolicyListener($dispatcher);
         /** @var Reader $reader */

@@ -36,11 +36,16 @@
         </div>
       </div>
       <div class="row">
-        <div class="form-group col-sm-4">
+        <div class="form-group col-sm-2">
             {{ form_label(form.postcode, 'Postcode') }}
             {{ form_errors(form.postcode) }}
             {{ form_widget(form.postcode) }}
         </div>
+          <div class="form-group col-sm-2">
+              {{ form_label(form.dob, 'Birthday') }}
+              {{ form_errors(form.dob) }}
+              {{ form_widget(form.dob, {'attr': {'placeholder': 'dd/mm/yyyy'}}) }}
+          </div>
         <div class="form-group col-sm-4">
             {{ form_label(form.facebookId, 'Facebook Id') }}
             {{ form_errors(form.facebookId) }}

@@ -3912,6 +3912,12 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
+jquery-circle-progress@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/jquery-circle-progress/-/jquery-circle-progress-1.2.2.tgz#260e9130ac8e2b5572eaa7a93b9e8a6b27bc8eea"
+  dependencies:
+    jquery "*"
+
 jquery-mask-plugin@^1.14.15:
   version "1.14.15"
   resolved "https://registry.yarnpkg.com/jquery-mask-plugin/-/jquery-mask-plugin-1.14.15.tgz#9daabb41024383cba2a793bacfa46ef8f87273a5"
@@ -3922,7 +3928,7 @@ jquery-validation@^1.17.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-jquery@>=1.11, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
+jquery@*, jquery@>=1.11, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 

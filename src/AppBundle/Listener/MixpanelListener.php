@@ -122,7 +122,7 @@ class MixpanelListener
 
     public function onCardUpdatedEvent(CardEvent $event)
     {
-        $user = $event->getUser();
+        $user = $event->getPolicyUserOrUser();
         $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
             'Previous Payment Method' => 'judo',
             'Payment Method' => 'judo',
@@ -131,7 +131,7 @@ class MixpanelListener
 
     public function onBacsUpdatedEvent(BacsEvent $event)
     {
-        $user = $event->getUser();
+        $user = $event->getPolicyUserOrUser();
         $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
             'Previous Payment Method' => 'bacs',
             'Payment Method' => 'bacs',
@@ -144,6 +144,15 @@ class MixpanelListener
         $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
             'Previous Payment Method' => $event->getPreviousPaymentMethod(),
             'Payment Method' => $user->getPaymentMethod() ? $user->getPaymentMethod()->getType() : null,
+        ]);
+    }
+
+    public function onPolicyPaymentMethodChangedEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
+            'Previous Payment Method' => $event->getPreviousPaymentMethod(),
+            'Payment Method' => $policy->getPaymentMethod() ? $policy->getPaymentMethod()->getType() : null,
         ]);
     }
 }

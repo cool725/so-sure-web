@@ -722,4 +722,139 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
         $this->assertTrue($user->shouldDelete(new \DateTime('2030-01-01')));
     }
+
+    public function testValidateDpaNotValid()
+    {
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber(self::generateRandomMobile());
+        $user->setBirthday(new \DateTime('1980-10-30'));
+        $this->assertEquals(User::DPA_VALIDATION_NOT_VALID, $user->validateDpa());
+        $this->assertEquals(User::DPA_VALIDATION_NOT_VALID, $user->validateDpa('foo'));
+        $this->assertEquals(
+            User::DPA_VALIDATION_NOT_VALID,
+            $user->validateDpa('foo', 'bar')
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_NOT_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980')
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_NOT_VALID,
+            $user->validateDpa('foo', 'bar', null, $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_NOT_VALID,
+            $user->validateDpa('foo', 'bar', 'not a dob', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_NOT_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980', '00321')
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+    }
+
+    public function testValidateDpaFailMobile()
+    {
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber(self::generateRandomMobile());
+        $user->setBirthday(new \DateTime('1980-10-30'));
+        $closeMobile = mb_substr($user->getMobileNumber(), 0, 12);
+        if (mb_substr($user->getMobileNumber(), 12, 1) == '0') {
+            $closeMobile = $closeMobile . '1';
+        } else {
+            $closeMobile = $closeMobile . '0';
+        }
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_MOBILE,
+            $user->validateDpa('foo', 'bar', '30/10/1980', self::generateRandomMobile())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_MOBILE,
+            $user->validateDpa('foo', 'bar', '30/10/1980', $closeMobile)
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+    }
+
+    public function testValidateDpaFailDOB()
+    {
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber(self::generateRandomMobile());
+        $user->setBirthday(new \DateTime('1980-10-30'));
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_DOB,
+            $user->validateDpa('foo', 'bar', '29/10/1980', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_DOB,
+            $user->validateDpa('foo', 'bar', '31/10/1980', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+    }
+
+    public function testValidateDpaFailFirstName()
+    {
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber(self::generateRandomMobile());
+        $user->setBirthday(new \DateTime('1980-10-30'));
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_FIRSTNAME,
+            $user->validateDpa('fo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_FIRSTNAME,
+            $user->validateDpa('fooo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+        // should fail at user level, but may be transformed at service level
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_FIRSTNAME,
+            $user->validateDpa('foó', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+    }
+
+    public function testValidateDpaFailLastName()
+    {
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setMobileNumber(self::generateRandomMobile());
+        $user->setBirthday(new \DateTime('1980-10-30'));
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_LASTNAME,
+            $user->validateDpa('foo', 'ba', '30/10/1980', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_LASTNAME,
+            $user->validateDpa('foo', 'barr', '30/10/1980', $user->getMobileNumber())
+        );
+        // should fail at user level, but may be transformed at service level
+        $this->assertEquals(
+            User::DPA_VALIDATION_FAIL_LASTNAME,
+            $user->validateDpa('foo', 'bár', '30/10/1980', $user->getMobileNumber())
+        );
+        $this->assertEquals(
+            User::DPA_VALIDATION_VALID,
+            $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
+        );
+    }
 }

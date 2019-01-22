@@ -116,20 +116,13 @@ class PaymentService
             if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
                 continue;
             }
-            if (!$scheduledPayment->getPolicy()->getPayerOrUser()) {
-                $this->logger->warning(sprintf(
-                    'Policy %s/%s does not have a user (payer)',
-                    $scheduledPayment->getPolicy()->getPolicyNumber(),
-                    $scheduledPayment->getPolicy()->getId()
-                ));
+            if (!$scheduledPayment->getPolicy()->getPolicyOrPayerOrUserPaymentMethod() instanceof $type) {
                 continue;
             }
-            if (!$scheduledPayment->getPolicy()->getPayerOrUser()->getPaymentMethod() instanceof $type) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->getPayerOrUser()->hasValidPaymentMethod()) {
+            if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
                 $this->logger->info(sprintf(
-                    'User %s does not have a valid payment method',
+                    'Policy %s or User %s does not have a valid payment method',
+                    $scheduledPayment->getPolicy()->getId(),
                     $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
                 ));
             }
@@ -149,7 +142,7 @@ class PaymentService
         $scheduledPayment->validateRunable($prefix, $date);
 
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
         if ($paymentMethod && $paymentMethod instanceof JudoPaymentMethod) {
             return $this->judopay->scheduledPayment(
                 $scheduledPayment,

@@ -32,6 +32,7 @@ class Feature
     const FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP = 'claims-default-direct-group';
     const FEATURE_RATE_LIMITING = 'rate-limiting';
     const FEATURE_PAYMENTS_BCC = 'bcc-payments';
+    const FEATURE_JUDO_RECURRING = 'judo-recurring';
 
     // All Features should be here
     public static $features = [
@@ -51,6 +52,7 @@ class Feature
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP,
         self::FEATURE_RATE_LIMITING,
         self::FEATURE_PAYMENTS_BCC,
+        self::FEATURE_JUDO_RECURRING
     ];
 
     // @codingStandardsIgnoreStart
@@ -71,6 +73,7 @@ class Feature
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP => 'Should direct group be the default claim handler for new claims. If changing update phone system as well.',
         self::FEATURE_RATE_LIMITING => 'Use rate limiting functionality for various items including recipero imei checks and policy creation.',
         self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',
+        self::FEATURE_JUDO_RECURRING => 'Perform Judopay token payments with the \'recurring\' flag set.'
     ];
     // @codingStandardsIgnoreEnd
 
