@@ -128,38 +128,38 @@ class MixpanelService
     ];
 
     public static $trackedEvents = [
-        EVENT_HOME_PAGE,
-        EVENT_QUOTE_PAGE,
-        EVENT_MANUFACTURER_PAGE,
-        EVENT_LANDING_PAGE,
-        EVENT_CPC_QUOTE_PAGE,
-        EVENT_CPC_MANUFACTURER_PAGE,
-        EVENT_CPC_COMPETITOR_PAGE,
-        EVENT_RECEIVE_DETAILS,
-        EVENT_PURCHASE_POLICY,
-        EVENT_PAYMENT,
-        EVENT_INVITE,
-        EVENT_CONNECTION_COMPLETE,
-        EVENT_BUY_BUTTON_CLICKED,
-        EVENT_POLICY_READY,
-        EVENT_LOGIN,
-        EVENT_APP_DOWNLOAD,
-        EVENT_TEST ,
-        EVENT_INVITATION_PAGE,
-        EVENT_CANCEL_POLICY,
-        EVENT_LEAD_CAPTURE,
-        EVENT_CANCEL_POLICY_PAGE,
-        EVENT_REQUEST_CANCEL_POLICY,
-        EVENT_RENEWAL,
-        EVENT_RENEW,
-        EVENT_CASHBACK,
-        EVENT_DECLINE_RENEW,
-        EVENT_SIXPACK,
-        EVENT_ONBOARDING,
-        EVENT_POLICY_STATUS,
-        EVENT_PAYMENT_METHOD_CHANGED,
-        EVENT_EMAIL,
-        EVENT_SMS
+        self::EVENT_HOME_PAGE,
+        self::EVENT_QUOTE_PAGE,
+        self::EVENT_MANUFACTURER_PAGE,
+        self::EVENT_LANDING_PAGE,
+        self::EVENT_CPC_QUOTE_PAGE,
+        self::EVENT_CPC_MANUFACTURER_PAGE,
+        self::EVENT_CPC_COMPETITOR_PAGE,
+        self::EVENT_RECEIVE_DETAILS,
+        self::EVENT_PURCHASE_POLICY,
+        self::EVENT_PAYMENT,
+        self::EVENT_INVITE,
+        self::EVENT_CONNECTION_COMPLETE,
+        self::EVENT_BUY_BUTTON_CLICKED,
+        self::EVENT_POLICY_READY,
+        self::EVENT_LOGIN,
+        self::EVENT_APP_DOWNLOAD,
+        self::EVENT_TEST ,
+        self::EVENT_INVITATION_PAGE,
+        self::EVENT_CANCEL_POLICY,
+        self::EVENT_LEAD_CAPTURE,
+        self::EVENT_CANCEL_POLICY_PAGE,
+        self::EVENT_REQUEST_CANCEL_POLICY,
+        self::EVENT_RENEWAL,
+        self::EVENT_RENEW,
+        self::EVENT_CASHBACK,
+        self::EVENT_DECLINE_RENEW,
+        self::EVENT_SIXPACK,
+        self::EVENT_ONBOARDING,
+        self::EVENT_POLICY_STATUS,
+        self::EVENT_PAYMENT_METHOD_CHANGED,
+        self::EVENT_EMAIL,
+        self::EVENT_SMS
     ];
 
     public static function getCampaignSources($event)
@@ -323,7 +323,7 @@ class MixpanelService
         $accounts = count($results);
         if ($accounts > 1) {
             $data = $this->findOldestMixpanelUser($results);
-        } elseif($accounts == 1) {
+        } elseif ($accounts == 1) {
             $data = $results['results']['properties'];
         } else {
             return null;
@@ -1350,10 +1350,10 @@ class MixpanelService
         $yearAgo = new \DateTime('one year ago');
         $oldestUser = ['time' => 789738127389];
         foreach ($mixpanelUsers['results'] as $user) {
-            $eventList = $mixpanel->export([
+            $eventList = $this->mixpanelData->export([
                 'from_date' => $yearAgo->format('Y-m-d'),
                 'to_date' => $date->format('Y-m-d'),
-                'event' => json_encode($trackedEvents),
+                'event' => json_encode($this->trackedEvents),
                 'where' => 'properties["$distinct_id"]=="'.$user['distinct_id'].'"'
             ]);
             $oldestEvent = $eventList['results'][0];
