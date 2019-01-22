@@ -101,7 +101,6 @@ class DefaultController extends BaseController
         $end   = new \DateTime('2019-02-14 23:59:59', SoSure::getSoSureTimezone());
 
         if ($now >= $start && $now <= $end) {
-            $pageType = 'vdayphonecase';
             return $this->redirectToRoute('valentines_day_free_phone_case');
         }
 
@@ -109,7 +108,6 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'page_type' => $pageType,
         );
 
         $template = 'AppBundle:Default:index.html.twig';
