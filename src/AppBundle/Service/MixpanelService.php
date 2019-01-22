@@ -127,6 +127,37 @@ class MixpanelService
         //'MoneySupermarket',
     ];
 
+    public static $trackedEvents = [
+        EVENT_CPC_QUOTE_PAGE,
+        EVENT_CPC_MANUFACTURER_PAGE,
+        EVENT_CPC_COMPETITOR_PAGE,
+        EVENT_RECEIVE_DETAILS,
+        EVENT_PURCHASE_POLICY,
+        EVENT_PAYMENT,
+        EVENT_INVITE,
+        EVENT_CONNECTION_COMPLETE,
+        EVENT_BUY_BUTTON_CLICKED,
+        EVENT_POLICY_READY,
+        EVENT_LOGIN,
+        EVENT_APP_DOWNLOAD,
+        EVENT_TEST ,
+        EVENT_INVITATION_PAGE,
+        EVENT_CANCEL_POLICY,
+        EVENT_LEAD_CAPTURE,
+        EVENT_CANCEL_POLICY_PAGE,
+        EVENT_REQUEST_CANCEL_POLICY,
+        EVENT_RENEWAL,
+        EVENT_RENEW,
+        EVENT_CASHBACK,
+        EVENT_DECLINE_RENEW,
+        EVENT_SIXPACK,
+        EVENT_ONBOARDING,
+        EVENT_POLICY_STATUS,
+        EVENT_PAYMENT_METHOD_CHANGED,
+        EVENT_EMAIL,
+        EVENT_SMS
+    ];
+
     public static function getCampaignSources($event)
     {
         $data = [];
@@ -286,6 +317,26 @@ class MixpanelService
         $results = $this->mixpanelData->data('engage', [
             'where' => $search
         ]);
+
+        $data = ['time' => 9999999999];
+        foreach ($results['results'] as $result) {
+            // Perform setup, as above
+            try {
+                // Export raw data
+                $data = $mixpanel->export([
+                    'from_date' => '2016-12-01',
+                    'to_date' => '2016-12-31'
+                ]);
+
+                // $data is an array
+            } catch ( DataExportApiException $e ) {
+                // Handle exception
+            }
+
+        }
+
+
+
         foreach ($results['results'] as $result) {
             $data = $result['$properties'];
             if (mb_strtolower($data['$email']) == $user->getEmailCanonical()) {
