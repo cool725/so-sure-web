@@ -117,7 +117,7 @@
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Card Expired</h1>
-                    <p>We were unable to take payment because your card ending <strong>{{ policy.user.paymentMethod.cardLastFour }}</strong> has expired.</p>
+                    <p>We were unable to take payment because your card ending <strong>{{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }}</strong> has expired.</p>
 
                     {% if not show_bacs_setup %}
                         <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
@@ -135,7 +135,7 @@
 
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment Failed</h1>
-                    <p>We were unable to take payment because your card ending <strong>{{ policy.user.paymentMethod.cardLastFour }}</strong> was declined.</p>
+                    <p>We were unable to take payment because your card ending <strong>{{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }}</strong> was declined.</p>
                     <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
                     {# END - PAYMENT FAILED #}
 
@@ -193,8 +193,8 @@
 
                 {# IF CAN RETRY BACS #}
                 {% if show_bacs_retry %}
-                    {% if policy.canBacsPaymentBeMadeInTime and policy.user.hasBacsPaymentMethod and (policy.user.bacsPaymentMethod.bankAccount.isMandateSuccess or policy.user.bacsPaymentMethod.bankAccount.isMandateInProgress) %}
-                        <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ app.user.paymentMethod.bankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
+                    {% if policy.canBacsPaymentBeMadeInTime and policy.hasPolicyOrUserBacsPaymentMethod and (policy.getPolicyOrUserBacsBankAccount.isMandateSuccess or policy.getPolicyOrUserBacsBankAccount.isMandateInProgress) %}
+                        <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ policy.getPolicyOrUserBacsBankAccount.bankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
                         {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form'}})  }}
                             <div class="form-group">
                                 {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-success'}}) }}
@@ -212,7 +212,7 @@
                 {% if show_bacs_setup %}
                     {% if policy.canBacsPaymentBeMadeInTime %}
                         <p>
-                            {% if not app.user.hasBacsPaymentMethod %}
+                            {% if not policy.hasPolicyOrUserBacsPaymentMethod %}
                                 <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
                                 <p><strong>Why not switch to Direct Debit?</strong></p>
                                 <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">

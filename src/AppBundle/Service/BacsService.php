@@ -26,6 +26,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
@@ -306,14 +307,27 @@ class BacsService
      */
     public function autoApprovePaymentsAndMandates($date)
     {
+        $payments = $this->approvePayments($date);
+        $serialNumbers = [];
+
+        /** @var PolicyRepository $policyRepository */
+        $policyRepository = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepository->findPendingMandates()->getQuery()->execute();
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            $serialNumber = $policy->getBacsBankAccount()->getMandateSerialNumber();
+            if (!in_array($serialNumber, $serialNumbers)) {
+                $this->approveMandates($serialNumber);
+                $serialNumbers[] = $serialNumber;
+            }
+        }
+
         /** @var UserRepository $userRepository */
         $userRepository = $this->dm->getRepository(User::class);
-        $payments = $this->approvePayments($date);
-
         $users = $userRepository->findPendingMandates()->getQuery()->execute();
-        $serialNumbers = [];
         foreach ($users as $user) {
-            $serialNumber = $user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber();
+            /** @var User $user */
+            $serialNumber = $user->getBacsBankAccount()->getMandateSerialNumber();
             if (!in_array($serialNumber, $serialNumbers)) {
                 $this->approveMandates($serialNumber);
                 $serialNumbers[] = $serialNumber;
@@ -572,8 +586,10 @@ class BacsService
             'transfer' => 0,
         ];
 
-        /** @var UserRepository $repo */
-        $repo = $this->dm->getRepository(User::class);
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
 
         $xml = file_get_contents($file);
         $dom = new DOMDocument();
@@ -591,27 +607,37 @@ class BacsService
             $results['instructions']++;
             $reason = $this->getReason($element);
             $reference = $this->getReference($element);
-            /** @var User $user */
-            $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
-            if (!$user) {
+
+            $bacs = $this->getBacsPaymentMethodByReference($reference);
+            if (!$bacs) {
                 $results['success'] = false;
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
 
                 continue;
             }
-            /** @var BacsPaymentMethod $bacs */
-            $bacs = $user->getPaymentMethod();
 
             $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
             $this->dm->flush();
 
+            $referenceId = null;
+            $referencePolicy = $this->getPolicyByReference($reference);
+            $referenceUser = $this->getUserByReference($reference);
+            if ($referencePolicy) {
+                $referenceId = $referencePolicy->getId();
+                $referenceUser = $referencePolicy->getUser();
+            } elseif ($referenceUser) {
+                $referenceId = $referenceUser->getId();
+            }
+
             // Service users must not send a 0C transaction to the old bank on receipt of an ADDACS reason code 3
             // advice containing both old and new account details.
             if ($reason != self::ADDACS_REASON_TRANSFER) {
-                $this->queueCancelBankAccount($bacs->getBankAccount(), $user->getId());
+                $this->queueCancelBankAccount($bacs->getBankAccount(), $referenceId);
             }
 
-            $this->notifyMandateCancelled($user, $reason);
+            if ($referenceUser) {
+                $this->notifyMandateCancelled($referenceUser, $reason);
+            }
 
             if ($reason == self::ADDACS_REASON_TRANSFER) {
                 $results['transer']++;
@@ -636,6 +662,48 @@ class BacsService
         return $results;
     }
 
+    private function getBacsPaymentMethodByReference($reference)
+    {
+        $policy = $this->getPolicyByReference($reference);
+        if ($policy) {
+            return $policy->getBacsPaymentMethod();
+        }
+
+        $user = $this->getUserByReference($reference);
+        if ($user) {
+            return $user->getBacsPaymentMethod();
+        }
+
+        return null;
+    }
+
+    private function getPolicyByReference($reference)
+    {
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+
+        $bacs = null;
+        /** @var Policy $policy */
+        $policy = $policyRepo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
+
+        return $policy;
+    }
+
+    /**
+     * TODO Eventually remove
+     * @param string $reference
+     * @return User|null
+     */
+    private function getUserByReference($reference)
+    {
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+
+        /** @var User $user */
+        $user = $userRepo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
+
+        return $user;
+    }
     public function arudd($file, $reprocess = false)
     {
         $results = [
@@ -692,17 +760,18 @@ class BacsService
             }
 
             $originalProcessingDate = $this->getOriginalProcessingDate($element);
-            /** @var User $user */
-            $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
-            if (!$user) {
+
+            $bacs = $this->getBacsPaymentMethodByReference($reference);
+            if (!$bacs) {
                 $results['success'] = false;
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
 
                 continue;
             }
+            $referencePolicy = $this->getPolicyByReference($reference);
+            $referenceUser = $this->getUserByReference($reference);
 
             $activePendingMandate = false;
-            $bacs = $user->getBacsPaymentMethod();
             if ($bacs) {
                 if ($bankAccount = $bacs->getBankAccount()) {
                     if ($bankAccount->isMandateInProgress() || $bankAccount->isMandateSuccess()) {
@@ -712,8 +781,9 @@ class BacsService
             }
             if ($activePendingMandate && mb_stripos($returnDescription, "INSTRUCTION CANCELLED") !== false) {
                 $this->logger->warning(sprintf(
-                    'User %s has an active or pending mandate, but an arudd indicating cancelled',
-                    $user->getId()
+                    'Policy (%s) or User (%s) has an active or pending mandate, but an arudd indicating cancelled',
+                    $referencePolicy ? $referencePolicy->getId() : null,
+                    $referenceUser ? $referenceUser->getId() : null
                 ));
             }
 
@@ -721,7 +791,8 @@ class BacsService
             foreach ($submittedPayments as $submittedPayment) {
                 /** @var BacsPayment $submittedPayment */
                 $policy = $submittedPayment->getPolicy();
-                if ($policy->getUser()->getId() == $user->getId()) {
+                if (($referencePolicy && $referencePolicy->getId() == $policy->getId()) ||
+                    ($referenceUser && $referenceUser->getId() == $policy->getUser()->getId())) {
                     $foundPayments++;
 
                     $debitPayment = new BacsPayment();
@@ -761,9 +832,8 @@ class BacsService
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
                     if ($days->days > 5) {
                         $this->logger->warning(sprintf(
-                            'Failed Payment %s for user %s was %d days off from processing date',
+                            'Failed Payment %s was %d days off from processing date',
                             $submittedPayment->getId(),
-                            $user->getId(),
                             $days->days
                         ));
                     }
@@ -772,11 +842,17 @@ class BacsService
 
             if ($foundPayments == 0) {
                 $this->logger->error(sprintf(
-                    'Failed to find any pending(submitted) payments for user %s',
-                    $user->getId()
+                    'Failed to find any pending(submitted) payments for policy %s or user %s',
+                    $referencePolicy ? $referencePolicy->getId() : null,
+                    $referenceUser ? $referenceUser->getId() : null
                 ));
             } elseif ($foundPayments > 1) {
-                $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
+                $this->logger->error(sprintf(
+                    'Failed %d payments for policy %s or user %s',
+                    $foundPayments,
+                    $referencePolicy ? $referencePolicy->getId() : null,
+                    $referenceUser ? $referenceUser->getId() : null
+                ));
             }
         }
 
@@ -875,30 +951,32 @@ class BacsService
                 continue;
             }
 
-            /** @var User $user */
-            $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
-            if (!$user) {
+            $bacsPaymentMethod = $this->getBacsPaymentMethodByReference($reference);
+            if (!$bacsPaymentMethod) {
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
 
                 continue;
             }
-            /** @var BacsPaymentMethod $bacsPaymentMethod */
-            $bacsPaymentMethod = $user->getPaymentMethod();
+            $referencePolicy = $this->getPolicyByReference($reference);
+            $referenceUser = $this->getUserByReference($reference);
+            if (!$referencePolicy && $referenceUser) {
+                $referencePolicy = $referenceUser->getLatestPolicy();
+            }
+
             $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
             $this->logger->warning(sprintf(
-                'Cancelled bacs mandate for User (%s) due to DDIC. Review as cancellation may not be needed.',
-                $user->getId()
+                'Cancelled bacs mandate [User %s / Policy %s] due to DDIC. Review as cancellation may not be needed.',
+                $referenceUser ? $referenceUser->getId() : null,
+                $referencePolicy ? $referencePolicy->getId() : null
             ));
-            /** @var PhonePolicy $policy */
-            $policy = $user->getLatestPolicy();
-            if ($policy) {
+            if ($referencePolicy) {
                 $indemnityPayment = new BacsIndemnityPayment();
                 $indemnityPayment->setAmount(0 - $amount);
                 $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
                 $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
                 $indemnityPayment->setNotes('Direct Debit Indemnity Claim (Chargeback)');
                 $indemnityPayment->setReference($ddicReference);
-                $policy->addPayment($indemnityPayment);
+                $referencePolicy->addPayment($indemnityPayment);
                 $this->dm->persist($indemnityPayment);
             }
         }
@@ -970,9 +1048,10 @@ class BacsService
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
-        $this->mailerService->sendTemplateToUser(
+        // sendTemplateToUser doesn't work well with listeners
+        $this->mailerService->sendTemplate(
             'Your recent name change',
-            $user,
+            $user->getEmail(),
             $templateHtml,
             ['user' => $user],
             $templateText,
@@ -1134,19 +1213,26 @@ class BacsService
                     $results['errors'][] = $error->attributes->getNamedItem('line1')->nodeValue;
                 }
             } elseif (in_array($recordType, ["N", "D"])) {
+                $reason = $this->getReason($element);
                 $reference = $this->getReference($element);
-                $repo = $this->dm->getRepository(User::class);
-                /** @var User $user */
-                $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
-                if (!$user) {
-                    $error = sprintf('Unable to find user with reference %s. Unable to cancel mandate.', $reference);
+
+                $bacsPaymentMethod = $this->getBacsPaymentMethodByReference($reference);
+                if (!$bacsPaymentMethod) {
+                    $error = sprintf(
+                        'Unable to find policy/user with reference %s. Unable to cancel mandate.',
+                        $reference
+                    );
                     $results['errors'][] = $error;
                     $this->logger->warning($error);
 
                     continue;
                 }
+                $referencePolicy = $this->getPolicyByReference($reference);
+                $referenceUser = $this->getUserByReference($reference);
+                if (!$referencePolicy && $referenceUser) {
+                    $referencePolicy = $referenceUser->getLatestPolicy();
+                }
 
-                $reason = $this->getReason($element);
                 if (in_array($reason, [
                     self::AUDDIS_REASON_USER,
                     self::AUDDIS_REASON_DECEASED,
@@ -1167,13 +1253,15 @@ class BacsService
                     self::AUDDIS_REASON_MISSING_SERVICE_NAME,
                     self::AUDDIS_REASON_INCORRECT_DETAILS,
                 ])) {
-                    /** @var BacsPaymentMethod $bacs */
-                    $bacs = $user->getPaymentMethod();
-                    $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+                    $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
 
-                    foreach ($user->getValidPolicies(true) as $policy) {
-                        /** @var Policy $policy */
-                        $policy->setPolicyStatusUnpaidIfActive();
+                    if ($referencePolicy) {
+                        $referencePolicy->setPolicyStatusUnpaidIfActive();
+                    } elseif ($referenceUser) {
+                        foreach ($referenceUser->getValidPolicies(true) as $policy) {
+                            /** @var Policy $policy */
+                            $policy->setPolicyStatusUnpaidIfActive();
+                        }
                     }
 
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1340,10 +1428,9 @@ class BacsService
             $type = $this->getChildNodeValue($element, 'ErrorMessage', 'type');
 
             if ($type == self::INPUT_ERROR_TYPE_REJECTED) {
-                $userRepo = $this->dm->getRepository(User::class);
-                /** @var User $user */
-                $user = $userRepo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
-                if (!$user) {
+                $referencePolicy = $this->getPolicyByReference($reference);
+                $referenceUser = $this->getUserByReference($reference);
+                if (!$referencePolicy && !$referenceUser) {
                     $this->logger->error(sprintf(
                         'Unable to locate bacs reference %s for rejected input record',
                         $reference
@@ -1353,7 +1440,14 @@ class BacsService
                 }
 
                 $foundPayment = false;
-                foreach ($user->getValidPolicies(true) as $policy) {
+                $policies = [];
+                if ($referencePolicy) {
+                    $policies[] = $referencePolicy;
+                }
+                if ($referenceUser) {
+                    $policies = array_merge($policies, $referenceUser->getValidPolicies(true));
+                }
+                foreach ($policies as $policy) {
                     /** @var Policy $policy */
                     foreach ($policy->getPaymentsByType(BacsPayment::class) as $payment) {
                         /** @var BacsPayment $payment */
@@ -1435,6 +1529,20 @@ class BacsService
 
     public function approveMandates($serialNumber, $actualSerialNumber = null)
     {
+        $result = $this->approveMandatesForPolicies($serialNumber, $actualSerialNumber);
+        $result = $result && $this->approveMandatesForUsers($serialNumber, $actualSerialNumber);
+
+        return $result;
+    }
+
+    /**
+     * TODO: Eventually remove
+     * @param string $serialNumber
+     * @param string $actualSerialNumber
+     * @return bool
+     */
+    private function approveMandatesForUsers($serialNumber, $actualSerialNumber = null)
+    {
         if (!$serialNumber) {
             return false;
         }
@@ -1445,7 +1553,36 @@ class BacsService
         foreach ($users as $user) {
             /** @var User $user */
             /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $user->getPaymentMethod();
+            $paymentMethod = $user->getBacsPaymentMethod();
+            if (!$paymentMethod || !$paymentMethod instanceof BacsPaymentMethod) {
+                continue;
+            }
+            $bankAccount = $paymentMethod->getBankAccount();
+            // TODO: How can we determine which mandates are successful vs failure
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            if ($actualSerialNumber) {
+                $bankAccount->setMandateSerialNumber($actualSerialNumber);
+            }
+        }
+
+        $this->dm->flush();
+
+        return true;
+    }
+
+    private function approveMandatesForPolicies($serialNumber, $actualSerialNumber = null)
+    {
+        if (!$serialNumber) {
+            return false;
+        }
+
+        /** @var PolicyRepository $repo */
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => $serialNumber]);
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            /** @var BacsPaymentMethod $paymentMethod */
+            $paymentMethod = $policy->getBacsPaymentMethod();
             if (!$paymentMethod || !$paymentMethod instanceof BacsPaymentMethod) {
                 continue;
             }
@@ -1528,7 +1665,7 @@ class BacsService
             $payment->setIsOneOffPayment(true);
         }
 
-        if (!$user->hasValidPaymentMethod()) {
+        if (!$policy->hasPolicyOrUserValidPaymentMethod()) {
             $payment->setStatus(BacsPayment::STATUS_SKIPPED);
             $this->logger->warning(sprintf(
                 'User %s does not have a valid payment method (Policy %s)',
@@ -1564,6 +1701,14 @@ class BacsService
 
     public function hasMandateOrPaymentDebit($prefix, \DateTime $date = null)
     {
+        /** @var PolicyRepository $repo */
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
+        if (count($policies) > 0) {
+            return true;
+        }
+
+        // TODO: Eventually remove User query
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
         $users = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
@@ -1589,7 +1734,7 @@ class BacsService
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
             /** @var BacsPaymentMethod $bacs */
-            $bacs = $scheduledPayment->getPolicy()->getUser()->getPaymentMethod();
+            $bacs = $scheduledPayment->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             if (!$bacs || !$bacs->getBankAccount()) {
                 continue;
             }
@@ -1612,6 +1757,53 @@ class BacsService
 
     public function exportMandates(\DateTime $date, $serialNumber, $includeHeader = false, $update = true)
     {
+        $lines = $this->exportMandatesForPolicies($date, $serialNumber, $includeHeader, $update);
+
+        return array_merge($lines, $this->exportMandatesForUsers($date, $serialNumber, false, $update));
+    }
+
+    public function exportMandatesForPolicies(\DateTime $date, $serialNumber, $includeHeader = false, $update = true)
+    {
+        /** @var PolicyRepository $repo */
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
+        $lines = [];
+        if ($includeHeader) {
+            $lines[] = $this->getHeader();
+        }
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            $bankAccount = $policy->getBacsBankAccount();
+            $lines[] = implode(',', [
+                sprintf('"%s"', $date->format('d/m/y')),
+                '"Initial Mandate"',
+                sprintf('"%s"', self::BACS_COMMAND_CREATE_MANDATE), // new Auddis
+                sprintf('"%s"', $bankAccount->getAccountName()),
+                sprintf('"%s"', $bankAccount->getSortCode()),
+                sprintf('"%s"', $bankAccount->getAccountNumber()),
+                '"0"', // £0 for Addis setup
+                sprintf('"%s"', $bankAccount->getReference()),
+                sprintf('"%s"', $policy->getId()),
+                '""',
+                '""',
+            ]);
+
+            if ($update) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+                $bankAccount->getBankAccount()->setMandateSerialNumber($serialNumber);
+
+                // do not attempt to take payment until 2 business days after to allow for mandate
+                $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());
+                $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
+                $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
+            }
+        }
+
+        return $lines;
+    }
+
+    public function exportMandatesForUsers(\DateTime $date, $serialNumber, $includeHeader = false, $update = true)
+    {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
         $users = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
@@ -1622,7 +1814,7 @@ class BacsService
         foreach ($users as $user) {
             /** @var User $user */
             /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $user->getPaymentMethod();
+            $paymentMethod = $user->getBacsPaymentMethod();
             $lines[] = implode(',', [
                 sprintf('"%s"', $date->format('d/m/y')),
                 '"Initial Mandate"',
@@ -1745,7 +1937,7 @@ class BacsService
     private function validateBacs(Policy $policy, $scheduledDate, $id, $ignoreNotEnoughTime = false)
     {
         /** @var BacsPaymentMethod $bacs */
-        $bacs = $policy->getUser()->getPaymentMethod();
+        $bacs = $policy->getPolicyOrUserBacsPaymentMethod();
 
         if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
             $msg = sprintf(
@@ -1878,9 +2070,7 @@ class BacsService
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
-            /** @var BacsPaymentMethod $bacs */
-            $bacs = $payment->getPolicy()->getUser()->getPaymentMethod();
-            $bankAccount = $bacs->getBankAccount();
+            $bankAccount = $payment->getPolicy()->getPolicyOrUserBacsBankAccount();
 
             $validate = $this->validateBacs(
                 $policy,
@@ -1967,9 +2157,10 @@ class BacsService
         $metadata['credit-amount'] = 0;
         foreach ($credits as $payment) {
             /* @var BacsPayment $payment */
+
             /** @var BacsPaymentMethod $bacs */
-            $bacs = $payment->getPolicy()->getUser()->getPaymentMethod();
-            if (!$bacs || !$payment->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+            $bacs = $payment->getPolicy()->getPolicyOrUserBacsPaymentMethod();
+            if (!$bacs || !$bacs->getBankAccount()) {
                 $msg = sprintf(
                     'Skipping payment %s as unable to determine payment method or missing bank account',
                     $payment->getId()
@@ -2099,7 +2290,7 @@ class BacsService
 
     public function generateBacsPdf(Policy $policy)
     {
-        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+        if (!$policy->hasPolicyOrUserBacsPaymentMethod()) {
             $this->logger->error(sprintf(
                 'Policy %s/%s does not have a bacs payment method for generating bacs pdf',
                 $policy->getPolicyNumber(),
@@ -2110,9 +2301,7 @@ class BacsService
         }
 
         $now = \DateTime::createFromFormat('U', time());
-        /** @var BacsPaymentMethod $paymentMethod */
-        $paymentMethod = $policy->getUser()->getPaymentMethod();
-        $bankAccount = $paymentMethod->getBankAccount();
+        $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
         $filename = sprintf(
             "%s-%s-%s.pdf",
             $policy->getId(),

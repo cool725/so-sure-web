@@ -495,7 +495,6 @@ class IntercomService
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
-        $data['custom_attributes']['Payment Method'] = $analytics['paymentMethod'];
         $data['custom_attributes']['Has Outstanding pic-sure Policy'] = $analytics['hasOutstandingPicSurePolicy'];
         $data['custom_attributes']['Displayable Renewal Monthly Premium'] =
             (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumNoPot']));
@@ -503,6 +502,7 @@ class IntercomService
             $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']);
         $data['custom_attributes']['Displayable Renewal Monthly Premium With Pot'] =
             (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']));
+        // TODO: Can we remove?
         $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ?
             $user->getPaymentMethod()->__toString() :
             null;

@@ -1075,7 +1075,7 @@ class MonitorService
                 continue;
             }
 
-            $bacs = $block->getPolicy()->getUser()->getBacsPaymentMethod();
+            $bacs = $block->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             if ($bacs) {
                 // ignore initial first payments if we haven't reached the initial notification date
                 if ($bacs->getBankAccount()->isFirstPayment() &&

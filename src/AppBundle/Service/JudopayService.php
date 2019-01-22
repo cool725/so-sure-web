@@ -612,7 +612,8 @@ class JudopayService
             $payment->setMessage($transactionDetails["message"]);
         }
 
-        $judo = $user->getPaymentMethod();
+        // TODO: This should update on all policies
+        $judo = $user->getJudoPaymentMethod();
         if (!$judo || !$judo instanceof JudoPaymentMethod) {
             $judo = new JudoPaymentMethod();
             $user->setPaymentMethod($judo);
@@ -711,7 +712,7 @@ class JudopayService
         }
 
         /** @var JudoPaymentMethod $judoPaymentMethod */
-        $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
+        $judoPaymentMethod = $policy->getPolicyOrUserPaymentMethod();
         if ($cardToken) {
             $tokens = $judoPaymentMethod->getCardTokens();
             if (!isset($tokens[$cardToken]) || !$tokens[$cardToken]) {
@@ -821,7 +822,7 @@ class JudopayService
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
         try {
             if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
                 throw new \Exception(sprintf(
@@ -936,7 +937,7 @@ class JudopayService
 
             // Due to a limitation in intercom, messages are only sent to a user once
             // So, we want to use Intercom but only if its the first time that's been used
-            $paymentMethod = $policy->getUser()->getPaymentMethod();
+            $paymentMethod = $policy->getPolicyOrUserPaymentMethod();
             $withinFirstProblemTimeframe = false;
             if ($paymentMethod && $firstProblem = $paymentMethod->getFirstProblem()) {
                 //print_r($date);
@@ -996,7 +997,7 @@ class JudopayService
             $nextMonth = clone $date;
         }
         $nextMonth->add(new \DateInterval('P1M'));
-        if (!$policy->getPayerOrUser()->getPaymentMethod()->isCardExpired($nextMonth)) {
+        if (!$policy->getPolicyOrPayerOrUserJudoPaymentMethod()->isCardExpired($nextMonth)) {
             return false;
         }
 
@@ -1035,7 +1036,7 @@ class JudopayService
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         if ($policy->hasMonetaryClaimed(true, true)) {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
-        } elseif (!$policy->getUser()->hasValidPaymentMethod()) {
+        } elseif (!$policy->hasPolicyOrUserValidPaymentMethod()) {
             $baseTemplate = sprintf('AppBundle:Email:card/cardMissing');
         } else {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPayment');
@@ -1078,15 +1079,19 @@ class JudopayService
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
-    public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)
+    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $customerRef = null)
     {
         /** @var JudoPaymentMethod $paymentMethod */
-        $paymentMethod = $user->getPaymentMethod();
+        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
         if (!$paymentMethod) {
-            throw new \Exception(sprintf('Unknown payment method for user %s', $user->getId()));
+            throw new \Exception(sprintf(
+                'Unknown payment method for policy %s user %s',
+                $policy->getId(),
+                $policy->getPayerOrUser()->getId()
+            ));
         }
         if (!$customerRef) {
-            $customerRef = $user->getId();
+            $customerRef = $policy->getPayerOrUser()->getId();
         }
 
         // add payment
@@ -1103,10 +1108,12 @@ class JudopayService
                 'amount' => $this->toTwoDp($amount),
                 'currency' => 'GBP',
                 'cardToken' => $paymentMethod->getCardToken(),
-                'emailAddress' => $user->getEmail(),
-                'mobileNumber' => $user->getMobileNumber(),
-                'recurringPayment' => true
+                'emailAddress' => $policy->getUser()->getEmail(),
+                'mobileNumber' => $policy->getUser()->getMobileNumber(),
         );
+        if ($this->featureService->isEnabled(Feature::FEATURE_JUDO_RECURRING)) {
+            $data['recurringPayment'] = true;
+        }
         // For webpayments, we won't have the customer token, but its optoinal anyway
         if ($paymentMethod->getCustomerToken()) {
             $data['consumerToken'] = $paymentMethod->getCustomerToken();
@@ -1119,7 +1126,7 @@ class JudopayService
             \AppBundle\Classes\NoOp::ignore([]);
         } else {
             // May not have for older customers
-            $this->logger->info(sprintf('Missing JudoPay DeviceDna for user %s', $user->getId()));
+            $this->logger->info(sprintf('Missing JudoPay DeviceDna for policy %s', $policy->getId()));
         }
 
         // populate the required data fields.
@@ -1193,8 +1200,8 @@ class JudopayService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        if ($user->hasValidPaymentMethod()) {
-            $tokenPaymentDetails = $this->runTokenPayment($user, $amount, $payment->getId(), $policy->getId());
+        if ($policy->hasPolicyOrUserValidPaymentMethod()) {
+            $tokenPaymentDetails = $this->runTokenPayment($policy, $amount, $payment->getId(), $policy->getId());
 
             $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
             $payment->setReceipt($tokenPaymentDetails["receiptId"]);

@@ -242,7 +242,7 @@
                             </div>
                             {{ form_start(sent_invitation_form) }}
                                 <ul class="list-group list-group-flush">
-                                    {% for invitation in policy.sentInvitations %}
+                                    {% for invitation in policy.sentInvitations|reverse %}
                                         <li class="list-group-item">
                                             <div class="d-md-flex align-items-center">
                                                 <img src="{{ invitation.inviteeImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviteeName }}" width="50px">

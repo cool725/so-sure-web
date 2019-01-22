@@ -70,6 +70,8 @@ abstract class BaseController extends Controller
     use DateTrait;
 
     const MONGO_QUERY_TYPE_REGEX = 'regex';
+    const MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT = 'regex-required-object';
+    const MONGO_QUERY_TYPE_EQUAL_REQUIRED_OBJECT = 'equal-required-object';
     const MONGO_QUERY_TYPE_EQUAL = 'equal';
     const MONGO_QUERY_TYPE_ID = 'id';
     const MONGO_QUERY_TYPE_DAY = 'day';
@@ -405,23 +407,9 @@ abstract class BaseController extends Controller
         return new JsonResponse(['code' => $errorCode, 'description' => $description], $httpCode);
     }
 
-    protected function queryToMongoSearch($form, $qb, $formField, $mongoField, $callable)
-    {
-        if ($data = $this->formToMongoSearch($form, $qb, $formField, $mongoField, true)) {
-            $ids = [];
-            foreach ($data as $item) {
-                $ids[] = call_user_func($callable, $item);
-            }
-
-            return $ids;
-        }
-
-        return null;
-    }
-
     protected function formToMongoSearch(
         $form,
-        $qb,
+        Builder $qb,
         $formField,
         $mongoField,
         $run = false,
@@ -433,11 +421,12 @@ abstract class BaseController extends Controller
     }
 
     protected function dataToMongoSearch(
-        $qb,
+        Builder $qb,
         $data,
         $mongoField,
         $run = false,
-        $queryType = self::MONGO_QUERY_TYPE_REGEX
+        $queryType = self::MONGO_QUERY_TYPE_REGEX,
+        $callable = null
     ) {
         if (mb_strlen($data) == 0) {
             return null;
@@ -447,6 +436,26 @@ abstract class BaseController extends Controller
             // Escape special chars
             $data = preg_quote($data, '/');
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT) {
+            // Escape special chars
+            $data = preg_quote($data, '/');
+            $object = explode('.', $mongoField);
+            $qb->addAnd(
+                $qb->expr()->addOr(
+                    $qb->expr()->field($object[0])->exists(false),
+                    $qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data)))
+                )
+            );
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL_REQUIRED_OBJECT) {
+            // Escape special chars
+            $data = preg_quote($data, '/');
+            $object = explode('.', $mongoField);
+            $qb->addAnd(
+                $qb->expr()->addOr(
+                    $qb->expr()->field($object[0])->exists(false),
+                    $qb->expr()->field($mongoField)->equals($data)
+                )
+            );
         } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
         } elseif ($queryType == self::MONGO_QUERY_TYPE_MOBILE) {
@@ -467,7 +476,15 @@ abstract class BaseController extends Controller
             throw new \Exception('unknown query type');
         }
 
-        if ($run) {
+        if ($run && $callable) {
+            $results = [];
+            $data = $qb->getQuery()->execute();
+            foreach ($data as $item) {
+                $results[] = call_user_func($callable, $item);
+            }
+
+            return $results;
+        } elseif ($run) {
             return $qb->getQuery()->execute();
         }
 
@@ -934,6 +951,23 @@ abstract class BaseController extends Controller
                 self::MONGO_QUERY_TYPE_ID
             );
         }
+        $this->formToMongoSearch(
+            $form,
+            $policiesQb,
+            'bacsReference',
+            'paymentMethod.bankAccount.reference',
+            false,
+            self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT
+        );
+
+        $this->formToMongoSearch(
+            $form,
+            $policiesQb,
+            'paymentMethod',
+            'paymentMethod.type',
+            false,
+            self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT
+        );
 
         if (!$includeInvalidPolicies) {
             $policy = new PhonePolicy();
@@ -945,49 +979,32 @@ abstract class BaseController extends Controller
             'email' => 'emailCanonical',
             'firstname' => 'firstName',
             'lastname' => 'lastName',
+            'mobile' => 'mobileNumber',
+            'paymentMethod' => 'paymentMethod.type',
+            'bacsReference' => 'paymentMethod.bankAccount.reference',
             'postcode' => 'billingAddress.postcode',
             'facebookId' => 'facebookId',
-            'paymentMethod' => 'paymentMethod.type',
-            'bacsReference' => 'paymentMethod.bankAccount.reference'
         ];
         foreach ($userFormData as $formField => $dataField) {
-            $ids = $this->queryToMongoSearch(
-                $form,
+            $queryType = self::MONGO_QUERY_TYPE_REGEX;
+            if ($dataField == 'mobileNumber') {
+                $queryType = self::MONGO_QUERY_TYPE_MOBILE;
+            } elseif ($dataField == 'paymentMethod.type') {
+                $queryType = self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT;
+            } elseif ($dataField == 'paymentMethod.bankAccount.reference') {
+                $queryType = self::MONGO_QUERY_TYPE_EQUAL_REQUIRED_OBJECT;
+            }
+            $ids = $this->dataToMongoSearch(
                 $userRepo->createQueryBuilder(),
-                $formField,
+                (string) $form->get($formField)->getData(),
                 $dataField,
+                true,
+                $queryType,
                 function ($data) {
                     return $data->getId();
                 }
             );
-            if ($ids !== null) {
-                $policiesQb->addAnd(
-                    $policiesQb->expr()->addOr(
-                        $policiesQb->expr()->field('user.id')->in($ids),
-                        $policiesQb->expr()->field('namedUser.id')->in($ids)
-                    )
-                );
-            }
-        }
-        $users = $this->dataToMongoSearch(
-            $userRepo->createQueryBuilder(),
-            $this->normalizeUkMobile((string) $form->get('mobile')->getData()),
-            'mobileNumber',
-            true
-        );
-        if ($users) {
-            $ids = [];
-            foreach ($users as $user) {
-                $ids[] = $user->getId();
-            }
-            if (count($ids) > 0) {
-                $policiesQb->addAnd(
-                    $policiesQb->expr()->addOr(
-                        $policiesQb->expr()->field('user.id')->in($ids),
-                        $policiesQb->expr()->field('namedUser.id')->in($ids)
-                    )
-                );
-            }
+            $this->queryPoliciesWithUserIds($policiesQb, $ids);
         }
 
         if ($status == Policy::STATUS_UNPAID) {
@@ -1041,6 +1058,20 @@ abstract class BaseController extends Controller
             'form' => $form->createView(),
             'status' => $status,
         ];
+    }
+
+    protected function queryPoliciesWithUserIds(Builder $qb, $ids)
+    {
+        if (!$ids || count($ids) == 0) {
+            return;
+        }
+
+        $qb->addAnd(
+            $qb->expr()->addOr(
+                $qb->expr()->field('user.id')->in($ids),
+                $qb->expr()->field('namedUser.id')->in($ids)
+            )
+        );
     }
 
     protected function searchUsers(Request $request)

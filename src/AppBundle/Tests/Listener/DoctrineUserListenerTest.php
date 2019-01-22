@@ -203,7 +203,8 @@ class DoctrineUserListenerTest extends WebTestCase
         /** @var JudoPaymentMethod $judo */
         $judo = $user->getPaymentMethod();
 
-        $cardEvent = new CardEvent($user);
+        $cardEvent = new CardEvent();
+        $cardEvent->setUser($user);
         $userEvent = new UserEvent($user);
         $listener = $this->createCardEventListener(
             $user,
@@ -517,7 +518,8 @@ class DoctrineUserListenerTest extends WebTestCase
     private function createBacsEventListener($user, $bankAccount, $count, $eventType, $eventType2 = null)
     {
         \AppBundle\Classes\NoOp::ignore([$eventType]);
-        $event = new BacsEvent($user, $bankAccount);
+        $event = new BacsEvent($bankAccount);
+        $event->setUser($user);
         $userEvent = new UserEvent($user);
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
@@ -543,7 +545,8 @@ class DoctrineUserListenerTest extends WebTestCase
 
     private function createCardEventListener($user, $count, $eventType, $eventType2 = null)
     {
-        $event = new CardEvent($user);
+        $event = new CardEvent();
+        $event->setUser($user);
         $userEvent = new UserEvent($user);
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
             ->setMethods(array('dispatch'))
