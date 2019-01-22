@@ -564,7 +564,7 @@
                                         <td>
                                             <strong>{{ policy.company.policies|length }}</strong>&nbsp;:&nbsp;
                                             {% for companyPolicy in policy.company.policies %}
-                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a>;
+                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a> ({{ companyPolicy.status }});
                                             {% endfor %}
                                         </td>
                                     </tr>
