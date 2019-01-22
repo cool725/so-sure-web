@@ -7,5 +7,11 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('../components/banner.js');
-//require('../components/modalVideo.js');
+// require('textfit');
+let textFit = require('textfit');
+
+$(function() {
+    textFit($('.fit')[0]);
+    $('.fit').css('visibility','visible');
+});
 

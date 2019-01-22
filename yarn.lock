@@ -6545,6 +6545,10 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
+textfit@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/textfit/-/textfit-2.3.1.tgz#5896db48ea70a767b97a73f28556406875ca208f"
+
 through2@^0.6.1:
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/through2/-/through2-0.6.5.tgz#41ab9c67b29d57209071410e1d7a7a968cd3ad48"

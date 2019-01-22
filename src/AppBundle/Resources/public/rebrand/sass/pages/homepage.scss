@@ -22,6 +22,7 @@
     &__intro {
 
         h1 {
+            visibility: hidden;
             font-size: 1.4rem;
 
             @include media-breakpoint-up(ss) {

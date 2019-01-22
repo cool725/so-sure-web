@@ -81,6 +81,7 @@ Encore
             Bloodhound: "corejs-typeahead/dist/bloodhound.js",
             doT: "dot/doT.js",
             moment: "moment",
+            fitText: "fitText",
         })
     )
 ;
