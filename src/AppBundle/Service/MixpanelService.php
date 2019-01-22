@@ -127,41 +127,6 @@ class MixpanelService
         //'MoneySupermarket',
     ];
 
-    public static $trackedEvents = [
-        self::EVENT_HOME_PAGE,
-        self::EVENT_QUOTE_PAGE,
-        self::EVENT_MANUFACTURER_PAGE,
-        self::EVENT_LANDING_PAGE,
-        self::EVENT_CPC_QUOTE_PAGE,
-        self::EVENT_CPC_MANUFACTURER_PAGE,
-        self::EVENT_CPC_COMPETITOR_PAGE,
-        self::EVENT_RECEIVE_DETAILS,
-        self::EVENT_PURCHASE_POLICY,
-        self::EVENT_PAYMENT,
-        self::EVENT_INVITE,
-        self::EVENT_CONNECTION_COMPLETE,
-        self::EVENT_BUY_BUTTON_CLICKED,
-        self::EVENT_POLICY_READY,
-        self::EVENT_LOGIN,
-        self::EVENT_APP_DOWNLOAD,
-        self::EVENT_TEST ,
-        self::EVENT_INVITATION_PAGE,
-        self::EVENT_CANCEL_POLICY,
-        self::EVENT_LEAD_CAPTURE,
-        self::EVENT_CANCEL_POLICY_PAGE,
-        self::EVENT_REQUEST_CANCEL_POLICY,
-        self::EVENT_RENEWAL,
-        self::EVENT_RENEW,
-        self::EVENT_CASHBACK,
-        self::EVENT_DECLINE_RENEW,
-        self::EVENT_SIXPACK,
-        self::EVENT_ONBOARDING,
-        self::EVENT_POLICY_STATUS,
-        self::EVENT_PAYMENT_METHOD_CHANGED,
-        self::EVENT_EMAIL,
-        self::EVENT_SMS
-    ];
-
     public static function getCampaignSources($event)
     {
         $data = [];
@@ -318,112 +283,107 @@ class MixpanelService
             return null;
         }
         $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
-        $results = $this->mixpanelData->data('engage', ['where' => $search]);
-        // If there are multiple user accounts then we have got to figure out which is the older.
-        $accounts = count($results);
-        if ($accounts > 1) {
-            $data = $this->findOldestMixpanelUser($results);
-        } elseif ($accounts == 1) {
-            $data = $results['results']['properties'];
-        } else {
-            return null;
-        }
-        // Write in the data from the user account.
-        if (mb_strtolower($data['$email']) == $user->getEmailCanonical()) {
-            $attribution = new Attribution();
-            $dataPresent = false;
-            if (isset($data['Campaign Name'])) {
-                $attribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
-                    urldecode($data['Campaign Name']),
-                    250
-                ));
-                $dataPresent = true;
+        $results = $this->mixpanelData->data('engage', [
+            'where' => $search
+        ]);
+        foreach ($results['results'] as $result) {
+            $data = $result['$properties'];
+            if (mb_strtolower($data['$email']) == $user->getEmailCanonical()) {
+                $attribution = new Attribution();
+                $dataPresent = false;
+                if (isset($data['Campaign Name'])) {
+                    $attribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
+                        urldecode($data['Campaign Name']),
+                        250
+                    ));
+                    $dataPresent = true;
+                }
+                if (isset($data['Campaign Source'])) {
+                    $attribution->setCampaignSource($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Source']),
+                        250
+                    ));
+                    $dataPresent = true;
+                }
+                if (isset($data['Campaign Medium'])) {
+                    $attribution->setCampaignMedium($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Medium']),
+                        250
+                    ));
+                    $dataPresent = true;
+                }
+                if (isset($data['Campaign Term'])) {
+                    $attribution->setCampaignTerm($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Term']),
+                        250
+                    ));
+                    $dataPresent = true;
+                }
+                if (isset($data['Campaign Content'])) {
+                    $attribution->setCampaignContent($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Content']),
+                        250
+                    ));
+                    $dataPresent = true;
+                }
+                if (isset($data['Referer'])) {
+                    $attribution->setReferer($data['Referer']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Device Category'])) {
+                    $attribution->setDeviceCategory($data['Device Category']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Device OS'])) {
+                    $attribution->setDeviceOS($data['Device OS']);
+                    $dataPresent = true;
+                }
+                // Only set the attribution if the user lacks one.
+                if (!$user->getAttribution() && $dataPresent) {
+                    $user->setAttribution($attribution);
+                }
+                $latestAttribution = new Attribution();
+                $dataPresent = false;
+                if (isset($data['Latest Campaign Name'])) {
+                    $latestAttribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
+                        urldecode($data['Latest Campaign Name']),
+                        250
+                    ));
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Campaign Source'])) {
+                    $latestAttribution->setCampaignSource(urldecode($data['Latest Campaign Source']));
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Campaign Medium'])) {
+                    $latestAttribution->setCampaignMedium(urldecode($data['Latest Campaign Medium']));
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Campaign Term'])) {
+                    $latestAttribution->setCampaignTerm(urldecode($data['Latest Campaign Term']));
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Campaign Content'])) {
+                    $latestAttribution->setCampaignContent(urldecode($data['Latest Campaign Content']));
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Referer'])) {
+                    $latestAttribution->setReferer($data['Latest Referer']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Device Category'])) {
+                    $latestAttribution->setDeviceCategory($data['Latest Device Category']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Device OS'])) {
+                    $latestAttribution->setDeviceOS($data['Latest Device OS']);
+                    $dataPresent = true;
+                }
+                if ($dataPresent) {
+                    $user->setLatestAttribution($latestAttribution);
+                }
+                $this->dm->flush();
             }
-            if (isset($data['Campaign Source'])) {
-                $attribution->setCampaignSource($this->conformAlphanumericSpaceDot(
-                    urldecode($data['Campaign Source']),
-                    250
-                ));
-                $dataPresent = true;
-            }
-            if (isset($data['Campaign Medium'])) {
-                $attribution->setCampaignMedium($this->conformAlphanumericSpaceDot(
-                    urldecode($data['Campaign Medium']),
-                    250
-                ));
-                $dataPresent = true;
-            }
-            if (isset($data['Campaign Term'])) {
-                $attribution->setCampaignTerm($this->conformAlphanumericSpaceDot(
-                    urldecode($data['Campaign Term']),
-                    250
-                ));
-                $dataPresent = true;
-            }
-            if (isset($data['Campaign Content'])) {
-                $attribution->setCampaignContent($this->conformAlphanumericSpaceDot(
-                    urldecode($data['Campaign Content']),
-                    250
-                ));
-                $dataPresent = true;
-            }
-            if (isset($data['Referer'])) {
-                $attribution->setReferer($data['Referer']);
-                $dataPresent = true;
-            }
-            if (isset($data['Device Category'])) {
-                $attribution->setDeviceCategory($data['Device Category']);
-                $dataPresent = true;
-            }
-            if (isset($data['Device OS'])) {
-                $attribution->setDeviceOS($data['Device OS']);
-                $dataPresent = true;
-            }
-            // Only set the attribution if the user lacks one.
-            if (!$user->getAttribution() && $dataPresent) {
-                $user->setAttribution($attribution);
-            }
-            $latestAttribution = new Attribution();
-            $dataPresent = false;
-            if (isset($data['Latest Campaign Name'])) {
-                $latestAttribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
-                    urldecode($data['Latest Campaign Name']),
-                    250
-                ));
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Campaign Source'])) {
-                $latestAttribution->setCampaignSource(urldecode($data['Latest Campaign Source']));
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Campaign Medium'])) {
-                $latestAttribution->setCampaignMedium(urldecode($data['Latest Campaign Medium']));
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Campaign Term'])) {
-                $latestAttribution->setCampaignTerm(urldecode($data['Latest Campaign Term']));
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Campaign Content'])) {
-                $latestAttribution->setCampaignContent(urldecode($data['Latest Campaign Content']));
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Referer'])) {
-                $latestAttribution->setReferer($data['Latest Referer']);
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Device Category'])) {
-                $latestAttribution->setDeviceCategory($data['Latest Device Category']);
-                $dataPresent = true;
-            }
-            if (isset($data['Latest Device OS'])) {
-                $latestAttribution->setDeviceOS($data['Latest Device OS']);
-                $dataPresent = true;
-            }
-            if ($dataPresent) {
-                $user->setLatestAttribution($latestAttribution);
-            }
-            $this->dm->flush();
         }
 
         return $data;
@@ -1335,38 +1295,5 @@ class MixpanelService
         }
 
         return $transform;
-    }
-
-    /**
-     * Takes a list of mixpanel user accounts and finds the one which has the oldest events against it's name in the
-     * last year.
-     * @param array $mixpanelUsers is the list of mixpanel user records that are directly from mixpanel.
-     * @return array the mixpanel user record that has the oldest event in the last year. If there are multiple users
-     *               that had events at the exact same time then which one you will get is undefined.
-     */
-    public function findOldestMixpanelUser(array $mixpanelUsers)
-    {
-        $date = new \DateTime();
-        $yearAgo = new \DateTime('one year ago');
-        $oldestUser = ['time' => 789738127389];
-        foreach ($mixpanelUsers['results'] as $user) {
-            $eventList = $this->mixpanelData->export([
-                'from_date' => $yearAgo->format('Y-m-d'),
-                'to_date' => $date->format('Y-m-d'),
-                'event' => json_encode($this->trackedEvents),
-                'where' => 'properties["$distinct_id"]=="'.$user['distinct_id'].'"'
-            ]);
-            $oldestEvent = $eventList['results'][0];
-            foreach ($eventList['results'] as $event) {
-                if ($event['properties']['time'] < $oldestEvent['properties']['time']) {
-                    $oldestEvent = $event;
-                }
-            }
-            $user['time'] = $oldestEvent['properties']['time'];
-            if ($oldestUser['time'] < $user['time']) {
-                $oldestUser = $user;
-            }
-        }
-        return $oldestUser['properties'];
     }
 }
