@@ -95,13 +95,25 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
+        $pageType = 'home';
+        $template = 'AppBundle:Default:index.html.twig';
+
+        // Valentines Day Promo
+        $now   = \DateTime::createFromFormat('U', time());
+        $start = new \DateTime('2019-02-14 00:00:00', SoSure::getSoSureTimezone());
+        $end   = new \DateTime('2019-02-14 23:59:59', SoSure::getSoSureTimezone());
+
+        if ($now >= $start && $now <= $end) {
+            $pageType = 'vdayphonecase';//
+            $template = 'AppBundle:Default:indexPromotions.html.twig';
+        }
+
         $data = array(
             // Make sure to check homepage landing below too
+            'page_type' => $pageType,
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
         );
-
-        $template = 'AppBundle:Default:index.html.twig';
 
         return $this->render($template, $data);
     }
