@@ -1658,6 +1658,8 @@ class IntercomService
             sprintf('%s <a href="%s">Search using provided details</a>', $prefix, $searchUrl),
             $adminId
         );
+
+        $this->unsnooze($conversationId, $adminId);
     }
 
     public function validateDpa($firstName, $lastName, $dob, $mobile, $conversationId)
@@ -1702,6 +1704,8 @@ class IntercomService
             $adminId
         );
 
+        $this->unsnooze($conversationId, $adminId);
+
         // @codingStandardsIgnoreStart
         $this->sendReply(
             $conversationId,
@@ -1738,6 +1742,18 @@ class IntercomService
             'message_type' => 'note',
             'admin_id' => $adminId,
             'body' => $text,
+        ]);
+    }
+
+    public function unsnooze($conversationId, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'message_type' => 'open',
+            'admin_id' => $adminId,
         ]);
     }
 
