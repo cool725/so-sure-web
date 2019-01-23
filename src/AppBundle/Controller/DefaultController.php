@@ -95,15 +95,6 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        // Valentines Day Promo
-        $now   = \DateTime::createFromFormat('U', time());
-        $start = new \DateTime('2019-02-14 00:00:00', SoSure::getSoSureTimezone());
-        $end   = new \DateTime('2019-02-14 23:59:59', SoSure::getSoSureTimezone());
-
-        if ($now >= $start && $now <= $end) {
-            return $this->redirectToRoute('valentines_day_free_phone_case');
-        }
-
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
