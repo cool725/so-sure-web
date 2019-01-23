@@ -1705,7 +1705,7 @@ class IntercomService
         // @codingStandardsIgnoreStart
         $this->sendReply(
             $conversationId,
-            'Thanks for confirming your identity. We will look into your request and soon as possible and respond via this chat or email.',
+            'Thanks for confirming your identity. We will look into your request as soon as possible and respond via this chat or email.',
             $adminId
         );
         // @codingStandardsIgnoreEnd
