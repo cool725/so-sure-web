@@ -1282,7 +1282,7 @@ class ReportingService
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
             $month["open"] = $runningTotal;
-            $month["new"] = $policyRepo->countAllStartedPolicies(null, $endOfMonth, $start);
+            $month["new"] = $policyRepo->countAllStartedPolicies(null, $start, $endOfMonth);
             $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
             $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
