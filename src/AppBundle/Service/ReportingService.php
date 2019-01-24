@@ -776,11 +776,11 @@ class ReportingService
         return $total;
     }
 
-    public function payments(\DateTime $date)
+    public function payments(\DateTime $date, $judoOnly = false)
     {
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
-        $payments = $repo->getAllPaymentsForReport($date);
+        $payments = $repo->getAllPaymentsForReport($date, $judoOnly);
         $sources = [
             Payment::SOURCE_TOKEN,
             Payment::SOURCE_WEB,
