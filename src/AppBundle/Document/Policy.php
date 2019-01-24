@@ -5686,6 +5686,10 @@ abstract class Policy
             $date = \DateTime::createFromFormat('U', time());
         }
 
+        if (!$this->getPolicyExpirationDate()) {
+            return false;
+        }
+
         //print $this->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate(), $date);
         //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;
