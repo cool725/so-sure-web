@@ -776,11 +776,11 @@ class ReportingService
         return $total;
     }
 
-    public function payments(\DateTime $date)
+    public function payments(\DateTime $date, $judoOnly = false)
     {
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
-        $payments = $repo->getAllPaymentsForReport($date);
+        $payments = $repo->getAllPaymentsForReport($date, $judoOnly);
         $sources = [
             Payment::SOURCE_TOKEN,
             Payment::SOURCE_WEB,
@@ -1282,7 +1282,7 @@ class ReportingService
             $endOfMonth = $this->endOfMonth($start);
             $month = [];
             $month["open"] = $runningTotal;
-            $month["new"] = $policyRepo->countAllNewPolicies($endOfMonth, $start);
+            $month["new"] = $policyRepo->countAllStartedPolicies(null, $start, $endOfMonth);
             $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
             $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
             $runningTotal += $month["new"];
