@@ -1252,6 +1252,16 @@ services:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }
 
+    app.listener.unpaid:
+        class: AppBundle\Listener\UnpaidListener
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.mailer"
+            - "@app.sms"
+            - "@app.feature"
+        tags:
+            -  { name: kernel.event_listener, event: event.scheduledPayment.failed, method: onUnpaidEvent }
+
     app.form.type.registration:
         class: AppBundle\Form\Type\RegistrationFormType
         arguments: ["@request_stack", "%kernel.environment%"]

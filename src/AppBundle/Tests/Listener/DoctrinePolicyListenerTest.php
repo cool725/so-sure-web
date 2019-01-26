@@ -59,6 +59,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
 
     public function tearDown()
     {
+        static::$dm->clear();
     }
 
     public function testPolicyPreUpdatePot()

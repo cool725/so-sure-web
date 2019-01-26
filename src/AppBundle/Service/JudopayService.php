@@ -29,6 +29,7 @@ use AppBundle\Document\MultiPay;
 use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Event\PaymentEvent;
+use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Event\PolicyEvent;
 
 use AppBundle\Exception\InvalidPremiumException;
@@ -440,7 +441,7 @@ class JudopayService
         }
     }
 
-    private function triggerPolicyEvent($policy, $event)
+    private function triggerPolicyEvent($policy, $event, \DateTime $date = null)
     {
         if (!$policy) {
             return;
@@ -449,7 +450,7 @@ class JudopayService
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             $this->logger->debug(sprintf('Event %s', $event));
-            $this->dispatcher->dispatch($event, new PolicyEvent($policy));
+            $this->dispatcher->dispatch($event, new PolicyEvent($policy, $date));
         } else {
             $this->logger->warning('Dispatcher is disabled for Judo Service');
         }
@@ -917,67 +918,11 @@ class JudopayService
             // and used by expire process to cancel policy if unpaid after 30 days
             $policy->setStatus(PhonePolicy::STATUS_UNPAID);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
-
-            /** @var ScheduledPaymentRepository $repo */
-            $repo = $this->dm->getRepository(ScheduledPayment::class);
-
-            // Only allow up to 4 failed payment attempts
-            $failedPayments = $repo->countUnpaidScheduledPayments($policy);
-
-            $finalAttempt = $failedPayments == 4;
-            $next = null;
-            if ($failedPayments <= 3) {
-                // create another scheduled payment for 7 days later
-                $rescheduled = $scheduledPayment->reschedule($date);
-                $policy->addScheduledPayment($rescheduled);
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                $next = $rescheduled->getScheduled();
-            }
-
-            // Due to a limitation in intercom, messages are only sent to a user once
-            // So, we want to use Intercom but only if its the first time that's been used
-            $paymentMethod = $policy->getPolicyOrUserPaymentMethod();
-            $withinFirstProblemTimeframe = false;
-            if ($paymentMethod && $firstProblem = $paymentMethod->getFirstProblem()) {
-                //print_r($date);
-                //print_r($firstProblem);
-                $diff = $date->diff($firstProblem);
-                //print_r($diff);
-                $days = $diff->days;
-                // 28 (feb) - 7 = 21 days - firstProblem is recorded 7 days into problem (failedPayments >= 2)
-                // must be less than or will catch first next month
-                $withinFirstProblemTimeframe = $days < 21;
-                //print $days . PHP_EOL;
-                //print $failedPayments . PHP_EOL;
-            }
-            if ($paymentMethod && $this->featureService->isEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM)) {
-                // We need the user to only enter the campaign on the 2nd failure as otherwise
-                // the timing will be completely off
-                if ($failedPayments == 2 && !$firstProblem) {
-                    $paymentMethod->setFirstProblem($date);
-                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                    if ($this->dispatcher) {
-                        $this->logger->debug('Event Payment First Problem');
-                        $this->dispatcher->dispatch(PaymentEvent::EVENT_FIRST_PROBLEM, new PaymentEvent($payment));
-                    } else {
-                        $this->logger->warning('Dispatcher is disabled for Judo Service');
-                    }
-                } elseif ($failedPayments >= 2 && $withinFirstProblemTimeframe) {
-                    // intercom campaign should be handling addition if its the same payment problem
-                    \AppBundle\Classes\NoOp::ignore([]);
-                } else {
-                    $this->failedPaymentEmail($policy, $failedPayments, $next);
-                }
-            } else {
-                $this->failedPaymentEmail($policy, $failedPayments, $next);
-            }
-
-            // Sms is quite invasive and occasionlly a failed payment will just work the next time
-            // so allow 1 failed payment before sending sms
-            if ($failedPayments > 1) {
-                $this->failedPaymentSms($policy, $failedPayments, $next);
-            }
+            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID, $date);
+            $this->dispatcher->dispatch(
+                ScheduledPaymentEvent::EVENT_FAILED,
+                new ScheduledPaymentEvent($scheduledPayment)
+            );
         }
     }
 

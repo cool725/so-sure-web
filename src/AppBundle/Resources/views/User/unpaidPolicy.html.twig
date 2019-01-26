@@ -194,7 +194,7 @@
                 {# IF CAN RETRY BACS #}
                 {% if show_bacs_retry %}
                     {% if policy.canBacsPaymentBeMadeInTime and policy.hasPolicyOrUserBacsPaymentMethod and (policy.getPolicyOrUserBacsBankAccount.isMandateSuccess or policy.getPolicyOrUserBacsBankAccount.isMandateInProgress) %}
-                        <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ policy.getPolicyOrUserBacsBankAccount.bankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
+                        <p>We need your permission to take &pound;{{ amount|number_format(2, '.', ',') }} from your account ({{ policy.getPolicyOrUserBacsBankAccount }}). Once you have given us permission, your payment will be scheduled as soon as possible (within 3 business days).</p>
                         {{ form_start(form, {'attr': {'id': 'reschedule-bacs-form'}})  }}
                             <div class="form-group">
                                 {{ form_widget(form.reschedule, {'attr': {'class': 'btn btn-success'}}) }}

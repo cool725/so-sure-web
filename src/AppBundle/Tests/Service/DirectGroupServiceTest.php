@@ -1699,8 +1699,8 @@ class DirectGroupServiceTest extends WebTestCase
 
         $directGroupClaim = new DirectGroupHandlerClaim();
         $directGroupClaim->claimNumber = (string) $claim->getNumber();
-        $directGroupClaim->excess = 300;
-        $directGroupClaim->phoneReplacementCost = 150;
+        $directGroupClaim->excess = 200;
+        $directGroupClaim->phoneReplacementCost = 50;
         $directGroupClaim->totalIncurred = 150;
         $directGroupClaim->reserved = 0;
         $directGroupClaim->policyNumber = $policy->getPolicyNumber();

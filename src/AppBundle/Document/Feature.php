@@ -21,7 +21,6 @@ class Feature
     const FEATURE_STARLING = 'starling';
 
     // Active features
-    const FEATURE_PAYMENT_PROBLEM_INTERCOM = 'payment-problem-intercom';
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
     const FEATURE_BACS = 'bacs';
     const FEATURE_CARD_OPTION_WITH_BACS = 'card-option-with-bacs';
@@ -39,7 +38,6 @@ class Feature
         self::FEATURE_QUOTE_LEAD,
         self::FEATURE_RENEWAL,
         self::FEATURE_PICSURE,
-        self::FEATURE_PAYMENT_PROBLEM_INTERCOM,
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL,
         self::FEATURE_STARLING,
         self::FEATURE_SALVA_POLICY_UPDATE,
@@ -60,7 +58,6 @@ class Feature
         self::FEATURE_QUOTE_LEAD => 'Display a save this quote w/email to user on quote page - unused?',
         self::FEATURE_RENEWAL => 'Create renewal policies - too integrated to turn off',
         self::FEATURE_PICSURE => 'pic-sure funcationlaity - too integrated to turn off',
-        self::FEATURE_PAYMENT_PROBLEM_INTERCOM => 'Use intercom campaign to send payment errors to the user (1st time payment failure only)',
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL => 'Notify davies of errors',
         self::FEATURE_STARLING => 'Starling integration - unused?',
         self::FEATURE_SALVA_POLICY_UPDATE => 'Use salva update api call instead of cancel/create',

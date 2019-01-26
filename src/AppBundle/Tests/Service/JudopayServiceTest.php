@@ -61,9 +61,6 @@ class JudopayServiceTest extends WebTestCase
         /** @var JudopayService $judopay */
         $judopay = self::$container->get('app.judopay');
         self::$judopay = $judopay;
-        /** @var FeatureService $feature */
-        $feature = self::$container->get('app.feature');
-        $feature->setEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM, true);
     }
 
     public function tearDown()
@@ -868,13 +865,17 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertEquals(11, count($policy->getScheduledPayments()));
 
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+
         // Payment failures should be rescheduled
         $initialScheduledPayment = $policy->getNextScheduledPayment();
         for ($i = 1; $i <= 3; $i++) {
-            $scheduledPayment = $policy->getNextScheduledPayment();
+            $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+            $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
             $this->assertLessThan(
                 29,
-                $scheduledPayment->getScheduled()->diff($initialScheduledPayment->getScheduled())->days
+                $scheduledPayment->getScheduled()->diff($initialScheduledPayment->getScheduled())->days,
+                $scheduledPayment->getScheduled()->format(\DateTime::ATOM)
             );
             if ($i > 1) {
                 $this->assertGreaterThan($initialScheduledPayment->getScheduled(), $scheduledPayment->getScheduled());
@@ -1052,10 +1053,13 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        /*
         $this->assertEquals(
             $scheduledPayment->getScheduled(),
             $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem()
         );
+        */
 
         // 3rd failure - nothing (expected no email; total = 1)
         // print '1/3rd failure' . PHP_EOL;
@@ -1072,10 +1076,12 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        /*
         $this->assertNotEquals(
             $scheduledPayment->getScheduled(),
             $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem()
         );
+        */
 
         // 4th - success (expected no email; total = 1)
         // print '1/4th success' . PHP_EOL;
@@ -1105,7 +1111,7 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        $this->assertNotNull($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem());
+        //$this->assertNotNull($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem());
         $mock->__phpunit_verify();
 
         /*
