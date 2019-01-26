@@ -360,6 +360,7 @@ class EmailDebugCommand extends ContainerAwareCommand
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
                 if (!$policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
+                    $policy = null;
                     continue;
                 }
 
@@ -369,13 +370,15 @@ class EmailDebugCommand extends ContainerAwareCommand
                     break;
                 }
 
-                if ($template == 'card/cardMissing' && !$policy->hasPolicyOrUserValidPaymentMethod()) {
+                if ($template == 'card/cardMissing' && !$policy->hasPolicyOrPayerOrUserValidPaymentMethod()) {
                     break;
                 }
 
-                if ($template != 'card/cardMissing' && $policy->hasPolicyOrUserValidPaymentMethod()) {
+                if ($template != 'card/cardMissing' && $policy->hasPolicyOrPayerOrUserValidPaymentMethod()) {
                     break;
                 }
+
+                $policy = null;
             }
 
             if (!$policy) {
@@ -384,7 +387,7 @@ class EmailDebugCommand extends ContainerAwareCommand
 
             if ($template != 'card/cardExpiring') {
                 $failedPayments = $variation ?: 1;
-                return $this->unpaidListener->emailNotification($data['policy'], $failedPayments);
+                return $this->unpaidListener->emailNotification($policy, $failedPayments);
             } else {
                 return $this->judopayService->cardExpiringEmail($policy);
             }

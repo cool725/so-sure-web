@@ -1,8 +1,8 @@
 
 Action required to keep your phone insured
 
-{% if policy.user.paymentMethod.cardType is defined %}
-Your card ending {{ policy.user.paymentMethod.cardLastFour }} was declined and we were unable to take your monthly payment of £{{ policy.premium.monthlyPremiumPrice }}
+{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardType is defined %}
+Your card ending {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }} was declined and we were unable to take your monthly payment of £{{ policy.premium.monthlyPremiumPrice }}
 {% endif %}
 
 If you fail to make payment your policy will be cancelled in {{ policy.policyExpirationDateDays }}  days
