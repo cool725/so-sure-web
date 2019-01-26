@@ -1391,13 +1391,13 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testVersionOkiOS()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.36');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.56');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
     public function testVersionOkAndroid()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.37.0');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.58.0');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
