@@ -502,10 +502,6 @@ class IntercomService
             $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']);
         $data['custom_attributes']['Displayable Renewal Monthly Premium With Pot'] =
             (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']));
-        // TODO: Can we remove?
-        $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ?
-            $user->getPaymentMethod()->__toString() :
-            null;
         $data['custom_attributes']['Policy Cancelled And Payment Owed'] = $user->hasPolicyCancelledAndPaymentOwed();
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
