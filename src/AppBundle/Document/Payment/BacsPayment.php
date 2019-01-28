@@ -95,14 +95,14 @@ class BacsPayment extends Payment
     protected $bacsReversedDate;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\BacsPayment", inversedBy="reverses")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="reverses")
      * @Gedmo\Versioned
      * @var BacsPayment
      */
     protected $reversedBy;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\BacsPayment", inversedBy="reversedBy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="reversedBy")
      * @Gedmo\Versioned
      * @var BacsPayment
      */
