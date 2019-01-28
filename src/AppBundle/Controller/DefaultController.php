@@ -296,6 +296,9 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'ivip',
                 'affiliate_company' => 'iVIP',
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [

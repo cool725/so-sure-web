@@ -9,14 +9,14 @@
                 <div class="td-container">
                     {% if affiliate_page is defined %}
                         <span class="td-swap td-active">
-                            {{ competitor[competitor1]['name'] }}
+                            {{ competitor[competitor1]['name']|raw }}
                         </span>
                         <span class="td-swap">
                             {{ competitor[competitor2]['name']|raw }}
                         </span>
                         {% if affiliate_page != 'vouchercodes' %}
                             <span class="td-swap">
-                               {{ competitor[competitor3]['name'] }}
+                               {{ competitor[competitor3]['name']|raw }}
                             </span>
                         {% endif %}
                     {% else %}
@@ -345,10 +345,10 @@
             <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
             <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
             {% if affiliate_page is defined %}
-                <th width="19%" class="b4 bs-l">{{ competitor[competitor1]['name'] }}</th>
+                <th width="19%" class="b4 bs-l">{{ competitor[competitor1]['name']|raw }}</th>
                 <th width="19%" class="b4">{{ competitor[competitor2]['name']|raw }}</th>
                 {% if affiliate_page != 'vouchercodes' %}
-                    <th width="19%" class="b4">{{ competitor[competitor3]['name'] }}</th>
+                    <th width="19%" class="b4">{{ competitor[competitor3]['name']|raw }}</th>
                 {% endif %}
             {% else %}
                 <th width="19%" class="b4 bs-l">Protect your Bubble</th>
