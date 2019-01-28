@@ -3,6 +3,7 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -28,7 +29,7 @@ class UserDetailType extends AbstractType
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
             ->add('birthday', DateType::class, ['years' => $years])
-            ->add('mobileNumber', TextType::class)
+            ->add('mobileNumber', TextType::class, ['required'  => false])
             ->add('update', SubmitType::class)
         ;
     }

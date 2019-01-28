@@ -18,6 +18,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 abstract class PaymentMethod
 {
+    const TYPE_JUDO = 'judo';
+    const TYPE_BACS = 'bacs';
     abstract public function isValid();
     abstract public function __toString();
 
@@ -41,9 +43,9 @@ abstract class PaymentMethod
     public function getType()
     {
         if ($this instanceof JudoPaymentMethod) {
-            return 'judo';
+            return self::TYPE_JUDO;
         } elseif ($this instanceof BacsPaymentMethod) {
-            return 'bacs';
+            return self::TYPE_BACS;
         } else {
             return null;
         }

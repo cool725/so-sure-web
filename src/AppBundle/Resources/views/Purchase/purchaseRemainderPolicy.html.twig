@@ -1,40 +1,53 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'purchase-remainder-policy' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-unpaid.css') }}">
+{% endblock %}
 
 {% block body %}
-    <section class="section--pad">
+
+    <section class="d-flex flex-column justify-content-center align-items-center">
         <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1 class="text-center">Pay the Remainder of Your Policy Premium</h1>
-                    {% if webpay_action and webpay_reference and amount > 0 %}
-                        <p class="lead text-center">Click below to pay for the remainder (£{{ amount|number_format(2, '.', ',') }}) of your {{ policy.policyNumber }} policy for your {{ policy.phone }}.</p>
-                        <form action="{{ webpay_action }}"
-                              method="post"
-                              id="webpay-form"
-                              class="text-center">
-                            <div class="row">
-                                <div class="col-sm-4 col-sm-offset-4">
-                                    <div class="form-group">
-                                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                        <input type="submit" class="btn btn-green btn-pad btn-block" value="Pay now">
-                                    </div>
-                                    {% if policy.displayRepurchase %}
-                                        <div class="form-group">
-                                            <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-blue btn-pad btn-block">Repurchase your policy</a>
-                                        </div>
-                                    {% endif %}
+            <div class="text-center pt-5 pb-3">
+                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
+                <h1 class="h2 mb-4">Pay the Remainder of Your Policy Premium</h1>
+                {% if webpay_action and webpay_reference and amount > 0 %}
+                    <p>Click below to pay for the remainder <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> of your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong>.</p>
+                    <form action="{{ webpay_action }}"
+                          method="post"
+                          id="webpay-form"
+                          class="mb-4">
+                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                        {% if policy.displayRepurchase %}
+                            <div class="form-row">
+                                <div class="col">
+                                    <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-primary btn-block-xs">Repurchase your policy</a>
+                                </div>
+                                <div class="col">
+                                    <input type="submit" class="btn btn-success btn-block-xs" value="Pay remainder now">
+                                </div>
                             </div>
-                        </form>
-                    {% elseif amount == 0 %}
-                        <h3 class="text-center">Your {{ policy.policyNumber }} policy for your {{ policy.phone }} has been fully paid.</h3>
-                    {% endif %}
-                </div>
+                        {% else %}
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-success btn-block-xs" value="Pay remainder now">
+                            </div>
+                        {% endif %}
+                        </div>
+                    </form>
+                {% elseif amount == 0 %}
+                    <p class="mb-4">Your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong> has been fully paid.</p>
+                {% endif %}
             </div>
         </div>
-        <section class="hidden-xs section--pad">&nbsp;</section>
     </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+
 {% endblock %}

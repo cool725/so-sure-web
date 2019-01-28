@@ -313,11 +313,11 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(MixpanelService::EVENT_POLICY_STATUS, $data['event']);
     }
 
-    public function testMixpanelOnCardUpdatedEvent()
+    public function testMixpanelOnCardUpdatedEventUser()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testMixpanelOnCardUpdatedEvent', $this),
+            static::generateEmail('testMixpanelOnCardUpdatedEventUser', $this),
             'bar'
         );
         $policy = new PhonePolicy();
@@ -330,7 +330,8 @@ class MixpanelListenerTest extends WebTestCase
 
         $listener = new MixpanelListener(static::$mixpanelService);
         static::$requestService->setEnvironment('prod');
-        $event = new CardEvent($user);
+        $event = new CardEvent();
+        $event->setUser($user);
         $listener->onCardUpdatedEvent($event);
         static::$requestService->setEnvironment('test');
 
@@ -347,11 +348,11 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, $data['event']);
     }
 
-    public function testMixpanelOnBacsUpdatedEvent()
+    public function testMixpanelOnCardUpdatedEventPolicy()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testMixpanelOnBacsUpdatedEvent', $this),
+            static::generateEmail('testMixpanelOnCardUpdatedEventPolicy', $this),
             'bar'
         );
         $policy = new PhonePolicy();
@@ -364,7 +365,43 @@ class MixpanelListenerTest extends WebTestCase
 
         $listener = new MixpanelListener(static::$mixpanelService);
         static::$requestService->setEnvironment('prod');
-        $event = new BacsEvent($user, new BankAccount());
+        $event = new CardEvent();
+        $event->setPolicy($policy);
+        $listener->onCardUpdatedEvent($event);
+        static::$requestService->setEnvironment('test');
+
+        // Expect a user update + a policy cancel event
+        $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_PERSON_PROPERTIES, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_ATTRIBUTION, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
+        $this->assertEquals(MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, $data['event']);
+    }
+
+    public function testMixpanelOnBacsUpdatedEventUser()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testMixpanelOnBacsUpdatedEventUser', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+
+        $listener = new MixpanelListener(static::$mixpanelService);
+        static::$requestService->setEnvironment('prod');
+        $event = new BacsEvent(new BankAccount());
+        $event->setUser($user);
         $listener->onBacsUpdatedEvent($event);
         static::$requestService->setEnvironment('test');
 
@@ -381,11 +418,46 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, $data['event']);
     }
 
-    public function testMixpanelOnPaymentMethodChangedEvent()
+    public function testMixpanelOnBacsUpdatedEventPolicy()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testMixpanelOnPaymentMethodChangedEvent', $this),
+            static::generateEmail('testMixpanelOnBacsUpdatedEventPolicy', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+
+        $listener = new MixpanelListener(static::$mixpanelService);
+        static::$requestService->setEnvironment('prod');
+        $event = new BacsEvent(new BankAccount());
+        $event->setPolicy($policy);
+        $listener->onBacsUpdatedEvent($event);
+        static::$requestService->setEnvironment('test');
+
+        // Expect a user update + a policy cancel event
+        $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_PERSON_PROPERTIES, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_ATTRIBUTION, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
+        $this->assertEquals(MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, $data['event']);
+    }
+
+    public function testMixpanelOnUserPaymentMethodChangedEvent()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testMixpanelOnUserPaymentMethodChangedEvent', $this),
             'bar'
         );
         $policy = new PhonePolicy();
@@ -401,6 +473,41 @@ class MixpanelListenerTest extends WebTestCase
         $event = new UserEvent($user);
         $event->setPreviousPaymentMethod('judo');
         $listener->onUserPaymentMethodChangedEvent($event);
+        static::$requestService->setEnvironment('test');
+
+        // Expect a user update + a policy cancel event
+        $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_PERSON_PROPERTIES, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_ATTRIBUTION, $data['action']);
+
+        $data = unserialize(static::$redis->lpop(MixpanelService::KEY_MIXPANEL_QUEUE));
+        $this->assertEquals(MixpanelService::QUEUE_TRACK, $data['action']);
+        $this->assertEquals(MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, $data['event']);
+    }
+
+    public function testMixpanelOnPolicyPaymentMethodChangedEvent()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testMixpanelOnPolicyPaymentMethodChangedEvent', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
+
+        $listener = new MixpanelListener(static::$mixpanelService);
+        static::$requestService->setEnvironment('prod');
+        $event = new PolicyEvent($policy);
+        $event->setPreviousPaymentMethod('judo');
+        $listener->onPolicyPaymentMethodChangedEvent($event);
         static::$requestService->setEnvironment('test');
 
         // Expect a user update + a policy cancel event

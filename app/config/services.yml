@@ -1157,6 +1157,7 @@ services:
             -  { name: kernel.event_listener, event: event.card.updated, method: onCardUpdatedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.payment-method.changed, method: onUserPaymentMethodChangedEvent }
+            -  { name: kernel.event_listener, event: event.policy.payment-method.changed, method: onPolicyPaymentMethodChangedEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener
@@ -1250,6 +1251,16 @@ services:
         tags:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }
+
+    app.listener.unpaid:
+        class: AppBundle\Listener\UnpaidListener
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.mailer"
+            - "@app.sms"
+            - "@app.feature"
+        tags:
+            -  { name: kernel.event_listener, event: event.scheduledPayment.failed, method: onUnpaidEvent }
 
     app.form.type.registration:
         class: AppBundle\Form\Type\RegistrationFormType

@@ -1286,7 +1286,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     // non-manual payments should be scheduled
                     if (!$bacsPayment->isManual()) {
                         $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
-                        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+                        if (!$policy->hasPolicyOrUserBacsPaymentMethod()) {
                             $this->get('logger')->warning(sprintf(
                                 'Payment (Policy %s) is scheduled, however no bacs account for user',
                                 $policy->getId()
@@ -1559,14 +1559,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     /** @var JudopayService $judopay */
                     $judopay = $this->get('app.judopay');
                     $details = $judopay->runTokenPayment(
-                        $policy->getPayerOrUser(),
+                        $policy,
                         $amount,
                         $date->getTimestamp(),
                         $policy->getId()
                     );
                     try {
                         /** @var JudoPaymentMethod $judoPaymentMethod */
-                        $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+                        $judoPaymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
                         $judopay->add(
                             $policy,
                             $details['receiptId'],
@@ -1600,11 +1600,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($cancelDirectDebitForm->isValid()) {
                     /** @var BacsService $bacsService */
                     $bacsService = $this->get('app.bacs');
-                    /** @var BacsPaymentMethod $bacsPaymentMethod */
-                    $bacsPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
                     $bacsService->queueCancelBankAccount(
-                        $bacsPaymentMethod->getBankAccount(),
-                        $policy->getPayerOrUser()->getId()
+                        $policy->getPolicyOrUserBacsBankAccount(),
+                        $policy->hasBacsPaymentMethod() ? $policy->getId() : $policy->getPayerOrUser()->getId()
                     );
                     $this->addFlash('success', sprintf(
                         'Direct Debit Cancellation has been queued.'
@@ -2155,7 +2153,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
             )) {
                 $total += $scheduledPayment->getAmount();
-                if ($scheduledPayment->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+                if ($scheduledPayment->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {
                     $totalBacs += $scheduledPayment->getAmount();
                 } else {
                     $totalJudo += $scheduledPayment->getAmount();
@@ -2949,7 +2947,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
         /** @var ReportingService $reporting */
         $reporting = $this->get('app.reporting');
-        $data = $reporting->payments($date);
+        $data = $reporting->payments($date, true);
 
         return [
             'data' => $data,

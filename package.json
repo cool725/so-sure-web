@@ -44,6 +44,7 @@
     "moment": "^2.23.0",
     "popper.js": "^1.14.3",
     "tempusdominus-bootstrap-4": "^5.1.2",
+    "textfit": "^2.3.1",
     "viewerjs": "^1.2.0"
   }
 }

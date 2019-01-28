@@ -631,16 +631,19 @@ class OpsController extends BaseController
 
     /**
      * @Route("/validation", name="ops_validation")
-     * @Method({"POST"})
+     * @Method({"GET", "POST"})
      */
     public function validationAction(Request $request)
     {
-        $logger = $this->get('logger');
-        $data = json_decode($request->getContent(), true);
-        $now = \DateTime::createFromFormat('U', time());
-        $data['browser'] = $request->headers->get('User-Agent');
-        $this->get('snc_redis.default')->hset('client-validation', json_encode($data), $now->format('U'));
-        $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));
+        // ignore get requests from security scanner
+        if ('POST' === $request->getMethod()) {
+            $logger = $this->get('logger');
+            $data = json_decode($request->getContent(), true);
+            $now = \DateTime::createFromFormat('U', time());
+            $data['browser'] = $request->headers->get('User-Agent');
+            $this->get('snc_redis.default')->hset('client-validation', json_encode($data), $now->format('U'));
+            $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));
+        }
 
         return new JsonResponse();
     }

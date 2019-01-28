@@ -50,14 +50,33 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         } else {
             $date = clone $policy->getStart();
         }
-
         return $this->createQueryBuilder()
             ->field('policy')->references($policy)
             ->field('scheduled')->gte($date)
-            ->field('status')->equals(ScheduledPayment::STATUS_FAILED)
+            ->field('status')->in([ScheduledPayment::STATUS_FAILED, ScheduledPayment::STATUS_REVERTED])
             ->getQuery()
             ->execute()
             ->count();
+    }
+
+    /**
+     * Finds the most recent scheduled payment that has a given status.
+     * @param Policy $policy   is the policy that the payment belongs to.
+     * @param array  $statuses are the statuses to look for in this payment.
+     * @return ScheduledPayment the most recent of the types you wanted, or null if there is nothing there.
+     */
+    public function mostRecentWithStatuses(
+        $policy,
+        array $statuses = [ScheduledPayment::STATUS_SCHEDULED]
+    ) {
+        /** @var ScheduledPayment $scheduledPayment */
+        $scheduledPayment = $this->createQueryBuilder()
+            ->field("policy")->references($policy)
+            ->field("status")->in($statuses)
+            ->sort("scheduled", "desc")
+            ->getQuery()
+            ->getSingleResult();
+        return $scheduledPayment;
     }
 
     public function getMonthlyValues()

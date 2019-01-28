@@ -1346,7 +1346,7 @@ class UserController extends BaseController
         $lastPaymentInProgress = false;
         if ($policy) {
             $lastPaymentCredit = $policy->getLastPaymentCredit();
-            if ($this->getUser()->hasBacsPaymentMethod()) {
+            if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
                 if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
                     /** @var BacsPayment $lastPaymentCredit */
                     $lastPaymentInProgress = $lastPaymentCredit->inProgress();

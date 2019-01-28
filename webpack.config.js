@@ -22,6 +22,7 @@ Encore
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
     .addEntry('homepage-xmas', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-xmas.js')
+    .addEntry('homepage-vday', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-vday.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
     .addEntry('purchase-personal', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal.js')
@@ -80,6 +81,7 @@ Encore
             Bloodhound: "corejs-typeahead/dist/bloodhound.js",
             doT: "dot/doT.js",
             moment: "moment",
+            fitText: "fitText",
         })
     )
 ;

@@ -31,8 +31,20 @@
         {% for company in companies %}
             <tr>
                 <td width="20%">{{ company.name }}</td>
-                <td width="70%">{% for user in company.users %}
-                    <a href="{{ path('admin_user', {'id': user.id })}}">{{ user.email }}</a>
+                <td width="70%">
+                    {% for user in company.users %}
+                        <a href="{{ path('admin_user', {'id': user.id })}}">{{ user.email }}</a>
+                        -
+                        {% if user.hasActivePolicy %}
+                            Active
+                        {% elseif user.hasUnpaidPolicy %}
+                            Unpaid
+                        {% elseif user.allPolicies|length == 0 %}
+                            No Policies
+                        {% else %}
+                            Expired/Other
+                        {% endif %}
+                        <br />
                     {% endfor %}
                 </td>
                 <td width="10%">

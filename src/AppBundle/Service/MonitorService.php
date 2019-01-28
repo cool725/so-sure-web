@@ -8,6 +8,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -30,6 +31,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -528,6 +530,22 @@ class MonitorService
             throw new MonitorException(sprintf(
                 'There is a bacs file (%s) that is pending',
                 $unsubmitted->getId()
+            ));
+        }
+    }
+
+    public function bacsInputFileNotImported()
+    {
+        $now = $this->now();
+        $startOfToday = $this->startOfDay($now);
+        $endOfToday = $this->endOfDay($now);
+
+        /** @var S3FileRepository $repo */
+        $repo = $this->dm->getRepository(BacsReportInputFile::class);
+        $imported = $repo->findBy(['date' => ['$gte' => $startOfToday, '$lt' => $endOfToday]]);
+        if (count($imported) == 0) {
+            throw new MonitorException(sprintf(
+                'Bacs input report has not been uploaded for today'
             ));
         }
     }
@@ -1075,7 +1093,7 @@ class MonitorService
                 continue;
             }
 
-            $bacs = $block->getPolicy()->getUser()->getBacsPaymentMethod();
+            $bacs = $block->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             if ($bacs) {
                 // ignore initial first payments if we haven't reached the initial notification date
                 if ($bacs->getBankAccount()->isFirstPayment() &&

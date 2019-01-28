@@ -1799,7 +1799,7 @@ class PolicyService
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
                 $date ? $date : \DateTime::createFromFormat('U', time())
             );
-            if ($policy->getUser()->hasJudoPaymentMethod()) {
+            if ($policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
                 $scheduledPayment = new ScheduledPayment();
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
                 $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
