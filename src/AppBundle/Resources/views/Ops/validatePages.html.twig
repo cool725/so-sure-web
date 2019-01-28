@@ -131,7 +131,7 @@
                             {% endif %}
                         </li>
                         <li class="mb-2">
-                            <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> (auto impersonate {{ valid_policy.user.email }})
+                            <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">Onboarding</a> (auto impersonate {{ valid_policy.user.email }})
                         </li>
                         <li class="mb-2">
                             {% if unpaid_policydiscount_policy %}
@@ -142,7 +142,7 @@
                         </li>
                         <li class="mb-2">
                             {% if policy_cancelled_payment_owed %}
-                            <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}">User Home Page Redirect (Policy Cancelled & Payment Owed)</a> (auto impersonate {{ policy_cancelled_payment_owed.user.email }})
+                            <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}">User Home Page Redirect (Policy Cancelled &amp; Payment Owed)</a> (auto impersonate {{ policy_cancelled_payment_owed.user.email }})
                             {% else %}
                                 No policy cancelled w/payment owed available
                             {% endif %}
