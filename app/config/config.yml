@@ -1302,10 +1302,6 @@ nelmio_security:
     #    cookie_name: auth
     #    unsecured_logout: false
 
-dpn_xml_sitemap:
-    additional_sitemaps:
-        - help/sitemap.xml
-
 fos_oauth_server:
     db_driver: mongodb
     client_class:        AppBundle\Document\Oauth\Client
