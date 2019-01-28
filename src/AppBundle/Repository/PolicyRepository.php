@@ -2,6 +2,9 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\JudoPaymentMethod;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -203,6 +206,47 @@ class PolicyRepository extends BaseDocumentRepository
         }
 
         return $qb->getQuery()
+            ->execute();
+    }
+
+    public function findPendingMandates(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $date = $this->endOfDay($date);
+
+        $qb = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.mandateStatus')->equals(BankAccount::MANDATE_PENDING_APPROVAL)
+            ->field('paymentMethod.bankAccount.initialPaymentSubmissionDate')->lt($date)
+        ;
+
+        return $qb;
+    }
+
+    public function findBankAccount(Policy $policy)
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->field('id')->notEqual($policy->getId());
+
+        if ($policy->getPaymentMethod() instanceof JudoPaymentMethod) {
+            $accountHash = $policy->getJudoPaymentMethod() ?
+                $policy->getJudoPaymentMethod()->getCardTokenHash() :
+                ['NotAHash'];
+            if (!$accountHash) {
+                $accountHash = ['NotAHash'];
+            }
+            $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
+        } elseif ($policy->getPaymentMethod() instanceof BacsPaymentMethod) {
+            $accountHash = $policy->getBacsBankAccount() ?
+                $policy->getBacsBankAccount()->getHashedAccount() : 'NotAHash';
+            $qb->field('paymentMethod.bankAccount.hashedAccount')->equals($accountHash);
+        } else {
+            throw new \Exception('Policy is missing a payment type');
+        }
+
+        return $qb
+            ->getQuery()
             ->execute();
     }
 }

@@ -431,4 +431,31 @@ trait DateTrait
         }
         return $days;
     }
+
+    public function normalizeDate($date)
+    {
+        $date = trim($date);
+        $date = str_replace(" ", "/", $date);
+        $date = str_replace(".", "/", $date);
+        $date = str_replace("-", "/", $date);
+
+        return $date;
+    }
+
+    public function createValidDate($date)
+    {
+        $date = $this->normalizeDate($date);
+
+        $dt = \DateTime::createFromFormat('d/m/Y', $date);
+        if (!$dt) {
+            return $dt;
+        }
+
+        return $this->startOfDay($dt);
+    }
+
+    public function isValidDate($date)
+    {
+        return $this->createValidDate($date) !== false;
+    }
 }

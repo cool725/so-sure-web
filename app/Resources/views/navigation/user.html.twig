@@ -1,0 +1,53 @@
+<nav id="secondary_nav" class="nav secondary-nav justify-content-center">
+    {% if policy is defined and policy %}
+
+        {# Dashboard #}
+        <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}">
+            <i class="fas fa-user fa-fw"></i> Dashboard</a>
+
+        {# Contact Details #}
+        <a href="{{ path('user_contact_details_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_contact_details' or app.request.get('_route') == 'user_contact_details_policy'  %}active{% endif %}">
+            <i class="fas fa-at fa-fw"></i> Contact Details</a>
+
+        {# Payment Details #}
+        <a href="{{ path('user_payment_details_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_payment_details' or app.request.get('_route') == 'user_payment_details_policy' %}active{% endif %}">
+            <i class="fal fa-credit-card fa-fw"></i> Payment Details</a>
+
+        {# My Policies #}
+        <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_policy_list' or app.request.get('_route') == 'user_policy_list_policy' %}active{% endif %}">
+            <i class="fal fa-file-invoice fa-fw"></i> My Policies</a>
+
+        {# Renewal #}
+        {% if policy.displayRenewal %}
+            <a id="user-homepage--nav-renew" href="{{ path('user_renew_policy', {'id': policy.id }) }}" class="nav-link {% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}">
+                <i class="fas fa-arrow-alt-circle-up fa-fw"></i> Renew your policy</a>
+        {% endif %}
+
+        {# Claims #}
+        <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}" class="nav-link">
+            <i class="fal fa-mobile-android fa-fw"></i> Claims</a>
+
+    {% else %}
+
+        {# Dashboard #}
+        <a href="{{ path('user_home') }}" class="nav-link {% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}">
+            <i class="fas fa-user fa-fw"></i> Dashboard</a>
+
+        {# Contact Details #}
+        <a href="{{ path('user_contact_details') }}" class="nav-link {% if app.request.get('_route') == 'user_contact_details' or app.request.get('_route') == 'user_contact_details_policy'  %}active{% endif %}">
+            <i class="fas fa-at fa-fw"></i> Contact Details</a>
+
+        {# Payment Details #}
+        <a href="{{ path('user_payment_details') }}" class="nav-link {% if app.request.get('_route') == 'user_payment_details' or app.request.get('_route') == 'user_payment_details_policy' %}active{% endif %}">
+            <i class="fal fa-credit-card fa-fw"></i> Payment Details</a>
+
+        {# My Policies #}
+        <a href="{{ path('user_policy_list') }}" class="nav-link {% if app.request.get('_route') == 'user_policy_list' or app.request.get('_route') == 'user_policy_list_policy' %}active{% endif %}">
+            <i class="fal fa-file-invoice fa-fw"></i> My Policies</a>
+
+        {# Claims #}
+        <a href="{{ path('user_claim') }}" class="nav-link">
+            <i class="fal fa-mobile-android fa-fw"></i> Claims</a>
+
+    {% endif %}
+</nav>

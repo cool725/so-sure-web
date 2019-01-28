@@ -1218,6 +1218,36 @@ class DirectGroupServiceTest extends WebTestCase
         $this->insureErrorExists('/does not have the correct phone replacement cost/');
     }
 
+    public function testValidateClaimPhoneReplacementCostsCorrectForMasterCard()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_DAMAGE);
+        $policy->addClaim($claim);
+
+        $twelveDaysAgo = \DateTime::createFromFormat('U', time());
+        $twelveDaysAgo = $twelveDaysAgo->sub(new \DateInterval('P12D'));
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->claimNumber = 1;
+        $directGroupClaim->status = 'open';
+        $directGroupClaim->totalIncurred = 6.68;
+        $directGroupClaim->unauthorizedCalls = 1.01;
+        $directGroupClaim->accessories = 1.03;
+        $directGroupClaim->handlingFees = 1.19;
+        $directGroupClaim->excess = 150;
+        $directGroupClaim->reserved = 0;
+        $directGroupClaim->replacementMake = 'Apple';
+        $directGroupClaim->replacementModel = 'iPhone';
+        $directGroupClaim->replacementReceivedDate = $twelveDaysAgo;
+        $directGroupClaim->policyNumber = $policy->getPolicyNumber();
+        $directGroupClaim->insuredName = 'Mr foo bar';
+        $directGroupClaim->replacementSupplier = DirectGroupHandlerClaim::SUPPLIER_MASTERCARD;
+
+        $directGroupClaim->status = 'Paid Closed';
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->insureErrorDoesNotExist('/does not have the correct phone replacement cost/');
+    }
+
     public function testValidateClaimPhoneReplacementCostsCorrectTooRecent()
     {
         $policy = static::createUserPolicy(true);

@@ -385,7 +385,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
                 sprintf(
                     '"%s"',
-                    $policy->getUser()->hasPaymentMethod() ? $policy->getUser()->getPaymentMethod()->getType() : null
+                    $policy->hasPolicyOrUserPaymentMethod() ? $policy->getPolicyOrUserPaymentMethod()->getType() : null
                 ),
                 sprintf(
                     '"%s"',
@@ -395,8 +395,8 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf(
                     '"%s"',
-                    $policy->getUser()->hasBacsPaymentMethod() ?
-                        $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+                    $policy->getPolicyOrUserBacsBankAccount() ?
+                        $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
                         null
                 ),
             ]);

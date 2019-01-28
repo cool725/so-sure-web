@@ -145,6 +145,7 @@ class EmailDebugCommand extends ContainerAwareCommand
                 'policy/new',
                 'policy/skippedRenewal',
                 'policy/trustpilot',
+                'policy/detectedImei',
             ],
             'card' => [
                 'card/failedPayment',
@@ -222,15 +223,28 @@ class EmailDebugCommand extends ContainerAwareCommand
         }
         $data = [];
         if (in_array($template, $templates['bacs'])) {
-            /** @var UserRepository $repo */
-            $repo = $this->dm->getRepository(User::class);
-            /** @var User $user */
-            $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
-            $data = [
-                'user' => $user,
-                'policy' => $user->getLatestPolicy(),
-                'claimed' => $variation == 'cancelledClaimed' ? true : false,
-            ];
+            /** @var PolicyRepository $repo */
+            $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
+            if ($policy) {
+                $data = [
+                    'user' => $policy->getUser(),
+                    'policy' => $policy,
+                    'claimed' => $variation == 'cancelledClaimed' ? true : false,
+                ];
+            } else {
+                // TODO: Eventually remove
+                /** @var UserRepository $repo */
+                $repo = $this->dm->getRepository(User::class);
+                /** @var User $user */
+                $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
+                $data = [
+                    'user' => $user,
+                    'policy' => $user->getLatestPolicy(),
+                    'claimed' => $variation == 'cancelledClaimed' ? true : false,
+                ];
+            }
         } elseif (in_array($template, $templates['cashback'])) {
             /** @var CashbackRepository $repo */
             $repo = $this->dm->getRepository(Cashback::class);
@@ -300,6 +314,8 @@ class EmailDebugCommand extends ContainerAwareCommand
                 $user->setLastName('McAndrew');
                 $policy->setUser($user);
                 return $this->mailerService->trustpilot($policy, MailerService::TRUSTPILOT_PURCHASE);
+            } elseif ($template == 'policy/detectedImei') {
+                return $this->policyService->detectedImeiEmail($policy);
             } elseif ($template == 'policy/skippedRenewal') {
                 return $this->policyService->skippedRenewalEmail($policy);
             } else {
@@ -312,21 +328,21 @@ class EmailDebugCommand extends ContainerAwareCommand
             $policy = null;
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
-                if (!$policy->getUser()->hasJudoPaymentMethod()) {
+                if (!$policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
                     continue;
                 }
 
                 if ($template == 'card/failedPaymentWithClaim' &&
                     $policy->hasMonetaryClaimed(true, true) &&
-                    $policy->getUser()->hasValidPaymentMethod()) {
+                    $policy->hasPolicyOrUserValidPaymentMethod()) {
                     break;
                 }
 
-                if ($template == 'card/cardMissing' && !$policy->getUser()->hasValidPaymentMethod()) {
+                if ($template == 'card/cardMissing' && !$policy->hasPolicyOrUserValidPaymentMethod()) {
                     break;
                 }
 
-                if ($template != 'card/cardMissing' && $policy->getUser()->hasValidPaymentMethod()) {
+                if ($template != 'card/cardMissing' && $policy->hasPolicyOrUserValidPaymentMethod()) {
                     break;
                 }
             }

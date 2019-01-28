@@ -753,7 +753,7 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim1);
         static::$dm->persist($claim2);
         static::$dm->flush();
-        
+
         $claim1Id = $claim1->getId();
         $claim2Id = $claim2->getId();
 
@@ -2128,7 +2128,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
         $policy->setPolicyNumber($policyNumber);
-        
+
         return $claim;
     }
 

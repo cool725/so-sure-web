@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\PaymentService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,6 +26,7 @@ class BacsServiceTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $xmlFile;
+    /** @var BacsService */
     protected static $bacsService;
     protected static $policyService;
 
@@ -49,7 +51,9 @@ class BacsServiceTest extends WebTestCase
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
-        self::$bacsService = self::$container->get('app.bacs');
+        /** @var BacsService $bacsService */
+        $bacsService = self::$container->get('app.bacs');
+        self::$bacsService = $bacsService;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
 
@@ -63,11 +67,11 @@ class BacsServiceTest extends WebTestCase
         self::$dm->clear();
     }
 
-    public function testBacsXml()
+    public function testBacsXmlUser()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testBacsXml', $this),
+            static::generateEmail('testBacsXmlUser', $this),
             'bar'
         );
         $this->setValidBacsPaymentMethod($user, 'SOSURE01');
@@ -83,7 +87,54 @@ class BacsServiceTest extends WebTestCase
         );
     }
 
+    public function testBacsXmlPolicy()
+    {
+        $now = $this->now();
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testBacsXmlPolicy', $this),
+            'bar'
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $now,
+            true
+        );
+        static::$policyService->setDispatcher(null);
+        static::$policyService->create($policy, $now);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $this->setValidBacsPaymentMethodForPolicy($policy, 'SOSURE01');
+        static::$dm->flush();
+
+        $results = self::$bacsService->addacs(self::$xmlFile);
+        $this->assertTrue($results['success']);
+
+        $updatePolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertEquals(
+            BankAccount::MANDATE_CANCELLED,
+            $updatePolicy->getPaymentMethod()->getBankAccount()->getMandateStatus()
+        );
+    }
+
+    private function setValidBacsPaymentMethodForPolicy(Policy $policy, $reference = null, \DateTime $date = null)
+    {
+        $bacs = $this->getBacsPaymentMethod($policy->getUser()->getName(), $reference, $date);
+        $policy->setPaymentMethod($bacs);
+
+        return $bacs;
+    }
+
     private function setValidBacsPaymentMethod(User $user, $reference = null, \DateTime $date = null)
+    {
+        $bacs = $this->getBacsPaymentMethod($user->getName(), $reference, $date);
+        $user->setPaymentMethod($bacs);
+
+        return $bacs;
+    }
+
+    private function getBacsPaymentMethod($name, $reference = null, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -96,11 +147,10 @@ class BacsServiceTest extends WebTestCase
         $bankAccount->setReference($reference);
         $bankAccount->setSortCode('000099');
         $bankAccount->setAccountNumber('87654321');
-        $bankAccount->setAccountName($user->getName());
+        $bankAccount->setAccountName($name);
         $bankAccount->setInitialPaymentSubmissionDate($date);
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
 
         return $bacs;
     }

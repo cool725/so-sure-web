@@ -143,7 +143,12 @@ class SanctionsService
         return $matches;
     }
 
-    private function getMinLevenshteinDoupleMetaphone($metaphone1, $metaphone2)
+    public function getMinLevenshteinDoupleMetaphoneString($a, $b)
+    {
+        return $this->getMinLevenshteinDoupleMetaphone(new \DoubleMetaphone($a), new \DoubleMetaphone($b));
+    }
+
+    public function getMinLevenshteinDoupleMetaphone($metaphone1, $metaphone2)
     {
         $distance = 10;
         $distance = min($distance, levenshtein($metaphone1->primary, $metaphone2->primary));

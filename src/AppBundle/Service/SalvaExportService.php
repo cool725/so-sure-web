@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -529,11 +530,19 @@ class SalvaExportService
         if ($policy) {
             /** @var SalvaPhonePolicy $nextPolicy */
             $nextPolicy = $policy->getNextPolicy();
+            $potReward = null;
+            foreach ($policy->getAllPayments() as $payment) {
+                if ($payment instanceof PotRewardPayment && $payment->isSuccess()) {
+                    $potReward = $payment;
+                }
+            }
+            $incurredDate = $potReward ? $potReward->getDate() : $policy->getStaticEnd();
             $data = [
                 $policy->getSalvaPolicyNumber(),
                 $this->toTwoDp($policy->getPotValue()),
                 $this->toTwoDp($policy->getStandardPotValue()),
-                $this->adjustDate($policy->getStaticEnd(), false),
+                //$this->adjustDate($policy->getStaticEnd(), false),
+                $this->adjustDate($incurredDate, false),
                 $policy->getCashback() ?
                     sprintf('cashback - %s', $policy->getCashback()->getDisplayableStatus()) :
                     'discount',
@@ -553,6 +562,7 @@ class SalvaExportService
                 'InitialPolicyNumber',
                 'RewardPot',
                 'RewardPotSalva',
+                //'RewardPotIncurredDate',
                 'RewardPotIncurredDate',
                 'RewardPotType',
                 'CashbackPaidDate',

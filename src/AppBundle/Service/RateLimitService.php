@@ -30,6 +30,7 @@ class RateLimitService
     const DEVICE_TYPE_TOKEN = 'token';
     const DEVICE_TYPE_USER_LOGIN = 'user-login';
     const DEVICE_TYPE_OPT = 'optout';
+    const DEVICE_TYPE_INTERCOM_DPA = 'intercom-dpa';
 
     public static $cacheTimes = [
         self::DEVICE_TYPE_IMEI => 86400, // 1 day
@@ -41,6 +42,7 @@ class RateLimitService
         self::DEVICE_TYPE_TOKEN => 600, // 10 minutes
         self::DEVICE_TYPE_USER_LOGIN => 3600, // 1 hour
         self::DEVICE_TYPE_OPT => 600, // 10 minutes
+        self::DEVICE_TYPE_INTERCOM_DPA => 600,
         'replay' => 60, // 1 minute
     ];
 
@@ -54,6 +56,7 @@ class RateLimitService
         self::DEVICE_TYPE_TOKEN => 10,
         self::DEVICE_TYPE_USER_LOGIN => 10,
         self::DEVICE_TYPE_OPT => 3,
+        self::DEVICE_TYPE_INTERCOM_DPA => 20,
     ];
 
     public static $maxIpRequests = [
@@ -123,10 +126,21 @@ class RateLimitService
      * @param User $user
      *
      */
-    public function clearByUser($user)
+    public function clearByUser(User $user)
     {
-        $type = self::DEVICE_TYPE_USER_LOGIN;
-        $userKey = sprintf(self::KEY_FORMAT, $type, $user->getId());
+        return $this->clearByUserId($user->getId(), self::DEVICE_TYPE_USER_LOGIN);
+    }
+
+    /**
+     * Clear the rate limit
+     *
+     * @param string $userId
+     * @param string $type
+     *
+     */
+    public function clearByUserId($userId, $type)
+    {
+        $userKey = sprintf(self::KEY_FORMAT, $type, $userId);
 
         $this->redis->del($userKey);
     }
@@ -216,13 +230,24 @@ class RateLimitService
      */
     public function allowedByUser(User $user)
     {
+        return $this->allowedByUserId($user->getId(), self::DEVICE_TYPE_USER_LOGIN);
+    }
+
+    /**
+     * Is the call allowed - special case for user login & intercom
+     *
+     * @param string $userId
+     * @param string $type
+     *
+     * @return boolean
+     */
+    public function allowedByUserId($userId, $type)
+    {
         if (!$this->featureService->isEnabled(Feature::FEATURE_RATE_LIMITING)) {
             return true;
         }
 
-        $type = self::DEVICE_TYPE_USER_LOGIN;
-        $userKey = sprintf(self::KEY_FORMAT, $type, $user->getId());
-
+        $userKey = sprintf(self::KEY_FORMAT, $type, $userId);
         $userRequests = $this->redis->incr($userKey);
         $maxRequests = self::$maxRequests[$type];
 
@@ -235,10 +260,9 @@ class RateLimitService
 
         if ($userRequests > $maxRequests) {
             $this->logger->warning(sprintf(
-                'Rate limit exceeded for %s (%s/%s)',
+                'Rate limit exceeded for %s (%s)',
                 $type,
-                $user->getName(),
-                $user->getId()
+                $userId
             ));
 
             return false;

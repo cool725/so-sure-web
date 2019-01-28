@@ -15,7 +15,8 @@
 a[class*="btn-outline-"],
 .btn-circle,
 .btn-square,
-button[class*="btn-outline-"] {
+button[class*="btn-outline-"],
+input[type="submit"][class*="btn-outline-"], {
     box-shadow: none;
 }
 

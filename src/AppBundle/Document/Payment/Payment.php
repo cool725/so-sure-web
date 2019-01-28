@@ -371,6 +371,21 @@ abstract class Payment
         return false;
     }
 
+    public function toString()
+    {
+        return $this->__toString();
+    }
+
+    public function __toString()
+    {
+        return sprintf(
+            '£%0.2f on %s (%s)',
+            $this->getAmount(),
+            $this->getDate()->format('d/m/Y H:i:s'),
+            $this->getType()
+        );
+    }
+
     public function calculateSplit()
     {
         $gwp = $this->getAmount() / (1 + $this->getPolicy()->getPremium()->getIptRate());

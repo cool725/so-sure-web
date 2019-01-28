@@ -582,6 +582,13 @@ abstract class Policy
      */
     protected $participations = array();
 
+    /**
+     * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
+     * @Gedmo\Versioned
+     * @var PaymentMethod
+     */
+    protected $paymentMethod;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -2254,6 +2261,162 @@ abstract class Policy
         return $nextDate;
     }
 
+    /**
+     * @return PaymentMethod
+     */
+    public function getPaymentMethod()
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod($paymentMethod)
+    {
+        $this->paymentMethod = $paymentMethod;
+    }
+
+    public function hasPaymentMethod()
+    {
+        return $this->getPaymentMethod() != null;
+    }
+
+    public function hasValidPaymentMethod()
+    {
+        return $this->hasPaymentMethod() && $this->getPaymentMethod()->isValid();
+    }
+
+    public function hasBacsPaymentMethod()
+    {
+        return $this->getPaymentMethod() instanceof BacsPaymentMethod;
+    }
+
+    /**
+     * @return BacsPaymentMethod|null
+     */
+    public function getBacsPaymentMethod()
+    {
+        if ($this->hasBacsPaymentMethod()) {
+            /** @var BacsPaymentMethod $paymentMethod */
+            $paymentMethod = $this->getPaymentMethod();
+
+            return $paymentMethod;
+        }
+
+        return null;
+    }
+
+    public function hasPolicyOrUserBacsPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->getPolicyOrUserBacsPaymentMethod() instanceof BacsPaymentMethod;
+    }
+
+    public function getPolicyOrUserBacsPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->getBacsPaymentMethod() ?: $this->getUser()->getBacsPaymentMethod();
+    }
+
+    public function getPolicyOrUserBacsBankAccount()
+    {
+        // TODO: Eventually remove this method
+        return $this->getBacsBankAccount() ?: $this->getUser()->getBacsBankAccount();
+    }
+
+    public function hasPolicyOrUserPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->hasPaymentMethod() ?: $this->getUser()->hasPaymentMethod();
+    }
+
+    public function hasPolicyOrUserValidPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->hasValidPaymentMethod() ?: $this->getUser()->hasValidPaymentMethod();
+    }
+
+    public function hasPolicyOrPayerOrUserValidPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->hasValidPaymentMethod() ?: $this->getPayerOrUser()->hasValidPaymentMethod();
+    }
+
+    public function getPolicyOrUserPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->getPaymentMethod() ?: $this->getUser()->getPaymentMethod();
+    }
+
+    public function getPolicyOrPayerOrUserPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->getPaymentMethod() ?: $this->getPayerOrUser()->getPaymentMethod();
+    }
+
+    /**
+     * @return BankAccount|null
+     */
+    public function getBacsBankAccount()
+    {
+        $bacsPaymentMethod = $this->getBacsPaymentMethod();
+        if ($bacsPaymentMethod) {
+            return $bacsPaymentMethod->getBankAccount();
+        }
+
+        return null;
+    }
+
+    public function hasJudoPaymentMethod()
+    {
+        return $this->getPaymentMethod() instanceof JudoPaymentMethod;
+    }
+
+    /**
+     * @return JudoPaymentMethod|null
+     */
+    public function getJudoPaymentMethod()
+    {
+        if ($this->hasJudoPaymentMethod()) {
+            /** @var JudoPaymentMethod $paymentMethod */
+            $paymentMethod = $this->getPaymentMethod();
+
+            return $paymentMethod;
+        }
+
+        return null;
+    }
+
+    public function hasPolicyOrPayerOrUserJudoPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->getPolicyOrPayerOrUserJudoPaymentMethod() instanceof JudoPaymentMethod;
+    }
+
+    public function getPolicyOrPayerOrUserJudoPaymentMethod()
+    {
+        // TODO: Eventually remove this method
+        return $this->getJudoPaymentMethod() ?: $this->getPayerOrUser()->getJudoPaymentMethod();
+    }
+
+    /**
+     * This method is slightly different then others, and incorporates the getPolicyOrUserBacsPaymentMethod
+     * @return bool
+     */
+    public function canUpdateBacsDetails()
+    {
+        /** @var BacsPaymentMethod $bacsPaymentMethod */
+        $bacsPaymentMethod = $this->getPolicyOrUserBacsPaymentMethod();
+        if ($bacsPaymentMethod instanceof BacsPaymentMethod &&
+            $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
+            return false;
+        }
+
+        if ($this->hasBacsPaymentInProgress()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
@@ -3357,7 +3520,7 @@ abstract class Policy
 
         // if its an initial (not renewal) valid policy without a payment, probably it should be expired
         if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit() &&
-            !$this->getUser()->hasBacsPaymentMethod()) {
+            !$this->hasPolicyOrUserBacsPaymentMethod()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -4605,11 +4768,7 @@ abstract class Policy
             return false;
         }
 
-        $bacs = $this->getUser()->getBacsPaymentMethod();
-        $bankAccount = null;
-        if ($bacs) {
-            $bankAccount = $bacs->getBankAccount();
-        }
+        $bankAccount = $this->getPolicyOrUserBacsBankAccount();
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
         } elseif ($this->isPolicyPaidToDate($date, true, false, true)) {
@@ -4684,7 +4843,7 @@ abstract class Policy
             return null;
         }
 
-        return $this->getUser()->hasBacsPaymentMethod();
+        return $this->hasPolicyOrUserBacsPaymentMethod();
     }
 
     public function isUnpaidCloseToExpirationDate(\DateTime $date = null)
@@ -4728,18 +4887,18 @@ abstract class Policy
             if ($this->hasPreviousPolicy()) {
                 // 4 payment retries - 0, 7, 14, 21; should be 30 days unpaid before cancellation
                 // 9 days diff + 2 on either side
-                if ($this->getUser()->hasJudoPaymentMethod()) {
+                if ($this->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P11D'));
-                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                } elseif ($this->hasPolicyOrUserBacsPaymentMethod()) {
                     // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
                 }
             } else {
                 // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
                 // 2 days diff + 2 on either side
-                if ($this->getUser()->hasJudoPaymentMethod()) {
+                if ($this->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
-                } elseif ($this->getUser()->hasBacsPaymentMethod()) {
+                } elseif ($this->hasPolicyOrUserBacsPaymentMethod()) {
                     // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
                 }
@@ -4752,10 +4911,9 @@ abstract class Policy
         // All Scheduled day must match the billing day
         if ($verifyBillingDay) {
             $initialNotificationDate = null;
-            if ($this->getUser()->getBacsPaymentMethod()) {
-                if ($bankAccount = $this->getUser()->getBacsPaymentMethod()->getBankAccount()) {
-                    $initialNotificationDate = $bankAccount->getInitialNotificationDate();
-                }
+            $bankAccount = $this->getPolicyOrUserBacsBankAccount();
+            if ($bankAccount) {
+                $initialNotificationDate = $bankAccount->getInitialNotificationDate();
             }
             foreach ($scheduledPayments as $scheduledPayment) {
                 /** @var ScheduledPayment $scheduledPayment */
@@ -4937,17 +5095,17 @@ abstract class Policy
         $lastPaymentCredit = $this->getLastPaymentCredit();
         $lastPaymentInProgress = false;
         $lastPaymentFailure = false;
-        if ($this->getUser()->hasBacsPaymentMethod()) {
+        if ($this->hasPolicyOrUserBacsPaymentMethod()) {
             if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
                 /** @var BacsPayment $lastPaymentCredit */
                 $lastPaymentInProgress = $lastPaymentCredit->inProgress();
                 $lastPaymentFailure = $lastPaymentCredit->getStatus() == BacsPayment::STATUS_FAILURE;
             }
 
-            $bacsPaymentMethod = $this->getUser()->getBacsPaymentMethod();
-            if ($bacsPaymentMethod && $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
+            $bankAccount = $this->getPolicyOrUserBacsBankAccount();
+            if ($bankAccount && $bankAccount->isMandateInProgress()) {
                 return self::UNPAID_BACS_MANDATE_PENDING;
-            } elseif ($bacsPaymentMethod && $bacsPaymentMethod->getBankAccount()->isMandateInvalid()) {
+            } elseif ($bankAccount && $bankAccount->isMandateInvalid()) {
                 return self::UNPAID_BACS_MANDATE_INVALID;
             } elseif ($lastPaymentInProgress) {
                 return self::UNPAID_BACS_PAYMENT_PENDING;
@@ -4960,13 +5118,13 @@ abstract class Policy
             }
 
             return self::UNPAID_BACS_UNKNOWN;
-        } elseif ($this->getUser()->hasJudoPaymentMethod()) {
+        } elseif ($this->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
             if ($lastPaymentCredit && $lastPaymentCredit instanceof JudoPayment) {
                 /** @var JudoPayment $lastPaymentCredit */
                 $lastPaymentFailure = !$lastPaymentCredit->isSuccess();
             }
 
-            $judoPaymentMethod = $this->getUser()->getJudoPaymentMethod();
+            $judoPaymentMethod = $this->getPolicyOrPayerOrUserJudoPaymentMethod();
             if ($judoPaymentMethod && $judoPaymentMethod->isCardExpired($date)) {
                 return self::UNPAID_JUDO_CARD_EXPIRED;
             } elseif ($lastPaymentFailure) {
@@ -4978,7 +5136,7 @@ abstract class Policy
             }
 
             return self::UNPAID_JUDO_UNKNOWN;
-        } elseif (!$this->getUser()->getPaymentMethod()) {
+        } elseif (!$this->getPolicyOrUserPaymentMethod()) {
             return self::UNPAID_PAYMENT_METHOD_MISSING;
         }
 

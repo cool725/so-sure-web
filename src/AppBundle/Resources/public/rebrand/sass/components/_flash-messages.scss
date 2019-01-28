@@ -5,6 +5,10 @@
     top: 4rem; left: 0; right: 0;
     z-index: 1030;
 
+    @include media-breakpoint-up(lg) {
+        top: 7rem;
+    }
+
     .alert {
         font-family: $g-medium;
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),

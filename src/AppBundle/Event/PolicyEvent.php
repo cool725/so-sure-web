@@ -29,10 +29,15 @@ class PolicyEvent extends Event
 
     const EVENT_UPDATED_POT = 'event.policy.pot';
 
+    const EVENT_PAYMENT_METHOD_CHANGED = 'event.policy.payment-method.changed';
+
     /** @var Policy */
     protected $policy;
     protected $date;
     protected $previousStatus;
+
+    /** @var string */
+    protected $previousPaymentMethod;
 
     public function __construct(Policy $policy, \DateTime $date = null)
     {
@@ -61,5 +66,15 @@ class PolicyEvent extends Event
     public function getPreviousStatus()
     {
         return $this->previousStatus;
+    }
+
+    public function getPreviousPaymentMethod()
+    {
+        return $this->previousPaymentMethod;
+    }
+
+    public function setPreviousPaymentMethod($previousPaymentMethod)
+    {
+        $this->previousPaymentMethod = $previousPaymentMethod;
     }
 }

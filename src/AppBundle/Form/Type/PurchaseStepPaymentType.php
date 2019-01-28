@@ -94,7 +94,7 @@ class PurchaseStepPaymentType extends AbstractType
                         'disabled' => true
                 ]);
             }
-            if ($purchase->getUser()->hasValidPaymentMethod()) {
+            if ($purchase->getPolicy()->hasPolicyOrUserValidPaymentMethod()) {
                 $form->add('existing', SubmitType::class);
             }
         });

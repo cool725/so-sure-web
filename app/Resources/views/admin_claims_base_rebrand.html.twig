@@ -35,7 +35,7 @@
         {% block nav %}
             {# TODO: Switch to user area nav when made #}
             {% if hide_nav is not defined or not hide_nav %}
-                {% include '::nav_rebrand.html.twig' %}
+                {% include '::navigation/main.html.twig' with {'admin_mode': true } %}
             {% endif %}
         {% endblock %}
 

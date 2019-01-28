@@ -16,6 +16,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\IntercomService;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -44,12 +45,16 @@ class TestCommand extends ContainerAwareCommand
     /** @var Reader */
     protected $reader;
 
-    public function __construct(DocumentManager $dm, Reader $reader, $environment)
+    /** @var IntercomService */
+    protected $intercomService;
+
+    public function __construct(DocumentManager $dm, Reader $reader, $environment, IntercomService $intercomService)
     {
         parent::__construct();
         $this->dm = $dm;
         $this->reader = $reader;
         $this->environment = $environment;
+        $this->intercomService = $intercomService;
     }
 
     protected function configure()
@@ -74,6 +79,15 @@ class TestCommand extends ContainerAwareCommand
             throw new \Exception(sprintf('Unknown command %s', $method));
         }
         $output->writeln('Finished');
+    }
+
+    private function intercomConversation(OutputInterface $output)
+    {
+        $adminId = $this->intercomService->getAdminIdForConversationId(20387006809);
+        $output->writeln($adminId);
+
+        $userId = $this->intercomService->getUserIdForConversationId(20399101869);
+        $output->writeln($userId);
     }
 
     private function removeTwoFactor(OutputInterface $output)

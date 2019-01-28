@@ -42,6 +42,7 @@ class UserSearchType extends BaseType
             ->add('postcode', TextType::class, ['required' => false])
             ->add('firstname', TextType::class, ['required' => false])
             ->add('lastname', TextType::class, ['required' => false])
+            ->add('dob', TextType::class, ['required' => false])
             ->add('facebookId', TextType::class, ['required' => false])
             ->add('sosure', ChoiceType::class, [
                 'required' => false,
@@ -66,6 +67,7 @@ class UserSearchType extends BaseType
             $this->formQuerystring($form, $currentRequest, 'postcode');
             $this->formQuerystring($form, $currentRequest, 'firstname');
             $this->formQuerystring($form, $currentRequest, 'lastname');
+            $this->formQuerystring($form, $currentRequest, 'dob');
             $this->formQuerystring($form, $currentRequest, 'facebookId');
             $this->formQuerystring($form, $currentRequest, 'waitingSanctions');
             $this->formQuerystring($form, $currentRequest, 'allSanctions');

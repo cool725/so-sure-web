@@ -164,7 +164,6 @@ class PhoneInsuranceController extends BaseController
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
-     *
      * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
      * @Route("/phone-insurance/{make}+{model}+{memory}GB", name="quote_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})

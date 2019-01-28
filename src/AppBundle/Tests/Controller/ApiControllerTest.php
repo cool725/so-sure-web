@@ -169,7 +169,7 @@ class ApiControllerTest extends BaseApiControllerTest
 
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('rate-limit-login-ok', $this), 'bar');
-        for ($i = 0; $i < 11; $i++) {
+        for ($i = 0; $i < RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN] + 2; $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
                 'email' => static::generateEmail('rate-limit-login-ok', $this),
                 'password' => 'bar'

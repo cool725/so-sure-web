@@ -1,80 +1,143 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% block title %}so-sure - Welcome back {{ app.user.firstname }}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
 {% endblock %}
 
 {% block body %}
-    {% include 'AppBundle:User:userNav.html.twig' %}
 
-    {% set active_tab = 'card' %}
+    {# Logic for tabs #}
+    {% set active_tab = 'payment_card' %}
     {% if form_errors(bacs_form.accountName) or form_errors(bacs_form.sortCode) or form_errors(bacs_form.accountNumber) or form_errors(bacs_form.soleSignature) %}
-        {% set active_tab = 'bacs-setup' %}
+        {% set active_tab = 'bacs_setup' %}
     {% elseif bacs and bacs.isValid %}
-        {% set active_tab = 'bacs-setup-confirm' %}
+        {% set active_tab = 'bacs_setup_confirm' %}
     {% elseif app.request.get('_route') == 'user_payment_details_bacs' %}
-        {% set active_tab = 'bacs-setup' %}
-    {% elseif user.paymentMethod and user.paymentMethod.type == 'bacs' %}
-        {% set active_tab = 'bacs' %}
+        {% set active_tab = 'bacs_setup' %}
+    {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
+        {% set active_tab = 'payment_bacs' %}
     {% endif %}
 
-    <div class="tab-content">
-        <div id="tab-card" class="tab-pane fade in {% if active_tab == 'card' %}active{% endif %}">
-            {% include 'AppBundle:User:cardDetails.html.twig' %}
-        </div>
-        <div id="tab-bacs" class="tab-pane fade in {% if active_tab == 'bacs' %}active{% endif %}">
-            {% include 'AppBundle:User:bacsDetails.html.twig' %}
-        </div>
-        <div id="tab-bacs-setup" class="tab-pane fade in {% if active_tab == 'bacs-setup' %}active{% endif %}">
-            {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
-        </div>
-        <div id="tab-bacs-setup-confirm" class="tab-pane fade in {% if active_tab == 'bacs-setup-confirm' %}active{% endif %}">
-            {% include 'AppBundle:User:bacsSetupConfirm.html.twig' %}
-        </div>
-    </div>
-
-    {% if policy.premiumPlan == 'monthly' %}
-    <div class="modal fade" id="billingModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                {{ form_start(billing_form) }}
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Request Billing Date Change</h4>
+    <section class="hero">
+        <div class="container">
+            {# NOTE: This is hidden! Remove d-none for testing #}
+            <ul class="nav nav-tabs d-none" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'payment_card' %}active{% endif %}"
+                    id="payment_card_tab"
+                    data-toggle="tab"
+                    href="#payment_card"
+                    role="tab"
+                    aria-controls="payment_card"
+                    aria-selected="{% if active_tab == 'payment_card' %}true{% else %}false{% endif %}">Payment Card</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'payment_bacs' %}active{% endif %}"
+                       id="payment_bacs_tab"
+                       data-toggle="tab"
+                       href="#payment_bacs"
+                       role="tab"
+                       aria-controls="payment_bacs"
+                       aria-selected="{% if active_tab == 'payment_bacs' %}true{% else %}false{% endif %}">Payment Bacs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'bacs_setup' %}active{% endif %}"
+                       id="bacs_setup_tab"
+                       data-toggle="tab"
+                       href="#bacs_setup"
+                       role="tab"
+                       aria-controls="bacs_setup"
+                       aria-selected="{% if active_tab == 'bacs_setup' %}true{% else %}false{% endif %}">Bacs Setup</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_tab == 'bacs_setup_confirm' %}active{% endif %}"
+                       id="bacs_setup_confirm_tab"
+                       data-toggle="tab"
+                       href="#bacs_setup_confirm"
+                       role="tab"
+                       aria-controls="bacs_setup_confirm"
+                       aria-selected="{% if active_tab == 'bacs_setup_confirm' %}true{% else %}false{% endif %}">Bacs Setup Confirm</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane {% if active_tab == 'payment_card' %}active{% endif %}"
+                     id="payment_card"
+                     role="tabpanel"
+                     aria-labelledby="payment_card_tab">
+                    {% include 'AppBundle:User:cardDetails.html.twig' %}
                 </div>
-                <div class="modal-body">
-                <p>Please change my billing date from the {{ policy.billing|date('jS','Europe/London') }} to the {{ form_widget(billing_form.day) }} each month.</p>
-                <p>Note the following:</p>
-                <ul>
-                    <li>You can't be behind in your payments. We will be unable to change your billing date until your account has a £0 balance.</li>
-                    <li>If the request day is earlier than the current day, you will be billed immediately for this month (e.g. today is the 15th, your payment is currently due on the 30th, but you want to change to the 1st. This month, you will be billed on the 15th, but next month will be on the 1st).</li>
-                    <li>If you request to change the date close to when the payment is due, you may need to wait an additional month before we're able to change the payment date.</li>
-                </ul>
+                <div class="tab-pane {% if active_tab == 'payment_bacs' %}active{% endif %}"
+                     id="payment_bacs"
+                     role="tabpanel"
+                     aria-labelledby="payment_bacs_tab">
+                    {% include 'AppBundle:User:bacsDetails.html.twig' %}
                 </div>
-                <div class="modal-footer">
-                    {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                <div class="tab-pane {% if active_tab == 'bacs_setup' %}active{% endif %}"
+                     id="bacs_setup"
+                     role="tabpanel"
+                     aria-labelledby="bacs_setup_tab">
+                    {% if policy %}
+                        {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
+                    {% endif %}
                 </div>
-                {{ form_end(billing_form) }}
+                <div class="tab-pane {% if active_tab == 'bacs_setup_confirm' %}active{% endif %}"
+                     id="bacs_setup_confirm"
+                     role="tabpanel"
+                     aria-labelledby="bacs_setup_confirm_tab">
+                    {% if policy %}
+                        {% include 'AppBundle:User:bacsSetupConfirm.html.twig' %}
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    {# Page Modals #}
+    {% if policy and policy.premiumPlan == 'monthly' %}
+        <div class="modal fade"
+             id="billing_modal"
+             tabindex="-1" role="dialog"
+             aria-labelledby="billing_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Request Billing Date Change</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    {{ form_start(billing_form) }}
+                        <div class="modal-body">
+                            <p>Please change my billing date from the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> to the {{ form_widget(billing_form.day) }} each month.</p>
+                            <p><strong>Note the following:</strong></p>
+                            <ul>
+                                <li class="mb-2">You can't be behind in your payments. We will be unable to change your billing date until your account has a £0 balance.</li>
+                                <li class="mb-2">If the request day is earlier than the current day, you will be billed immediately for this month (e.g. today is the 15th, your payment is currently due on the 30th, but you want to change to the 1st. This month, you will be billed on the 15th, but next month will be on the 1st).</li>
+                                <li class="mb-2">If you request to change the date close to when the payment is due, you may need to wait an additional month before we're able to change the payment date.</li>
+                            </ul>
+                            <div class="form-group text-center">
+                                {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                            </div>
+                        </div>
+                    {{ form_end(billing_form) }}
+                </div>
+            </div>
+        </div>
     {% endif %}
 
-    {% include 'AppBundle::Default/directDebitGuaranteeModal.html.twig' %}
+    {% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/jquery-mask-plugin/jquery.mask.min.js'
-    '@AppBundle/Resources/public/js/User/payment.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
+    <script src="{{ asset('css-js/user-purchase-bacs.js') }}"></script>
 {% endblock %}

@@ -1334,7 +1334,8 @@ class UserController extends BaseController
             /** @var Policy $policy */
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
         // If a user has an unpaid policy, then avoid updating card details (email directing to here)
         // as its then in a very odd state - card correct, but unpaid. better ask user to take the payment immediately
@@ -1342,12 +1343,14 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
-        $lastPaymentCredit = $policy->getLastPaymentCredit();
         $lastPaymentInProgress = false;
-        if ($this->getUser()->hasBacsPaymentMethod()) {
-            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
-                /** @var BacsPayment $lastPaymentCredit */
-                $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+        if ($policy) {
+            $lastPaymentCredit = $policy->getLastPaymentCredit();
+            if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
+                if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                    /** @var BacsPayment $lastPaymentCredit */
+                    $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+                }
             }
         }
 
@@ -1357,14 +1360,19 @@ class UserController extends BaseController
         if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
             $bacsFeature = false;
         }
-        // For now, only allow monthly policies with bacs
-        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+
+        if (!$policy) {
             $bacsFeature = false;
-        }
-        // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
-        // or no point in swapping to bacs
-        if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
-            $bacsFeature = false;
+        } else {
+            // For now, only allow monthly policies with bacs
+            if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+                $bacsFeature = false;
+            }
+            // we need enough time for bacs to be billed + reverse payment to be notified + 1 day internal processing
+            // or no point in swapping to bacs
+            if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
+                $bacsFeature = false;
+            }
         }
 
         /** @var PaymentService $paymentService */
@@ -1382,7 +1390,9 @@ class UserController extends BaseController
             $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
         }
         $billing = new BillingDay();
-        $billing->setPolicy($policy);
+        if ($policy) {
+            $billing->setPolicy($policy);
+        }
         /** @var FormInterface $billingForm */
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
@@ -1479,7 +1489,8 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
         $userEmailForm = $this->get('form.factory')
             ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
@@ -1767,7 +1778,7 @@ class UserController extends BaseController
                 // @codingStandardsIgnoreEnd
             }
         }
-        
+
         $data = [
             'claim' => $claim,
             'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',

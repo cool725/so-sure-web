@@ -27,7 +27,7 @@
         "symfony/assetic-bundle": "^2.7",
         "drewm/mailchimp-api": "dev-api-v3",
         "google/apiclient": "^2.2",
-        "judopay/judopay-sdk": "2.0.1.5",
+        "judopay/judopay-sdk": "2.0.1.8",
         "aws/aws-sdk-php": "^3.15",
         "white-october/pagerfanta-bundle": "^1.2",
         "geoip2/geoip2": "^2.0",

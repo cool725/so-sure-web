@@ -60,9 +60,11 @@
                             <th>Status</th>
                             <th>Card</th>
                         </tr>
-                        {% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy and not scheduledPayment.policy.user.hasBacsPaymentMethod %}
+                        {% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy and not scheduledPayment.policy.hasPolicyOrUserBacsPaymentMethod %}
                             {% set isExpired = false %}
-                            {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod and scheduledPayment.policy.user.paymentMethod.isCardExpired(end) %}
+                            {% if scheduledPayment.policy.user and
+                                scheduledPayment.policy.getPolicyOrPayerOrUserJudoPaymentMethod and
+                                scheduledPayment.policy.getPolicyOrPayerOrUserJudoPaymentMethod.isCardExpired(end) %}
                                 {% set isExpired = true %}
                             {% endif %}
                             <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
@@ -108,8 +110,8 @@
                                     {{ scheduledPayment.status }}
                                 </td>
                                 <td>
-                                    {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod %}
-                                        {{ scheduledPayment.policy.user.paymentMethod }}
+                                    {% if scheduledPayment.policy.hasPolicyOrUserPaymentMethod %}
+                                        {{ scheduledPayment.policy.getPolicyOrUserPaymentMethod }}
                                     {% endif %}
                                 </td>
                             </tr>
@@ -131,7 +133,7 @@
                         <th>Status</th>
                         <th>Bacs</th>
                     </tr>
-                    {% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy and scheduledPayment.policy.user.hasBacsPaymentMethod %}
+                    {% for scheduledPayment in scheduledPayments if scheduledPayment.policy.validPolicy and scheduledPayment.policy.hasPolicyOrUserBacsPaymentMethod %}
                         <tr class="{% if scheduledPayment.status == 'failed' %}danger{% endif %}">
                             <td>
                                 {% if not scheduledPayment.policy.isBillablePolicy %}<del>{% endif %}
@@ -175,8 +177,8 @@
                                 {{ scheduledPayment.status }}
                             </td>
                             <td>
-                                {% if scheduledPayment.policy.user and scheduledPayment.policy.user.paymentMethod %}
-                                    {{ scheduledPayment.policy.user.paymentMethod }}
+                                {% if scheduledPayment.policy.hasPolicyOrUserPaymentMethod %}
+                                    {{ scheduledPayment.policy.getPolicyOrUserPaymentMethod }}
                                 {% endif %}
                             </td>
                         </tr>
