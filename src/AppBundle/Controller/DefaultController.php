@@ -198,7 +198,6 @@ class DefaultController extends BaseController
      */
     public function affiliateLanding(Request $request)
     {
-        $data = [];
         $competitor = [
             'PYB' => [
                 'name' => 'Protect Your Bubble',
@@ -261,6 +260,11 @@ class DefaultController extends BaseController
                 'trustpilot' => 2,
             ]
         ];
+
+        $data = [
+            'competitor' => $competitor,
+        ];
+
         if ($request->get('_route') == 'topcashback') {
             $data = [
                 'competitor' => $competitor,

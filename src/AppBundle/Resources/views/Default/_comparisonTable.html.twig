@@ -21,13 +21,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            Protect Your Bubble
+                            {{ competitor['PYB']['name']|raw }}
                         </span>
                         <span class="td-swap">
-                            Gadget <br> Cover
+                            {{ competitor['GC']['name']|raw }}
                         </span>
                         <span class="td-swap">
-                            Loveit<br>coverit <br>.co.uk
+                            {{ competitor['LICI']['name']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -68,13 +68,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <strong>1 - 5</strong> days <div>depending on stock</div>
+                            {{ competitor['PYB']['days']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>5 - 7</strong> <div>working days</div>
+                            {{ competitor['GC']['days']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>1 - 5</strong> <div>working days</div>
+                            {{ competitor['LICI']['days']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -112,13 +112,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['LICI']['cashback'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -156,13 +156,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['LICI']['cover'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -193,13 +193,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -230,13 +230,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <strong>6 months</strong> <div>from purchase</div>
+                            {{ competitor['PYB']['phoneage']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>18 months</strong> <div>from purchase</div>
+                            {{ competitor['GC']['phoneage']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>3 years</strong> <div>from purchase</div>
+                            {{ competitor['LICI']['phoneage']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -274,13 +274,13 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                           <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['LICI']['saveexcess'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -320,18 +320,19 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                            {% for i in 1..competitor['PYB']['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
                         <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                            {% for i in 1..competitor['GC']['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
                         <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                            {% for i in 1..competitor['LICI']['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
                     {% endif %}
                 </div>
@@ -351,9 +352,9 @@
                     <th width="19%" class="b4">{{ competitor[competitor3]['name']|raw }}</th>
                 {% endif %}
             {% else %}
-                <th width="19%" class="b4 bs-l">Protect your Bubble</th>
-                <th width="19%" class="b4">Gadget <br> Cover</th>
-                <th width="19%" class="b4">Loveit <br> coverIt.co.uk</th>
+                <th width="19%" class="b4 bs-l">{{ competitor['PYB']['name']|raw }}</th>
+                <th width="19%" class="b4">{{ competitor['GC']['name']|raw }}</th>
+                <th width="19%" class="b4">{{ competitor['LICI']['name']|raw }}</th>
             {% endif %}
     </thead>
     <tbody>
@@ -376,9 +377,9 @@
                     <td class="bb1">{{ competitor[competitor3]['days']|raw }}</td>
                 {% endif %}
             {% else %}
-                <td class="bb1 bs-l"><strong>1 - 5</strong> days <div>depending on stock</div></td>
-                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
-                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+                <td class="bb1 bs-l">{{ competitor['PYB']['name']|raw }}</td>
+                <td class="bb1">{{ competitor['GC']['name']|raw }}</td>
+                <td class="bb1">{{ competitor['LICI']['name']|raw }}</td>
             {% endif %}
         </tr>
         <tr>
@@ -406,9 +407,15 @@
                     </td>
                 {% endif %}
             {% else %}
-                <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">
+                    <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['LICI']['cashback'] }} fa-2x"></i>
+                </td>
             {% endif %}
         </tr>
         <tr>
@@ -439,13 +446,13 @@
                 {% endif %}
             {% else %}
                 <td class="bb1 bs-l">
-                    <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
+                    <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
                 </td>
                 <td class="bb1">
-                    <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
+                    <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
                 </td>
                 <td class="bb1">
-                   <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
+                   <i class="far {{ competitor['LICI']['cover'] }} fa-2x"></i>
                 </td>
             {% endif %}
         </tr>
@@ -468,13 +475,13 @@
                 {% endif %}
             {% else %}
                 <td class="wh bs-l">
-                    <i class="far {{ competitor[competitor1]['oldphones'] }} fa-2x"></i>
+                    <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
+                    <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
+                    <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
                 </td>
             {% endif %}
         </tr>
@@ -488,9 +495,9 @@
                     <td class="bb1">{{ competitor[competitor3]['phoneage']|raw }}</td>
                 {% endif %}
             {% else %}
-                <td class="bb1 bs-l"><strong>6 months</strong> <div>from purchase</div></td>
-                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
-                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+                <td class="bb1 bs-l">{{ competitor['PYB']['phoneage']|raw }}</td>
+                <td class="bb1">{{ competitor['GC']['phoneage']|raw }}</td>
+                <td class="bb1">{{ competitor['LICI']['phoneage']|raw }}</td>
             {% endif %}
         </tr>
         <tr>
@@ -518,9 +525,15 @@
                     </td>
                 {% endif %}
             {% else %}
-                <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">
+                    <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
+                </td>
             {% endif %}
         </tr>
         <tr>
@@ -551,18 +564,19 @@
                 {% endif %}
             {% else %}
                 <td class="bb1 bs-l">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor['PYB']['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor['GC']['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor['LICI']['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
             {% endif %}
         </tr>
