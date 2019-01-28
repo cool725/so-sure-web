@@ -12,7 +12,7 @@ require('corejs-typeahead/dist/typeahead.jquery.js');
 require('jquery-mask-plugin');
 require('fuse.js');
 require('jquery-validation');
-require('../../../js/Default/jqueryValidatorMethods.js');
+require('../common/validationMethods.js');
 
 const sosure = sosure || {};
 
