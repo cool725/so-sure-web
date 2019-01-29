@@ -1300,7 +1300,7 @@ class ReportingService
             $month["queryOpen"] = $this->totalAtPoint($start);
             $month["queryClose"] = $this->totalAtPoint($endOfMonth);
             $report[$start->format("F Y")] = $month;
-            $start->add(new \DateInterval("P1M"));
+            $start = $endOfMonth;
         }
         $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($report));
         return $report;
