@@ -241,7 +241,7 @@ class DefaultController extends BaseController
             ],
             'END' => [
                 'name' => 'Endsleigh',
-                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-check',
                 'oldphones' => 'fa-check',
@@ -311,8 +311,8 @@ class DefaultController extends BaseController
                 'affiliate_company' => 'Reward Gateway',
                 'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
                 'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor2' => 'END',
+                'competitor3' => 'SS',
             ];
         }
 

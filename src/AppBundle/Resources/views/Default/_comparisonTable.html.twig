@@ -14,7 +14,7 @@
                         <span class="td-swap">
                             {{ competitor[competitor2]['name']|raw }}
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                {{ competitor[competitor3]['name']|raw }}
                             </span>
@@ -61,7 +61,7 @@
                         <span class="td-swap">
                             {{ competitor[competitor2]['days']|raw }}
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 {{ competitor[competitor3]['days']|raw }}
                             </span>
@@ -105,7 +105,7 @@
                         <span class="td-swap">
                             <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
                             </span>
@@ -149,7 +149,7 @@
                         <span class="td-swap">
                             <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
                             </span>
@@ -186,7 +186,7 @@
                         <span class="td-swap">
                             <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
                             </span>
@@ -223,7 +223,7 @@
                         <span class="td-swap">
                             {{ competitor[competitor2]['phoneage']|raw }}
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 {{ competitor[competitor3]['phoneage']|raw }}
                             </span>
@@ -267,7 +267,7 @@
                         <span class="td-swap">
                             <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
                             </span>
@@ -311,7 +311,7 @@
                                 <i class="fas fa-star"></i>
                             {% endfor %}
                         </span>
-                        {% if affiliate_page != 'vouchercodes' %}
+                        {% if competitor3 is defined %}
                             <span class="td-swap">
                                 {% for i in 1..competitor[competitor3]['trustpilot'] %}
                                     <i class="fas fa-star"></i>
@@ -348,7 +348,7 @@
             {% if affiliate_page is defined %}
                 <th width="19%" class="b4 bs-l">{{ competitor[competitor1]['name']|raw }}</th>
                 <th width="19%" class="b4">{{ competitor[competitor2]['name']|raw }}</th>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <th width="19%" class="b4">{{ competitor[competitor3]['name']|raw }}</th>
                 {% endif %}
             {% else %}
@@ -373,7 +373,7 @@
             {% if affiliate_page is defined %}
                 <td class="bb1 bs-l">{{ competitor[competitor1]['days']|raw }}</td>
                 <td class="bb1">{{ competitor[competitor2]['days']|raw }}</td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="bb1">{{ competitor[competitor3]['days']|raw }}</td>
                 {% endif %}
             {% else %}
@@ -401,7 +401,7 @@
                 <td class="wh">
                     <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
                 </td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="wh">
                         <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
                     </td>
@@ -439,7 +439,7 @@
                 <td class="bb1">
                     <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
                 </td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="bb1">
                        <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
                     </td>
@@ -468,7 +468,7 @@
                 <td class="wh">
                     <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
                 </td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="wh">
                         <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
                     </td>
@@ -491,7 +491,7 @@
             {% if affiliate_page is defined %}
                 <td class="bb1 bs-l">{{ competitor[competitor1]['phoneage']|raw }}</td>
                 <td class="bb1">{{ competitor[competitor2]['phoneage']|raw }}</td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="bb1">{{ competitor[competitor3]['phoneage']|raw }}</td>
                 {% endif %}
             {% else %}
@@ -519,7 +519,7 @@
                 <td class="wh">
                     <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
                 </td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="wh">
                         <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
                     </td>
@@ -555,7 +555,7 @@
                         <i class="fas fa-star"></i>
                     {% endfor %}
                 </td>
-                {% if affiliate_page != 'vouchercodes' %}
+                {% if competitor3 is defined %}
                     <td class="bb1">
                         {% for i in 1..competitor[competitor3]['trustpilot'] %}
                             <i class="fas fa-star"></i>
