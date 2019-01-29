@@ -37,12 +37,6 @@ class BankAccount
     protected $accountName;
 
     /**
-     * @AppAssert\Token()
-     * @var string
-     */
-    protected $validateName;
-
-    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
@@ -192,16 +186,6 @@ class BankAccount
     public function getAccountName()
     {
         return $this->accountName;
-    }
-
-    public function setValidateName($validateName)
-    {
-        $this->validateName = $validateName;
-    }
-
-    public function getValidateName()
-    {
-        return $this->validateName;
     }
 
     public function setBankName($bankName)

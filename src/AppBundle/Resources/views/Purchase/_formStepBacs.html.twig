@@ -30,7 +30,7 @@
     <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
         {{ form_label(bacs_form.accountName, 'Name on account') }}
         {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Enter full name', 'class': 'form-control', 'data-hj-suppress': ''}}) }}
-        {{ form_widget(bacs_form.validateName, {'value' : app.user.name}) }}
+        {{ form_widget(bacs_form.validateName) }}
         {% if form_errors(bacs_form.accountName) %}
             <div class="with-errors">{{ form_errors(bacs_form.accountName) }}</div>
         {% else %}
