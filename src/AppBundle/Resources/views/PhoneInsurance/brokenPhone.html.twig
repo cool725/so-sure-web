@@ -1,49 +1,40 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
+{# Set vars #}
+{% set body_class = 'seo-broken-phone' %}
+
+{% block title %}so-sure - Phone Insurance Broken Phone{% endblock %}
 {% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
     <link rel="canonical" href="{{ url('phone_insurance_broken_phone') }}" />
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/about.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/seo-pages.css') }}">
 {% endblock %}
 
 {% block body %}
-<section class="about-section section--pad">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="section-title">Broken Phone</h1>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="text-zaffre mb-0">Phone Insurance</h5>
+                    <h1 class="text-primary mb-4">Broken Phone</h1>
+                    <p class="mb-4">Breaking your phone is a serious drag and can happen either accidentally or by putting your phone at risk. If it's the former, we'll make sure that you are covered. Examples of damage include mechanical faults like broken buttons or when the phone simply won't turn on.</p>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote sosure-track"
+                       data-event="seo-pages-broken-phone">
+                       Get a Quote</a>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <p>Breaking your phone is a serious drag and can happen either accidentally or by putting your phone at risk. If it’s the former, we’ll make sure that you are covered. Examples of damage include mechanical faults like broken buttons or when the phone simply won’t turn on. </p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
+    {# Page Modals #}
 
-{% include 'AppBundle::Default/footerCta.html.twig' %}
+{% endblock %}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}
+{% block javascriptsPage %}
 
 {% endblock %}

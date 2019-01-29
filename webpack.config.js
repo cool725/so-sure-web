@@ -36,6 +36,7 @@ Encore
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
     .addEntry('careers', './src/AppBundle/Resources/public/rebrand/js/pages/careers.js')
+    .addEntry('seo-pages', './src/AppBundle/Resources/public/rebrand/js/pages/seo-pages.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
