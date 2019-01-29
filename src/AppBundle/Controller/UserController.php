@@ -1398,6 +1398,7 @@ class UserController extends BaseController
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
             ->getForm();
         $bacs = new Bacs();
+        $bacs->setValidateName($user->getName());
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)

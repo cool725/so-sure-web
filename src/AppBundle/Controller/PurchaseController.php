@@ -570,6 +570,7 @@ class PurchaseController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
         $amount = null;
         $bacs = new Bacs();
+        $bacs->setValidateName($user->getName());
         $bacsConfirm = new Bacs();
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
@@ -600,6 +601,7 @@ class PurchaseController extends BaseController
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
+            // ->setValidationName('asdasdasd')
             ->getForm();
         /** @var FormInterface $bacsConfirmForm */
         $bacsConfirmForm = $this->get('form.factory')

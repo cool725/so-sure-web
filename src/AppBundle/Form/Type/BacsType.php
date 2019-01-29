@@ -49,9 +49,7 @@ class BacsType extends AbstractType
 
         $builder
             ->add('accountName', TextType::class, ['required' => $this->required])
-            ->add('validateName', HiddenType::class, [
-                // 'data' => Add user here
-            ])
+            ->add('validateName', HiddenType::class)
             ->add('sortCode', TextType::class, ['required' => $this->required, 'attr' => ['maxlength' => 8]])
             ->add('accountNumber', TextType::class, ['required' => $this->required])
             ->add('soleSignature', CheckboxType::class, [
@@ -60,6 +58,7 @@ class BacsType extends AbstractType
             ])
             ->add('save', SubmitType::class)
         ;
+
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             /** @var Bacs $bacs */
             $bacs = $event->getData();
