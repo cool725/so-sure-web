@@ -5,6 +5,8 @@ namespace AppBundle\Form\Type;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Service\PCAService;
 use AppBundle\Exception\DirectDebitBankException;
+use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -18,6 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class BacsType extends AbstractType
 {
@@ -43,9 +46,12 @@ class BacsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         $builder
             ->add('accountName', TextType::class, ['required' => $this->required])
-            ->add('validateName', HiddenType::class)
+            ->add('validateName', HiddenType::class, [
+                // 'data' => Add user here
+            ])
             ->add('sortCode', TextType::class, ['required' => $this->required, 'attr' => ['maxlength' => 8]])
             ->add('accountNumber', TextType::class, ['required' => $this->required])
             ->add('soleSignature', CheckboxType::class, [
