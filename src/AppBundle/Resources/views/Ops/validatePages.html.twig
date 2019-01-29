@@ -17,346 +17,420 @@
         <div class="container container-xtra py-5">
             <h1 class="text-primary">Ops</h1>
             <h5 class="text-zaffre mb-4">Pages to manually verify when updating design</h5>
-            <div class="row">
-                <div class="col-lg-5">
-                    <h4 class="mb-2">Cookie warning</h4>
-                    <a href="#" id="clear_cookies" class="btn btn-success btn-sm mb-4">Clear Cookies</a>
-                    <h4 class="mb-2">Any login status</h4>
-                    <ul>
-                        <li class="mb-2"><a href="{{ url('homepage') }}">Home</a></li>
-                        <li class="mb-2"><a href="{{ url('quote_make_model', {'make':'apple','model':'iphone+X'}) }}">Quote</a></li>
-                        <li class="mb-2"><a href="{{ url('phone_insurance_water_damage') }}">SEO Phone Pages (several other similiar)</a></li>
-                        <li class="mb-2"><a href="{{ url('learn_more_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Learn More</a></li>
-                    </ul>
-                    <h4 class="mb-2">Logged out required</h4>
-                    <ul>
-                        <li class="mb-2">
-                            <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a>
-                        </li>
-                    </ul>
-                    <h4 class="mb-2">Admin login required</h4>
-                    <ul>
-                        <li class="mb-2">
-                            {% if cancelled_policy %}
-                                <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> (auto impersonate {{ cancelled_policy.user.email }}
-                            {% else %}
-                                No User Invalid Policy
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if cancelled_fraud_policy %}
-                                <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_fraud_policy.user.email }}">User Policy Invalid (Fraud) - no additonal purchase</a> (auto impersonate {{ cancelled_fraud_policy.user.email }}
-                            {% else %}
-                                No User Invalid Policy (fraud)
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_multiple_policy %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> (auto impersonate {{ valid_multiple_policy.user.email }})
-                            {% else %}
-                                No User Home - Multiple Policy
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_policy_monthly %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_monthly.user.email }}">User Home - Monthly</a> (auto impersonate {{ valid_policy_monthly.user.email }})
-                            {% else %}
-                                No User Home - Monthly
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {%  if unpaid_valid_policy_monthly %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ unpaid_valid_policy_monthly.user.email }}">User Home - Monthly (Unpaid)</a> (auto impersonate {{ unpaid_valid_policy_monthly.user.email }})
-                            {% else %}
-                                No Monthly unpaid policy available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_policy_annual %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_annual.user.email }}">User Home - Annual</a> (auto impersonate {{ valid_policy_annual.user.email }})
-                            {% else %}
-                                No user home - annual
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if invitation %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> (auto impersonate {{ invitation.inviter.email }})
-                            {% else %}
-                                No user home - send invitations
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if claimed_policy %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> (auto impersonate {{ claimed_policy.user.email }})
-                            {% else %}
-                                No user home - unable to invite
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {%  if multipay_policy %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ multipay_policy.user.email }}">User Home - Multipay</a> (auto impersonate {{ multipay_policy.user.email }})
-                            {% else %}
-                                No Mulitpay policy available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if expired_policy_nocashback %}
-                            <a href="{{ url('user_policy', {'policyId': expired_policy_nocashback.id }) }}?_impersonate={{ expired_policy_nocashback.user.email }}">User Home - Expired Policy No Cashback</a> (auto impersonate {{ expired_policy_nocashback.user.email }})
-                            {% else %}
-                                No expired policy (no cashback) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if expired_policy_cashback %}
-                            <a href="{{ url('user_policy', {'policyId': expired_policy_cashback.id }) }}?_impersonate={{ expired_policy_cashback.user.email }}">User Home - Expired Policy Cashback</a> (auto impersonate {{ expired_policy_cashback.user.email }})
-                            {% else %}
-                                No expired policy (cashback) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if fully_expired_policy_nocashback %}
-                            <a href="{{ url('user_policy', {'policyId': fully_expired_policy_nocashback.id }) }}?_impersonate={{ fully_expired_policy_nocashback.user.email }}">User Home - Fully Expired Policy No Cashback</a> (auto impersonate {{ fully_expired_policy_nocashback.user.email }})
-                            {% else %}
-                                No fully expired policy (no cashback) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if fully_expired_policy_cashback %}
-                            <a href="{{ url('user_policy', {'policyId': fully_expired_policy_cashback.id }) }}?_impersonate={{ fully_expired_policy_cashback.user.email }}">User Home - Fully Expired Policy Cashback</a> (auto impersonate {{ fully_expired_policy_cashback.user.email }})
-                            {% else %}
-                                No fully expired policy (cashback) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">Onboarding</a> (auto impersonate {{ valid_policy.user.email }})
-                        </li>
-                        <li class="mb-2">
-                            {% if unpaid_policydiscount_policy %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policydiscount_policy.user.email }}">User Unpaid w/Policy Discount Page</a> (auto impersonate {{ unpaid_policydiscount_policy.user.email }})
-                            {% else %}
-                                No policy unpaid w/policy discount available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if policy_cancelled_payment_owed %}
-                            <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}">User Home Page Redirect (Policy Cancelled &amp; Payment Owed)</a> (auto impersonate {{ policy_cancelled_payment_owed.user.email }})
-                            {% else %}
-                                No policy cancelled w/payment owed available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_remainder_policy %}
-                            <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}">User Remainder Payment Page</a> (auto impersonate {{ valid_remainder_policy.user.email }})
-                            {% else %}
-                                No remainder policy available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if picsure_approved_policy %}
-                            <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_approved_policy.user.email }}">User Policy List pic-sure Approved</a> (auto impersonate {{ picsure_approved_policy.user.email }})
-                            {% else %}
-                                No pic-sure approved policy available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if picsure_rejected_policy %}
-                            <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_rejected_policy.user.email }}">User Policy List pic-sure Rejected</a> (auto impersonate {{ picsure_rejected_policy.user.email }})
-                            {% else %}
-                                No pic-sure rejected policy available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if non_picsure_policy %}
-                                <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}">User Policy List non-pic-sure policy</a> (auto impersonate {{ non_picsure_policy.user.email }})
-                            {% else %}
-                                No non-picsure policy
-                            {% endif %}
-                        </li>
-                    </ul>
-                    <h4 class="mb-2">Unpaid</h4>
-                    <ul>
-                        {% for paymentOnTime in ['ontime', 'outoftime'] %}
-                            {% for unpaid_reason in unpaid_reasons %}
-                                <li class="mb-2">
-                                    {% if unpaid_policies_for_display[paymentOnTime][unpaid_reason] is defined %}
-                                        <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policies_for_display[paymentOnTime][unpaid_reason].user.email }}">User Unpaid Page ({{ unpaid_reason }} - {{ paymentOnTime }})</a> (auto impersonate {{ unpaid_policies_for_display[paymentOnTime][unpaid_reason].user.email }})
-                                    {% else %}
-                                        No policy unpaid available ({{ unpaid_reason }} - {{ paymentOnTime }})
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-                    <h4 class="mb-2">Renewals</h4>
-                    <ul>
-                        <li class="mb-2">
-                            {% if valid_renewal_policy_monthly_no_pot %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_no_pot.user.email }}">User Renewal Monthly No Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_monthly_no_pot.user.email }})
-                            {% else %}
-                                No renewal policy (monthly without pot) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_renewal_policy_yearly_no_pot %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_no_pot.user.email }}">User Renewal Yearly No Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_no_pot.user.email }})
-                            {% else %}
-                                No renewal policy (yearly without pot) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_renewal_policy_yearly_only_no_pot %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_no_pot.user.email }}">User Renewal Yearly (Restricted) No Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_only_no_pot.user.email }})
-                            {% else %}
-                                No renewal policy (yearly restricted without pot) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_renewal_policy_monthly_with_pot %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_with_pot.user.email }}">User Renewal Monthly With Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_monthly_with_pot.user.email }})
-                            {% else %}
-                                No renewal policy (monthly with pot) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_renewal_policy_yearly_with_pot %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_with_pot.user.email }}">User Renewal Yearly With Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_with_pot.user.email }})
-                            {% else %}
-                                No renewal policy (yearly with pot) available
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {% if valid_renewal_policy_yearly_only_with_pot %}
-                                <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_with_pot.user.email }}">User Renewal Yearly (Restricted) With Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_only_with_pot.user.email }})
-                            {% else %}
-                                No renewal policy (yearly restricted with pot) available
-                            {% endif %}
-                        </li>
-                    </ul>
+
+            <h4 class="mb-2">Cookie warning</h4>
+            <a href="#" id="clear_cookies" class="btn btn-success btn-sm mb-4">Clear Cookies</a>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Any login status <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><a href="{{ url('homepage') }}"><i class="fal fa-link fa-fw"></i> Home</a></li>
+                            <li class="mb-2"><a href="{{ url('quote_make_model', {'make':'apple','model':'iphone+X'}) }}"><i class="fal fa-link fa-fw"></i> Quote</a></li>
+                            <li class="mb-2"><a href="{{ url('phone_insurance_water_damage') }}"><i class="fal fa-link fa-fw"></i> SEO Phone Pages (several other similiar)</a></li>
+                            <li class="mb-2"><a href="{{ url('learn_more_make_model', {'make':'Apple','model':'iPhone+6S'}) }}"><i class="fal fa-link fa-fw"></i> Learn More</a></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="col-lg-5 offset-lg-1">
-                    <h4 class="mb-2">Other pages</h4>
-                    <ul>
-                        <li class="mb-2">
-                            <a href="{{ url('about_home') }}">About Us Page</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('about_how_to_contact_so_sure') }}">Contact Us Page</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('mobile_phone_insurance_for_your_company') }}">Company page</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('purchase_cancel', {'id': valid_policy.id}) }}">Cancel policy</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('claim') }}">Make a claim page</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ url('launch_usa') }}">USA Page</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v10.pdf" target="_blank" rel="noopener noreferrer">Sample policy terms</a>
-                        </li>
-                    </ul>
-                    <h4 class="mb-2">Error pages</h4>
-                    <ul>
-                        <li class="mb-2">
-                            <a href="/_error/403">403</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="/_error/404">404</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="/_error/500">500</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="/_error/503">503</a>
-                        </li>
-                        <li class="mb-2">
-                            <a href="{{ path('ops_exception') }}">Varnish Exception Page</a>
-                        </li>
-                    </ul>
-                    <h4 class="mb-2">External</h4>
-                    <ul class="mb-2">
-                        <li class="mb-2"><a href="http://test.protectyourgadget.com/quote/" target="_blank" rel="noopener noreferrer">GoCompare / Protect your gadget</a>
-                        </li>
-                    </ul>
-                    <form method="POST" action="{{ path('api_external_gocompare_deeplink') }}">
-                        <input type="hidden" name="reference" value="{{ active_phone.id }}">
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="first_name" placeholder="First Name" value="{{ fake.first }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="surname" placeholder="Last Name" value="{{ fake.last }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="email" class="form-control" name="email_address" placeholder="email" value="{{ fake.email }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="dob" placeholder="DOB (YYYY-MM-DD)" value="{{ fake.dob }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="house_no" placeholder="House Number">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="address_1" placeholder="Address 1" value="{{ fake.line1 }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="address_2" placeholder="Address 2" value="{{ fake.line2 }}">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="address_3" placeholder="Address 3">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="address_4" placeholder="Address 4">
-                        </div>
-                        <div class="form-group">
-                            <input type="text"class="form-control"  name="postcode" placeholder="Postcode" value="{{ fake.postcode }}">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success">Register user</button>
-                        </div>
-                    </form>
-                    <h4 class="mb-2">OAuth/Bearer Api</h4>
-                    <ul>
-                        <li class="mb-2">
-                            Oauth request inbound
-                            <a href="{{ oauthStarlingUrl }}">Request Starling summary access</a>
-                        </li>
-                    </ul>
-                    <h4 class="mb-2">User Welcome w/Starling Session</h4>
-                    <ol>
-                        <li class="mb-2">
-                            Ensure logged in as admin
-                        </li>
-                        <li class="mb-2">
-                            {% if not valid_policy_monthly.user.enabled %}<del>{% endif %}
-                            <a href="{{ url('ops_pages') }}?_impersonate={{ valid_policy_monthly.user.email }}">Ops</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
-                            {% if not valid_policy_monthly.user.enabled %}</del> (user not enabled){% endif %}
-                        </li>
-                        <li class="mb-2">
-                            {{ form_start(starling_form) }}
-                            {{ form_widget(starling_form.set, {'fa': 'fa fa-bank', 'right': true, 'left' : true, 'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
-                            {{ form_end(starling_form) }}
-                        </li>
-                    </ol>
-                    <form id="bearer_form">
-                        <div class="form-group">
-                            <input type="text" name="bearer" class="form-control" id="bearer-token">
-                        </div>
-                        <div class="form-group">
-                            <input type="button" class="btn btn-success" id="bearer_submit" value="Query User Api">
-                        </div>
-                    </form>
-                    <p class="bg-link-water rounded p-3">
-                        The resulting 'code' (from the oauth/auth URL) can be used with
-                        <code title="see: src/AppBundle/DataFixtures/MongoDB/d/Oauth2/LoadOauth2Data.php">client_secret=...</code> and <code>grant_type=authorization_code</code> to get a bearer token.
-                        You can also get the token via Postman for API tests, or create your own by writing a
-                        <code title="example: App\Tests\Controller\BearerApi\BearerTest::testAuthenticatedComplexUser()">\App\Tests\Traits\Oauth::newOauth2AccessToken()</code> record yourself.\
-                    </p>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Logged out required <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="{{ url('scode', {'code':scode}) }}"><i class="fal fa-link fa-fw"></i> SCode Invitiation</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('invitation', {'id':invitation.id}) }}"><i class="fal fa-link fa-fw"></i> Email Invitiation</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Admin login required <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                {% if cancelled_policy %}
+                                    <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy Invalid</a> (auto impersonate {{ cancelled_policy.user.email }}
+                                {% else %}
+                                    No User Invalid Policy
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if cancelled_fraud_policy %}
+                                    <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_fraud_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy Invalid (Fraud) - no additonal purchase</a> (auto impersonate {{ cancelled_fraud_policy.user.email }}
+                                {% else %}
+                                    No User Invalid Policy (fraud)
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_multiple_policy %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Multiple Policy</a> (auto impersonate {{ valid_multiple_policy.user.email }})
+                                {% else %}
+                                    No User Home - Multiple Policy
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_policy_monthly %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_monthly.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Monthly</a> (auto impersonate {{ valid_policy_monthly.user.email }})
+                                {% else %}
+                                    No User Home - Monthly
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {%  if unpaid_valid_policy_monthly %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_valid_policy_monthly.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Monthly (Unpaid)</a> (auto impersonate {{ unpaid_valid_policy_monthly.user.email }})
+                                {% else %}
+                                    No Monthly unpaid policy available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_policy_annual %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_annual.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Annual</a> (auto impersonate {{ valid_policy_annual.user.email }})
+                                {% else %}
+                                    No user home - annual
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if invitation %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}"><i class="fal fa-link fa-fw"></i> User Home - Sent Invitation</a> (auto impersonate {{ invitation.inviter.email }})
+                                {% else %}
+                                    No user home - send invitations
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if claimed_policy %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Unable to invite (w/Claimed Policy)</a> (auto impersonate {{ claimed_policy.user.email }})
+                                {% else %}
+                                    No user home - unable to invite
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {%  if multipay_policy %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ multipay_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Multipay</a> (auto impersonate {{ multipay_policy.user.email }})
+                                {% else %}
+                                    No Mulitpay policy available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if expired_policy_nocashback %}
+                                <a href="{{ url('user_policy', {'policyId': expired_policy_nocashback.id }) }}?_impersonate={{ expired_policy_nocashback.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Expired Policy No Cashback</a> (auto impersonate {{ expired_policy_nocashback.user.email }})
+                                {% else %}
+                                    No expired policy (no cashback) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if expired_policy_cashback %}
+                                <a href="{{ url('user_policy', {'policyId': expired_policy_cashback.id }) }}?_impersonate={{ expired_policy_cashback.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Expired Policy Cashback</a> (auto impersonate {{ expired_policy_cashback.user.email }})
+                                {% else %}
+                                    No expired policy (cashback) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if fully_expired_policy_nocashback %}
+                                <a href="{{ url('user_policy', {'policyId': fully_expired_policy_nocashback.id }) }}?_impersonate={{ fully_expired_policy_nocashback.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Fully Expired Policy No Cashback</a> (auto impersonate {{ fully_expired_policy_nocashback.user.email }})
+                                {% else %}
+                                    No fully expired policy (no cashback) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if fully_expired_policy_cashback %}
+                                <a href="{{ url('user_policy', {'policyId': fully_expired_policy_cashback.id }) }}?_impersonate={{ fully_expired_policy_cashback.user.email }}"><i class="fal fa-link fa-fw"></i> User Home - Fully Expired Policy Cashback</a> (auto impersonate {{ fully_expired_policy_cashback.user.email }})
+                                {% else %}
+                                    No fully expired policy (cashback) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}"><i class="fal fa-link fa-fw"></i> Onboarding</a> (auto impersonate {{ valid_policy.user.email }})
+                            </li>
+                            <li class="mb-2">
+                                {% if unpaid_policydiscount_policy %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policydiscount_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Unpaid w/Policy Discount Page</a> (auto impersonate {{ unpaid_policydiscount_policy.user.email }})
+                                {% else %}
+                                    No policy unpaid w/policy discount available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if policy_cancelled_payment_owed %}
+                                <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}"><i class="fal fa-link fa-fw"></i> User Home Page Redirect (Policy Cancelled &amp; Payment Owed)</a> (auto impersonate {{ policy_cancelled_payment_owed.user.email }})
+                                {% else %}
+                                    No policy cancelled w/payment owed available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_remainder_policy %}
+                                <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Remainder Payment Page</a> (auto impersonate {{ valid_remainder_policy.user.email }})
+                                {% else %}
+                                    No remainder policy available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if picsure_approved_policy %}
+                                <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_approved_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy List pic-sure Approved</a> (auto impersonate {{ picsure_approved_policy.user.email }})
+                                {% else %}
+                                    No pic-sure approved policy available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if picsure_rejected_policy %}
+                                <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_rejected_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy List pic-sure Rejected</a> (auto impersonate {{ picsure_rejected_policy.user.email }})
+                                {% else %}
+                                    No pic-sure rejected policy available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if non_picsure_policy %}
+                                    <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy List non-pic-sure policy</a> (auto impersonate {{ non_picsure_policy.user.email }})
+                                {% else %}
+                                    No non-picsure policy
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Unpaid <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            {% for paymentOnTime in ['ontime', 'outoftime'] %}
+                                {% for unpaid_reason in unpaid_reasons %}
+                                    <li class="mb-2">
+                                        {% if unpaid_policies_for_display[paymentOnTime][unpaid_reason] is defined %}
+                                            <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policies_for_display[paymentOnTime][unpaid_reason].user.email }}"><i class="fal fa-link fa-fw"></i> User Unpaid Page ({{ unpaid_reason }} - {{ paymentOnTime }})</a> (auto impersonate {{ unpaid_policies_for_display[paymentOnTime][unpaid_reason].user.email }})
+                                        {% else %}
+                                            No policy unpaid available ({{ unpaid_reason }} - {{ paymentOnTime }})
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Renewals <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                {% if valid_renewal_policy_monthly_no_pot %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_no_pot.user.email }}"><i class="fal fa-link fa-fw"></i> User Renewal Monthly No Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_monthly_no_pot.user.email }})
+                                {% else %}
+                                    No renewal policy (monthly without pot) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_renewal_policy_yearly_no_pot %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_no_pot.user.email }}"><i class="fal fa-link fa-fw"></i> User Renewal Yearly No Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_no_pot.user.email }})
+                                {% else %}
+                                    No renewal policy (yearly without pot) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_renewal_policy_yearly_only_no_pot %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_no_pot.user.email }}"><i class="fal fa-link fa-fw"></i> User Renewal Yearly (Restricted) No Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_only_no_pot.user.email }})
+                                {% else %}
+                                    No renewal policy (yearly restricted without pot) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_renewal_policy_monthly_with_pot %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_with_pot.user.email }}"><i class="fal fa-link fa-fw"></i> User Renewal Monthly With Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_monthly_with_pot.user.email }})
+                                {% else %}
+                                    No renewal policy (monthly with pot) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_renewal_policy_yearly_with_pot %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_with_pot.user.email }}"><i class="fal fa-link fa-fw"></i> User Renewal Yearly With Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_with_pot.user.email }})
+                                {% else %}
+                                    No renewal policy (yearly with pot) available
+                                {% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {% if valid_renewal_policy_yearly_only_with_pot %}
+                                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_with_pot.user.email }}"><i class="fal fa-link fa-fw"></i> User Renewal Yearly (Restricted) With Pot - Home Page</a> (auto impersonate {{ valid_renewal_policy_yearly_only_with_pot.user.email }})
+                                {% else %}
+                                    No renewal policy (yearly restricted with pot) available
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Other pages <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="{{ url('about_home') }}"><i class="fal fa-link fa-fw"></i> About Us Page</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('about_how_to_contact_so_sure') }}"><i class="fal fa-link fa-fw"></i> Contact Us Page</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('mobile_phone_insurance_for_your_company') }}"><i class="fal fa-link fa-fw"></i> Company page</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('purchase_cancel', {'id': valid_policy.id}) }}"><i class="fal fa-link fa-fw"></i> Cancel policy</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('claim') }}"><i class="fal fa-link fa-fw"></i> Make a claim page</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ url('launch_usa') }}"><i class="fal fa-link fa-fw"></i> USA Page</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v10.pdf" target="_blank" rel="noopener noreferrer"><i class="fal fa-link fa-fw"></i> Sample policy terms</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        Error pages <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <a href="/_error/403"><i class="fal fa-link fa-fw"></i> 403</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="/_error/404"><i class="fal fa-link fa-fw"></i> 404</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="/_error/500"><i class="fal fa-link fa-fw"></i> 500</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="/_error/503"><i class="fal fa-link fa-fw"></i> 503</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="{{ path('ops_exception') }}"><i class="fal fa-link fa-fw"></i> Varnish Exception Page</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        External <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><a href="http://test.protectyourgadget.com/quote/" target="_blank" rel="noopener noreferrer"><i class="fal fa-link fa-fw"></i> GoCompare / Protect your gadget</a></li>
+                        </ul>
+                        <form method="POST" class="form-400 m-0" action="{{ path('api_external_gocompare_deeplink') }}">
+                            <input type="hidden" name="reference" value="{{ active_phone.id }}">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="first_name" placeholder="First Name" value="{{ fake.first }}">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="surname" placeholder="Last Name" value="{{ fake.last }}">
+                            </div>
+                            <div class="form-group">
+                                <input type="email" class="form-control" name="email_address" placeholder="email" value="{{ fake.email }}">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="dob" placeholder="DOB (YYYY-MM-DD)" value="{{ fake.dob }}">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="house_no" placeholder="House Number">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="address_1" placeholder="Address 1" value="{{ fake.line1 }}">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="address_2" placeholder="Address 2" value="{{ fake.line2 }}">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="address_3" placeholder="Address 3">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="address_4" placeholder="Address 4">
+                            </div>
+                            <div class="form-group">
+                                <input type="text"class="form-control"  name="postcode" placeholder="Postcode" value="{{ fake.postcode }}">
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-success">Register user</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanding-cardbox mb-4">
+                <div class="expanding-cardbox__body">
+                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                        OAuth/Bearer Api <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h5>
+                    <div class="expanding-cardbox__expand mt-4">
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                Oauth request inbound <br>
+                                <a href="{{ oauthStarlingUrl }}"><i class="fal fa-link fa-fw"></i>  Request Starling summary access</a>
+                            </li>
+                        </ul>
+                        <ol>
+                            <li class="mb-2">
+                                Ensure logged in as admin
+                            </li>
+                            <li class="mb-2">
+                                {% if not valid_policy_monthly.user.enabled %}<del>{% endif %}
+                                <a href="{{ url('ops_pages') }}?_impersonate={{ valid_policy_monthly.user.email }}">Ops</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
+                                {% if not valid_policy_monthly.user.enabled %}</del> (user not enabled){% endif %}
+                            </li>
+                            <li class="mb-2">
+                                {{ form_start(starling_form) }}
+                                {{ form_widget(starling_form.set, {'fa': 'fa fa-bank', 'right': true, 'left' : true, 'attr': {'class': 'btn btn-success'}, 'label': 'Set Session Vars' }) }}
+                                {{ form_end(starling_form) }}
+                            </li>
+                        </ol>
+                        <form id="bearer_form">
+                            <div class="form-group">
+                                <input type="text" name="bearer" class="form-control" id="bearer-token">
+                            </div>
+                            <div class="form-group">
+                                <input type="button" class="btn btn-success" id="bearer_submit" value="Query User Api">
+                            </div>
+                        </form>
+                        <p class="bg-link-water rounded p-3">
+                            The resulting 'code' (from the oauth/auth URL) can be used with
+                            <code title="see: src/AppBundle/DataFixtures/MongoDB/d/Oauth2/LoadOauth2Data.php">client_secret=...</code> and <code>grant_type=authorization_code</code> to get a bearer token.
+                            You can also get the token via Postman for API tests, or create your own by writing a
+                            <code title="example: App\Tests\Controller\BearerApi\BearerTest::testAuthenticatedComplexUser()">\App\Tests\Traits\Oauth::newOauth2AccessToken()</code> record yourself.\
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
