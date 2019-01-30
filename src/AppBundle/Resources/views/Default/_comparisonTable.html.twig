@@ -7,40 +7,27 @@
             <th width="50%" class="b4">
                 <a href="#" class="td-prev-btn"><i class="fal fa-angle-left fa-3x text-columbia-blue-e"></i></a>
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        Protect Your Bubble
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            Gadget <br> Cover
+                    {% if affiliate_page is defined %}
+                        <span class="td-swap td-active">
+                            {{ competitor[competitor1]['name']|raw }}
                         </span>
                         <span class="td-swap">
-                            Simplesurance
+                            {{ competitor[competitor2]['name']|raw }}
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            Gadget <br> Cover
-                        </span>
-                        <span class="td-swap">
-                            CloudCover
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            Endsleigh
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            Endsleigh
-                        </span>
-                        <span class="td-swap">
-                            Simplesurance
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                               {{ competitor[competitor3]['name']|raw }}
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            Gadget <br> Cover
+                        <span class="td-swap td-active">
+                            {{ competitor['PYB']['name']|raw }}
                         </span>
                         <span class="td-swap">
-                            Loveit<br>coverit <br>.co.uk
+                            {{ competitor['GC']['name']|raw }}
+                        </span>
+                        <span class="td-swap">
+                            {{ competitor['LICI']['name']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -67,40 +54,27 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <strong>1 - 5</strong> days <div>depending on stock</div>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <strong>5 - 7</strong> <div>working days</div>
+                    {% if affiliate_page is defined %}
+                        <span class="td-swap td-active">
+                            {{ competitor[competitor1]['days']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>3 - 5</strong> <div>working days</div>
+                            {{ competitor[competitor2]['days']|raw }}
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <strong>5 - 7</strong> <div>working days</div>
-                        </span>
-                        <span class="td-swap">
-                            <strong>3 - 5</strong> <div>working days</div>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <strong>1 - 5</strong> <div>working days</div>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <strong>1 - 5</strong> <div>working days</div>
-                        </span>
-                        <span class="td-swap">
-                            <strong>3 - 5</strong> <div>working days</div>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                {{ competitor[competitor3]['days']|raw }}
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <strong>5 - 7</strong> <div>working days</div>
+                        <span class="td-swap td-active">
+                            {{ competitor['PYB']['days']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>1 - 5</strong> <div>working days</div>
+                            {{ competitor['GC']['days']|raw }}
+                        </span>
+                        <span class="td-swap">
+                            {{ competitor['LICI']['days']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -124,40 +98,27 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                    {% if affiliate_page is defined %}
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor[competitor1]['cashback'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far {{ competitor['LICI']['cashback'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -181,40 +142,27 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                    {% if affiliate_page is defined%}
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <i class="far fa-check fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <i class="far fa-check fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far {{ competitor['LICI']['cover'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -231,40 +179,27 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                    {% if affiliate_page is defined %}
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor[competitor1]['oldphones'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <i class="far fa-check fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <i class="far fa-check fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -281,40 +216,27 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <strong>6 months</strong> <div>from purchase</div>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <strong>18 months</strong> <div>from purchase</div>
+                    {% if affiliate_page is defined %}
+                        <span class="td-swap td-active">
+                            {{ competitor[competitor1]['phoneage']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>6 months</strong> <div>from purchase</div>
+                            {{ competitor[competitor2]['phoneage']|raw }}
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <strong>18 months</strong> <div>from purchase</div>
-                        </span>
-                        <span class="td-swap">
-                            <strong>6 months</strong> <div>from purchase</div>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <strong>3 years</strong> <div>from purchase</div>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <strong>3 years</strong> <div>from purchase</div>
-                        </span>
-                        <span class="td-swap">
-                            <strong>6 months</strong> <div>from purchase</div>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                {{ competitor[competitor3]['phoneage']|raw }}
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <strong>18 months</strong> <div>from purchase</div>
+                        <span class="td-swap td-active">
+                            {{ competitor['PYB']['phoneage']|raw }}
                         </span>
                         <span class="td-swap">
-                            <strong>3 years</strong> <div>from purchase</div>
+                            {{ competitor['GC']['phoneage']|raw }}
+                        </span>
+                        <span class="td-swap">
+                            {{ competitor['LICI']['phoneage']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -338,40 +260,27 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <i class="far fa-times fa-2x"></i>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                    {% if affiliate_page is defined and affiliate_page != 'vouchercodes' %}
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor[competitor1]['saveexcess'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <i class="far fa-times fa-2x"></i>
+                        <span class="td-swap td-active">
+                            <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                           <i class="far fa-times fa-2x"></i>
+                            <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
+                        </span>
+                        <span class="td-swap">
+                            <i class="far {{ competitor['LICI']['saveexcess'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -391,49 +300,39 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    <span class="td-swap td-active">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </span>
-                    {% if table_content is defined and table_content == 'topcashback' %}
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                    {% if affiliate_page is defined %}
+                        <span class="td-swap td-active">
+                            {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
                         <span class="td-swap">
-                            <i class="fas fa-star"></i>
+                            {% for i in 1..competitor[competitor2]['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
-                    {% elseif table_content is defined and table_content == 'quidco' %}
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                        </span>
-                    {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                        </span>
+                        {% if competitor3 is defined %}
+                            <span class="td-swap">
+                                {% for i in 1..competitor[competitor3]['trustpilot'] %}
+                                    <i class="fas fa-star"></i>
+                                {% endfor %}
+                            </span>
+                        {% endif %}
                     {% else %}
-                        <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <span class="td-swap td-active">
+                            {% for i in 1..competitor['PYB']['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
                         <span class="td-swap">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                            {% for i in 1..competitor['GC']['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
+                        </span>
+                        <span class="td-swap">
+                            {% for i in 1..competitor['LICI']['trustpilot'] %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
                         </span>
                     {% endif %}
                 </div>
@@ -444,35 +343,18 @@
 <table class="table-comparison light-table d-none d-md-block mx-auto mt-lg-5 animated fadeInUp">
     <thead>
         <tr>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
-                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
-                <th width="19%" class="b4">Gadget <br> Cover</th>
-                <th width="19%" class="b4">Simplesurance</th>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
-                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
-                <th width="19%" class="b4">Gadget <br> Cover</th>
-                <th width="19%" class="b4">CloudCover</th>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <th width="40%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
-                <th width="20%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-                <th width="20%" class="b4 bs-l">Protect Your Bubble</th>
-                <th width="20%" class="b4">Endsleigh</th>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
-                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
-                <th width="19%" class="b4">Endsleigh</th>
-                <th width="19%" class="b4">Simplesurance</th>
+            <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+            <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+            {% if affiliate_page is defined %}
+                <th width="19%" class="b4 bs-l">{{ competitor[competitor1]['name']|raw }}</th>
+                <th width="19%" class="b4">{{ competitor[competitor2]['name']|raw }}</th>
+                {% if competitor3 is defined %}
+                    <th width="19%" class="b4">{{ competitor[competitor3]['name']|raw }}</th>
+                {% endif %}
             {% else %}
-                <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
-                <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-                <th width="19%" class="b4 bs-l">Protect Your Bubble</th>
-                <th width="19%" class="b4">Gadget <br> Cover</th>
-                <th width="19%" class="b4">Loveit <br> coverIt.co.uk</th>
+                <th width="19%" class="b4 bs-l">{{ competitor['PYB']['name']|raw }}</th>
+                <th width="19%" class="b4">{{ competitor['GC']['name']|raw }}</th>
+                <th width="19%" class="b4">{{ competitor['LICI']['name']|raw }}</th>
             {% endif %}
     </thead>
     <tbody>
@@ -488,21 +370,16 @@
                     <i class="fal fa-info-circle fa-lg"></i>
                 </a>
             </td>
-            <td class="bb1 bs-l"><strong>1 - 5</strong> days <div>depending on stock</div></td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
-                <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
-                <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
-                <td class="bb1"><strong>3 - 5</strong> <div>working days</div></td>
+            {% if affiliate_page is defined %}
+                <td class="bb1 bs-l">{{ competitor[competitor1]['days']|raw }}</td>
+                <td class="bb1">{{ competitor[competitor2]['days']|raw }}</td>
+                {% if competitor3 is defined %}
+                    <td class="bb1">{{ competitor[competitor3]['days']|raw }}</td>
+                {% endif %}
             {% else %}
-                <td class="bb1"><strong>5 - 7</strong> <div>working days</div></td>
-                <td class="bb1"><strong>1 - 5</strong> <div>working days</div></td>
+                <td class="bb1 bs-l">{{ competitor['PYB']['name']|raw }}</td>
+                <td class="bb1">{{ competitor['GC']['name']|raw }}</td>
+                <td class="bb1">{{ competitor['LICI']['name']|raw }}</td>
             {% endif %}
         </tr>
         <tr>
@@ -517,21 +394,28 @@
                     <i class="fal fa-info-circle fa-lg"></i>
                 </a>
             </td>
-            <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% if affiliate_page is defined %}
+                <td class="wh bs-l">
+                    <i class="far {{ competitor[competitor1]['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="wh">
+                        <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
             {% else %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">
+                    <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['LICI']['cashback'] }} fa-2x"></i>
+                </td>
             {% endif %}
         </tr>
         <tr>
@@ -548,21 +432,28 @@
                     <i class="fal fa-info-circle fa-lg"></i>
                 </a>
             </td>
-            <td class="bb1 bs-l"><i class="far fa-times fa-2x"></i></td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="bb1"><i class="far fa-check fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="bb1"><i class="far fa-check fa-2x"></i></td>
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+            {% if affiliate_page is defined %}
+                <td class="bb1 bs-l">
+                    <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
+                </td>
+                <td class="bb1">
+                    <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="bb1">
+                       <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
             {% else %}
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
-                <td class="bb1"><i class="far fa-times fa-2x"></i></td>
+                <td class="bb1 bs-l">
+                    <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
+                </td>
+                <td class="bb1">
+                    <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
+                </td>
+                <td class="bb1">
+                   <i class="far {{ competitor['LICI']['cover'] }} fa-2x"></i>
+                </td>
             {% endif %}
         </tr>
         <tr>
@@ -570,41 +461,43 @@
             <td class="b2a">
                 <i class="far fa-check fa-2x"></i>
             </td>
-            <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="wh"><i class="far fa-check fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="wh"><i class="far fa-check fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% if affiliate_page is defined %}
+                <td class="wh bs-l">
+                    <i class="far {{ competitor[competitor1]['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="wh">
+                        <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
             {% else %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">
+                    <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
+                </td>
             {% endif %}
         </tr>
         <tr>
             <td class="bb1 text-left"><strong>Cover for phones purchased up to</strong></td>
             <td class="b2"><strong>3 years</strong> <div>from purchase</div></td>
-            <td class="bb1 bs-l"><strong>6 months</strong> <div>from purchase</div></td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
-                <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
-                <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
-                <td class="bb1"><strong>6 months</strong> <div>from purchase</div></td>
+            {% if affiliate_page is defined %}
+                <td class="bb1 bs-l">{{ competitor[competitor1]['phoneage']|raw }}</td>
+                <td class="bb1">{{ competitor[competitor2]['phoneage']|raw }}</td>
+                {% if competitor3 is defined %}
+                    <td class="bb1">{{ competitor[competitor3]['phoneage']|raw }}</td>
+                {% endif %}
             {% else %}
-                <td class="bb1"><strong>18 months</strong> <div>from purchase</div></td>
-                <td class="bb1"><strong>3 years</strong> <div>from purchase</div></td>
+                <td class="bb1 bs-l">{{ competitor['PYB']['phoneage']|raw }}</td>
+                <td class="bb1">{{ competitor['GC']['phoneage']|raw }}</td>
+                <td class="bb1">{{ competitor['LICI']['phoneage']|raw }}</td>
             {% endif %}
         </tr>
         <tr>
@@ -619,21 +512,28 @@
                     <i class="fal fa-info-circle fa-lg"></i>
                 </a>
             </td>
-            <td class="wh bs-l"><i class="far fa-times fa-2x"></i></td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+            {% if affiliate_page is defined %}
+                <td class="wh bs-l">
+                    <i class="far {{ competitor[competitor1]['saveexcess'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="wh">
+                        <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
             {% else %}
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
-                <td class="wh"><i class="far fa-times fa-2x"></i></td>
+                <td class="wh bs-l">
+                    <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                </td>
+                <td class="wh">
+                    <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
+                </td>
             {% endif %}
         </tr>
         <tr>
@@ -644,51 +544,41 @@
                 <i class="fas fa-star"></i>
                 <i class="fas fa-star"></i>
             </td>
-            <td class="bb1 bs-l">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-            </td>
-            {% if table_content is defined and table_content == 'topcashback' %}
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+            {% if affiliate_page is defined %}
+                <td class="bb1 bs-l">
+                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
                 <td class="bb1">
-                    <i class="fas fa-star"></i>
+                    {% for i in 1..competitor[competitor2]['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
                 </td>
-            {% elseif table_content is defined and table_content == 'quidco' %}
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </td>
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </td>
-            {% elseif table_content is defined and table_content == 'vouchercodes' %}
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                </td>
-            {% elseif table_content is defined and table_content == 'reward-gateway' %}
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                </td>
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                </td>
-            {% else %}
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </td>
-                <td class="bb1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </td>
+                {% if competitor3 is defined %}
+                    <td class="bb1">
+                        {% for i in 1..competitor[competitor3]['trustpilot'] %}
+                            <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </td>
                 {% endif %}
+            {% else %}
+                <td class="bb1 bs-l">
+                    {% for i in 1..competitor['PYB']['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
+                </td>
+                <td class="bb1">
+                    {% for i in 1..competitor['GC']['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
+                </td>
+                <td class="bb1">
+                    {% for i in 1..competitor['LICI']['trustpilot'] %}
+                        <i class="fas fa-star"></i>
+                    {% endfor %}
+                </td>
+            {% endif %}
         </tr>
     </tbody>
 </table>
