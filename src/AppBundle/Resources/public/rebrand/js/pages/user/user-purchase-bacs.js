@@ -11,7 +11,7 @@
 // Require components
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../../../../js/Default/jqueryValidatorMethods.js');
+require('../../common/validationMethods.js');
 // require('jssocials');
 
 const sosure = sosure || {};

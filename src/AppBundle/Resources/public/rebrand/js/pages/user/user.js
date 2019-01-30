@@ -6,13 +6,9 @@ require('../../../sass/pages/user/user.scss');
 require('bootstrap/js/dist/tab');
 require('bootstrap/js/dist/util');
 require('bootstrap/js/dist/dropdown');
-// require('bootstrap/js/dist/tooltip');
 
 // Require components
-// require('jquery-validation');
-// require('jquery-mask-plugin');
-// require('../../../../js/Default/jqueryValidatorMethods.js');
-// require('jssocials');
+
 
 $(function() {
 

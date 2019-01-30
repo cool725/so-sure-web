@@ -463,36 +463,34 @@
                                         </td>
                                     </tr>
                                 {% endif %}
-                                {% if policy.isPolicy and policy.payerOrUser.paymentMethod and
-                                    policy.payerOrUser.paymentMethod.getType == "judo" %}
+                                {% if policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                                     <tr>
                                         <td>Card</td>
-                                        <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
-                                            {{ policy.payerOrUser.paymentMethod }}
+                                        <td class="{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.isCardExpired %}danger{% endif %}">
+                                            {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
                                             <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank" rel="noopener noreferrer">
                                                 <i class="fa fa-external-link"></i>
                                             </a>
                                         </td>
 
                                     </tr>
-                                {% elseif policy.isPolicy and policy.payerOrUser.paymentMethod and
-                                    policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                                {% elseif policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                                     <tr>
                                         <td>Bacs</td>
                                         <td class="">
-                                            {% if policy.payerOrUser.paymentMethod.bankAccount.isMandateInvalid %}
-                                                <s>{{ policy.payerOrUser.paymentMethod }}</s>
+                                            {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
+                                                <s>{{ policy.getPolicyOrUserBacsPaymentMethod }}</s>
                                             {% else %}
-                                                {{ policy.payerOrUser.paymentMethod }}
+                                                {{ policy.getPolicyOrUserBacsPaymentMethod }}
                                             {% endif %}
                                             <br>
-                                            Reference: {{ policy.payerOrUser.paymentMethod.bankAccount.reference }}
+                                            Reference: {{ policy.getPolicyOrUserBacsBankAccount.reference }}
                                             <br>
-                                            Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }}
+                                            Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
                                             <br>
-                                            Initial date: {{  policy.payerOrUser.paymentMethod.bankAccount.initialNotificationDate| date('d M Y')   }}
+                                            Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
                                             <br>
-                                            and then on the {{  policy.payerOrUser.paymentMethod.bankAccount.standardNotificationDate|date('jS')  }}
+                                            and then on the {{  policy.getPolicyOrUserBacsBankAccount.standardNotificationDate|date('jS')  }}
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -566,7 +564,7 @@
                                         <td>
                                             <strong>{{ policy.company.policies|length }}</strong>&nbsp;:&nbsp;
                                             {% for companyPolicy in policy.company.policies %}
-                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a>;
+                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a> ({{ companyPolicy.status }});
                                             {% endfor %}
                                         </td>
                                     </tr>
@@ -606,12 +604,17 @@
                                     <td>{% if fraud.duplicate_postcode %}{{ fraud.duplicate_postcode }}{% else %}N/A{% endif %}</td>
                                 </tr>
                                 <tr>
-                                    <td>Other Users w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
+                                    <td>Other Users/Policies w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
                                     <td>
                                         <strong>{{ fraud.duplicate_bank_accounts_count }}</strong>
-                                        {% for user in fraud.duplicate_bank_accounts %}
+                                        {% for user in fraud.duplicate_bank_user_accounts %}
                                             <a href="{{ path(user_route, {'id': user.id }) }}">
                                                 {{ user.name }}
+                                            </a>;
+                                        {% endfor %}
+                                        {% for policy in fraud.duplicate_bank_policy_accounts %}
+                                            <a href="{{ path(policy6_route, {'id': policy.id }) }}">
+                                                {{ policy.policyNumber }}
                                             </a>;
                                         {% endfor %}
                                     </td>
@@ -1222,9 +1225,9 @@
                 <tr>
                     <td>Pay Policy</td>
                     <td>
-                        {% if not policy.payerOrUser.paymentMethod %}
+                        {% if not policy.getPolicyOrPayerOrUserPaymentMethod %}
                             Missing payment method
-                        {% elseif policy.payerOrUser.paymentMethod.type != 'judo' %}
+                        {% elseif not policy.getPolicyOrPayerOrUserJudoPaymentMethod %}
                             Non-Judo payment method
                         {% elseif not policy.user.hasValidDetails %}
                             Invalid user details (missing mobile number, address, or birthday)
@@ -1239,9 +1242,7 @@
                     </td>
                 </tr>
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                    {% if policy.isPolicy
-                        and policy.payerOrUser.paymentMethod
-                        and policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                    {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                         <tr>
                             <td><i class="fa fa-shield" title="Customer Service only"></i> Cancel Direct Debit</td>
                             <td>
@@ -1253,9 +1254,7 @@
                     {% endif %}
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
-                    {% if policy.isPolicy
-                        and policy.payerOrUser.paymentMethod
-                        and policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                    {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                         <tr>
                             <td><i class="fa fa-lock" title="Admin only"></i> Refund Bacs</td>
                             <td>
@@ -1265,9 +1264,7 @@
                                 </button>
                             </td>
                         </tr>
-                    {% elseif policy.isPolicy
-                        and policy.payerOrUser.paymentMethod
-                        and policy.payerOrUser.paymentMethod.type == "judo" %}
+                    {% elseif policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                         <tr>
                             <td><i class="fa fa-lock" title="Admin only"></i> Refund Judo</td>
                             <td>

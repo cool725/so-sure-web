@@ -122,6 +122,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         self::$dm->flush();
         $crawler = self::$client->request('GET', '/insure/Samsung');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 
@@ -129,34 +130,34 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/phone-insurance/cracked-screen');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchInsuranceTheft()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/theft');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchInsuranceWaterDamage()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/water-damage');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchInsuranceBrokenPhone()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/broken-phone');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchInsuranceLost()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/loss');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 }

@@ -8,7 +8,7 @@ require('bootstrap/js/dist/dropdown');
 // Require components
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../../../js/Default/jqueryValidatorMethods.js');
+require('../common/validationMethods.js');
 
 const sosure = sosure || {};
 

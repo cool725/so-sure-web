@@ -3,9 +3,7 @@ Final Payment Failure: Urgent action required to stay insured
 
 Update your payment details today to avoid cancellation
 
-{% if policy.user.paymentMethod.cardType is defined %}
-We tried again to take your monthly payment of£{{ policy.premium.monthlyPremiumPrice }}, but your account appears to be missing a payment method.
-{% endif %}
+We tried again to take your monthly payment of £{{ policy.premium.monthlyPremiumPrice }}, but your account appears to be missing a payment method.
 
 If you fail to make payment, your policy will be cancelled in {{ policy.policyExpirationDateDays }} days
 

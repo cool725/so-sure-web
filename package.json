@@ -40,10 +40,12 @@
     "jquery-circle-progress": "^1.2.2",
     "jquery-mask-plugin": "^1.14.15",
     "jquery-validation": "^1.17.0",
+    "js.cookie": "^0.0.4",
     "jssocials": "git://github.com/so-sure/jssocials.git#master",
     "moment": "^2.23.0",
     "popper.js": "^1.14.3",
     "tempusdominus-bootstrap-4": "^5.1.2",
+    "textfit": "^2.3.1",
     "viewerjs": "^1.2.0"
   }
 }

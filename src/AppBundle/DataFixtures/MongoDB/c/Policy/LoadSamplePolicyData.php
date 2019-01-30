@@ -665,6 +665,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
+        $policy->setPaymentMethod($user->getPaymentMethod());
         $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
@@ -709,7 +710,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
-        $bacs = $user->hasBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
+        $bacs = $policy->hasPolicyOrUserBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
 
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && random_int(0, 1) == 0)) {
@@ -906,7 +907,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
         $payment->setSuccess(true);
         /** @var BacsPaymentMethod $bacsPaymentMethod */
-        $bacsPaymentMethod = $user->getPaymentMethod();
+        $bacsPaymentMethod = $user->getBacsPaymentMethod();
         $bankAccount = $bacsPaymentMethod->getBankAccount();
         $bankAccount->setMandateSerialNumber($serialNumber);
         $manager->persist($bankAccount);

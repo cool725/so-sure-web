@@ -7,7 +7,7 @@ require('bootstrap/js/dist/tooltip');
 
 // Require components
 require('jquery-validation');
-require('../../../../js/Default/jqueryValidatorMethods.js');
+require('../../common/validationMethods.js');
 require('jquery-circle-progress');
 require('jssocials');
 
@@ -148,9 +148,11 @@ $(function() {
                 }).tooltip('show');
 
                 setTimeout(function() {
-                    $('.btn-invite').tooltip('hide')
-                                    .removeAttr('disabled', '')
-                                    .html('invite');
+                    $('.btn-invite').tooltip('hide');
+                    // Temp solution to reloading page so invite appears in list
+                                    // .removeAttr('disabled', '')
+                                    // .html('invite');
+                    location.reload();
                 }, 1500);
 
                 // Clear the input and suggest another one? TODO: Copy

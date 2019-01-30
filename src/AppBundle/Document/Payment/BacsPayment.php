@@ -94,6 +94,20 @@ class BacsPayment extends Payment
      */
     protected $bacsReversedDate;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="reverses")
+     * @Gedmo\Versioned
+     * @var BacsPayment
+     */
+    protected $reversedBy;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="reversedBy")
+     * @Gedmo\Versioned
+     * @var BacsPayment
+     */
+    protected $reverses;
+
     public function isManual()
     {
         return $this->manual;
@@ -162,6 +176,36 @@ class BacsPayment extends Payment
     public function setBacsReversedDate(\DateTime $bacsReversedDate)
     {
         $this->bacsReversedDate = $bacsReversedDate;
+    }
+
+    public function getReversedBy(): BacsPayment
+    {
+        return $this->reversedBy;
+    }
+
+    public function setReversedBy(BacsPayment $reversedBy)
+    {
+        $this->reversedBy = $reversedBy;
+    }
+
+    public function getReverses(): BacsPayment
+    {
+        return $this->reverses;
+    }
+
+    public function setReverses(BacsPayment $reverses)
+    {
+        $this->reverses = $reverses;
+    }
+
+    /**
+     * Sets this payment as reversed by another payment, setting the correct properties on both.
+     * @param BacsPayment $reverse is the payment to set as reversing this one.
+     */
+    public function addReverse($reverse)
+    {
+        $this->setReversedBy($reverse);
+        $reverse->setReverses($this);
     }
 
     public function submit(\DateTime $date = null)
@@ -242,9 +286,9 @@ class BacsPayment extends Payment
             $this->setCommission();
         }
 
-        if ($this->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+        if ($this->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {
             /** @var BacsPaymentMethod $bacsPaymentMethod */
-            $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
+            $bacsPaymentMethod = $this->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
         }
 

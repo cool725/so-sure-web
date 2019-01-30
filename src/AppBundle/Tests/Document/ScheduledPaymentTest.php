@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePremium;
@@ -116,6 +117,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $premium = new PhonePremium();
         $policy = new SalvaPhonePolicy();
         $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+        $policy->setPaymentMethod(new JudoPaymentMethod());
 
         $scheduledPayment = new ScheduledPayment();
         $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);

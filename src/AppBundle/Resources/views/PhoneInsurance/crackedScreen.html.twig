@@ -1,50 +1,41 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
+{# Set vars #}
+{% set body_class = 'seo-cracked-screen' %}
+
+{% block title %}so-sure - Phone Insurance Cracked Screen{% endblock %}
 {% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
     <link rel="canonical" href="{{ url('phone_insurance_cracked_screen') }}" />
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/about.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/seo-pages.css') }}">
 {% endblock %}
 
 {% block body %}
-<section class="about-section section--pad">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="section-title">Cracked Screen</h1>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="text-zaffre mb-0">Phone Insurance</h5>
+                    <h1 class="text-primary mb-4">Cracked Screen</h1>
+                    <p>Smashing your screen really is rubbish. A smashed screen can leave your phone totally unusable (and we know how much your phone can mean to you). If your screen is broken, smashed or cracked to the point where you cannot use your phone anymore then so-sure will replace or repair it within one working day.</p>
+                    <p class="mb-4">As we all know, a really common way for someone to crack the screen on their phone is by dropping it on hard ground. You can make sure that having to pick it up is the only inconvenience you’ll suffer by getting yourself a new trustworthy phone case. They also don’t have to be ugly - you can get some really cool ones now! Check out <a href="http://www.urbanoutfitters.com/urban/index.jsp" target="_blank" rel="noopener noreferrer">Urban Outfitters</a> or crawl <a href="https://www.depop.com/" target="_blank" rel="noopener noreferrer">Depop</a> for something decent.</p>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote sosure-track"
+                       data-event="seo-pages-cracked-screen">
+                       Get a Quote</a>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <p>Smashing your screen really is rubbish. A smashed screen can leave your phone totally unusable (and we know how much your phone can mean to you). If your screen is broken, smashed or cracked to the point where you cannot use your phone anymore then so-sure will replace or repair it within one working day. </p>
-                <p>As we all know, a really common way for someone to crack the screen on their phone is by dropping it on hard ground. You can make sure that having to pick it up is the only inconvenience you’ll suffer by getting yourself a new trustworthy phone case. They also don’t have to be ugly - you can get some really cool ones now! Check out <a href="http://www.urbanoutfitters.com/urban/index.jsp" target="_blank" rel="noopener noreferrer">Urban Outfitters</a> or crawl <a href="https://www.depop.com/" target="_blank" rel="noopener noreferrer">Depop</a> for something decent.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
+    {# Page Modals #}
 
-{% include 'AppBundle::Default/footerCta.html.twig' %}
+{% endblock %}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}
+{% block javascriptsPage %}
 
 {% endblock %}

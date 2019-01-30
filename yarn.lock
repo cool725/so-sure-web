@@ -3928,7 +3928,7 @@ jquery-validation@^1.17.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-jquery@>=1.11, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
+jquery@*, jquery@>=1.11, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -3954,6 +3954,10 @@ js-yaml@~3.7.0:
   dependencies:
     argparse "^1.0.7"
     esprima "^2.6.0"
+
+js.cookie@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/js.cookie/-/js.cookie-0.0.4.tgz#c581270d0403b1c5125f91d5a48295e290e2869a"
 
 jsbn@~0.1.0:
   version "0.1.1"
@@ -6544,6 +6548,10 @@ tempusdominus-bootstrap-4@^5.1.2:
 text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
+
+textfit@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/textfit/-/textfit-2.3.1.tgz#5896db48ea70a767b97a73f28556406875ca208f"
 
 through2@^0.6.1:
   version "0.6.5"

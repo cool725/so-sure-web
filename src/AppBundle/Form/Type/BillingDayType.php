@@ -28,7 +28,7 @@ class BillingDayType extends AbstractType
         /** @var Policy $policy */
         $policy = $builder->getData()->getPolicy();
         if ($policy) {
-            if ($policy->getUser()->hasBacsPaymentMethod()) {
+            if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
                 $enabled = false;
             } else {
                 $enabled = $policy->isPolicyPaidToDate() &&

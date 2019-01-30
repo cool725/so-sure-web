@@ -2077,6 +2077,7 @@ class PhonePolicyTest extends WebTestCase
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setPolicy($policy);
             $policy->addScheduledPayment($scheduledPayment->reschedule());
         }
 

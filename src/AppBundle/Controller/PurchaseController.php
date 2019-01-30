@@ -319,7 +319,7 @@ class PurchaseController extends BaseController
         }
 
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -550,7 +550,7 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -721,7 +721,7 @@ class PurchaseController extends BaseController
         }
 
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -806,7 +806,7 @@ class PurchaseController extends BaseController
         }
 
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 

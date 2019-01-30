@@ -197,16 +197,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         } elseif ($resyncPicsureMetadata) {
             $this->resyncPicsureMetadata();
         } elseif ($flushPolicyRedis) {
-            foreach ($this->redis->zrange('policy:validation', 0, -1) as $member) {
-                $policy = unserialize($member);
-
-                if ($this->redis->sismember('policy:validation:flags', $policy['id'])) {
-                    continue;
-                }
-
-                $this->redis->zrem('policy:validation', $member);
-            }
+            $this->redis->del(['policy:validation']);
+            $this->redis->del(['policy:validation:flags']);
         } else {
+            $this->redis->del(['policy:validation']);
+
             /** @var PolicyRepository $policyRepo */
             $policyRepo = $this->dm->getRepository(Policy::class);
 
@@ -432,10 +427,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $policy->getPolicyNumber()
                         );
                     }
-                } elseif ($policy->getUser()->hasBacsPaymentMethod() &&
-                    $policy->getUser()->getBacsPaymentMethod() &&
-                    $policy->getUser()->getBacsPaymentMethod()->getBankAccount() &&
-                    $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()) {
+                } elseif ($policy->hasPolicyOrUserBacsPaymentMethod() &&
+                    $policy->getPolicyOrUserBacsBankAccount() &&
+                    $policy->getPolicyOrUserBacsBankAccount()->isMandateInvalid()) {
                     // If the mandate is invalid, we can just ignore - user will be prompted to resolve the issue
                     /*
                     $lines[] = sprintf(
@@ -520,13 +514,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             // bacs checks are only necessary on active policies
-            if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
+            if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive(true)) {
                 $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
-                $bacsPaymentMethod = $policy->getUser()->getBacsPaymentMethod();
-                $bankAccount = null;
-                if ($bacsPaymentMethod) {
-                    $bankAccount = $bacsPaymentMethod->getBankAccount();
-                }
+                $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPayments >= 1 && $isFirstPayment) {
@@ -574,9 +564,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy->getStatus()
         );
 
-        if ($policy->getUser()->hasBacsPaymentMethod()) {
-            $bacsStatus = $policy->getUser()->getBacsPaymentMethod() ?
-                $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+        if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
+            $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
+            $bacsStatus = $bankAccount ?
+                $bankAccount->getMandateStatus() :
                 'unknown';
             $message = sprintf('%s (Bacs Mandate Status: %s)', $message, $bacsStatus);
         }

@@ -23,6 +23,7 @@ class ScheduledPayment
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_REVERTED = 'reverted';
 
     const TYPE_SCHEDULED = 'scheduled';
     const TYPE_RESCHEDULED = 'rescheduled';
@@ -41,7 +42,7 @@ class ScheduledPayment
     protected $created;
 
     /**
-     * @Assert\Choice({"scheduled", "success", "failed", "cancelled", "pending"}, strict=true)
+     * @Assert\Choice({"scheduled", "success", "failed", "cancelled", "pending", "reverted"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -106,7 +107,7 @@ class ScheduledPayment
     {
         $this->amount = $amount;
     }
-    
+
     public function getAmount()
     {
         return $this->amount;
@@ -190,12 +191,26 @@ class ScheduledPayment
         $this->setStatus(self::STATUS_CANCELLED);
     }
 
-    public function reschedule($date = null, $days = 7)
+    public function reschedule($date = null, $days = null)
     {
+        if (!$this->getPolicy()) {
+            throw new \Exception(sprintf('Missing policy for scheduled payment %s', $this->getId()));
+        }
+
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         } else {
             $date = clone $date;
+        }
+
+        if ($days === null) {
+            if ($this->getPolicy()->getPolicyOrUserBacsPaymentMethod()) {
+                $days = 6;
+            } elseif ($this->getPolicy()->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+                $days = 7;
+            } else {
+                $days = 7;
+            }
         }
         $date->add(new \DateInterval(sprintf('P%dD', $days)));
 

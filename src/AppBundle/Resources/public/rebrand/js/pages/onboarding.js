@@ -8,7 +8,7 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('jquery-validation');
-require('../../../js/Default/jqueryValidatorMethods.js');
+require('../common/validationMethods.js');
 require('jssocials');
 
 let Clipboard = require('clipboard');

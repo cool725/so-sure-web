@@ -1,51 +1,42 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
+{# Set vars #}
+{% set body_class = 'seo-water-damage' %}
+
+{% block title %}so-sure - Phone Insurance Water Damage{% endblock %}
 {% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
     <link rel="canonical" href="{{ url('phone_insurance_water_damage') }}" />
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/about.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/seo-pages.css') }}">
 {% endblock %}
 
 {% block body %}
-<section class="about-section section--pad">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="section-title">Water Damage</h1>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="text-zaffre mb-0">Phone Insurance</h5>
+                    <h1 class="text-primary mb-4">Water Damage</h1>
+                    <p>One of the most common claims, water damage is when your phone has been submerged in water and has been left unusable as a result. It's a really common thing to do so don’t feel like a massive doofus if you do end up doing it. </p>
+                    <p>However, if you do end up dunking your phone in a pint or the bath then don’t fear, because the infamous 'rice trick' can actually work. Our founder, Dylan even managed to revive his beloved phone via granular intervention!</p>
+                    <p class="mb-4">Fortunately, so-sure covers you for water damage.</p>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote sosure-track"
+                       data-event="seo-pages-water-damage">
+                       Get a Quote</a>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <p>One of the most common claims, water damage is when your phone has been submerged in water and has been left unusable as a result. It’s a really common thing to do so don’t feel like a massive doofus if you do end up doing it. </p>
-                <p>However, if you do end up dunking your phone in a pint or the bath then don’t fear, because the infamous ‘rice trick’ can actually work. Our founder, Dylan even managed to revive his beloved phone via granular intervention!</p>
-                <p>Fortunately, so-sure covers you for water damage.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
+    {# Page Modals #}
 
-{% include 'AppBundle::Default/footerCta.html.twig' %}
+{% endblock %}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}
+{% block javascriptsPage %}
 
 {% endblock %}
