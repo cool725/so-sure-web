@@ -22,10 +22,13 @@ class ScheduledPaymentEvent extends Event
      * Constructs the event and puts in the scheduled payment that it relates to and sets it's creation date.
      * @param ScheduledPayment $scheduledPayment is the relevant scheduled payment.
      */
-    public function __construct(ScheduledPayment $scheduledPayment)
+    public function __construct(ScheduledPayment $scheduledPayment, \DateTime $date = null)
     {
         $this->scheduledPayment = $scheduledPayment;
-        $this->date = new \DateTime();
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $this->date = $date;
     }
 
     /**

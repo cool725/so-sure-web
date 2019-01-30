@@ -1072,79 +1072,6 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
-    public function test2ndPolicyPayCC()
-    {
-        $email = self::generateEmail('test2ndPolicyPayCC', $this);
-        $password = 'foo';
-        $phone1 = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone1,
-            self::$dm
-        );
-
-        $policy1 = self::initPolicy($user, self::$dm, $phone1, null, false, false);
-
-        $judopay = self::$container->get('app.judopay');
-        $policyService = self::$container->get('app.policy');
-        $details = $judopay->testPayDetails(
-            $user,
-            $policy1->getId(),
-            $phone1->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-        $policyService->setEnvironment('prod');
-        // @codingStandardsIgnoreStart
-        $judopay->add(
-            $policy1,
-            $details['receiptId'],
-            $details['consumer']['consumerToken'],
-            $details['cardDetails']['cardToken'],
-            Payment::SOURCE_WEB_API,
-            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
-        );
-        // @codingStandardsIgnoreEnd
-        $policyService->setEnvironment('test');
-        $this->assertTrue($policy1->hasPolicyOrUserValidPaymentMethod());
-
-        $this->login($email, $password, 'user');
-
-        $phone2 = $this->getRandomPhoneAndSetSession();
-        $this->setPhone($phone2);
-        self::verifyResponse(302);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
-
-        //print $crawler->html();
-        $crawler = $this->agreePledge($crawler);
-        //print $crawler->html();
-        self::verifyResponse(302);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
-
-        $crawler = $this->setPaymentExisting($crawler, $phone2);
-        self::verifyResponse(302);
-        //$this->verifyPurchaseNotReady($crawler);
-
-        $dm = $this->getDocumentManager(true);
-        $userRepo = $dm->getRepository(User::class);
-        /** @var User $updatedUser */
-        $updatedUser = $userRepo->find($user->getId());
-
-        $latestPolicy = $updatedUser->getLatestPolicy();
-        $this->assertNotNull($latestPolicy);
-        if ($latestPolicy) {
-            $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $latestPolicy->getId()]);
-            $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
-            self::$client->followRedirect();
-            self::verifyResponse(200);
-        }
-    }
-
     public function testLeadSource()
     {
         $email = self::generateEmail('testLeadSource', $this);
@@ -1363,16 +1290,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         return $crawler;
     }
-
-    private function setPaymentExisting(Crawler $crawler, $phone)
-    {
-        $form = $crawler->selectButton('purchase_form[existing]')->form();
-        $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
-        $crawler = self::$client->submit($form);
-
-        return $crawler;
-    }
-
+    
     private function setBacs(Crawler $crawler, Policy $policy, $accountNumber = PCAService::TEST_ACCOUNT_NUMBER_OK)
     {
         //print $crawler->html();

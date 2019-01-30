@@ -822,7 +822,7 @@ class JudopayServiceTest extends WebTestCase
     public function testProcessTokenPayResult()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('judo-process-token', $this));
+        $user = $this->createValidUser(static::generateEmail('judo-process-token', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
         static::$dm->persist($policy);
