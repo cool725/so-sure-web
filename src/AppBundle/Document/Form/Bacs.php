@@ -22,6 +22,13 @@ class Bacs extends BankAccount
      */
     protected $soleSignature;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\Token()
+     * @var string
+     */
+    protected $validateName;
+
     public function setSoleSignature($soleSignature)
     {
         $this->soleSignature = filter_var($soleSignature, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -30,6 +37,16 @@ class Bacs extends BankAccount
     public function getSoleSignature()
     {
         return $this->soleSignature;
+    }
+
+    public function setValidateName($validateName)
+    {
+        $this->validateName = $validateName;
+    }
+
+    public function getValidateName()
+    {
+        return $this->validateName;
     }
 
     public function setBankAccount(BankAccount $bankAccount = null)

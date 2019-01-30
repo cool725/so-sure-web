@@ -485,7 +485,7 @@ class BankAccount
         if ($processingDate->format('j') < $this->getNotificationDay()) {
             $maxAllowedDate = $maxAllowedDate->sub(new \DateInterval('P1M'));
         }
-        
+
         $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
         $maxAllowedDate = $this->startOfDay($maxAllowedDate);
         $maxAllowedDay = $maxAllowedDate->format('j');
