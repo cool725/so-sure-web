@@ -683,19 +683,6 @@ class MonitorService
 
     public function missingPaymentCommissions()
     {
-        // a few payments were missing, but had a later payment to adjust the missing commission figure
-        $commissionValidationPaymentExclusions = [
-            new \MongoId('5a8a7f55c084c74d28413471'),
-            new \MongoId('5aa6dec854e50f46ab3e8874'),
-            new \MongoId('5ac61e7a7c62216654636bea'),
-            new \MongoId('5ad5e80e75435e73e152874f'),
-            new \MongoId('5bd0381fedc29544427b31ab'),
-            new \MongoId('5bd03821edc29544427b31af'),
-            new \MongoId('5c2bb9f6d6c8c6148f38aed4'),
-            new \MongoId('5c1bb0f90b967f3da712c163'),
-            new \MongoId('5c336c06b870c22e9b4d56d0'),
-        ];
-
         $commissionValidationPolicyExclusions = [];
         foreach (Salva::$commissionValidationExclusions as $item) {
             $commissionValidationPolicyExclusions[] = new \MongoId($item);
@@ -709,8 +696,8 @@ class MonitorService
             'type' => ['$nin' => ['potReward', 'sosurePotReward', 'policyDiscount', 'policyDiscountRefund']],
             'amount' => ['$gt' => 2], // we may need to take small offsets; if so, there would not be a commission
             'policy.$id' => ['$nin' => $commissionValidationPolicyExclusions],
-            '_id' => ['$nin' => $commissionValidationPaymentExclusions],
             'date' => ['$gt' => new \DateTime('2017-11-01')],
+            'skipCommissionValidation' => ['neq' => true],
         ]);
 
         /** @noinspection LoopWhichDoesNotLoopInspection */

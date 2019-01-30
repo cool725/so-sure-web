@@ -921,7 +921,7 @@ class JudopayService
             $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID, $date);
             $this->dispatcher->dispatch(
                 ScheduledPaymentEvent::EVENT_FAILED,
-                new ScheduledPaymentEvent($scheduledPayment)
+                new ScheduledPaymentEvent($scheduledPayment, $date)
             );
         }
     }

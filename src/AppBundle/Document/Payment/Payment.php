@@ -215,6 +215,13 @@ abstract class Payment
     protected $success;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $skipCommissionValidation;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\IdentityLog")
      * @Gedmo\Versioned
      * @var IdentityLog
@@ -374,6 +381,16 @@ abstract class Payment
     public function toString()
     {
         return $this->__toString();
+    }
+
+    public function getSkipCommissionValidation()
+    {
+        return $this->skipCommissionValidation;
+    }
+
+    public function setSkipCommissionValidation($skipCommissionValidation)
+    {
+        $this->skipCommissionValidation = $skipCommissionValidation;
     }
 
     public function __toString()
