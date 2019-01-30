@@ -826,14 +826,14 @@ class BacsService
 
                     // Set policy as unpaid if there's a payment failure
                     $policy->setPolicyStatusUnpaidIfActive();
-
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
-                    $this->dispatcher->dispatch(
-                        ScheduledPaymentEvent::EVENT_FAILED,
-                        new ScheduledPaymentEvent($scheduledPayment)
-                    );
-
+                    if ($scheduledPayment) {
+                        $this->dispatcher->dispatch(
+                            ScheduledPaymentEvent::EVENT_FAILED,
+                            new ScheduledPaymentEvent($scheduledPayment)
+                        );
+                    }
                     $results['failed-payments']++;
                     $results['failed-value'] += $amount;
                     $days = $submittedPayment->getDate()->diff($originalProcessingDate);
