@@ -57,6 +57,9 @@ Encore
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
+    // Dev
+    .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
+
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
 
