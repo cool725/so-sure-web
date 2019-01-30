@@ -23,6 +23,7 @@ class Bacs extends BankAccount
     protected $soleSignature;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
      * @AppAssert\Token()
      * @var string
      */
