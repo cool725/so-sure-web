@@ -24,10 +24,24 @@ class HubspotService
 {
     const QUEUE_CONTACT = 'contact';
 
-    const QUEUE_EVENT_USER_PAYMENT_FAILED = 'userpayment-failed';
-
     const KEY_HUBSPOT_QUEUE = 'queue:hubspot';
     const KEY_HUBSPOT_RATELIMIT = 'hubspot:ratelimit';
+
+    const LIFECYCLE_QUOTE = 'quote';
+    const LIFECYCLE_READY_FOR_PURCHASE = 'ready-for-purchase';
+    const LIFECYCLE_PURCHASED = 'purchased';
+    const LIFECYCLE_RENEWED = 'renewed';
+    const LIFECYCLE_CANCELLED = 'cancelled';
+    const LIFECYCLE_EXPIRED = 'expired';
+
+    static private $lifecycleStages = [
+        self::QUOTE              => 1,
+        self::READY_FOR_PURCHASE => 2,
+        self::PURCHASED          => 3,
+        self::RENEWED            => 4,
+        self::CANCELLED          => 5,
+        self::EXPIRED            => 6,
+    ];
 
     private const RETRY_LIMIT = 3;
 
@@ -39,33 +53,35 @@ class HubspotService
     private $client;
     /** @var RedisClient */
     private $redis;
-    /** @var \App\Hubspot\HubspotData */
-    private $hubspotData;
+    /** @var SearchService */
+    private $searchService;
 
     /**
      * Builds the service.
-     * @param DocumentManager $dm          is the document manager.
-     * @param LoggerInterface $logger      is the logger.
-     * @param string          $hubspotKey  is the hubspot integration API key.
-     * @param RedisClient     $redis       is the client for redis.
-     * @param HubspotData     $hubspotData is the hubspot data formatter.
+     * @param DocumentManager $dm            is the document manager.
+     * @param LoggerInterface $logger        is the logger.
+     * @param string          $hubspotKey    is the hubspot integration API key.
+     * @param RedisClient     $redis         is the client for redis.
+     * @param SearchService   $searchService is used to search.
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $hubspotKey,
         RedisClient $redis,
-        HubspotData $hubspotData
+        SearchService $searchService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->client = new HubspotFactory(["key" => $hubspotKey], null, ['http_errors' => false], false);
         $this->redis = $redis;
         $this->hubspotData = $hubspotData;
+        $this->searchService = $searchService;
     }
 
     /**
      * Sets the hubspot service's logger so it can be output somewhere else.
+     * TODO: get rid of this functionality.
      * @param LoggerInterface $logger is the new logger to use.
      */
     public function setLogger(LoggerInterface $logger)
@@ -375,5 +391,119 @@ class HubspotService
                 "Hubspot request returned status {$code} instead of {$desired}. ".$response->getBody()
             );
         }
+    }
+
+    /**
+     * Tells you if a given string is one of the So-Sure lifecycle stages.
+     * @param string $option is the string to be checked.
+     * @return boolean true iff the given string was a valid licecycle stage.
+     */
+    public function isValidSosureLifecycleStage(string $option)
+    {
+        return isset(self::$lifecycleStages[$option]);
+    }
+
+    /**
+     * builds data array of all user properties for hubspot.
+     * @param User $user is the user that the data will be based on.
+     * @return array of the data.
+     */
+    public function getHubspotUserData(User $user)
+    {
+        $data = array_merge(
+            $this->buildHubspotUserDetailsData($user),
+            $this->buildHubspotAddressData($user),
+            $this->buildHubspotMiscData($user),
+            $this->buildHubspotLifecycleStageData($user)
+        );
+        // TODO: add the custom fields that allegedly exist.
+        return $data;
+    }
+
+    /**
+     * Builds array of user general data for hubspot.
+     * @param User $user is the user we are building the data array on.
+     * @return array containing the data we just collated.
+     */
+    private function buildHubspotUserDetailsData(User $user)
+    {
+        $data = [
+            $this->buildHubspotProperty("firstname", $user->getFirstName()),
+            $this->buildHubspotProperty("lastname", $user->getLastName()),
+            $this->buildHubspotProperty("email", $user->getEmailCanonical()),
+            $this->buildHubspotProperty("mobilephone", $user->getMobileNumber()),
+            $this->buildHubspotProperty("gender", $user->getGender()),
+        ];
+        if ($user->getBirthday()) {
+            $data[] = $this->buildHubspotProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
+        }
+        return $data;
+    }
+
+    /**
+     * Builds array of data related to user's address.
+     * @param User $user is the user that the data is on.
+     * @return array containing the data.
+     */
+    private function buildHubspotAddressData(User $user)
+    {
+        $data = [];
+        if ($user->getBillingAddress()) {
+            $data[] = $this->buildHubspotProperty("billing_address", $user->getBillingAddress());
+            if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
+                $data[] = $this->buildHubspotProperty("census_subgroup", $census->getSubGroup());
+            }
+            if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
+                $data[] = $this->buildHubspotProperty("total_weekly_income", $income->getTotal()->getIncome());
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Builds array of miscellanious user data.
+     * @param User $user is the user that we are building the data on.
+     * @return array containing the collected data.
+     */
+    private function buildHubspotMiscData(User $user)
+    {
+        $hasFacebook = $user->getFacebookId() == true;
+        $data = [
+            $this->hubspotProperty("attribution", $user->getAttribution() ?: ''),
+            $this->hubspotProperty("latestattribution", $user->getLatestAttribution() ?: ''),
+            $this->hubspotProperty("facebook", $hasFacebook ? "yes" : "no"),
+        ];
+        if ($hasFacebook) {
+            $data['hs_facebookid'] = $this->hubspotProperty("hs_facebookid", $user->getFacebookId());
+        }
+        return $data;
+    }
+
+    /**
+     * Builds array containing the lifecycle data of a user for hubspot.
+     * @param User $user is the subject of the data.
+     * @return array of the data.
+     */
+    public function buildHubspotLifecycleStageData(User $user)
+    {
+        $userStage = self::LIFECYCLE_QUOTE;
+        if ($user->hasActivePolicy()) {
+            $userStage = self::LIFECYCLE_PURCHASED;
+        } elseif ($user->hasCancelledPolicy()) {
+            $userStage = self::LIFECYCLE_CANCELLED;
+        }
+        // TODO: this is incomplete apparantly. I will figure out what is needed.
+        return [$this->hubspotProperty("sosure_lifecycle_stage", $userStage)];
+    }
+
+    /**
+     * Puts a single property into the format that hubspot wants to receive it as.
+     * @param string $name  is the name of the property.
+     * @param mixed  $value is the object that the property consists of.
+     * @return array with the property.
+     */
+    private function buildHubspotProperty($name, $value)
+    {
+        return ['property' => $name, 'value' => $value];
     }
 }

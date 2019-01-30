@@ -2,7 +2,6 @@
 
 namespace AppBundle\Listener;
 
-use App\Hubspot\HubspotData;
 use AppBundle\Event\InvitationEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
@@ -11,115 +10,170 @@ use AppBundle\Event\UserPaymentEvent;
 use AppBundle\Service\HubspotService;
 
 /**
- * @todo wrap more queue's with `isChanged()`, to avoid sending the same data.
+ * Waits for events to occur in our system and then updates the state of Hubspot to match.
  */
 class HubspotListener
 {
     /** @var HubspotService */
-    protected $hubspot;
-    /** @var \App\Hubspot\HubspotData */
-    private $hubspotData;
+    protected $hubspotService;
 
-    public function __construct(HubspotService $hubspot, HubspotData $hubspotData)
+    /**
+     * Builds the listener.
+     * @param HubspotService $hubspotService provides hubspotService functionality.
+     */
+    public function __construct(HubspotService $hubspotService)
     {
-        $this->hubspot = $hubspot;
-        $this->hubspotData = $hubspotData;
+        $this->hubspotService = $hubspotService;
     }
 
+    /**
+     * Hubspot actions for when a user is created.
+     * @param UserEvent $event is the event object representing the creation of the user.
+     */
     public function onUserCreatedEvent(UserEvent $event)
     {
-        $this->hubspot->queueContact($event->getUser());
+        $this->hubspotService->queueContact($event->getUser());
     }
 
+    /**
+     * Hubspot actions for when a user is updated.
+     * @param UserEvent $event is the event object representing the user update.
+     */
     public function onUserUpdatedEvent(UserEvent $event)
     {
-        $this->hubspot->queueContact($event->getUser());
+        $this->hubspotService->queueContact($event->getUser());
     }
 
-    public function onPolicyPotEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-        // TODO: Trigger hubspot event
-    }
-
-    public function onPolicyCancelledEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-//        $this->hubspot->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_CANCELLED);
-    }
-
-    public function onPolicyPendingRenewedEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-        //$this->hubspot->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_PENDING_RENEWAL);
-    }
-
-    public function onPolicyRenewedEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-        //$this->hubspot->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_RENEWED);
-    }
-
-    public function onPolicyStartEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-        //$this->hubspot->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_START);
-
-        // Eventually we want to migrate users to the policy started event
-        // However, this will impact on users in the connection campaign, and so
-        // send both created & started events for now until we can migrate over
-        //$this->hubspot->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_CREATED);
-    }
-
-    public function onPolicyUnpaidEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-    }
-
-    public function onPolicyReactivatedEvent(PolicyEvent $event)
-    {
-        $this->hubspot->queueContact($event->getPolicy()->getUser());
-    }
-
-    public function onInvitationAcceptedEvent(InvitationEvent $event)
-    {
-        // Invitation accepted is a connection, so update both inviter & invitee
-        $this->hubspot->queueContact($event->getInvitation()->getInviter());
-        $this->hubspot->queueContact($event->getInvitation()->getInvitee());
-    }
-
-    public function onPaymentSuccessEvent(PaymentEvent $event)
-    {
-        // user record needs to be updated to ensure that the paid state is set correctly
-        $this->hubspot->queueContact($event->getPayment()->getPolicy()->getUser());
-        //$this->hubspot->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_SUCCESS);
-    }
-
-    public function onPaymentFailedEvent(PaymentEvent $event)
-    {
-        // user record needs to be updated to ensure that the paid state is set correctly
-        $this->hubspot->queueContact($event->getPayment()->getPolicy()->getUser());
-        //$this->hubspot->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_FAILED);
-    }
-
-    public function onPaymentFirstProblemEvent(PaymentEvent $event)
-    {
-        // We have a few new properties on the user that are required for the payment first problem
-        // Resync user for now to ensure everything is present.
-        // Eventually can be removed if all users are re-synced or if enough time has elapsed (1 year?)
-        $this->hubspot->queueContact($event->getPayment()->getPolicy()->getUser());
-        //$this->hubspot->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_FIRST_PROBLEM);
-    }
-
+    /**
+     * Hubspot actions for when a user has a failed payment.
+     * @param UserPaymentEvent $event represents the failure.
+     */
     public function onUserPaymentFailedEvent(UserPaymentEvent $event)
     {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
         /*
-        TODO: this is unimplemented as far as I can see.
-        $this->hubspot->queueContact(
+        TODO: apparantly event is unused but do this anyway.
+        $this->hubspotService->queueContact(
             $event->getUser(),
             HubspotService::QUEUE_EVENT_USER_PAYMENT_FAILED,
             ['reason' => $event->getReason()]
         );
         */
+    }
+
+    /**
+     * Hubspot actions for when a reward pot is changed.
+     * @param PolicyEvent $event is the event object representing the reward pot change.
+     */
+    public function onPolicyPotEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        // TODO: hubspot event
+    }
+
+    /**
+     * Hubspot actions for when a policy is cancelled.
+     * @param PolicyEvent $event is the event object representing the cancellation.
+     */
+    public function onPolicyCancelledEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        // $this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_CANCELLED);
+    }
+
+    /**
+     * Hubspot actions for when a pending policy is renewed.
+     * @param PolicyEvent $event represents the renewal.
+     */
+    public function onPolicyPendingRenewedEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_PENDING_RENEWAL);
+    }
+
+    /**
+     * Hubspot actions for when policy is renewed.
+     * @param PolicyEvent $event represents the renewal.
+     */
+    public function onPolicyRenewedEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_RENEWED);
+    }
+
+    /**
+     * Hubspot actions for when a policy starts.
+     * @param PolicyEvent $event represents the policy starting.
+     */
+    public function onPolicyStartEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_START);
+
+        // Eventually we want to migrate users to the policy started event
+        // However, this will impact on users in the connection campaign, and so
+        // send both created & started events for now until we can migrate over
+        //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_CREATED);
+    }
+
+    /**
+     * Hubspot actions for when a policy goes unpaid.
+     * @param PolicyEvent $event represents the policy going unpaid.
+     */
+    public function onPolicyUnpaidEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+    }
+
+    /**
+     * Hubspot actions for when a policy is reactivated.
+     * @param PolicyEvent $event represents the reactivation.
+     */
+    public function onPolicyReactivatedEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+    }
+
+    /**
+     * Hubspot actions for when an invitation is accepted.
+     * @param InvitationEvent $event represents the acceptance.
+     */
+    public function onInvitationAcceptedEvent(InvitationEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getInvitation()->getInviter());
+        $this->hubspotService->queueContact($event->getInvitation()->getInvitee());
+    }
+
+    /**
+     * Hubspot actions for when a payment has been successful.
+     * @param PaymentEvent $event represents the payment being successful.
+     */
+    public function onPaymentSuccessEvent(PaymentEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPayment()->getPolicy()->getUser());
+        //$this->hubspotService->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_SUCCESS);
+    }
+
+    /**
+     * Hubspot actions for when a payment fails.
+     * @param PaymentEvent $event represents the payment failure.
+     */
+    public function onPaymentFailedEvent(PaymentEvent $event)
+    {
+        $this->hubspotService->queueContact($event->getPayment()->getPolicy()->getUser());
+        //$this->hubspotService->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_FAILED);
+    }
+
+    /**
+     * Hubspot actions for when a payment encounters it's first problem.
+     * @param PaymentEvent $event represents the problem occurring.
+     */
+    public function onPaymentFirstProblemEvent(PaymentEvent $event)
+    {
+        // We have a few new properties on the user that are required for the payment first problem
+        // Resync user for now to ensure everything is present.
+        // Eventually can be removed if all users are re-synced or if enough time has elapsed (1 year?)
+        $this->hubspotService->queueContact($event->getPayment()->getPolicy()->getUser());
+        //$this->hubspotService->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_FIRST_PROBLEM);
     }
 }
