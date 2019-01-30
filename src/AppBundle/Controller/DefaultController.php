@@ -216,34 +216,126 @@ class DefaultController extends BaseController
      */
     public function affiliateLanding(Request $request)
     {
-        $page = null;
-        $affiliate = null;
+        $competitor = [
+            'PYB' => [
+                'name' => 'Protect Your Bubble',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 4
+            ],
+            'GC' => [
+                'name' => 'Gadget<br>Cover',
+                'days' => '<strong>5 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'SS' => [
+                'name' => 'Simplesurance',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'CC' => [
+                'name' => 'CloudCover',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 3,
+            ],
+            'END' => [
+                'name' => 'Endsleigh',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-check',
+                'oldphones' => 'fa-check',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'LICI' => [
+                'name' => 'Loveit<br>coverIt.co.uk',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ]
+        ];
+
+        $data = [
+            'competitor' => $competitor,
+        ];
 
         if ($request->get('_route') == 'topcashback') {
-            $page = 'topcashback';
-            $affiliate = 'TopCashback';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'topcashback',
+                'affiliate_company' => 'TopCashback',
+                'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'SS',
+            ];
         } elseif ($request->get('_route') == 'vouchercodes') {
-            $page = 'vouchercodes';
-            $affiliate = 'VoucherCodes';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'vouchercodes',
+                'affiliate_company' => 'VoucherCodes',
+                'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'END',
+            ];
         } elseif ($request->get('_route') == 'quidco') {
-            $page = 'quidco';
-            $affiliate = 'Quidco';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'quidco',
+                'affiliate_company' => 'Quidco',
+                'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'CC',
+            ];
         } elseif ($request->get('_route') == 'ivip') {
-            $page = 'ivip';
-            $affiliate = 'iVIP';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'ivip',
+                'affiliate_company' => 'iVIP',
+                'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
         } elseif ($request->get('_route') == 'reward_gateway') {
-            $page = 'reward-gateway';
-            $affiliate = 'Reward Gateway';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'reward-gateway',
+                'affiliate_company' => 'Reward Gateway',
+                'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'END',
+                'competitor3' => 'SS',
+            ];
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => $page
-        ]);
-
-        $data = [
-            'affiliate_company' => $affiliate,
-            'affiliate_page' => $page,
-        ];
+            'page' => $data['affiliate_page']]);
 
         return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
     }
