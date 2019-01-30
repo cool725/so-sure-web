@@ -124,6 +124,65 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
+    /**
+     * Tests if user can progress through the purchase flow with personal details unset.
+     */
+    public function testPurchaseMissingPersonalDetailsPledge()
+    {
+        $phone = $this->getRandomPhoneAndSetSession();
+        $email = self::generateEmail('testPurchaseMissingPersonalDetailsPledge', $this);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+        self::verifyResponse(302);
+        $crawler = $this->setPhone($phone);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $user = self::$dm->getRepository(User::class)->findBy(["email" => $email])[0];
+        $user->setMobileNumber("");
+        static::$dm->flush();
+        $crawler = $this->agreePledge($crawler);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('step-personal', self::$client->getHistory()->current()->getUri());
+    }
+
+    /**
+     * Tests if user can progress through the purchase flow with personal details unset.
+     */
+    public function testPurchaseMissingPersonalDetailsPayment()
+    {
+        $phone = $this->getRandomPhoneAndSetSession();
+        $email = self::generateEmail('testPurchaseMissingPersonalDetailsPayment', $this);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+        self::verifyResponse(302);
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+        $crawler = $this->setPhone($phone);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+        $crawler = $this->agreePledge($crawler);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+        $user = self::$dm->getRepository(User::class)->findBy(["email" => $email])[0];
+        $user->setMobileNumber("");
+        static::$dm->flush();
+        $crawler = $this->setPayment($crawler, $phone);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('step-personal', self::$client->getHistory()->current()->getUri());
+    }
+
     public function testPurchaseExistingUserWithPolicyDiffDetailsNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -1204,12 +1263,12 @@ class PurchaseControllerTest extends BaseControllerTest
 
     private function createPurchaseUser($user, $name, $birthday)
     {
-        $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
+        return $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
     }
 
     private function createPurchaseUserNew($user, $name, $birthday)
     {
-        $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
+        return $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
     }
 
     private function verifyPurchaseReady($crawler)

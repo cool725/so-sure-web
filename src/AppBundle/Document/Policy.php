@@ -2313,43 +2313,45 @@ abstract class Policy
     public function getPolicyOrUserBacsPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getBacsPaymentMethod() ?: $this->getUser()->getBacsPaymentMethod();
+        return $this->getBacsPaymentMethod() ?: ($this->getUser() ? $this->getUser()->getBacsPaymentMethod() : null);
     }
 
     public function getPolicyOrUserBacsBankAccount()
     {
         // TODO: Eventually remove this method
-        return $this->getBacsBankAccount() ?: $this->getUser()->getBacsBankAccount();
+        return $this->getBacsBankAccount() ?: ($this->getUser() ? $this->getUser()->getBacsBankAccount() : null);
     }
 
     public function hasPolicyOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasPaymentMethod() ?: $this->getUser()->hasPaymentMethod();
+        return $this->hasPaymentMethod() ?: ($this->getUser() ? $this->getUser()->hasPaymentMethod() : null);
     }
 
     public function hasPolicyOrUserValidPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasValidPaymentMethod() ?: $this->getUser()->hasValidPaymentMethod();
+        return $this->hasValidPaymentMethod() ?: ($this->getUser() ?  $this->getUser()->hasValidPaymentMethod() : null);
     }
 
     public function hasPolicyOrPayerOrUserValidPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasValidPaymentMethod() ?: $this->getPayerOrUser()->hasValidPaymentMethod();
+        return $this->hasValidPaymentMethod() ?:
+            ($this->getPayerOrUser() ? $this->getPayerOrUser()->hasValidPaymentMethod() : null);
     }
 
     public function getPolicyOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getPaymentMethod() ?: $this->getUser()->getPaymentMethod();
+        return $this->getPaymentMethod() ?: ($this->getUser() ? $this->getUser()->getPaymentMethod() : null);
     }
 
     public function getPolicyOrPayerOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getPaymentMethod() ?: $this->getPayerOrUser()->getPaymentMethod();
+        return $this->getPaymentMethod() ?:
+            ($this->getPayerOrUser() ? $this->getPayerOrUser()->getPaymentMethod() : null);
     }
 
     /**
@@ -2394,7 +2396,8 @@ abstract class Policy
     public function getPolicyOrPayerOrUserJudoPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getJudoPaymentMethod() ?: $this->getPayerOrUser()->getJudoPaymentMethod();
+        return $this->getJudoPaymentMethod() ?:
+            ($this->getPayerOrUser() ? $this->getPayerOrUser()->getJudoPaymentMethod() : null);
     }
 
     /**
@@ -5684,6 +5687,10 @@ abstract class Policy
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
+        }
+
+        if (!$this->getPolicyExpirationDate()) {
+            return false;
         }
 
         //print $this->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;

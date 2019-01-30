@@ -349,102 +349,12 @@ class ApiAuthController extends BaseController
      * @Route("/multipay/{id}", name="api_auth_put_multipay")
      * @Method({"PUT"})
      */
-    public function putMultiPayAction(Request $request, $id)
+    public function putMultiPayAction($id)
     {
-        try {
-            $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['action'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-            $action = $this->getDataString($data, 'action');
-            $amount = $this->getDataString($data, 'amount');
-            if (!in_array($action, ['accept', 'reject'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Unknown action', 422);
-            } elseif ($action == 'accept' && !$amount) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
+        \AppBundle\Classes\NoOp::ignore([$id]);
 
-            $dm = $this->getManager();
-            $multiPayRepo = $dm->getRepository(MultiPay::class);
+        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UPGRADE_APP, 'Deprecated', 422);
 
-            $multiPay = $multiPayRepo->find($id);
-            if (!$multiPay) {
-                throw new NotFoundHttpException();
-            } elseif ($multiPay->getPolicy()->getStatus() != Policy::STATUS_MULTIPAY_REQUESTED) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                    'Invalid policy status',
-                    422
-                );
-            }
-            // TODO: Validate payment amount for accept
-
-            $this->denyAccessUnlessGranted(MultiPayVoter::PAY, $multiPay);
-
-            if ($action == 'accept') {
-                /** @var JudopayService $judopay */
-                $judopay = $this->get('app.judopay');
-                if (!$judopay->multiPay($multiPay, $amount)) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED,
-                        'Access denied',
-                        422
-                    );
-                }
-                $multiPay->setStatus(MultiPay::STATUS_ACCEPTED);
-            } else {
-                $multiPay->setStatus(MultiPay::STATUS_REJECTED);
-                $multiPay->getPolicy()->setStatus(Policy::STATUS_MULTIPAY_REJECTED);
-            }
-            $dm->flush();
-
-            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $action, 200);
-        } catch (InvalidPremiumException $e) {
-            $this->get('logger')->error(sprintf(
-                'Invalid premium policy %s in mulitpay.',
-                $id
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT,
-                'Invalid premium paid',
-                422
-            );
-        } catch (ProcessedException $e) {
-            $this->get('logger')->error(sprintf(
-                'Duplicate receipt id for policy %s in multipay',
-                $id
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED,
-                'Payment not valid',
-                422
-            );
-        } catch (PaymentDeclinedException $e) {
-            $this->get('logger')->info(sprintf(
-                'Payment declined policy %s in multipay.',
-                $id
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED,
-                'Payment Declined',
-                422
-            );
-        } catch (AccessDeniedException $ade) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (NotFoundHttpException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'Unable to find multipay',
-                404
-            );
-        } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api putMultiPayAction.', ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
     }
 
     /**
@@ -1719,112 +1629,11 @@ class ApiAuthController extends BaseController
      * @Route("/scode/{code}", name="api_auth_put_scode")
      * @Method({"PUT"})
      */
-    public function putPolicySCodeAction(Request $request, $code)
+    public function putPolicySCodeAction($code)
     {
-        try {
-            $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['action', 'policy_id'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-            $action = $this->getDataString($data, 'action');
-            if (!in_array($action, ['request', 'cancel'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Unknown action', 422);
-            }
+        \AppBundle\Classes\NoOp::ignore([$code]);
 
-            $dm = $this->getManager();
-            $policyRepo = $dm->getRepository(Policy::class);
-            $scodeRepo = $dm->getRepository(SCode::class);
-
-            $scode = $scodeRepo->findOneBy(['code' => $code]);
-            if (!$scode || !$scode->isActive() || !$scode->getPolicy()) {
-                throw new NotFoundHttpException();
-            }
-
-            $scodePolicy = $scode->getPolicy();
-            $policyId = $this->getDataString($data, 'policy_id');
-            $multiPayPolicy = $policyRepo->find($policyId);
-            if (!$multiPayPolicy) {
-                throw new NotFoundHttpException();
-            } elseif ($action == 'request' && $multiPayPolicy->getStatus() !== null) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                    'Policy status not consistent with request',
-                    422
-                );
-            } elseif ($action == 'cancel' && $multiPayPolicy->getStatus() !== Policy::STATUS_MULTIPAY_REQUESTED) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                    'Policy status not consistent with cancellation',
-                    422
-                );
-            }
-
-            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $multiPayPolicy);
-
-            if ($action == 'request') {
-                $multiPay = new MultiPay();
-                $multiPay->setSCode($scode);
-                $multiPay->setPayee($this->getUser());
-                $multiPay->setPolicy($multiPayPolicy);
-                $scodePolicy->getUser()->addMultiPay($multiPay);
-                $multiPayPolicy->setStatus(Policy::STATUS_MULTIPAY_REQUESTED);
-                $dm->flush();
-
-                try {
-                    $push = $this->get('app.push');
-                    // @codingStandardsIgnoreStart
-                    $push->sendToUser(PushService::MESSAGE_MULTIPAY, $multiPay->getPayer(), sprintf(
-                        '%s has requested you to pay for their policy. You can pay £%0.2f/month or £%0.2f for the year.',
-                        $multiPay->getPayee()->getName(),
-                        $multiPayPolicy->getPremium()->getMonthlyPremiumPrice(),
-                        $multiPayPolicy->getPremium()->getYearlyPremiumPrice()
-                    ), null, ['id' => $multiPay->getId()]);
-                    // @codingStandardsIgnoreEnd
-                } catch (\Exception $e) {
-                    $this->get('logger')->error(sprintf("Error in multipay push."), ['exception' => $e]);
-                }
-                try {
-                    $mailer = $this->get('app.mailer');
-                    $mailer->sendTemplateToUser(
-                        sprintf('%s has requested you pay for their policy', $multiPay->getPayee()->getName()),
-                        $multiPay->getPayer(),
-                        'AppBundle:Email:policy/multiPayRequest.html.twig',
-                        ['multiPay' => $multiPay],
-                        'AppBundle:Email:policy/multiPayRequest.txt.twig',
-                        ['multiPay' => $multiPay]
-                    );
-                } catch (\Exception $e) {
-                    $this->get('logger')->error(sprintf("Error in multipay email."), ['exception' => $e]);
-                }
-            } else {
-                $multiPay = $dm->getRepository(MultiPay::class)->findOneBy([
-                    'scode' => $scode,
-                    'policy' => $multiPayPolicy,
-                    'payee' => $this->getUser()
-                ]);
-                if ($multiPay) {
-                    $multiPay->setStatus(MultiPay::STATUS_CANCELLED);
-                    $multiPay->getPolicy()->setStatus(null);
-                } else {
-                    throw new NotFoundHttpException();
-                }
-            }
-            $dm->flush();
-
-            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, sprintf('success multipay %s', $action), 200);
-        } catch (AccessDeniedException $ade) {
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (NotFoundHttpException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'Unable to find policy/code',
-                404
-            );
-        } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api putPolicySCodeAction.', ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
+        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UPGRADE_APP, 'Deprecated', 422);
     }
 
     /**

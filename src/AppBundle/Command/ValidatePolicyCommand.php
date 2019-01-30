@@ -197,16 +197,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         } elseif ($resyncPicsureMetadata) {
             $this->resyncPicsureMetadata();
         } elseif ($flushPolicyRedis) {
-            foreach ($this->redis->zrange('policy:validation', 0, -1) as $member) {
-                $policy = unserialize($member);
-
-                if ($this->redis->sismember('policy:validation:flags', $policy['id'])) {
-                    continue;
-                }
-
-                $this->redis->zrem('policy:validation', $member);
-            }
+            $this->redis->del(['policy:validation']);
+            $this->redis->del(['policy:validation:flags']);
         } else {
+            $this->redis->del(['policy:validation']);
+
             /** @var PolicyRepository $policyRepo */
             $policyRepo = $this->dm->getRepository(Policy::class);
 

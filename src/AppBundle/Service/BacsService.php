@@ -24,6 +24,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Classes\SoSure;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -815,16 +816,23 @@ class BacsService
                     }
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
-
+                    $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true);
+                    // Cancel scheduled payment.
+                    $scheduledPayment = $submittedPayment->getScheduledPayment();
+                    if ($scheduledPayment) {
+                        $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
+                    }
 
                     // Set policy as unpaid if there's a payment failure
                     $policy->setPolicyStatusUnpaidIfActive();
 
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
-
-                    $this->failedPaymentEmail($policy);
+                    $this->dispatcher->dispatch(
+                        ScheduledPaymentEvent::EVENT_FAILED,
+                        new ScheduledPaymentEvent($scheduledPayment)
+                    );
 
                     $results['failed-payments']++;
                     $results['failed-value'] += $amount;
@@ -984,28 +992,6 @@ class BacsService
         $this->dm->flush();
 
         return $results;
-    }
-
-    /**
-     * TODO: Combine with JudopayService::failedPaymentEmail (move to policy service?)
-     * @param Policy $policy
-     */
-    private function failedPaymentEmail(Policy $policy)
-    {
-        $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
-        $baseTemplate = sprintf('AppBundle:Email:bacs/failedPayment');
-
-        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
-        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
-
-        $this->mailer->sendTemplateToUser(
-            $subject,
-            $policy->getUser(),
-            $htmlTemplate,
-            ['policy' => $policy],
-            $textTemplate,
-            ['policy' => $policy]
-        );
     }
 
     private function notifyMandateCancelled(User $user, $reason)

@@ -10,6 +10,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
+use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Repository\ClaimRepository;
@@ -589,5 +590,41 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->checkDetectedImei();
         $this->assertEquals("a", $redis->lpop("DETECTED-IMEI"));
         self::$monitor->checkDetectedImei();
+    }
+
+    /**
+     * Tests if the bacs input file monitor will except when there are no input files at all.
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testBacsInputFileNotImportedNoFile()
+    {
+        self::$monitor->bacsInputFileNotImported();
+    }
+
+    /**
+     * Tests if the bacs input file monitor will except when there are old input files.
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
+    public function testBacsInputFileNotImportedOldFile()
+    {
+        $file = new BacsReportInputFile();
+        $file->setDate(new \DateTime("yesterday"));
+        self::$dm->persist($file);
+        self::$dm->flush();
+        self::$monitor->bacsInputFileNotImported();
+    }
+
+    /**
+     * Tests if the bacs input file monitor will except when there is a current input file.
+     */
+    public function testBacsInputFileNotImportedCurrentFile()
+    {
+        $file = new BacsReportInputFile();
+        $file->setDate(new \DateTime());
+        self::$dm->persist($file);
+        self::$dm->flush();
+        self::$monitor->bacsInputFileNotImported();
+        // if there are no exceptions then the test passed.
+        $this->assertTrue(true);
     }
 }
