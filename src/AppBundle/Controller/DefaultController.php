@@ -251,7 +251,7 @@ class DefaultController extends BaseController
             ],
             'LICI' => [
                 'name' => 'Loveit<br>coverIt.co.uk',
-                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
                 'oldphones' => 'fa-times',
