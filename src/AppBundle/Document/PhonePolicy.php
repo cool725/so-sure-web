@@ -231,7 +231,7 @@ class PhonePolicy extends Policy
     public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
     {
         $this->phone = $phone;
-        if (!$phone->getCurrentPhonePrice()) {
+        if (!$phone->getCurrentPhonePrice($date)) {
             throw new \Exception('Phone must have a price');
         }
 
