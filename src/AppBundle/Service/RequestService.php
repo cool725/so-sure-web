@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Attribution;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
@@ -21,6 +22,12 @@ class RequestService
     const DEVICE_OS_ANDROID = 'Android';
     const DEVICE_OS_IPHONE = 'iPhone';
     const DEVICE_OS_IOS = 'iOS';
+
+    const UTM_CAMPAIGN = 'campaign';
+    const UTM_MEDIUM = 'medium';
+    const UTM_SOURCE = 'source';
+    const UTM_TERM = 'term';
+    const UTM_CONTENT = 'content';
 
     /** @var RequestStack */
     protected $requestStack;
@@ -101,6 +108,54 @@ class RequestService
         }
 
         return null;
+    }
+
+    /**
+     * @return Attribution
+     * @throws \UAParser\Exception\FileNotFoundException
+     */
+    public function getAttribution()
+    {
+        $attribution = new Attribution();
+
+        $utm = $this->getUtm();
+        if (isset($utm[self::UTM_CAMPAIGN])) {
+            $attribution->setCampaignName($utm[self::UTM_CAMPAIGN]);
+        }
+        if (isset($utm[self::UTM_SOURCE])) {
+            $attribution->setCampaignSource($utm[self::UTM_SOURCE]);
+        }
+        if (isset($utm[self::UTM_MEDIUM])) {
+            $attribution->setCampaignMedium($utm[self::UTM_MEDIUM]);
+        }
+        if (isset($utm[self::UTM_CONTENT])) {
+            $attribution->setCampaignContent($utm[self::UTM_CONTENT]);
+        }
+        if (isset($utm[self::UTM_TERM])) {
+            $attribution->setCampaignTerm($utm[self::UTM_TERM]);
+        }
+
+        $deviceCategory = null;
+        $deviceOS = null;
+        if ($userAgent = $this->getUserAgent()) {
+            $parser = Parser::create();
+            $userAgentDetails = $parser->parse($userAgent);
+            $deviceCategory = $this->getDeviceCategory();
+            $deviceOS = $this->getDeviceOS();
+        }
+        $attribution->setDeviceCategory($deviceCategory);
+        $attribution->setDeviceOS($deviceOS);
+
+        $referer = $this->getReferer();
+        if ($referer) {
+            $refererDomain = parse_url($referer, PHP_URL_HOST);
+            $currentDomain = parse_url($this->getUri(), PHP_URL_HOST);
+            if (mb_strtolower($refererDomain) != mb_strtolower($currentDomain)) {
+                $attribution->setReferer($referer);
+            }
+        }
+
+        return $attribution;
     }
 
     /**

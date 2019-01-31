@@ -118,6 +118,14 @@ class Attribution implements EqualsInterface
     protected $referer;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="1500")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $goCompareQuote;
+
+    /**
      * Make sure to sync choices with RequestService
      * @Assert\Choice({"Desktop", "Tablet", "Mobile"}, strict=true)
      * @MongoDB\Field(type="string")
@@ -193,6 +201,16 @@ class Attribution implements EqualsInterface
     public function getReferer()
     {
         return $this->referer;
+    }
+
+    public function getGoCompareQuote()
+    {
+        return $this->goCompareQuote;
+    }
+
+    public function setGoCompareQuote($goCompareQuote)
+    {
+        $this->goCompareQuote = $goCompareQuote;
     }
 
     public function setDeviceCategory($deviceCategory)

@@ -343,6 +343,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\EmbedOne(targetDocument="Attribution")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false)
+     * @var Attribution
      */
     protected $attribution;
 

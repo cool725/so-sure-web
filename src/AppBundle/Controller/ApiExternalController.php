@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\NoOp;
 use AppBundle\Document\Address;
+use AppBundle\Document\Attribution;
 use AppBundle\Document\DateTrait;
 use AppBundle\Service\IntercomService;
 use AppBundle\Service\RequestService;
@@ -310,9 +311,18 @@ class ApiExternalController extends BaseController
         $user = new User();
         $user->setEnabled(true);
 
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        $attribution = $requestService->getAttribution();
+        $attribution->setGoCompareQuote(
+            $alphaValidator->conform($this->getRequestString($request, 'quote_id'))
+        );
+        $user->setAttribution($attribution);
+
         $user->setFirstName($alphaValidator->conform($this->getRequestString($request, 'first_name')));
         $user->setLastName($alphaValidator->conform($this->getRequestString($request, 'surname')));
         $user->setEmail($email);
+
 
         $dob = $this->getRequestString($request, 'dob');
         $birthday = null;

@@ -1244,6 +1244,7 @@ class MixpanelService
 
     private function transformUtm($setOnce = true)
     {
+        // TODO: refactor to use RequestService::getAttribution
         $prefix = '';
         if (!$setOnce) {
             $prefix = 'Latest ';

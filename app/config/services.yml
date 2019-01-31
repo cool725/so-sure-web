@@ -1108,6 +1108,15 @@ services:
         tags:
         -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
+    app.listener.gocompare:
+        class:   AppBundle\Listener\GoCompareListener
+        arguments:
+        - "@logger"
+        - "%kernel.environment%"
+        tags:
+        -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+        -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
     app.listener.intercom:
         class:   AppBundle\Listener\IntercomListener
         arguments:
