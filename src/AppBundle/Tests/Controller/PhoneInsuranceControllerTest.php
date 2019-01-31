@@ -122,7 +122,6 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         self::$dm->flush();
         $crawler = self::$client->request('GET', '/insure/Samsung');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 

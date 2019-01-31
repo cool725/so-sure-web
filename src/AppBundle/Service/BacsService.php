@@ -1974,11 +1974,22 @@ class BacsService
             return self::VALIDATE_SKIP;
         }
 
-        if (!$bankAccount->allowedSubmission()) {
+        try {
+            if (!$bankAccount->allowedSubmission()) {
+                $msg = sprintf(
+                    'Skipping payment %s as submission is not yet allowed (must be at least %s) [Rescheduled]',
+                    $id,
+                    $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
+                );
+                $this->logger->error($msg);
+
+                return self::VALIDATE_RESCHEDULE;
+            }
+        } catch (\Exception $e) {
             $msg = sprintf(
-                'Skipping payment %s as submission is not yet allowed (must be at least %s) [Rescheduled]',
+                'Skipping payment %s. Error: %s',
                 $id,
-                $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
+                $e->getMessage()
             );
             $this->logger->error($msg);
 

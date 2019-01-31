@@ -2471,61 +2471,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals($data['id'], $policyData['id']);
     }
 
-    public function testJudopayMultipayDisassociation()
-    {
-        $multiPay = $this->createMultiPayRequest(
-            self::generateEmail('testJudopayMultipayDisassociation-payer', $this),
-            self::generateEmail('testJudopayMultipayDisassociation-payee', $this),
-            true
-        );
-
-        $payerCognitoIdentityId = $this->getAuthUser($multiPay->getPayer());
-        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', $multiPay->getId());
-        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
-            'action' => 'accept',
-            'amount' => $multiPay->getPolicy()->getPremium()->getMonthlyPremiumPrice(),
-        ]);
-        $data = $this->verifyResponse(200);
-
-        $updatedPolicy = $this->assertPolicyExists(self::$client->getContainer(), $multiPay->getPolicy());
-        $this->assertTrue($updatedPolicy->isDifferentPayer());
-        //$this->assertTrue($multiPay->getPolicy()->isDifferentPayer());
-
-        $url = sprintf('/api/v1/auth/user?_method=GET');
-        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        //print_r($data);
-
-        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
-        $url = sprintf('/api/v1/auth/user?_method=GET');
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        //print_r($data);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $details = $judopay->testPayDetails(
-            $multiPay->getPayee(),
-            $multiPay->getPolicy()->getId(),
-            $multiPay->getPolicy()->getPremium()->getMonthlyPremiumPrice(),
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $multiPay->getPolicy()->getId());
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => $details['consumer']['consumerToken'],
-            'card_token' => $details['cardDetails']['cardToken'],
-            'receipt_id' => $details['receiptId'],
-        ]]);
-        $policyData1 = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData1['status']);
-
-        $updatedPolicy = $this->assertPolicyExists(self::$client->getContainer(), $multiPay->getPolicy());
-        $this->assertFalse($updatedPolicy->isDifferentPayer());
-    }
-
     // policy/{id}/terms
 
     /**
@@ -4058,81 +4003,24 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     public function testPutPolicySCode()
     {
-        $multiPay = $this->createMultiPayRequest(
-            self::generateEmail('testPutPolicySCode-payer', $this),
-            self::generateEmail('testPutPolicySCode-payee', $this)
-        );
-
-        // Rerunning should not be allowed
-        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $multiPay->getSCode()->getCode());
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
-            'action' => 'request',
-            'policy_id' => $multiPay->getPolicy()->getId(),
-        ]);
-        $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
-    }
-    
-    public function testPutPolicySCodeCancel()
-    {
-        $multiPay = $this->createMultiPayRequest(
-            self::generateEmail('testPutPolicySCodeCancel-payer', $this),
-            self::generateEmail('testPutPolicySCodeCancel-payee', $this)
-        );
-
-        // Cancellation (done here as all above would just need duplication if different method)
-        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $multiPay->getSCode()->getCode());
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
-            'action' => 'cancel',
-            'policy_id' => $multiPay->getPolicy()->getId(),
-        ]);
-        $getData = $this->verifyResponse(200);
-
-        // Verify cancellation
-        $dm = $this->getDocumentManager(true);
-        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $payeePolicy */
-        $payeePolicy = $policyRepo->find($multiPay->getPolicy()->getId());
-        $this->assertNull($payeePolicy->getStatus());
-        $userRepo = $dm->getRepository(User::class);
-        /** @var User $updatedPayerUser */
-        $updatedPayerUser = $userRepo->find($multiPay->getPayer()->getId());
-        $this->assertEquals(1, count($updatedPayerUser->getMultiPays()));
-        $updatedMultipay = $updatedPayerUser->getMultiPays()[0];
-        $this->assertEquals(MultiPay::STATUS_CANCELLED, $updatedMultipay->getStatus());
-        $this->assertEquals($multiPay->getPayer()->getId(), $updatedMultipay->getPayer()->getId());
-        $this->assertEquals($multiPay->getPayee()->getId(), $updatedMultipay->getPayee()->getId());
-
-        // Rerunning should not be allowed
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $multiPay->getSCode()->getCode());
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
-            'action' => 'cancel',
-            'policy_id' => $multiPay->getPolicy()->getId(),
-        ]);
-        $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
-    }
-
-    public function testPutSCodeInactiveSCode()
-    {
+        $payerEmail = self::generateEmail('testPutPolicySCode-payer', $this);
+        $payeeEmail = self::generateEmail('testPutPolicySCode-payee', $this);
         // Payer
         $payerUser = self::createUser(
             self::$userManager,
-            self::generateEmail('testPutSCodeInactiveSCode-payer', $this),
+            $payerEmail,
             'foo'
         );
         $payerCognitoIdentityId = $this->getAuthUser($payerUser);
         $crawler = $this->generatePolicy($payerCognitoIdentityId, $payerUser);
         $createData = $this->verifyResponse(200);
         $payerPolicyId = $createData['id'];
-
-        $this->payPolicy($payerUser, $payerPolicyId);
-
+        $amount = null;
+        $this->payPolicy($payerUser, $payerPolicyId, $amount);
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
         $this->assertEquals(0, count($data['multipay_policies']));
-
         $url = sprintf('/api/v1/auth/scode');
         $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
             'type' => SCode::TYPE_MULTIPAY,
@@ -4141,124 +4029,29 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
         $this->assertEquals(8, mb_strlen($sCode));
-
         // Payee
         $payeeUser = self::createUser(
             self::$userManager,
-            self::generateEmail('testPutSCodeInactiveSCode-payee', $this),
+            $payeeEmail,
             'foo'
         );
         $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
         $crawler = $this->generatePolicy($payeeCognitoIdentityId, $payeeUser);
         $createData = $this->verifyResponse(200);
         $payeePolicyId = $createData['id'];
-
-        // DELETE SCode
-        $url = sprintf('/api/v1/auth/scode/%s?_method=DELETE', $sCode);
-        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
-            'action' => 'request',
-            'policy_id' => $payeePolicyId,
-        ]);
-        $getData = $this->verifyResponse(200);
-
         // Finally scode request
         $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
         $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
             'action' => 'request',
             'policy_id' => $payeePolicyId,
         ]);
-        $getData = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
-    }
-
-    public function testPutSCodeMissingAction()
-    {
-        $payeeUser = self::createUser(
-            self::$userManager,
-            self::generateEmail('testPutSCodeMissingAction', $this),
-            'foo'
-        );
-        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
-
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, ['policy_id' => 'foo']);
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-    }
-
-    public function testPutSCodeMissingPolicyId()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testPutSCodeMissingPolicyId', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['action' => 'request']);
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-    }
-
-    public function testPutSCodeInvalidAction()
-    {
-        $payeeUser = self::createUser(
-            self::$userManager,
-            self::generateEmail('testPutSCodeInvalidAction', $this),
-            'foo'
-        );
-        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
-
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
-            'action' => 'foo',
-            'policy_id' => 'foo'
-        ]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
-    }
-
-    public function testPutSCodeUnknownSCode()
-    {
-        $payeeUser = self::createUser(
-            self::$userManager,
-            self::generateEmail('testPutSCodeUnknownSCode', $this),
-            'foo'
-        );
-        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
-
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', 'foo');
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
-            'action' => 'request',
-            'policy_id' => 'foo'
-        ]);
-        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
-    }
-
-    public function testPutSCodeUnknownPolicyId()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testPutSCodeUnknownPolicyId', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $createData = $this->verifyResponse(200);
-        $policyId = $createData['id'];
-
-        $url = sprintf('/api/v1/auth/scode');
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'type' => SCode::TYPE_MULTIPAY,
-            'policy_id' => $policyId,
-        ]);
-        $getData = $this->verifyResponse(200);
-        $sCode = $getData['code'];
-        $this->assertEquals(8, mb_strlen($sCode));
-
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'action' => 'request',
-            'policy_id' => 'foo'
-        ]);
-        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+        $getData = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
+        // Verify payee data
+        $dm = $this->getDocumentManager(true);
+        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $payeePolicy */
+        $payeePolicy = $policyRepo->find($payeePolicyId);
+        $this->assertNull($payeePolicy->getStatus());
     }
 
     // policy/{id}/terms

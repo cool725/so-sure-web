@@ -207,7 +207,8 @@ class BacsServiceTest extends WebTestCase
         static::$policyService->create($policy, $now);
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        $bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
+        $bacs = $this->setValidBacsPaymentMethodForPolicy($policy, rand(111111, 999999), $now);
+        //$bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
         $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
         self::$paymentService->confirmBacs($policy, $bacs);
 
@@ -268,7 +269,7 @@ class BacsServiceTest extends WebTestCase
         static::$policyService->create($policy, $now);
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        $bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
+        $bacs = $this->setValidBacsPaymentMethodForPolicy($policy, rand(111111, 999999), $now);
         $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
         self::$paymentService->confirmBacs($policy, $bacs);
 

@@ -563,7 +563,7 @@ class UserControllerTest extends BaseControllerTest
             $count = 1;
         }
 
-        $this->assertEquals($count, $crawler->evaluate(sprintf('count(%s)', $xpath))[0]);
+        $this->assertEquals($count, $crawler->evaluate(sprintf('count(%s)', $xpath))[0], $crawler->html());
     }
 
     public function testUserUnpaidPolicyPaid()
@@ -648,8 +648,10 @@ class UserControllerTest extends BaseControllerTest
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_CANCELLED);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
@@ -668,6 +670,10 @@ class UserControllerTest extends BaseControllerTest
 
         $payment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
         self::$dm->flush();
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
+        $this->assertTrue($policy->hasPolicyOrUserBacsPaymentMethod());
+        $this->assertFalse($policy->isPolicyPaidToDate());
 
         $crawler = self::$client->request('GET', '/user/unpaid');
 
@@ -728,8 +734,10 @@ class UserControllerTest extends BaseControllerTest
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
@@ -808,8 +816,10 @@ class UserControllerTest extends BaseControllerTest
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
@@ -838,6 +848,11 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
         $this->logout();
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
+        $this->assertTrue($policy->hasPolicyOrUserBacsPaymentMethod());
+        $this->assertFalse($policy->isPolicyPaidToDate());
+
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateUnpaidJudoForm($crawler, false);
@@ -875,8 +890,10 @@ class UserControllerTest extends BaseControllerTest
         self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
@@ -905,6 +922,11 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
         $this->logout();
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
+        $this->assertTrue($policy->hasPolicyOrUserBacsPaymentMethod());
+        $this->assertFalse($policy->isPolicyPaidToDate());
+
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateUnpaidJudoForm($crawler, false);

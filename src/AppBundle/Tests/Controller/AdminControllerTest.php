@@ -152,7 +152,6 @@ class AdminControllerTest extends BaseControllerTest
 
         $form = $crawler->selectButton('link_claim_form_submit')->form();
 
-        $form['link_claim_form[id]'] = $claim->getId();
         $form['link_claim_form[number]'] = $claim->getNumber();
         $form['link_claim_form[note]'] = 'A test justification';
 
