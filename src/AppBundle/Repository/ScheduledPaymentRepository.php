@@ -20,7 +20,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
 
         return $this->createQueryBuilder()
             ->field('payment')->equals(null)
-            ->field('scheduled')->lte($date)
+            ->field('scheduled')->lt($date)
             ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
             ->getQuery()
             ->execute();
