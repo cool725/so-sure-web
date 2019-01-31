@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 
-class FacebookCommand extends ContainerAwareCommand
+class FacebookValidateCommand extends ContainerAwareCommand
 {
     /** @var FacebookService */
     protected $facebookService;

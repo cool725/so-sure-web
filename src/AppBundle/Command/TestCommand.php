@@ -16,6 +16,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\FacebookService;
 use AppBundle\Service\IntercomService;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
@@ -48,13 +49,22 @@ class TestCommand extends ContainerAwareCommand
     /** @var IntercomService */
     protected $intercomService;
 
-    public function __construct(DocumentManager $dm, Reader $reader, $environment, IntercomService $intercomService)
-    {
+    /** @var FacebookService */
+    protected $facebookService;
+
+    public function __construct(
+        DocumentManager $dm,
+        Reader $reader,
+        $environment,
+        IntercomService $intercomService,
+        FacebookService $facebookService
+    ) {
         parent::__construct();
         $this->dm = $dm;
         $this->reader = $reader;
         $this->environment = $environment;
         $this->intercomService = $intercomService;
+        $this->facebookService = $facebookService;
     }
 
     protected function configure()
@@ -79,6 +89,11 @@ class TestCommand extends ContainerAwareCommand
             throw new \Exception(sprintf('Unknown command %s', $method));
         }
         $output->writeln('Finished');
+    }
+
+    private function facebookAds(OutputInterface $output)
+    {
+        $this->facebookService->monthlyLookalike(new \DateTime(), 'VAGRANT');
     }
 
     private function intercomConversation(OutputInterface $output)

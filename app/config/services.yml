@@ -59,9 +59,14 @@ services:
         arguments:
             - "@logger"
             - "@router"
+            - "@doctrine_mongodb.odm.default_document_manager"
             - "%fb_appid%"
             - "%fb_secret%"
             - "%account_kit_secret%"
+            - "%fb_business_id%"
+            - "%fb_ad_account_id%"
+            - "%fb_system_user_access_token%"
+            - "%kernel.environment%"
 
     app.facebook:
         alias: AppBundle\Service\FacebookService

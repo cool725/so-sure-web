@@ -34,6 +34,9 @@ parameters:
     fb_appid: changeme
     fb_secret: changeme
     fb_pixel_id:
+    fb_business_id:
+    fb_ad_account_id:
+    fb_system_user_access_token:
     fb_og_namespace: 'wearesosure-dev'
     account_kit_secret: changeme
 
