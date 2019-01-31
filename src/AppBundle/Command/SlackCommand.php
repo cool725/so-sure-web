@@ -2,8 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\RouterService;
+use AppBundle\Service\ReportingService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Maknz\Slack\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -24,14 +26,22 @@ class SlackCommand extends ContainerAwareCommand
     /** @var RouterService */
     protected $routerService;
 
+    /** @var ReportingService */
+    protected $reportingService;
+
     /** @var Client */
     protected $slackClient;
 
-    public function __construct(DocumentManager $dm, RouterService $routerService, Client $slackClient)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        RouterService $routerService,
+        ReportingService $reportingService,
+        Client $slackClient
+    ) {
         parent::__construct();
         $this->dm = $dm;
         $this->routerService = $routerService;
+        $this->reportingService = $reportingService;
         $this->slackClient = $slackClient;
     }
 
@@ -255,7 +265,11 @@ class SlackCommand extends ContainerAwareCommand
         $oneWeekAgo = \DateTime::createFromFormat('U', time());
         $oneWeekAgo->sub(new \DateInterval('P7D'));
 
-        $total = $repo->countAllActivePolicies();
+        $cumulativeReport = $this->reportingService->getCumulativePolicies(
+            new \DateTime(SoSure::POLICY_START),
+            new \DateTime()
+        );
+        $total = end($cumulativeReport)["close"];
         $daily = $total - $repo->countAllActivePolicies($yesterday);
         $weekStart = $repo->countAllActivePolicies($start);
 

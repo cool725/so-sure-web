@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Admin\Reports\KpiCached;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Service\ReportingService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -73,9 +74,7 @@ class AdminReportsCommand extends ContainerAwareCommand
             list($start, $end) = ReportingService::getLastPeriod($period);
             $this->reporting->report($start, $end, false, false);
         }
-        $startDate = new \DateTime();
-        $startDate->setDate(2016, 9, 1);
-        $this->reporting->getCumulativePolicies($startDate, new \DateTime(), false);
+        $this->reporting->getCumulativePolicies(new \DateTime(SoSure::POLICY_START), new \DateTime(), false);
     }
 
     /**

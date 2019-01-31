@@ -1264,15 +1264,10 @@ class ReportingService
     public function getCumulativePolicies($start, $end, $useCache = true)
     {
         $start = $this->startOfMonth($start);
-        $end = $this->startOfMonth($end);
-        $redisKey = sprintf(
-            self::REPORT_KEY_FORMAT,
-            $start->format('Y-m-d.hi'),
-            $end->format('Y-m-d.hi'),
-            "cumulative"
-        );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
+        $end = $this->startOfDay($end);
+        $key = sprintf(self::REPORT_KEY_FORMAT, $start->format('Y-m-d.hi'), $end->format('Y-m-d.hi'), "cumulative");
+        if ($useCache === true && $this->redis->exists($key)) {
+            return unserialize($this->redis->get($key));
         }
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
@@ -1280,6 +1275,9 @@ class ReportingService
         $runningTotal = $this->totalAtPoint($start);
         while ($start < $end) {
             $endOfMonth = $this->endOfMonth($start);
+            if ($endOfMonth > $end) {
+                $endOfMonth = $end;
+            }
             $month = [];
             $month["open"] = $runningTotal;
             $month["new"] = $policyRepo->countAllStartedPolicies(null, $start, $endOfMonth);
@@ -1302,7 +1300,7 @@ class ReportingService
             $report[$start->format("F Y")] = $month;
             $start = $endOfMonth;
         }
-        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($report));
+        $this->redis->setex($key, self::REPORT_CACHE_TIME, serialize($report));
         return $report;
     }
 

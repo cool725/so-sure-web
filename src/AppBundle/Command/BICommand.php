@@ -288,7 +288,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllStartedPolicies($prefix);
+        $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START));
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',
