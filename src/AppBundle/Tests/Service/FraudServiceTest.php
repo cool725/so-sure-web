@@ -94,8 +94,8 @@ class FraudServiceTest extends WebTestCase
         $account = ['type' => '1', 'lastfour' => '1234', 'exp' => '1220'];
         $judo = new JudoPaymentMethod();
         $judo->addCardToken('1', $account);
-        $user->setPaymentMethod($judo);
         $policy = static::initPolicy($user, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
+        $policy->setPaymentMethod($judo);
 
         $user2 = static::createUser(
             static::$userManager,
@@ -109,8 +109,8 @@ class FraudServiceTest extends WebTestCase
 
         $judo2 = new JudoPaymentMethod();
         $judo2->addCardToken('1', $account);
-        $user2->setPaymentMethod($judo2);
         $policy2 = static::initPolicy($user2, static::$dm, static::getRandomPhone(static::$dm), null, false, true);
+        $policy2->setPaymentMethod($judo2);
         self::$dm->persist($user2);
         self::$dm->flush();
 

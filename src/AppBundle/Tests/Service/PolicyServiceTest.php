@@ -3806,7 +3806,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             4
         );
-        self::setPaymentMethod($policyA->getUser());
+        self::setPaymentMethodForPolicy($policyA);
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(50, $policyA->getPotValue());
@@ -3905,7 +3905,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             new \DateTime('2016-01-01')
         );
-        self::setPaymentMethod($policyA->getUser());
+        self::setPaymentMethodForPolicy($policyA);
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(10, $policyA->getPotValue());
@@ -4510,7 +4510,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             true
         );
-        self::setPaymentMethod($policyA->getUser());
+        self::setPaymentMethodForPolicy($policyA);
         $policyA->setStatus(PhonePolicy::STATUS_PENDING);
         $policyB->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');

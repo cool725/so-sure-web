@@ -96,7 +96,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $paymentA = new JudoPayment();
@@ -140,7 +140,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -174,7 +174,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -201,7 +201,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -236,7 +236,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -274,7 +274,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
         $receiptId = self::$judopay->testPay(
             $user,
@@ -311,7 +311,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -338,7 +338,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -371,7 +371,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -805,7 +805,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertTrue($policy->hasPolicyOrUserValidPaymentMethod());
 
-        $policy->getUser()->setPaymentMethod(null);
+        $policy->setPaymentMethod(null);
         self::$dm->flush();
         $this->assertFalse($policy->hasPolicyOrUserValidPaymentMethod());
 
@@ -1452,7 +1452,7 @@ class JudopayServiceTest extends WebTestCase
         );
         // @codingStandardsIgnoreEnd
 
-        $user->setPaymentMethod(new JudoPaymentMethod());
+        $policy->setPaymentMethod(new JudoPaymentMethod());
 
         for ($i = 1; $i < 4; $i++) {
             $scheduledPayment = $policy->getNextScheduledPayment();

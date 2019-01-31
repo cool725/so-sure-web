@@ -5393,13 +5393,13 @@ class PhonePolicyTest extends WebTestCase
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setPaymentMethod($policy->getUser(), '0116');
+        self::setPaymentMethodForPolicy($policy, '0116');
         $this->assertEquals(
             Policy::UNPAID_JUDO_CARD_EXPIRED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setPaymentMethod($policy->getUser(), '0120');
+        self::setPaymentMethodForPolicy($policy, '0120');
         //\Doctrine\Common\Util\Debug::dump($policy->getLastPaymentCredit(), 3);
         $this->assertEquals(
             Policy::UNPAID_JUDO_PAYMENT_MISSING,

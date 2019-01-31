@@ -410,7 +410,7 @@ class JudopayService
         if ($deviceDna) {
             $judo->setDeviceDna($deviceDna);
         }
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
 
@@ -617,7 +617,14 @@ class JudopayService
         $judo = $user->getJudoPaymentMethod();
         if (!$judo || !$judo instanceof JudoPaymentMethod) {
             $judo = new JudoPaymentMethod();
-            $user->setPaymentMethod($judo);
+            if ($policy) {
+                $policy->setPaymentMethod($judo);
+            } else {
+                $user->setPaymentMethod($judo);
+                foreach ($user->getValidPolicies(true) as $userPolicy) {
+                    $userPolicy->setPaymentMethod($judo);
+                }
+            }
         }
         $judo->setCustomerToken($consumerToken);
         if ($cardToken) {

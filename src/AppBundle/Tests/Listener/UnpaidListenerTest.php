@@ -278,7 +278,7 @@ class UnpaidListenerTest extends WebTestCase
     private function payingPolicy($method)
     {
         $policy = $this->createUserPolicy(true, null, false, uniqid()."@yahoo.com");
-        $policy->getUser()->setPaymentMethod($method);
+        $policy->setPaymentMethod($method);
         self::$dm->persist($policy);
         self::$dm->persist($method);
         self::$dm->persist($policy->getUser());

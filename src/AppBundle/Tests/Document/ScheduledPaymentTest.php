@@ -141,9 +141,9 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
     public function testValidateRunable()
     {
         $user = new User();
-        $user->setPaymentMethod(new JudoPaymentMethod());
         $premium = new PhonePremium();
         $policy = new SalvaPhonePolicy();
+        $policy->setPaymentMethod(new JudoPaymentMethod());
         $policy->setPolicyNumber(sprintf('TESTING/%s', rand(1, 999999)));
         $policy->setBilling(new \DateTime('2017-01-15 15:00'));
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
