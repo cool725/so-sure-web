@@ -80,9 +80,9 @@ class GoCompare
         1432 => ['make' => 'Samsung', 'model' => 'Galaxy Note 9', 'memory' => 128],
         1433 => ['make' => 'Samsung', 'model' => 'Galaxy Note 9', 'memory' => 512],
 
-        //1440 => ['make' => 'Apple', 'model' => 'iPhone XR', 'memory' => 64],
-        //1441 => ['make' => 'Apple', 'model' => 'iPhone XR', 'memory' => 128],
-        //1442 => ['make' => 'Apple', 'model' => 'iPhone XR', 'memory' => 256],
+        1440 => ['make' => 'Apple', 'model' => 'iPhone XR', 'memory' => 64],
+        1441 => ['make' => 'Apple', 'model' => 'iPhone XR', 'memory' => 128],
+        1442 => ['make' => 'Apple', 'model' => 'iPhone XR', 'memory' => 256],
         1443 => ['make' => 'Apple', 'model' => 'iPhone XS', 'memory' => 64],
         1444 => ['make' => 'Apple', 'model' => 'iPhone XS', 'memory' => 256],
         1445 => ['make' => 'Apple', 'model' => 'iPhone XS', 'memory' => 512],
@@ -107,5 +107,15 @@ class GoCompare
         1463 => ['make' => 'Samsung', 'model' => 'Galaxy A6', 'memory' => 32],
         1464 => ['make' => 'Google', 'model' => 'Pixel 3', 'memory' => 64],
         1465 => ['make' => 'Google', 'model' => 'Pixel 3 XL', 'memory' => 64],
+        1466 => ['make' => 'OnePlus', 'model' => '6T', 'memory' => 128],
+        1467 => ['make' => 'OnePlus', 'model' => '6T', 'memory' => 256],
+
+        1475 => ['make' => 'Huawei', 'model' => 'Honor 8', 'memory' => 32],
+        //1476 => ['make' => 'Huawei', 'model' => 'Honor 8 Pro', 'memory' => 32],
+
+        1479 => ['make' => 'Samsung', 'model' => 'Galaxy A7 (2018)', 'memory' => 64],
+        1480 => ['make' => 'Samsung', 'model' => 'Galaxy A9 (2018)', 'memory' => 128],
+
+        1483 => ['make' => 'Huawei', 'model' => 'Honor 10', 'memory' => 64],
     ];
 }

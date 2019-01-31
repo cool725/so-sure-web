@@ -171,7 +171,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         // @codingStandardsIgnoreEnd
         $mailer->send(
             'Request for Gadget List ID',
-            ['matt@comparisoncreator.com' ,'marketing@so-sure.com'],
+            ['matt@comparisoncreator.com','ellie@ComparisonCreator.com','marketing@so-sure.com'],
             $body,
          null,
          null,
