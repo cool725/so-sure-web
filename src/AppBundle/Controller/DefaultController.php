@@ -176,19 +176,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/starling-bank", name="starling_bank")
-     * @Template
-     */
-    public function starlingLanding(Request $request)
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'starling']);
-
-        $this->starlingOAuthSession($request);
-
-        return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
-    }
-
-    /**
      * @Route("/social-insurance", name="social_insurance", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      */
     public function socialInsurance()
@@ -205,6 +192,7 @@ class DefaultController extends BaseController
      * @Route("/reward-gateway", name="reward_gateway")
      * @Route("/money", name="money")
      * @Route("/money-free-phone-case", name="money_free_phone_case")
+     * @Route("/starling-bank", name="starling_bank")
      */
     public function affiliateLanding(Request $request)
     {
@@ -275,6 +263,8 @@ class DefaultController extends BaseController
             'competitor' => $competitor,
         ];
 
+        $template = 'AppBundle:Default:indexAffiliate.html.twig';
+
         if ($request->get('_route') == 'topcashback') {
             $data = [
                 'competitor' => $competitor,
@@ -344,12 +334,24 @@ class DefaultController extends BaseController
                 'competitor2' => 'GC',
                 'competitor3' => 'LICI',
             ];
+        } elseif ($request->get('_route') == 'starling_bank') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'starling-bank',
+                // 'affiliate_company' => 'Starling Bank',
+                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+            $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            $this->starlingOAuthSession($request);
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
             'page' => $data['affiliate_page']]);
 
-        return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
+        return $this->render($template, $data);
     }
 
     /**
