@@ -613,7 +613,7 @@
                                             </a>;
                                         {% endfor %}
                                         {% for policy in fraud.duplicate_bank_policy_accounts %}
-                                            <a href="{{ path(policy6_route, {'id': policy.id }) }}">
+                                            <a href="{{ path(policy_route, {'id': policy.id }) }}">
                                                 {{ policy.policyNumber }}
                                             </a>;
                                         {% endfor %}

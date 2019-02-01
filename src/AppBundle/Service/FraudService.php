@@ -90,13 +90,8 @@ class FraudService
         try {
             /** @var PolicyRepository $policyRepo */
             $policyRepo = $this->dm->getRepository(Policy::class);
-            $policyRepo->findBankAccount($policy);
 
-            $user = $policy->getUser();
-            /** @var UserRepository $userRepo */
-            $userRepo = $this->dm->getRepository(User::class);
-
-            return $userRepo->findBankAccount($user);
+            return $policyRepo->findBankAccount($policy);
         } catch (\Exception $e) {
             return [];
         }
