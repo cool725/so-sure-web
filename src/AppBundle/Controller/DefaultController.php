@@ -176,16 +176,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/money", name="money")
-     */
-    public function moneyLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'money']);
-
-        return $this->render('AppBundle:Default:indexMoney.html.twig');
-    }
-
-    /**
      * @Route("/starling-bank", name="starling_bank")
      * @Template
      */
@@ -213,6 +203,8 @@ class DefaultController extends BaseController
      * @Route("/quidco", name="quidco")
      * @Route("/ivip", name="ivip")
      * @Route("/reward-gateway", name="reward_gateway")
+     * @Route("/money", name="money")
+     * @Route("/money-free-phone-case", name="money_free_phone_case")
      */
     public function affiliateLanding(Request $request)
     {
@@ -331,6 +323,26 @@ class DefaultController extends BaseController
                 'competitor1' => 'PYB',
                 'competitor2' => 'END',
                 'competitor3' => 'SS',
+            ];
+        } elseif ($request->get('_route') == 'money') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'money',
+                'affiliate_company' => 'money',
+                'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'money_free_phone_case') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'money-free-phone-case',
+                'affiliate_company' => 'money',
+                'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
             ];
         }
 

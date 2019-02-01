@@ -10,16 +10,36 @@
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/landing.css') }}">
+    {% if affiliate_page == 'money-free-phone-case' %}
+        <link rel="stylesheet" href="{{ asset('css-js/homepage-vday.css') }}">
+    {% endif %}
 {% endblock %}
 
 {% block body %}
 
+    {% if affiliate_page == 'money-free-phone-case' %}
+        <div class="snow"></div>
+    {% endif %}
+
     <section class="hero">
         <div class="container container-xtra">
             <div class="hero__intro">
-                <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
-                <img src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto">
+                {% if affiliate_page == 'money-free-phone-case' %}
+                    <h1 class="mb-2 text-white h2">Protect the one you love this Valentines Day</h1>
+                    <h4 class="text-zaffre mb-2">We're giving away Free Phone cases worth &pound;19. Hurry while stocks last</h4>
+                    <p class="mb-4 text-white">
+                        <a href="#"
+                           class="text-white"
+                           data-toggle="modal"
+                           data-target="#page_terms"
+                           role="button"><small><u>Terms &amp; Conditions</u></small>
+                        </a>
+                   </p>
+                {% else %}
+                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
+                    <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
+                    <img src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto">
+                {% endif %}
             </div>
             <div class="hero__controls mb-5">
                 <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
@@ -84,8 +104,35 @@
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
+    <div class="modal fade"
+         id="page_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Free phone case
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Terms and conditions</h5>
+                    <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>
+                    <p>Promotion is valid from 23rd January 2019 until 15th February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/landing.js') }}"></script>
+    {% if affiliate_page == 'money-free-phone-case' %}
+        <script src="{{ asset('css-js/homepage-vday.js') }}"></script>
+    {% endif %}
 {% endblock %}
