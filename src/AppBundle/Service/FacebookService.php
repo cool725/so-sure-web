@@ -300,7 +300,11 @@ class FacebookService
 
         $customAudienceId = $this->createCustomAudience($date);
         $this->populateCustomAudience($customAudienceId, $caUsers);
-        $this->createLookalike($customAudienceId, $date);
+        // create lookalike seems to not be working - potentially GB is not the right country code
+        // however as can easily be done manually in fb, not worth debugging right now
+        // FacebookAds\Http\Exception\AuthorizationException: (#2654) Source is Too Small:
+        // Please choose a source that includes at least 100 people in the same country.
+        // $this->createLookalike($customAudienceId, $date);
     }
 
     public function createCustomAudience(\DateTime $date)
