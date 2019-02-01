@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Tests\UserClassTrait;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -15,6 +17,9 @@ use AppBundle\Document\Payment\JudoPayment;
  */
 class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
 {
+    use UserClassTrait;
+    use DateTrait;
+
     public static function setUpBeforeClass()
     {
     }
@@ -254,5 +259,75 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->addScheduledPayment($scheduledPayment);
 
         $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
+    }
+
+    /**
+     * Tests the edge cases in rescheduled in time function so that it does not pollute the other test.
+     */
+    public function testRescheduledInTimeEdgeCases()
+    {
+        $date = new \DateTime();
+        $bacsPolicy = $this->createUserPolicy(false, $date, false, uniqid()."@gmail.com");
+        $judoPolicy = $this->createUserPolicy(false, $date, false, uniqid()."@gmail.com");
+        $this->setBacsPaymentMethodForPolicy($bacsPolicy);
+        $this->setPaymentMethodForPolicy($judoPolicy);
+        // non bacs returns null.
+        $judoPayment = new ScheduledPayment();
+        $judoPolicy->addScheduledPayment($judoPayment);
+        $judoPayment->setScheduled($date);
+        $judoPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $this->assertNull($judoPayment->rescheduledInTime());
+        // non rescheduled bacs payment returns null.
+        $bacsPayment = new ScheduledPayment();
+        $bacsPolicy->addScheduledPayment($bacsPayment);
+        $bacsPayment->setScheduled($date);
+        $bacsPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+        $this->assertNull($bacsPayment->rescheduledInTime());
+    }
+
+    /**
+     * Tests that the rescheduled in time function does the right stuff in the general case where it is testing bacs
+     * rescheduled payments.
+     */
+    public function testRescheduledInTime()
+    {
+        $date = new \DateTime();
+        // payment too late.
+        $payment = $this->createScheduledPayments(6, $date);
+        $this->assertEquals(false, $payment->rescheduledInTime());
+        // payment within 30 days.
+        $payment = $payment->getRescheduledScheduledPayment();
+        $this->assertEquals(true, $payment->rescheduledInTime());
+        // payment within 30 days.
+        $payment = $payment->getRescheduledScheduledPayment();
+        $this->assertEquals(true, $payment->rescheduledInTime());
+        // payment within 30 days.
+        $payment = $payment->getRescheduledScheduledPayment();
+        $this->assertEquals(true, $payment->rescheduledInTime());
+        // payment within 30 days.
+        $payment = $payment->getRescheduledScheduledPayment();
+        $this->assertEquals(true, $payment->rescheduledInTime());
+        // original payment which is not rescheduled so it is null.
+        $payment = $payment->getRescheduledScheduledPayment();
+        $this->assertNull($payment->rescheduledInTime());
+    }
+
+    /**
+     * Creates a sequence of scheduled payment that are then rescheduled.
+     * @param int       $number is the number of scheduled payments to be created.
+     * @param \DateTime $start  is the date that the first scheduled payment will be set at.
+     * @return ScheduledPayment the last scheduled payment in the sequence.
+     */
+    private function createScheduledPayments($number, $start)
+    {
+        $policy = $this->createUserPolicy(false, $start, false, uniqid()."@gmail.com");
+        $this->setBacsPaymentMethodForPolicy($policy);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setScheduled($start);
+        $policy->addScheduledPayment($scheduledPayment);
+        for ($i = 1; $i < $number; $i++) {
+            $scheduledPayment = $scheduledPayment->reschedule($this->addDays($scheduledPayment->getScheduled(), 1));
+        }
+        return $scheduledPayment;
     }
 }

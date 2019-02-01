@@ -1879,7 +1879,13 @@ class BacsService
 
             // If admin has rescheduled, then allow payment to go through, but should be manually approved
             $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN;
-            $validate = $this->validateBacs($policy, $scheduledDate, $scheduledPayment->getId(), $ignoreNotEnoughTime);
+            $validate = $this->validateBacs(
+                $policy,
+                $scheduledDate,
+                $scheduledPayment->getId(),
+                $ignoreNotEnoughTime,
+                $scheduledPayment
+            );
             if ($validate == self::VALIDATE_SKIP) {
                 continue;
             } elseif ($validate == self::VALIDATE_CANCEL) {
@@ -1920,8 +1926,21 @@ class BacsService
         }
     }
 
-    private function validateBacs(Policy $policy, $scheduledDate, $id, $ignoreNotEnoughTime = false)
-    {
+    /**
+     * Validates that a payment or scheduled payment can go through.
+     * @param Policy                $policy              is the owner of the payment.
+     * @param \DateTime             $scheduledDate       is the date that the payment is set to go through.
+     * @param string                $id                  is the payment or scheduled payment id.
+     * @param boolean               $ignoreNotEnoughTime is whether to skip time related checks.
+     * @param ScheduledPayment|null $scheduledPayment    is the scheduled payment if there is one.
+     */
+    private function validateBacs(
+        Policy $policy,
+        $scheduledDate,
+        $id,
+        $ignoreNotEnoughTime = false,
+        $scheduledPayment = null
+    ) {
         /** @var BacsPaymentMethod $bacs */
         $bacs = $policy->getPolicyOrUserBacsPaymentMethod();
 
@@ -2025,6 +2044,9 @@ class BacsService
         // processing date
         if (!$ignoreNotEnoughTime) {
             if (!$bankAccount->allowedProcessing($scheduledDate)) {
+                if ($scheduledPayment && $scheduledPayment->rescheduledInTime()) {
+                    return self::VALIDATE_OK;
+                }
                 // @codingStandardsIgnoreStart
                 $msg = sprintf(
                     'Skipping (scheduled) payment %s on %s as processing day is too early/late (expected: %d max: %d initial: %s)',

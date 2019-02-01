@@ -22,6 +22,7 @@ class BacsPayment extends Payment
     const DAYS_PROCESSING = 1;
     const DAYS_CREDIT = 2;
     const DAYS_REVERSE = 5;
+    const DAYS_REPRESENTING = 30;
 
     const STATUS_PENDING = 'pending';
     const STATUS_GENERATED = 'generated';

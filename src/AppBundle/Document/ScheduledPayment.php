@@ -7,6 +7,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Classes\SoSure;
 
 /**
@@ -91,6 +92,15 @@ class ScheduledPayment
      * @Gedmo\Versioned
      */
     protected $notes;
+
+    /**
+     * If this scheduled payment is a rescheduling of an older scheduled payment, then this field will contain the
+     * old one.
+     * @MongoDB\ReferenceOne(targetDocument="ScheduledPayment")
+     * @Gedmo\Versioned
+     * @var ScheduledPayment
+     */
+    protected $rescheduledScheduledPayment;
 
     public function __construct()
     {
@@ -186,6 +196,16 @@ class ScheduledPayment
         return $this->notes;
     }
 
+    public function setRescheduledScheduledPayment(ScheduledPayment $rescheduledScheduledPayment)
+    {
+        $this->rescheduledScheduledPayment = $rescheduledScheduledPayment;
+    }
+
+    public function getRescheduledScheduledPayment()
+    {
+        return $this->rescheduledScheduledPayment;
+    }
+
     public function cancel()
     {
         $this->setStatus(self::STATUS_CANCELLED);
@@ -220,7 +240,7 @@ class ScheduledPayment
         $rescheduled->setAmount($this->getAmount());
         $rescheduled->setStatus(self::STATUS_SCHEDULED);
         $rescheduled->setScheduled($date);
-
+        $rescheduled->setRescheduledScheduledPayment($this);
         return $rescheduled;
     }
 
@@ -317,6 +337,32 @@ class ScheduledPayment
         }
 
         return false;
+    }
+
+    /**
+     * Tells you if a scheduled payment is a rescheduled one and if it is close enough to it's original payment that it
+     * is ok to let it go ahead. If this is not a rescheduled payment then it will always fail.
+     * @return boolean|null true if we can go ahead and false if not, and null if the scheduled payment is not even bacs
+     *                      or rescheduled.
+     */
+    public function rescheduledInTime()
+    {
+        $paymentType = $this->getPolicy()->getPolicyOrUserPaymentMethod()->getType();
+        if ($paymentType !== PaymentMethod::TYPE_BACS || $this->type !== self::TYPE_RESCHEDULED) {
+            return null;
+        }
+        $origin = $this;
+        $limiter = 0;
+        while ($origin->getRescheduledScheduledPayment() && $limiter < 100) {
+            $origin = $origin->getRescheduledScheduledPayment();
+            $limiter++;
+        }
+        if ($origin == $this || $limiter == 100) {
+            return false;
+        }
+        $date = $origin->getScheduled();
+        return $date < $this->getScheduled() &&
+            $date >= $this->subDays($this->getScheduled(), BacsPayment::DAYS_REPRESENTING);
     }
 
     public function toApiArray()

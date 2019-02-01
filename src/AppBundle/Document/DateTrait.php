@@ -387,6 +387,17 @@ trait DateTrait
     }
 
     /**
+     * Returns a copy of a given date which is n days behind it, taking into account negative numbers.
+     * @param \DateTime $date is the starting date.
+     * @param int       $days is the number of days to go back.
+     * @return \DateTime the new date.
+     */
+    public static function subDays($date, $days)
+    {
+        return self::addDays($date, 0 - $days);
+    }
+
+    /**
      * Creates a date interval over a given number of days and takes into account negative numbers.
      * @param int $days is the number of days to make the interval cover.
      * @return \DateInterval given number of days as an interval.

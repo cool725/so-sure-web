@@ -304,9 +304,9 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests to make sure addDays works as expected.
+     * Tests to make sure addDays and subDays work as expected.
      */
-    public function testaddDays()
+    public function testAddSubDays()
     {
         $now = new \DateTime('2018-03-28 00:00');
         $now = static::addDays($now, 1);
@@ -319,6 +319,10 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2018-03-19 00:00'), $now);
         $now = static::addDays($now, 3);
         $this->assertEquals(new \DateTime('2018-03-22 00:00'), $now);
+        $now = static::subDays($now, 3);
+        $this->assertEquals(new \DateTime('2018-03-19 00:00'), $now);
+        $now = static::subDays($now, 1);
+        $this->assertEquals(new \DateTime('2018-03-18 00:00'), $now);
     }
 
     /**
