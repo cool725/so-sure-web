@@ -132,33 +132,52 @@ class PaymentServiceTest extends WebTestCase
 
     public function testConfirmBacsDuplicate()
     {
-        $user = static::createUser(
+        $user1 = static::createUser(
             static::$userManager,
-            static::generateEmail('testConfirmBacsDuplicate', $this),
+            static::generateEmail('testConfirmBacsDuplicate1', $this),
             'bar',
             null,
             static::$dm
         );
 
-        $policy = static::initPolicy(
-            $user,
+        $policy1 = static::initPolicy(
+            $user1,
             static::$dm,
             $this->getRandomPhone(static::$dm),
             null,
             false
         );
 
-        static::$policyService->create($policy, null, true, 12);
+        $user2 = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConfirmBacsDuplicate2', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
+        $policy2 = static::initPolicy(
+            $user2,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false
+        );
+
+        static::$policyService->create($policy1, null, true, 12);
+        static::$policyService->create($policy2, null, true, 12);
 
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount(new BankAccount());
 
-        $mailer = $this->createMailer($this->exactly(2));
+        $mailer = $this->createMailer($this->exactly(4));
         static::$paymentService->setMailerMailer($mailer);
 
-        static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
+        static::$paymentService->confirmBacs($policy1, $bacs, $policy1->getStart());
+        static::$paymentService->confirmBacs($policy2, $bacs, $policy2->getStart());
 
-        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccountsCount($policy));
+        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccountsCount($policy1));
+        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccountsCount($policy2));
     }
 
     public function testConfirmBacsDifferentPayer()

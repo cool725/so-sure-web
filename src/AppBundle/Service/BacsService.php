@@ -1776,7 +1776,7 @@ class BacsService
 
             if ($update) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
-                $bankAccount->getBankAccount()->setMandateSerialNumber($serialNumber);
+                $bankAccount->setMandateSerialNumber($serialNumber);
 
                 // do not attempt to take payment until 2 business days after to allow for mandate
                 $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());

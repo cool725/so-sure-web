@@ -88,8 +88,12 @@ class PaymentCommand extends ContainerAwareCommand
         $unlinkable = 0;
         foreach ($pairs as $pair) {
             if ($pair[0] === null) {
-                $reversal = $pair[1]->getId();
-                $output->writeln("<info>{$reversal}</info> unlinkable");
+                $output->writeln(sprintf(
+                    "<info>%s</info> unlinkable. Policy Number: <info>%s</info> Notes: <info>%s</info>",
+                    $pair[1]->getId(),
+                    $pair[1]->getPolicy()->getId(),
+                    $pair[1]->getNotes()
+                ));
                 $unlinkable++;
             } else {
                 $reversed = $pair[0]->getId();

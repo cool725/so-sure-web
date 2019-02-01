@@ -1503,21 +1503,23 @@ class JudopayServiceTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy1 = $repo->find($policy1->getId());
+        $updatedPolicy1 = $this->assertPolicyExists(self::$container, $policy1);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy1->getStatus());
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy1->getPolicyNumber()));
+
+        $policy2->setPaymentMethod($policy1->getPaymentMethod());
 
         static::$policyService->setEnvironment('prod');
         self::$judopay->existing($policy2, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         static::$policyService->setEnvironment('test');
 
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy2 = $repo->find($policy2->getId());
+        $updatedPolicy2 = $this->assertPolicyExists(self::$container, $policy2);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy2->getStatus());
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy2->getPolicyNumber()));
+
+        $policy3->setPaymentMethod($policy1->getPaymentMethod());
 
         static::$policyService->setEnvironment('prod');
         $invalidPremium = false;
@@ -1539,7 +1541,7 @@ class JudopayServiceTest extends WebTestCase
         self::$judopay->existing($policy3, $phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         static::$policyService->setEnvironment('test');
 
-        $updatedPolicy3 = $repo->find($policy3->getId());
+        $updatedPolicy3 = $this->assertPolicyExists(self::$container, $policy3);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy3->getStatus());
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy3->getPolicyNumber()));
