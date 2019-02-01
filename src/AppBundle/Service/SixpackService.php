@@ -28,9 +28,6 @@ class SixpackService
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
-    const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
-    const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
-    const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
@@ -117,12 +114,12 @@ class SixpackService
         'ad-landing-2',
         'homepage-new-copy',
         'bacs',
+        'ebay-landing',
+        'ebay-landing-1',
+        'ebay-landing-2',
     ];
 
     public static $unauthExperiments = [
-        self::EXPERIMENT_EBAY_LANDING,
-        self::EXPERIMENT_EBAY_LANDING_1,
-        self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
         self::EXPERIMENT_SCODE_LANDING_TEXT,
@@ -182,9 +179,6 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        self::EXPERIMENT_EBAY_LANDING,
-        self::EXPERIMENT_EBAY_LANDING_1,
-        self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
 

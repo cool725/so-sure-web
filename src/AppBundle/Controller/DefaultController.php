@@ -355,66 +355,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/eb", name="eb")
-     * @Template
-     */
-    public function ebLanding(Request $request)
-    {
-        $exp = $this->sixpackSimple(SixpackService::EXPERIMENT_EBAY_LANDING, $request);
-
-        if ($exp === 'ebay-landing') {
-            return $this->render('AppBundle:Default:indexEbay.html.twig');
-        }
-
-        return $this->redirectToRoute('homepage');
-    }
-
-    /**
-     * @Route("/eb1", name="eb1")
-     * @Template
-     */
-    public function eb1Landing(Request $request)
-    {
-        $data = [
-            'main_title' => 'Honest Insurance for Honest People',
-            'hero_class' => 'ebay__hero_1',
-        ];
-
-        $exp = $this->sixpackSimple(SixpackService::EXPERIMENT_EBAY_LANDING_1, $request);
-
-        if ($exp === 'ebay-landing') {
-            return $this->render('AppBundle:Default:indexEbay.html.twig', $data);
-        }
-
-        return $this->redirectToRoute('homepage');
-    }
-
-    /**
-     * @Route("/eb2", name="eb2")
-     * @Template
-     */
-    public function eb2Landing(Request $request)
-    {
-
-        $data = [
-            'main_title' => 'Insurance You Deserve',
-            'hero_class' => 'ebay__hero_2',
-        ];
-
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EBAY_LANDING_2,
-            ['homepage', 'ebay-landing-2']
-        );
-
-        if ($exp == 'ebay-landing') {
-            return $this->render('AppBundle:Default:indexEbay.html.twig', $data);
-        } else {
-            return $this->redirectToRoute('homepage');
-        }
-    }
-
-    /**
      * @Route("/comparison", name="comparison")
      * @Template
      */
