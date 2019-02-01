@@ -411,6 +411,7 @@ class JudopayService
             $judo->setDeviceDna($deviceDna);
         }
         $policy->setPaymentMethod($judo);
+        $user->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
 
