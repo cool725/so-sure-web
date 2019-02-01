@@ -63,4 +63,41 @@ class BacsPaymentRepository extends PaymentRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Finds all backpayments that are not linked to a payment.
+     * @return array of bacs backpayments.
+     */
+    public function findUnlinkedReversals()
+    {
+        return $this->createQueryBuilder()
+            ->field('amount')->lt(0)
+            ->field('reverses')->equals(null)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Takes a reversing bacs payment and find the payment that it is reversing.
+     * @param BacsPayment $payment is the reversing payment.
+     * @return BacsPayment|null the payment that it is likely a reversal of, or null if nothing is found.
+     */
+    public function findReversed($payment)
+    {
+        if ($payment->getReverses()) {
+            return $payment->getReverses();
+        }
+        /** @var BacsPayment|null $reversed */
+        $reversed = $this->findOneBy([
+            '_id' => ['$ne' => $payment->getId()],
+            'reversedBy' => null,
+            'date' => [
+                '$gte' => $this->addDays($payment->getDate(), 0 - BacsPayment::DAYS_REVERSE),
+                '$lte' => $payment->getDate()
+            ],
+            'policy.id' => $payment->getPolicy()->getId(),
+            'amount' => 0 - $payment->getAmount()
+        ]);
+        return $reversed;
+    }
 }

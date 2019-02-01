@@ -179,7 +179,7 @@ class BacsPayment extends Payment
         $this->bacsReversedDate = $bacsReversedDate;
     }
 
-    public function getReversedBy(): BacsPayment
+    public function getReversedBy()
     {
         return $this->reversedBy;
     }
@@ -189,7 +189,7 @@ class BacsPayment extends Payment
         $this->reversedBy = $reversedBy;
     }
 
-    public function getReverses(): BacsPayment
+    public function getReverses()
     {
         return $this->reverses;
     }
