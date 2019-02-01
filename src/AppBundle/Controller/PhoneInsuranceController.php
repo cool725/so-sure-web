@@ -104,6 +104,10 @@ class PhoneInsuranceController extends BaseController
      */
     public function makeInsurance(Request $request, $make)
     {
+        if ($request->get('_route') === 'insure_make') {
+            return new RedirectResponse($this->generateUrl('homepage'));
+        }
+
         $phones = $this->getAllPhonesByMake($make);
         $phonesMem = $this->sortPhoneNamesByMemory($phones);
 
