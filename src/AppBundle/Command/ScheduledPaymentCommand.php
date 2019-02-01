@@ -147,7 +147,11 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 /** @var ScheduledPayment $scheduledPayment */
                 try {
                     if (!$show) {
-                        $scheduledPayment = $this->paymentService->scheduledPayment($scheduledPayment, $prefix);
+                        $scheduledPayment = $this->paymentService->scheduledPayment(
+                            $scheduledPayment,
+                            $prefix,
+                            $scheduledDate
+                        );
                     }
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 } catch (\Exception $e) {
