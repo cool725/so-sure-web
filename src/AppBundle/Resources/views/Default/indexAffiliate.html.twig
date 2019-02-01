@@ -3,7 +3,7 @@
 {# Set vars #}
 {% set body_class = 'landing' %}
 
-{% block title %}so-sure - Welcome to Social Insurance with {{ affiliate_company }}{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %}{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
@@ -35,6 +35,9 @@
                            role="button"><small><u>Terms &amp; Conditions</u></small>
                         </a>
                    </p>
+                {% elseif affiliate_page == 'comparison' %}
+                    <h1 class="mb-2 text-white h2">{{ titleH1 }}</h1>
+                    <h4 class="text-zaffre mb-4">{{ leadP|raw }}</h4>
                 {% else %}
                     <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
                     <p class="lead text-columbia-blue-e mb-2">affiliated with</p>

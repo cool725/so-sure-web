@@ -193,6 +193,7 @@ class DefaultController extends BaseController
      * @Route("/money", name="money")
      * @Route("/money-free-phone-case", name="money_free_phone_case")
      * @Route("/starling-bank", name="starling_bank")
+     * @Route("/comparison", name="comparison")
      */
     public function affiliateLanding(Request $request)
     {
@@ -346,27 +347,22 @@ class DefaultController extends BaseController
             ];
             $template = 'AppBundle:Default:indexStarlingBank.html.twig';
             $this->starlingOAuthSession($request);
+        } elseif ($request->get('_route') == 'comparison') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'comparison',
+                'titleH1' => 'Mobile Insurance beyond compare',
+                'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
             'page' => $data['affiliate_page']]);
 
         return $this->render($template, $data);
-    }
-
-    /**
-     * @Route("/comparison", name="comparison")
-     * @Template
-     */
-    public function soSureCompetitors()
-    {
-        $data = [
-            'headline'     => 'Mobile Insurance Beyond Compare',
-            'sub_heading'  => 'But if you do want to compare…',
-            'sub_heading2' => 'here’s how we stack up against the competition',
-        ];
-
-        return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
     }
 
     /**
