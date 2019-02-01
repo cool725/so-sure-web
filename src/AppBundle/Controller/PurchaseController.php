@@ -318,7 +318,6 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
@@ -344,6 +343,12 @@ class PurchaseController extends BaseController
         }
 
         // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
+
+        if ($policy) {
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+        } else {
+            $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
+        }
 
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -720,7 +725,6 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
@@ -742,6 +746,9 @@ class PurchaseController extends BaseController
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
         }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
         if ($policy && !$phone && $policy->getPhone()) {
             $phone = $policy->getPhone();
             $this->setSessionQuotePhone($request, $phone);
@@ -805,7 +812,6 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
@@ -827,6 +833,9 @@ class PurchaseController extends BaseController
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
         }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
         if ($policy && !$phone && $policy->getPhone()) {
             $phone = $policy->getPhone();
             $this->setSessionQuotePhone($request, $phone);
