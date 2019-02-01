@@ -426,6 +426,7 @@ class MixpanelService
         }
         $data = null;
         $count = 0;
+
         $count += $this->deleteOldUsersByDays($days);
         $count += $this->deleteQuotePageMissingBotUserAgentUser();
         $count += $this->deleteHomepagePageMissingBotUserAgentUser();
@@ -434,6 +435,7 @@ class MixpanelService
         $count += $this->deleteFacebookPreview();
         $count += $this->deleteSixpack();
         $count += $this->deleteHappyApp();
+        $count += $this->deleteLittleValueUsers(30);
 
         return ['count' => $count, 'total' => $this->getUserCount()];
     }
@@ -465,6 +467,25 @@ class MixpanelService
                 $time->format('U')
             )
             ];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteLittleValueUsers($days)
+    {
+        // users are primarily for attribution
+        // if there is no attribution and no name, then there is little reason to keep around so long
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s) > user["$last_seen"] and not defined(user["$first_name"]) and not defined(user["$last_name"]) and not defined(user["Device Category"]) and user["Country"] != "United Kingdom")',
+                $time->format('U')
+            )
+        ];
         // @codingStandardsIgnoreEnd
         //print_r($query);
 
