@@ -465,7 +465,7 @@
                                 {% endif %}
                                 {% if policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                                     <tr>
-                                        <td>Card</td>
+                                        <td>Card {% if policy.hasJudoPaymentMethod %}on policy{% else %}on user{% endif %}</td>
                                         <td class="{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.isCardExpired %}danger{% endif %}">
                                             {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
                                             <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank" rel="noopener noreferrer">
@@ -474,9 +474,10 @@
                                         </td>
 
                                     </tr>
-                                {% elseif policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
+                                {% endif %}
+                                {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                                     <tr>
-                                        <td>Bacs</td>
+                                        <td>Bacs {% if policy.hasBacsPaymentMethod %}on policy{% else %}on user{% endif %}</td>
                                         <td class="">
                                             {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
                                                 <s>{{ policy.getPolicyOrUserBacsPaymentMethod }}</s>
