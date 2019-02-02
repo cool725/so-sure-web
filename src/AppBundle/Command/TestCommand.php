@@ -91,6 +91,22 @@ class TestCommand extends ContainerAwareCommand
         $output->writeln('Finished');
     }
 
+    private function migratePaymentMethod(OutputInterface $output)
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+        $policies = $repo->findAll();
+        $count = 0;
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            if (!$policy->hasPaymentMethod() && $policy->getUser() && $policy->getUser()->hasPaymentMethod()) {
+                $policy->setPaymentMethod($policy->getUser()->getPaymentMethod());
+                $count++;
+            }
+        }
+        $this->dm->flush();
+        $output->writeln(sprintf('%d policies updated with user payment method', $count));
+    }
+
     private function facebookAds(OutputInterface $output)
     {
         $this->facebookService->monthlyLookalike(new \DateTime(), 'VAGRANT');
