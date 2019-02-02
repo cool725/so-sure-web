@@ -1504,8 +1504,8 @@ class MixpanelService
             $eventList = $this->mixpanelData->export([
                 'from_date' => $yearAgo->format('Y-m-d'),
                 'to_date' => $date->format('Y-m-d'),
-                'event' => json_encode($this->trackedEvents),
-                'where' => 'properties["$distinct_id"]=="'.$user['distinct_id'].'"'
+                'event' => json_encode(self::$trackedEvents),
+                'where' => sprintf('properties["$distinct_id"]=="%s"', $user['$distinct_id'])
             ]);
             if (count($eventList) == 0) {
                 continue;
