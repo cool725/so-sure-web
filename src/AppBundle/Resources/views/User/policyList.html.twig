@@ -15,7 +15,10 @@
 
     <section class="hero">
         <div class="container">
-            <h1 class="h2 mb-4">My Policies</h1>
+            <h1 class="h2">My Policies</h1>
+            {% if policy is defined and policy %}
+                <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
+            {% endif %}
 
             <div class="row">
                 {% for policyItem in user.getDisplayablePoliciesSorted %}

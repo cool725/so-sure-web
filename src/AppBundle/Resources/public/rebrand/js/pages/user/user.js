@@ -9,7 +9,6 @@ require('bootstrap/js/dist/dropdown');
 
 // Require components
 
-
 $(function() {
 
     $('.show-tab').on('click', function (e) {
@@ -25,7 +24,5 @@ $(function() {
     $(window).on('load', function(event) {
         secondaryNav.animate({scrollLeft: currentPos}, 1000);
     });
-
-    // $('[data-toggle="tooltip"]').tooltip();
 
 });

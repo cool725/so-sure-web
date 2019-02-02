@@ -34,4 +34,13 @@ class SoSurePotRewardPayment extends Payment
     {
         return false;
     }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        return "Cashback";
+    }
 }

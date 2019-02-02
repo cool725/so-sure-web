@@ -331,4 +331,30 @@ class BacsPayment extends Payment
     {
         return true;
     }
+
+    /**
+     * Specific logic for whether or not a bacs payment should be shown to users.
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        if ($this->reverses) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        return "Direct Debit";
+    }
 }

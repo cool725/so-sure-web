@@ -15,10 +15,13 @@
 
     <section class="hero">
         <div class="container">
-            <h1 class="h2 mb-4">Contact details</h1>
+            <h1 class="h2">Contact details</h1>
+            {% if policy is defined and policy %}
+                <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
+            {% endif %}
 
             <div class="row">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-lg-6">
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Email</h5>
@@ -27,10 +30,10 @@
                                class="card-link"
                                data-toggle="modal"
                                data-target="#email_modal">
-                                <i class="fal fa-edit fa-fw"></i> Edit email</a>
+                                <i class="fal fa-edit fa-fw mr-1"></i> Edit email</a>
                             <a href="{{ path('optout') }}"
                                class="card-link">
-                               <i class="fal fa-cog fa-fw"></i> Manage my preferences</a>
+                               <i class="fal fa-cog fa-fw mr-1"></i> Manage my preferences</a>
                         </div>
                     </div>
                 </div>

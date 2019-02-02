@@ -1,74 +1,69 @@
-<h1 class="h2 mb-4">Payment details</h1>
+<h1 class="h2">Payment details</h1>
+{% if policy is defined and policy %}
+    <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</span></h6>
+{% endif %}
+
+{% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
+    <div class="cardbox cardbox-100 mb-4 bg-lily-white">
+        <div class="cardbox__body d-lg-flex justify-content-lg-between align-items-lg-center">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo-dark.svg" alt="Direct Debit" width="140px" class="mb-2 mb-md-0">
+            <div>
+                <h5>Why not switch to Direct Debit?</h5>
+                <p>It helps avoid a lot of the problems with card payments… and only takes seconds to setup!</p>
+            </div>
+            <a href="#"
+               data-tab-to="#bacs_setup_tab"
+               class="btn btn-success show-tab"
+               >Switch to Direct Debit</a>
+        </div>
+    </div>
+{% endif %}
 
 <div class="row">
     {% if bacs_feature %}
-        <div class="col-12 col-md-6">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Your current payment method</h5>
-                    <p class="card-text">
-                        {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
-                            Credit/Debit Card
-                        {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
-                            Direct Debit
-                        {% else %}
-                            Unknown
-                        {% endif %}
-                    </p>
-                    {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
-                        <h6 class="card-title">Why not switch to Direct Debit?</h6>
-                        <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="140px" class="mx-auto mt-2 mb-3">
-                        <p class="card-text">It helps avoid a lot of problems with Debit/Credit Card payments...</p>
-                        <p class="card-text">...and only takes seconds to setup!</p>
-                    {% endif %}
-                    <a href="#"
-                       data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
-                       class="btn {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
-                       >
-                        {% if not policy.hasPolicyOrUserBacsPaymentMethod %}
-                            Switch to Direct Debit
-                        {% else %}
-                            Back to Direct Debit
-                        {% endif %}</a>
-                    {% if policy.isDifferentPayer %}
-                        <p class="card-text"><i class="fa fa-warning"></i> You are using multipay. Changing to direct debit will remove your multipay.</p>
-                    {% endif %}
+        <div class="col-12 col-lg-4">
+            <div class="cardbox cardbox-100 mb-4">
+                <div class="cardbox__body">
+                    <h5 class="cardbox__title">Current payment method</h5>
+                    <div class="cardbox__text">
+                        <p>{% if policy.getPolicyOrUserPaymentMethod and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}Credit/Debit Card{% elseif policy.hasPolicyOrUserBacsPaymentMethod %}Direct Debit{% else %}Unknown{% endif %}</p>
+                        <a href="#"
+                           data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
+                           class="btn {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
+                           >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}Switch to Direct Debit{% else %}Back to Direct Debit{% endif %}</a>
+                    </div>
                 </div>
             </div>
         </div>
     {% endif %}
-    <div class="col-12 col-md-6">
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5 class="card-title">Your card</h5>
-                <p class="card-text mb-4">
-                    {% if policy and policy.isDifferentPayer %}
-                        You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
-                    {% elseif policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
-                        {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
-                    {% else %}
-                        Not setup
+    <div class="col-12 col-lg-4">
+        <div class="cardbox cardbox-100 mb-4">
+            <div class="cardbox__body">
+                <h5 class="cardbox__title">Card details</h5>
+                <div class="cardbox__text">
+                    <p>{% if policy and policy.isDifferentPayer %}You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.{% elseif policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}{{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}{% else %}Not setup{% endif %}</p>
+                    {% if webpay_action and webpay_reference %}
+                        <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                            <input type="submit" class="btn btn-outline-primary" value="Update your card details">
+                        </form>
                     {% endif %}
-                </p>
-                {% if webpay_action and webpay_reference %}
-                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                        <input type="submit" class="btn btn-outline-primary" value="Update your card details">
-                    </form>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>
     {% if policy and policy.premiumPlan == 'monthly' and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
-        <div class="col-12 col-md-6">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Billing date</h5>
-                    <p class="card-text mb-4">Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
-                    <a href="#"
-                       class="card-link"
-                       data-toggle="modal"
-                       data-target="#billing_modal"><i class="fal fa-calendar fa-fw mr-2"></i> Change billing date</a>
+        <div class="col-12 col-lg-4">
+            <div class="cardbox cardbox-100 mb-4">
+                <div class="cardbox__body">
+                    <h5 class="cardbox__title">Billing date</h5>
+                    <div class="cardbox__text">
+                        <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> around <strong>{{ policy.billing|date('H','Europe/London') }}:00</strong></p>
+                        <a href="#"
+                           class="btn btn-outline-primary"
+                           data-toggle="modal"
+                           data-target="#billing_modal">Change billing date</a>
+                    </div>
                 </div>
             </div>
         </div>

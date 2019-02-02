@@ -29,4 +29,13 @@ class SoSurePayment extends Payment
     {
         return false;
     }
+
+    /**
+     * Gives user facing description of sosure payment.
+     * @inheritDoc
+     */
+    public function getUserPaymentDisplay()
+    {
+        return "Card Payment";
+    }
 }

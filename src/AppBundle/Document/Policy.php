@@ -829,6 +829,47 @@ abstract class Policy
         });
     }
 
+    public function getInvoiceSchedule()
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $invoiceDates = [];
+        $invoiceDate = clone $this->start;
+        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
+            $invoiceDates[] = clone $invoiceDate;
+            $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+        }
+
+        return $invoiceDates;
+    }
+
+    public function getInvoiceAmountToDate(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = $this->now();
+        }
+
+        $invoiceSchedule = $this->getInvoiceSchedule();
+        if (!$invoiceSchedule) {
+            return null;
+        }
+        $total = 0;
+        foreach ($invoiceSchedule as $invoiceDate) {
+            if ($invoiceDate < $date) {
+                $total += $this->getPremiumInstallmentPrice();
+            }
+        }
+
+        return $total;
+    }
+
+    public function getCurrentInvoiceBalance(\DateTime $date = null)
+    {
+        return $this->getPremiumPaid(null, $date) - $this->getInvoiceAmountToDate($date);
+    }
+
     /**
      * Payments filtered by credits (pos amount)
      */

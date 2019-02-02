@@ -60,4 +60,13 @@ class BacsIndemnityPayment extends Payment
 
         return 'Bacs Indemnity (Chargeback)';
     }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        return "Chargeback";
+    }
 }

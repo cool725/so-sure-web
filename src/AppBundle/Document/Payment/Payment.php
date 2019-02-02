@@ -470,12 +470,12 @@ abstract class Payment
     {
         $this->reference = $reference;
     }
-    
+
     public function getReference()
     {
         return $this->reference;
     }
-    
+
     public function setPolicy($policy)
     {
         $this->policy = $policy;
@@ -557,6 +557,29 @@ abstract class Payment
                 $this->getAmount(),
                 $this->getPolicy()->getId()
             ));
+        }
+    }
+
+    /**
+     * Tells if a payment should be visible to users.
+     * @return boolean true if the user should see it, otherwise false.
+     */
+    public function isVisibleUserPayment()
+    {
+        return false;
+    }
+
+    /**
+     * Gives a public description of the payment to be viewed externally by users or something.
+     * Just defaults to payment, and is meant to be extended by subclasses.
+     * @return string containing the name.
+     */
+    public function getUserPaymentDisplay()
+    {
+        if ($this->amount < 0) {
+            return "Credit";
+        } else {
+            return $this->userPaymentName();
         }
     }
 
@@ -698,5 +721,14 @@ abstract class Payment
         } else {
             return null;
         }
+    }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @return string containing the name.
+     */
+    protected function userPaymentName()
+    {
+        return "Payment";
     }
 }

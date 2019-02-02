@@ -233,3 +233,11 @@
     }
 }
 
+.table-hover {
+    .toggle-row {
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+

@@ -3,10 +3,6 @@
 // require('../../../sass/pages/user.scss');
 
 // Require BS component(s)
-// require('bootstrap/js/dist/tab');
-// require('bootstrap/js/dist/util');
-// require('bootstrap/js/dist/dropdown');
-// require('bootstrap/js/dist/tooltip');
 
 // Require components
 require('jquery-validation');

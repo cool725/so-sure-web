@@ -1,0 +1,189 @@
+<div class="tabbed-cardbox mt-4" role="tablist">
+    <div class="tabbed-cardbox__header">
+        <ul class="nav nav-pills nav-fill" id="payments" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link h5 mb-0 active"
+                   id="payment_history_tab"
+                   data-toggle="tab"
+                   href="#payment_history"
+                   role="tab"
+                   aria-controls="payment_history"
+                   aria-selected="false">Payment History</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link h5 mb-0"
+                   id="policy_premium_schedule_tab"
+                   data-toggle="tab"
+                   href="#policy_premium_schedule"
+                   role="tab"
+                   aria-controls="policy_premium_schedule"
+                   aria-selected="true">Premium Schedule</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tabbed-cardbox__body">
+        <div class="tab-content" id="payments_content">
+            <div class="tab-pane active"
+                 id="payment_history"
+                 role="tabpanel"
+                 aria-labelledby="payment_history_tab">
+                 {# TODO: Is payment pending status available??? #}
+{#                 #}
+                {% if bacs_last_payment_in_progress %}
+                    <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-warning">
+                        <div class="text-center text-md-left"><i class="fas fa-exclamation-triangle fa-lg fa-fw text-warning"></i> Payment pending</div>
+                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                    </div>
+                {% elseif policy.getCurrentInvoiceBalance >= 0 %}
+                    <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-success">
+                        <div class="text-center text-md-left"><i class="fas fa-check-square fa-lg fa-fw text-success"></i> Paid up to date</div>
+                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                    </div>
+                {% else %}
+                    <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-danger">
+                        <div class="text-center text-md-left"><i class="fas fa-exclamation-square fa-lg fa-fw text-danger"></i> Payment overdue</div>
+                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                    </div>
+                {% endif %}
+                <div class="d-md-flex align-items-md-center justify-content-md-between p-3 bg-lily-white">
+                    <div class="text-center text-md-left">Policy Number: <strong>{{ policy.policyNumber }}</strong></div>
+                    <div class="text-center text-md-left">Last payment received:
+                        <strong>{{ policy.lastSuccessfulUserPaymentCredit.date | date("d/m/Y") }}</strong>
+                    </div>
+                    <div class="text-center text-md-left">Paid to date: <strong>&pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</strong></div>
+                </div>
+                <table class="table table-striped mb-0" id="payment_history_table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Date
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="This is the date you payment is due to be credited or debited to from your account. It is possible you will already see this payment on your bank or card statement, but it can take a couple of days for us to be notified."></i></small>
+                            </th>
+                            <th>Type</th>
+                            <th class="text-right">Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set itemsHistory = 0 %}
+                        {% set displayedTotal = 0 %}
+                        {% for payment in policy.payments if payment.isVisibleUserPayment %}
+                            {% set itemsHistory = itemsHistory + 1 %}
+                            {% if payment.type != 'bacs' or not payment.reversedBy %}
+                                {% set displayedTotal = displayedTotal + payment.amount %}
+                            {% endif %}
+                            <tr>
+                                <td>
+                                    <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}
+                                </td>
+                                <td class="h6">
+                                    {{ payment.userPaymentDisplay }}
+                                    <em class="sub"><small>{{ policy.payerOrUser.paymentMethod }}</small></em>
+                                    <br>
+                                </td>
+                                <td align="right">
+                                    {% if payment.type == 'bacs' and payment.reversedBy %}
+                                        <del>
+                                    {% endif %}
+
+                                    {% if payment.amount >= 0 %}
+                                        &pound;{{ payment.amount | number_format(2, '.', ',') }}
+                                    {% else %}
+                                        &pound;{{ (0 - payment.amount) | number_format(2, '.', ',') }}
+                                    {% endif %}
+
+                                    {% if payment.type == 'bacs' and payment.reversedBy %}
+                                        </del>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if payment.type == 'bacs' and payment.reversedBy %}
+                                        <i class="far fa-times fa-fw fa-lg text-danger"></i>
+                                        <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Unpaid direct debit payment. This may have been caused by using an incorrect sort code/account number or not having suffient funds in your account. Depending on your bank, this may or may not appear on your bank statement and/or result in bank charges."></i></small>
+                                    {% elseif payment.amount < 0 %}
+                                        <strong><small>CR</small></strong>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% if not equal_to_two_dp(displayedTotal, policy.premiumPaid) %}
+                            {% set itemsHistory = itemsHistory + 1 %}
+                            <tr>
+                                <td>
+                                    -
+                                </td>
+                                <td class="h6">
+                                    Other
+                                    <em class="sub"><small>Please contact us for more details</small></em>
+                                    <br>
+                                </td>
+                                <td align="right">
+                                    {% if (policy.premiumPaid - displayedTotal) >= 0 %}
+                                        &pound;{{ (policy.premiumPaid - displayedTotal) | number_format(2, '.', ',') }}
+                                    {% else %}
+                                        &pound;{{ (0 - (policy.premiumPaid - displayedTotal)) | number_format(2, '.', ',') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if (policy.premiumPaid - displayedTotal) < 0 %}
+                                        <strong><small>CR</small></strong>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                        {% endif %}
+                        {% if itemsHistory == 0 %}
+                            <tr>
+                                <td colspan="4">Once you've made your first payment, it will be visible here.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane"
+                 id="policy_premium_schedule"
+                 role="tabpanel"
+                 aria-labelledby="policy_premium_schedule_tab">
+                <div class="d-md-flex align-items-md-center justify-content-md-between p-3">
+                    <div class="mb-0 text-center text-md-left">
+                        {% if policy.premiumPlan == 'monthly' %}
+                            ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> in monthly installments of <strong>&pound;{{ policy.premium.monthlyPremiumPrice }}</strong>
+                        {% else %}
+                            ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> for the policy year
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-md-flex align-items-md-center justify-content-md-between p-3 bg-lily-white">
+                    <div class="text-center text-md-left">Policy Number: <strong>{{ policy.policyNumber }}</strong></div>
+                    <div class="text-center text-md-left">Policy Start Date: <strong>{{ policy.start| date('d/m/Y') }}</strong></div>
+                    <div class="text-center text-md-left">Premium to date: <strong>&pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}</strong></div>
+                </div>
+                <table class="table table-striped mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Date</th>
+                            <th class="text-right">Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    {% for invoiceDate in policy.getInvoiceSchedule %}
+                        <tr>
+                            <td>{{ invoiceDate| date('d/m/Y', 'Europe/London') }}</td>
+                            <td align="right">&pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}</td>
+                            {% if invoiceDate|date('U') < 'now'|date('U') %}
+                                <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
+                            {% else %}
+                                <td align="center"></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
