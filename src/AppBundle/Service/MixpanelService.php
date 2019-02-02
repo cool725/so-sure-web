@@ -344,7 +344,8 @@ class MixpanelService
             $latestData = $this->findLatestMixpanelUser($results);
             $foundEarliestCampaignAttribution = false;
             foreach ($results['results'] as $result) {
-                if (array_key_exists('Campaign Attribution Date', $result['properties'])) {
+                if (is_array($result['properties']) &&
+                    array_key_exists('Campaign Attribution Date', $result['properties'])) {
                     $dataDate = $this->getCampaignAttributionDate($data);
                     $resultDate = $this->getCampaignAttributionDate($result['properties']);
                     if (!$dataDate || $resultDate < $dataDate) {
@@ -406,8 +407,11 @@ class MixpanelService
                 $dataPresent = true;
             }
             if (isset($data['Campaign Attribution Date'])) {
-                $attribution->setDate($this->getCampaignAttributionDate($data));
-                $dataPresent = true;
+                $date = $this->getCampaignAttributionDate($data);
+                if ($date) {
+                    $attribution->setDate($this->getCampaignAttributionDate($data));
+                    $dataPresent = true;
+                }
             }
             if (isset($data['Referer'])) {
                 $attribution->setReferer($data['Referer']);
@@ -451,8 +455,11 @@ class MixpanelService
                 $dataPresent = true;
             }
             if (isset($data['Latest Campaign Attribution Date'])) {
-                $attribution->setDate($this->getCampaignAttributionDate($data, 'Latest '));
-                $dataPresent = true;
+                $date = $this->getCampaignAttributionDate($data, 'Latest ');
+                if ($date) {
+                    $attribution->setDate($this->getCampaignAttributionDate($data, 'Latest '));
+                    $dataPresent = true;
+                }
             }
             if (isset($latestData['Latest Referer'])) {
                 $latestAttribution->setReferer($latestData['Latest Referer']);
