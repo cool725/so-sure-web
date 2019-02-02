@@ -326,7 +326,7 @@ class MixpanelService
         );
     }
 
-    public function attributionByUser(User $user = null)
+    public function attributionByUser(User $user = null, $overrideAttribution = false)
     {
         $data = null;
         $latestData = null;
@@ -419,7 +419,7 @@ class MixpanelService
                 $dataPresent = true;
             }
             // Only set the attribution if the user lacks one.
-            if (!$user->getAttribution() && $dataPresent) {
+            if (($overrideAttribution || !$user->getAttribution()) && $dataPresent) {
                 $user->setAttribution($attribution);
             }
             $latestAttribution = new Attribution();
@@ -1495,8 +1495,9 @@ class MixpanelService
      */
     private function findOldestMixpanelUser(array $mixpanelUsers)
     {
-        $date = new \DateTime();
-        $yearAgo = new \DateTime('one year ago');
+        $date = $this->now();
+        $yearAgo = clone $date;
+        $yearAgo = $date->sub(new \DateInterval('P1Y'));
         $oldestUser = ['time' => 789738127389];
         $oldestUserSet = false;
         foreach ($mixpanelUsers['results'] as $user) {
