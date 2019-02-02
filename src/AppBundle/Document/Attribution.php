@@ -141,6 +141,13 @@ class Attribution implements EqualsInterface
      */
     protected $deviceOS;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $date;
+
     public function setCampaignName($campaignName)
     {
         $this->campaignName = $campaignName;
@@ -231,6 +238,16 @@ class Attribution implements EqualsInterface
     public function getDeviceOS()
     {
         return $this->deviceOS;
+    }
+
+    public function setDate(\DateTime $date)
+    {
+        $this->date = $date;
+    }
+
+    public function getDate()
+    {
+        return $this->date;
     }
 
     public function equals($attribution)

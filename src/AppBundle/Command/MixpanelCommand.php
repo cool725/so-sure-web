@@ -40,7 +40,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|count-users|count-queue (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -92,12 +92,12 @@ class MixpanelCommand extends ContainerAwareCommand
                 $id = $user->getId();
             }
         }
-        if ($action == 'test') {
-            if (!$user) {
-                throw new \Exception('Requires user; add --email');
+        if ($action == 'attribution-duplicate-users') {
+            $duplicateUsers = $this->mixpanelService->findDuplicateUsers();
+            foreach ($duplicateUsers as $user) {
+                $this->mixpanelService->queueAttribution($user);
             }
-            $this->mixpanelService->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
-            $output->writeln(sprintf('Queued test event'));
+            $output->writeln(sprintf('Queued update for all '.count($duplicateUsers).' users duplicated on mixpanel.'));
         } elseif ($action == 'data') {
             $end = \DateTime::createFromFormat('U', time());
             $end->sub(new \DateInterval(sprintf('P%dD', $end->format('N'))));
