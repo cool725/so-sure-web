@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
@@ -984,6 +985,13 @@ class BacsService
                 $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
                 $indemnityPayment->setNotes('Direct Debit Indemnity Claim (Chargeback)');
                 $indemnityPayment->setReference($ddicReference);
+
+                $numPayments = $referencePolicy->getPremium()->getNumberOfMonthlyPayments($amount);
+                if ($numPayments >= 1) {
+                    $indemnityPayment->setRefundTotalCommission($numPayments * Salva::MONTHLY_TOTAL_COMMISSION);
+                }
+                $indemnityPayment->calculateSplit();
+
                 $referencePolicy->addPayment($indemnityPayment);
                 $this->dm->persist($indemnityPayment);
             }
