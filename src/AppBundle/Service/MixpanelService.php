@@ -337,6 +337,9 @@ class MixpanelService
         $results = $this->mixpanelData->data('engage', ['where' => $search]);
         // If there are multiple user accounts then we have got to figure out which is the older.
         $accounts = count($results);
+        //$this->findLatestMixpanelUser($results);
+        //$this->findOldestMixpanelUser($results);
+        //return;
         if ($accounts > 1) {
             $latestData = $this->findLatestMixpanelUser($results);
             $foundEarliestCampaignAttribution = false;
@@ -1475,14 +1478,27 @@ class MixpanelService
      * @param array $mixpanelUsers is the list of users that we are checking out.
      * @return array the mixpanel record that the most recent.
      */
-    private function findLatestMixpanelUser(array $mixpanelUsers)
+    public function findLatestMixpanelUser(array $mixpanelUsers)
     {
-        $latestUser = ['time' => 0];
+        //print_r($mixpanelUsers);
+        $latestUser = ['$last_seen' => '1980-01-01T00:00:00'];
         foreach ($mixpanelUsers['results'] as $user) {
-            if ($user['properties']['$last_seen'] > $latestUser['time']) {
-                $latestUser = $user['properties'];
+            //print_r($user);
+            //print_r($user['$properties']['$last_seen']);
+            $userLastSeen = \DateTime::createFromFormat("Y-m-d\TH:i:s", $user['$properties']['$last_seen']);
+            //print_r($userLastSeen);
+
+            //print_r($latestUser['$last_seen']);
+            $latestUserLastSeen = \DateTime::createFromFormat("Y-m-d\TH:i:s", $latestUser['$last_seen']);
+            //print_r($latestUserLastSeen);
+
+            if ($userLastSeen > $latestUserLastSeen) {
+                $latestUser = $user['$properties'];
             }
         }
+        //print_r('-------');
+        //print_r($latestUser);
+        //print_r('-------');
         return $latestUser;
     }
 
@@ -1490,42 +1506,47 @@ class MixpanelService
      * Takes a list of mixpanel user accounts and finds the one which has the oldest events against it's name in the
      * last year.
      * @param array $mixpanelUsers is the list of mixpanel user records that are directly from mixpanel.
-     * @return array the mixpanel user record that has the oldest event in the last year. If there are multiple users
-     *               that had events at the exact same time then which one you will get is undefined.
+     * @return array|null the mixpanel user record that has the oldest event in the last year.
+     *                    If there are multiple users that had events at the exact same time,
+     *                    then which one you will get is undefined.
      */
     private function findOldestMixpanelUser(array $mixpanelUsers)
     {
         $date = $this->now();
         $yearAgo = clone $date;
-        $yearAgo = $date->sub(new \DateInterval('P1Y'));
-        $oldestUser = ['time' => 789738127389];
-        $oldestUserSet = false;
+        $yearAgo = $yearAgo->sub(new \DateInterval('P1Y'));
+        $oldestUser = null;
+        $oldestUserTime = null;
+        //print_r($mixpanelUsers);
         foreach ($mixpanelUsers['results'] as $user) {
-            $eventList = $this->mixpanelData->export([
+            $query = [
                 'from_date' => $yearAgo->format('Y-m-d'),
                 'to_date' => $date->format('Y-m-d'),
                 'event' => json_encode(self::$trackedEvents),
                 'where' => sprintf('properties["$distinct_id"]=="%s"', $user['$distinct_id'])
-            ]);
+            ];
+            //print_r($query);
+            $eventList = $this->mixpanelData->export($query);
+            //print_r($eventList);
             if (count($eventList) == 0) {
                 continue;
             }
-            $oldestEvent = $eventList['results'][0];
-            foreach ($eventList['results'] as $event) {
+            $oldestEvent = $eventList[0];
+            foreach ($eventList as $event) {
                 if ($event['properties']['time'] < $oldestEvent['properties']['time']) {
                     $oldestEvent = $event;
                 }
             }
-            $user['time'] = $oldestEvent['properties']['time'];
-            if ($oldestUser['time'] < $user['time']) {
+            $oldestEvent['properties']['time'];
+            if (!$oldestUserTime || $oldestUserTime > $oldestEvent['properties']['time']) {
                 $oldestUser = $user;
-                $oldestUserSet = true;
             }
         }
-        if ($oldestUserSet) {
-            return $oldestUser['properties'];
-        } else {
-            return [];
+
+        if ($oldestUser) {
+            return $oldestUser['$properties'];
         }
+
+        return null;
     }
 }
