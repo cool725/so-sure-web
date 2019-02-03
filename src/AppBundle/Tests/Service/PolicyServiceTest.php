@@ -8,6 +8,7 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Exception\DuplicateImeiException;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -5570,5 +5571,33 @@ class PolicyServiceTest extends WebTestCase
         $payment->setSuccess(true);
         $policy->addPayment($payment);
         static::$policyService->create($policy);
+    }
+
+    /**
+     * @expectedException AppBundle\Exception\DuplicateImeiException
+     */
+    public function testCreateWithDuplicateImei()
+    {
+        $imei = static::generateRandomImei();
+        $a = $this->preparePolicy($imei);
+        static::$policyService->create($a);
+        $b = $this->preparePolicy($imei);
+        static::$policyService->create($b);
+    }
+
+    /**
+     * Makes a policy object which is ready to be created by the policyservice, but has not been just yet.
+     * @param String $imei is the imei number to give the policy.
+     * @return Policy the new policy.
+     */
+    private function preparePolicy($imei)
+    {
+        $policy = static::createUserPolicy(false, null, false, null, $imei);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy->setPhone($phone, new \DateTime());
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->flush();
+        return $policy;
     }
 }

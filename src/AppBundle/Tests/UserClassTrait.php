@@ -79,7 +79,7 @@ trait UserClassTrait
         }
     }
 
-    public static function createUserPolicy($init = false, $date = null, $setId = false, $email = null)
+    public static function createUserPolicy($init = false, $date = null, $setId = false, $email = null, $imei = null)
     {
         $user = new User();
         $user->setFirstName('foo');
@@ -94,7 +94,9 @@ trait UserClassTrait
 
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
-
+        if ($imei) {
+            $policy->setImei($imei);
+        }
         if ($init) {
             $policy->init($user, self::getLatestPolicyTerms(static::$dm));
             $phone = self::$phone;
@@ -105,7 +107,9 @@ trait UserClassTrait
                 throw new \Exception('Missing phone');
             }
             $policy->setPhone($phone, $date);
-            $policy->setImei(static::generateRandomImei());
+            if (!$imei) {
+                $policy->setImei(static::generateRandomImei());
+            }
             $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
 
             // still getting no excess on occasion. if so try resetting the phone

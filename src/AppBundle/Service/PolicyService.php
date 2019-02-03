@@ -4,8 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
 use AppBundle\Document\Feature;
-use AppBundle\Document\Promotion;
-use AppBundle\Document\Participation;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -32,6 +31,8 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Promotion;
+use AppBundle\Document\Participation;
 use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
@@ -464,6 +465,12 @@ class PolicyService
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
 
                 return false;
+            }
+            // validate the IMEI if this is a phone policy.
+            if ($policy instanceof PhonePolicy &&
+                $this->imeiValidator->isDuplicatePolicyImei($policy->getImei(), $policy)
+            ) {
+                throw new DuplicateImeiException("Given IMEI '".$policy->getImei()."' is already in use.");
             }
 
             if (count($policy->getScheduledPayments()) > 0) {
