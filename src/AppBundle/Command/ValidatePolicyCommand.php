@@ -515,19 +515,26 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             // bacs checks are only necessary on active policies
             if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive(true)) {
-                $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
                 $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
+                    $bacsPayments = $policy->getPaymentsByType(BacsPayment::class);
+                    $bacsPaymentCount = 0;
+                    foreach ($bacsPayments as $bacsPayment) {
+                        /** @var BacsPayment $bacsPayment */
+                        if ($bacsPayment->getDate() >= $bankAccount->getInitialNotificationDate()) {
+                            $bacsPaymentCount++;
+                        }
+                    }
+
                     $isFirstPayment = $bankAccount->isFirstPayment();
-                    if ($bacsPayments >= 1 && $isFirstPayment) {
+                    if ($bacsPaymentCount >= 1 && $isFirstPayment) {
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
-                    } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                    } elseif ($bacsPaymentCount == 0 && !$isFirstPayment) {
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
-                    $now = \DateTime::createFromFormat('U', time());
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
-                        if ($bacsPayments == 0) {
+                        if ($bacsPaymentCount == 0) {
                             $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
