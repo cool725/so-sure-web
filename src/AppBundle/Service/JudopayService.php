@@ -734,6 +734,10 @@ class JudopayService
             }
         }
 
+        if ($judoPaymentMethod && !$payment->getDetails()) {
+            $payment->setDetails($judoPaymentMethod->__toString());
+        }
+
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         if (!isset($transactionDetails["yourPaymentMetaData"]) ||
@@ -864,6 +868,9 @@ class JudopayService
             $payment = new JudoPayment();
             $payment->setAmount(0);
             $payment->setResult(JudoPayment::RESULT_SKIPPED);
+            if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+                $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+            }
             $policy->addPayment($payment);
         }
         $this->processScheduledPaymentResult($scheduledPayment, $payment);
@@ -1151,6 +1158,9 @@ class JudopayService
         $payment->setNotes($notes);
         $payment->setUser($policy->getUser());
         $payment->setSource(Payment::SOURCE_TOKEN);
+        if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+            $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+        }
         $policy->addPayment($payment);
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1250,7 +1260,7 @@ class JudopayService
         return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
     }
 
-    public function webRegister(User $user, $ipAddress, $userAgent, $policy = null)
+    public function webRegister(User $user, $ipAddress, $userAgent, Policy $policy = null)
     {
         $payment = new JudoPayment();
         $payment->setAmount(0);
@@ -1313,13 +1323,17 @@ class JudopayService
         if (!$totalCommision) {
             $totalCommision = $payment->getTotalCommission();
         }
+        $policy = $payment->getPolicy();
 
         // Refund is a negative payment
         $refund = new JudoPayment();
         $refund->setAmount(0 - $amount);
         $refund->setNotes($notes);
         $refund->setSource($source);
-        $payment->getPolicy()->addPayment($refund);
+        if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+            $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+        }
+        $policy->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 

@@ -152,6 +152,14 @@ abstract class Payment
     protected $reference;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $details;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="payments")
      * @Gedmo\Versioned
      * @var Policy
@@ -317,6 +325,16 @@ abstract class Payment
     public function getIpt()
     {
         return $this->ipt;
+    }
+
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    public function setDetails($details)
+    {
+        $this->details = $details;
     }
 
     public function setNotes($notes)

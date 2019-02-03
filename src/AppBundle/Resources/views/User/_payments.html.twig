@@ -80,8 +80,10 @@
                                 </td>
                                 <td class="h6">
                                     {{ payment.userPaymentDisplay }}
-                                    <em class="sub"><small>{{ policy.payerOrUser.paymentMethod }}</small></em>
-                                    <br>
+                                    {% if payment.details %}
+                                        <br>
+                                        <em class="sub"><small>{{ payment.details }}</small></em>
+                                    {% endif %}
                                 </td>
                                 <td align="right">
                                     {% if payment.type == 'bacs' and payment.reversedBy %}

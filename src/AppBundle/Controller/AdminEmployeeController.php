@@ -1063,6 +1063,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
         $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $bacsPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
 
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
@@ -1135,6 +1138,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
         $bacsRefund->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $bacsRefund->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
             ->getForm();

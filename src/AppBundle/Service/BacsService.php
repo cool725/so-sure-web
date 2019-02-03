@@ -804,6 +804,9 @@ class BacsService
                     $debitPayment->setSerialNumber($submittedPayment->getSerialNumber());
                     $debitPayment->setDate($this->getNextBusinessDay($currentProcessingDate));
                     $debitPayment->setSource(Payment::SOURCE_SYSTEM);
+                    if ($policy->getPolicyOrUserBacsBankAccount()) {
+                        $debitPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+                    }
                     $debitPayment->setNotes(sprintf(
                         'Arudd payment failure: %s (%s)',
                         $returnDescription,
@@ -1653,6 +1656,9 @@ class BacsService
         $payment->setUser($policy->getUser());
         $payment->setStatus(BacsPayment::STATUS_PENDING);
         $payment->setSource($source);
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $payment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
 
         // Admin or user source is always a one off payment
         if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB])) {
