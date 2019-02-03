@@ -864,10 +864,6 @@ class PurchaseController extends BaseController
         $paymentProviderTest = 'bacs';
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
-            $bacsFeature = false;
-        }
         if (!$bacsFeature) {
             $paymentProviderTest = 'judo';
         }

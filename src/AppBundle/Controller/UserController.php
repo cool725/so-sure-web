@@ -1171,10 +1171,6 @@ class UserController extends BaseController
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
 
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
-            $bacsFeature = false;
-        }
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
@@ -1343,6 +1339,11 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
+        // page no longer makes much sense unless associated with a policy
+        if (!$policy) {
+            return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
         $lastPaymentInProgress = false;
         if ($policy) {
             $lastPaymentCredit = $policy->getLastPaymentCredit();
@@ -1356,23 +1357,14 @@ class UserController extends BaseController
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
 
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
+        // For now, only allow monthly policies with bacs
+        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
-
-        if (!$policy) {
+        // we need enough time for bacs to be billed + reverse payment to be notified + 1 day internal processing
+        // or no point in swapping to bacs
+        if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
-        } else {
-            // For now, only allow monthly policies with bacs
-            if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
-                $bacsFeature = false;
-            }
-            // we need enough time for bacs to be billed + reverse payment to be notified + 1 day internal processing
-            // or no point in swapping to bacs
-            if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
-                $bacsFeature = false;
-            }
         }
 
         /** @var PaymentService $paymentService */
