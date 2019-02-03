@@ -457,6 +457,31 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
+    public function testRenewedNoPreviousClaim()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testRenewedNoPreviousClaim', $this));
+        $policyRenewed = static::createUserPolicy(true);
+        $policyRenewed->setUser($policy->getUser());
+        $policy->link($policyRenewed);
+        static::$dm->persist($policyRenewed->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($policyRenewed);
+        static::$dm->flush();
+        $this->assertNotNull($policyRenewed->getId());
+
+        $claimA = new Claim();
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        $policyRenewed->addClaim($claimA);
+        $this->assertTrue($policyRenewed->hasMonetaryClaimed());
+        $this->assertEquals(
+            SalvaPhonePolicy::RISK_RENEWED_NO_PREVIOUS_CLAIM,
+            $policyRenewed->getRiskReason(new \DateTime("2016-01-10"))
+        );
+    }
+
     public function testLinkedClaimed()
     {
         $policyA = static::createUserPolicy(true);

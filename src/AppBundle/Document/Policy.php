@@ -66,6 +66,7 @@ abstract class Policy
     const RISK_NOT_CONNECTED_NEW_POLICY = 'not connected w/new policy';
     const RISK_NOT_CONNECTED_ESTABLISHED_POLICY = 'not connected w/established policy (30+ days)';
     const RISK_PENDING_CANCELLATION_POLICY = 'policy is pending cancellation';
+    const RISK_RENEWED_NO_PREVIOUS_CLAIM = 'policy was renewed with no previous claim';
 
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
@@ -169,6 +170,7 @@ abstract class Policy
         self::RISK_NOT_CONNECTED_NEW_POLICY => self::RISK_LEVEL_HIGH,
         self::RISK_NOT_CONNECTED_ESTABLISHED_POLICY => self::RISK_LEVEL_MEDIUM,
         self::RISK_PENDING_CANCELLATION_POLICY => self::RISK_LEVEL_HIGH,
+        self::RISK_RENEWED_NO_PREVIOUS_CLAIM => self::RISK_LEVEL_LOW,
     ];
 
     public static $expirationStatuses = [
@@ -3156,6 +3158,13 @@ abstract class Policy
 
         // Once of the few cases where we want to check linked claims as can affect risk rating
         if ($this->hasMonetaryClaimed(true, true)) {
+            $currentApprovedClaimCount = count($this->getApprovedClaims(true, true));
+            if ($this->hasPreviousPolicy() &&
+                count($this->getPreviousPolicy()->getApprovedClaims(true, true)) == 0 &&
+                $currentApprovedClaimCount == 1) {
+                return self::RISK_RENEWED_NO_PREVIOUS_CLAIM;
+            }
+
             // a self claim can be before the pot is adjusted.  also a pot zero is not always due to a self claim
             return self::RISK_CONNECTED_SELF_CLAIM;
             // return self::RISK_LEVEL_HIGH;
