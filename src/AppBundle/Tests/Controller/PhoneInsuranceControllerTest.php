@@ -121,8 +121,14 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $phone->setHighlight(true);
         self::$dm->flush();
         $crawler = self::$client->request('GET', '/insure/Samsung');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
+        $this->assertEquals(302, $this->getClientResponseStatusCode());
+        $crawler = self::$client->followRedirect();
+        $this->assertEquals(
+            sprintf('http://localhost/'),
+            self::$client->getHistory()->current()->getUri()
+        );
+
+        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
 
     public function testPhoneSearchInsuranceCrackedScreen()
