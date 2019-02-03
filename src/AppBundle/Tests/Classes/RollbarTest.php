@@ -54,5 +54,8 @@ class RollbarTest extends \PHPUnit\Framework\TestCase
 
         $e = new \RuntimeException('No resource owner');
         $this->assertTrue(Rollbar::shouldIgnore(false, $e, null));
+
+        $e = new \InvalidArgumentException('Invalid csrf token');
+        $this->assertTrue(Rollbar::shouldIgnore(false, $e, null));
     }
 }
