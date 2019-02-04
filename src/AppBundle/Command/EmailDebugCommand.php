@@ -154,6 +154,7 @@ class EmailDebugCommand extends ContainerAwareCommand
                 'policy/skippedRenewal',
                 'policy/trustpilot',
                 'policy/detectedImei',
+                'policy/invalidImei',
             ],
             'card' => [
                 'card/failedPayment',
@@ -347,6 +348,8 @@ class EmailDebugCommand extends ContainerAwareCommand
                 return $this->mailerService->trustpilot($policy, MailerService::TRUSTPILOT_PURCHASE);
             } elseif ($template == 'policy/detectedImei') {
                 return $this->policyService->detectedImeiEmail($policy);
+            } elseif ($template == 'policy/invalidImei') {
+                return $this->policyService->invalidImeiEmail($policy);
             } elseif ($template == 'policy/skippedRenewal') {
                 return $this->policyService->skippedRenewalEmail($policy);
             } else {

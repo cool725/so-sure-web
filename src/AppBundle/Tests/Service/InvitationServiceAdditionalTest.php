@@ -84,7 +84,8 @@ class InvitationServiceAdditionalTest extends WebTestCase
             $mixpanelService,
             $s3Client,
             self::$container->getParameter('kernel.environment'),
-            $dm
+            $dm,
+            false
         );
         /** @var InvitationService invitationService */
         $invitationService = self::$container->get('app.invitation');

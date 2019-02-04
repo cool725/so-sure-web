@@ -5199,7 +5199,7 @@ abstract class Policy
     public function getSupportWarnings()
     {
         // @codingStandardsIgnoreStart
-        $warnings = ['Ensure DPA is validated (Intercom - DPA message). If cancellation requested, and DPA not validated, referrer to Dylan for retention.'];
+        $warnings = [];
         // @codingStandardsIgnoreEnd
         if ($this->hasOpenClaim(true)) {
             // @codingStandardsIgnoreStart
@@ -5211,6 +5211,17 @@ abstract class Policy
         }
         if ($this->hasSuspectedFraudulentClaim()) {
             $warnings[] = sprintf('Policy has had a suspected fraudulent claim. Do NOT allow policy upgrade.');
+        }
+
+        if ($this instanceof PhonePolicy) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $this;
+
+            if ($phonePolicy->hasInvalidImei()) {
+                // @codingStandardsIgnoreStart
+                $warnings[] = 'Policy IMEI is unknown and should be requested. Proof of purchase is required prior to claim approval.';
+                // @codingStandardsIgnoreEnd
+            }
         }
 
         return $warnings;
@@ -5287,9 +5298,18 @@ abstract class Policy
         }
 
         if ($this instanceof PhonePolicy) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $this;
+
+            if ($phonePolicy->hasInvalidImei()) {
+                // @codingStandardsIgnoreStart
+                $warnings[] = 'Policy IMEI is unknown and should be requested. Proof of purchase is required prior to claim approval.';
+                // @codingStandardsIgnoreEnd
+            }
+
             $foundSerial = false;
             $mismatch = false;
-            foreach ($this->getCheckmendCertsAsArray(false) as $key => $cert) {
+            foreach ($phonePolicy->getCheckmendCertsAsArray(false) as $key => $cert) {
                 if (isset($cert['certId']) && $cert['certId'] == 'serial') {
                     $foundSerial = true;
                     if (!isset($cert['response']['makes']) ||

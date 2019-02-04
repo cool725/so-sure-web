@@ -27,6 +27,7 @@ parameters:
         - '10.0.2.2'
     pos_ips:
         - '172.16.0.0' # Temp. HelloZ should go here
+    online: true
 
 framework:
     #esi:             ~
@@ -68,8 +69,8 @@ twig:
         pca_webkey: "%pca_webkey%"
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
-        use_cdn: true
-        use_fa_cdn: true
+        use_cdn: "%online%"
+        use_fa_cdn: "%online%"
         #default_login_method: "accountkit"
         default_login_method: "accountkit"
         branch_pot_url: "%branch_pot_url%"

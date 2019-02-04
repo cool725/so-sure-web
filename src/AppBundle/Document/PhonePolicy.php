@@ -125,6 +125,14 @@ class PhonePolicy extends Policy
     protected $detectedImei;
 
     /**
+     * We know the imei is not correct and needs to be validated
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $invalidImei;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -305,6 +313,16 @@ class PhonePolicy extends Policy
     public function setImei($imei)
     {
         $this->imei = $imei;
+    }
+
+    public function hasInvalidImei()
+    {
+        return $this->invalidImei;
+    }
+
+    public function setInvalidImei($invalidImei)
+    {
+        $this->invalidImei = $invalidImei;
     }
 
     public function adjustImei($imei, $setReplacementDate = true)
