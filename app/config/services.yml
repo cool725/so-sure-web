@@ -225,12 +225,6 @@ services:
             - "@logger"
             - "%hubspot_app_key%"
             - "@snc_redis.default"
-            - "@app.hubspot.data"
-
-    app.hubspot.data:
-        class: App\Hubspot\HubspotData
-        public: false
-        arguments:
             - "@census.search"
 
     app.bacs:

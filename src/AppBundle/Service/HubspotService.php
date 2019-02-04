@@ -2,18 +2,17 @@
 
 namespace AppBundle\Service;
 
+use CensusBundle\Service\SearchService;
 use AppBundle\Exception\Queue\QueueException;
 use AppBundle\Exception\Queue\UnknownMessageException;
 use AppBundle\Exception\Queue\MalformedMessageException;
-use App\Hubspot\HubspotData;
-use App\Hubspot\Api;
 use AppBundle\Document\User;
 use AppBundle\Exception\RateLimitException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client as RedisClient;
 use Psr\Log\LoggerInterface;
 use SevenShores\Hubspot\Exceptions\BadRequest;
-use SevenShores\Hubspot\Http\Response;
+use GuzzleHttp\Psr7\Response;
 use SevenShores\Hubspot\Factory as HubspotFactory;
 use SevenShores\Hubspot\Resources\Contacts;
 
@@ -35,12 +34,12 @@ class HubspotService
     const LIFECYCLE_EXPIRED = 'expired';
 
     static private $lifecycleStages = [
-        self::QUOTE              => 1,
-        self::READY_FOR_PURCHASE => 2,
-        self::PURCHASED          => 3,
-        self::RENEWED            => 4,
-        self::CANCELLED          => 5,
-        self::EXPIRED            => 6,
+        self::LIFECYCLE_QUOTE              => 1,
+        self::LIFECYCLE_READY_FOR_PURCHASE => 2,
+        self::LIFECYCLE_PURCHASED          => 3,
+        self::LIFECYCLE_RENEWED            => 4,
+        self::LIFECYCLE_CANCELLED          => 5,
+        self::LIFECYCLE_EXPIRED            => 6,
     ];
 
     private const RETRY_LIMIT = 3;
@@ -75,7 +74,6 @@ class HubspotService
         $this->logger = $logger;
         $this->client = new HubspotFactory(["key" => $hubspotKey], null, ['http_errors' => false], false);
         $this->redis = $redis;
-        $this->hubspotData = $hubspotData;
         $this->searchService = $searchService;
     }
 
@@ -209,7 +207,7 @@ class HubspotService
             $this->client->contactProperties()->get($data["name"]);
             return null;
         } catch (\Exception $e) {
-            return $this->client->contactProperties()->create($data)->getData();
+            return $this->client->contactProperties()->create($data)->getBody();
         }
     }
 
@@ -222,7 +220,7 @@ class HubspotService
     {
         $response = $this->client->contactProperties()->all();
         $this->validateResponse($response, 200);
-        return $response->getData();
+        return $response->getBody();
     }
 
     /**
@@ -236,7 +234,7 @@ class HubspotService
         if (!$allowSoSure && $user->hasSoSureEmail() || !$user->hasEmail()) {
             return;
         }
-        $hubspotUserArray = $this->hubspotData->getHubspotUserArray($user);
+        $hubspotUserArray = $this->buildHubspotUserDetailsData($user);
         if (empty($user->getHubspotId())) {
             $this->createNewHubspotContact($user, $hubspotUserArray);
         } else {
@@ -264,7 +262,7 @@ class HubspotService
         $params = array_merge(["count" => 100], $params);
         do {
             $response = $this->client->contacts()->all($params);
-            $contacts = $response->getData()->contacts;
+            $contacts = $response->getBody()->contacts;
             foreach ($contacts as $contact) {
                 yield $contact;
             }
@@ -338,11 +336,11 @@ class HubspotService
     {
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
         $this->validateResponse($response, 200);
-        if ($response->getData()->isNew) {
-            $user->setHubspotId($response->getData()->vid);
+        if ($response->getBody()->isNew) {
+            $user->setHubspotId($response->getBody()->vid);
             $this->dm->flush();
         }
-        return $response->getData()->vid;
+        return $response->getBody()->vid;
     }
 
     /**

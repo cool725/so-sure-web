@@ -5,8 +5,6 @@ namespace App\Command;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\HubspotService;
-use App\Hubspot\HubspotData;
-use App\Hubspot\Api;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -57,7 +55,7 @@ class HubspotCommand extends ContainerAwareCommand
     {
         $this->setDescription("Sync with HubSpot")
             ->addOption("list", null, InputOption::VALUE_NONE, "List users found in Hubspot")
-            ->addOption("email", null, InputOption::VALUE_REQUIRED, "email address to sync")
+            ->addOption("email", null, InputOption::VALUE_REQUIRED, "sync owner of given email")
             ->addOption("requeue", null, InputOption::VALUE_NONE, "Requeue user (if email param given) or all users")
             ->addOption("queue-count", null, InputOption::VALUE_NONE, "Count the queue")
             ->addOption("queue-show", null, InputOption::VALUE_NONE, "Show items in the queue")
@@ -71,7 +69,13 @@ class HubspotCommand extends ContainerAwareCommand
             )
             ->addOption("properties-list", null, InputOption::VALUE_NONE, "List Hubspot properties. Can use -v")
             ->addOption("properties-group", null, InputOption::VALUE_NONE, "Check if sosure group exists on Hubspot.")
-            ->addOption("properties-sync", null, InputOption::VALUE_NONE, "Sync our properties to Hubspot.");
+            ->addOption("properties-sync", null, InputOption::VALUE_NONE, "Sync our properties to Hubspot.")
+            ->addOption(
+                "test",
+                null,
+                InputOption::VALUE_NONE,
+                "One off and testing functionality. Don't run without checking what it does."
+            );
     }
 
     /**
@@ -106,6 +110,7 @@ class HubspotCommand extends ContainerAwareCommand
         $propertiesList = $input->getOption("properties-list");
         $propertiesGroup = $input->getOption("properties-group");
         $propertiesSync = $input->getOption("properties-sync");
+        $test = $input->getOption("test");
         if ($list) {
             $this->showContacts($output, $this->hubspot);
         }
@@ -122,6 +127,8 @@ class HubspotCommand extends ContainerAwareCommand
             $this->queueClear($input, $output, $this->hubspot);
         }
         if ($requeue) {
+            // TODO: should also be able to work for a specific user.
+            // TODO: also who knows what the difference between normal queueing and requeueing is.
             $this->requeueAllUsers($output, $this->hubspot);
         }
         if ($propertiesList) {
@@ -133,20 +140,22 @@ class HubspotCommand extends ContainerAwareCommand
         if ($propertiesSync) {
             $this->propertiesSync($output);
         }
+        if ($test) {
+            $this->test($output);
+        }
         $this->process($output, $queueProcessMaxCount);
     }
 
     /**
      * Displays all contacts on the commandline.
      * @param OutputInterface $output  is the commandline output used to display the data.
-     * @param HubspotService  $hubspot is the hubspot service used to access the data.
      * @return int 0 (denoting success).
      */
-    public function showContacts(OutputInterface $output, HubspotService $hubspot)
+    public function showContacts(OutputInterface $output)
     {
         $table = new Table($output);
         $table->setHeaders(["VID", "First Name", "Last Name"]);
-        $contacts = $hubspot->getAllContacts([]);
+        $contacts = $this->hubspot->getAllContacts([]);
         foreach ($contacts as $contact) {
             $table->addRow([
                 $contact->vid,
@@ -163,20 +172,19 @@ class HubspotCommand extends ContainerAwareCommand
      * @param string          $email   is the user's email address.
      * @param boolean         $requeue tells whether to requeue or do some other mystery thing. TODO: dunno lol.
      * @param OutputInterface $output  is used to output status information.
-     * @param HubspotService  $hubspot is the owner of the queue that they are being placed on.
      * @return int 1 if there is an error and otherwise 0.
      */
-    public function requeueUserByEmail($email, $requeue, OutputInterface $output, HubspotService $hubspot)
+    public function requeueUserByEmail($email, $requeue, OutputInterface $output)
     {
         $output->write("Syncing user: <comment>$email</comment> ");
         try {
             $user = $this->getUser($email);
             if ($requeue) {
-                $hubspot->queueContact($user);
+                $this->hubspot->queueContact($user);
                 $output->writeln(sprintf("Added to queue userId: %s", $user->getId()));
                 return 0;
             }
-            $responseObj = $hubspot->createOrUpdateContact($user);
+            $responseObj = $this->hubspot->createOrUpdateContact($user);
             $output->writeln("created the contact.");
             return 0;
         } catch (\Exception $e) {
@@ -188,12 +196,11 @@ class HubspotCommand extends ContainerAwareCommand
     /**
      * Gives the length of the queue.
      * @param OutputInterface $output  is used to output the number.
-     * @param HubspotService  $hubspot is the owner of the queue we are looking at.
      * @return int 0 (denoting success).
      */
-    public function queueCount(OutputInterface $output, HubspotService $hubspot)
+    public function queueCount(OutputInterface $output)
     {
-        $count = $hubspot->countQueue();
+        $count = $this->hubspot->countQueue();
         $output->writeln(sprintf("%d in queue", $count));
         return 0;
     }
@@ -202,12 +209,11 @@ class HubspotCommand extends ContainerAwareCommand
      * Displays the queue.
      * @param int             $max     is the maximum number of queue items to show.
      * @param OutputInterface $output  is used to output to the commandline.
-     * @param HubspotService  $hubspot contains the queue being shown.
      * @return int 0 (denoting success).
      */
-    public function queueShow($max, OutputInterface $output, HubspotService $hubspot)
+    public function queueShow($max, OutputInterface $output)
     {
-        $data = $hubspot->getQueueData($max);
+        $data = $this->hubspot->getQueueData($max);
         $output->writeln(sprintf("Queue Size: %d", count($data)));
         foreach ($data as $line) {
             $output->writeln(json_encode(unserialize($line), JSON_PRETTY_PRINT));
@@ -219,10 +225,9 @@ class HubspotCommand extends ContainerAwareCommand
      * Deletes everything in the queue.
      * @param InputInterface  $input   used to take user confirmation from the commandline.
      * @param OutputInterface $output  used to output to the commandline.
-     * @param HubspotService  $hubspot contains the queue to be cleared.
      * @return int 1 if the user cancels, and 0 if they go ahead with it.
      */
-    public function queueClear(InputInterface $input, OutputInterface $output, HubspotService $hubspot)
+    public function queueClear(InputInterface $input, OutputInterface $output)
     {
         $helper = $this->getHelper("question");
         $question = new ConfirmationQuestion(
@@ -231,7 +236,7 @@ class HubspotCommand extends ContainerAwareCommand
             "/^(y|n)/i"
         );
         if ($helper->ask($input, $output, $question)) {
-            $hubspot->clearQueue();
+            $this->hubspot->clearQueue();
             $output->writeln(sprintf("Queue is cleared"));
             return 0;
         }
@@ -242,14 +247,13 @@ class HubspotCommand extends ContainerAwareCommand
     /**
      * Puts every single user in the database onto the queue.
      * @param OutputInterface $output  is used to output to the commandline.
-     * @param HubspotService  $hubspot contains the queue.
      */
-    public function requeueAllUsers(OutputInterface $output, HubspotService $hubspot)
+    public function requeueAllUsers(OutputInterface $output)
     {
         $count = 0;
         $users = $this->dm->getRepository(User::class)->findAll();
         foreach ($users as $user) {
-            $hubspot->queueContact($user);
+            $this->hubspot->queueContact($user);
             $count++;
         }
         $output->writeln(sprintf("Queued %d Users", $count));
@@ -258,11 +262,10 @@ class HubspotCommand extends ContainerAwareCommand
     /**
      * Outputs a table of all properties in huubspot.
      * @param OutputInterface $output  is used to output to the commandline.
-     * @param HubspotService  $hubspot is used to access the list of properties in hubspot.
      */
-    public function propertiesList(OutputInterface $output, HubspotService $hubspot)
+    public function propertiesList(OutputInterface $output)
     {
-        $properties = $hubspot->getProperties();
+        $properties = $this->hubspot->getProperties();
         $table = new Table($output);
         $tableHeaders = ["Name", "Group", "Type", "Field"];
         if ($output->isVerbose()) {
@@ -303,6 +306,16 @@ class HubspotCommand extends ContainerAwareCommand
                 $output->writeln("Skipped <info>{$name}</info> property.");
             }
         }
+    }
+
+    /**
+     * Temporary or testing functionality.
+     * @param OutputInterface $output allows output to the commandline.
+     */
+    public function test($output)
+    {
+        
+        $output->writeln("gday fellas");
     }
 
     /**
