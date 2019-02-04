@@ -1329,9 +1329,9 @@ class DefaultController extends BaseController
             $mailer->sendTemplate(
                 'Update your communication preferences',
                 $email,
-                'AppBundle:Email:User/optOutLink.html.twig',
+                'AppBundle:Email:user/optOutLink.html.twig',
                 ['hash' => $hash],
-                'AppBundle:Email:User/optOutLink.txt.twig',
+                'AppBundle:Email:user/optOutLink.txt.twig',
                 ['hash' => $hash]
             );
 
