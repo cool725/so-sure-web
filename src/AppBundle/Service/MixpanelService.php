@@ -68,6 +68,7 @@ class MixpanelService
     const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
     const EVENT_POLICY_READY = 'Policy Ready For Purchase';
+    const EVENT_COMPLETE_PLEDGE = 'Completed Pledge';
     const EVENT_LOGIN = 'Login';
     const EVENT_APP_DOWNLOAD = 'App Download';
     const EVENT_TEST = 'Tracking Test Event';

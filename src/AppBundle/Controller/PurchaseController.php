@@ -763,6 +763,12 @@ class PurchaseController extends BaseController
                 $purchaseForm->handleRequest($request);
 
                 if ($purchaseForm->isValid() && $purchase->areAllAgreed()) {
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_COMPLETE_PLEDGE, [
+                        'Device Insured' => $phone ? $phone->__toString() : null,
+                        'OS' => $phone ? $phone->getOs() : null,
+                        'Policy Id' => $policy->getId(),
+                    ]);
+
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
