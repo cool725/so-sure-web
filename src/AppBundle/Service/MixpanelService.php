@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Exception\ExternalRateLimitException;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
@@ -25,6 +26,8 @@ class MixpanelService
 {
     use ValidatorTrait;
     use DateTrait;
+
+    const CACHE_TIME = 172800;
 
     const KEY_MIXPANEL_QUEUE = 'queue:mixpanel';
 
@@ -334,11 +337,8 @@ class MixpanelService
         if (!$user) {
             return null;
         }
-        $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
-        $results = $this->mixpanelData->data('engage', ['where' => $search]);
-        // If there are multiple user accounts then we have got to figure out which is the older.
+        $results = $this->getCachedEngagements($user);
         $accounts = count($results);
-        //$this->findLatestMixpanelUser($results);
         //$this->findOldestMixpanelUser($results);
         //return;
         if ($accounts > 1) {
@@ -516,7 +516,7 @@ class MixpanelService
                 }
             }
         }
-        
+
         return $users;
     }
 
@@ -1038,6 +1038,14 @@ class MixpanelService
                     json_encode($data),
                     $e->getMessage()
                 ));
+            } catch (ExternalRateLimitException $e) {
+                $this->logger->error(sprintf(
+                    'Rate limited mixpanel (requeued in 60s) %s. Ex: %s',
+                    json_encode($data),
+                    $e->getMessage()
+                ));
+                $data['processTime'] = time() + 60;
+                $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
             } catch (\Exception $e) {
                 if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
                     $data['retryAttempts'] += 1;
@@ -1517,6 +1525,7 @@ class MixpanelService
      * @return array|null the mixpanel user record that has the oldest event in the last year.
      *                    If there are multiple users that had events at the exact same time,
      *                    then which one you will get is undefined.
+     * @throws \Exception when there is some kind of mixpanel error other than rate limit.
      */
     private function findOldestMixpanelUser(array $mixpanelUsers)
     {
@@ -1533,8 +1542,24 @@ class MixpanelService
                 'event' => json_encode(self::$trackedEvents),
                 'where' => sprintf('properties["$distinct_id"]=="%s"', $user['$distinct_id'])
             ];
+            $cacheKey = sprintf("mixpanel:oldest:%s:%s", $user['$distinct_id'], $date->format('Ymd'));
+            $eventList = $this->redis->get($cacheKey);
+            if (!$eventList) {
+                $eventList = $this->mixpanelData->export($query);
+                if (array_key_exists('error', $eventList)) {
+                    if ($eventList['error']['status'] == 429) {
+                        throw new ExternalRateLimitException("Mixpanel rate limit reached.");
+                    } else {
+                        throw new \Exception("Data access in mixpanel failed.");
+                    }
+                } else {
+                    $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($eventList));
+                }
+            } else {
+                $eventList = unserialize($eventList);
+            }
             //print_r($query);
-            $eventList = $this->mixpanelData->export($query);
+
             //print_r($eventList);
             if (count($eventList) == 0) {
                 continue;
@@ -1556,5 +1581,36 @@ class MixpanelService
         }
 
         return null;
+    }
+
+    /**
+     * Gets a previously cached engagements query which will contain all events by all mixpanel users with the given
+     * email address so that we don't lose this data over and over due to mixpanel rate
+     * limiting after very few queries.
+     * @param User $user user to find
+     * @return array containing the response.
+     * @throws \Exception when there is an error in the mixpanel query other than rate limiting.
+     */
+    protected function getCachedEngagements(User $user)
+    {
+        $cacheKey = sprintf("mixpanel:user:%s", $user->getId());
+        $results = $this->redis->get($cacheKey);
+        if (!$results) {
+            $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
+            $results = $this->mixpanelData->data('engage', ['where' => $search]);
+            if (array_key_exists('error', $results)) {
+                if ($results['error']['status'] == 429) {
+                    throw new ExternalRateLimitException("Mixpanel rate limit reached in engagement query.");
+                } else {
+                    throw new \Exception(sprintf("Data access for users with email %s failed.", $user->getEmail()));
+                }
+            } else {
+                // cache for two days.
+                $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($results));
+            }
+        } else {
+            $results = unserialize($results);
+        }
+        return $results;
     }
 }
