@@ -338,3 +338,10 @@ remove_trailing_slash:
         _controller: 'App\Controller\RedirectingController'
     requirements:
         url: .*/$
+
+redirect_iphone_insured_with_bank:
+    path: /think-your-iPhone-7-is-insured-by-your-bank
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
