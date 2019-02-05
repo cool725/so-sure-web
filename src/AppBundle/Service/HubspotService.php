@@ -79,23 +79,21 @@ class HubspotService
     }
 
     /**
-     * Sets the hubspot service's logger so it can be output somewhere else.
-     * TODO: get rid of this functionality.
-     * @param LoggerInterface $logger is the new logger to use.
+     * Adds a user sync message to the queue.
+     * @param User $user is the user to be synched as a contact.
      */
-    public function setLogger(LoggerInterface $logger)
+    public function queueUser(User $user)
     {
-        $this->logger = $logger;
+        $this->queue(['action' => self::QUEUE_CONTACT, 'userId' => $user->getId()]);
     }
 
     /**
-     * Adds a contact sync message to the queue.
-     * @param User $user is the user to be synched as a contact.
+     * Adds a user deletion message to the queue.
+     * @param User $user is the user to be deleted along with their associated hubspot deals.
      */
-    public function queueContact(User $user)
+    public function queueRemoveUser(User $user)
     {
-        $data = ['action' => self::QUEUE_CONTACT, 'userId' => $user->getId()];
-        $this->queue($data);
+        $this->queue(['action' => self::QUEUE_DELETE_CONTACT, 'userId' => $user->getId()]);
     }
 
     /**
@@ -505,6 +503,37 @@ class HubspotService
         }
         // TODO: this is incomplete apparantly. I will figure out what is needed.
         return [$this->hubspotProperty("sosure_lifecycle_stage", $userStage)];
+    }
+
+    /**
+     * Builds the form that a new property description must take in order to be synced to hubspot.
+     * @param string $name      is the name of the property internally.
+     * @param string $label     is the name to show to users on hubspot.
+     * @param string $type      is the type of this property.
+     * @param string $fieldType is the type of editing it would use on mixpanel.
+     * @param bool   $formField is TODO: I dunno.
+     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
+     *                          those.
+     * @return array containing the new property data.
+     */
+    private function buildPropertyPrototype(
+        $name,
+        $label,
+        $type = "string",
+        $fieldType = "text",
+        $formField = false,
+        $options = null
+    ) {
+        $data = [
+            "name" => $name,
+            "type" => $type,
+            "fieldType" => $fieldType,
+            "formField" => $formField
+        ];
+        if ($options) {
+            $data["options"] = $options;
+        }
+        return $data;
     }
 
     /**

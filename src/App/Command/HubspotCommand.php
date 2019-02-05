@@ -436,35 +436,4 @@ class HubspotCommand extends ContainerAwareCommand
             $this->buildPropertyPrototype("latestattribution", "Latest attribution")
         ];
     }
-
-    /**
-     * Builds the form that a new property description must take in order to be synced to hubspot.
-     * @param string $name      is the name of the property internally.
-     * @param string $label     is the name to show to users on hubspot.
-     * @param string $type      is the type of this property.
-     * @param string $fieldType is the type of editing it would use on mixpanel.
-     * @param bool   $formField is TODO: I dunno.
-     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
-     *                          those.
-     * @return array containing the new property data.
-     */
-    private function buildPropertyPrototype(
-        $name,
-        $label,
-        $type = "string",
-        $fieldType = "text",
-        $formField = false,
-        $options = null
-    ) {
-        $data = [
-            "name" => $name,
-            "type" => $type,
-            "fieldType" => $fieldType,
-            "formField" => $formField
-        ];
-        if ($options) {
-            $data["options"] = $options;
-        }
-        return $data;
-    }
 }
