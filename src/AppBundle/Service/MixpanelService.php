@@ -300,22 +300,22 @@ class MixpanelService
         return $this->redis->llen(self::KEY_MIXPANEL_QUEUE);
     }
 
-    public function attribution($userId)
+    public function attribution($userId, $overrideAttribution = false)
     {
         $repo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->find($userId);
 
-        return $this->attributionByUser($user);
+        return $this->attributionByUser($user, $overrideAttribution);
     }
 
-    public function attributionByEmail($email)
+    public function attributionByEmail($email, $overrideAttribution = false)
     {
         $repo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
-        return $this->attributionByUser($user);
+        return $this->attributionByUser($user, $overrideAttribution);
     }
 
     private function getCampaignAttributionDate($data, $prefix = '')
@@ -1016,7 +1016,7 @@ class MixpanelService
                     if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
-                    $this->attribution($data['userId']);
+                    $this->attribution($data['userId'], isset($data['override']) ? $data['override'] : false);
                 } elseif ($action == self::QUEUE_DELETE) {
                     if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -1063,9 +1063,9 @@ class MixpanelService
         return ['processed' => $processed, 'requeued' => $requeued];
     }
 
-    public function queueAttribution(User $user)
+    public function queueAttribution(User $user, $overrideAttribution = false)
     {
-        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), []);
+        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), ['override' => $overrideAttribution]);
     }
 
     public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
