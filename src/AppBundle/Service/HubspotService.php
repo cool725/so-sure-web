@@ -22,26 +22,12 @@ use SevenShores\Hubspot\Resources\DealPipelines;
  */
 class HubspotService
 {
-    const QUEUE_CONTACT = 'contact';
+    const QUEUE_USER = 'user';
+    const QUEUE_DELETE_USER = 'delete-user';
+    const QUEUE_DEAL = 'deal';
 
     const KEY_HUBSPOT_QUEUE = 'queue:hubspot';
     const KEY_HUBSPOT_RATELIMIT = 'hubspot:ratelimit';
-
-    const LIFECYCLE_QUOTE = 'quote';
-    const LIFECYCLE_READY_FOR_PURCHASE = 'ready-for-purchase';
-    const LIFECYCLE_PURCHASED = 'purchased';
-    const LIFECYCLE_RENEWED = 'renewed';
-    const LIFECYCLE_CANCELLED = 'cancelled';
-    const LIFECYCLE_EXPIRED = 'expired';
-
-    static private $lifecycleStages = [
-        self::LIFECYCLE_QUOTE              => 1,
-        self::LIFECYCLE_READY_FOR_PURCHASE => 2,
-        self::LIFECYCLE_PURCHASED          => 3,
-        self::LIFECYCLE_RENEWED            => 4,
-        self::LIFECYCLE_CANCELLED          => 5,
-        self::LIFECYCLE_EXPIRED            => 6,
-    ];
 
     private const RETRY_LIMIT = 3;
 
@@ -156,10 +142,52 @@ class HubspotService
     }
 
     /**
+     * Builds the form that a new property description must take in order to be synced to hubspot.
+     * @param string $name      is the name of the property internally.
+     * @param string $label     is the name to show to users on hubspot.
+     * @param string $type      is the type of this property.
+     * @param string $fieldType is the type of editing it would use on mixpanel.
+     * @param bool   $formField is TODO: I dunno.
+     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
+     *                          those.
+     * @return array containing the new property data.
+     */
+    public function buildPropertyPrototype(
+        $name,
+        $label,
+        $type = "string",
+        $fieldType = "text",
+        $formField = false,
+        $options = null
+    ) {
+        $data = [
+            "name" => $name,
+            "type" => $type,
+            "fieldType" => $fieldType,
+            "formField" => $formField
+        ];
+        if ($options) {
+            $data["options"] = $options;
+        }
+        return $data;
+    }
+
+    /**
+     * Puts a single property into the format that hubspot wants to receive it as.
+     * @param string $name  is the name of the property.
+     * @param mixed  $value is the object that the property consists of.
+     * @return array with the property.
+     */
+    public function buildProperty($name, $value)
+    {
+        return ['property' => $name, 'value' => $value];
+    }
+
+    /**
      * Tells the length of the queue.
      * @return int the length of the queue.
      */
-    public function countQueue()
+    private function countQueue()
     {
         return $this->redis->llen(self::KEY_HUBSPOT_QUEUE);
     }
@@ -167,7 +195,7 @@ class HubspotService
     /**
      * Deletes everything in the queue.
      */
-    public function clearQueue()
+    private function clearQueue()
     {
         $this->redis->del([self::KEY_HUBSPOT_QUEUE]);
     }
@@ -177,9 +205,33 @@ class HubspotService
      * @param int $max is the maximum number of messages to return.
      * @return array containing the messages.
      */
-    public function getQueueData(int $max): array
+    private function getQueueData(int $max): array
     {
         return $this->redis->lrange(self::KEY_HUBSPOT_QUEUE, 0, $max);
+    }
+
+    /**
+     * Creates a contact list on hubspot if it does not already exist.
+     * @param string $name is the name of the list that it will create.
+     */
+    private function syncList($name)
+    {
+        $this->client->contactLists()->create(["name" => $name, "dynamic" => false]);
+        $this->validateResponse($response, [200, 409]);
+    }
+
+    /**
+     * Synchronises a contact property with hubspot.
+     * @param string $name is the name of the property to create.
+     * @param string $displayName is the name that will be shown to users of hubspot for this property.
+     * TODO: no.
+     */
+    private function syncProperty($name, $displayName)
+    {
+        $this->client->contactProperties()->create(
+            ["name" => $name, "displayName" => $displayName]
+        );
+        $this->validateResponse($response, [200, 409]);
     }
 
     /**
@@ -187,7 +239,7 @@ class HubspotService
      * @param string $groupName   is the name of the group to run for.
      * @param string $displayName is the desired display name of the group.
      */
-    public function syncPropertyGroup($groupName, $displayName)
+    private function syncPropertyGroup($groupName, $displayName)
     {
         $response = $this->client->contactProperties()->createGroup(
             ["name" => $groupName, "displayName" => $displayName]
@@ -196,44 +248,16 @@ class HubspotService
     }
 
     /**
-     * Updates a property on hubspot or creates it if it does not yet exist.
-     * @param array $data is the content of the property to be created.
-     * @return array|null the property if newly created, or nothing if it already existed.
-     */
-    public function syncProperty($data)
-    {
-        try {
-            $this->client->contactProperties()->get($data["name"]);
-            return null;
-        } catch (\Exception $e) {
-            return $this->client->contactProperties()->create($data)->getBody();
-        }
-    }
-
-    /**
      * Adds a pipeline onto hubspot.
-     * @param array $data is the content of the pipeline.
-     * @return array|null the pipeline if newly created, or nothing if it already exists.
+     * @param string $name is the name that the pipeline will be given.
+     * @param array  $stages is a list of each pipeline stage which must be formatted as hubspot requires.
      */
-    public function syncPipeline($data)
+    private function syncPipeline($name, $stages)
     {
-        try {
-            $this->client->dealPipelines()->get($data["name"]);
-            return null;
-        } catch (\Exception $e) {
-            return $this->client->dealPipelines()->create($data)->getBody();
-        }
-    }
-
-    /**
-     * Downloads all current contact properties from hubspot.
-     * @return array containing all of the properties.
-     * @throws \Exception when the properties can not be got.
-     */
-    public function getProperties()
-    {
-        $response = $this->client->contactProperties()->all();
-        return $this->validateResponse($response, 200);
+        $response = $this->client->contactProperties()->createGroup(
+            ["label" => $name, "stages" => $stages]
+        );
+        $this->validateResponse($response, [200, 409]);
     }
 
     /**
@@ -394,6 +418,8 @@ class HubspotService
         if (is_array($desired) && in_array($code, $desired) || $code === $desired) {
             return json_decode($response->getBody()->getContents());
         } elseif ($code === 429) {
+            // TODO: next time I merge master there is an exception I made for this and use catch it up in the process
+            //       function like it does in mixpanel service to requeue unconditionally.
             throw new \Exception("Hubspot rate limited.");
         } else {
             throw new \Exception(
@@ -503,47 +529,5 @@ class HubspotService
         }
         // TODO: this is incomplete apparantly. I will figure out what is needed.
         return [$this->hubspotProperty("sosure_lifecycle_stage", $userStage)];
-    }
-
-    /**
-     * Builds the form that a new property description must take in order to be synced to hubspot.
-     * @param string $name      is the name of the property internally.
-     * @param string $label     is the name to show to users on hubspot.
-     * @param string $type      is the type of this property.
-     * @param string $fieldType is the type of editing it would use on mixpanel.
-     * @param bool   $formField is TODO: I dunno.
-     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
-     *                          those.
-     * @return array containing the new property data.
-     */
-    private function buildPropertyPrototype(
-        $name,
-        $label,
-        $type = "string",
-        $fieldType = "text",
-        $formField = false,
-        $options = null
-    ) {
-        $data = [
-            "name" => $name,
-            "type" => $type,
-            "fieldType" => $fieldType,
-            "formField" => $formField
-        ];
-        if ($options) {
-            $data["options"] = $options;
-        }
-        return $data;
-    }
-
-    /**
-     * Puts a single property into the format that hubspot wants to receive it as.
-     * @param string $name  is the name of the property.
-     * @param mixed  $value is the object that the property consists of.
-     * @return array with the property.
-     */
-    private function buildProperty($name, $value)
-    {
-        return ['property' => $name, 'value' => $value];
     }
 }
