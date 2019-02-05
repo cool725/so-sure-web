@@ -15,6 +15,7 @@ use SevenShores\Hubspot\Exceptions\BadRequest;
 use GuzzleHttp\Psr7\Response;
 use SevenShores\Hubspot\Factory as HubspotFactory;
 use SevenShores\Hubspot\Resources\Contacts;
+use SevenShores\Hubspot\Resources\DealPipelines;
 
 /**
  * Provides the primary hubspot functionality.
@@ -193,7 +194,7 @@ class HubspotService
         $response = $this->client->contactProperties()->createGroup(
             ["name" => $groupName, "displayName" => $displayName]
         );
-        $this->validateResponse($response, 200);
+        $this->validateResponse($response, [200, 409]);
     }
 
     /**
@@ -212,6 +213,21 @@ class HubspotService
     }
 
     /**
+     * Adds a pipeline onto hubspot.
+     * @param array $data is the content of the pipeline.
+     * @return array|null the pipeline if newly created, or nothing if it already exists.
+     */
+    public function syncPipeline($data)
+    {
+        try {
+            $this->client->dealPipelines()->get($data["name"]);
+            return null;
+        } catch (\Exception $e) {
+            return $this->client->dealPipelines()->create($data)->getBody();
+        }
+    }
+
+    /**
      * Downloads all current contact properties from hubspot.
      * @return array containing all of the properties.
      * @throws \Exception when the properties can not be got.
@@ -219,8 +235,7 @@ class HubspotService
     public function getProperties()
     {
         $response = $this->client->contactProperties()->all();
-        $this->validateResponse($response, 200);
-        return $response->getBody();
+        return $this->validateResponse($response, 200);
     }
 
     /**
@@ -319,10 +334,7 @@ class HubspotService
     private function ready(array $data)
     {
         $now = new \DateTime();
-        if (isset($data["processTime"]) && ($data["processTime"] > $now->format("U"))) {
-            return false;
-        }
-        return true;
+        return (!(isset($data["processTime"]) && ($data["processTime"] > $now->format("U"))));
     }
 
     /**
@@ -335,12 +347,12 @@ class HubspotService
     private function createNewHubspotContact(User $user, $hubspotUserArray)
     {
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        $this->validateResponse($response, 200);
-        if ($response->getBody()->isNew) {
-            $user->setHubspotId($response->getBody()->vid);
+        $response = $this->validateResponse($response, 200);
+        if ($response->isNew) {
+            $user->setHubspotId($response->vid);
             $this->dm->flush();
         }
-        return $response->getBody()->vid;
+        return $response->vid;
     }
 
     /**
@@ -373,15 +385,16 @@ class HubspotService
     /**
      * Check if a response has the correct status code, and if it does not then it throws an exception. If the status
      * code returned denotes rate limiting then it will tell you of this.
-     * @param Response $response is the response that you are checking.
-     * @param int      $desired  is the response code that you want the response to have.
+     * @param Response  $response is the response that you are checking.
+     * @param array|int $desired  is the response code or list containing that you want the response to have.
      * @throws \Exception when $response's status code is not $desired.
      */
     private function validateResponse(Response $response, $desired)
     {
         $code = $response->getStatusCode();
-        if ($code === $desired) {
-            return;
+
+        if (is_array($desired) && in_array($code, $desired) || $code === $desired) {
+            return json_decode($response->getBody()->getContents());
         } elseif ($code === 429) {
             throw new \Exception("Hubspot rate limited.");
         } else {
@@ -426,14 +439,14 @@ class HubspotService
     private function buildHubspotUserDetailsData(User $user)
     {
         $data = [
-            $this->buildHubspotProperty("firstname", $user->getFirstName()),
-            $this->buildHubspotProperty("lastname", $user->getLastName()),
-            $this->buildHubspotProperty("email", $user->getEmailCanonical()),
-            $this->buildHubspotProperty("mobilephone", $user->getMobileNumber()),
-            $this->buildHubspotProperty("gender", $user->getGender()),
+            $this->buildProperty("firstname", $user->getFirstName()),
+            $this->buildProperty("lastname", $user->getLastName()),
+            $this->buildProperty("email", $user->getEmailCanonical()),
+            $this->buildProperty("mobilephone", $user->getMobileNumber()),
+            $this->buildProperty("gender", $user->getGender()),
         ];
         if ($user->getBirthday()) {
-            $data[] = $this->buildHubspotProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
+            $data[] = $this->buildProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
         }
         return $data;
     }
@@ -447,12 +460,12 @@ class HubspotService
     {
         $data = [];
         if ($user->getBillingAddress()) {
-            $data[] = $this->buildHubspotProperty("billing_address", $user->getBillingAddress());
+            $data[] = $this->buildProperty("billing_address", $user->getBillingAddress());
             if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->buildHubspotProperty("census_subgroup", $census->getSubGroup());
+                $data[] = $this->buildProperty("census_subgroup", $census->getSubGroup());
             }
             if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->buildHubspotProperty("total_weekly_income", $income->getTotal()->getIncome());
+                $data[] = $this->buildProperty("total_weekly_income", $income->getTotal()->getIncome());
             }
         }
         return $data;
@@ -500,7 +513,7 @@ class HubspotService
      * @param mixed  $value is the object that the property consists of.
      * @return array with the property.
      */
-    private function buildHubspotProperty($name, $value)
+    private function buildProperty($name, $value)
     {
         return ['property' => $name, 'value' => $value];
     }

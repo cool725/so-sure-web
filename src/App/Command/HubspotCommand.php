@@ -23,12 +23,14 @@ use SevenShores\Hubspot\Exceptions\BadRequest;
  */
 class HubspotCommand extends ContainerAwareCommand
 {
-    const HUBSPOT_SOSURE_PROPERTY_NAME = "sosure";
-    const HUBSPOT_SOSURE_PROPERTY_DESC = "Custom properties used by SoSure";
-
     private const COMMAND_NAME = "sosure:hubspot";
     protected static $defaultName = self::COMMAND_NAME;
+
     const QUEUE_RATE_DEFAULT = 50;
+
+    const PROPERTY_NAME = "sosure";
+    const PROPERTY_DESC = "Custom properties used by SoSure";
+
     /** @var HubspotService */
     private $hubspot;
     /** @var LoggerInterface */
@@ -54,7 +56,6 @@ class HubspotCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setDescription("Sync with HubSpot")
-            ->addOption("list", null, InputOption::VALUE_NONE, "List users found in Hubspot")
             ->addOption("email", null, InputOption::VALUE_REQUIRED, "sync owner of given email")
             ->addOption("requeue", null, InputOption::VALUE_NONE, "Requeue user (if email param given) or all users")
             ->addOption("queue-count", null, InputOption::VALUE_NONE, "Count the queue")
@@ -67,9 +68,8 @@ class HubspotCommand extends ContainerAwareCommand
                 "Max Number to process",
                 self::QUEUE_RATE_DEFAULT
             )
-            ->addOption("properties-list", null, InputOption::VALUE_NONE, "List Hubspot properties. Can use -v")
-            ->addOption("properties-group", null, InputOption::VALUE_NONE, "Check if sosure group exists on Hubspot.")
-            ->addOption("properties-sync", null, InputOption::VALUE_NONE, "Sync our properties to Hubspot.")
+            ->addOption("sync-structures", null, InputOption::VALUE_NONE, "Sync our custom properties and pipeline to hubspot.")
+            ->addOption("list", null, InputOption::VALUE_OPTIONAL, "List Hubspot thingies. properties|deals|users")
             ->addOption(
                 "test",
                 null,
@@ -108,7 +108,6 @@ class HubspotCommand extends ContainerAwareCommand
         $queueClear = true === $input->getOption("queue-clear");
         $queueProcessMaxCount = (int) ($input->getOption("queue-process") ?? self::QUEUE_RATE_DEFAULT);
         $propertiesList = $input->getOption("properties-list");
-        $propertiesGroup = $input->getOption("properties-group");
         $propertiesSync = $input->getOption("properties-sync");
         $test = $input->getOption("test");
         if ($list) {
@@ -133,9 +132,6 @@ class HubspotCommand extends ContainerAwareCommand
         }
         if ($propertiesList) {
             $this->propertiesList($output, $this->hubspot);
-        }
-        if ($propertiesGroup) {
-            $this->propertiesSyncGroup($output);
         }
         if ($propertiesSync) {
             $this->propertiesSync($output);
@@ -281,23 +277,13 @@ class HubspotCommand extends ContainerAwareCommand
     }
 
     /**
-     * Makes sure that the sosure contact property group exists. Should only really need to be run once.
-     * @param OutputInterface $output is used to write to the commandline.
-     * @throws \Exception when something goes wrong in the process.
-     */
-    public function propertiesSyncGroup(OutputInterface $output)
-    {
-        $this->hubspot->syncPropertyGroup(self::HUBSPOT_SOSURE_PROPERTY_NAME, self::HUBSPOT_SOSURE_PROPERTY_DESC);
-        $output->writeln("Successfully synced sosure property group.");
-    }
-
-    /**
      * Synchronises the list of so-sure properties onto hubspot. Should only really need to be run once.
      * @param OutputInterface $output is used to output to the commandline.
      */
     public function propertiesSync(OutputInterface $output)
     {
-        $properties = $this->allPropertiesWithGroup();
+        $this->hubspot->syncPropertyGroup(self::PROPERTY_NAME, self::PROPERTY_DESC);
+        $properties = $this->buildContactPropertyList();
         foreach ($properties as $property) {
             $name = $property["name"];
             if ($this->hubspot->syncProperty($property)) {
@@ -314,8 +300,8 @@ class HubspotCommand extends ContainerAwareCommand
      */
     public function test($output)
     {
-        
-        $output->writeln("gday fellas");
+
+        $output->writeln("gday fellas. this is a test");
     }
 
     /**
@@ -338,27 +324,27 @@ class HubspotCommand extends ContainerAwareCommand
 
     /**
      * Moves some stuff about.
-     * @param \stdClass $property  is a thingy with properties.
-     * @param boolean   $isVerbose tells whether to pull out the basic set or the big set of properties.
+     * @param array   $property  is filled with properties that must be laid out in a table row.
+     * @param boolean $isVerbose tells whether to pull out the basic set or the big set of properties.
      * @return array containing the properties you chose in the right order and such.
      */
     private function fillTableRowWithProperty($property, $isVerbose)
     {
         if ($isVerbose) {
             return [
-                $property->name,
-                $property->label,
-                $property->groupName,
-                $property->type,
-                $property->fieldType,
-                $property->description,
+                $property["name"],
+                $property["label"],
+                $property["groupName"],
+                $property["type"],
+                $property["fieldType"],
+                $property["description"]
             ];
         }
         return [
-            $property->name,
-            $property->groupName,
-            $property->type,
-            $property->fieldType,
+            $property["name"],
+            $property["groupName"],
+            $property["type"],
+            $property["fieldType"]
         ];
     }
 
@@ -395,111 +381,90 @@ class HubspotCommand extends ContainerAwareCommand
     }
 
     /**
+     * Builds array of the data describing the deal pipeline that we want for policies.
+     * @return array containing this data.
+     */
+    private function buildPipeline()
+    {
+        return [
+            "pipelineId" => "sosure_policies",
+            "label" => "So-Sure Policies",
+            "active" => true,
+            "stages" => [
+                ["stagedId" => "pre-pending", "label" => "Pre Pending"],
+                ["stagedId" => "pending", "label" => "Pending"],
+                ["stagedId" => "active", "label" => "Active"],
+                ["stagedId" => "unpaid", "label" => "Unpaid"],
+                ["stagedId" => "expired", "label" => "Expired"]
+            ]
+        ];
+    }
+
+    /**
      * Fields that, if they do not exist, will be created as properties in the 'sosure' group
      * @return array containing property data formatted for hubspot.
      */
-    private function allPropertiesWithGroup()
+    private function buildContactPropertyList()
     {
         return [
-            [
-                "name" => "gender",
-                "label" => "gender",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "enumeration",
-                "fieldType" => "radio",
-                "formField" => false,
-                "displayOrder" => -1,
-                "options" => [
+            $this->buildPropertyPrototype(
+                "gender",
+                "gender",
+                "enumeration",
+                "radio",
+                false,
+                [
                     ["label" => "male", "value" => "male"],
                     ["label" => "female", "value" => "female"],
                     ["label" => "x/not-known", "value" => "x"]
                 ]
-            ],
-            [
-                "name" => "date_of_birth",
-                "label" => "Date of birth",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "date",
-                "fieldType" => "date",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "facebook",
-                "label" => "Facebook?",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "enumeration",
-                "fieldType" => "checkbox",
-                "formField" => false,
-                "displayOrder" => -1,
-                "options" => [
-                    ["label" => "yes", "value" => "yes"],
-                    ["label" => "no", "value" => "no"]
-                ],
-            ],
-            [
-                "name" => "billing_address",
-                "label" => "Billing address",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "textarea",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "census_subgroup",
-                "label" => "Estimated census_subgroup",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "total_weekly_income",
-                "label" => "Estimated total_weekly_income",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "attribution",
-                "label" => "attribution",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "latestattribution",
-                "label" => "Latest attribution",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "string",
-                "fieldType" => "text",
-                "formField" => false,
-                "displayOrder" => -1
-            ],
-            [
-                "name" => "sosure_lifecycle_stage",
-                "label" => "SO-SURE lifecycle stage",
-                "description" => "Current stage in purchase-flow",
-                "groupName" => self::HUBSPOT_SOSURE_PROPERTY_NAME,
-                "type" => "enumeration",
-                "fieldType" => "select",
-                "formField" => true,
-                "displayOrder" => -1,
-                "options" => [
-                    ["label" => Api::QUOTE, "value" => Api::QUOTE],
-                    ["label" => Api::READY_FOR_PURCHASE, "value" => Api::READY_FOR_PURCHASE],
-                    ["label" => Api::PURCHASED, "value" => Api::PURCHASED],
-                    ["label" => Api::RENEWED, "value" => Api::RENEWED],
-                    ["label" => Api::CANCELLED, "value" => Api::CANCELLED],
-                    ["label" => Api::EXPIRED, "value" => Api::EXPIRED]
-                ]
-            ]
+            ),
+            $this->buildPropertyPrototype("date_of_birth", "Date of birth", "date", "date"),
+            $this->buildPropertyPrototype(
+                "facebook",
+                "Facebook?",
+                "enumeration",
+                "checkbox",
+                false,
+                [["label" => "yes", "value" => "yes"], ["label" => "no", "value" => "no"]]
+            ),
+            $this->buildPropertyPrototype("billing_address", "Billing address", "string", "textarea"),
+            $this->buildPropertyPrototype("census_subgroup", "Estimated census_subgroup"),
+            $this->buildPropertyPrototype("total_weekly_income", "Estimated total_weekly_income"),
+            $this->buildPropertyPrototype("total_weekly_income", "Estimated total_weekly_income"),
+            $this->buildPropertyPrototype("attribution", "attribution"),
+            $this->buildPropertyPrototype("latestattribution", "Latest attribution")
         ];
+    }
+
+    /**
+     * Builds the form that a new property description must take in order to be synced to hubspot.
+     * @param string $name      is the name of the property internally.
+     * @param string $label     is the name to show to users on hubspot.
+     * @param string $type      is the type of this property.
+     * @param string $fieldType is the type of editing it would use on mixpanel.
+     * @param bool   $formField is TODO: I dunno.
+     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
+     *                          those.
+     * @return array containing the new property data.
+     */
+    private function buildPropertyPrototype(
+        $name,
+        $label,
+        $type = "string",
+        $fieldType = "text",
+        $formField = false,
+        $options = null
+    ) {
+        $data = [
+            "name" => $name,
+            "type" => $type,
+            "fieldType" => $fieldType,
+            "formField" => $formField
+        ];
+        if ($options) {
+            $data["options"] = $options;
+        }
+        return $data;
     }
 }
