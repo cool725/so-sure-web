@@ -338,3 +338,17 @@ remove_trailing_slash:
         _controller: 'App\Controller\RedirectingController'
     requirements:
         url: .*/$
+
+redirect_make_insurance:
+    path: /phone-insurance/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_make_insure:
+    path: /insure/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
