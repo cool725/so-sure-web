@@ -8,4 +8,9 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('../components/modalVideo.js');
+let textFit = require('textfit');
+
+$(function() {
+    textFit($('.fit')[0], {detectMultiLine: false});
+});
 

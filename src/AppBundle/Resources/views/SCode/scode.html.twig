@@ -24,16 +24,16 @@
                     <div class="hero__intro">
                         {% if scode is defined and scode and scode.policy %}
                             {% if landing_text is defined and landing_text == 'scode-landing-text-a' %}
-                                <h1 class="mb-4 text-white">Protect your phone<br><span class="sub">with {{ scode.policy.user.name }}</span></h1>
+                                <h1 class="mb-4 text-white fit">Protect your phone<br><span class="sub">with {{ scode.policy.user.name }}</span></h1>
                                 <h4 class="text-zaffre h5">Connect with {{ scode.policy.user.firstname }} to get money back.</h4>
                                 <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed every year if none of you claim. Yes, really!</p>
                             {% else %}
-                                <h1 class="mb-4 text-white">Friends like {{ scode.policy.user.name }}<br><span class="sub">are the best</span></h1>
+                                <h1 class="mb-4 text-white fit">Friends like {{ scode.policy.user.name }}<br><span class="sub">are the best</span></h1>
                                 <h4 class="text-zaffre h5">Join forces with your friends and family to save big on your phone insurance.</h4>
                                 <p class="mb-4 text-white">We're rewarding our careful customers. If you, Joanna and your connections are careful and don't claim all year, you can get up to 80% of your money back. Yes really!</p>
                             {% endif %}
                         {% else %}
-                            <h1 class="mb-4 text-white">Mobile Insurance <br><span class="sub">that's Simply Better</span></h1>
+                            <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub">that's Simply Better</span></h1>
                             <h4 class="text-zaffre">Simple terms, pain-free claims, premium cover</h4>
                             <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed to you every year. Yes, really!</p>
                         {% endif %}
