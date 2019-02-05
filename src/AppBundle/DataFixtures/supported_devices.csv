@@ -473,6 +473,7 @@ AllView,E4,E4,E4
 AllView,E4 Lite,E4_Lite,E4_Lite
 AllView,P10 Life,P10_Life,P10_Life
 AllView,P10 Max,P10_Max,P10_Max
+AllView,P10 Mini,P10_Mini,P10_Mini
 AllView,P10 Pro,P10_Pro,P10_Pro
 AllView,P10_Style,P10_Style,P10_Style
 AllView,P4 Pro,P4_Pro,P4_Pro
@@ -607,6 +608,7 @@ Alphascan,SAT2242 WorkTab,ADP_WW,G2SMNT
 Altice,ALTICE S60,S60,S60
 Altice,ALTICE S70,S70,S70
 Altice,AlTICE S11,S11,S11
+Altice,AlTICE S12,S12,S12
 Altice,Altice S21,STARNAUTE4,STARNAUTE4
 Altice,S22,S22,S22
 Altice,S31,S31,Altice_S31
@@ -1522,6 +1524,7 @@ Azumi,A40 Style Plus,A40_Style_Plus,A40_Style_Plus
 Azumi,A40C,A40C,A40C
 Azumi,A50 Style Plus,A50_Style_Plus,A50_Style_Plus
 Azumi,A50LT,A50LT,A50LT
+Azumi,A53,Azumi_A53,A53
 Azumi,AT7,AT7,AT7
 Azumi,AX5,AX5,Azumi AX5
 Azumi,AZUMI KIREI A5D,KIREI_A5_D,Azumi KIREI A5 D
@@ -1838,6 +1841,7 @@ Bentley,Tab,sdis1,BENTLEY ENTERTAINMENT TABLET
 Bertoli,B20X,B20X,B20X
 Best Buy,Transformer Pad (TF103C),K010,K010
 Beyond,MAX4,MAX4,MAX4
+Beyond,SURVE,SURVE,SURVE
 Beyond,WIN,WIN,WIN
 Bigben,BB8252,Bigben-TAB,BB8252
 Bigben,GAMETAB-ONE,GAMETAB-ONE,GAMETAB-ONE
@@ -10341,6 +10345,7 @@ Laiq,Glow,Glow,Glow
 Laiq,STARTRAIL 8,STARTRAIL,STARTRAIL 8
 Lamborghini,SDIS1,sdis1,Lamborghini tablet
 Land Rover,Explore,LRExplore,Land Rover Explore
+Landbyte,LT5030,LT5030,LT5030
 Landbyte,Lt6248,Lt6248,Lt6248
 Lanix,Alpha_950,Alpha_950,Alpha 950
 Lanix,Alpha_950XL,Alpha_950XL,Alpha 950XL
@@ -10477,6 +10482,7 @@ Lava,R2,R2,R2
 Lava,R3,R3,R3
 Lava,T101,T101,T101
 Lava,T71,T71,T71
+Lava,T71_w,T71_w,T71_w
 Lava,V2 3GB,V23GB,V23GB
 Lava,V2s,V2s,V2s
 Lava,V2s,V2s,V2s M
@@ -11017,6 +11023,7 @@ Lenovo,Lenovo Tab E7,TB7104I,Lenovo TB-7104I
 Lenovo,Lenovo Tab M10,X605F,Lenovo TB-X605F
 Lenovo,Lenovo Tab M10,X605L,Lenovo TB-X605L
 Lenovo,Lenovo Tab M10,X705L,Lenovo TB-X705L
+Lenovo,Lenovo Tab V7,PB-6505M,Lenovo PB-6505M
 Lenovo,Lenovo Tab V7,PB-6505NC,Lenovo PB-6505NC
 Lenovo,Lenovo Tab4 10 Plus,X704A,TB-X704A
 Lenovo,Lenovo X2-CU/VIBE X2,X2-CU,Lenovo X2-CU
@@ -12267,10 +12274,12 @@ Mobiwire,H,Halona,Halona
 Mobiwire,HALONA,Halona,Halona
 Mobiwire,Hawk from EE,Hawk_from_EE,Hawk_from_EE
 Mobiwire,Hotah,Hotah,Hotah
+Mobiwire,Kicka 5 Plus,Kicka_5_Plus,Kicka 5 Plus
 Mobiwire,Kiona,Kiona,Kiona
 Mobiwire,Kohana,Kohana,Kohana
 Mobiwire,Kosumi,Kosumi,Kosumi
 Mobiwire,Kwanita,Kwanita,KWANITA
+Mobiwire,Lonan,Lonan,Lonan
 Mobiwire,MobiWire Halona,Halona,Halona
 Mobiwire,MobiWire Kanuna,Kanuna_MobiWire,KANUNA
 Mobiwire,MobiWire Kaya,Kaya_EU_SKU1,KAYA
@@ -12752,6 +12761,7 @@ Multilaser,M7I-3G,astar-ococci,ML01-M7S-Quad-Core
 Multilaser,M7SQC Plus,M7SQC_Plus,M7SQC_Plus
 Multilaser,M7s Dual Core,NB116_NB117_NB118,M7s Dual ML03
 Multilaser,M7s Quad Core,astar-ococci,ML01-M7S-Quad-Core
+Multilaser,M9 3G,ML-WI16-M9_3G,M9_3G
 Multilaser,M9-3G,M9-3G,M9-3G
 Multilaser,M9-3G,ML-SO-M9-3G,ML-SO-M9-3G
 Multilaser,M9-3G,ML-WI-M9-3G,ML-WI-M9-3G
@@ -12826,6 +12836,7 @@ MyPhone (PL),myPhone_Prime_2,myPhone_Prime_2,Prime 2
 Myphone,CITY XL,myPhone_CityXL,CityXL
 Myphone,CITY XL,myPhone_CityXL,myPhone CityXL
 Myphone,CUBE,myphone_cube,myPhone Cube
+Myphone,FUN_18x9,myPhone_FUN_18x9_EEA,myPhone_FUN_18x9_EEA
 Myphone,Fun 18x9,FUN_18x9,FUN_18x9
 Myphone,Fun 6 Lite,Fun6Lite,myPhone_Fun6Lite
 Myphone,Fusion5_F803B,Fusion5_F803B,Fusion5_F803B
@@ -12892,6 +12903,7 @@ Myphone,myNX1,myNX1,myNX1
 Myphone,myPhone,Hammer_Active2_LTE,Hammer_Active2_LTE
 Myphone,myPhone  Q-Smart III Plus,Q-Smart_III_Plus,Q-Smart_III_Plus
 Myphone,myPhone FUN7 LTE,myPhone_Fun_7_LTE,myPhone_Fun_7_LTE
+Myphone,myPhone_Fun_8,myPhone_Fun_8,myPhone_Fun_8
 Myphone,myPhone_Pocket_2,myPhone_Pocket_2,Pocket_2
 Myphone,myT3 DTV,myT3_DTV,myT3 DTV
 Myphone,myT5 DTV,myT5_DTV,myT5 DTV
@@ -15106,6 +15118,7 @@ Reeder,P10SE,P10SE,P10SE
 Reeder,P12 Curve,P12Curve,P12Curve
 Reeder,P13,P13,P13
 Reeder,P13_Black,P13_Black,P13_Black
+Reeder,P13_Lite,P13_Lite,P13_Lite
 Reeder,P9C,P9C,P9C
 Reeder,Preo P3,Preo_P3,Preo P3
 Reeder,T8,reeder_T8,reeder_T8
@@ -18549,6 +18562,7 @@ Sts-tottori,TAB-A03,TAB-A03,TAB-A03-SD
 Stylo,Destiny,Destiny,Destiny
 Stylo,Luna,Luna,Luna
 Stylo,Onyx,Onyx,Onyx
+Stylo,S49 MONO,S49_MONO,S49 MONO
 Stylo,S49_POISE,S49_POISE,S49_POISE
 Stylo,S50_BOLD,S50_BOLD,S50_BOLD
 Stylo,S53_STARK,S53_STARK,S53_STARK
@@ -20339,6 +20353,7 @@ Turbopad,S5,S5,S5
 Turbopad,TurboX,TurboX_Ray,TurboX_Ray
 Turbopad,Turbopad1016,Turbopad1016,Turbopad1016
 Turk Telekom,E4,722T,E4
+ULCOOL,U1,U1,U1
 UNILORIN,UNI10IN,UNI10IN,UNI10IN
 UNOWHY,QOOQ,QOOQ,QOOQ
 UNOWHY,QOOQ,QOOQ-V41,QOOQ-V41
@@ -20456,6 +20471,7 @@ Venso,CX-508,CX-508,CX-508
 Venso,Venso CX-551,Venso_CX_551,Venso CX-551
 Venturer,Mariner 10 Pro,CT9A03W23,CT9A03W23
 Venturer,i7,RCT6773W22,i7
+Venus,V1401,V1401,V1401
 Venus,V5,V5,V5
 Venus,V5Plus,V5_Plus,V5_Plus
 Venus,V5Plus Lite,V5_Plus_Lite,V5_Plus_Lite
