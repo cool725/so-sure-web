@@ -259,7 +259,7 @@ class MailerService
     public function trustpilot(Policy $policy, $template)
     {
         $body = $this->templating->render(
-            'AppBundle:Email:trustpilot.html.twig',
+            'AppBundle:Email:system/trustpilot.html.twig',
             ['policy' => $policy, 'template_id' => $template]
         );
 

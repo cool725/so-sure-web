@@ -152,6 +152,7 @@ class EmailDebugCommand extends ContainerAwareCommand
             'policy' => [
                 'policy/new',
                 'policy/skippedRenewal',
+                'policy/trustpilot',
                 'policy/detectedImei',
             ],
             'card' => [
@@ -180,9 +181,6 @@ class EmailDebugCommand extends ContainerAwareCommand
                 'picsure/accepted',
                 'picsure/rejected',
                 'picsure/invalid',
-            ],
-            'system' => [
-                'system/trustpilot',
             ],
         ];
         $variations = [
