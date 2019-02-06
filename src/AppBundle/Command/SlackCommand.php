@@ -271,19 +271,20 @@ class SlackCommand extends ContainerAwareCommand
             $startOfDay
         );
         $total = end($cumulativeReport)["close"];
-        $activeToYesterday = $repo->countAllActivePolicies($yesterday);
-        $daily = $repo->countAllActivePolicies($startOfDay) - $activeToYesterday;
-        $dailyTotal = $total - $activeToYesterday;
+        $gross = $total - $repo->countAllActivePolicies($yesterday);
+        $cooloff = $repo->countAllEndingPolicies(Policy::CANCELLED_COOLOFF, $yesterday, $startOfDay);
+        $cancellations = $repo->countEndingByStatus(Policy::STATUS_CANCELLED, $yesterday, $startOfDay);
         $weekStart = $repo->countAllActivePolicies($start);
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
         $weekTargetIncCancellations = 1.2 * $weekTarget;
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\n\nLast 24 hours (exc cancellations): *%d*\nLast 24 hours (inc cancellations): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
+            "*%s*\n\nGross Policies (last 24 hours): *%d*\nNet Policies (last 24 hours): *%d*\nNon cooloff cancellations (last 24 hours): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
             $weekText,
-            $daily,
-            $dailyTotal,
+            $gross,
+            $gross - $cooloff,
+            $cancellations - $cooloff,
             $weekTarget,
             $weekTargetIncCancellations,
             $total - $weekStart,

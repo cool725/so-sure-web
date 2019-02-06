@@ -63,7 +63,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstPaymentDateUnpaid()
+    public function testGetFirstPaymentDatePolicyUnpaid()
     {
         $user = new User();
         $policy = new PhonePolicy();
@@ -88,11 +88,11 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $this->assertEquals(
             new \DateTime('2018-03-12'),
-            $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-03-06'))
+            $bankAccount->getFirstPaymentDateForPolicy($policy, new \DateTime('2018-03-06'))
         );
     }
 
-    public function testGetFirstPaymentDatePaid()
+    public function testGetFirstPaymentDateForPolicyPaid()
     {
         $user = new User();
         $policy = new PhonePolicy();
@@ -121,11 +121,11 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $this->assertEquals(
             new \DateTime('2018-04-05 00:00', SoSure::getSoSureTimezone()),
-            $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-03-06'))
+            $bankAccount->getFirstPaymentDateForPolicy($policy, new \DateTime('2018-03-06'))
         );
     }
 
-    public function testGetFirstPaymentDateCloseToBacs()
+    public function testGetFirstPaymentDateForPolicyCloseToBacs()
     {
         $user = new User();
         $policy = new PhonePolicy();
@@ -154,7 +154,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $bankAccount = new BankAccount();
         $this->assertEquals(
             new \DateTime('2018-04-10'),
-            $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-04-04'))
+            $bankAccount->getFirstPaymentDateForPolicy($policy, new \DateTime('2018-04-04'))
         );
     }
 
