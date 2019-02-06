@@ -718,6 +718,7 @@ services:
             - "@aws.s3"
             - "%kernel.environment%"
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "%online%"
 
     app.router:
         alias: AppBundle\Service\RouterService

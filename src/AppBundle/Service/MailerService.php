@@ -51,6 +51,9 @@ class MailerService
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var bool */
+    protected $uploadEmail;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -83,6 +86,7 @@ class MailerService
      * @param S3Client         $s3Client
      * @param string           $environment
      * @param DocumentManager  $dm
+     * @param boolean          $uploadEmail
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -94,7 +98,8 @@ class MailerService
         MixpanelService $mixpanelService,
         S3Client $s3Client,
         $environment,
-        DocumentManager $dm
+        DocumentManager $dm,
+        $uploadEmail
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
@@ -106,6 +111,7 @@ class MailerService
         $this->s3 = $s3Client;
         $this->environment = $environment;
         $this->dm = $dm;
+        $this->uploadEmail = $uploadEmail;
     }
 
     public function sendTemplateToUser(
@@ -245,7 +251,7 @@ class MailerService
 
         $mailer->send($message);
 
-        if ($user) {
+        if ($this->uploadEmail && $user) {
             $this->uploadS3($user, $to, $subject, $message->toString());
         }
 

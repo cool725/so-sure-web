@@ -113,9 +113,12 @@ class BaseImeiService
                 continue;
             }
 
-            // If the policy has already been persisted we do not want to consider it a duplicate of itself.
-            if ($original && $original->getId() === $policy->getId()) {
-                continue;
+            // Extra checks if we are checking with a specific policy in mind.
+            if ($original) {
+                $ancestor = $original->getPreviousPolicy();
+                if ($original->getId() === $policy->getId() || ($ancestor && $ancestor->getId() === $policy->getId())) {
+                    continue;
+                }
             }
 
             // TODO: may want to allow a new policy if within 1 month of expiration and same user

@@ -1340,6 +1340,22 @@
                         </form>
                     </td>
                 </tr>
+                <tr>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Invalid Imei</td>
+                    <td>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {% if policy.invalidImei %}IMEI has been flagged as invalid. User needs to provide proof of purchase.
+                                {% else %}IMEI is valid
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#invalidImeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
                 {% if is_granted('ROLE_ADMIN') %}
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
@@ -1877,6 +1893,7 @@
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:invalidImeiForm', 'params': {'id': policy.id }, 'id': 'invalidImeiForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_ADMIN') %}

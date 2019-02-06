@@ -19,7 +19,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
-                        <h1 class="mb-4 text-white">
+                        <h1 class="mb-4 text-white fit">
                             <span class="sub">An insurance company,</span><br>
                             giving you money back.<br>
                             <span class="sub">Sorry, what!?</span>
@@ -219,7 +219,10 @@
         </div>
     </section>
 
-    <section class="reviews py-lg-5">
+    {# Reviews #}
+    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
+
+ {#    <section class="reviews py-lg-5">
         <div class="container container-xtra py-5">
             <div class="row">
                 <div class="col-lg-6">
@@ -299,13 +302,6 @@
                         </ul>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-{#     <section class="banner blue-gradient py-5">
-        <div class="container container-xtra">
-            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
             </div>
         </div>
     </section> #}

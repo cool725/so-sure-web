@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
@@ -19,6 +20,7 @@ use AppBundle\Form\Type\BacsCreditType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\DetectedImeiType;
+use AppBundle\Form\Type\InvalidImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
@@ -859,6 +861,61 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $this->addFlash(
                         'success',
                         sprintf('Policy %s detected imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/invalid-imei-form/{id}", name="invalid_imei_form")
+     * @Template
+     */
+    public function invalidImeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $invalidImei = new InvalidImei();
+        $invalidImei->setPolicy($policy);
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', InvalidImeiType::class, $invalidImei)
+            ->setAction($this->generateUrl(
+                'invalid_imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    /** @var PolicyService $policyService */
+                    $policyService = $this->get('app.policy');
+
+                    $policyService->setInvalidImei(
+                        $policy,
+                        $invalidImei->hasInvalidImei(),
+                        $this->getUser(),
+                        $invalidImei->getNote()
+                    );
+
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s invalid imei updated.', $policy->getPolicyNumber())
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);

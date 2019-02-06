@@ -1155,6 +1155,29 @@ class PolicyService
 
     /**
      * @param PhonePolicy $policy
+     * @param boolean     $invalidImei
+     * @param User        $adminUser
+     * @param string      $notes
+     */
+    public function setInvalidImei(PhonePolicy $policy, $invalidImei, User $adminUser, $notes)
+    {
+        $policy->setInvalidImei($invalidImei);
+
+        $policy->addNoteDetails(
+            $notes,
+            $adminUser,
+            'Invalid IMEI Update'
+        );
+        $this->dm->flush();
+
+        // only email user if its invalid
+        if ($invalidImei) {
+            $this->invalidImeiEmail($policy);
+        }
+    }
+
+    /**
+     * @param PhonePolicy $policy
      */
     public function detectedImeiEmail(PhonePolicy $policy)
     {
@@ -1167,6 +1190,25 @@ class PolicyService
             ['policy' => $policy],
             sprintf('%s.txt.twig', $baseTemplate),
             ['policy' => $policy]
+        );
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     */
+    public function invalidImeiEmail(PhonePolicy $policy)
+    {
+        $baseTemplate = 'AppBundle:Email:policy/invalidImei';
+
+        $this->mailer->sendTemplateToUser(
+            sprintf('Important Information regarding your so-sure Policy %s', $policy->getPolicyNumber()),
+            $policy->getUser(),
+            sprintf('%s.html.twig', $baseTemplate),
+            ['policy' => $policy],
+            sprintf('%s.txt.twig', $baseTemplate),
+            ['policy' => $policy],
+            null,
+            'bcc@sosure.com'
         );
     }
 

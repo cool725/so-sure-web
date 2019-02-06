@@ -637,6 +637,26 @@ abstract class Policy
         return $payments;
     }
 
+    public function getSortedPayments($mostRecent = true, \DateTime $date = null)
+    {
+        $payments = $this->getPayments($date);
+
+        if ($mostRecent) {
+            // sort more recent to older
+            usort($payments, function ($a, $b) {
+                return $a->getDate() < $b->getDate();
+            });
+        } else {
+            // sort older to more recent
+            usort($payments, function ($a, $b) {
+                return $a->getDate() > $b->getDate();
+            });
+        }
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments;
+    }
+
     /**
      * @return ArrayCollection
      */
@@ -840,8 +860,10 @@ abstract class Policy
         $invoiceDates = [];
         $invoiceDate = clone $this->start;
         for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
-            $invoiceDates[] = clone $invoiceDate;
-            $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+            if ($invoiceDate <= $this->getEnd()) {
+                $invoiceDates[] = clone $invoiceDate;
+                $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+            }
         }
 
         return $invoiceDates;
@@ -853,6 +875,10 @@ abstract class Policy
             $date = $this->now();
         }
 
+        if ($this->getStatus() == Policy::STATUS_CANCELLED) {
+            return $this->getProratedPremium($this->getEnd());
+        }
+
         $invoiceSchedule = $this->getInvoiceSchedule();
         if (!$invoiceSchedule) {
             return null;
@@ -862,6 +888,24 @@ abstract class Policy
             if ($invoiceDate < $date) {
                 $total += $this->getPremiumInstallmentPrice();
             }
+        }
+
+        return $total;
+    }
+
+    public function getInvoiceAmountTotal()
+    {
+        if ($this->getStatus() == Policy::STATUS_CANCELLED) {
+            return $this->getProratedPremium($this->getEnd());
+        }
+
+        $invoiceSchedule = $this->getInvoiceSchedule();
+        if (!$invoiceSchedule) {
+            return null;
+        }
+        $total = 0;
+        foreach ($invoiceSchedule as $invoiceDate) {
+            $total += $this->getPremiumInstallmentPrice();
         }
 
         return $total;
@@ -5199,7 +5243,7 @@ abstract class Policy
     public function getSupportWarnings()
     {
         // @codingStandardsIgnoreStart
-        $warnings = ['Ensure DPA is validated (Intercom - DPA message). If cancellation requested, and DPA not validated, referrer to Dylan for retention.'];
+        $warnings = [];
         // @codingStandardsIgnoreEnd
         if ($this->hasOpenClaim(true)) {
             // @codingStandardsIgnoreStart
@@ -5211,6 +5255,17 @@ abstract class Policy
         }
         if ($this->hasSuspectedFraudulentClaim()) {
             $warnings[] = sprintf('Policy has had a suspected fraudulent claim. Do NOT allow policy upgrade.');
+        }
+
+        if ($this instanceof PhonePolicy) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $this;
+
+            if ($phonePolicy->hasInvalidImei()) {
+                // @codingStandardsIgnoreStart
+                $warnings[] = 'Policy IMEI is unknown and should be requested. Proof of purchase is required prior to claim approval.';
+                // @codingStandardsIgnoreEnd
+            }
         }
 
         return $warnings;
@@ -5287,9 +5342,18 @@ abstract class Policy
         }
 
         if ($this instanceof PhonePolicy) {
+            /** @var PhonePolicy $phonePolicy */
+            $phonePolicy = $this;
+
+            if ($phonePolicy->hasInvalidImei()) {
+                // @codingStandardsIgnoreStart
+                $warnings[] = 'Policy IMEI is unknown and should be requested. Proof of purchase is required prior to claim approval.';
+                // @codingStandardsIgnoreEnd
+            }
+
             $foundSerial = false;
             $mismatch = false;
-            foreach ($this->getCheckmendCertsAsArray(false) as $key => $cert) {
+            foreach ($phonePolicy->getCheckmendCertsAsArray(false) as $key => $cert) {
                 if (isset($cert['certId']) && $cert['certId'] == 'serial') {
                     $foundSerial = true;
                     if (!isset($cert['response']['makes']) ||

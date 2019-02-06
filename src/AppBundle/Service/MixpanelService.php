@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Exception\ExternalRateLimitException;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
@@ -25,6 +26,8 @@ class MixpanelService
 {
     use ValidatorTrait;
     use DateTrait;
+
+    const CACHE_TIME = 172800;
 
     const KEY_MIXPANEL_QUEUE = 'queue:mixpanel';
 
@@ -68,6 +71,7 @@ class MixpanelService
     const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
     const EVENT_POLICY_READY = 'Policy Ready For Purchase';
+    const EVENT_COMPLETE_PLEDGE = 'Completed Pledge';
     const EVENT_LOGIN = 'Login';
     const EVENT_APP_DOWNLOAD = 'App Download';
     const EVENT_TEST = 'Tracking Test Event';
@@ -296,22 +300,22 @@ class MixpanelService
         return $this->redis->llen(self::KEY_MIXPANEL_QUEUE);
     }
 
-    public function attribution($userId)
+    public function attribution($userId, $overrideAttribution = false)
     {
         $repo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->find($userId);
 
-        return $this->attributionByUser($user);
+        return $this->attributionByUser($user, $overrideAttribution);
     }
 
-    public function attributionByEmail($email)
+    public function attributionByEmail($email, $overrideAttribution = false)
     {
         $repo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
-        return $this->attributionByUser($user);
+        return $this->attributionByUser($user, $overrideAttribution);
     }
 
     private function getCampaignAttributionDate($data, $prefix = '')
@@ -333,11 +337,8 @@ class MixpanelService
         if (!$user) {
             return null;
         }
-        $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
-        $results = $this->mixpanelData->data('engage', ['where' => $search]);
-        // If there are multiple user accounts then we have got to figure out which is the older.
+        $results = $this->getCachedEngagements($user);
         $accounts = count($results);
-        //$this->findLatestMixpanelUser($results);
         //$this->findOldestMixpanelUser($results);
         //return;
         if ($accounts > 1) {
@@ -515,7 +516,7 @@ class MixpanelService
                 }
             }
         }
-        
+
         return $users;
     }
 
@@ -1015,7 +1016,7 @@ class MixpanelService
                     if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
-                    $this->attribution($data['userId']);
+                    $this->attribution($data['userId'], isset($data['override']) ? $data['override'] : false);
                 } elseif ($action == self::QUEUE_DELETE) {
                     if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -1037,6 +1038,9 @@ class MixpanelService
                     json_encode($data),
                     $e->getMessage()
                 ));
+            } catch (ExternalRateLimitException $e) {
+                $data['processTime'] = time() + 60;
+                $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
             } catch (\Exception $e) {
                 if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
                     $data['retryAttempts'] += 1;
@@ -1054,9 +1058,9 @@ class MixpanelService
         return ['processed' => $processed, 'requeued' => $requeued];
     }
 
-    public function queueAttribution(User $user)
+    public function queueAttribution(User $user, $overrideAttribution = false)
     {
-        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), []);
+        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), ['override' => $overrideAttribution]);
     }
 
     public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
@@ -1516,6 +1520,7 @@ class MixpanelService
      * @return array|null the mixpanel user record that has the oldest event in the last year.
      *                    If there are multiple users that had events at the exact same time,
      *                    then which one you will get is undefined.
+     * @throws \Exception when there is some kind of mixpanel error other than rate limit.
      */
     private function findOldestMixpanelUser(array $mixpanelUsers)
     {
@@ -1532,8 +1537,24 @@ class MixpanelService
                 'event' => json_encode(self::$trackedEvents),
                 'where' => sprintf('properties["$distinct_id"]=="%s"', $user['$distinct_id'])
             ];
+            $cacheKey = sprintf("mixpanel:oldest:%s:%s", $user['$distinct_id'], $date->format('Ymd'));
+            $eventList = $this->redis->get($cacheKey);
+            if (!$eventList) {
+                try {
+                    $eventList = $this->mixpanelData->export($query);
+                } catch (DataExportApiException $e) {
+                    if (mb_stripos($e->getMessage(), "rate limit") !== false) {
+                        throw new ExternalRateLimitException("Mixpanel rate limit reached.");
+                    } else {
+                        throw $e;
+                    }
+                }
+                $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($eventList));
+            } else {
+                $eventList = unserialize($eventList);
+            }
             //print_r($query);
-            $eventList = $this->mixpanelData->export($query);
+
             //print_r($eventList);
             if (count($eventList) == 0) {
                 continue;
@@ -1555,5 +1576,35 @@ class MixpanelService
         }
 
         return null;
+    }
+
+    /**
+     * Gets a previously cached engagements query which will contain all events by all mixpanel users with the given
+     * email address so that we don't lose this data over and over due to mixpanel rate
+     * limiting after very few queries.
+     * @param User $user user to find
+     * @return array containing the response.
+     * @throws \Exception when there is an error in the mixpanel query other than rate limiting.
+     */
+    protected function getCachedEngagements(User $user)
+    {
+        $cacheKey = sprintf("mixpanel:user:%s", $user->getId());
+        $results = $this->redis->get($cacheKey);
+        if (!$results) {
+            $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
+            try {
+                $results = $this->mixpanelData->data('engage', ['where' => $search]);
+            } catch (DataExportApiException $e) {
+                if (mb_stripos($e->getMessage(), "rate limit") !== false) {
+                    throw new ExternalRateLimitException("Mixpanel rate limit reached.");
+                } else {
+                    throw $e;
+                }
+            }
+            $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($results));
+        } else {
+            $results = unserialize($results);
+        }
+        return $results;
     }
 }

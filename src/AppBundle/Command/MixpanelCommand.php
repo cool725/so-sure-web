@@ -95,7 +95,7 @@ class MixpanelCommand extends ContainerAwareCommand
         if ($action == 'attribution-duplicate-users') {
             $duplicateUsers = $this->mixpanelService->findDuplicateUsers();
             foreach ($duplicateUsers as $user) {
-                $this->mixpanelService->attributionByUser($user, true);
+                $this->mixpanelService->queueAttribution($user, true);
             }
             $output->writeln(sprintf('Queued update for all '.count($duplicateUsers).' users duplicated on mixpanel.'));
         } elseif ($action == 'data') {

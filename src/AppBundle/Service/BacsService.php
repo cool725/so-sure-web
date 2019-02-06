@@ -1002,6 +1002,13 @@ class BacsService
 
         $this->dm->flush();
 
+        $body = sprintf(
+            'DDIC(s) recorded [%d]. Please review and contest.',
+            $results['records']
+        );
+
+        $this->mailer->send('DDIC record - Contest', 'tech+ops@so-sure.com', $body);
+
         return $results;
     }
 

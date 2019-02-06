@@ -13,5 +13,7 @@ $('.confirmModal').on('show.bs.modal', function (event) {
 
     cases.on('click', function (e) {
         $(modal).find('.form_note').val(this.innerText);
+        // todo: get this working
+        //$(modal).find('.cases-common').check();
     });
 });
