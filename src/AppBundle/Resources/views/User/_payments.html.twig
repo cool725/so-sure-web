@@ -176,7 +176,7 @@
                             <th></th>
                         </tr>
                     </thead>
-                    {% set invoiceRemaining = policy.getInvoiceAmountTotalgetInvoiceSchedule %}
+                    {% set invoiceRemaining = policy.getInvoiceAmountTotal %}
                     {% for invoiceDate in policy.getInvoiceSchedule %}
                         <tr>
                             <td>{{ invoiceDate| date('d/m/Y', 'Europe/London') }}</td>
