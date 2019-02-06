@@ -1502,17 +1502,21 @@ class UserController extends BaseController
                             'Sorry, but that email already exists in our system. Please contact us to resolve this issue.'
                         );
                         // @codingStandardsIgnoreEnd
-
-                        return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
+                    } else {
+                        $this->getManager()->flush();
+                        $this->addFlash(
+                            'success',
+                            'Your email address is updated. You should receive an email confirmation shortly.'
+                        );
                     }
 
-                    $this->getManager()->flush();
-                    $this->addFlash(
-                        'success',
-                        'Your email address is updated. You should receive an email confirmation shortly.'
-                    );
-
-                    return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
+                    if ($policy) {
+                        return $this->redirectToRoute('user_contact_details_policy', [
+                            'policyId' => $policy->getId()
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('user_contact_details');
+                    }
                 }
             }
         }

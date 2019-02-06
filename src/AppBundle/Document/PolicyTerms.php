@@ -46,6 +46,9 @@ class PolicyTerms extends PolicyDocument
     // change of registered address; tightening terms
     const VERSION_11 = 'Version 11 January 2019';
 
+    // clarify UK or EU for phone
+    const VERSION_12 = 'Version 12 February 2019';
+
     // ensure that lastest version is last in the array
     public static $allVersions = [
         self::VERSION_0 => '1',
@@ -60,6 +63,7 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_9 => '9',
         self::VERSION_10 => '10',
         self::VERSION_11 => '11',
+        self::VERSION_12 => '12',
     ];
 
     public static function getLowExcess()

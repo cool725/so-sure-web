@@ -184,7 +184,7 @@ class PaymentService
     {
         $policy->setPaymentMethod($bacsPaymentMethod);
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
-            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser(), $date)
+            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDateForPolicy($policy, $date)
         );
         $bacsPaymentMethod->getBankAccount()->setFirstPayment(true);
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());

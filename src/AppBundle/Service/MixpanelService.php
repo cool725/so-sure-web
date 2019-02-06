@@ -1039,11 +1039,6 @@ class MixpanelService
                     $e->getMessage()
                 ));
             } catch (ExternalRateLimitException $e) {
-                $this->logger->error(sprintf(
-                    'Rate limited mixpanel (requeued in 60s) %s. Ex: %s',
-                    json_encode($data),
-                    $e->getMessage()
-                ));
                 $data['processTime'] = time() + 60;
                 $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
             } catch (\Exception $e) {
@@ -1545,16 +1540,16 @@ class MixpanelService
             $cacheKey = sprintf("mixpanel:oldest:%s:%s", $user['$distinct_id'], $date->format('Ymd'));
             $eventList = $this->redis->get($cacheKey);
             if (!$eventList) {
-                $eventList = $this->mixpanelData->export($query);
-                if (array_key_exists('error', $eventList)) {
-                    if ($eventList['error']['status'] == 429) {
+                try {
+                    $eventList = $this->mixpanelData->export($query);
+                } catch (DataExportApiException $e) {
+                    if (mb_stripos($e->getMessage(), "rate limit") !== false) {
                         throw new ExternalRateLimitException("Mixpanel rate limit reached.");
                     } else {
-                        throw new \Exception("Data access in mixpanel failed.");
+                        throw $e;
                     }
-                } else {
-                    $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($eventList));
                 }
+                $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($eventList));
             } else {
                 $eventList = unserialize($eventList);
             }
@@ -1597,17 +1592,16 @@ class MixpanelService
         $results = $this->redis->get($cacheKey);
         if (!$results) {
             $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
-            $results = $this->mixpanelData->data('engage', ['where' => $search]);
-            if (array_key_exists('error', $results)) {
-                if ($results['error']['status'] == 429) {
-                    throw new ExternalRateLimitException("Mixpanel rate limit reached in engagement query.");
+            try {
+                $results = $this->mixpanelData->data('engage', ['where' => $search]);
+            } catch (DataExportApiException $e) {
+                if (mb_stripos($e->getMessage(), "rate limit") !== false) {
+                    throw new ExternalRateLimitException("Mixpanel rate limit reached.");
                 } else {
-                    throw new \Exception(sprintf("Data access for users with email %s failed.", $user->getEmail()));
+                    throw $e;
                 }
-            } else {
-                // cache for two days.
-                $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($results));
             }
+            $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($results));
         } else {
             $results = unserialize($results);
         }
