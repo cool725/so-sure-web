@@ -345,3 +345,24 @@ redirect_iphone_insured_with_bank:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
         permanent: true
+
+redirect_sosure_vs_gadgetcover:
+    path: /so-sure-vs-gadget-cover-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_halifax:
+    path: /so-sure-vs-halifax-phone-insuranc
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_three:
+    path: /so-sure-vs-three-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
