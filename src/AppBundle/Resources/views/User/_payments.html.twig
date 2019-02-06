@@ -71,12 +71,12 @@
                         {% set displayedTotal = 0 %}
                         {% for payment in policy.getSortedPayments if payment.isVisibleUserPayment %}
                             {% set itemsHistory = itemsHistory + 1 %}
-                            {% if payment.type != 'bacs' or not payment.reversedBy %}
+                            {% if payment.type != 'bacs' or not payment.reversedBy or payment.status != 'pending' %}
                                 {% set displayedTotal = displayedTotal + payment.amount %}
                             {% endif %}
-                            <tr>
+                            <tr class="{% if payment.status == 'pending' %}table-warning{% endif %}">
                                 <td>
-                                    <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}
+                                    <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}</small>
                                 </td>
                                 <td class="h6">
                                     {{ payment.userPaymentDisplay }}
@@ -90,10 +90,18 @@
                                         <del>
                                     {% endif %}
 
+                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                        <em>
+                                    {% endif %}
+
                                     {% if payment.amount >= 0 %}
                                         &pound;{{ payment.amount | number_format(2, '.', ',') }}
                                     {% else %}
                                         &pound;{{ (0 - payment.amount) | number_format(2, '.', ',') }}
+                                    {% endif %}
+
+                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                        </em>
                                     {% endif %}
 
                                     {% if payment.type == 'bacs' and payment.reversedBy %}
@@ -107,6 +115,11 @@
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Unpaid direct debit payment. This may have been caused by using an incorrect sort code/account number or not having suffient funds in your account. Depending on your bank, this may or may not appear on your bank statement and/or result in bank charges."></i></small>
+                                    {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
+                                        <i class="fal fa-clock fa-fw text-primary"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Expected: {{ payment.getBacsReversedDate|date('d/m/Y', 'Europe/London') }}"></i>
                                     {% elseif payment.amount < 0 %}
                                         <strong><small>CR</small></strong>
                                     {% endif %}
