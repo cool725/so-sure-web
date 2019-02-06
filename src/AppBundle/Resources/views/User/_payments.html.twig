@@ -83,6 +83,9 @@
                                     {% if payment.details %}
                                         <br>
                                         <em class="sub"><small>{{ payment.details }}</small></em>
+                                    {% elseif payment.status == 'pending' %}
+                                        <br>
+                                        <em class="sub"><small>Pending</small></em>
                                     {% endif %}
                                 </td>
                                 <td align="right">
