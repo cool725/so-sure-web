@@ -69,7 +69,7 @@
                     <tbody>
                         {% set itemsHistory = 0 %}
                         {% set displayedTotal = 0 %}
-                        {% for payment in policy.payments if payment.isVisibleUserPayment %}
+                        {% for payment in policy.getSortedPayments if payment.isVisibleUserPayment %}
                             {% set itemsHistory = itemsHistory + 1 %}
                             {% if payment.type != 'bacs' or not payment.reversedBy %}
                                 {% set displayedTotal = displayedTotal + payment.amount %}
@@ -163,6 +163,9 @@
                 <div class="d-md-flex align-items-md-center justify-content-md-between p-3 bg-lily-white">
                     <div class="text-center text-md-left">Policy Number: <strong>{{ policy.policyNumber }}</strong></div>
                     <div class="text-center text-md-left">Policy Start Date: <strong>{{ policy.start| date('d/m/Y') }}</strong></div>
+                    {% if not policy.isactive %}
+                    <div class="text-center text-md-left">Policy End Date: <strong>{{ policy.end| date('d/m/Y') }}</strong></div>
+                    {% endif %}
                     <div class="text-center text-md-left">Premium to date: <strong>&pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}</strong></div>
                 </div>
                 <table class="table table-striped mb-0">
@@ -173,10 +176,18 @@
                             <th></th>
                         </tr>
                     </thead>
+                    {% set invoiceRemaining = policy.getInvoiceAmountTotalgetInvoiceSchedule %}
                     {% for invoiceDate in policy.getInvoiceSchedule %}
                         <tr>
                             <td>{{ invoiceDate| date('d/m/Y', 'Europe/London') }}</td>
-                            <td align="right">&pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}</td>
+                            <td align="right">
+                                {% if invoiceRemaining >= policy.getPremiumInstallmentPrice %}
+                                    {% set invoiceRemaining = invoiceRemaining - policy.getPremiumInstallmentPrice %}
+                                    &pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}
+                                {% else %}
+                                    &pound;{{ invoiceRemaining | number_format(2, '.', ',') }}
+                                {% endif %}
+                            </td>
                             {% if invoiceDate|date('U') < 'now'|date('U') %}
                                 <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
                             {% else %}
