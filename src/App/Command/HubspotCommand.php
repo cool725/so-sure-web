@@ -107,8 +107,6 @@ class HubspotCommand extends ContainerAwareCommand
         $queueShow = true === $input->getOption("queue-show");
         $queueClear = true === $input->getOption("queue-clear");
         $queueProcessMaxCount = (int) ($input->getOption("queue-process") ?? self::QUEUE_RATE_DEFAULT);
-        $propertiesList = $input->getOption("properties-list");
-        $propertiesSync = $input->getOption("properties-sync");
         $test = $input->getOption("test");
         if ($list) {
             $this->showContacts($output, $this->hubspot);
@@ -128,13 +126,7 @@ class HubspotCommand extends ContainerAwareCommand
         if ($requeue) {
             // TODO: should also be able to work for a specific user.
             // TODO: also who knows what the difference between normal queueing and requeueing is.
-            $this->requeueAllUsers($output, $this->hubspot);
-        }
-        if ($propertiesList) {
-            $this->propertiesList($output, $this->hubspot);
-        }
-        if ($propertiesSync) {
-            $this->propertiesSync($output);
+            $this->requeueAllUsers($output);
         }
         if ($test) {
             $this->test($output);

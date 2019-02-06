@@ -580,6 +580,14 @@ abstract class Policy
      */
     protected $participations = array();
 
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $hubspotId;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -1405,6 +1413,16 @@ abstract class Policy
     {
         $participation->setPolicy($this);
         $this->participations[] = $participation;
+    }
+
+    public function getHubspotId()
+    {
+        return $this->hubspotId;
+    }
+
+    public function setHubspotId($hubspotId)
+    {
+        $this->hubspotId = $hubspotId;
     }
 
     public function getStandardConnections()
