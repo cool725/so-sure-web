@@ -345,6 +345,8 @@ redirect_make_insurance:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
         permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
 
 redirect_make_insure:
     path: /insure/{make}
@@ -352,3 +354,5 @@ redirect_make_insure:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
         permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
