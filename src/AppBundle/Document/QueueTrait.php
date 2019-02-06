@@ -47,7 +47,7 @@ trait QueueTrait
             try {
                 $message = $this->redis->lpop($this->queueKey);
                 if (!$message) {
-                    throw new UnknownMessageException("Empty message in {$this->queueKey} queue.");
+                    break;
                 }
                 $data = unserialize($message);
                 if (!$data || !isset($data["action"])) {

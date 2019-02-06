@@ -66,10 +66,11 @@ class HubspotService
     }
 
     /**
-     * Adds a user update message to the queue.
+     * Adds a user update message to the queue. The update user action will create new users, and update those that
+     * already exist as contacts on hubspot.
      * @param User $user is the user to be updated on hubspot.
      */
-    public function queueUpdateUser(User $user)
+    public function queueUpdateContact(User $user)
     {
         $this->queue(['action' => self::QUEUE_UPDATE_USER, 'userId' => $user->getId()]);
     }
@@ -78,18 +79,104 @@ class HubspotService
      * Adds a user deletion message to the queue.
      * @param User $user is the user to be deleted on hubspot along with all their associated deals.
      */
-    public function queueDeleteUser(User $user)
+    public function queueDeleteContact(User $user)
     {
         $this->queue(['action' => self::QUEUE_DELETE_USER, 'userId' => $user->getId()]);
     }
 
     /**
-     * Adds a policy update message to the queue.
+     * Adds a policy update message to the queue. If the policy does not now exist it will be created as a deal on
+     * hubspot.
      * @param Policy $policy is the policy to be updated on hubspot.
      */
-    public function queueUpdatePolicy(Policy $policy)
+    public function queueUpdateDeal(Policy $policy)
     {
         $this->queue(['action' => self::QUEUE_UPDATE_POLICY, 'policyId' => $policy->getId()]);
+    }
+
+    /**
+     * Adds a pipeline onto hubspot.
+     * @param string $name is the name that the pipeline will be given.
+     * @param array  $stages is a list of each pipeline stage which must be formatted as hubspot requires.
+     */
+    public function syncPipeline($name, $stages)
+    {
+        $response = $this->client->contactProperties()->createGroup(
+            ["label" => $name, "stages" => $stages]
+        );
+        $this->validateResponse($response, [200, 409]);
+    }
+
+    /**
+     * If the given user already exists as a contact then update them, otherwise create them.
+     * @param User $user        the user the update will be based off of.
+     * @throws \Exception
+     */
+    public function createOrUpdateContact(User $user)
+    {
+        $hubspotUserArray = $this->buildHubspotUserDetailsData($user);
+        if (!$user->getHubspotId()) {
+            $this->createContact($user, $hubspotUserArray);
+        } else {
+            $this->updateContact($user, $hubspotUserArray);
+        }
+    }
+
+    /**
+     * Updates a contact record on hubspot.
+     * @param User  $user             is the user that we are updating.
+     * @param array $hubspotUserArray is the array of data that we are sending to hubspot.
+     * @return int the vid of the new user.
+     */
+    public function updateContact(User $user, $hubspotUserArray)
+    {
+        $response = $this->client->contacts()->update($user->getHubspotId(), $hubspotUserArray);
+        $this->validateResponse($response, 204);
+        $this->dm->persist($user);
+        return $user->getHubspotId();
+    }
+
+    /**
+     * Creates a new contact on hubspot.
+     * @param User  $user             is the user that we are basing the new contact on.
+     * @param array $hubspotUserArray contains hubspot users I guess.
+     * @return int containing the hubspot vid returned from the request.
+     * @throws \Exception if the request does not work out.
+     */
+    public function createContact(User $user, $hubspotUserArray)
+    {
+        $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
+        $response = $this->validateResponse($response, 200);
+        $user->setHubspotId($response->vid);
+        $this->dm->flush();
+        return $response->vid;
+    }
+
+    /**
+     * Requests a contact from the hubspot api via their email.
+     * @param string $email is the email address of the contact being looked for.
+     * @return Response containing hubspot's reply.
+     */
+    public function getContactByEmail(string $email)
+    {
+        return $this->client->contacts()->getByEmail($email);
+    }
+
+    /**
+     * Gets list of all the contacts from Hubspot via generator, since only a limited number can be gotten at a time.
+     * @param array $params is an optional list of parameters to add to the request.
+     * @return \Generator yielding all contacts in hubspot.
+     */
+    public function getAllContacts($params = [])
+    {
+        $params = array_merge(["count" => 100], $params);
+        do {
+            $response = $this->client->contacts()->all($params);
+            foreach ($response->contacts as $contact) {
+                yield $contact;
+            }
+            $params["vidOffset"] = $contacts["\$vid-offset"];
+        } while ($contacts["\$has-more"]);
     }
 
     /**
@@ -127,96 +214,6 @@ class HubspotService
             ["name" => $groupName, "displayName" => $displayName]
         );
         $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * Adds a pipeline onto hubspot.
-     * @param string $name is the name that the pipeline will be given.
-     * @param array  $stages is a list of each pipeline stage which must be formatted as hubspot requires.
-     */
-    public function syncPipeline($name, $stages)
-    {
-        $response = $this->client->contactProperties()->createGroup(
-            ["label" => $name, "stages" => $stages]
-        );
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * If the given user already exists as a contact then update them, otherwise create them.
-     * @param User $user        the user the update will be based off of.
-     * @param bool $allowSoSure whether to proceed if $user has a so-sure email address. defaults no.
-     * @throws \Exception
-     */
-    public function createOrUpdateContact(User $user, $allowSoSure = false)
-    {
-        if (!$user->hasEmail() || $user->hasSoSureEmail()) {
-            return;
-        }
-        $hubspotUserArray = $this->buildHubspotUserDetailsData($user);
-        if (!$user->getHubspotId()) {
-            $this->createNewHubspotContact($user, $hubspotUserArray);
-        } else {
-            $this->updateHubspotContact($user, $hubspotUserArray);
-        }
-    }
-
-    /**
-     * Updates a contact record on hubspot.
-     * @param User  $user             is the user that we are updating.
-     * @param array $hubspotUserArray is the array of data that we are sending to hubspot.
-     * @return int the vid of the new user.
-     */
-    public function updateHubspotContact(User $user, $hubspotUserArray)
-    {
-        $response = $this->client->contacts()->update($user->getHubspotId(), $hubspotUserArray);
-        $this->validateResponse($response, 204);
-        $this->dm->persist($user);
-        return $user->getHubspotId();
-    }
-
-    /**
-     * Creates a new contact on hubspot.
-     * @param User  $user             is the user that we are basing the new contact on.
-     * @param array $hubspotUserArray contains hubspot users I guess.
-     * @return int containing the hubspot vid returned from the request.
-     * @throws \Exception if the request does not work out.
-     */
-    public function createNewHubspotContact(User $user, $hubspotUserArray)
-    {
-        $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        $response = $this->validateResponse($response, 200);
-        $user->setHubspotId($response->vid);
-        $this->dm->flush();
-        return $response->vid;
-    }
-
-    /**
-     * Requests a contact from the hubspot api via their email.
-     * @param string $email is the email address of the contact being looked for.
-     * @return Response containing hubspot's reply.
-     */
-    public function getContactByEmail(string $email): Response
-    {
-        return $this->client->contacts()->getByEmail($email);
-    }
-
-    /**
-     * Gets list of all the contacts from Hubspot via generator, since only a limited number can be gotten at a time.
-     * @param array $params is an optional list of parameters to add to the request.
-     * @return \Generator yielding all contacts in hubspot.
-     */
-    public function getAllContacts($params = [])
-    {
-        $params = array_merge(["count" => 100], $params);
-        do {
-            $response = $this->client->contacts()->all($params);
-            $contacts = $response->getBody()->contacts;
-            foreach ($contacts as $contact) {
-                yield $contact;
-            }
-            $params["vidOffset"] = $response["vid-offset"];
-        } while ($response["has-more"]);
     }
 
     /**
