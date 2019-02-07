@@ -83,7 +83,6 @@ class BacsListenerTest extends WebTestCase
         $bankAccount->setAccountName('f bar');
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
         static::$dm->flush();
 
         $user->setLastName('rab');
@@ -352,7 +351,6 @@ class BacsListenerTest extends WebTestCase
             static::$dm
         );
         $bacs = new BacsPaymentMethod();
-        $user->setPaymentMethod($bacs);
         $policy = static::initPolicy(
             $user,
             static::$dm,

@@ -759,12 +759,6 @@ class JudopayServiceTest extends WebTestCase
             '1',
             json_encode(['cardLastfour' => '0000', 'endDate' => '0115'])
         );
-        if ($user->getJudoPaymentMethod()) {
-            $user->getJudoPaymentMethod()->addCardToken(
-                '1',
-                json_encode(['cardLastfour' => '0000', 'endDate' => '0115'])
-            );
-        }
         self::$dm->flush();
         $this->assertFalse($policy->hasPolicyOrUserValidPaymentMethod());
 
@@ -813,7 +807,6 @@ class JudopayServiceTest extends WebTestCase
         $this->assertTrue($policy->hasPolicyOrUserValidPaymentMethod());
 
         $policy->setPaymentMethod(null);
-        $user->setPaymentMethod(null);
         self::$dm->flush();
         $this->assertFalse($policy->hasPolicyOrUserValidPaymentMethod());
 
@@ -1461,7 +1454,6 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $policy->setPaymentMethod(new JudoPaymentMethod());
-        $user->setPaymentMethod(new JudoPaymentMethod());
 
         for ($i = 1; $i < 4; $i++) {
             $scheduledPayment = $policy->getNextScheduledPayment();
