@@ -422,6 +422,7 @@ class ApiController extends BaseController
                 );
             }
 
+            /** @var RateLimitService $rateLimit */
             $rateLimit = $this->get('app.ratelimit');
             if (!$rateLimit->allowedByDevice(
                 RateLimitService::DEVICE_TYPE_RESET,

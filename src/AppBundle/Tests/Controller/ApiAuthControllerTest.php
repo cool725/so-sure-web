@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\JudopayService;
+use AppBundle\Service\PolicyService;
 use AppBundle\Tests\UserClassTrait;
 use PhpParser\Node\Expr\AssignOp\Mul;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -58,9 +59,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     {
     }
 
-    public static function setUpBeforeClass()
+    public static function createTestUsers()
     {
-        parent::setUpBeforeClass();
         self::$testUser = self::createUser(
             self::$userManager,
             'foo@auth-api.so-sure.com',
@@ -93,7 +93,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         self::$reward->setSCode($scode);
         static::$dm->persist(self::$reward);
         static::$dm->persist($scode);
+    }
 
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        self::createTestUsers();
         $phoneRepo = static::$dm->getRepository(Phone::class);
         self::$expiredPhone = $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 4']);
 
@@ -462,11 +467,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $invitationData = $this->verifyResponse(200);
 
-        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $emailRepo = self::getDocumentManager(true)->getRepository(EmailInvitation::class);
         /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
-        self::$dm->flush();
+        $this->getDocumentManager(true)->flush();
         $this->assertTrue($invitation->canReinvite());
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
@@ -494,16 +499,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $invitationData = $this->verifyResponse(200);
 
-        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $emailRepo = self::getDocumentManager(true)->getRepository(EmailInvitation::class);
         /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
-        $policyRepo = self::$dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $policyRepo->find($policyData['id']);
-        $policy->setPotValue($policy->getMaxPot());
-        self::$dm->flush();
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $this->assertNotNull($updatedPolicy);
+        $updatedPolicy->setPotValue($updatedPolicy->getMaxPot());
+        $this->getDocumentManager(true)->flush();
         $this->assertTrue($invitation->canReinvite());
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
@@ -531,19 +536,19 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $invitationData = $this->verifyResponse(200);
 
-        $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        $emailRepo = self::getDocumentManager(true)->getRepository(EmailInvitation::class);
         /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
-        $policyRepo = self::$dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $policyRepo->find($policyData['id']);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $this->assertNotNull($updatedPolicy);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
-        $policy->addClaim($claim);
-        self::$dm->flush();
+        $updatedPolicy->addClaim($claim);
+        $this->getDocumentManager(true)->flush();
         $this->assertTrue($invitation->canReinvite());
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
@@ -665,7 +670,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $claim->setType(Claim::TYPE_THEFT);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->addClaim($claim);
-        self::$dm->flush();
+        $this->getDocumentManager(true)->flush();
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $inviteeCognitoIdentityId, $url, [
@@ -705,12 +710,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $invitationData = $this->verifyResponse(200);
 
-        // set policy to max pot value
-        $policyRepo = self::$dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $policyRepo->find($inviteePolicyData['id']);
-        $policy->setPotValue($policy->getMaxPot());
-        self::$dm->flush();
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $this->assertNotNull($updatedPolicy);
+        $updatedPolicy->setPotValue($updatedPolicy->getMaxPot());
+        $this->getDocumentManager(true)->flush();
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
         $crawler = static::postRequest(self::$client, $inviteeCognitoIdentityId, $url, [
@@ -3124,17 +3128,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
-        $repo = static::$dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $repo->find($policyData['id']);
-        $this->assertNotNull($policy);
-        if ($policy) {
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $this->assertNotNull($updatedPolicy);
+        if ($updatedPolicy) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-                'scode' => $policy->getStandardSCode() ? $policy->getStandardSCode()->getCode() : null
+                'scode' => $updatedPolicy->getStandardSCode() ? $updatedPolicy->getStandardSCode()->getCode() : null
             ]);
             $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
 
-            $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+            $updatedPolicy = $this->assertPolicyExists(self::getContainer(true), $updatedPolicy);
             $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
         }
     }
@@ -3153,23 +3156,22 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->payPolicy($user, $policyData['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyData['id']);
 
-        $repo = static::$dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $repo->find($policyData['id']);
-        $this->assertNotNull($policy);
-        if ($policy) {
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $this->assertNotNull($updatedPolicy);
+        if ($updatedPolicy) {
             $crawler = static::postRequest(
                 self::$client,
                 $cognitoIdentityId,
                 $url,
                 [
-                    'scode' => $policy->getStandardSCode() ? $policy->getStandardSCode()->getCode() : null
+                    'scode' => $updatedPolicy->getStandardSCode() ? $updatedPolicy->getStandardSCode()->getCode() : null
                 ],
                 IdentityLog::SDK_JAVASCRIPT
             );
             $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
 
-            $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+            $updatedPolicy = $this->assertPolicyExists(self::getContainer(true), $updatedPolicy);
             $this->assertCount(0, $updatedPolicy->getSentInvitations(false));
         }
     }
@@ -3395,9 +3397,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'key' => 'test/picsure-test.png',
         ]);
         $data = $this->verifyResponse(200);
-
-        // allow time for event listener to trigger and update db
-        sleep(1);
 
         /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
@@ -4229,7 +4228,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('get-user-declined', $this),
+            self::generateEmail('get-user-declined', $this, true),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
@@ -4248,11 +4247,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('Please update your card', $data['card_details']);
         $this->assertNull($data['payment_method']);
 
-        $policyService = static::$container->get('app.policy');
-        $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        $policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+        /** @var PolicyService $policyService */
+        $policyService = self::getContainer(true)->get('app.policy');
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $policyService->cancel($updatedPolicy, SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
 
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
@@ -4267,11 +4265,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('get-user-ok', $this),
+            self::generateEmail('get-user-ok', $this, true),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user, true);
         $policyData = $this->verifyResponse(200);
 
         $this->payPolicy($user, $policyData['id']);
@@ -4283,12 +4281,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertFalse($data['has_cancelled_policy']);
         $this->assertTrue($data['has_valid_policy']);
 
-        $policyService = static::$container->get('app.policy');
+        /** @var PolicyService $policyService */
+        $policyService = self::getContainer(true)->get('app.policy');
         $policyService->setDispatcher(null);
-        $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
         /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        $policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $policyService->cancel($updatedPolicy, SalvaPhonePolicy::CANCELLED_COOLOFF);
 
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
