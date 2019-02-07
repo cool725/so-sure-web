@@ -26,7 +26,7 @@ $(function(){
 
         value = removeAccents(value);
 
-        return this.optional(element) || value.match(/^[a-zA-Z]+(([ -][a-zA-Z ])?[a-zA-Z]*)*$/);
+        return this.optional(element) || value.match(/^[a-zA-Z]+\s[a-zA-Z]+\s?$/);
 
     }, 'Please enter your full name');
 
