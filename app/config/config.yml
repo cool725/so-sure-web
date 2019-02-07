@@ -726,6 +726,7 @@ nelmio_security:
                 - https://*.facebook.com
                 - https://connect.facebook.net
                 - http://*.facebook.com
+                - https://tr.snapchat.com
                 - https://vimeo.com
                 - https://*.vimeo.com
                 - https://*.hotjar.com
