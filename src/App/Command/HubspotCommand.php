@@ -31,6 +31,7 @@ class HubspotCommand extends ContainerAwareCommand
 
     const PROPERTY_NAME = "sosure";
     const PROPERTY_DESC = "Custom properties used by SoSure";
+    const LIST_NAME = "SoSure Customers";
 
     /** @var HubspotService */
     private $hubspot;
@@ -107,10 +108,10 @@ class HubspotCommand extends ContainerAwareCommand
                             $this->showContacts($output);
                             break;
                         case "properties":
-                            pass;
+                            // TODO: implement.
                             break;
                         case "deals":
-                            pass;
+                            // TODO: implement.
                             break;
                         default:
                             throw new \Exception("'{$listType}' can not be listed.");
@@ -140,7 +141,7 @@ class HubspotCommand extends ContainerAwareCommand
      * Displays all contacts on the commandline.
      * @param OutputInterface $output  is the commandline output used to display the data.
      */
-    public function showContacts(OutputInterface $output)
+    private function showContacts(OutputInterface $output)
     {
         $table = new Table($output);
         $table->setHeaders(["VID", "First Name", "Last Name"]);
@@ -158,7 +159,7 @@ class HubspotCommand extends ContainerAwareCommand
      * Gives the length of the queue.
      * @param OutputInterface $output is used to output the number.
      */
-    public function queueCount(OutputInterface $output)
+    private function queueCount(OutputInterface $output)
     {
         $count = $this->hubspot->countQueue();
         $output->writeln(sprintf("%d in queue", $count));
@@ -169,7 +170,7 @@ class HubspotCommand extends ContainerAwareCommand
      * @param int             $max    is the maximum number of queue items to show.
      * @param OutputInterface $output is used to output to the commandline.
      */
-    public function queueShow($max, OutputInterface $output)
+    private function queueShow($max, OutputInterface $output)
     {
         $data = $this->hubspot->getQueueData($max);
         $output->writeln(sprintf("Queue Size: %d", count($data)));
@@ -183,7 +184,7 @@ class HubspotCommand extends ContainerAwareCommand
      * @param InputInterface  $input  used to take user confirmation from the commandline.
      * @param OutputInterface $output used to output to the commandline.
      */
-    public function queueClear(InputInterface $input, OutputInterface $output)
+    private function queueClear(InputInterface $input, OutputInterface $output)
     {
         $this->hubspot->clearQueue();
         $output->writeln(sprintf("Queue is cleared"));
@@ -193,12 +194,12 @@ class HubspotCommand extends ContainerAwareCommand
      * Puts every single user in the database onto the queue.
      * @param OutputInterface $output  is used to output to the commandline.
      */
-    public function syncAllUsers(OutputInterface $output)
+    private function syncAllUsers(OutputInterface $output)
     {
         $count = 0;
         $users = $this->dm->getRepository(User::class)->findAll();
         foreach ($users as $user) {
-            $this->hubspot->queueContact($user);
+            $this->hubspot->queueUpdateContact($user);
             $count++;
         }
         $output->writeln(sprintf("Queued %d Users", $count));
@@ -208,7 +209,7 @@ class HubspotCommand extends ContainerAwareCommand
      * Outputs a table of all properties in huubspot.
      * @param OutputInterface $output  is used to output to the commandline.
      */
-    public function propertiesList(OutputInterface $output)
+    private function propertiesList(OutputInterface $output)
     {
         $properties = $this->hubspot->getProperties();
         $table = new Table($output);
@@ -225,27 +226,37 @@ class HubspotCommand extends ContainerAwareCommand
      * Synchronises the so sure custom properties, user list and property pipeline.
      * @param OutputInterface $output is used to output to the commandline.
      */
-    public function syncStructures(OutputInterface $output)
+    private function syncStructures(OutputInterface $output)
     {
-        $this->hubspot->syncPropertyGroup(self::PROPERTY_NAME, self::PROPERTY_DESC);
+        $this->hubspot->syncList(self::LIST_NAME);
+        $this->hubspot->syncContactPropertyGroup(self::PROPERTY_NAME, self::PROPERTY_DESC);
+        $this->hubspot->syncDealPropertyGroup(self::PROPERTY_NAME, self::PROPERTY_DESC);
         $properties = $this->buildContactPropertyList();
-        // TODO: get the list of properties that are currently on hubspot so we can nuke the ones that are no longer on
-        //       our system or whatever.
         foreach ($properties as $property) {
             $name = $property["name"];
-            if ($this->hubspot->syncProperty($property)) {
-                $output->writeln("Created <info>{$name}</info> property.");
+            if ($this->hubspot->syncContactProperty($property)) {
+                $output->writeln("Created <info>{$name}</info> contact property.");
             } else {
-                $output->writeln("Skipped <info>{$name}</info> property.");
+                $output->writeln("Skipped <info>{$name}</info> contact property.");
             }
         }
+        $properties = $this->buildDealPropertyList();
+        foreach ($properties as $property) {
+            $name = $property["name"];
+            if ($this->hubspot->syncDealProperty($property)) {
+                $output->writeln("Created <info>{$name}</info> deal property.");
+            } else {
+                $output->writeln("Skipped <info>{$name}</info> deal property.");
+            }
+        }
+        $this->hubspot->syncPipeline($this->buildPipeline());
     }
 
     /**
      * Temporary or testing functionality.
      * @param OutputInterface $output allows output to the commandline.
      */
-    public function test($output)
+    private function test($output)
     {
         $output->writeln("gday fellas. this is a test");
     }
@@ -298,6 +309,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     private function buildPipeline()
     {
+        // TODO: they need to have ordering numbers because they are currently in random order on hubspot.
         return [
             "pipelineId" => "sosure_policies",
             "label" => "So-Sure Policies",
@@ -307,8 +319,22 @@ class HubspotCommand extends ContainerAwareCommand
                 ["stagedId" => "pending", "label" => "Pending"],
                 ["stagedId" => "active", "label" => "Active"],
                 ["stagedId" => "unpaid", "label" => "Unpaid"],
-                ["stagedId" => "expired", "label" => "Expired"]
+                ["stagedId" => "expired", "label" => "Expired"],
+                ["stagedId" => "cancelled", "label" => "Cancelled"]
             ]
+        ];
+    }
+
+    /**
+     * Builds the list of custom so sure deal properties.
+     * @return array containing a list that can be sent to hubspot to create the deal properties.
+     */
+    private function buildDealPropertyList()
+    {
+        return [
+            // TODO: sort this out after figuring out the list of properties to have.
+            $this->buildPropertyProtoType("payment_type", "Payment Type"),
+            $this->buildPropertyProtoType("start", "start", "datetime")
         ];
     }
 
@@ -343,9 +369,40 @@ class HubspotCommand extends ContainerAwareCommand
             $this->buildPropertyPrototype("billing_address", "Billing address", "string", "textarea"),
             $this->buildPropertyPrototype("census_subgroup", "Estimated census_subgroup"),
             $this->buildPropertyPrototype("total_weekly_income", "Estimated total_weekly_income"),
-            $this->buildPropertyPrototype("total_weekly_income", "Estimated total_weekly_income"),
             $this->buildPropertyPrototype("attribution", "attribution"),
             $this->buildPropertyPrototype("latestattribution", "Latest attribution")
         ];
+    }
+
+    /**
+     * Builds the form that a new property description must take in order to be synced to hubspot.
+     * @param string $name      is the name of the property internally.
+     * @param string $label     is the name to show to users on hubspot.
+     * @param string $type      is the type of this property.
+     * @param string $fieldType is the type of editing it would use on mixpanel.
+     * @param bool   $formField is TODO: I dunno.
+     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
+     *                          those.
+     * @return array containing the new property data.
+     */
+    private function buildPropertyPrototype(
+        $name,
+        $label,
+        $type = "string",
+        $fieldType = "text",
+        $formField = false,
+        $options = null
+    ) {
+        $data = [
+            "name" => $name,
+            "type" => $type,
+            "fieldType" => $fieldType,
+            "formField" => $formField,
+            "groupName" => self::PROPERTY_NAME
+        ];
+        if ($options) {
+            $data["options"] = $options;
+        }
+        return $data;
     }
 }

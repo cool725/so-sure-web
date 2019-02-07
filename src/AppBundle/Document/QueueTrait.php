@@ -65,7 +65,7 @@ trait QueueTrait
                 $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "exception" => $e->getMessage()]);
                 $dropped++;
             } catch (\Exception $e) {
-                print $e->getMessage();
+                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "exception" => $e->getMessage()]);
                 $retrial = $this->queue($data, true);
                 if ($retrial) {
                     $requeued++;
@@ -113,10 +113,10 @@ trait QueueTrait
 
     /**
      * Add a message to the given queue.
-     * @param array   $value is the message to add.
+     * @param array   $data is the message to add.
      * @param boolean $retry is true if retries of the message should be counted.
      */
-    protected function queue($value, $retry = false)
+    protected function queue($data, $retry = false)
     {
         if (!isset($this->queueKey)) {
             throw new QueueException("Trying to use queue without defining \$queueKey.");

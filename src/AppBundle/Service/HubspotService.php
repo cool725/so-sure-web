@@ -31,6 +31,8 @@ class HubspotService
     const QUEUE_DELETE_USER = 'delete-user';
     const QUEUE_UPDATE_DEAL = 'update-deal';
 
+    const PIPELINE_NAME = 'SoSure Policies';
+
     /** @var LoggerInterface */
     protected $logger;
     /** @var DocumentManager */
@@ -95,61 +97,51 @@ class HubspotService
     }
 
     /**
-     * Adds a pipeline onto hubspot.
-     * @param string $name is the name that the pipeline will be given.
-     * @param array  $stages is a list of each pipeline stage which must be formatted as hubspot requires.
-     */
-    public function syncPipeline($name, $stages)
-    {
-        $response = $this->client->contactProperties()->createGroup(
-            ["label" => $name, "stages" => $stages]
-        );
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
      * If the given user already exists as a contact then update them, otherwise create them.
-     * @param User $user        the user the update will be based off of.
-     * @throws \Exception
+     * @param User $user the user the update will be based off of.
+     * @return string containing the hubspot id of the contact.
      */
     public function createOrUpdateContact(User $user)
     {
-        $hubspotUserArray = $this->buildHubspotUserDetailsData($user);
+        $hubspotUserArray = $this->buildHubspotUserData($user);
+        //print_r($hubspotUserArray);
         if (!$user->getHubspotId()) {
-            $this->createContact($user, $hubspotUserArray);
+            $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
+            $response = $this->validateResponse($response, 200);
+            $user->setHubspotId($response->vid);
+            $this->dm->flush();
+            return $response->vid;
         } else {
-            $this->updateContact($user, $hubspotUserArray);
+            $response = $this->client->contacts()->update($user->getHubspotId(), $hubspotUserArray);
+            $this->validateResponse($response, 204);
+            return $user->getHubspotId();
         }
     }
 
     /**
-     * Updates a contact record on hubspot.
-     * @param User  $user             is the user that we are updating.
-     * @param array $hubspotUserArray is the array of data that we are sending to hubspot.
-     * @return int the vid of the new user.
+     * If a given policy already exists as a hubspot deal then update it's properties, otherwise create it.
+     * @param Policy $policy is the policy that the deal represents.
+     * @return string containing the hubspot id of the deal.
      */
-    public function updateContact(User $user, $hubspotUserArray)
+    public function createOrUpdateDeal(Policy $policy)
     {
-        $response = $this->client->contacts()->update($user->getHubspotId(), $hubspotUserArray);
-        $this->validateResponse($response, 204);
-        $this->dm->persist($user);
-        return $user->getHubspotId();
-    }
-
-    /**
-     * Creates a new contact on hubspot.
-     * @param User  $user             is the user that we are basing the new contact on.
-     * @param array $hubspotUserArray contains hubspot users I guess.
-     * @return int containing the hubspot vid returned from the request.
-     * @throws \Exception if the request does not work out.
-     */
-    public function createContact(User $user, $hubspotUserArray)
-    {
-        $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        $response = $this->validateResponse($response, 200);
-        $user->setHubspotId($response->vid);
-        $this->dm->flush();
-        return $response->vid;
+        if (!$policy->getUser()->getHubspotId()) {
+            // TODO: this is likely to happen when the code is first merged but not everything has been synced yet.
+            //       a logging message would probably be better.
+            throw new \Exception("cannot create policy/deal before user/contact. Policy id: ".$policy->getId());
+        }
+        $hubspotPolicyArray = $this->buildHubspotPolicyData($policy);
+        if (!$policy->getHubspotId()) {
+            $response = $this->client->deals()->create($hubspotPolicyArray);
+            $response = $this->validateResponse($response, 200);
+            $policy->setHubspotId($response->dealId);
+            $this->dm->flush();
+            return $response->dealId;
+        } else {
+            $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
+            $this->validateResponse($response, 204);
+            return $policy->getHubspotId();
+        }
     }
 
     /**
@@ -180,26 +172,36 @@ class HubspotService
     }
 
     /**
+     * Gets a hubspot list by it's name.
+     * @param string $name is the name of the list on hubspot.
+     * @return array containing the list's parameters.
+     */
+    public function getList($name)
+    {
+        //$response = $this->client->contactLists->
+        // TODO: Seems that you must add contacts to a list rather than being able to specify the list on the contact.
+        //       also, it does not seem you can get a list by name, so we will have to figure out a way of storing the
+        //       list ID.
+        return [];
+    }
+
+    /**
      * Creates a contact list on hubspot if it does not already exist.
      * @param string $name is the name of the list that it will create.
      */
     public function syncList($name)
     {
-        $this->client->contactLists()->create(["name" => $name, "dynamic" => false]);
+        $response = $this->client->contactLists()->create(["name" => $name, "dynamic" => false]);
         $this->validateResponse($response, [200, 409]);
     }
 
     /**
      * Synchronises a contact property with hubspot.
-     * @param string $name is the name of the property to create.
-     * @param string $displayName is the name that will be shown to users of hubspot for this property.
-     * TODO: this is wrong I think
+     * @param array $property is the property we are going to create on hubspot in the correct format.
      */
-    public function syncProperty($name, $displayName)
+    public function syncContactProperty($property)
     {
-        $this->client->contactProperties()->create(
-            ["name" => $name, "displayName" => $displayName]
-        );
+        $response = $this->client->contactProperties()->create($property);
         $this->validateResponse($response, [200, 409]);
     }
 
@@ -208,7 +210,7 @@ class HubspotService
      * @param string $groupName   is the name of the group to run for.
      * @param string $displayName is the desired display name of the group.
      */
-    public function syncPropertyGroup($groupName, $displayName)
+    public function syncContactPropertyGroup($groupName, $displayName)
     {
         $response = $this->client->contactProperties()->createGroup(
             ["name" => $groupName, "displayName" => $displayName]
@@ -217,45 +219,38 @@ class HubspotService
     }
 
     /**
-     * Puts a single property into the format that hubspot wants to receive it as.
-     * @param string $name  is the name of the property.
-     * @param mixed  $value is the object that the property consists of.
-     * @return array with the property.
+     * Adds a deal property group to hubspot.
+     * @param string $groupName is the technical name of the new property group.
+     * @param string $displayName is the name that users of hubspot will see.
      */
-    public function buildProperty($name, $value)
+    public function syncDealPropertyGroup($groupName, $displayName)
     {
-        return ['property' => $name, 'value' => $value];
+        $response = $this->client->dealProperties()->createGroup(
+            ["name" => $groupName, "displayName" => $displayName]
+        );
+        $this->validateResponse($response, [200, 409]);
     }
 
     /**
-     * Builds the form that a new property description must take in order to be synced to hubspot.
-     * @param string $name      is the name of the property internally.
-     * @param string $label     is the name to show to users on hubspot.
-     * @param string $type      is the type of this property.
-     * @param string $fieldType is the type of editing it would use on mixpanel.
-     * @param bool   $formField is TODO: I dunno.
-     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
-     *                          those.
-     * @return array containing the new property data.
+     * Adds a deal property to hubspot.
+     * @param array $property is the content of the new property.
      */
-    public function buildPropertyPrototype(
-        $name,
-        $label,
-        $type = "string",
-        $fieldType = "text",
-        $formField = false,
-        $options = null
-    ) {
-        $data = [
-            "name" => $name,
-            "type" => $type,
-            "fieldType" => $fieldType,
-            "formField" => $formField
-        ];
-        if ($options) {
-            $data["options"] = $options;
-        }
-        return $data;
+    public function syncDealProperty($property)
+    {
+        $response = $this->client->dealProperties()->create($property);
+        $this->validateResponse($response, [200, 409]);
+    }
+
+    /**
+     * Adds a pipeline onto hubspot.
+     * @param string $name is the name that the pipeline will be given.
+     * @param array  $stages is a list of each pipeline stage which must be formatted as hubspot requires.
+     */
+    public function syncPipeline($pipeline)
+    {
+        // TODO: complains when you make the same pipeline twice, should update the pipeline.
+        $response = $this->client->dealPipelines()->create($pipeline);
+        $this->validateResponse($response, [200, 409]);
     }
 
     /**
@@ -268,15 +263,21 @@ class HubspotService
         switch ($message["action"]) {
             case self::QUEUE_UPDATE_USER:
                 $user = $this->userFromMessage($message);
-                $this->updateContact($user);
+                $this->createOrUpdateContact($user);
+                foreach ($user->getPolicies() as $policy) {
+                    $this->createOrUpdateDeal($policy);
+                }
                 break;
             case self::QUEUE_DELETE_USER:
                 $user = $this->userFromMessage($message);
                 $this->deleteContact($user);
+                foreach ($user->getPolicies() as $policy) {
+                    $this->deleteDeal($policy);
+                }
                 break;
             case self::QUEUE_UPDATE_DEAL:
                 $user = $this->userFromMessage($message);
-                $this->updateDeal($policy);
+                $this->createOrUpdateDeal($policy);
                 break;
             default:
                 throw new UnknownMessageException(sprintf('Unknown message in queue %s', json_encode($message)));
@@ -333,17 +334,55 @@ class HubspotService
     private function validateResponse(Response $response, $desired)
     {
         $code = $response->getStatusCode();
-        if (is_array($desired) && in_array($code, $desired) || $code === $desired) {
+        if (!is_array($desired)) {
+            $desired = [$desired];
+        }
+        if (in_array($code, $desired)) {
             return json_decode($response->getBody()->getContents());
         } elseif ($code === 429) {
             // TODO: next time I merge master there is an exception I made for this and use catch it up in the process
             //       function like it does in mixpanel service to requeue unconditionally.
+            //       Must also put that in the queue trait.
             throw new \Exception("Hubspot rate limited.");
         } else {
-            throw new \Exception(
-                "Hubspot request returned status {$code} instead of {$desired}. ".$response->getBody()
-            );
+            throw new \Exception("Hubspot request returned status {$code}. ".$response->getBody());
         }
+    }
+
+    /**
+     * Collates the full set of data needed to create or update a hubspot deal based on a policy.
+     * @param Policy $policy is the policy whose data is being used.
+     * @return array containing the data formatted for sending to the hubspot apis.
+     */
+    private function buildHubspotPolicyData(Policy $policy)
+    {
+        $stage = "pre-pending";
+        $status = $policy->getStatus();
+        if ($status == Policy::STATUS_PENDING) {
+            $stage = "pending";
+        } elseif ($status == Policy::STATUS_ACTIVE) {
+            $stage = "active";
+        } elseif ($status == Policy::STATUS_UNPAID) {
+            $stage = "unpaid";
+        } elseif ($status == Policy::STATUS_CANCELLED) {
+            $stage = "cancelled";
+        } elseif ($status == Policy::STATUS_EXPIRED) {
+            $stage = "expired";
+        }
+        return [
+            "associations" => [
+                "associatedVids" => [$policy->getUser()->getHubspotId()]
+            ],
+            "properties" => [
+                $this->buildProperty("dealname", $policy->getPolicyNumber()),
+                $this->buildProperty("dealstage", $stage),
+                $this->buildProperty("pipeline", self::PIPELINE_NAME),
+                $this->buildProperty("payment_type", $policy->getPaymentType()),
+                $this->buildProperty("start", $policy->getStart()->format("U"))
+                // TODO: Probably going to want more deal properties.
+                //       Would be nice to use the premium value as the deal amount maybe.
+            ]
+        ];
     }
 
     /**
@@ -351,13 +390,12 @@ class HubspotService
      * @param User $user is the user that the data will be based on.
      * @return array of the data.
      */
-    private function getHubspotUserData(User $user)
+    private function buildHubspotUserData(User $user)
     {
         $data = array_merge(
             $this->buildHubspotUserDetailsData($user),
             $this->buildHubspotAddressData($user),
-            $this->buildHubspotMiscData($user),
-            $this->buildHubspotLifecycleStageData($user)
+            $this->buildHubspotMiscData($user)
         );
         return $data;
     }
@@ -374,7 +412,7 @@ class HubspotService
             $this->buildProperty("lastname", $user->getLastName()),
             $this->buildProperty("email", $user->getEmailCanonical()),
             $this->buildProperty("mobilephone", $user->getMobileNumber()),
-            $this->buildProperty("gender", $user->getGender()),
+            $this->buildProperty("gender", $user->getGender() ?: "no"),
         ];
         if ($user->getBirthday()) {
             $data[] = $this->buildProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
@@ -411,13 +449,24 @@ class HubspotService
     {
         $hasFacebook = $user->getFacebookId() == true;
         $data = [
-            $this->hubspotProperty("attribution", $user->getAttribution() ?: ''),
-            $this->hubspotProperty("latestattribution", $user->getLatestAttribution() ?: ''),
-            $this->hubspotProperty("facebook", $hasFacebook ? "yes" : "no"),
+            $this->buildProperty("attribution", $user->getAttribution()),
+            $this->buildProperty("latestattribution", $user->getLatestAttribution()),
+            $this->buildProperty("facebook", $hasFacebook ? "yes" : "no"),
         ];
         if ($hasFacebook) {
-            $data['hs_facebookid'] = $this->hubspotProperty("hs_facebookid", $user->getFacebookId());
+            $data['hs_facebookid'] = $this->buildProperty("hs_facebookid", $user->getFacebookId());
         }
         return $data;
+    }
+
+    /**
+     * Puts a single property into the format that hubspot wants to receive it as.
+     * @param string $name  is the name of the property.
+     * @param mixed  $value is the object that the property consists of.
+     * @return array with the property.
+     */
+    private function buildProperty($name, $value)
+    {
+        return ['property' => $name, 'value' => $value ?: ''];
     }
 }
