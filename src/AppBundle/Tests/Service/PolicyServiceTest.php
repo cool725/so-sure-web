@@ -512,7 +512,6 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
-        static::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS, true);
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
         $phone = $policy->getPhone();
         static::$paymentService->confirmBacs($policy, $policy->getPolicyOrUserBacsPaymentMethod(), $date);
@@ -3998,7 +3997,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             new \DateTime('2016-01-01')
         );
-        self::setBacsPaymentMethod($policyA->getUser());
+        self::setBacsPaymentMethodForPolicy($policyA);
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(10, $policyA->getPotValue());
@@ -5574,30 +5573,52 @@ class PolicyServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\DuplicateImeiException
+     * @expectedException \AppBundle\Exception\DuplicateImeiException
      */
     public function testCreateWithDuplicateImei()
     {
         $imei = static::generateRandomImei();
-        $a = $this->preparePolicy($imei);
-        static::$policyService->create($a);
-        $b = $this->preparePolicy($imei);
-        static::$policyService->create($b);
-    }
 
-    /**
-     * Makes a policy object which is ready to be created by the policyservice, but has not been just yet.
-     * @param String $imei is the imei number to give the policy.
-     * @return Policy the new policy.
-     */
-    private function preparePolicy($imei)
-    {
-        $policy = static::createUserPolicy(false, null, false, null, $imei);
-        $phone = self::getRandomPhone(self::$dm);
-        $policy->setPhone($phone, new \DateTime());
-        static::$dm->persist($policy);
-        static::$dm->persist($policy->getUser());
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateWithDuplicateImeiA', $this),
+            'bar',
+            static::$dm
+        );
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateWithDuplicateImeiB', $this),
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true,
+            false,
+            true,
+            $imei
+        );
+        self::setPaymentMethodForPolicy($policyA);
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
         static::$dm->flush();
-        return $policy;
+
+        $policyB = static::initPolicy(
+            $userB,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true,
+            false,
+            true,
+            $imei
+        );
+        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policyB, new \DateTime('2016-01-01'), true);
     }
 }

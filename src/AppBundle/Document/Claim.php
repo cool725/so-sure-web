@@ -1998,6 +1998,10 @@ class Claim
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
+        if ($policy->hasInvalidImei()) {
+            return true;
+        }
+
         // TODO: Consider if we should be using claim FNOL pic-sure validation
         // or current policy pic-sure validation
         return $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();

@@ -637,6 +637,26 @@ abstract class Policy
         return $payments;
     }
 
+    public function getSortedPayments($mostRecent = true, \DateTime $date = null)
+    {
+        $payments = $this->getPayments($date);
+
+        if ($mostRecent) {
+            // sort more recent to older
+            usort($payments, function ($a, $b) {
+                return $a->getDate() < $b->getDate();
+            });
+        } else {
+            // sort older to more recent
+            usort($payments, function ($a, $b) {
+                return $a->getDate() > $b->getDate();
+            });
+        }
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments;
+    }
+
     /**
      * @return ArrayCollection
      */
@@ -840,8 +860,10 @@ abstract class Policy
         $invoiceDates = [];
         $invoiceDate = clone $this->start;
         for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
-            $invoiceDates[] = clone $invoiceDate;
-            $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+            if ($invoiceDate <= $this->getEnd()) {
+                $invoiceDates[] = clone $invoiceDate;
+                $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+            }
         }
 
         return $invoiceDates;
@@ -853,6 +875,10 @@ abstract class Policy
             $date = $this->now();
         }
 
+        if ($this->getStatus() == Policy::STATUS_CANCELLED) {
+            return $this->getProratedPremium($this->getEnd());
+        }
+
         $invoiceSchedule = $this->getInvoiceSchedule();
         if (!$invoiceSchedule) {
             return null;
@@ -862,6 +888,24 @@ abstract class Policy
             if ($invoiceDate < $date) {
                 $total += $this->getPremiumInstallmentPrice();
             }
+        }
+
+        return $total;
+    }
+
+    public function getInvoiceAmountTotal()
+    {
+        if ($this->getStatus() == Policy::STATUS_CANCELLED) {
+            return $this->getProratedPremium($this->getEnd());
+        }
+
+        $invoiceSchedule = $this->getInvoiceSchedule();
+        if (!$invoiceSchedule) {
+            return null;
+        }
+        $total = 0;
+        foreach ($invoiceSchedule as $invoiceDate) {
+            $total += $this->getPremiumInstallmentPrice();
         }
 
         return $total;
@@ -2356,45 +2400,43 @@ abstract class Policy
     public function getPolicyOrUserBacsPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getBacsPaymentMethod() ?: ($this->getUser() ? $this->getUser()->getBacsPaymentMethod() : null);
+        return $this->getBacsPaymentMethod() ?:null;
     }
 
     public function getPolicyOrUserBacsBankAccount()
     {
         // TODO: Eventually remove this method
-        return $this->getBacsBankAccount() ?: ($this->getUser() ? $this->getUser()->getBacsBankAccount() : null);
+        return $this->getBacsBankAccount() ?: null;
     }
 
     public function hasPolicyOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasPaymentMethod() ?: ($this->getUser() ? $this->getUser()->hasPaymentMethod() : null);
+        return $this->hasPaymentMethod() ?: null;
     }
 
     public function hasPolicyOrUserValidPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasValidPaymentMethod() ?: ($this->getUser() ?  $this->getUser()->hasValidPaymentMethod() : null);
+        return $this->hasValidPaymentMethod() ?: null;
     }
 
     public function hasPolicyOrPayerOrUserValidPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasValidPaymentMethod() ?:
-            ($this->getPayerOrUser() ? $this->getPayerOrUser()->hasValidPaymentMethod() : null);
+        return $this->hasValidPaymentMethod() ?: null;
     }
 
     public function getPolicyOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getPaymentMethod() ?: ($this->getUser() ? $this->getUser()->getPaymentMethod() : null);
+        return $this->getPaymentMethod() ?: null;
     }
 
     public function getPolicyOrPayerOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getPaymentMethod() ?:
-            ($this->getPayerOrUser() ? $this->getPayerOrUser()->getPaymentMethod() : null);
+        return $this->getPaymentMethod() ?: null;
     }
 
     /**
@@ -2439,8 +2481,7 @@ abstract class Policy
     public function getPolicyOrPayerOrUserJudoPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getJudoPaymentMethod() ?:
-            ($this->getPayerOrUser() ? $this->getPayerOrUser()->getJudoPaymentMethod() : null);
+        return $this->getJudoPaymentMethod() ?: null;
     }
 
     /**

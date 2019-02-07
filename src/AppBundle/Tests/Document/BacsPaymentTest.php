@@ -107,10 +107,9 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
 
         $bankAccount = new BankAccount();
-        $bacs = new BacsPaymentMethod();
-        $bacs->setBankAccount($bankAccount);
+        $bacsPaymentMethod = new BacsPaymentMethod();
+        $bacsPaymentMethod->setBankAccount($bankAccount);
         $user = new User();
-        $user->setPaymentMethod($bacs);
         $policy = new PhonePolicy();
         $user->addPolicy($policy);
 
@@ -127,6 +126,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $premium->setIpt(1);
         $policy->setPremium($premium);
 
+        $policy->setPaymentMethod($bacsPaymentMethod);
         $policy->addPayment($bacs);
         $now = \DateTime::createFromFormat('U', time());
         $bacs->approve();

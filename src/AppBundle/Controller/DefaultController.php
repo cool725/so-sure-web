@@ -913,57 +913,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/think-your-iPhone-7-is-insured-by-your-bank", name="think_your_iPhone-7_is_insured_by_your_bank")
-     * @Template
-     */
-    public function thinkYourIPhone7IsInsuredByYourBank()
-    {
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-gadget-cover-phone-insurance", name="so-sure-vs-gadget_cover_phone_insurance")
-     * @Template
-     */
-    public function soSureVsGadgetCover()
-    {
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => 'Gadget Cover',
-        ]);
-
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-halifax-phone-insurance", name="so-sure-vs-halifax_phone_insurance")
-     * @Template
-     */
-    public function soSureVsHalifaxCover()
-    {
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => 'Halifax',
-        ]);
-
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-three-phone-insurance", name="so-sure-vs-three_phone_insurance")
-     * @Template
-     */
-    public function soSureVsThree()
-    {
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => 'Three',
-        ]);
-
-        return array();
-    }
-
-    /**
      * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
      * @Route("/so-sure-vs-protect-your-bubble-phone-insurance", name="so_sure_vs_protect_your_bubble_phone_insurance")
      * @Route("/so-sure-vs-carphone-warehouse-phone-insurance", name="so_sure_vs_carphone_warehouse_phone_insurance")
@@ -1329,9 +1278,9 @@ class DefaultController extends BaseController
             $mailer->sendTemplate(
                 'Update your communication preferences',
                 $email,
-                'AppBundle:Email:optOutLink.html.twig',
+                'AppBundle:Email:user/optOutLink.html.twig',
                 ['hash' => $hash],
-                'AppBundle:Email:optOutLink.txt.twig',
+                'AppBundle:Email:user/optOutLink.txt.twig',
                 ['hash' => $hash]
             );
 

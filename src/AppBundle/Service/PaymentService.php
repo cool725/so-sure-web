@@ -184,7 +184,7 @@ class PaymentService
     {
         $policy->setPaymentMethod($bacsPaymentMethod);
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
-            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser(), $date)
+            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDateForPolicy($policy, $date)
         );
         $bacsPaymentMethod->getBankAccount()->setFirstPayment(true);
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
@@ -211,7 +211,7 @@ class PaymentService
             'bcc-ddnotifications@so-sure.com'
         );
 
-        if ($this->fraudService->getDuplicateBankAccountsCount($policy) > 0) {
+        if (count($this->fraudService->getDuplicatePolicyBankAccounts($policy)) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
                 'tech@so-sure.com',

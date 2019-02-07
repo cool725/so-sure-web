@@ -69,20 +69,23 @@
                     <tbody>
                         {% set itemsHistory = 0 %}
                         {% set displayedTotal = 0 %}
-                        {% for payment in policy.payments if payment.isVisibleUserPayment %}
+                        {% for payment in policy.getSortedPayments if payment.isVisibleUserPayment %}
                             {% set itemsHistory = itemsHistory + 1 %}
-                            {% if payment.type != 'bacs' or not payment.reversedBy %}
+                            {% if payment.type != 'bacs' or not payment.reversedBy or payment.status != 'pending' %}
                                 {% set displayedTotal = displayedTotal + payment.amount %}
                             {% endif %}
-                            <tr>
+                            <tr class="{% if payment.status == 'pending' %}table-warning{% endif %}">
                                 <td>
-                                    <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}
+                                    <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}</small>
                                 </td>
                                 <td class="h6">
                                     {{ payment.userPaymentDisplay }}
                                     {% if payment.details %}
                                         <br>
                                         <em class="sub"><small>{{ payment.details }}</small></em>
+                                    {% elseif payment.status == 'pending' %}
+                                        <br>
+                                        <em class="sub"><small>Pending</small></em>
                                     {% endif %}
                                 </td>
                                 <td align="right">
@@ -90,10 +93,18 @@
                                         <del>
                                     {% endif %}
 
+                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                        <em>
+                                    {% endif %}
+
                                     {% if payment.amount >= 0 %}
                                         &pound;{{ payment.amount | number_format(2, '.', ',') }}
                                     {% else %}
                                         &pound;{{ (0 - payment.amount) | number_format(2, '.', ',') }}
+                                    {% endif %}
+
+                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                        </em>
                                     {% endif %}
 
                                     {% if payment.type == 'bacs' and payment.reversedBy %}
@@ -107,6 +118,11 @@
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Unpaid direct debit payment. This may have been caused by using an incorrect sort code/account number or not having suffient funds in your account. Depending on your bank, this may or may not appear on your bank statement and/or result in bank charges."></i></small>
+                                    {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
+                                        <i class="fal fa-clock fa-fw text-primary"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Expected: {{ payment.getBacsReversedDate|date('d/m/Y', 'Europe/London') }}"></i>
                                     {% elseif payment.amount < 0 %}
                                         <strong><small>CR</small></strong>
                                     {% endif %}
@@ -163,6 +179,9 @@
                 <div class="d-md-flex align-items-md-center justify-content-md-between p-3 bg-lily-white">
                     <div class="text-center text-md-left">Policy Number: <strong>{{ policy.policyNumber }}</strong></div>
                     <div class="text-center text-md-left">Policy Start Date: <strong>{{ policy.start| date('d/m/Y') }}</strong></div>
+                    {% if not policy.isactive %}
+                    <div class="text-center text-md-left">Policy End Date: <strong>{{ policy.end| date('d/m/Y') }}</strong></div>
+                    {% endif %}
                     <div class="text-center text-md-left">Premium to date: <strong>&pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}</strong></div>
                 </div>
                 <table class="table table-striped mb-0">
@@ -173,10 +192,18 @@
                             <th></th>
                         </tr>
                     </thead>
+                    {% set invoiceRemaining = policy.getInvoiceAmountTotal %}
                     {% for invoiceDate in policy.getInvoiceSchedule %}
                         <tr>
                             <td>{{ invoiceDate| date('d/m/Y', 'Europe/London') }}</td>
-                            <td align="right">&pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}</td>
+                            <td align="right">
+                                {% if invoiceRemaining >= policy.getPremiumInstallmentPrice %}
+                                    {% set invoiceRemaining = invoiceRemaining - policy.getPremiumInstallmentPrice %}
+                                    &pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}
+                                {% else %}
+                                    &pound;{{ invoiceRemaining | number_format(2, '.', ',') }}
+                                {% endif %}
+                            </td>
                             {% if invoiceDate|date('U') < 'now'|date('U') %}
                                 <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
                             {% else %}

@@ -592,20 +592,17 @@ class BankAccount
         return $this->addBusinessDays($date, $days);
     }
 
-    public function getFirstPaymentDate(User $user, \DateTime $date = null)
+    public function getFirstPaymentDateForPolicy(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         $useClosestPaymentDate = false;
         $nextPolicyPaymentDate = null;
-        foreach ($user->getValidPolicies(true) as $policy) {
-            /** @var Policy $policy */
-            if (!$policy->isPolicyPaidToDate($date, false, true)) {
-                $useClosestPaymentDate = true;
-            } else {
-                $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
-            }
+        if (!$policy->isPolicyPaidToDate($date, false, true)) {
+            $useClosestPaymentDate = true;
+        } else {
+            $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
         }
 
         $bacsPaymentDate = $this->getPaymentDate($date);

@@ -411,7 +411,6 @@ class JudopayService
             $judo->setDeviceDna($deviceDna);
         }
         $policy->setPaymentMethod($judo);
-        $user->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
 
@@ -615,13 +614,15 @@ class JudopayService
         }
 
         // TODO: This should update on all policies
-        $judo = $user->getJudoPaymentMethod();
+        $judo = null;
+        if ($policy && $policy->getJudoPaymentMethod()) {
+            $judo = $policy->getJudoPaymentMethod();
+        }
         if (!$judo || !$judo instanceof JudoPaymentMethod) {
             $judo = new JudoPaymentMethod();
             if ($policy) {
                 $policy->setPaymentMethod($judo);
             } else {
-                $user->setPaymentMethod($judo);
                 foreach ($user->getValidPolicies(true) as $userPolicy) {
                     $userPolicy->setPaymentMethod($judo);
                 }

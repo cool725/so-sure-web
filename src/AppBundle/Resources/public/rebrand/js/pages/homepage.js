@@ -11,6 +11,6 @@ require('../components/banner.js');
 let textFit = require('textfit');
 
 $(function() {
-    textFit($('.fit')[0]);
+    textFit($('.fit')[0], {detectMultiLine: false});
 });
 
