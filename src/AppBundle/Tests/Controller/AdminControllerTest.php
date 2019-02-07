@@ -112,7 +112,8 @@ class AdminControllerTest extends BaseControllerTest
         );
     }
 
-    /* TODO: test fails too often to be useful and not of much value - maybe fix or remove
+    // TODO: test fails too often to be useful and not of much value - maybe fix or remove
+    /*
     public function testAdminLinkClaimForm()
     {
         $user = static::createUser(
@@ -186,6 +187,9 @@ class AdminControllerTest extends BaseControllerTest
     }
     */
 
+    /**
+     * @throws \Exception
+     */
     public function testImeiFormAction()
     {
         $user = static::createUser(
