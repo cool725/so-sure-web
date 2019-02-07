@@ -763,6 +763,8 @@ nelmio_security:
                 - http://*.facebook.net
                 - https://*.facebook.com
                 - http://*.facebook.com
+                - https://sc-static.net
+                - https://tr.snapchat.com
                 - https://cdn.optimizely.com
                 - http://cdn.optimizely.com
                 - https://*.intercom.io
