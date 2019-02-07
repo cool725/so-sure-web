@@ -7,8 +7,14 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('../components/banner.js');
-// require('textfit');
 let textFit = require('textfit');
+
+// Lazy load images
+import lozad from 'lozad';
+
+const observer = lozad(); // lazy loads elements with default selector as '.lozad'
+observer.observe();
+
 
 $(function() {
     textFit($('.fit')[0], {detectMultiLine: false});
