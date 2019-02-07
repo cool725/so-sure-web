@@ -100,52 +100,6 @@ class DoctrineUserListener extends BaseDoctrineListener
             $this->triggerEvent($user, UserEvent::EVENT_NAME_UPDATED);
         }
 
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['paymentMethod'],
-            DataChange::COMPARE_BACS
-        )) {
-            /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $user->getPaymentMethod();
-
-            // prefer the old bank account data if it exists
-            /** @var BacsPaymentMethod $oldValue */
-            $oldValue = $eventArgs->getOldValue('paymentMethod');
-            if ($oldValue instanceof BacsPaymentMethod && $oldValue->getBankAccount()) {
-                /** @var BacsPaymentMethod $paymentMethod */
-                $paymentMethod = $oldValue;
-            }
-
-            $bankAccount = clone $paymentMethod->getBankAccount();
-            $event = new BacsEvent($bankAccount);
-            $event->setUser($user);
-            $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
-        }
-
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['paymentMethod'],
-            DataChange::COMPARE_JUDO
-        )) {
-            $this->triggerCardEvent($user, CardEvent::EVENT_UPDATED);
-        }
-
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['paymentMethod'],
-            DataChange::COMPARE_PAYMENT_METHOD_CHANGED
-        )) {
-            /** @var PaymentMethod $oldValue */
-            $oldValue = $eventArgs->getOldValue('paymentMethod');
-
-            $event = new UserEvent($user);
-            $event->setPreviousPaymentMethod($oldValue->getType());
-            $this->dispatcher->dispatch(UserEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
-        }
-
         if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_INTERCOM)) {
             $this->triggerEvent($user, UserEvent::EVENT_UPDATED_INTERCOM);
         }

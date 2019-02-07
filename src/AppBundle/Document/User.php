@@ -253,7 +253,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
      * @Gedmo\Versioned
      * @var PaymentMethod
-     * @DataChange(categories="intercom")
      */
     protected $paymentMethod;
 
@@ -1250,90 +1249,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
-    /**
-     * @deprecated Use same method name in Policy
-     * @return bool
-     */
-    public function hasBacsPaymentMethod()
-    {
-        return $this->getPaymentMethod() instanceof BacsPaymentMethod;
-    }
-
-    /**
-     * @return BacsPaymentMethod|null
-     * @deprecated Use same method name in Policy
-     */
-    public function getBacsPaymentMethod()
-    {
-        if ($this->hasBacsPaymentMethod()) {
-            /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $this->getPaymentMethod();
-
-            return $paymentMethod;
-        }
-
-        return null;
-    }
-
-    /**
-     * @deprecated Use same method name in Policy
-     * @return bool
-     */
-    public function hasJudoPaymentMethod()
-    {
-        return $this->getPaymentMethod() instanceof JudoPaymentMethod;
-    }
-
-    /**
-     * @deprecated Use same method name in Policy
-     * @return JudoPaymentMethod|null
-     */
-    public function getJudoPaymentMethod()
-    {
-        if ($this->hasJudoPaymentMethod()) {
-            /** @var JudoPaymentMethod $paymentMethod */
-            $paymentMethod = $this->getPaymentMethod();
-
-            return $paymentMethod;
-        }
-
-        return null;
-    }
-
-    /**
-     * @deprecated Use same method name in Policy
-     * @return bool
-     */
-    public function canUpdateBacsDetails()
-    {
-        /** @var BacsPaymentMethod $bacsPaymentMethod */
-        $bacsPaymentMethod = $this->getPaymentMethod();
-        if ($bacsPaymentMethod instanceof BacsPaymentMethod &&
-            $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
-                return false;
-        }
-
-        if ($this->hasPolicyBacsPaymentInProgress()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @deprecated Use same method name in Policy
-     * @return BankAccount|null
-     */
-    public function getBacsBankAccount()
-    {
-        $bacsPaymentMethod = $this->getBacsPaymentMethod();
-        if ($bacsPaymentMethod) {
-            return $bacsPaymentMethod->getBankAccount();
-        }
-
-        return null;
-    }
-
     public function getAnalytics()
     {
         $data = [];
@@ -1418,15 +1333,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             }
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
                 $data['accountPaidToDate'] = false;
-            }
-        }
-
-        // TODO: Eventually remove, but for now if we didn't find anything on the policy, keep using the user
-        if ($data['paymentMethod'] == 'none') {
-            if ($this->hasBacsPaymentMethod()) {
-                $data['paymentMethod'] = 'bacs';
-            } elseif ($this->hasJudoPaymentMethod()) {
-                $data['paymentMethod'] = 'judo';
             }
         }
 
@@ -1713,40 +1619,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->userFiles[] = $file;
     }
 
-    /**
-     * @return PaymentMethod
-     */
-    public function getPaymentMethod()
-    {
-        return $this->paymentMethod;
-    }
-
-    public function setPaymentMethod($paymentMethod)
-    {
-        $this->paymentMethod = $paymentMethod;
-    }
-
     public function hasEmail()
     {
         return mb_strlen(trim($this->getEmail())) > 0;
-    }
-
-    /**
-     * @return bool
-     * @deprecated See same method name in Policy
-     */
-    public function hasPaymentMethod()
-    {
-        return $this->getPaymentMethod() != null;
-    }
-
-    /**
-     * @return bool
-     * @deprecated See same method name in Policy
-     */
-    public function hasValidPaymentMethod()
-    {
-        return $this->hasPaymentMethod() && $this->getPaymentMethod()->isValid();
     }
 
     public function hasValidBillingDetails()
@@ -2159,6 +2034,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if ($this->getPolicyAddress()) {
             $addresses[] = $this->getPolicyAddress()->toApiArray();
         }
+        $policy = $this->getLatestPolicy();
         return [
             'id' => $this->getId(),
             'email' => $this->getEmailCanonical(),
@@ -2186,12 +2062,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 false
             ),
             'can_purchase_policy' => $this->canPurchasePolicy(),
-            'has_payment_method' => $this->hasValidPaymentMethod(),
-            'card_details' => $this->getPaymentMethod() && $this->getPaymentMethod()->getType() == 'judo' ?
-                $this->getPaymentMethod()->__toString() :
+            'has_payment_method' => $policy ? $policy->hasValidPaymentMethod() : false,
+            'card_details' => $policy && $policy->getPaymentMethod() &&
+                $policy->getPaymentMethod()->getType() == 'judo' ?
+                $policy->getPaymentMethod()->__toString() :
                 'Please update your card',
-            'payment_method' => $this->getPaymentMethod() ?
-                $this->getPaymentMethod()->getType() :
+            'payment_method' => $policy && $policy->getPaymentMethod() ?
+                $policy->getPaymentMethod()->getType() :
                 null,
             'has_mobile_number_verified' => $this->getMobileNumberVerified()
         ];

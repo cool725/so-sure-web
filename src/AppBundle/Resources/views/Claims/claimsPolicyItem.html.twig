@@ -608,11 +608,6 @@
                                     <td>Other Users/Policies w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
                                     <td>
                                         <strong>{{ fraud.duplicate_bank_accounts_count }}</strong>
-                                        {% for user in fraud.duplicate_bank_user_accounts %}
-                                            <a href="{{ path(user_route, {'id': user.id }) }}">
-                                                {{ user.name }}
-                                            </a>;
-                                        {% endfor %}
                                         {% for policy in fraud.duplicate_bank_policy_accounts %}
                                             <a href="{{ path(policy_route, {'id': policy.id }) }}">
                                                 {{ policy.policyNumber }}

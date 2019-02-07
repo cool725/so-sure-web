@@ -177,7 +177,6 @@ class DoctrineUserListenerTest extends WebTestCase
         $bankAccount->setAccountNumber('12345678');
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
         $user->setEmail(static::generateEmail($email, $this));
         static::$dm->persist($user);
 
@@ -190,7 +189,6 @@ class DoctrineUserListenerTest extends WebTestCase
         $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => '1225'];
         $judo = new JudoPaymentMethod();
         $judo->addCardTokenArray(random_int(1, 999999), $account);
-        $user->setPaymentMethod($judo);
         $user->setEmail(static::generateEmail($email, $this));
         static::$dm->persist($user);
 

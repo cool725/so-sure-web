@@ -662,14 +662,13 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $invitationData = $this->verifyResponse(200);
 
-        // Add claim to policy
-        $policyRepo = self::$dm->getRepository(Policy::class);
-        /** @var Policy $policy */
-        $policy = $policyRepo->find($policyData['id']);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::getContainer(true), $policyData['id']);
+        $this->assertNotNull($updatedPolicy);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_THEFT);
         $claim->setStatus(Claim::STATUS_SETTLED);
-        $policy->addClaim($claim);
+        $updatedPolicy->addClaim($claim);
         $this->getDocumentManager(true)->flush();
 
         $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
@@ -4839,18 +4838,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(self::$JUDO_TEST_CARD_NAME, $data['card_details']);
         $this->assertEquals('judo', $data['payment_method']);
 
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(User::class);
-        /** @var User $updatedUser */
-        $updatedUser = $repo->find($user->getId());
-        $this->assertNotNull($updatedUser->getJudoPaymentMethod());
-        if ($updatedUser->getJudoPaymentMethod()) {
-            $this->assertEquals(
-                self::$JUDO_TEST_CARD_LAST_FOUR,
-                $updatedUser->getJudoPaymentMethod()->getCardLastFour()
-            );
-        }
-
         $details = $judopay->testRegisterDetails(
             $user,
             rand(1, 999999),
@@ -4866,18 +4853,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'receipt_id' => $details['receiptId'],
         ]]);
         $data = $this->verifyResponse(200);
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(User::class);
-        /** @var User $updatedUser */
-        $updatedUser = $repo->find($user->getId());
-        $this->assertNotNull($updatedUser->getJudoPaymentMethod());
-        if ($updatedUser->getJudoPaymentMethod()) {
-            $this->assertEquals(
-                self::$JUDO_TEST_CARD2_LAST_FOUR,
-                $updatedUser->getJudoPaymentMethod()->getCardLastFour()
-            );
-        }
     }
 
     public function testUpdateUserPaymentJudopayFail()

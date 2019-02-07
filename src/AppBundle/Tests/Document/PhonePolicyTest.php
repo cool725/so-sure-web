@@ -3513,7 +3513,7 @@ class PhonePolicyTest extends WebTestCase
             12,
             $date
         );
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_APPROVAL);
 
         $this->assertEquals(new \DateTime('2018-10-31'), $policy->getPolicyExpirationDate(new \DateTime('2018-09-01')));
         $this->assertTrue($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-21')));
@@ -5464,30 +5464,30 @@ class PhonePolicyTest extends WebTestCase
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_INIT);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_INIT);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_PENDING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_APPROVAL);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_PENDING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_CANCELLED);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_CANCELLED);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_INVALID,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_FAILURE);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_FAILURE);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_INVALID,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_SUCCESS);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
 
         $this->assertEquals(
             Policy::UNPAID_BACS_PAYMENT_MISSING,
