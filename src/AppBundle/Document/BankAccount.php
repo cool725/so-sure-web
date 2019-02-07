@@ -595,7 +595,7 @@ class BankAccount
     public function getFirstPaymentDateForPolicy(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', SoSure::getSoSureTimezone());
+            $date = $this->now(SoSure::getSoSureTimezone());
         }
         $useClosestPaymentDate = false;
         $nextPolicyPaymentDate = null;
