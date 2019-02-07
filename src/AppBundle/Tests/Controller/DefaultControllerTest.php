@@ -160,27 +160,6 @@ class DefaultControllerTest extends BaseControllerTest
             $this->getClientResponseContent()
         );
     }
-    public function testPhoneSearchVSGadget()
-    {
-        $crawler = self::$client->request('GET', '/so-sure-vs-gadget-cover-phone-insurance');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
-
-    public function testPhoneSearchVSHalifax()
-    {
-        $crawler = self::$client->request('GET', '/so-sure-vs-halifax-phone-insurance');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
-
-    public function testPhoneSearchVSThree()
-    {
-        $crawler = self::$client->request('GET', '/so-sure-vs-three-phone-insurance');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
 
     public function testPhoneSearchHomepage()
     {
