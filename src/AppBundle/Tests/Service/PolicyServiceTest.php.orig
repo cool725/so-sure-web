@@ -512,8 +512,8 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
+        static::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS, true);
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
-        static::setBacsPaymentMethodForPolicy($policy);
         $phone = $policy->getPhone();
         static::$paymentService->confirmBacs($policy, $policy->getPolicyOrUserBacsPaymentMethod(), $date);
         $policy->getPolicyOrUserBacsBankAccount()->setInitialPaymentSubmissionDate($date);
@@ -3987,18 +3987,38 @@ class PolicyServiceTest extends WebTestCase
         );
     }
 
+<<<<<<< HEAD
+    public function testPolicyRenewalNetworkClaimOpenWithDiscount()
+=======
     public function testPolicyRenewalNetworkClaim10WithDiscountBacs()
+>>>>>>> ec35ccf44e906d0f099f2a266817f53c64e3fdcd
     {
         /** @var Policy $policyA */
         /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+<<<<<<< HEAD
+            static::generateEmail('testPolicyRenewalNetworkClaimOpenWithDiscount-A', $this),
+            static::generateEmail('testPolicyRenewalNetworkClaimOpenWithDiscount-B', $this),
+=======
             static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountBacsA', $this),
             static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountBacsB', $this),
+>>>>>>> ec35ccf44e906d0f099f2a266817f53c64e3fdcd
             true,
             new \DateTime('2016-01-01'),
             new \DateTime('2016-01-01')
         );
-        self::setBacsPaymentMethodForPolicy($policyA);
+<<<<<<< HEAD
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $claimB->setProcessed(true);
+        $policyB->addClaim($claimB);
+
+=======
+        self::setBacsPaymentMethod($policyA->getUser());
+>>>>>>> ec35ccf44e906d0f099f2a266817f53c64e3fdcd
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(10, $policyA->getPotValue());
@@ -4027,6 +4047,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
 
+<<<<<<< HEAD
+=======
         $claimB = new Claim();
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $claimB->setType(Claim::TYPE_LOSS);
@@ -4034,6 +4056,7 @@ class PolicyServiceTest extends WebTestCase
         $claimB->setProcessed(true);
         $policyB->addClaim($claimB);
 
+>>>>>>> ec35ccf44e906d0f099f2a266817f53c64e3fdcd
         $paymentA = new JudoPayment();
         $paymentA->setDate(new \DateTime('2017-01-01'));
         $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
@@ -4045,7 +4068,11 @@ class PolicyServiceTest extends WebTestCase
         $policyA->getNextPolicy()->addPayment($paymentA);
 
         static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+<<<<<<< HEAD
+        $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policyA->getStatus());
+=======
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+>>>>>>> ec35ccf44e906d0f099f2a266817f53c64e3fdcd
 
         $paymentB = new JudoPayment();
         $paymentB->setDate(new \DateTime('2017-01-01'));
@@ -4059,6 +4086,25 @@ class PolicyServiceTest extends WebTestCase
         static::$dm->flush();
 
         static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+<<<<<<< HEAD
+        $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policyB->getStatus());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $this->assertFalse($policyA->getNextPolicy()->getPremium()->hasAnnualDiscount());
+        $this->assertFalse($policyB->getNextPolicy()->getPremium()->hasAnnualDiscount());
+
+        // 12 original scheduled (1 paid, 11 cancelled)
+        $this->assertEquals(12, count($renewalPolicyA->getScheduledPayments()));
+        $this->assertEquals(
+            $policyA->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $policyB->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            $policyB->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+=======
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
 
         $this->assertEquals(0, $policyA->getPotValue());
@@ -4076,6 +4122,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(
             $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
             $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
+>>>>>>> ec35ccf44e906d0f099f2a266817f53c64e3fdcd
         );
     }
 
@@ -5574,52 +5621,30 @@ class PolicyServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \AppBundle\Exception\DuplicateImeiException
+     * @expectedException AppBundle\Exception\DuplicateImeiException
      */
     public function testCreateWithDuplicateImei()
     {
         $imei = static::generateRandomImei();
+        $a = $this->preparePolicy($imei);
+        static::$policyService->create($a);
+        $b = $this->preparePolicy($imei);
+        static::$policyService->create($b);
+    }
 
-        $userA = static::createUser(
-            static::$userManager,
-            static::generateEmail('testCreateWithDuplicateImeiA', $this),
-            'bar',
-            static::$dm
-        );
-        $userB = static::createUser(
-            static::$userManager,
-            static::generateEmail('testCreateWithDuplicateImeiB', $this),
-            'bar',
-            static::$dm
-        );
-        $policyA = static::initPolicy(
-            $userA,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true,
-            false,
-            true,
-            $imei
-        );
-        self::setPaymentMethodForPolicy($policyA);
-        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
-        static::$policyService->setEnvironment('test');
+    /**
+     * Makes a policy object which is ready to be created by the policyservice, but has not been just yet.
+     * @param String $imei is the imei number to give the policy.
+     * @return Policy the new policy.
+     */
+    private function preparePolicy($imei)
+    {
+        $policy = static::createUserPolicy(false, null, false, null, $imei);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy->setPhone($phone, new \DateTime());
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
         static::$dm->flush();
-
-        $policyB = static::initPolicy(
-            $userB,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true,
-            false,
-            true,
-            $imei
-        );
-        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->create($policyB, new \DateTime('2016-01-01'), true);
+        return $policy;
     }
 }

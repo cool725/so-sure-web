@@ -60,16 +60,6 @@ class BacsListener
     public function onUserNameChangedEvent(UserEvent $event)
     {
         $user = $event->getUser();
-        if ($user->hasBacsPaymentMethod()) {
-            $bankAccount = $user->getBacsBankAccount();
-            if ($bankAccount && !$this->bankAccountNameValidator->isAccountName(
-                $bankAccount->getAccountName(),
-                $user
-            )) {
-                $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-                $this->bacsService->notifyMandateCancelledByNameChange($user);
-            }
-        }
         foreach ($user->getValidPolicies(true) as $policy) {
             /** @var Policy $policy */
             if ($policy->hasBacsPaymentMethod()) {

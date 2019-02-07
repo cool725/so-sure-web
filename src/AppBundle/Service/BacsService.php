@@ -1663,7 +1663,7 @@ class BacsService
         }
 
         // Admin or user source is always a one off payment
-        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB])) {
+        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB, Payment::SOURCE_MOBILE])) {
             $payment->setIsOneOffPayment(true);
         }
 

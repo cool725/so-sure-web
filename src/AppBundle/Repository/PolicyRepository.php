@@ -224,6 +224,15 @@ class PolicyRepository extends BaseDocumentRepository
         return $qb;
     }
 
+    public function findDuplicateMandates($mandate)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.reference')->equals($mandate)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findBankAccount(Policy $policy)
     {
         $qb = $this->createQueryBuilder();

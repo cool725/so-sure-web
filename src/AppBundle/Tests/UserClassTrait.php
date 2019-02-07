@@ -59,6 +59,7 @@ trait UserClassTrait
     public static $JUDO_TEST_CARD2_LAST_FOUR = '3436';
     public static $JUDO_TEST_CARD2_EXP = '12/20';
     public static $JUDO_TEST_CARD2_PIN = '452';
+    public static $JUDO_TEST_CARD2_NAME = 'Visa Debit **** 3436 (Exp: 1220)';
 
     public static function generateEmail($name, $caller, $rand = false)
     {
