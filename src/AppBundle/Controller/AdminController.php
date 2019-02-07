@@ -648,6 +648,10 @@ class AdminController extends BaseController
     /**
      * @Route("/bacs", name="admin_bacs")
      * @Route("/bacs/{year}/{month}", name="admin_bacs_date", requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/payments/{year}/{month}", name="admin_bacs_payments",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/reports/{year}/{month}", name="admin_bacs_reports",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Template
      */
     public function bacsAction(Request $request, $year = null, $month = null)
@@ -834,19 +838,9 @@ class AdminController extends BaseController
             }
         }
 
-        return [
+        $data = [
             'year' => $year,
             'month' => $month,
-            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
-            'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
-            'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
-            'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
-            'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
-            'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
-            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
-            'payments' => $paymentsRepo->findPayments($date),
-            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
-            'indemnity' => $paymentsIndemnityRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'uploadDebitForm' => $uploadDebitForm->createView(),
             'uploadCreditForm' => $uploadCreditForm->createView(),
@@ -855,7 +849,27 @@ class AdminController extends BaseController
             'approvePaymentsForm' => $approvePaymentsForm->createView(),
             'currentSequence' => $currentSequence,
             'outstandingMandates' => $userRepo->findPendingMandates()->getQuery()->execute()->count(),
+            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
+            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
+            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
         ];
+
+        if ($request->get('_route') == 'admin_bacs_payments') {
+            $data = array_merge($data, [
+                'indemnity' => $paymentsIndemnityRepo->findPayments($date),
+                'payments' => $paymentsRepo->findPayments($date),
+            ]);
+        } elseif ($request->get('_route') == 'admin_bacs_reports') {
+            $data = array_merge($data, [
+                'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
+                'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
+                'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
+                'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
+                'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+            ]);
+        }
+
+        return $data;
     }
 
     /**
