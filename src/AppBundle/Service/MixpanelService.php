@@ -345,7 +345,7 @@ class MixpanelService
             $latestData = $this->findLatestMixpanelUser($results);
             $foundEarliestCampaignAttribution = false;
             foreach ($results['results'] as $result) {
-                if (is_array($result['properties']) &&
+                if (isset($result['properties']) &&
                     array_key_exists('Campaign Attribution Date', $result['properties'])) {
                     $dataDate = $this->getCampaignAttributionDate($data);
                     $resultDate = $this->getCampaignAttributionDate($result['properties']);
