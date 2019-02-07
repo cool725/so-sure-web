@@ -73,7 +73,8 @@ class SmsServiceTest extends WebTestCase
     {
         static::$redis->del([MixpanelService::KEY_MIXPANEL_QUEUE]);
 
-        $policy = static::createUserPolicy(true);
+        $email = static::generateEmail('testSendTemplateCampaign', $this);
+        $policy = static::createUserPolicy(true, null, false, $email);
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
         static::$dm->flush();

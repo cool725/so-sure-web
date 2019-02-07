@@ -428,14 +428,6 @@ trait UserClassTrait
         return $payment;
     }
 
-    public static function setPaymentMethod(User $user, $endDate = '1220')
-    {
-        $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
-        $judo = new JudoPaymentMethod();
-        $judo->addCardTokenArray(random_int(1, 999999), $account);
-        $user->setPaymentMethod($judo);
-    }
-
     public static function setPaymentMethodForPolicy(Policy $policy, $endDate = '1220')
     {
         $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
@@ -468,21 +460,6 @@ trait UserClassTrait
         $policy->addPayment($payment);
 
         return $payment;
-    }
-
-    public static function setBacsPaymentMethod(
-        User $user,
-        $mandateStatus = BankAccount::MANDATE_SUCCESS,
-        $randomReference = false
-    ) {
-        $bacs = new BacsPaymentMethod();
-        $bankAccount = new BankAccount();
-        $bankAccount->setMandateStatus($mandateStatus);
-        if ($randomReference) {
-            $bankAccount->setReference(sprintf('TESTREF-%d', random_int(1, 999999)));
-        }
-        $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
     }
 
     public static function setBacsPaymentMethodForPolicy(

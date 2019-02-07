@@ -211,7 +211,7 @@ class PaymentService
             'bcc-ddnotifications@so-sure.com'
         );
 
-        if ($this->fraudService->getDuplicateBankAccountsCount($policy) > 0) {
+        if (count($this->fraudService->getDuplicatePolicyBankAccounts($policy)) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
                 'tech@so-sure.com',

@@ -67,26 +67,6 @@ class BacsServiceTest extends WebTestCase
         self::$dm->clear();
     }
 
-    public function testBacsXmlUser()
-    {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testBacsXmlUser', $this),
-            'bar'
-        );
-        $this->setValidBacsPaymentMethod($user, 'SOSURE01');
-        static::$dm->flush();
-
-        $results = self::$bacsService->addacs(self::$xmlFile);
-        $this->assertTrue($results['success']);
-
-        $updatedUser = $this->assertUserExists(self::$container, $user);
-        $this->assertEquals(
-            BankAccount::MANDATE_CANCELLED,
-            $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
-        );
-    }
-
     public function testBacsXmlPolicy()
     {
         $now = $this->now();
@@ -126,14 +106,6 @@ class BacsServiceTest extends WebTestCase
         return $bacs;
     }
 
-    private function setValidBacsPaymentMethod(User $user, $reference = null, \DateTime $date = null)
-    {
-        $bacs = $this->getBacsPaymentMethod($user->getName(), $reference, $date);
-        $user->setPaymentMethod($bacs);
-
-        return $bacs;
-    }
-
     private function getBacsPaymentMethod($name, $reference = null, \DateTime $date = null)
     {
         if (!$date) {
@@ -159,7 +131,7 @@ class BacsServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testBacsPayment', $this));
-        $this->setValidBacsPaymentMethod($policy->getUser());
+        $this->setValidBacsPaymentMethodForPolicy($policy);
         $payment = static::$bacsService->bacsPayment($policy, 'test', 1.01);
         $this->assertEquals(1.01, $payment->getAmount());
         $this->assertEquals('test', $payment->getNotes());

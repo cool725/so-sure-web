@@ -610,7 +610,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setBacsPaymentMethod($user, BankAccount::MANDATE_PENDING_APPROVAL);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -645,7 +644,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setBacsPaymentMethod($user, BankAccount::MANDATE_CANCELLED);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
@@ -696,7 +694,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -731,7 +728,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
@@ -813,7 +809,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
@@ -887,7 +882,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
@@ -970,7 +964,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setPaymentMethod($user);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -1003,7 +996,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setPaymentMethod($user);
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
@@ -1043,7 +1035,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setPaymentMethod($user);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -1084,7 +1075,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setPaymentMethod($user);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
@@ -1134,7 +1124,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setPaymentMethod($user, '0116');
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
@@ -1167,7 +1156,6 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        self::setPaymentMethod($user, '0116');
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);

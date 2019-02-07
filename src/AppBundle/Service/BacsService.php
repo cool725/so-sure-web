@@ -671,11 +671,6 @@ class BacsService
             return $policy->getBacsPaymentMethod();
         }
 
-        $user = $this->getUserByReference($reference);
-        if ($user) {
-            return $user->getBacsPaymentMethod();
-        }
-
         return null;
     }
 
