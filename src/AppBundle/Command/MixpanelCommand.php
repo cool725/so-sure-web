@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\UserRepository;
@@ -18,6 +19,8 @@ use AppBundle\Document\PhonePolicy;
 
 class MixpanelCommand extends ContainerAwareCommand
 {
+    use DateTrait;
+
     /** @var DocumentManager  */
     protected $dm;
 
@@ -40,7 +43,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -168,6 +171,18 @@ class MixpanelCommand extends ContainerAwareCommand
         } elseif ($action == 'freeze-attribution') {
             $n = $this->freezeAttributions($days);
             $output->writeln("Queued {$n} users to have blank attribution set.");
+        } elseif ($action == 'reattribute-recent') {
+            if (!$days) {
+                throw new \Exception('Requires time period; add --days');
+            }
+            $date = new \DateTime();
+            $startDate = $this->subDays($date, $days);
+            /** @var UserRepository */
+            $userRepo = $this->dm->getRepository(User::class);
+            $users = $userRepo->findNewUsers($startDate, $date);
+            foreach ($users as $user) {
+                $this->mixpanelService->queueAttribution($user);
+            }
         } else {
             $data = $this->mixpanelService->process($process);
             $output->writeln(sprintf("Processed %d Requeued: %d", $data['processed'], $data['requeued']));
