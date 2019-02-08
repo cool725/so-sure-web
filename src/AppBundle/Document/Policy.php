@@ -3833,6 +3833,7 @@ abstract class Policy
         $claims = [];
         foreach ($this->getStandardConnections() as $connection) {
             foreach ($connection->getLinkedClaimsDuringPeriod() as $claim) {
+                /** @var Claim $claim */
                 if (!$monitaryOnly || $claim->isMonetaryClaim($includeApproved)) {
                     $claims[] = $claim;
                 }
