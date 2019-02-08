@@ -338,13 +338,61 @@ remove_trailing_slash:
         _controller: 'App\Controller\RedirectingController'
     requirements:
         url: .*/$
-
+        
 redirect_iphone_insured_with_bank:
     path: /think-your-iPhone-7-is-insured-by-your-bank
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
+        permanent: true        
+
+redirect_samsung_seven_edge_vodafone:
+    path: /samsung-s7-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true    
+
+redirect_pixel_vodafone:
+    path: /google-pixel-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
         permanent: true
+
+redirect_iphone_se_vodafone:
+    path: /iphone-SE-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_six_vodafone:
+    path: /iphone-6-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_six_s_vodafone:
+    path: /iphone-6s-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_seven_vodafone:
+    path: /iphone-7-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_seven_s_vodafone:
+    path: /iphone-7-plus-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
 
 redirect_sosure_vs_gadgetcover:
     path: /so-sure-vs-gadget-cover-phone-insurance
