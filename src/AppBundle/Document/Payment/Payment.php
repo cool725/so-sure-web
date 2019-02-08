@@ -627,6 +627,9 @@ abstract class Payment
             'totalUnderwriterPercent' => 0,
             'avgPayment' => null,
         ];
+        if (!$payments) {
+            return $data;
+        }
         foreach ($payments as $payment) {
             /** @var Payment $payment */
             // For prod, skip invalid policies
