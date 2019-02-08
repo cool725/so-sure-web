@@ -755,8 +755,6 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Payment failed', $crawler->html());
 
-        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
-
         $newPayment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
         $newPayment->setStatus(BacsPayment::STATUS_FAILURE);
         self::$dm->flush();
@@ -782,7 +780,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
         $this->assertContains('Payment is processing', $crawler->html());
 
-        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $updatedPolicy = $this->assertPolicyExists($this->getContainer(true), $policy);
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
         $payment = $updatedPolicy->getLastPaymentCredit();

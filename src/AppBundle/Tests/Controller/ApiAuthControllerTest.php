@@ -480,8 +480,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $cognitoIdentityId = $this->getAuthUser($user);
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyDataA = $this->verifyResponse(200);
+        $this->payPolicy($user, $policyDataA['id']);
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $policyDataB = $this->verifyResponse(200);
+        $this->payPolicy($user, $policyDataB['id']);
 
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
@@ -2018,6 +2020,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
                 'account_name' => 'foo bar',
                 'mandate' => 'R012345678',
+                'initial_amount' => 0,
+                'recurring_amount' => 0,
             ]
         ]);
         $data = $this->verifyResponse(404);
@@ -2933,9 +2937,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'card_token' => $details['cardDetails']['cardToken'],
             'receipt_id' => $details['receiptId'],
         ]]);
-        $policyData1 = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData1['status']);
-        $this->assertEquals($data['id'], $policyData1['id']);
+        $policyData11 = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData11['status']);
+        $this->assertEquals($data['id'], $policyData11['id']);
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
+            'amount' => '7.15'
+        ]]);
+        $policyData12 = $this->verifyResponse(200);
+        $this->assertEquals($data['id'], $policyData12['id']);
 
         $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
@@ -2943,11 +2954,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
             'amount' => '7.15'
         ]]);
-        $policyData2 = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData2['status']);
+        $policyData2 = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policyData2['status']);
         $this->assertEquals($data['id'], $policyData2['id']);
 
-        $this->assertNotEquals($policyData1['id'], $policyData2['id']);
+        $this->assertNotEquals($policyData11['id'], $policyData2['id']);
     }
 
     public function testNewPolicyMultipayDeclinedJudopayOk()
@@ -5763,6 +5774,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             self::$JUDO_TEST_CARD_PIN
         );
 
+        // todo add policy - should then work
         $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
             'consumer_token' => $details['consumer']['consumerToken'],
