@@ -1267,6 +1267,7 @@ class ApiAuthController extends BaseController
                 }
                 $paymentMethod = $policy->getPolicyOrPayerOrUserPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
+                    /** @var JudopayService $judo */
                     $judo = $this->get('app.judopay');
                     if (!$judo->existing($policy, $existingData['amount'])) {
                         throw new PaymentDeclinedException('Token payment failed');

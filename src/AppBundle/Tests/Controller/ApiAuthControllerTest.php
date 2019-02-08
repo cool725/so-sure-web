@@ -2941,6 +2941,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData11['status']);
         $this->assertEquals($data['id'], $policyData11['id']);
 
+        $updatedPolicy = $this->assertPolicyByIdExists($this->getContainer(true), $policyData11['id']);
+        $this->assertNotNull($updatedPolicy->getStatus());
+        $this->assertTrue($updatedPolicy->hasPolicyOrUserValidPaymentMethod());
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
+
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
             'amount' => '7.15'
@@ -2954,11 +2959,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
             'amount' => '7.15'
         ]]);
-        $policyData2 = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_SELF_INVITATION);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policyData2['status']);
-        $this->assertEquals($data['id'], $policyData2['id']);
-
-        $this->assertNotEquals($policyData11['id'], $policyData2['id']);
+        $policyData2 = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
     }
 
     public function testNewPolicyMultipayDeclinedJudopayOk()
@@ -5774,7 +5775,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             self::$JUDO_TEST_CARD_PIN
         );
 
-        // todo add policy - should then work
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+        $this->payPolicy($user, $policyId);
+
         $url = sprintf("/api/v1/auth/user/%s/payment", $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
             'consumer_token' => $details['consumer']['consumerToken'],

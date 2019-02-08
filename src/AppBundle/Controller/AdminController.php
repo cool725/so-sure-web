@@ -17,6 +17,7 @@ use AppBundle\Document\Form\JudoRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
@@ -983,8 +984,18 @@ class AdminController extends BaseController
                     $file->getFileName()
                 );
             } elseif ($request->get('_route') == 'admin_bacs_update_serial_number') {
-                $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
-                $message = sprintf('Bacs file %s serial number updated', $file->getFileName());
+                try {
+                    $count = $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
+                    $message = sprintf(
+                        'Bacs file %s serial number updated (%d payments updated)',
+                        $file->getFileName(),
+                        $count
+                    );
+                } catch (ValidationException $e) {
+                    $this->addFlash('error', $e->getMessage());
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs'));
+                }
             } else {
                 throw new \Exception('Unknown route');
             }
