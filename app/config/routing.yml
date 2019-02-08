@@ -366,3 +366,21 @@ redirect_sosure_vs_three:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison
         permanent: true
+
+redirect_make_insurance:
+    path: /phone-insurance/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
+
+redirect_make_insure:
+    path: /insure/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
