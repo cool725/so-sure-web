@@ -1,0 +1,53 @@
+<h2>Daily Files</h2>
+{% if files|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="30%">File name</th>
+            <th width="45%">Details</th>
+            <th width="15%">Submitted to BACS</th>
+            <th width="10%">Edit</th>
+        </tr>
+        {% for file in files %}
+            <tr>
+                <td width="30%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                    <br>
+                    <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ file.serialNumber }}"
+                       data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
+                        {{ file.serialNumber }}
+                    </a>
+                    (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
+                </td>
+                <td width="45%">
+                    {{ file.metadata|json_encode }}
+                </td>
+                <td width="15%">
+                    {% if file.isActioned %}
+                        {{ file.status }}
+                        {% if file.status == 'submitted' %}
+                            <i class="fa fa-check text-success"></i><br>
+                            {{  file.submittedDate|date('d M Y H:i', 'Europe/London')  }}
+                        {% elseif file.status == 'cancelled' %}
+                            <i class="fa fa-minus text-danger"></i>
+                        {% endif %}
+                    {% else %}
+                        <button title="Mark as submitted" type="button" class="btn btn-success bacs-submit" data-token="{{ csrf_token('default') }}"
+                                data-bacs-action-url="{{ path('admin_bacs_submit', {'id': file.id}) }}"><i class="fa fa-check"></i></button>
+                        <button title="Mark as cancelled" type="button" class="btn btn-danger bacs-cancel" data-token="{{ csrf_token('default') }}"
+                                data-bacs-action-url="{{ path('admin_bacs_cancel', {'id': file.id}) }}"><i class="fa fa-power-off"></i></button>
+                    {% endif %}
+                </td>
+                <td width="10%">
+                    <button class="btn btn-success bacs-serial-edit" data-serial-number="{{ file.serialNumber }}"
+                            data-serial-number-url="{{ path('admin_bacs_update_serial_number', {'id': file.id }) }}"
+                            data-toggle="modal" data-target="#editSerialNumberModal">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

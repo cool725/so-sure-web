@@ -594,11 +594,7 @@ abstract class Payment
      */
     public function getUserPaymentDisplay()
     {
-        if ($this->amount < 0) {
-            return "Credit";
-        } else {
-            return $this->userPaymentName();
-        }
+        return $this->userPaymentName();
     }
 
     public function toApiArray()

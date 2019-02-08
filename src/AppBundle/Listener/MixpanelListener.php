@@ -138,15 +138,6 @@ class MixpanelListener
         ]);
     }
 
-    public function onUserPaymentMethodChangedEvent(UserEvent $event)
-    {
-        $user = $event->getUser();
-        $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_PAYMENT_METHOD_CHANGED, [
-            'Previous Payment Method' => $event->getPreviousPaymentMethod(),
-            'Payment Method' => $user->getPaymentMethod() ? $user->getPaymentMethod()->getType() : null,
-        ]);
-    }
-
     public function onPolicyPaymentMethodChangedEvent(PolicyEvent $event)
     {
         $policy = $event->getPolicy();

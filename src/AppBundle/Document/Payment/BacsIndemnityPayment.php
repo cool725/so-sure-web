@@ -67,6 +67,6 @@ class BacsIndemnityPayment extends Payment
      */
     protected function userPaymentName()
     {
-        return "Chargeback";
+        return "Refund due to bank dispute";
     }
 }

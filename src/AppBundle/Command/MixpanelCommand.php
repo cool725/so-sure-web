@@ -7,7 +7,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\MixpanelService;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +15,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 
 class MixpanelCommand extends ContainerAwareCommand
 {
@@ -27,11 +28,15 @@ class MixpanelCommand extends ContainerAwareCommand
     /** @var MixpanelService */
     protected $mixpanelService;
 
-    public function __construct(DocumentManager $dm, MixpanelService $mixpanelService)
+    /** @var Client  */
+    protected $redis;
+
+    public function __construct(DocumentManager $dm, MixpanelService $mixpanelService, Client $redis)
     {
         parent::__construct();
         $this->dm = $dm;
         $this->mixpanelService = $mixpanelService;
+        $this->redis = $redis;
     }
 
     protected function configure()
@@ -43,7 +48,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent|extend-cache (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -181,7 +186,13 @@ class MixpanelCommand extends ContainerAwareCommand
             $userRepo = $this->dm->getRepository(User::class);
             $users = $userRepo->findNewUsers($startDate, $date);
             foreach ($users as $user) {
-                $this->mixpanelService->queueAttribution($user);
+                $this->mixpanelService->queueAttribution($user, true);
+            }
+        } elseif ($action == 'extend-cache') {
+            $cachedItems = $this->redis->keys("mixpanel:user:*");
+            array_merge($cachedItems, $this->redis->keys("mixpanel:oldest:*"));
+            foreach ($cachedItems as $item) {
+                $this->redis->setex($item, MixpanelService::CACHE_TIME, $this->redis->get($item));
             }
         } else {
             $data = $this->mixpanelService->process($process);

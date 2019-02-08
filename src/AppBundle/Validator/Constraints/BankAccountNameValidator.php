@@ -69,6 +69,13 @@ class BankAccountNameValidator extends ConstraintValidator
             return true;
         }
 
+        $this->logger->debug(sprintf(
+            'Validate Bank Account Failed Name %s for User %s / %s',
+            $name,
+            $user->getName(),
+            $user->getId()
+        ));
+
         return false;
     }
 }

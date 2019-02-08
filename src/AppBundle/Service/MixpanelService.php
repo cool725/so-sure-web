@@ -345,20 +345,21 @@ class MixpanelService
             $latestData = $this->findLatestMixpanelUser($results);
             $foundEarliestCampaignAttribution = false;
             foreach ($results['results'] as $result) {
-                if (is_array($result['properties']) &&
-                    array_key_exists('Campaign Attribution Date', $result['properties'])) {
-                    $dataDate = $this->getCampaignAttributionDate($data);
-                    $resultDate = $this->getCampaignAttributionDate($result['properties']);
-                    if (!$dataDate || $resultDate < $dataDate) {
-                        $foundEarliestCampaignAttribution = true;
-                        $data = $result['properties'];
+                if (is_array($result) && isset($result['properties'])) {
+                    if (array_key_exists('Campaign Attribution Date', $result['properties'])) {
+                        $dataDate = $this->getCampaignAttributionDate($data);
+                        $resultDate = $this->getCampaignAttributionDate($result['properties']);
+                        if (!$dataDate || $resultDate < $dataDate) {
+                            $foundEarliestCampaignAttribution = true;
+                            $data = $result['properties'];
+                        }
                     }
                 }
             }
             if (!$foundEarliestCampaignAttribution) {
                 $data = $this->findOldestMixpanelUser($results);
             }
-        } elseif ($accounts == 1) {
+        } elseif ($accounts == 1 && is_array($results) && isset($results['results'])) {
             $data = $results['results']['properties'];
             $latestData = $data;
         } else {

@@ -159,19 +159,19 @@ class PaymentService
     }
 
     /**
-     * @param Bacs $bacs
-     * @param User $user
+     * @param BankAccount $bankAccount
+     * @param User        $user
      * @return string
      * @throws \Exception
      */
-    public function generateBacsReference(Bacs $bacs, User $user)
+    public function generateBacsReference(BankAccount $bankAccount, User $user)
     {
         if ($this->environment == 'prod') {
             $seq = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE);
         } else {
             $seq = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE_INVALID);
         }
-        $ref = $bacs->generateReference($user, $seq);
+        $ref = $bankAccount->generateReference($user, $seq);
 
         return $ref;
     }
@@ -211,7 +211,7 @@ class PaymentService
             'bcc-ddnotifications@so-sure.com'
         );
 
-        if ($this->fraudService->getDuplicateBankAccountsCount($policy) > 0) {
+        if (count($this->fraudService->getDuplicatePolicyBankAccounts($policy)) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
                 'tech@so-sure.com',

@@ -72,19 +72,23 @@
                      id="payment_card"
                      role="tabpanel"
                      aria-labelledby="payment_card_tab">
-                    {% include 'AppBundle:User:cardDetails.html.twig' %}
+                    {% if policy and policy.isActive %}
+                        {% include 'AppBundle:User:cardDetails.html.twig' %}
+                    {% endif %}
                 </div>
                 <div class="tab-pane {% if active_tab == 'payment_bacs' %}active{% endif %}"
                      id="payment_bacs"
                      role="tabpanel"
                      aria-labelledby="payment_bacs_tab">
-                    {% include 'AppBundle:User:bacsDetails.html.twig' %}
+                    {% if policy and policy.isActive %}
+                        {% include 'AppBundle:User:bacsDetails.html.twig' %}
+                    {% endif %}
                 </div>
                 <div class="tab-pane {% if active_tab == 'bacs_setup' %}active{% endif %}"
                      id="bacs_setup"
                      role="tabpanel"
                      aria-labelledby="bacs_setup_tab">
-                    {% if policy %}
+                    {% if policy and policy.isActive %}
                         {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
                     {% endif %}
                 </div>
@@ -92,7 +96,7 @@
                      id="bacs_setup_confirm"
                      role="tabpanel"
                      aria-labelledby="bacs_setup_confirm_tab">
-                    {% if policy %}
+                    {% if policy and policy.isActive %}
                         {% include 'AppBundle:User:bacsSetupConfirm.html.twig' %}
                     {% endif %}
                 </div>

@@ -44,6 +44,6 @@ class ChargebackPayment extends Payment
      */
     protected function userPaymentName()
     {
-        return "Refund";
+        return "Refund due to card dispute";
     }
 }
