@@ -34,4 +34,25 @@ class PolicyDiscountRefundPayment extends Payment
     {
         return true;
     }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        return "Refund of Policy Discount";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        return $this->success;
+    }
 }
