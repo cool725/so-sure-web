@@ -29,7 +29,7 @@
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
             <div class="col-md-3">
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <div class="input-group date month" data-url="{{ path('admin_bacs') }}">
                         <input name="bacs" type='text' class="form-control" value="{{month}}-{{year}}" />
                         <span class="input-group-addon">
@@ -44,31 +44,33 @@
                 </div>
             </div>
             <div class="col-md-5">
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal"
-                        > Upload Report</button>
-                        <button class="btn btn-success bacs-serial-edit" type="button"
-                                data-toggle="modal" data-target="#approvePaymentsModal">
-                            Approve Payments
+                        <button type="button"
+                                class="btn btn-primary dropdown-toggle"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                            Page actions <span class="caret"></span>
                         </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-toggle="modal" data-target="#uploadModal">Upload Report</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#approvePaymentsModal">Approve Payments</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#uploadDebitModal">Bacs Debit</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#uploadCreditModal">Bacs Credit</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments">Payments</a></li>
+                            <li><a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports">Bacs Report</a></li>
+                        </ul>
                     </div>
                 </div>
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <button class="btn btn-warning bacs-serial-edit" type="button"
                             data-toggle="modal" data-target="#editSequenceSerialNumberModal">
                         <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
                     </button>
                 </div>
-                <div class="form-group" style="padding-top: 15px;">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadDebitModal"
-                        > Bacs Debit</button>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadCreditModal"
-                        > Bacs Credit</button>
-                    </div>
-                </div>
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <div class="form-group">
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
                         > Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
@@ -78,7 +80,7 @@
         </form>
     </div>
     <div id="claimPolicyItem" style="margin-top: 20px">
-        <ul class="nav nav-tabs nav-justified">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
             {% set dailyCount = 0 %}
             {% for file in files %}
                 {% if not file.isActioned %}
@@ -96,38 +98,90 @@
                 {% set paymentsCount = '?' %}
             {% endif %}
 
-            <li role="presentation" class="{% if not payments is defined and not input is defined %}active{% endif %}"><a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#dddc">Debits/Credits <span class="badge" title="Actionable Files">{{ dailyCount }}</span></a></li>
-            <li role="presentation" class="{% if payments is defined %}active{% endif %}"><a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments">Payments <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span></a></li>
-            <li role="presentation" class="{% if input is defined %}active{% endif %}"><a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports">Bacs Reports</a></li>
-            <li role="presentation"><a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-debit">Reconciliation Debit</a></li>
-            <li role="presentation"><a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-credit">Reconciliation Credit</a></li>
+            <li role="presentation"
+                class="{% if not payments is defined and not input is defined %}active{% endif %}">
+                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#dddc"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="dddc">
+                    Debits/Credits
+                    <span class="badge" title="Actionable Files">{{ dailyCount }}</span>
+                </a>
+            </li>
+            <li role="presentation"
+                class="{% if payments is defined %}active{% endif %}">
+                <a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="payments">
+                    Payments
+                    <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span>
+                </a>
+            </li>
+            <li role="presentation"
+                class="{% if input is defined %}active{% endif %}">
+                <a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="reports">
+                    Bacs Reports
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-debit"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="reconciliation-debit">
+                    Reconciliation Debit
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-credit"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="reconciliation-credit">
+                    Reconciliation Credit
+                </a>
+            </li>
         </ul>
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane {% if not payments is defined and not input is defined %}active{% endif %}" id="dddc">
-                {%  if files is defined %}
+            <div role="tabpanel"
+                 class="tab-pane {% if not payments is defined and not input is defined %}active{% endif %}"
+                 id="dddc">
+                {% if files is defined %}
                     {% include 'AppBundle::Admin/bacs/dddc.html.twig' %}
                 {% endif %}
             </div>
-            <div role="tabpanel" class="tab-pane {% if input is defined %}active{% endif %}" id="reports">
-                {%  if input is defined %}
-                    {% include 'AppBundle::Admin/bacs/reports.html.twig' %}
-                {% endif %}
-            </div>
-            <div role="tabpanel" class="tab-pane {% if payments is defined %}active{% endif %}" id="payments">
-                {%  if payments is defined %}
+            <div role="tabpanel"
+                 class="tab-pane {% if payments is defined %}active{% endif %}"
+                 id="payments">
+                {% if payments is defined %}
                     {% include 'AppBundle::Admin/bacs/indemnity.html.twig' %}
                     {% include 'AppBundle::Admin/bacs/payments.html.twig' %}
+                {% else %}
+                    <h4>Use temp link in page actions 👆</h4>
                 {% endif %}
             </div>
-
-            <div role="tabpanel" class="tab-pane" id="reconciliation-debit">
-                {%  if files is defined %}
+            <div role="tabpanel"
+                 class="tab-pane {% if input is defined %}active{% endif %}"
+                 id="reports">
+                {% if input is defined %}
+                    {% include 'AppBundle::Admin/bacs/reports.html.twig' %}
+                {% else %}
+                    <h4>Use temp link in page actions 👆</h4>
+                {% endif %}
+            </div>
+            <div role="tabpanel"
+                 class="tab-pane"
+                 id="reconciliation-debit">
+                {% if files is defined %}
                     {% include 'AppBundle::Admin/bacs/reconciliation_debit.html.twig' %}
                 {% endif %}
             </div>
-
-            <div role="tabpanel" class="tab-pane" id="reconciliation-credit">
-                {%  if files is defined %}
+            <div role="tabpanel"
+                 class="tab-pane"
+                 id="reconciliation-credit">
+                {% if files is defined %}
                     {% include 'AppBundle::Admin/bacs/reconciliation_credit.html.twig' %}
                 {% endif %}
             </div>
