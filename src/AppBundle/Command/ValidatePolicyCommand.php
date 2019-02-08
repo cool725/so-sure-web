@@ -519,9 +519,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $bacsPayments = $policy->getPaymentsByType(BacsPayment::class);
                     $bacsPaymentCount = 0;
+                    $initialDay = $this->startOfDay($bankAccount->getInitialNotificationDate());
                     foreach ($bacsPayments as $bacsPayment) {
                         /** @var BacsPayment $bacsPayment */
-                        if ($bacsPayment->getDate() >= $bankAccount->getInitialNotificationDate()) {
+                        if ($bacsPayment->getDate() >= $initialDay) {
                             $bacsPaymentCount++;
                         }
                     }

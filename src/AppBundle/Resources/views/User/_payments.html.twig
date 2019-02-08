@@ -27,8 +27,6 @@
                  id="payment_history"
                  role="tabpanel"
                  aria-labelledby="payment_history_tab">
-                 {# TODO: Is payment pending status available??? #}
-{#                 #}
                 {% if bacs_last_payment_in_progress %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-warning">
                         <div class="text-center text-md-left"><i class="fas fa-exclamation-triangle fa-lg fa-fw text-warning"></i> Payment pending</div>
@@ -74,26 +72,25 @@
                             {% if payment.type != 'bacs' or not payment.reversedBy or payment.status != 'pending' %}
                                 {% set displayedTotal = displayedTotal + payment.amount %}
                             {% endif %}
-                            <tr class="{% if payment.status == 'pending' %}table-warning{% endif %}">
+                            <tr class="{% if payment.type == 'bacs' and payment.status == 'pending' %}table-warning{% endif %}">
                                 <td>
                                     <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}</small>
                                 </td>
                                 <td class="h6">
                                     {{ payment.userPaymentDisplay }}
-                                    {% if payment.details %}
-                                        <br>
-                                        <em class="sub"><small>{{ payment.details }}</small></em>
-                                    {% elseif payment.status == 'pending' %}
-                                        <br>
-                                        <em class="sub"><small>Pending</small></em>
-                                    {% endif %}
+                                    <br>
+                                    <em class="sub"><small>
+                                        {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                            Pending
+                                        {% elseif payment.details %}
+                                            {{ payment.details }}
+                                        {% endif %}
+                                    </small></em>
                                 </td>
                                 <td align="right">
                                     {% if payment.type == 'bacs' and payment.reversedBy %}
                                         <del>
-                                    {% endif %}
-
-                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                    {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
                                         <em>
                                     {% endif %}
 
@@ -105,9 +102,7 @@
 
                                     {% if payment.type == 'bacs' and payment.status == 'pending' %}
                                         </em>
-                                    {% endif %}
-
-                                    {% if payment.type == 'bacs' and payment.reversedBy %}
+                                    {% elseif payment.type == 'bacs' and payment.reversedBy %}
                                         </del>
                                     {% endif %}
                                 </td>

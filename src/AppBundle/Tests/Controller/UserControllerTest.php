@@ -615,6 +615,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_INIT);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         self::$dm->flush();
@@ -651,6 +652,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_FAILURE);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         self::$dm->flush();
@@ -699,6 +701,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_PENDING);
@@ -735,6 +738,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_FAILURE);
@@ -751,7 +755,6 @@ class UserControllerTest extends BaseControllerTest
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Payment failed', $crawler->html());
 
-        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
         $newPayment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
         $newPayment->setStatus(BacsPayment::STATUS_FAILURE);
         self::$dm->flush();
@@ -777,10 +780,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
         $this->assertContains('Payment is processing', $crawler->html());
 
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(Policy::class);
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists($this->getContainer(true), $policy);
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
         $payment = $updatedPolicy->getLastPaymentCredit();
@@ -789,8 +789,7 @@ class UserControllerTest extends BaseControllerTest
             $this->assertTrue($payment instanceof BacsPayment);
             /** @var BacsPayment $bacsPayment */
             $bacsPayment = $payment;
-            // user doesn't have a valid payment method, so status will be skipped instead of pending
-            $this->assertEquals(BacsPayment::STATUS_SKIPPED, $bacsPayment->getStatus());
+            $this->assertEquals(BacsPayment::STATUS_PENDING, $bacsPayment->getStatus());
             $this->assertNotNull($payment->getIdentityLog());
             $this->assertEquals(IdentityLog::SDK_WEB, $payment->getIdentityLog()->getSdk());
             $this->assertNotNull($payment->getIdentityLog()->getIp());
@@ -816,6 +815,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_SUCCESS);
@@ -889,6 +889,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_SUCCESS);
@@ -969,6 +970,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        self::setPaymentMethodForPolicy($policy);
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
@@ -999,6 +1001,7 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
+        self::setPaymentMethodForPolicy($policy);
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
@@ -1040,6 +1043,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        self::setPaymentMethodForPolicy($policy);
         $policy->setStatus(Policy::STATUS_UNPAID);
         static::addPayment(
             $policy,
@@ -1080,6 +1084,7 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
+        self::setPaymentMethodForPolicy($policy);
         $policy->setStatus(Policy::STATUS_UNPAID);
         static::addPayment(
             $policy,
@@ -1129,6 +1134,7 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        self::setPaymentMethodForPolicy($policy, '0101');
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
@@ -1159,6 +1165,7 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
         $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
         $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
+        self::setPaymentMethodForPolicy($policy, '0101');
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 

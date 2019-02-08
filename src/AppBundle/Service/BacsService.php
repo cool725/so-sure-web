@@ -26,6 +26,7 @@ use AppBundle\Document\User;
 use AppBundle\Classes\SoSure;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\ScheduledPaymentEvent;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -1356,13 +1357,21 @@ class BacsService
     public function bacsFileUpdateSerialNumber(AccessPayFile $file, $serialNumber)
     {
         $paymentRepo = $this->dm->getRepository(BacsPayment::class);
+        $existing = $paymentRepo->findBy([
+            'serialNumber' => $serialNumber,
+        ]);
+        if (count($existing) > 0) {
+            throw new ValidationException('There are existing payments for the new serial number');
+        }
+
         $payments = $paymentRepo->findBy([
             'serialNumber' => $file->getSerialNumber(),
-            'status' => BacsPayment::STATUS_GENERATED
         ]);
+        $count = 0;
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $payment->setSerialNumber($serialNumber);
+            $count++;
         }
 
         $file->setSerialNumber($serialNumber);
@@ -1370,6 +1379,8 @@ class BacsService
         $metadata['serial-number'] = $serialNumber;
         $file->setMetadata($metadata);
         $this->dm->flush();
+
+        return $count;
     }
 
     /**
@@ -1663,7 +1674,7 @@ class BacsService
         }
 
         // Admin or user source is always a one off payment
-        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB])) {
+        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB, Payment::SOURCE_MOBILE])) {
             $payment->setIsOneOffPayment(true);
         }
 

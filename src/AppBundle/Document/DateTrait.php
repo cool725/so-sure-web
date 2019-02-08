@@ -40,9 +40,9 @@ trait DateTrait
         return false;
     }
 
-    public function now()
+    public function now(\DateTimeZone $timeZone = null)
     {
-        return \DateTime::createFromFormat('U', time());
+        return \DateTime::createFromFormat('U', time(), $timeZone);
     }
 
     public function startOfPreviousMonth(\DateTime $date = null)

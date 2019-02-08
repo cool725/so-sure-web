@@ -42,15 +42,6 @@ class BacsMandatesType extends AbstractType
             $mandates[$serialNumber][$policy->getPolicyNumber()] = $serialNumber;
         }
 
-        /** @var UserRepository $repo */
-        $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findPendingMandates()->getQuery()->execute();
-        $mandates = [];
-        foreach ($users as $user) {
-            /** @var User $user */
-            $serialNumber = $user->getBacsBankAccount()->getMandateSerialNumber();
-            $mandates[$serialNumber][$user->getName()] = $serialNumber;
-        }
         $builder
             ->add('serialNumber', ChoiceType::class, [
                 'placeholder' => 'Select a name (will approval all name for that serial number)',
