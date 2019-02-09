@@ -920,6 +920,25 @@ class ReportingService
         }
 
         $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
+
+        return $data;
+    }
+
+    private function cacheSumPayments($name, $payments, $isProd, $class = null, $useCache = true)
+    {
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            $name,
+            $isProd ? 'prod' : 'non-prod',
+            'all'
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+        $data = Payment::sumPayments($payments, $isProd, $class);
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
+
+        return $data;
     }
 
     public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
@@ -998,20 +1017,93 @@ class ReportingService
 
         // @codingStandardsIgnoreStart
         $data = [
-            'all' => Payment::sumPayments($payments, $isProd),
-            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
-            'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
-            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
-            'bacsIndemnity' => Payment::sumPayments($payments, $isProd, BacsIndemnityPayment::class),
-            'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
-            'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
-            'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
-            'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
-            'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
-            'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
-            'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
-            'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
+            'all' =>
+                $this->cacheSumPayments('allPaymentSumAll', $payments, $isProd, null, $useCache),
+            'judo' =>
+                $this->cacheSumPayments('allPaymentSumJudo', $payments, $isProd, JudoPayment::class, $useCache),
+            'sosure' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumSoSure',
+                    $payments,
+                    $isProd,
+                    SoSurePayment::class,
+                    $useCache
+                ),
+            'chargebacks' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumChargebacks',
+                    $payments,
+                    $isProd,
+                    ChargebackPayment::class,
+                    $useCache
+                ),
+            'bacs' =>
+                $this->cacheSumPayments('allPaymentSumBacs', $payments, $isProd, BacsPayment::class, $useCache),
+            'bacsIndemnity' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumBacsIndemnity',
+                    $payments,
+                    $isProd,
+                    BacsIndemnityPayment::class,
+                    $useCache
+                ),
+            'potReward' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumPotRewards',
+                    $potRewardPayments,
+                    $isProd,
+                    PotRewardPayment::class,
+                    $useCache
+                ),
+            'potRewardCashback' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumPotRewardCashback',
+                    $potRewardPaymentsCashback,
+                    $isProd,
+                    PotRewardPayment::class,
+                    $useCache
+                ),
+            'potRewardDiscount' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumPotRewardDiscount',
+                    $potRewardPaymentsDiscount,
+                    $isProd,
+                    PotRewardPayment::class,
+                    $useCache
+                ),
+            'sosurePotReward' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumSoSurePotReward',
+                    $soSurePotRewardPayments,
+                    $isProd,
+                    SoSurePotRewardPayment::class
+                ),
+            'sosurePotRewardCashback' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumSoSurePotRewardCashback',
+                    $soSurePotRewardPaymentsCashback,
+                    $isProd,
+                    SoSurePotRewardPayment::class,
+                    $useCache
+                ),
+            'sosurePotRewardDiscount' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumSoSurePotRewardDiscount',
+                    $soSurePotRewardPaymentsDiscount,
+                    $isProd,
+                    SoSurePotRewardPayment::class,
+                    $useCache
+                ),
+            'policyDiscounts' =>
+                $this->cacheSumPayments(
+                    'allPaymentSumPolicyDiscount',
+                    $policyDiscountPayments,
+                    $isProd,
+                    PolicyDiscountPayment::class,
+                    $useCache
+                ),
+            'policyDiscountRefunds' =>
+                $this->cacheSumPayments('allPaymentSumPolicyDiscountRefunds', $policyDiscountRefundPayments, $isProd),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
