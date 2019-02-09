@@ -924,13 +924,13 @@ class ReportingService
         return $data;
     }
 
-    private function cacheSumPayments($name, $payments, $isProd, $class = null, $useCache = true)
+    private function cacheSumPayments($name, $payments, $isProd, \DateTime $date, $class = null, $useCache = true)
     {
         $redisKey = sprintf(
             self::REPORT_KEY_FORMAT,
             $name,
             $isProd ? 'prod' : 'non-prod',
-            'all'
+            $date->format('Y-m-d')
         );
         if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
@@ -1018,14 +1018,15 @@ class ReportingService
         // @codingStandardsIgnoreStart
         $data = [
             'all' =>
-                $this->cacheSumPayments('allPaymentSumAll', $payments, $isProd, null, $useCache),
+                $this->cacheSumPayments('allPaymentSumAll', $payments, $isProd, $date, $useCache),
             'judo' =>
-                $this->cacheSumPayments('allPaymentSumJudo', $payments, $isProd, JudoPayment::class, $useCache),
+                $this->cacheSumPayments('allPaymentSumJudo', $payments, $isProd, $date, JudoPayment::class, $useCache),
             'sosure' =>
                 $this->cacheSumPayments(
                     'allPaymentSumSoSure',
                     $payments,
                     $isProd,
+                    $date,
                     SoSurePayment::class,
                     $useCache
                 ),
@@ -1034,16 +1035,25 @@ class ReportingService
                     'allPaymentSumChargebacks',
                     $payments,
                     $isProd,
+                    $date,
                     ChargebackPayment::class,
                     $useCache
                 ),
             'bacs' =>
-                $this->cacheSumPayments('allPaymentSumBacs', $payments, $isProd, BacsPayment::class, $useCache),
+                $this->cacheSumPayments(
+                    'allPaymentSumBacs',
+                    $payments,
+                    $isProd,
+                    $date,
+                    BacsPayment::class,
+                    $useCache
+                ),
             'bacsIndemnity' =>
                 $this->cacheSumPayments(
                     'allPaymentSumBacsIndemnity',
                     $payments,
                     $isProd,
+                    $date,
                     BacsIndemnityPayment::class,
                     $useCache
                 ),
@@ -1052,6 +1062,7 @@ class ReportingService
                     'allPaymentSumPotRewards',
                     $potRewardPayments,
                     $isProd,
+                    $date,
                     PotRewardPayment::class,
                     $useCache
                 ),
@@ -1060,6 +1071,7 @@ class ReportingService
                     'allPaymentSumPotRewardCashback',
                     $potRewardPaymentsCashback,
                     $isProd,
+                    $date,
                     PotRewardPayment::class,
                     $useCache
                 ),
@@ -1068,6 +1080,7 @@ class ReportingService
                     'allPaymentSumPotRewardDiscount',
                     $potRewardPaymentsDiscount,
                     $isProd,
+                    $date,
                     PotRewardPayment::class,
                     $useCache
                 ),
@@ -1076,6 +1089,7 @@ class ReportingService
                     'allPaymentSumSoSurePotReward',
                     $soSurePotRewardPayments,
                     $isProd,
+                    $date,
                     SoSurePotRewardPayment::class
                 ),
             'sosurePotRewardCashback' =>
@@ -1083,6 +1097,7 @@ class ReportingService
                     'allPaymentSumSoSurePotRewardCashback',
                     $soSurePotRewardPaymentsCashback,
                     $isProd,
+                    $date,
                     SoSurePotRewardPayment::class,
                     $useCache
                 ),
@@ -1091,6 +1106,7 @@ class ReportingService
                     'allPaymentSumSoSurePotRewardDiscount',
                     $soSurePotRewardPaymentsDiscount,
                     $isProd,
+                    $date,
                     SoSurePotRewardPayment::class,
                     $useCache
                 ),
@@ -1099,11 +1115,17 @@ class ReportingService
                     'allPaymentSumPolicyDiscount',
                     $policyDiscountPayments,
                     $isProd,
+                    $date,
                     PolicyDiscountPayment::class,
                     $useCache
                 ),
             'policyDiscountRefunds' =>
-                $this->cacheSumPayments('allPaymentSumPolicyDiscountRefunds', $policyDiscountRefundPayments, $isProd),
+                $this->cacheSumPayments(
+                    'allPaymentSumPolicyDiscountRefunds',
+                    $policyDiscountRefundPayments,
+                    $isProd,
+                    $date
+                ),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
