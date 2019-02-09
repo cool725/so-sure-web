@@ -649,6 +649,21 @@ class MonitorService
         }
     }
 
+    public function bacsSubmittedPayments()
+    {
+        /** @var BacsPaymentRepository $paymentsRepo */
+        $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
+
+        /** @var BacsPayment[] $unpaid */
+        $submitted = $paymentsRepo->findSubmittedPayments();
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($submitted as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are submitted unactioned bacs payments waiting: ' . $payment->getId());
+        }
+    }
+
     public function salvaBinder(\DateTime $now = null)
     {
         if (!$now) {
