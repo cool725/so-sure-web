@@ -15,7 +15,6 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\StatsRepository;
 use AppBundle\Repository\UserRepository;
-use Doctrine\ODM\MongoDB\Cursor;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
 use Psr\Log\LoggerInterface;
@@ -903,234 +902,51 @@ class ReportingService
         return $rewardPotLiability;
     }
 
-    private function cachePayments($name, $isProd, \DateTime $date, $type, $cashback = null, $useCache = true)
-    {
-        $redisKey = sprintf(
-            self::REPORT_KEY_FORMAT,
-            $name,
-            $isProd ? 'prod' : 'non-prod',
-            $date->format('Y-m-d')
-        );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
-        $data = $this->getPayments($date, $type, $cashback);
-        if ($data instanceof Cursor) {
-            $data = $data->toArray();
-        }
-
-        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
-
-        return $data;
-    }
-
-    private function cacheSumPayments($name, $payments, $isProd, \DateTime $date, $class = null, $useCache = true)
-    {
-        $redisKey = sprintf(
-            self::REPORT_KEY_FORMAT,
-            $name,
-            $isProd ? 'prod' : 'non-prod',
-            $date->format('Y-m-d')
-        );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
-        $data = Payment::sumPayments($payments, $isProd, $class);
-        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
-
-        return $data;
-    }
-
     public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
     {
-        $payments = $this->cachePayments(
-            'allPaymentPayments',
-            $isProd,
-            $date,
-            null,
-            null,
-            $useCache
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            'allPaymentsTotal',
+            $isProd ? 'prod' : 'non-prod',
+            $date->format('Y-m-d')
         );
-        $potRewardPayments = $this->cachePayments(
-            'allPaymentPotRewardPayments',
-            $isProd,
-            $date,
-            'potReward',
-            null,
-            $useCache
-        );
-        $potRewardPaymentsCashback = $this->cachePayments(
-            'allPaymentPotRewardPaymentsCashback',
-            $isProd,
-            $date,
-            'potReward',
-            true,
-            $useCache
-        );
-        $potRewardPaymentsDiscount = $this->cachePayments(
-            'allPaymentPotRewardPaymentsDiscount',
-            $isProd,
-            $date,
-            'potReward',
-            false,
-            $useCache
-        );
-        $soSurePotRewardPayments = $this->cachePayments(
-            'allPaymentSoSurePotRewardPayments',
-            $isProd,
-            $date,
-            'sosurePotReward'
-        );
-        $soSurePotRewardPaymentsCashback = $this->cachePayments(
-            'allPaymentSoSurePotRewardPaymentsCashback',
-            $isProd,
-            $date,
-            'sosurePotReward',
-            true,
-            $useCache
-        );
-        $soSurePotRewardPaymentsDiscount = $this->cachePayments(
-            'allPaymentSoSurePotRewardPaymentsDiscount',
-            $isProd,
-            $date,
-            'sosurePotReward',
-            false,
-            $useCache
-        );
-        $policyDiscountPayments = $this->cachePayments(
-            'allPaymentPolicyDiscount',
-            $isProd,
-            $date,
-            'policyDiscount',
-            null,
-            $useCache
-        );
-        $policyDiscountRefundPayments = $this->cachePayments(
-            'allPaymentPolicyDiscountRefund',
-            $isProd,
-            $date,
-            'policyDiscountRefund',
-            null,
-            $useCache
-        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
+        $payments = $this->getPayments($date);
+        $potRewardPayments = $this->getPayments($date, 'potReward');
+        $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
+        $potRewardPaymentsDiscount = $this->getPayments($date, 'potReward', false);
+        $soSurePotRewardPayments = $this->getPayments($date, 'sosurePotReward');
+        $soSurePotRewardPaymentsCashback = $this->getPayments($date, 'sosurePotReward', true);
+        $soSurePotRewardPaymentsDiscount = $this->getPayments($date, 'sosurePotReward', false);
+        $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
+        $policyDiscountRefundPayments = $this->getPayments($date, 'policyDiscountRefund');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         // @codingStandardsIgnoreStart
         $data = [
-            'all' =>
-                $this->cacheSumPayments('allPaymentSumAll', $payments, $isProd, $date, $useCache),
-            'judo' =>
-                $this->cacheSumPayments('allPaymentSumJudo', $payments, $isProd, $date, JudoPayment::class, $useCache),
-            'sosure' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumSoSure',
-                    $payments,
-                    $isProd,
-                    $date,
-                    SoSurePayment::class,
-                    $useCache
-                ),
-            'chargebacks' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumChargebacks',
-                    $payments,
-                    $isProd,
-                    $date,
-                    ChargebackPayment::class,
-                    $useCache
-                ),
-            'bacs' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumBacs',
-                    $payments,
-                    $isProd,
-                    $date,
-                    BacsPayment::class,
-                    $useCache
-                ),
-            'bacsIndemnity' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumBacsIndemnity',
-                    $payments,
-                    $isProd,
-                    $date,
-                    BacsIndemnityPayment::class,
-                    $useCache
-                ),
-            'potReward' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumPotRewards',
-                    $potRewardPayments,
-                    $isProd,
-                    $date,
-                    PotRewardPayment::class,
-                    $useCache
-                ),
-            'potRewardCashback' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumPotRewardCashback',
-                    $potRewardPaymentsCashback,
-                    $isProd,
-                    $date,
-                    PotRewardPayment::class,
-                    $useCache
-                ),
-            'potRewardDiscount' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumPotRewardDiscount',
-                    $potRewardPaymentsDiscount,
-                    $isProd,
-                    $date,
-                    PotRewardPayment::class,
-                    $useCache
-                ),
-            'sosurePotReward' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumSoSurePotReward',
-                    $soSurePotRewardPayments,
-                    $isProd,
-                    $date,
-                    SoSurePotRewardPayment::class
-                ),
-            'sosurePotRewardCashback' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumSoSurePotRewardCashback',
-                    $soSurePotRewardPaymentsCashback,
-                    $isProd,
-                    $date,
-                    SoSurePotRewardPayment::class,
-                    $useCache
-                ),
-            'sosurePotRewardDiscount' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumSoSurePotRewardDiscount',
-                    $soSurePotRewardPaymentsDiscount,
-                    $isProd,
-                    $date,
-                    SoSurePotRewardPayment::class,
-                    $useCache
-                ),
-            'policyDiscounts' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumPolicyDiscount',
-                    $policyDiscountPayments,
-                    $isProd,
-                    $date,
-                    PolicyDiscountPayment::class,
-                    $useCache
-                ),
-            'policyDiscountRefunds' =>
-                $this->cacheSumPayments(
-                    'allPaymentSumPolicyDiscountRefunds',
-                    $policyDiscountRefundPayments,
-                    $isProd,
-                    $date
-                ),
+            'all' => Payment::sumPayments($payments, $isProd),
+            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
+            'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
+            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
+            'bacsIndemnity' => Payment::sumPayments($payments, $isProd, BacsIndemnityPayment::class),
+            'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
+            'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
+            'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
+            'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
+            'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
+            'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
+            'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
+            'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
             'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
         // @codingStandardsIgnoreEnd
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
 
         return $data;
     }

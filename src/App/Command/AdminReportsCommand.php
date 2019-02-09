@@ -54,7 +54,7 @@ class AdminReportsCommand extends ContainerAwareCommand
         }
 
         if ($input->getOption('accounts')) {
-            $this->cacheAccountsReport();
+            $this->cacheAccountsReport($output);
         }
     }
 
@@ -80,7 +80,7 @@ class AdminReportsCommand extends ContainerAwareCommand
     /**
      * Runs the accounts reports that need caching so that they get cached.
      */
-    private function cacheAccountsReport()
+    private function cacheAccountsReport(OutputInterface $output)
     {
         $date = new \DateTime();
         $date = $this->startOfMonth($date);
@@ -89,9 +89,13 @@ class AdminReportsCommand extends ContainerAwareCommand
         $threeMonths = $this->startOfPreviousMonth($twoMonths);
 
         $isProd = $this->environment == 'prod';
+        $output->writeln(sprintf('Caching accounts for %s', $date->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $date, false);
+        $output->writeln(sprintf('Caching accounts for %s', $lastMonth->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $lastMonth, false);
+        $output->writeln(sprintf('Caching accounts for %s', $twoMonths->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $twoMonths, false);
+        $output->writeln(sprintf('Caching accounts for %s', $threeMonths->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $threeMonths, false);
     }
 }
