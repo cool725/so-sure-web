@@ -435,7 +435,7 @@ class MixpanelService
             $dataPresent = false;
             if (isset($latestData['Latest Campaign Name'])) {
                 $latestAttribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
-                    urldecode($data['Latest Campaign Name']),
+                    urldecode($latestData['Latest Campaign Name']),
                     250
                 ));
                 $dataPresent = true;
@@ -456,10 +456,10 @@ class MixpanelService
                 $latestAttribution->setCampaignContent(urldecode($latestData['Latest Campaign Content']));
                 $dataPresent = true;
             }
-            if (isset($data['Latest Campaign Attribution Date'])) {
-                $date = $this->getCampaignAttributionDate($data, 'Latest ');
+            if (isset($latestData['Latest Campaign Attribution Date'])) {
+                $date = $this->getCampaignAttributionDate($latestData, 'Latest ');
                 if ($date) {
-                    $attribution->setDate($this->getCampaignAttributionDate($data, 'Latest '));
+                    $latestAttribution->setDate($this->getCampaignAttributionDate($latestData, 'Latest '));
                     $dataPresent = true;
                 }
             }
