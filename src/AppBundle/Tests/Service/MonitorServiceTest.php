@@ -627,4 +627,17 @@ class MonitorServiceTest extends WebTestCase
         // if there are no exceptions then the test passed.
         $this->assertTrue(true);
     }
+
+    public function testQuoteSafeArrayToString()
+    {
+        $data = [
+            "432432",
+            "4324323242",
+        ];
+
+        $resp = self::$monitor->quoteSafeArrayToString($data);
+        //print_r($resp);
+        $this->assertNotContains("'", $resp);
+        $this->assertNotContains('"', $resp);
+    }
 }

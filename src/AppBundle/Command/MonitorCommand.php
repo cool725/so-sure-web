@@ -18,6 +18,7 @@ class MonitorCommand extends ContainerAwareCommand
     {
         parent::__construct();
         $this->monitorService = $monitorService;
+        $this->monitorService->setJsonEncodeOptions(JSON_PRETTY_PRINT);
     }
 
     protected function configure()

@@ -61,6 +61,13 @@ class MonitorService
     /** @var JudopayService */
     protected $judopay;
 
+    protected $jsonEncodeOptions = 0;
+
+    public function setJsonEncodeOptions($options)
+    {
+        $this->jsonEncodeOptions = $options;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -1116,8 +1123,8 @@ class MonitorService
         }
     }
 
-    private function quoteSafeArrayToString($data, $options = JSON_PRETTY_PRINT)
+    public function quoteSafeArrayToString($data)
     {
-        return str_replace("\"", "'", json_encode($data, $options));
+        return str_replace("\"", "", json_encode($data, $this->jsonEncodeOptions));
     }
 }

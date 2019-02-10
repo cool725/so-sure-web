@@ -775,22 +775,21 @@ class DirectGroupService extends ExcelSftpService
             $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
-            in_array('replacementImei', $directGroupClaim->unobtainableFields)) {
-            $msg = sprintf(
-                'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
-                $directGroupClaim->claimNumber
-            );
-            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
-        }
-
-        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
-            $directGroupClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
-            $msg = sprintf(
-                'Claim %s is settled without a replacement imei.',
-                $directGroupClaim->claimNumber
-            );
-            $this->errors[$directGroupClaim->claimNumber][] = $msg;
+        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired()) {
+            if ($directGroupClaim->getClaimStatus() == Claim::STATUS_SETTLED &&
+                !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
+                $msg = sprintf(
+                    'Claim %s is settled without a replacement imei.',
+                    $directGroupClaim->claimNumber
+                );
+                $this->errors[$directGroupClaim->claimNumber][] = $msg;
+            } elseif (in_array('replacementImei', $directGroupClaim->unobtainableFields)) {
+                $msg = sprintf(
+                    'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
+                    $directGroupClaim->claimNumber
+                );
+                $this->warnings[$directGroupClaim->claimNumber][] = $msg;
+            }
         }
 
         if ($directGroupClaim->isOpen() && $claim->getPhonePolicy() && $directGroupClaim->replacementImei &&
