@@ -1098,7 +1098,7 @@ class MonitorService
         $blockedItems = [];
         foreach ($blocked as $block) {
             /** @var ScheduledPayment $block */
-            if (!$block->getPolicy()->isValidPolicy()) {
+            if (!$block->getPolicy()->isActive() || !$block->getPolicy()->isValidPolicy()) {
                 continue;
             }
 
