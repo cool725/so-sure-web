@@ -1270,9 +1270,13 @@ class AdminController extends BaseController
     private function getYMD($year, $month, $daysInNextMonth = 3)
     {
         $ymd = [];
+        $bacs = [];
         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $ymd[$day] = sprintf('%d%02d%02d', $year, $month, $day);
+            $date = \DateTime::createFromFormat('Ymd', $ymd[$day]);
+            $reversed = $this->subBusinessDays($date, BacsPayment::DAYS_CREDIT);
+            $bacs[$day] = $reversed->format('Ymd');
         }
 
         $nextMonth = $month + 1;
@@ -1292,6 +1296,7 @@ class AdminController extends BaseController
             'ym' => sprintf('%d%02d', $year, $month),
             'ymd' => $ymd,
             'next_ymd' => $nextMonthYMD,
+            'bacs' => $bacs,
         ];
     }
 
@@ -1365,6 +1370,11 @@ class AdminController extends BaseController
             ),
             'dailyDebitBacsTransaction' => Payment::dailyPayments(
                 $extraDebitPayments,
+                $isProd,
+                BacsPayment::class
+            ),
+            'dailyBacsTransaction' => Payment::dailyPayments(
+                $payments,
                 $isProd,
                 BacsPayment::class
             ),
@@ -1508,6 +1518,7 @@ class AdminController extends BaseController
             'dailyProcessed' => $monthlyPerDayLloydsProcessing,
             'dailyCreditBacs' => $monthlyPerDayLloydsCreditBacs,
             'dailyDebitBacs' => $monthlyPerDayLloydsDebitBacs,
+            'dailyBacs' => $monthlyPerDayLloydsBacs,
             'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
             'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
             'monthlyBacs' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsBacs, $year, $month),
