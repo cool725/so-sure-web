@@ -30,24 +30,39 @@
                 {% if bacs_last_payment_in_progress %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-warning">
                         <div class="text-center text-md-left"><i class="fas fa-exclamation-triangle fa-lg fa-fw text-warning"></i> Payment pending</div>
-                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                        <div class="text-center text-md-left">
+                            Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong>
+                            <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
+                        </div>
                     </div>
                 {% elseif policy.getCurrentInvoiceBalance >= 0 %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-success">
                         <div class="text-center text-md-left"><i class="fas fa-check-square fa-lg fa-fw text-success"></i> Paid up to date</div>
-                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                        <div class="text-center text-md-left">
+                            Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong>
+                            <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
+                        </div>
                     </div>
                 {% else %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-danger">
                         <div class="text-center text-md-left"><i class="fas fa-exclamation-square fa-lg fa-fw text-danger"></i> Payment overdue</div>
-                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                        <div class="text-center text-md-left">
+                            Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong>
+                            <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
+                        </div>
                     </div>
                 {% endif %}
                 <div class="d-md-flex align-items-md-center justify-content-md-between p-3 bg-lily-white">
                     <div class="text-center text-md-left">Policy Number: <strong>{{ policy.policyNumber }}</strong></div>
-                    <div class="text-center text-md-left">Last payment received:
-                        <strong>{{ policy.lastSuccessfulUserPaymentCredit.date | date("d/m/Y") }}</strong>
-                    </div>
                     <div class="text-center text-md-left">Paid to date: <strong>&pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</strong></div>
                 </div>
                 <table class="table table-striped mb-0" id="payment_history_table">
@@ -65,6 +80,29 @@
                         </tr>
                     </thead>
                     <tbody>
+                    {% if policy.cashback %}
+                        <tr>
+                            <td>
+                                -
+                            </td>
+                            <td class="h6">
+                                <span class="text-success">Cashback</span>
+                                <em class="sub"><small>{{ policy.cashback.getDisplayableStatus }}</small></em>
+                            </td>
+                            <td align="right">
+                                    <span class="text-success">
+                                        &pound;{{ policy.cashback.getDisplayableAmount| number_format(2, '.', ',') }}
+                                    </span>
+                            </td>
+                            <td>
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Cashback is not included in your current balance, nor in your paid to date"></i></small>
+                            </td>
+                        </tr>
+                    {% endif %}
+
                         {% set itemsHistory = 0 %}
                         {% set displayedTotal = 0 %}
                         {% for payment in policy.getSortedPayments if payment.isVisibleUserPayment %}
