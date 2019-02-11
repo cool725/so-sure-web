@@ -826,6 +826,7 @@ class BacsService
 
                     // Set policy as unpaid if there's a payment failure
                     $policy->setPolicyStatusUnpaidIfActive();
+                    $this->dm->persist($debitPayment);
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
                     if ($scheduledPayment) {
