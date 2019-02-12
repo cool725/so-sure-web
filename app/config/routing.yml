@@ -338,20 +338,20 @@ remove_trailing_slash:
         _controller: 'App\Controller\RedirectingController'
     requirements:
         url: .*/$
-        
+
 redirect_iphone_insured_with_bank:
     path: /think-your-iPhone-7-is-insured-by-your-bank
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
-        permanent: true        
+        permanent: true
 
 redirect_samsung_seven_edge_vodafone:
     path: /samsung-s7-insured-with-vodafone
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
-        permanent: true    
+        permanent: true
 
 redirect_pixel_vodafone:
     path: /google-pixel-insured-with-vodafone
@@ -432,3 +432,38 @@ redirect_make_insure:
         permanent: true
     requirements:
         url: '[a-zA-Z]+'
+
+redirect_sosure_vs_pb:
+    path: /so-sure-vs-protect-your-bubble
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_pb_insurance:
+    path: /so-sure-vs-protect-your-bubble-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_cw_insurance:
+    path: /so-sure-vs-carphone-warehouse-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_ee_insurance:
+    path: /so-sure-vs-ee-damage-cover-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_tesco_insurance:
+    path: /so-sure-vs-tesco-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
