@@ -986,13 +986,14 @@ class BacsService
                 $indemnityPayment->setNotes('Direct Debit Indemnity Claim (Chargeback)');
                 $indemnityPayment->setReference($ddicReference);
 
+                $referencePolicy->addPayment($indemnityPayment);
+
                 $numPayments = $referencePolicy->getPremium()->getNumberOfMonthlyPayments($amount);
                 if ($numPayments >= 1) {
                     $indemnityPayment->setRefundTotalCommission($numPayments * Salva::MONTHLY_TOTAL_COMMISSION);
                 }
                 $indemnityPayment->calculateSplit();
 
-                $referencePolicy->addPayment($indemnityPayment);
                 $this->dm->persist($indemnityPayment);
             }
         }
