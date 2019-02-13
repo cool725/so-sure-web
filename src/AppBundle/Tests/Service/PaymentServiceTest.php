@@ -178,6 +178,9 @@ class PaymentServiceTest extends WebTestCase
 
         $this->assertGreaterThan(0, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy1)));
         $this->assertGreaterThan(0, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy2)));
+        // if run in isolation (this test only), then would expect only 1 - manually verify that query is correct
+        //$this->assertEquals(1, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy1)));
+        //$this->assertEquals(1, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy2)));
     }
 
     public function testConfirmBacsDifferentPayer()
