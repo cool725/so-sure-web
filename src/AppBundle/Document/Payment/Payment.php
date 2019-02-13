@@ -746,6 +746,6 @@ abstract class Payment
      */
     protected function userPaymentName()
     {
-        return "Payment";
+        return "Other";
     }
 }

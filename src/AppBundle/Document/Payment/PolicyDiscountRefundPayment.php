@@ -41,7 +41,11 @@ class PolicyDiscountRefundPayment extends Payment
      */
     protected function userPaymentName()
     {
-        return "Refund of Policy Discount";
+        if ($this->amount < 0) {
+            return "Refund of Policy Discount";
+        } else {
+            return "Refund of Policy Discount adjustment";
+        }
     }
 
     /**

@@ -130,6 +130,8 @@
                                         <del>
                                     {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
                                         <em>
+                                    {% elseif payment.type == 'policyDiscount' %}
+                                        <span class="text-warning">
                                     {% endif %}
 
                                     {% if payment.amount >= 0 %}
@@ -138,13 +140,19 @@
                                         &pound;{{ (0 - payment.amount) | number_format(2, '.', ',') }}
                                     {% endif %}
 
-                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                    {% if payment.type == 'policyDiscount' %}
+                                        </span>
+                                    {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
                                         </em>
                                     {% elseif payment.type == 'bacs' and payment.reversedBy %}
                                         </del>
                                     {% endif %}
                                 </td>
                                 <td>
+                                    {% if payment.amount < 0 %}
+                                        <strong><small>CR</small></strong>
+                                    {% endif %}
+
                                     {% if payment.type == 'bacs' and payment.reversedBy %}
                                         <i class="far fa-times fa-fw fa-lg text-danger"></i>
                                         <i class="fal fa-info-circle ml-2 text-primary fa-fw"
@@ -156,8 +164,11 @@
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Expected: {{ payment.getBacsReversedDate|date('d/m/Y', 'Europe/London') }}"></i>
-                                    {% elseif payment.amount < 0 %}
-                                        <strong><small>CR</small></strong>
+                                    {% elseif payment.type == 'policyDiscount' %}
+                                        <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Your policy discount is applied across the annual policy and has reduced your payment(s) accordingly"></i>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -203,9 +214,21 @@
                 <div class="d-md-flex align-items-md-center justify-content-md-between p-3">
                     <div class="mb-0 text-center text-md-left">
                         {% if policy.premiumPlan == 'monthly' %}
-                            ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> in monthly installments of <strong>&pound;{{ policy.premium.monthlyPremiumPrice }}</strong>
+                            ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> in monthly installments of <strong>&pound;{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }}</strong>
+                            {% if policy.premium.annualDiscount %}
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Your monthly payments of &pound;{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} are reduced to 11 payments of &pound;{{ policy.premium.adjustedStandardMonthlyPremiumPrice| number_format(2, '.', ',') }} and one final payment of &pound;{{ policy.premium.adjustedFinalMonthlyPremiumPrice| number_format(2, '.', ',') }} due to your policy discount of &pound;{{ policy.premium.annualDiscount| number_format(2, '.', ',') }}"></i>
+                            {% endif %}
                         {% else %}
                             ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> for the policy year
+                            {% if policy.premium.annualDiscount %}
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Your annual payment of &pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} is reduced to &pound;{{ policy.premium.adjustedYearlyPremiumPrice| number_format(2, '.', ',') }} due to your policy discount of &pound;{{ policy.premium.annualDiscount| number_format(2, '.', ',') }}"></i>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

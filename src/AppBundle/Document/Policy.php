@@ -875,6 +875,10 @@ abstract class Policy
             $date = $this->now();
         }
 
+        if (!$this->isActive() && $this->hasMonetaryClaimed(true)) {
+            return $this->getYearlyPremiumPrice();
+        }
+
         if ($this->getStatus() == Policy::STATUS_CANCELLED) {
             return $this->getProratedPremium($this->getEnd());
         }
@@ -895,6 +899,10 @@ abstract class Policy
 
     public function getInvoiceAmountTotal()
     {
+        if (!$this->isActive() && $this->hasMonetaryClaimed(true)) {
+            return $this->getYearlyPremiumPrice();
+        }
+
         if ($this->getStatus() == Policy::STATUS_CANCELLED) {
             return $this->getProratedPremium($this->getEnd());
         }
