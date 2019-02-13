@@ -2170,6 +2170,19 @@ class DirectGroupServiceTest extends WebTestCase
             json_encode(self::$directGroupService->getWarnings())
         );
         $this->insureWarningExists('/does not have a replacement IMEI/');
+
+        self::$directGroupService->clearWarnings();
+        self::$directGroupService->postValidateClaimDetails($claim, $directGroupClaim);
+        $this->insureWarningExists('/noted as unobtainable/');
+
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE);
+
+        self::$directGroupService->clearWarnings();
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->insureWarningDoesNotExist('/does not have a replacement IMEI/');
+
+        self::$directGroupService->postValidateClaimDetails($claim, $directGroupClaim);
+        $this->insureWarningExists('/noted as unobtainable/');
     }
 
     public function testReportMissingClaims()

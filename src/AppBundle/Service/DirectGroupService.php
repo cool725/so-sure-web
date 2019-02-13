@@ -783,7 +783,8 @@ class DirectGroupService extends ExcelSftpService
                     $directGroupClaim->claimNumber
                 );
                 $this->errors[$directGroupClaim->claimNumber][] = $msg;
-            } elseif (in_array('replacementImei', $directGroupClaim->unobtainableFields)) {
+            } elseif (in_array('replacementImei', $directGroupClaim->unobtainableFields) &&
+                !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
                 $msg = sprintf(
                     'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
                     $directGroupClaim->claimNumber
@@ -873,10 +874,19 @@ class DirectGroupService extends ExcelSftpService
             $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (count($directGroupClaim->unobtainableFields) > 0) {
+        $unobtainableFields = [];
+        foreach ($directGroupClaim->unobtainableFields as $unobtainableField) {
+            $unobtainableFields[] = $unobtainableField;
+        }
+
+        if ($claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
+            unset($unobtainableFields['replacementImei']);
+        }
+
+        if (count($unobtainableFields) > 0) {
             $msg = sprintf(
                 'The following fields are noted as unobtainable: %s',
-                json_encode($directGroupClaim->unobtainableFields)
+                json_encode($unobtainableFields)
             );
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
