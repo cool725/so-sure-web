@@ -165,7 +165,7 @@ class JudoPayment extends Payment
     protected function userPaymentName()
     {
         if ($this->amount < 0) {
-            return "Credit";
+            return "Card Refund";
         } else {
             return "Card Payment";
         }

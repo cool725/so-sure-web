@@ -62,6 +62,19 @@ class BacsIndemnityPayment extends Payment
     }
 
     /**
+     * Specific logic for whether to show a payment to users.
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        return $this->success;
+    }
+
+    /**
      * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
      * @inheritDoc
      */
