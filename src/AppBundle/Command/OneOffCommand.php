@@ -18,6 +18,7 @@ use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\FacebookService;
 use AppBundle\Service\IntercomService;
+use AppBundle\Service\MixpanelService;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -33,7 +34,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class TestCommand extends ContainerAwareCommand
+class OneOffCommand extends ContainerAwareCommand
 {
     use DateTrait;
 
@@ -52,12 +53,16 @@ class TestCommand extends ContainerAwareCommand
     /** @var FacebookService */
     protected $facebookService;
 
+    /** @var MixpanelService */
+    protected $mixpanelService;
+
     public function __construct(
         DocumentManager $dm,
         Reader $reader,
         $environment,
         IntercomService $intercomService,
-        FacebookService $facebookService
+        FacebookService $facebookService,
+        MixpanelService $mixpanelService
     ) {
         parent::__construct();
         $this->dm = $dm;
@@ -65,13 +70,14 @@ class TestCommand extends ContainerAwareCommand
         $this->environment = $environment;
         $this->intercomService = $intercomService;
         $this->facebookService = $facebookService;
+        $this->mixpanelService = $mixpanelService;
     }
 
     protected function configure()
     {
         $this
-            ->setName('sosure:test')
-            ->setDescription('Run tests or conversions')
+            ->setName('sosure:oneoff')
+            ->setDescription('Run one off functionality')
             ->addArgument(
                 'method',
                 InputArgument::REQUIRED,
@@ -89,6 +95,26 @@ class TestCommand extends ContainerAwareCommand
             throw new \Exception(sprintf('Unknown command %s', $method));
         }
         $output->writeln('Finished');
+    }
+
+    private function goCompareAttribution(OutputInterface $output)
+    {
+        $repo = $this->dm->getRepository(User::class);
+        $users = $repo->findBy(['attribution.goCompareQuote' => ['$ne' => null]]);
+        $count = 0;
+        foreach ($users as $user) {
+            /** @var User $user */
+            if ($user->getAttribution()) {
+                $this->mixpanelService->queuePersonProperties(
+                    $user->getAttribution()->getMixpanelProperties(),
+                    true,
+                    $user
+                );
+                $count++;
+            }
+        }
+        $this->dm->flush();
+        $output->writeln(sprintf('%d attributions requeued', $count));
     }
 
     private function migratePaymentMethod(OutputInterface $output)

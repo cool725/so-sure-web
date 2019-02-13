@@ -1322,7 +1322,8 @@ class MixpanelService
             $utm = $this->transformUtm();
             // TODO: this logic is temporary to stop old accounts without attribution date from getting overwritten.
             //       after 90 days (by june 2019) should be revert back and remove this if statement (keeping queue)
-            if (!$user || !$user->getAttribution() || $user->getAttribution()->getDate()) {
+            if (!$user || !$user->getAttribution() || $user->getAttribution()->getDate() ||
+                $user->getAttribution()->getGoCompareQuote()) {
                 $this->queuePersonProperties($utm, true, $user);
             }
             $properties = array_merge($properties, $utm);
@@ -1429,60 +1430,14 @@ class MixpanelService
 
     private function transformUtm($setOnce = true)
     {
-        // TODO: refactor to use RequestService::getAttribution
         $prefix = '';
         if (!$setOnce) {
             $prefix = 'Latest ';
         }
-        $utm = $this->requestService->getUtm();
-        $referer = $this->requestService->getReferer();
-        $deviceCategory = null;
-        $deviceOS = null;
-        if ($userAgent = $this->requestService->getUserAgent()) {
-            $parser = Parser::create();
-            $userAgentDetails = $parser->parse($userAgent);
-            $deviceCategory = $this->requestService->getDeviceCategory();
-            $deviceOS = $this->requestService->getDeviceOS();
-        }
 
-        $transform = [];
-        if ($utm) {
-            if (isset($utm['source']) && $utm['source']) {
-                $transform[sprintf('%sCampaign Source', $prefix)] = $utm['source'];
-            }
-            if (isset($utm['medium']) && $utm['medium']) {
-                $transform[sprintf('%sCampaign Medium', $prefix)] = $utm['medium'];
-            }
-            if (isset($utm['campaign']) && $utm['campaign']) {
-                $transform[sprintf('%sCampaign Name', $prefix)] = $utm['campaign'];
-            }
-            if (isset($utm['term']) && $utm['term']) {
-                $transform[sprintf('%sCampaign Term', $prefix)] = $utm['term'];
-            }
-            if (isset($utm['content']) && $utm['content']) {
-                $transform[sprintf('%sCampaign Content', $prefix)] = $utm['content'];
-            }
-            $transform[sprintf('%sCampaign Attribution Date', $prefix)] =
-                $this->now()->format(\DateTime::ISO8601);
-        }
+        $attribution = $this->requestService->getAttribution();
 
-        if ($referer) {
-            $refererDomain = parse_url($referer, PHP_URL_HOST);
-            $currentDomain = parse_url($this->requestService->getUri(), PHP_URL_HOST);
-            if (mb_strtolower($refererDomain) != mb_strtolower($currentDomain)) {
-                $transform[sprintf('%sReferer', $prefix)] = $referer;
-            }
-        }
-
-        if ($deviceCategory) {
-            $transform[sprintf('%sDevice Category', $prefix)] = $deviceCategory;
-        }
-
-        if ($deviceOS) {
-            $transform[sprintf('%sDevice OS', $prefix)] = $deviceOS;
-        }
-
-        return $transform;
+        return $attribution->getMixpanelProperties($prefix);
     }
 
     /**

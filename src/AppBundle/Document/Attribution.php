@@ -19,6 +19,8 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
  */
 class Attribution implements EqualsInterface
 {
+    use DateTrait;
+
     const SOURCE_UNTRACKED = 'untracked';
     const SOURCE_ACCOUNT_KIT = 'www.accountkit.com';
     const SOURCE_JUDOPAY = 'pay.judopay.com';
@@ -328,5 +330,41 @@ class Attribution implements EqualsInterface
         }
 
         return $source;
+    }
+
+    public function getMixpanelProperties($prefix = '')
+    {
+        $data = [];
+        if ($this->getCampaignSource()) {
+            $data[sprintf('%sCampaign Source', $prefix)] = $this->getCampaignSource();
+        }
+        if ($this->getCampaignMedium()) {
+            $data[sprintf('%sCampaign Medium', $prefix)] = $this->getCampaignMedium();
+        }
+        if ($this->getCampaignName()) {
+            $data[sprintf('%sCampaign Name', $prefix)] = $this->getCampaignName();
+        }
+        if ($this->getCampaignTerm()) {
+            $data[sprintf('%sCampaign Term', $prefix)] = $this->getCampaignTerm();
+        }
+        if ($this->getCampaignContent()) {
+            $data[sprintf('%sCampaign Content', $prefix)] = $this->getCampaignContent();
+        }
+
+        if ($this->getReferer()) {
+            $transform[sprintf('%sReferer', $prefix)] = $this->getReferer();
+        }
+
+        if ($this->getDeviceCategory()) {
+            $transform[sprintf('%sDevice Category', $prefix)] = $this->getDeviceCategory();
+        }
+
+        if ($this->getDeviceOS()) {
+            $transform[sprintf('%sDevice OS', $prefix)] = $this->getDeviceOS();
+        }
+
+        $data[sprintf('%sCampaign Attribution Date', $prefix)] = $this->now()->format(\DateTime::ISO8601);
+
+        return $data;
     }
 }
