@@ -52,6 +52,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     const BLACKLISTED_IMEI = '352000067704506';
     const LOSTSTOLEN_IMEI = '351451208401216';
 
+    /** @var User */
     protected static $testUser;
     protected static $testUser2;
     protected static $testUser3;
@@ -65,11 +66,15 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public static function createTestUsers()
     {
-        self::$testUser = self::createUser(
+        /** @var User $testUser */
+        $testUser = self::createUser(
             self::$userManager,
             'foo@auth-api.so-sure.com',
             'foo'
         );
+        self::$testUser = $testUser;
+        self::$testUser->setFirstName('Foo');
+        self::$testUser->setLastName('Bar');
         self::$testUser2 = self::createUser(
             self::$userManager,
             'bar@auth-api.so-sure.com',
@@ -275,6 +280,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $this->assertEquals('foo bank', $data['bank_name']);
+        $this->assertEquals('Foo Bar', $data['account_name']);
         $this->assertEquals('00-00-99', $data['displayable_sort_code']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
         $this->assertEquals('BX1 1LT', $data['bank_address']['postcode']);
@@ -296,6 +302,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $this->assertEquals('foo bank', $data['bank_name']);
+        $this->assertEquals('Foo Bar', $data['account_name']);
         $this->assertEquals('00-00-99', $data['displayable_sort_code']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);

@@ -186,6 +186,7 @@ class ApiAuthController extends BaseController
 
             $policy = new PhonePolicy();
             $bacs->setInitialNotificationDate($bacs->getFirstPaymentDateForPolicy($policy));
+            $bacs->setAccountName($this->getUser()->getName());
 
             return new JsonResponse($bacs->toApiArray());
         } catch (ValidationException $ex) {
