@@ -904,7 +904,7 @@ class DirectGroupService extends ExcelSftpService
         $policy = $claim->getPolicy();
         // Closed claims should not replace the imei as if there are multiple claims
         // for a policy it will trigger a salva policy update
-        if ($claim->isOpen()) {
+        if ($claim->isOpen() || count($policy->getClaims()) == 1) {
             // We've replaced their phone with a new imei number
             if ($claim->getReplacementImei() &&
                 $claim->getReplacementImei() != $policy->getImei() && !$skipImeiUpdate) {
@@ -921,18 +921,6 @@ class DirectGroupService extends ExcelSftpService
                     ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
                     'AppBundle:Email:davies/checkPhone.html.twig',
                     ['policy' => $policy, 'daviesClaim' => $directGroupClaim, 'skipImeiUpdate' => $skipImeiUpdate]
-                );
-            }
-        } elseif (count($policy->getClaims()) == 1) {
-            // Davies may be closing the claim before reporting the imei properly (not following process)
-            // , so if there's only 1 claim on the policy without an imei number, report it properly
-            if ($claim->getReplacementImei() &&
-                $claim->getReplacementImei() != $policy->getImei()) {
-                $this->mailer->sendTemplate(
-                    sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
-                    ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
-                    'AppBundle:Email:davies/checkPhone.html.twig',
-                    ['policy' => $policy, 'daviesClaim' => $directGroupClaim, 'skipImeiUpdate' => true]
                 );
             }
         }
