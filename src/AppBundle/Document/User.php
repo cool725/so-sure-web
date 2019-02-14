@@ -735,6 +735,19 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->policies;
     }
 
+    public function getAllPolicyPolicies()
+    {
+        $policies = [];
+        foreach ($this->getAllPolicies() as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isPolicy()) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
     public function getPayerPolicies()
     {
         return $this->payerPolicies;
@@ -1197,9 +1210,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @return Policy|null
      */
-    public function getLatestPolicy()
+    public function getLatestPolicy($valid = true)
     {
-        $policies = $this->getValidPolicies(true);
+        if ($valid) {
+            $policies = $this->getValidPolicies(true);
+        } else {
+            $policies = $this->getAllPolicyPolicies();
+        }
         if (!is_array($policies)) {
             $policies = $policies->getValues();
         }

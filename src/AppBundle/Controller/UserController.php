@@ -1329,6 +1329,9 @@ class UserController extends BaseController
         } else {
             /** @var Policy $policy */
             $policy = $user->getLatestPolicy();
+            if (!$policy) {
+                $policy = $user->getLatestPolicy(false);
+            }
         }
 
         $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);

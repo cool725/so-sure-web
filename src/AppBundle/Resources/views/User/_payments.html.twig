@@ -38,7 +38,7 @@
                                title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
                         </div>
                     </div>
-                {% elseif policy.getCurrentInvoiceBalance >= 0 %}
+                {% elseif policy.getCurrentInvoiceBalance >= 0 or equal_to_two_dp(0, policy.getCurrentInvoiceBalance) %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-success">
                         <div class="text-center text-md-left"><i class="fas fa-check-square fa-lg fa-fw text-success"></i> Paid up to date</div>
                         <div class="text-center text-md-left">
@@ -244,21 +244,25 @@
                     <thead class="thead-light">
                         <tr>
                             <th>Date</th>
+                            <th>Type</th>
                             <th class="text-right">Amount</th>
                             <th></th>
                         </tr>
                     </thead>
-                    {% set invoiceRemaining = policy.getInvoiceAmountTotal %}
+                    {% set invoiceTotal = 0 %}
                     {% for invoiceDate in policy.getInvoiceSchedule %}
+                        {% set invoiceTotal = invoiceTotal + policy.getPremiumInstallmentPrice %}
                         <tr>
                             <td>{{ invoiceDate| date('d/m/Y', 'Europe/London') }}</td>
-                            <td align="right">
-                                {% if invoiceRemaining >= policy.getPremiumInstallmentPrice %}
-                                    {% set invoiceRemaining = invoiceRemaining - policy.getPremiumInstallmentPrice %}
-                                    &pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}
+                            <td>
+                                {% if policy.premiumPlan == 'monthly' %}
+                                    Monthly Premium
                                 {% else %}
-                                    &pound;{{ invoiceRemaining | number_format(2, '.', ',') }}
+                                    Annual Premium
                                 {% endif %}
+                            </td>
+                            <td align="right">
+                                &pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}
                             </td>
                             {% if invoiceDate|date('U') < 'now'|date('U') %}
                                 <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
@@ -267,6 +271,32 @@
                             {% endif %}
                         </tr>
                     {% endfor %}
+                    {% set invoiceRemaining = policy.getInvoiceAmountTotal - invoiceTotal  %}
+                    {% if  not equal_to_two_dp(0, invoiceRemaining) %}
+                        <tr>
+                            <td>{{ policy.end| date('d/m/Y', 'Europe/London') }}</td>
+                            <td>
+                                {% if invoiceRemaining >= 0 %}
+                                    Additional Premium
+                                {% else %}
+                                    Premium Refund
+                                {% endif %}
+                            </td>
+                            <td align="right">
+                                {% if invoiceRemaining >= 0 %}
+                                    &pound;{{ invoiceRemaining | number_format(2, '.', ',') }}
+                                {% else %}
+                                    &pound;{{ (0 - invoiceRemaining) | number_format(2, '.', ',') }}
+                                    <strong><small>CR</small></strong>
+                                {% endif %}
+                            </td>
+                            {% if policy.end|date('U') < 'now'|date('U') %}
+                                <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
+                            {% else %}
+                                <td align="center"></td>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
                 </table>
             </div>
         </div>
