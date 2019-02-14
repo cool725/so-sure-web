@@ -2182,7 +2182,7 @@ class DirectGroupServiceTest extends WebTestCase
         $this->insureWarningDoesNotExist('/does not have a replacement IMEI/');
 
         self::$directGroupService->postValidateClaimDetails($claim, $directGroupClaim);
-        $this->insureWarningExists('/noted as unobtainable/');
+        $this->insureWarningDoesNotExist('/noted as unobtainable/');
     }
 
     public function testReportMissingClaims()

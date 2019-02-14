@@ -880,7 +880,9 @@ class DirectGroupService extends ExcelSftpService
         }
 
         if ($claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
-            unset($unobtainableFields['replacementImei']);
+            if (($key = array_search('replacementImei', $unobtainableFields)) !== false) {
+                unset($unobtainableFields[$key]);
+            }
         }
 
         if (count($unobtainableFields) > 0) {
