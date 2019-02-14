@@ -1312,13 +1312,29 @@
                 <tr>
                     <td><i class="fa fa-shield" title="Customer Service only"></i> Phone</td>
                     <td>
-                        <div class="form-group">
-                            {{ policy.phone }}
-                        </div>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
-                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            Update
-                        </button>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {{ policy.phone }}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Serial Number</td>
+                    <td>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {{ policy.serialNumber }}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#serialNumberForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 <tr>
@@ -1876,6 +1892,7 @@
 
     {% if is_granted('ROLE_EMPLOYEE') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:serialNumberForm', 'policy': policy, 'id': 'serialNumberForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}

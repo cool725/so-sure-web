@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
+use AppBundle\Document\Form\SerialNumber;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\BacsPaymentMethod;
@@ -25,6 +26,7 @@ use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\PicSureStatusType;
+use AppBundle\Form\Type\SerialNumberType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PromotionType;
@@ -818,6 +820,64 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'form' => $imeiForm->createView(),
             'policy' => $policy,
         ];
+    }
+
+    /**
+     * @Route("/serial-number-form/{id}", name="serial_number_form")
+     * @Template
+     */
+    public function serialNumberFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $serialNumber = new SerialNumber();
+        $serialNumber->setPolicy($policy);
+        $serialNumberForm = $this->get('form.factory')
+            ->createNamedBuilder('serial_number_form', SerialNumberType::class, $serialNumber)
+            ->setAction($this->generateUrl(
+                'serial_number_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ("POST" === $request->getMethod()) {
+            $serialNumberForm->handleRequest($request);
+            if ($serialNumberForm->isValid()) {
+                $policy->setSerialNumber($serialNumber->getSerialNumber());
+                $msg = "Serial Number update";
+                $this->addFlash(
+                    'success',
+                    sprintf('Policy %s %s', $policy->getPolicyNumber(), $msg)
+                );
+
+                $policy->addNoteDetails(
+                    $serialNumber->getNote(),
+                    $this->getUser(),
+                    $msg
+                );
+
+                $dm->flush();
+            } else {
+                $this->addFlash(
+                    'error',
+                    'Unable to save form'
+                );
+            }
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+
+        return [
+            'form' => $serialNumberForm->createView(),
+            'policy' => $policy,
+        ];
+
     }
 
     /**
