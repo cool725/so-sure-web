@@ -46,7 +46,20 @@ class SoSure
     // WN1 2XD added 23/4/18 due to suspected fraud for Mob/2018/5503304
     // TW15 1LN added 1/5/18 due to attempting to insure an already damaged phone
     // CB6 1DD added 23/8/18 reason unknown
-    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA', 'WN1 2XD', 'TW15 1LN', 'CB6 1DD'];
+    // IG11 9XH, E6 1DY, IG3 9JX, E6 3EZ added 14/2/19 due to suspected fraud;
+    //                                   MOB/2019/5510071; MOB/2018/5509081; MOB/2018/5509738; Mob/2018/5504956
+    public static $yearlyOnlyPostcodes = [
+        'TN15 7LY',
+        'PE21 7TB',
+        'OL11 1QA',
+        'WN1 2XD',
+        'TW15 1LN',
+        'CB6 1DD',
+        'IG11 9XH',
+        'E6 1DY',
+        'IG3 9JX',
+        'E6 3EZ',
+    ];
 
     public static function getActivationInterval()
     {
