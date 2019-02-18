@@ -30,6 +30,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/');
         self::verifyResponse(200);
+        $this->assertNotContains('<meta name="robots" content="noindex">', $crawler->html());
     }
 
     public function testTagManager()

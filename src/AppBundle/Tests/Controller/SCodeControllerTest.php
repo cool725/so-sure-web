@@ -32,6 +32,7 @@ class SCodeControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
         $this->assertContains(sprintf("%s", $scode->getUser()->getName()), $crawler->html());
+        $this->assertContains('<meta name="robots" content="noindex">', $crawler->html());
         // check if phone forms are pointing to the right location
         $this->assertHasFormAction($crawler, '/select-phone-dropdown');
     }
