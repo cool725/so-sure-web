@@ -145,8 +145,15 @@ class MixpanelCommand extends ContainerAwareCommand
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
             }
-            $results = $this->mixpanelService->attributionByUser($user, true);
-            $output->writeln(sprintf('Attribution %s', json_encode($results, JSON_PRETTY_PRINT)));
+            $user = $this->mixpanelService->attributionByUser($user, true);
+            $output->writeln(sprintf(
+                'First Attribution %s',
+                json_encode($user->getAttribution()->__toString(), JSON_PRETTY_PRINT)
+            ));
+            $output->writeln(sprintf(
+                'Last Attribution %s',
+                json_encode($user->getLatestAttribution()->__toString(), JSON_PRETTY_PRINT)
+            ));
         } elseif ($action == 'sync') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
