@@ -61,6 +61,13 @@ class MonitorService
     /** @var JudopayService */
     protected $judopay;
 
+    protected $jsonEncodeOptions = 0;
+
+    public function setJsonEncodeOptions($options)
+    {
+        $this->jsonEncodeOptions = $options;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -649,6 +656,21 @@ class MonitorService
         }
     }
 
+    public function bacsSubmittedPayments()
+    {
+        /** @var BacsPaymentRepository $paymentsRepo */
+        $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
+
+        /** @var BacsPayment[] $unpaid */
+        $submitted = $paymentsRepo->findSubmittedPayments();
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($submitted as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are submitted unactioned bacs payments waiting: ' . $payment->getId());
+        }
+    }
+
     public function salvaBinder(\DateTime $now = null)
     {
         if (!$now) {
@@ -1076,7 +1098,7 @@ class MonitorService
         $blockedItems = [];
         foreach ($blocked as $block) {
             /** @var ScheduledPayment $block */
-            if (!$block->getPolicy()->isValidPolicy()) {
+            if (!$block->getPolicy()->isActive() || !$block->getPolicy()->isValidPolicy()) {
                 continue;
             }
 
@@ -1101,8 +1123,8 @@ class MonitorService
         }
     }
 
-    private function quoteSafeArrayToString($data, $options = JSON_PRETTY_PRINT)
+    public function quoteSafeArrayToString($data)
     {
-        return str_replace("\"", "'", json_encode($data, $options));
+        return str_replace("\"", "", json_encode($data, $this->jsonEncodeOptions));
     }
 }

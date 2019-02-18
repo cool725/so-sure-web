@@ -346,6 +346,54 @@ redirect_iphone_insured_with_bank:
         route: homepage
         permanent: true
 
+redirect_samsung_seven_edge_vodafone:
+    path: /samsung-s7-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_pixel_vodafone:
+    path: /google-pixel-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_se_vodafone:
+    path: /iphone-SE-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_six_vodafone:
+    path: /iphone-6-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_six_s_vodafone:
+    path: /iphone-6s-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_seven_vodafone:
+    path: /iphone-7-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_seven_s_vodafone:
+    path: /iphone-7-plus-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+
 redirect_sosure_vs_gadgetcover:
     path: /so-sure-vs-gadget-cover-phone-insurance
     defaults:
@@ -362,6 +410,59 @@ redirect_sosure_vs_halifax:
 
 redirect_sosure_vs_three:
     path: /so-sure-vs-three-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_make_insurance:
+    path: /phone-insurance/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
+
+redirect_make_insure:
+    path: /insure/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
+
+redirect_sosure_vs_pb:
+    path: /so-sure-vs-protect-your-bubble
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_pb_insurance:
+    path: /so-sure-vs-protect-your-bubble-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_cw_insurance:
+    path: /so-sure-vs-carphone-warehouse-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_ee_insurance:
+    path: /so-sure-vs-ee-damage-cover-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_tesco_insurance:
+    path: /so-sure-vs-tesco-phone-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison

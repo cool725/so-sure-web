@@ -2182,7 +2182,10 @@ class PolicyService
         //$startDate = $this->endOfDay($policy->getEnd());
         $discount = 0;
         if (!$cashback && $policy->getPotValue() > 0) {
-            $discount = $policy->getPotValue();
+            // for open claims, we should assume that they are going to be settled, so don't provide a discount
+            if (!$policy->hasOpenClaim() && !$policy->hasOpenNetworkClaim()) {
+                $discount = $policy->getPotValue();
+            }
         }
 
         if ($payer = $policy->getPayer()) {

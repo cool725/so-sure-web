@@ -19,6 +19,9 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
  */
 class Attribution implements EqualsInterface
 {
+    use DateTrait;
+    use ValidatorTrait;
+
     const SOURCE_UNTRACKED = 'untracked';
     const SOURCE_ACCOUNT_KIT = 'www.accountkit.com';
     const SOURCE_JUDOPAY = 'pay.judopay.com';
@@ -328,5 +331,114 @@ class Attribution implements EqualsInterface
         }
 
         return $source;
+    }
+
+    public function getMixpanelProperties($prefix = '')
+    {
+        $data = [];
+        if ($this->getCampaignSource()) {
+            $data[sprintf('%sCampaign Source', $prefix)] = $this->getCampaignSource();
+        }
+        if ($this->getCampaignMedium()) {
+            $data[sprintf('%sCampaign Medium', $prefix)] = $this->getCampaignMedium();
+        }
+        if ($this->getCampaignName()) {
+            $data[sprintf('%sCampaign Name', $prefix)] = $this->getCampaignName();
+        }
+        if ($this->getCampaignTerm()) {
+            $data[sprintf('%sCampaign Term', $prefix)] = $this->getCampaignTerm();
+        }
+        if ($this->getCampaignContent()) {
+            $data[sprintf('%sCampaign Content', $prefix)] = $this->getCampaignContent();
+        }
+
+        if ($this->getReferer()) {
+            $transform[sprintf('%sReferer', $prefix)] = $this->getReferer();
+        }
+
+        if ($this->getDeviceCategory()) {
+            $transform[sprintf('%sDevice Category', $prefix)] = $this->getDeviceCategory();
+        }
+
+        if ($this->getDeviceOS()) {
+            $transform[sprintf('%sDevice OS', $prefix)] = $this->getDeviceOS();
+        }
+
+        $data[sprintf('%sCampaign Attribution Date', $prefix)] = $this->now()->format(\DateTime::ISO8601);
+
+        return $data;
+    }
+
+    public function setMixpanelProperties($data, $prefix = '')
+    {
+        $dataPresent = false;
+        if (isset($data[sprintf('%sCampaign Name', $prefix)])) {
+            $this->setCampaignName($this->conformAlphanumericSpaceDotPipe(
+                urldecode($data[sprintf('%sCampaign Name', $prefix)]),
+                250
+            ));
+            $dataPresent = true;
+        }
+        if (isset($data[sprintf('%sCampaign Source', $prefix)])) {
+            $this->setCampaignSource($this->conformAlphanumericSpaceDot(
+                urldecode($data[sprintf('%sCampaign Source', $prefix)]),
+                250
+            ));
+            $dataPresent = true;
+        }
+        if (isset($data[sprintf('%sCampaign Medium', $prefix)])) {
+            $this->setCampaignMedium($this->conformAlphanumericSpaceDot(
+                urldecode($data[sprintf('%sCampaign Medium', $prefix)]),
+                250
+            ));
+            $dataPresent = true;
+        }
+        if (isset($data[sprintf('%sCampaign Term', $prefix)])) {
+            $this->setCampaignTerm($this->conformAlphanumericSpaceDot(
+                urldecode($data[sprintf('%sCampaign Term', $prefix)]),
+                250
+            ));
+            $dataPresent = true;
+        }
+        if (isset($data[sprintf('%sCampaign Content', $prefix)])) {
+            $this->setCampaignContent($this->conformAlphanumericSpaceDot(
+                urldecode($data[sprintf('%sCampaign Content', $prefix)]),
+                250
+            ));
+            $dataPresent = true;
+        }
+        if (isset($data[sprintf('%sCampaign Attribution Date', $prefix)])) {
+            $date = $this->getCampaignAttributionDate($data, $prefix);
+            if ($date) {
+                $this->setDate($this->getCampaignAttributionDate($data, $prefix));
+                $dataPresent = true;
+            }
+        }
+        if (isset($data[sprintf('%sReferer', $prefix)])) {
+            $this->setReferer($data[sprintf('%sReferer', $prefix)]);
+            $dataPresent = true;
+        }
+        if (isset($data[sprintf('%sDevice Category', $prefix)])) {
+            $this->setDeviceCategory($data[sprintf('%sDevice Category', $prefix)]);
+            $dataPresent = true;
+        }
+        if (isset($data['Device OS'])) {
+            $this->setDeviceOS($data[sprintf('%sDevice OS', $prefix)]);
+            $dataPresent = true;
+        }
+
+        return $dataPresent;
+    }
+
+    private function getCampaignAttributionDate($data, $prefix = '')
+    {
+        $field = sprintf('%sCampaign Attribution Date', $prefix);
+        if (!isset($data[$field])) {
+            return null;
+        }
+        return \DateTime::createFromFormat(
+            \DateTime::ISO8601,
+            urldecode($data[$field])
+        );
     }
 }

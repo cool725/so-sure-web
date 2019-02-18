@@ -147,6 +147,15 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
+                       id="bacs_files_tab"
+                       data-toggle="tab"
+                       href="#bacs_files_content"
+                       role="tab"
+                       aria-controls="bacs_files_content"
+                       aria-selected="false">Bacs Files</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
                        id="lloyds_tab"
                        data-toggle="tab"
                        href="#lloyds_content"
@@ -186,6 +195,12 @@
                      role="tabpanel"
                      aria-labelledby="bacs_tab">
                     {% include 'AppBundle::Admin/adminBanking/bacs.html.twig' %}
+                </div>
+                <div class="tab-pane fade"
+                     id="bacs_files_content"
+                     role="tabpanel"
+                     aria-labelledby="bacs_files_tab">
+                    {% include 'AppBundle::Admin/adminBanking/bacsFiles.html.twig' %}
                 </div>
                 <div class="tab-pane fade"
                      id="lloyds_content"

@@ -31,11 +31,28 @@ class SoSurePayment extends Payment
     }
 
     /**
+     * Judopay specific logic for whether to show a payment to users.
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        return $this->success;
+    }
+
+    /**
      * Gives user facing description of sosure payment.
      * @inheritDoc
      */
-    public function getUserPaymentDisplay()
+    protected function userPaymentName()
     {
-        return "Card Payment";
+        if ($this->amount < 0) {
+            return "so-sure adjustment";
+        } else {
+            return "Payment by so-sure";
+        }
     }
 }

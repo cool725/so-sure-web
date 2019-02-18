@@ -24,6 +24,7 @@ class Feature
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
     const FEATURE_BACS = 'bacs';
     const FEATURE_CARD_OPTION_WITH_BACS = 'card-option-with-bacs';
+    const FEATURE_CARD_SWAP_FROM_BACS = 'card-swap-from-bacs';
     const FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR = 'app-ios-imei-validation-colour';
     const FEATURE_APP_PICSURE_ACCELEROMETER = 'app-picsure-accelerometer';
     const FEATURE_APP_PICSURE_DOTCODE = 'app-picsure-dotcode';
@@ -32,6 +33,7 @@ class Feature
     const FEATURE_RATE_LIMITING = 'rate-limiting';
     const FEATURE_PAYMENTS_BCC = 'bcc-payments';
     const FEATURE_JUDO_RECURRING = 'judo-recurring';
+    const FEATURE_USER_PAYMENT_HISTORY = 'user-payment-history';
 
     // All Features should be here
     public static $features = [
@@ -50,7 +52,9 @@ class Feature
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP,
         self::FEATURE_RATE_LIMITING,
         self::FEATURE_PAYMENTS_BCC,
-        self::FEATURE_JUDO_RECURRING
+        self::FEATURE_JUDO_RECURRING,
+        self::FEATURE_CARD_SWAP_FROM_BACS,
+        self::FEATURE_USER_PAYMENT_HISTORY,
     ];
 
     // @codingStandardsIgnoreStart
@@ -63,6 +67,7 @@ class Feature
         self::FEATURE_SALVA_POLICY_UPDATE => 'Use salva update api call instead of cancel/create',
         self::FEATURE_BACS => 'Bacs functionality - too integrated to turn off',
         self::FEATURE_CARD_OPTION_WITH_BACS => 'Allow users to also pay by card in web purchase flow',
+        self::FEATURE_CARD_SWAP_FROM_BACS => 'Allow user to swap from bacs to card',
         self::FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR => 'Check the colour of the top left pixel in the screenshot and if it is too different from the iOS header colour it will return an error as an anti-fraud measure.',
         self::FEATURE_APP_PICSURE_ACCELEROMETER => 'If enabled it will use the accelerometer data to check any sudden movements while taking the picsure and prevent doing picsure if any are detected as an anti-fraud measure.',
         self::FEATURE_APP_PICSURE_DOTCODE => 'Display dotcode on iOS for on the background image. Allows us to validate the imei in cases of suspected hacking.',
@@ -70,7 +75,8 @@ class Feature
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP => 'Should direct group be the default claim handler for new claims. If changing update phone system as well.',
         self::FEATURE_RATE_LIMITING => 'Use rate limiting functionality for various items including recipero imei checks and policy creation.',
         self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',
-        self::FEATURE_JUDO_RECURRING => 'Perform Judopay token payments with the \'recurring\' flag set.'
+        self::FEATURE_JUDO_RECURRING => 'Perform Judopay token payments with the \'recurring\' flag set.',
+        self::FEATURE_USER_PAYMENT_HISTORY => 'Allow users to view their payment history',
     ];
     // @codingStandardsIgnoreEnd
 

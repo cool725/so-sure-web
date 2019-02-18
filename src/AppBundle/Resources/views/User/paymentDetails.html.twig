@@ -101,7 +101,10 @@
                     {% endif %}
                 </div>
                 {# Include payment history once or tabs breaks! #}
-                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                {% if feature_enabled('user-payment-history') or is_granted('ROLE_PREVIOUS_ADMIN') %}
+                    {% if not feature_enabled('user-payment-history') %}
+                        <h4>Admin View Only</h4>
+                    {% endif %}
                     {% if policy and (active_tab == 'payment_card' or active_tab == 'payment_bacs') %}
                         {% include 'AppBundle::User/_payments.html.twig' %}
                     {% endif %}

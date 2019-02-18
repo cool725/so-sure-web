@@ -70,31 +70,6 @@ class BacsListenerTest extends WebTestCase
     {
     }
 
-    public function testUserChangeName()
-    {
-        $user = static::createUser(
-            self::$userManager,
-            self::generateEmail('testUserChangeName', $this),
-            'foo'
-        );
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $bankAccount = new BankAccount();
-        $bankAccount->setAccountName('f bar');
-        $bacs = new BacsPaymentMethod();
-        $bacs->setBankAccount($bankAccount);
-        static::$dm->flush();
-
-        $user->setLastName('rab');
-        static::$dm->flush();
-
-        $updatedUser = $this->assertUserExists(self::$container, $user);
-        $this->assertEquals(
-            BankAccount::MANDATE_CANCELLED,
-            $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
-        );
-    }
-
     public function testUserChangeNamePolicy()
     {
         self::$redis->flushdb();
@@ -138,33 +113,6 @@ class BacsListenerTest extends WebTestCase
         );
     }
 
-    public function testUserChangeNameSameAccount()
-    {
-        $user = static::createUser(
-            self::$userManager,
-            self::generateEmail('testUserChangeNameSameAccount', $this),
-            'foo'
-        );
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $bankAccount = new BankAccount();
-        $bankAccount->setAccountName('f bar');
-        $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
-        $bacs = new BacsPaymentMethod();
-        $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
-        static::$dm->flush();
-
-        $user->setFirstName('f');
-        static::$dm->flush();
-
-        $updatedUser = $this->assertUserExists(self::$container, $user);
-        $this->assertEquals(
-            BankAccount::MANDATE_SUCCESS,
-            $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
-        );
-    }
-
     public function testUserChangeNameSameAccountPolicy()
     {
         $user = static::createUser(
@@ -200,39 +148,6 @@ class BacsListenerTest extends WebTestCase
             BankAccount::MANDATE_SUCCESS,
             $updatedPolicy->getPaymentMethod()->getBankAccount()->getMandateStatus()
         );
-    }
-
-    public function testBankAccountChangedEvent()
-    {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testBankAccountChangedEvent', $this),
-            'bar',
-            null,
-            static::$dm
-        );
-
-        self::$redis->flushdb();
-        $this->assertEquals(0, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
-        $bankAccount = new BankAccount();
-        $bankAccount->setAccountName('f bar');
-        $bankAccount->setAccountNumber('12345678');
-        $bankAccount->setSortCode('000099');
-        $bankAccount->setReference('123');
-        $bacsEvent = new BacsEvent($bankAccount);
-        $bacsEvent->setUser($user);
-
-
-        self::$bacsListener->onBankAccountChangedEvent($bacsEvent);
-
-        $this->assertEquals(1, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
-        $cancellations = self::$bacsService->getBacsCancellations();
-        $data = $cancellations[0];
-        $this->assertEquals($bankAccount->getSortCode(), $data['sortCode']);
-        $this->assertEquals($bankAccount->getAccountName(), $data['accountName']);
-        $this->assertEquals($bankAccount->getAccountNumber(), $data['accountNumber']);
-        $this->assertEquals($bankAccount->getReference(), $data['reference']);
-        $this->assertEquals($user->getId(), $data['id']);
     }
 
     public function testBankAccountChangedEventPolicy()
@@ -295,28 +210,6 @@ class BacsListenerTest extends WebTestCase
 
         self::$bacsListener->onPolicyBacsCreated(new PolicyEvent($policy));
         $this->assertEquals(1, self::$redis->llen(BacsService::KEY_BACS_QUEUE));
-    }
-
-    public function testPolicyUpdatedPremium()
-    {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyUpdatedPremium', $this),
-            'bar',
-            null,
-            static::$dm
-        );
-        $bacs = new BacsPaymentMethod();
-        $user->setPaymentMethod($bacs);
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm)
-        );
-
-        self::$bacsListener->onPolicyUpdatedPremium(new PolicyEvent($policy));
-        // TODO: check logger
-        $this->assertTrue(true);
     }
 
     public function testPolicyUpdatedPremiumPolicy()

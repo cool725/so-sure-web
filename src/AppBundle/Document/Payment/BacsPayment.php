@@ -355,6 +355,10 @@ class BacsPayment extends Payment
      */
     protected function userPaymentName()
     {
-        return "Direct Debit";
+        if ($this->amount < 0) {
+            return "Direct Debit Refund";
+        } else {
+            return "Direct Debit";
+        }
     }
 }

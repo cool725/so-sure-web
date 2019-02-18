@@ -1558,10 +1558,6 @@ class JudopayService
     {
         $this->statsd->startTiming("judopay.existing");
 
-        if ($policy->getStatus() != null) {
-            throw new ProcessedException();
-        }
-
         $premium = $policy->getPremium();
         if ($amount < $premium->getMonthlyPremiumPrice() &&
             !$this->areEqualToTwoDp($amount, $premium->getMonthlyPremiumPrice())) {

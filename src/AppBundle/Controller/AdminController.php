@@ -17,6 +17,7 @@ use AppBundle\Document\Form\JudoRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
@@ -648,6 +649,10 @@ class AdminController extends BaseController
     /**
      * @Route("/bacs", name="admin_bacs")
      * @Route("/bacs/{year}/{month}", name="admin_bacs_date", requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/payments/{year}/{month}", name="admin_bacs_payments",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/reports/{year}/{month}", name="admin_bacs_reports",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Template
      */
     public function bacsAction(Request $request, $year = null, $month = null)
@@ -834,19 +839,9 @@ class AdminController extends BaseController
             }
         }
 
-        return [
+        $data = [
             'year' => $year,
             'month' => $month,
-            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
-            'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
-            'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
-            'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
-            'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
-            'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
-            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
-            'payments' => $paymentsRepo->findPayments($date),
-            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
-            'indemnity' => $paymentsIndemnityRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'uploadDebitForm' => $uploadDebitForm->createView(),
             'uploadCreditForm' => $uploadCreditForm->createView(),
@@ -855,7 +850,27 @@ class AdminController extends BaseController
             'approvePaymentsForm' => $approvePaymentsForm->createView(),
             'currentSequence' => $currentSequence,
             'outstandingMandates' => $userRepo->findPendingMandates()->getQuery()->execute()->count(),
+            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
+            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
+            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
         ];
+
+        if ($request->get('_route') == 'admin_bacs_payments') {
+            $data = array_merge($data, [
+                'indemnity' => $paymentsIndemnityRepo->findPayments($date),
+                'payments' => $paymentsRepo->findPayments($date),
+            ]);
+        } elseif ($request->get('_route') == 'admin_bacs_reports') {
+            $data = array_merge($data, [
+                'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
+                'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
+                'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
+                'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
+                'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+            ]);
+        }
+
+        return $data;
     }
 
     /**
@@ -969,8 +984,18 @@ class AdminController extends BaseController
                     $file->getFileName()
                 );
             } elseif ($request->get('_route') == 'admin_bacs_update_serial_number') {
-                $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
-                $message = sprintf('Bacs file %s serial number updated', $file->getFileName());
+                try {
+                    $count = $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
+                    $message = sprintf(
+                        'Bacs file %s serial number updated (%d payments updated)',
+                        $file->getFileName(),
+                        $count
+                    );
+                } catch (ValidationException $e) {
+                    $this->addFlash('error', $e->getMessage());
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs'));
+                }
             } else {
                 throw new \Exception('Unknown route');
             }
@@ -1245,9 +1270,13 @@ class AdminController extends BaseController
     private function getYMD($year, $month, $daysInNextMonth = 3)
     {
         $ymd = [];
+        $bacs = [];
         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $ymd[$day] = sprintf('%d%02d%02d', $year, $month, $day);
+            $date = \DateTime::createFromFormat('Ymd', $ymd[$day]);
+            $reversed = $this->subBusinessDays($date, BacsPayment::DAYS_CREDIT);
+            $bacs[$day] = $reversed->format('Ymd');
         }
 
         $nextMonth = $month + 1;
@@ -1267,6 +1296,7 @@ class AdminController extends BaseController
             'ym' => sprintf('%d%02d', $year, $month),
             'ymd' => $ymd,
             'next_ymd' => $nextMonthYMD,
+            'bacs' => $bacs,
         ];
     }
 
@@ -1340,6 +1370,11 @@ class AdminController extends BaseController
             ),
             'dailyDebitBacsTransaction' => Payment::dailyPayments(
                 $extraDebitPayments,
+                $isProd,
+                BacsPayment::class
+            ),
+            'dailyBacsTransaction' => Payment::dailyPayments(
+                $payments,
                 $isProd,
                 BacsPayment::class
             ),
@@ -1483,6 +1518,7 @@ class AdminController extends BaseController
             'dailyProcessed' => $monthlyPerDayLloydsProcessing,
             'dailyCreditBacs' => $monthlyPerDayLloydsCreditBacs,
             'dailyDebitBacs' => $monthlyPerDayLloydsDebitBacs,
+            'dailyBacs' => $monthlyPerDayLloydsBacs,
             'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
             'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
             'monthlyBacs' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsBacs, $year, $month),

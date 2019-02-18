@@ -2,11 +2,20 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\Salva;
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\DirectDebitBankException;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
+use AppBundle\Service\PaymentService;
+use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
+use AppBundle\Validator\Constraints\BankAccountNameValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -91,6 +100,7 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/address", name="api_auth_address")
+     * @Route("/lookup/address", name="api_auth_lookup_address")
      * @Method({"GET"})
      */
     public function addressAction(Request $request)
@@ -123,6 +133,94 @@ class ApiAuthController extends BaseController
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api addressAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/lookup/bacs", name="api_auth_lookup_bacs")
+     * @Method({"GET"})
+     */
+    public function bacsAction(Request $request)
+    {
+        $bacs = null;
+        try {
+            if (!$this->validateQueryFields($request, ['sort_code', 'account_number'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_BACS,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
+            $sortCode = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'sort_code'), 10);
+            $accountNumber = $this->conformAlphanumericSpaceDot(
+                $this->getRequestString($request, 'account_number'),
+                10
+            );
+            $includes = [];
+            $include = trim($this->conformAlphanumericSpaceDot($this->getRequestString($request, 'include'), 200));
+            if (mb_strlen($include) > 0) {
+                $includes = explode(',', $include);
+            }
+
+            /** @var PCAService $lookup */
+            $lookup = $this->get('app.address');
+            if (!$bacs = $lookup->getBankAccount($sortCode, $accountNumber, $this->getUser())) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
+            if (in_array('mandate', $includes)) {
+                /** @var PaymentService $paymentService */
+                $paymentService = $this->get('app.payment');
+                $paymentService->generateBacsReference($bacs, $this->getUser());
+            }
+
+            $policy = new PhonePolicy();
+            $bacs->setInitialNotificationDate($bacs->getFirstPaymentDateForPolicy($policy));
+            $bacs->setAccountName($this->getUser()->getName());
+
+            return new JsonResponse($bacs->toApiArray());
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (DirectDebitBankException $e) {
+            $this->get('logger')->info(sprintf(
+                'Direct Debit Error lookup details %s.',
+                $bacs ? $bacs->__toString() : 'unknnown'
+            ), ['exception' => $e]);
+
+            if ($e->getCode() == DirectDebitBankException::ERROR_SORT_CODE) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_INVALID_SORTCODE,
+                    'Invalid Sort Code',
+                    422
+                );
+            } elseif ($e->getCode() == DirectDebitBankException::ERROR_ACCOUNT_NUMBER) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_INVALID_NUMBER,
+                    'Invalid Account Number',
+                    422
+                );
+            } elseif ($e->getCode() == DirectDebitBankException::ERROR_NON_DIRECT_DEBIT) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_DIRECT_DEBIT_UNAVAILABLE,
+                    'Direct debit not available on account',
+                    422
+                );
+            }
+
+            // DirectDebitBankException::ERROR_UNKNOWN
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown issue', 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api addressAction.', ['exception' => $e]);
 
@@ -1011,14 +1109,22 @@ class ApiAuthController extends BaseController
      */
     public function payPolicyAction(Request $request, $id)
     {
+        $bankAccount = null;
         $dm = $this->getManager();
         $judoData = null;
+        $bacsData = null;
         $existingData = null;
         try {
             $this->get('statsd')->startTiming("api.payPolicy");
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['bank_account'])) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+                if (!$this->validateFields(
+                    $data['bank_account'],
+                    ['sort_code', 'account_number', 'account_name', 'mandate', 'initial_amount', 'recurring_amount']
+                )) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $bacsData = $data['bank_account'];
             } elseif (isset($data['braintree'])) {
                 // Not allow braintree
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
@@ -1046,6 +1152,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
             /** @var PhonePolicy $policy */
             $policy = $repo->find($id);
@@ -1058,8 +1165,84 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
-            if (isset($data['bank_account'])) {
-                throw new \Exception('gocardless is no longer supported');
+            if ($bacsData) {
+                /** @var BankAccountNameValidator $validator */
+                $validator = $this->get('app.validator.bankaccountname');
+                $accountName = $this->getDataString($bacsData, 'account_name');
+                if ($validator->isAccountName($accountName, $policy->getUser()) === false) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_BANK_NAME_MISMATCH,
+                        'Name on bank account does not match policy name',
+                        422
+                    );
+                }
+
+                $mandate = $this->getDataString($bacsData, 'mandate');
+                if (count($repo->findDuplicateMandates($mandate)) > 0) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_BANK_INVALID_MANDATE,
+                        'Duplicate mandate',
+                        422
+                    );
+                }
+
+                if ($policy->isActive() && !$policy->canBacsPaymentBeMadeInTime()) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_BANK_NOT_ENOUGH_TIME,
+                        'Not enough time to make a payment',
+                        422
+                    );
+                }
+
+                /** @var PCAService $pcaService */
+                $pcaService = $this->get('app.address');
+                $sortCode = $this->getDataString($bacsData, 'sort_code');
+                $accountNumber = $this->getDataString($bacsData, 'account_number');
+                $bankAccount = $pcaService->getBankAccount($sortCode, $accountNumber);
+                if (!$bankAccount) {
+                    throw new DirectDebitBankException('Unknown error');
+                }
+
+                $bankAccount->setAccountName($accountName);
+                $bankAccount->setReference($mandate);
+                $bankAccount->setIdentityLog($this->getIdentityLog($request));
+
+                // todo: record/bill initial amount
+                $initialAmount = $this->getDataString($bacsData, 'initial_amount');
+                $recurringAmount = $this->getDataString($bacsData, 'recurring_amount');
+                $installments = $policy->getPremium()->getNumberOfMonthlyPayments($recurringAmount);
+                if (!in_array($installments, [1, 12])) {
+                    throw new InvalidPremiumException(sprintf(
+                        '%0.2f is not a monthly/annual price for policy %s',
+                        $recurringAmount,
+                        $policy->getId()
+                    ));
+                }
+                $policy->setPremiumInstallments($installments);
+                $bankAccount->setAnnual($installments == 1);
+
+                $bacs = new BacsPaymentMethod();
+                $bacs->setBankAccount($bankAccount);
+
+                // only create policy if not already created
+                if (!$policy->getStatus() || $policy->getStatus() == PhonePolicy::STATUS_PENDING) {
+                    /** @var PolicyService $policyService */
+                    $policyService = $this->get('app.policy');
+                    $policyService->create(
+                        $policy,
+                        $this->now(),
+                        true,
+                        $installments,
+                        $this->getIdentityLog($request)
+                    );
+                }
+
+                /** @var PaymentService $paymentService */
+                $paymentService = $this->get('app.payment');
+                $paymentService->confirmBacs(
+                    $policy,
+                    $bacs
+                );
             } elseif (isset($data['braintree'])) {
                 throw new \Exception('Braintree is no longer supported');
             } elseif ($judoData) {
@@ -1085,10 +1268,26 @@ class ApiAuthController extends BaseController
                 }
                 $paymentMethod = $policy->getPolicyOrPayerOrUserPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
+                    /** @var JudopayService $judo */
                     $judo = $this->get('app.judopay');
                     if (!$judo->existing($policy, $existingData['amount'])) {
                         throw new PaymentDeclinedException('Token payment failed');
                     }
+                } elseif ($paymentMethod instanceof  BacsPaymentMethod) {
+                    // for unpaid, we can allow a bacs payment
+                    $amount = $existingData['amount'];
+                    $now = \DateTime::createFromFormat('U', time());
+                    $notes = sprintf(
+                        'User manually confirmed payment for £%0.2f on %s',
+                        $amount,
+                        $now->format(\DateTime::ATOM)
+                    );
+
+                    /** @var BacsService $bacsService */
+                    $bacsService = $this->get('app.bacs');
+                    $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_MOBILE);
+                    $payment->setIdentityLog($this->getIdentityLog($request));
+                    $dm->flush();
                 } else {
                     throw new ValidationException('Unsupport payment method');
                 }
@@ -1118,6 +1317,41 @@ class ApiAuthController extends BaseController
             ), ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Payment not valid', 422);
+        } catch (DirectDebitBankException $e) {
+            $this->get('logger')->info(sprintf(
+                'Direct Debit Error policy %s details %s.',
+                $id,
+                $bankAccount ? $bankAccount->__toString() : 'unknown'
+            ), ['exception' => $e]);
+
+            // Status should be set to null for pending policies to avoid trigger monitoring alerts
+            if ($policy->getStatus() == Policy::STATUS_PENDING) {
+                $policy->setStatus(null);
+                $dm->flush();
+            }
+
+            if ($e->getCode() == DirectDebitBankException::ERROR_SORT_CODE) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_INVALID_SORTCODE,
+                    'Invalid Sort Code',
+                    422
+                );
+            } elseif ($e->getCode() == DirectDebitBankException::ERROR_ACCOUNT_NUMBER) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_BANK_INVALID_NUMBER,
+                        'Invalid Account Number',
+                        422
+                    );
+            } elseif ($e->getCode() == DirectDebitBankException::ERROR_NON_DIRECT_DEBIT) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_DIRECT_DEBIT_UNAVAILABLE,
+                    'Direct debit not available on account',
+                    422
+                );
+            }
+
+            // DirectDebitBankException::ERROR_UNKNOWN
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown issue', 422);
         } catch (PaymentDeclinedException $e) {
             $this->get('logger')->info(sprintf(
                 'Payment declined policy %s receipt %s.',
@@ -1148,6 +1382,185 @@ class ApiAuthController extends BaseController
                 'User is missing required details',
                 422
             );
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/payment", name="api_auth_policy_payment")
+     * @Method({"POST"})
+     */
+    public function paymentPolicyAction(Request $request, $id)
+    {
+        $bankAccount = null;
+        $judoData = null;
+        $bacsData = null;
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (isset($data['bank_account'])) {
+                if (!$this->validateFields(
+                    $data['bank_account'],
+                    ['sort_code', 'account_number', 'account_name', 'mandate', 'initial_amount', 'recurring_amount']
+                )) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $bacsData = $data['bank_account'];
+            } elseif (isset($data['judo'])) {
+                if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $judoData = $data['judo'];
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+            if ($bacsData) {
+                /** @var BankAccountNameValidator $validator */
+                $validator = $this->get('app.validator.bankaccountname');
+                $accountName = $this->getDataString($bacsData, 'account_name');
+                if ($validator->isAccountName($accountName, $policy->getUser()) === false) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_BANK_NAME_MISMATCH,
+                        'Name on bank account does not match policy name',
+                        422
+                    );
+                }
+
+                $mandate = $this->getDataString($bacsData, 'mandate');
+                if (count($repo->findDuplicateMandates($mandate)) > 0) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_BANK_INVALID_MANDATE,
+                        'Duplicate mandate',
+                        422
+                    );
+                }
+
+                /** @var PCAService $pcaService */
+                $pcaService = $this->get('app.address');
+                $sortCode = $this->getDataString($bacsData, 'sort_code');
+                $accountNumber = $this->getDataString($bacsData, 'account_number');
+                $bankAccount = $pcaService->getBankAccount($sortCode, $accountNumber);
+                if (!$bankAccount) {
+                    throw new DirectDebitBankException('Unknown error');
+                }
+
+                $bankAccount->setAccountName($accountName);
+                $bankAccount->setReference($mandate);
+                $bankAccount->setIdentityLog($this->getIdentityLog($request));
+
+                // todo: record/bill initial amount
+                $initialAmount = $this->getDataString($bacsData, 'initial_amount');
+                $recurringAmount = $this->getDataString($bacsData, 'recurring_amount');
+                $installments = $policy->getPremium()->getNumberOfMonthlyPayments($recurringAmount);
+                if (!in_array($installments, [1, 12])) {
+                    throw new InvalidPremiumException(sprintf(
+                        '%0.2f is not a monthly/annual price for policy %s',
+                        $recurringAmount,
+                        $policy->getId()
+                    ));
+                }
+                $bankAccount->setAnnual($installments == 1);
+
+                $bacs = new BacsPaymentMethod();
+                $bacs->setBankAccount($bankAccount);
+
+                /** @var PaymentService $paymentService */
+                $paymentService = $this->get('app.payment');
+                $paymentService->confirmBacs(
+                    $policy,
+                    $bacs
+                );
+            } elseif ($judoData) {
+                /** @var JudopayService $judo */
+                $judo = $this->get('app.judopay');
+                $judo->updatePaymentMethod(
+                    $policy->getUser(),
+                    $this->getDataString($judoData, 'receipt_id'),
+                    $this->getDataString($judoData, 'consumer_token'),
+                    $this->getDataString($judoData, 'card_token'),
+                    $this->getDataString($judoData, 'device_dna'),
+                    $policy
+                );
+            }
+
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+        } catch (PaymentDeclinedException $e) {
+            $this->get('logger')->info(sprintf(
+                'Payment declined policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
+        } catch (InvalidPremiumException $e) {
+            $this->get('logger')->error(sprintf(
+                'Invalid premium policy payment %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT,
+                'Invalid premium payment',
+                422
+            );
+        } catch (DirectDebitBankException $e) {
+            $this->get('logger')->info(sprintf(
+                'Direct Debit Error policy payment %s details %s.',
+                $id,
+                $bankAccount ? $bankAccount->__toString() : 'unknown'
+            ), ['exception' => $e]);
+
+            if ($e->getCode() == DirectDebitBankException::ERROR_SORT_CODE) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_INVALID_SORTCODE,
+                    'Invalid Sort Code',
+                    422
+                );
+            } elseif ($e->getCode() == DirectDebitBankException::ERROR_ACCOUNT_NUMBER) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_INVALID_NUMBER,
+                    'Invalid Account Number',
+                    422
+                );
+            } elseif ($e->getCode() == DirectDebitBankException::ERROR_NON_DIRECT_DEBIT) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_BANK_DIRECT_DEBIT_UNAVAILABLE,
+                    'Direct debit not available on account',
+                    422
+                );
+            }
+
+            // DirectDebitBankException::ERROR_UNKNOWN
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown issue', 422);
+        } catch (AccessDeniedException $e) {
+            $this->get('logger')->warning(sprintf(
+                'Access denied policy %s receipt %s.',
+                $id,
+                $this->getDataString($judoData, 'receipt_id')
+            ), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 

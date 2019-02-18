@@ -775,22 +775,22 @@ class DirectGroupService extends ExcelSftpService
             $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
-            in_array('replacementImei', $directGroupClaim->unobtainableFields)) {
-            $msg = sprintf(
-                'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
-                $directGroupClaim->claimNumber
-            );
-            $this->warnings[$directGroupClaim->claimNumber][] = $msg;
-        }
-
-        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired() &&
-            $directGroupClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
-            $msg = sprintf(
-                'Claim %s is settled without a replacement imei.',
-                $directGroupClaim->claimNumber
-            );
-            $this->errors[$directGroupClaim->claimNumber][] = $msg;
+        if (!$directGroupClaim->replacementImei && !$directGroupClaim->isReplacementRepaired()) {
+            if ($directGroupClaim->getClaimStatus() == Claim::STATUS_SETTLED &&
+                !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
+                $msg = sprintf(
+                    'Claim %s is settled without a replacement imei.',
+                    $directGroupClaim->claimNumber
+                );
+                $this->errors[$directGroupClaim->claimNumber][] = $msg;
+            } elseif (in_array('replacementImei', $directGroupClaim->unobtainableFields) &&
+                !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
+                $msg = sprintf(
+                    'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
+                    $directGroupClaim->claimNumber
+                );
+                $this->warnings[$directGroupClaim->claimNumber][] = $msg;
+            }
         }
 
         if ($directGroupClaim->isOpen() && $claim->getPhonePolicy() && $directGroupClaim->replacementImei &&
@@ -874,10 +874,21 @@ class DirectGroupService extends ExcelSftpService
             $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
         }
 
-        if (count($directGroupClaim->unobtainableFields) > 0) {
+        $unobtainableFields = [];
+        foreach ($directGroupClaim->unobtainableFields as $unobtainableField) {
+            $unobtainableFields[] = $unobtainableField;
+        }
+
+        if ($claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE)) {
+            if (($key = array_search('replacementImei', $unobtainableFields)) !== false) {
+                unset($unobtainableFields[$key]);
+            }
+        }
+
+        if (count($unobtainableFields) > 0) {
             $msg = sprintf(
                 'The following fields are noted as unobtainable: %s',
-                json_encode($directGroupClaim->unobtainableFields)
+                json_encode($unobtainableFields)
             );
             $this->warnings[$directGroupClaim->claimNumber][] = $msg;
         }
@@ -895,7 +906,7 @@ class DirectGroupService extends ExcelSftpService
         $policy = $claim->getPolicy();
         // Closed claims should not replace the imei as if there are multiple claims
         // for a policy it will trigger a salva policy update
-        if ($claim->isOpen()) {
+        if ($claim->isOpen() || count($policy->getClaims()) == 1) {
             // We've replaced their phone with a new imei number
             if ($claim->getReplacementImei() &&
                 $claim->getReplacementImei() != $policy->getImei() && !$skipImeiUpdate) {
@@ -912,18 +923,6 @@ class DirectGroupService extends ExcelSftpService
                     ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
                     'AppBundle:Email:davies/checkPhone.html.twig',
                     ['policy' => $policy, 'daviesClaim' => $directGroupClaim, 'skipImeiUpdate' => $skipImeiUpdate]
-                );
-            }
-        } elseif (count($policy->getClaims()) == 1) {
-            // Davies may be closing the claim before reporting the imei properly (not following process)
-            // , so if there's only 1 claim on the policy without an imei number, report it properly
-            if ($claim->getReplacementImei() &&
-                $claim->getReplacementImei() != $policy->getImei()) {
-                $this->mailer->sendTemplate(
-                    sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
-                    ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
-                    'AppBundle:Email:davies/checkPhone.html.twig',
-                    ['policy' => $policy, 'daviesClaim' => $directGroupClaim, 'skipImeiUpdate' => true]
                 );
             }
         }

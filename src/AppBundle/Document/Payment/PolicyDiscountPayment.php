@@ -34,4 +34,30 @@ class PolicyDiscountPayment extends Payment
     {
         return true;
     }
+
+    /**
+     * Specific logic for whether to show a payment to users.
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        return $this->success;
+    }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        if ($this->amount < 0) {
+            return "Policy Discount adjustment";
+        } else {
+            return "Policy Discount";
+        }
+    }
 }

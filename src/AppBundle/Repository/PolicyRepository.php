@@ -224,10 +224,21 @@ class PolicyRepository extends BaseDocumentRepository
         return $qb;
     }
 
+    public function findDuplicateMandates($mandate)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.reference')->equals($mandate)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findBankAccount(Policy $policy)
     {
         $qb = $this->createQueryBuilder();
-        $qb->field('id')->notEqual($policy->getId());
+        if ($policy->getUser()) {
+            $qb->field('user.$id')->notIn([new \MongoId($policy->getUser()->getId())]);
+        }
 
         if ($policy->getPaymentMethod() instanceof JudoPaymentMethod) {
             $accountHash = $policy->getJudoPaymentMethod() ?

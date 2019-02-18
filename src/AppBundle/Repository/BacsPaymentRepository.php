@@ -39,8 +39,11 @@ class BacsPaymentRepository extends PaymentRepository
             ->execute();
     }
 
-    public function findSubmittedPayments(\DateTime $date)
+    public function findSubmittedPayments(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = $this->now();
+        }
         return $this->createQueryBuilder()
             ->field('status')->equals(BacsPayment::STATUS_SUBMITTED)
             ->field('bacsReversedDate')->lte($date)

@@ -29,7 +29,7 @@
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
             <div class="col-md-3">
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <div class="input-group date month" data-url="{{ path('admin_bacs') }}">
                         <input name="bacs" type='text' class="form-control" value="{{month}}-{{year}}" />
                         <span class="input-group-addon">
@@ -44,31 +44,33 @@
                 </div>
             </div>
             <div class="col-md-5">
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <div class="btn-group">
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadModal"
-                        > Upload Report</button>
-                        <button class="btn btn-success bacs-serial-edit" type="button"
-                                data-toggle="modal" data-target="#approvePaymentsModal">
-                            Approve Payments
+                        <button type="button"
+                                class="btn btn-primary dropdown-toggle"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                            Page actions <span class="caret"></span>
                         </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" data-toggle="modal" data-target="#uploadModal">Upload Report</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#approvePaymentsModal">Approve Payments</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#uploadDebitModal">Bacs Debit</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#uploadCreditModal">Bacs Credit</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments">Payments</a></li>
+                            <li><a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports">Bacs Report</a></li>
+                        </ul>
                     </div>
                 </div>
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <button class="btn btn-warning bacs-serial-edit" type="button"
                             data-toggle="modal" data-target="#editSequenceSerialNumberModal">
                         <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
                     </button>
                 </div>
-                <div class="form-group" style="padding-top: 15px;">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadDebitModal"
-                        > Bacs Debit</button>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadCreditModal"
-                        > Bacs Credit</button>
-                    </div>
-                </div>
-                <div class="form-group" style="padding-top: 15px;">
+                <div class="form-group">
                     <div class="form-group">
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
                         > Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
@@ -78,488 +80,110 @@
         </form>
     </div>
     <div id="claimPolicyItem" style="margin-top: 20px">
-        <ul class="nav nav-tabs nav-justified">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
             {% set dailyCount = 0 %}
             {% for file in files %}
                 {% if not file.isActioned %}
                     {% set dailyCount = dailyCount + 1 %}
                 {% endif %}
             {% endfor %}
-            {% set paymentsCount = 0 %}
-            {% for payment in payments if payment.serialNumber and payment.submittedDate %}
-                {% if payment.canAction %}
-                    {% set paymentsCount = paymentsCount + 1 %}
-                {% endif %}
-            {% endfor %}
+            {% if payments is defined %}
+                {% set paymentsCount = 0 %}
+                {% for payment in payments if payment.serialNumber and payment.submittedDate %}
+                    {% if payment.canAction %}
+                        {% set paymentsCount = paymentsCount + 1 %}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% set paymentsCount = '?' %}
+            {% endif %}
 
-            <li role="presentation" class="active"><a href="#dddc">Debits/Credits <span class="badge" title="Actionable Files">{{ dailyCount }}</span></a></li>
-            <li role="presentation"><a href="#payments">Payments <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span></a></li>
-            <li role="presentation"><a href="#reports">Bacs Reports</a></li>
-            <li role="presentation"><a href="#reconciliation-debit">Reconciliation Debit</a></li>
-            <li role="presentation"><a href="#reconciliation-credit">Reconciliation Credit</a></li>
+            <li role="presentation"
+                class="{% if not payments is defined and not input is defined %}active{% endif %}">
+                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#dddc"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="dddc">
+                    Debits/Credits
+                    <span class="badge" title="Actionable Files">{{ dailyCount }}</span>
+                </a>
+            </li>
+            <li role="presentation"
+                class="{% if payments is defined %}active{% endif %}">
+                <a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="payments">
+                    Payments
+                    <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span>
+                </a>
+            </li>
+            <li role="presentation"
+                class="{% if input is defined %}active{% endif %}">
+                <a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="reports">
+                    Bacs Reports
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-debit"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="reconciliation-debit">
+                    Reconciliation Debit
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-credit"
+                   role="tab"
+                   data-toggle="tab"
+                   aria-controls="reconciliation-credit">
+                    Reconciliation Credit
+                </a>
+            </li>
         </ul>
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="dddc">
-                <h2>Daily Files</h2>
-                {% if files|length == 0 %}
-                    <p>No files present</p>
-                {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="30%">File name</th>
-                            <th width="45%">Details</th>
-                            <th width="15%">Submitted to BACS</th>
-                            <th width="10%">Edit</th>
-                        </tr>
-                        {% for file in files %}
-                            <tr>
-                                <td width="30%">
-                                    {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
-                                    <br>
-                                    <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ file.serialNumber }}"
-                                       data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
-                                        {{ file.serialNumber }}
-                                    </a>
-                                    (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
-                                </td>
-                                <td width="45%">
-                                    {{ file.metadata|json_encode }}
-                                </td>
-                                <td width="15%">
-                                    {% if file.isActioned %}
-                                        {{ file.status }}
-                                        {% if file.status == 'submitted' %}
-                                            <i class="fa fa-check text-success"></i><br>
-                                            {{  file.submittedDate|date('d M Y H:i', 'Europe/London')  }}
-                                        {% elseif file.status == 'cancelled' %}
-                                            <i class="fa fa-minus text-danger"></i>
-                                        {% endif %}
-                                    {% else %}
-                                        <button title="Mark as submitted" type="button" class="btn btn-success bacs-submit" data-token="{{ csrf_token('default') }}"
-                                                data-bacs-action-url="{{ path('admin_bacs_submit', {'id': file.id}) }}"><i class="fa fa-check"></i></button>
-                                        <button title="Mark as cancelled" type="button" class="btn btn-danger bacs-cancel" data-token="{{ csrf_token('default') }}"
-                                                data-bacs-action-url="{{ path('admin_bacs_cancel', {'id': file.id}) }}"><i class="fa fa-power-off"></i></button>
-                                    {% endif %}
-                                </td>
-                                <td width="10%">
-                                    <button class="btn btn-success bacs-serial-edit" data-serial-number="{{ file.serialNumber }}"
-                                            data-serial-number-url="{{ path('admin_bacs_update_serial_number', {'id': file.id }) }}"
-                                            data-toggle="modal" data-target="#editSerialNumberModal">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+            <div role="tabpanel"
+                 class="tab-pane {% if not payments is defined and not input is defined %}active{% endif %}"
+                 id="dddc">
+                {% if files is defined %}
+                    {% include 'AppBundle::Admin/bacs/dddc.html.twig' %}
                 {% endif %}
             </div>
-            <div role="tabpanel" class="tab-pane" id="reports">
-                <h2>Input Files <span class="small">(confirmation of debit/credit)</span></h2>
-                {% if input|length == 0 %}
-                    <p>No files present</p>
+            <div role="tabpanel"
+                 class="tab-pane {% if payments is defined %}active{% endif %}"
+                 id="payments">
+                {% if payments is defined %}
+                    {% include 'AppBundle::Admin/bacs/indemnity.html.twig' %}
+                    {% include 'AppBundle::Admin/bacs/payments.html.twig' %}
                 {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="50%">File name</th>
-                            <th width="50%">Details</th>
-                        </tr>
-                        {% for file in input %}
-                            <tr>
-                                <td width="50%">
-                                    {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
-                                </td>
-                                <td width="50%">
-                                    {{ file.metadata|json_encode }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-                <h2>Auddis <span class="small">(Direct debit setups)</span></h2>
-                {% if auddis|length == 0 %}
-                    <p>No files present</p>
-                {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="50%">File name</th>
-                            <th width="50%">Details</th>
-                        </tr>
-                        {% for file in auddis %}
-                            <tr>
-                                <td width="50%">
-                                    {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
-                                </td>
-                                <td width="50%">
-                                    {{ file.metadata|json_encode }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-                <h2>Addacs <span class="small">(Direct debit cancellations)</span></h2>
-                {% if addacs|length == 0 %}
-                    <p>No files present</p>
-                {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="50%">File name</th>
-                            <th width="50%">Details</th>
-                        </tr>
-                        {% for file in addacs %}
-                            <tr>
-                                <td width="50%">
-                                    {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
-                                </td>
-                                <td width="50%">
-                                    {{ file.metadata|json_encode }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-                <h2>Arudd <span class="small">(Direct debit failures)</span></h2>
-                {% if arudds|length == 0 %}
-                    <p>No files present</p>
-                {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="50%">File name</th>
-                            <th width="50%">Details</th>
-                        </tr>
-                        {% for file in arudds %}
-                            <tr>
-                                <td width="50%">
-                                    {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
-                                </td>
-                                <td width="50%">
-                                    {{ file.metadata|json_encode }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-                <h2>DDIC <span class="small">(Direct debit indemnity claims)</span></h2>
-                {% if ddic|length == 0 %}
-                    <p>No files present</p>
-                {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="50%">File name</th>
-                            <th width="50%">Details</th>
-                        </tr>
-                        {% for file in ddic %}
-                            <tr>
-                                <td width="50%">
-                                    {{ file.key }}
-                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
-                                </td>
-                                <td width="50%">
-                                    {{ file.metadata|json_encode }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
+                    <h4>Use temp link in page actions 👆</h4>
                 {% endif %}
             </div>
-            <div role="tabpanel" class="tab-pane" id="payments">
-
-
-                {% include 'AppBundle::Admin/_bacs_indemnity.html.twig' %}
-
-
-                <div class="row">
-                    <div class="col-sm-4">
-                        <h2>Payments</h2>
-                    </div>
-                    <div class="col-sm-8">
-
-                    </div>
-                </div>
-                {% if payments|length == 0 %}
-                    <p>No payments present</p>
+            <div role="tabpanel"
+                 class="tab-pane {% if input is defined %}active{% endif %}"
+                 id="reports">
+                {% if input is defined %}
+                    {% include 'AppBundle::Admin/bacs/reports.html.twig' %}
                 {% else %}
-                    {% set serial = '' %}
-                        {% for payment in payments if payment.serialNumber and payment.submittedDate %}
-                        {% if serial != payment.serialNumber %}
-                            {% if serial != '' %}</table>{% endif %}
-                            <h4>
-                                {% if payment.serialNumber %}
-                                    <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ payment.serialNumber }}"
-                                       data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': payment.serialNumber} ) }}">
-                                        {{ payment.serialNumber }}
-                                    </a>
-                                {% else %}
-                                    {{ payment.serialNumber }}
-                                {% endif %}
-                            {% for file in files %}
-                                {% if file.serialNumber == payment.serialNumber %}
-                                    (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
-                                {% endif %}
-                            {% endfor %}
-                            </h4>
-                            <table class="table table-striped">
-                                <tr>
-                                    <th width="10%">Status</th>
-                                    <th width="20%">Policy</th>
-                                    <th width="5%">Amount</th>
-                                    <th width="15%">Submitted Date</th>
-                                    <th width="15%">Bacs Credit Date</th>
-                                    <th width="15%">Bacs Reversed Date</th>
-                                    <th width="20%">Actions</th>
-                                </tr>
-                        {% endif %}
-                            <tr>
-                                <td width="10%">
-                                    {{ payment.status }}
-                                    {% if payment.success %}
-                                        <i class="fa fa-check text-success"></i>
-                                    {% elseif payment.success is null %}
-                                        <i class="fa fa-question"></i>
-                                    {% else %}
-                                        <i class="fa fa-minus text-danger"></i>
-                                    {% endif %}
-                                </td>
-                                <td width="20%">
-                                    <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.user.name }}</a>
-                                </td>
-                                <td width="5%">
-                                    £{{ payment.amount|number_format(2, '.', ',') }}
-                                </td>
-                                <td width="15%">
-                                    {% if payment.submittedDate %}
-                                        {{ payment.submittedDate|date('d M Y', 'Europe/London') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td width="15%">
-                                    {% if payment.bacsCreditDate %}
-                                        {{ payment.bacsCreditDate|date('d M Y', 'Europe/London') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td width="15%">
-                                    {% if payment.bacsReversedDate %}
-                                        {{ payment.bacsReversedDate|date('d M Y', 'Europe/London') }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td width="20%">
-                                    {% if payment.canAction %}
-                                        <button title="Mark as approved" type="button" class="btn btn-success bacs-approve" data-token="{{ csrf_token('default') }}"
-                                                data-bacs-approve-url="{{ path('admin_bacs_payment_approve', {'id': payment.id}) }}">Approve</button>
-                                        <button title="Mark as rejected" type="button" class="btn btn-danger bacs-reject" data-token="{{ csrf_token('default') }}"
-                                                data-bacs-reject-url="{{ path('admin_bacs_payment_reject', {'id': payment.id}) }}">Reject</button>
-                                    {% elseif not payment.inProgress %}
-                                        Already actioned
-                                    {% else %}
-                                        Wait
-                                    {% endif %}
-                                    {% if payment.inProgress %}
-                                        <button title="Edit Serial" type="button" class="btn btn-warning bacs-serial"
-                                                data-token="{{ csrf_token('default') }}"
-                                                data-serial-number="{{ payment.serialNumber }}"
-                                                data-serial-number-url="{{ path('admin_bacs_payment_serial', {'id': payment.id}) }}"
-                                                data-toggle="modal" data-target="#editSerialNumberModal">Edit Serial</button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% set serial = payment.serialNumber %}
-                    {% endfor %}
-                    </table>
+                    <h4>Use temp link in page actions 👆</h4>
                 {% endif %}
-                </div>
-
-                <div role="tabpanel" class="tab-pane" id="reconciliation-debit">
-                    <h2>Reconciliation Debit</h2>
-                    {% if files|length == 0 %}
-                        <p>No data present</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            <tr>
-                                <th width="25%">Serial Number</th>
-                                <th width="25%">Debit Amount</th>
-                                <th width="25%">Payment Amount</th>
-                                <th width="25%">Bacs Report Amount</th>
-                            </tr>
-                            {% for file in files if file.status != 'cancelled' %}
-                                {% set debitAmount = 0 %}
-                                {%  if file and file.metadata %}
-                                    {% if file.metadata['debit-amount'] is defined %}
-                                        {% set debitAmount = file.metadata['debit-amount'] %}
-                                    {% endif %}
-                                {% endif %}
-
-                                {% set paymentAmount = 0 %}
-                                {% set lastSubmittedPayment = {} %}
-                                {% for payment in paymentsIncPrevNextMonth if payment.serialNumber and payment.submittedDate %}
-                                    {% if payment.serialNumber == file.serialNumber and payment.amount >= 0.0 and payment.status != 'failure' %}
-                                        {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
-                                            {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
-                                        {% endif %}
-                                        {% set paymentAmount = paymentAmount + payment.amount %}
-                                    {% endif %}
-                                {% endfor %}
-
-                                {% set reportAmount = 0 %}
-                                {% for inputFile in inputIncPrevMonth %}
-                                    {% if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
-                                        {% if inputFile.metadata['debit-accepted-value'] is defined %}
-                                            {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-
-                                <tr>
-                                    <td width="25%">
-                                        {{ file.serialNumber }}
-                                    </td>
-                                    <td width="25%">
-                                        <span title="{{ file.metadata|json_encode }}">
-                                        {% if file.metadata %}
-                                            {{ debitAmount|number_format(2, '.', ',') }}
-                                            {% if file.metadata['debit-amount-notes'] is defined %}
-                                                <i class="fa fa-warning" title="{{ file.metadata['debit-amount-notes'] }}"></i>
-                                            {% endif %}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                        </span>
-                                    </td>
-
-                                    {% set color = '' %}
-                                    {% if equal_to_two_dp(debitAmount, paymentAmount) %}
-                                        {% set color = 'success' %}
-                                    {% else %}
-                                        {% set color = 'danger' %}
-                                    {% endif %}
-                                    <td class="{{ color }}" width="25%">
-                                        {% if paymentAmount > 0 %}
-                                            {{ paymentAmount|number_format(2, '.', ',') }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-
-                                    {% set delay = false %}
-                                    {% if equal_to_two_dp(debitAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
-                                        {% set color = 'success' %}
-                                    {% elseif lastSubmittedPayment[file.serialNumber] is defined and lastSubmittedPayment[file.serialNumber]|date > 'now'|date %}
-                                        {% set color = 'warning' %}
-                                    {% else %}
-                                        {% set color = 'danger' %}
-                                    {% endif %}
-                                    <td class="{{ color }}" width="25%">
-                                        {% if reportAmount != 0 %}
-                                            {{ reportAmount|number_format(2, '.', ',') }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                        {% if color == 'warning' %}<i class="fa fa-clock-o" title="Wait until {{  lastSubmittedPayment[file.serialNumber]|date}}"></i>{% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% endif %}
-                </div>
-
-                <div role="tabpanel" class="tab-pane" id="reconciliation-credit">
-                    <h2>Reconciliation Credit</h2>
-                    {% if files|length == 0 %}
-                        <p>No data present</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            <tr>
-                                <th width="20%">Serial Number</th>
-                                <th width="25%">Credit Amount</th>
-                                <th width="25%">Payment Amount</th>
-                                <th width="25%">Bacs Report Amount</th>
-                            </tr>
-                            {% for file in files if file.status != 'cancelled' %}
-                                {% set creditAmount = 0 %}
-                                {%  if file and file.metadata %}
-                                    {% if file.metadata['credit-amount'] is defined %}
-                                        {% set creditAmount = file.metadata['credit-amount'] %}
-                                    {% endif %}
-                                {% endif %}
-
-                                {% set paymentAmount = 0 %}
-                                {% set lastSubmittedPayment = {} %}
-                                {% for payment in paymentsIncPrevNextMonth if payment.serialNumber and payment.submittedDate %}
-                                    {% if payment.serialNumber == file.serialNumber and payment.amount < 0.0 %}
-                                        {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
-                                            {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
-                                        {% endif %}
-                                        {% set paymentAmount = paymentAmount + payment.amount %}
-                                    {% endif %}
-                                {% endfor %}
-                                {% set paymentAmount = 0 - paymentAmount %}
-
-                                {% set reportAmount = 0 %}
-                                {% for inputFile in inputIncPrevMonth %}
-                                    {% if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
-                                        {% if inputFile.metadata['credit-accepted-value'] is defined %}
-                                            {% set reportAmount = reportAmount + inputFile.metadata['credit-accepted-value'] %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-
-                                <tr>
-                                    <td width="25%">
-                                        {{ file.serialNumber }}
-                                    </td>
-                                    <td width="25%">
-                                        <span title="{{ file.metadata|json_encode }}">
-                                        {% if file.metadata %}
-                                            {{ creditAmount|number_format(2, '.', ',') }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                        </span>
-                                    </td>
-
-                                    {% set color = '' %}
-                                    {% if equal_to_two_dp(creditAmount, paymentAmount) %}
-                                        {% set color = 'success' %}
-                                    {% else %}
-                                        {% set color = 'danger' %}
-                                    {% endif %}
-                                    <td class="{{ color }}" width="25%">
-                                        {% if paymentAmount > 0 %}
-                                            {{ paymentAmount|number_format(2, '.', ',') }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                    </td>
-
-                                    {% set delay = false %}
-                                    {% if equal_to_two_dp(creditAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
-                                        {% set color = 'success' %}
-                                    {% elseif lastSubmittedPayment[file.serialNumber] is defined and lastSubmittedPayment[file.serialNumber]|date > 'now'|date %}
-                                        {% set color = 'warning' %}
-                                    {% else %}
-                                        {% set color = 'danger' %}
-                                    {% endif %}
-                                    <td class="{{ color }}" width="25%">
-                                        {% if reportAmount != 0 %}
-                                            {{ reportAmount|number_format(2, '.', ',') }}
-                                        {% else %}
-                                            -
-                                        {% endif %}
-                                        {% if color == 'warning' %}<i class="fa fa-clock-o" title="Wait until {{  lastSubmittedPayment[file.serialNumber]|date}}"></i>{% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% endif %}
-                </div>
+            </div>
+            <div role="tabpanel"
+                 class="tab-pane"
+                 id="reconciliation-debit">
+                {% if files is defined %}
+                    {% include 'AppBundle::Admin/bacs/reconciliation_debit.html.twig' %}
+                {% endif %}
+            </div>
+            <div role="tabpanel"
+                 class="tab-pane"
+                 id="reconciliation-credit">
+                {% if files is defined %}
+                    {% include 'AppBundle::Admin/bacs/reconciliation_credit.html.twig' %}
+                {% endif %}
             </div>
         </div>
     </div>

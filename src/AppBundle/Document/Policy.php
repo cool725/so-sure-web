@@ -875,6 +875,10 @@ abstract class Policy
             $date = $this->now();
         }
 
+        if (!$this->isActive() && $this->hasMonetaryClaimed(true)) {
+            return $this->getYearlyPremiumPrice();
+        }
+
         if ($this->getStatus() == Policy::STATUS_CANCELLED) {
             return $this->getProratedPremium($this->getEnd());
         }
@@ -895,6 +899,10 @@ abstract class Policy
 
     public function getInvoiceAmountTotal()
     {
+        if (!$this->isActive() && $this->hasMonetaryClaimed(true)) {
+            return $this->getYearlyPremiumPrice();
+        }
+
         if ($this->getStatus() == Policy::STATUS_CANCELLED) {
             return $this->getProratedPremium($this->getEnd());
         }
@@ -2400,43 +2408,43 @@ abstract class Policy
     public function getPolicyOrUserBacsPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getBacsPaymentMethod() ?:null;
+        return $this->getBacsPaymentMethod();
     }
 
     public function getPolicyOrUserBacsBankAccount()
     {
         // TODO: Eventually remove this method
-        return $this->getBacsBankAccount() ?: null;
+        return $this->getBacsBankAccount();
     }
 
     public function hasPolicyOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasPaymentMethod() ?: null;
+        return $this->hasPaymentMethod();
     }
 
     public function hasPolicyOrUserValidPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasValidPaymentMethod() ?: null;
+        return $this->hasValidPaymentMethod();
     }
 
     public function hasPolicyOrPayerOrUserValidPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->hasValidPaymentMethod() ?: null;
+        return $this->hasValidPaymentMethod();
     }
 
     public function getPolicyOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getPaymentMethod() ?: null;
+        return $this->getPaymentMethod();
     }
 
     public function getPolicyOrPayerOrUserPaymentMethod()
     {
         // TODO: Eventually remove this method
-        return $this->getPaymentMethod() ?: null;
+        return $this->getPaymentMethod();
     }
 
     /**
@@ -3833,6 +3841,7 @@ abstract class Policy
         $claims = [];
         foreach ($this->getStandardConnections() as $connection) {
             foreach ($connection->getLinkedClaimsDuringPeriod() as $claim) {
+                /** @var Claim $claim */
                 if (!$monitaryOnly || $claim->isMonetaryClaim($includeApproved)) {
                     $claims[] = $claim;
                 }
@@ -5897,6 +5906,17 @@ abstract class Policy
             'cashback_status' => $this->getCashback() ? $this->getCashback()->getStatus() : null,
             'adjusted_monthly_premium' => $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
             'adjusted_yearly_premium' => $this->getPremium()->getAdjustedYearlyPremiumPrice(),
+            'has_payment_method' => $this->hasValidPaymentMethod(),
+            'payment_details' => $this->getPaymentMethod() ?
+                $this->getPaymentMethod()->__toString() :
+                'Please update your payment details',
+            'payment_method' => $this->getPaymentMethod() ?
+                $this->getPaymentMethod()->getType() :
+                null,
+            'bank_account' => $this->getBacsBankAccount() ?
+                $this->getBacsBankAccount()->toApiArray() :
+                null,
+            'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime()
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

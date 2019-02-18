@@ -594,11 +594,7 @@ abstract class Payment
      */
     public function getUserPaymentDisplay()
     {
-        if ($this->amount < 0) {
-            return "Credit";
-        } else {
-            return $this->userPaymentName();
-        }
+        return $this->userPaymentName();
     }
 
     public function toApiArray()
@@ -631,6 +627,9 @@ abstract class Payment
             'totalUnderwriterPercent' => 0,
             'avgPayment' => null,
         ];
+        if (!$payments) {
+            return $data;
+        }
         foreach ($payments as $payment) {
             /** @var Payment $payment */
             // For prod, skip invalid policies
@@ -747,6 +746,6 @@ abstract class Payment
      */
     protected function userPaymentName()
     {
-        return "Payment";
+        return "Other";
     }
 }

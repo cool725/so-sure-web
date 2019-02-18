@@ -79,12 +79,12 @@ class DirectGroupHandlerClaim extends HandlerClaim
     public $supplierStatus;
 
     public static $breakdownEmailAddresses = [
-        'SoSure@directgroup.co.uk',
+        'Robert.Hodson@directgroup.co.uk',
         'Tracey.McManus@directgroup.co.uk',
     ];
 
     public static $errorEmailAddresses = [
-        'SoSure@directgroup.co.uk',
+        'Robert.Hodson@directgroup.co.uk',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
         'Sally.Hancock@directgroup.co.uk',

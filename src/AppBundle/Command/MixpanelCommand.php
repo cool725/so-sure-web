@@ -48,7 +48,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent|extend-cache (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent|extend-cache|import-jql-events|reset-campaign-attribution (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -83,6 +83,12 @@ class MixpanelCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Type of mixpanel queue item to clear'
             )
+            ->addOption(
+                'filename',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'filename to import'
+            )
         ;
     }
 
@@ -94,6 +100,7 @@ class MixpanelCommand extends ContainerAwareCommand
         $process = $input->getOption('process');
         $days = $input->getOption('days');
         $type = $input->getOption('type');
+        $filename = $input->getOption('filename');
         $user = null;
         if ($email) {
             if ($user = $this->getUser($email)) {
@@ -105,7 +112,18 @@ class MixpanelCommand extends ContainerAwareCommand
             foreach ($duplicateUsers as $user) {
                 $this->mixpanelService->queueAttribution($user, true);
             }
-            $output->writeln(sprintf('Queued update for all '.count($duplicateUsers).' users duplicated on mixpanel.'));
+            $output->writeln(sprintf(
+                'Queued update for all %d users duplicated on mixpanel.',
+                count($duplicateUsers)
+            ));
+        } elseif ($action == 'import-jql-events') {
+            $this->mixpanelService->importJqlQueryHistoricEvents($filename);
+        } elseif ($action == 'reset-campaign-attribution') {
+            $results = $this->mixpanelService->resetCampaignAttributionData(true, true, $process);
+            if (count($results) <= 50) {
+                $output->writeln(sprintf('Queued %s', json_encode($results, JSON_PRETTY_PRINT)));
+            }
+            $output->writeln(sprintf('%d records queued', count($results)));
         } elseif ($action == 'data') {
             $end = \DateTime::createFromFormat('U', time());
             $end->sub(new \DateInterval(sprintf('P%dD', $end->format('N'))));
@@ -113,7 +131,7 @@ class MixpanelCommand extends ContainerAwareCommand
             $start->sub(new \DateInterval('P6D'));
             $output->writeln(sprintf('Running from %s to %s', $start->format('Y-m-d'), $end->format('Y-m-d')));
             $results = $this->mixpanelService->stats($start, $end);
-            print_r($results);
+            //print_r($results);
             $output->writeln('Finished');
         } elseif ($action == 'attribution') {
             if (!$user) {

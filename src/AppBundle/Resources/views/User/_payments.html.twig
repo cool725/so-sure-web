@@ -27,29 +27,42 @@
                  id="payment_history"
                  role="tabpanel"
                  aria-labelledby="payment_history_tab">
-                 {# TODO: Is payment pending status available??? #}
-{#                 #}
                 {% if bacs_last_payment_in_progress %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-warning">
                         <div class="text-center text-md-left"><i class="fas fa-exclamation-triangle fa-lg fa-fw text-warning"></i> Payment pending</div>
-                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                        <div class="text-center text-md-left">
+                            Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong>
+                            <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
+                        </div>
                     </div>
-                {% elseif policy.getCurrentInvoiceBalance >= 0 %}
+                {% elseif policy.getCurrentInvoiceBalance >= 0 or equal_to_two_dp(0, policy.getCurrentInvoiceBalance) %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-success">
                         <div class="text-center text-md-left"><i class="fas fa-check-square fa-lg fa-fw text-success"></i> Paid up to date</div>
-                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                        <div class="text-center text-md-left">
+                            Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong>
+                            <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
+                        </div>
                     </div>
                 {% else %}
                     <div class="d-md-flex align-items-md-center justify-content-md-between p-3 table-danger">
                         <div class="text-center text-md-left"><i class="fas fa-exclamation-square fa-lg fa-fw text-danger"></i> Payment overdue</div>
-                        <div class="text-center text-md-left">Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong></div>
+                        <div class="text-center text-md-left">
+                            Current balance: <strong>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</strong>
+                            <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Paid to date &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }} - Premium to date &pound;{{ policy.getInvoiceAmountToDate| number_format(2, '.', ',') }}"></i>
+                        </div>
                     </div>
                 {% endif %}
                 <div class="d-md-flex align-items-md-center justify-content-md-between p-3 bg-lily-white">
                     <div class="text-center text-md-left">Policy Number: <strong>{{ policy.policyNumber }}</strong></div>
-                    <div class="text-center text-md-left">Last payment received:
-                        <strong>{{ policy.lastSuccessfulUserPaymentCredit.date | date("d/m/Y") }}</strong>
-                    </div>
                     <div class="text-center text-md-left">Paid to date: <strong>&pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</strong></div>
                 </div>
                 <table class="table table-striped mb-0" id="payment_history_table">
@@ -67,6 +80,29 @@
                         </tr>
                     </thead>
                     <tbody>
+                    {% if policy.cashback %}
+                        <tr>
+                            <td>
+                                -
+                            </td>
+                            <td class="h6">
+                                <span class="text-success">Cashback</span>
+                                <em class="sub"><small>{{ policy.cashback.getDisplayableStatus }}</small></em>
+                            </td>
+                            <td align="right">
+                                    <span class="text-success">
+                                        &pound;{{ policy.cashback.getDisplayableAmount| number_format(2, '.', ',') }}
+                                    </span>
+                            </td>
+                            <td>
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Cashback is not included in your current balance, nor in your paid to date"></i></small>
+                            </td>
+                        </tr>
+                    {% endif %}
+
                         {% set itemsHistory = 0 %}
                         {% set displayedTotal = 0 %}
                         {% for payment in policy.getSortedPayments if payment.isVisibleUserPayment %}
@@ -74,27 +110,28 @@
                             {% if payment.type != 'bacs' or not payment.reversedBy or payment.status != 'pending' %}
                                 {% set displayedTotal = displayedTotal + payment.amount %}
                             {% endif %}
-                            <tr class="{% if payment.status == 'pending' %}table-warning{% endif %}">
+                            <tr class="{% if payment.type == 'bacs' and payment.status == 'pending' %}table-warning{% endif %}">
                                 <td>
                                     <small>{{ payment.date | date('d/m/Y', 'Europe/London') }}</small>
                                 </td>
                                 <td class="h6">
                                     {{ payment.userPaymentDisplay }}
-                                    {% if payment.details %}
-                                        <br>
-                                        <em class="sub"><small>{{ payment.details }}</small></em>
-                                    {% elseif payment.status == 'pending' %}
-                                        <br>
-                                        <em class="sub"><small>Pending</small></em>
-                                    {% endif %}
+                                    <br>
+                                    <em class="sub"><small>
+                                        {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                            Pending
+                                        {% elseif payment.details %}
+                                            {{ payment.details }}
+                                        {% endif %}
+                                    </small></em>
                                 </td>
                                 <td align="right">
                                     {% if payment.type == 'bacs' and payment.reversedBy %}
                                         <del>
-                                    {% endif %}
-
-                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                    {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
                                         <em>
+                                    {% elseif payment.type == 'policyDiscount' %}
+                                        <span class="text-warning">
                                     {% endif %}
 
                                     {% if payment.amount >= 0 %}
@@ -103,15 +140,19 @@
                                         &pound;{{ (0 - payment.amount) | number_format(2, '.', ',') }}
                                     {% endif %}
 
-                                    {% if payment.type == 'bacs' and payment.status == 'pending' %}
+                                    {% if payment.type == 'policyDiscount' %}
+                                        </span>
+                                    {% elseif payment.type == 'bacs' and payment.status == 'pending' %}
                                         </em>
-                                    {% endif %}
-
-                                    {% if payment.type == 'bacs' and payment.reversedBy %}
+                                    {% elseif payment.type == 'bacs' and payment.reversedBy %}
                                         </del>
                                     {% endif %}
                                 </td>
                                 <td>
+                                    {% if payment.amount < 0 %}
+                                        <strong><small>CR</small></strong>
+                                    {% endif %}
+
                                     {% if payment.type == 'bacs' and payment.reversedBy %}
                                         <i class="far fa-times fa-fw fa-lg text-danger"></i>
                                         <i class="fal fa-info-circle ml-2 text-primary fa-fw"
@@ -123,8 +164,11 @@
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Expected: {{ payment.getBacsReversedDate|date('d/m/Y', 'Europe/London') }}"></i>
-                                    {% elseif payment.amount < 0 %}
-                                        <strong><small>CR</small></strong>
+                                    {% elseif payment.type == 'policyDiscount' %}
+                                        <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Your policy discount is applied across the annual policy and has reduced your payment(s) accordingly"></i>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -170,9 +214,21 @@
                 <div class="d-md-flex align-items-md-center justify-content-md-between p-3">
                     <div class="mb-0 text-center text-md-left">
                         {% if policy.premiumPlan == 'monthly' %}
-                            ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> in monthly installments of <strong>&pound;{{ policy.premium.monthlyPremiumPrice }}</strong>
+                            ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> in monthly installments of <strong>&pound;{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }}</strong>
+                            {% if policy.premium.annualDiscount %}
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Your monthly payments of &pound;{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} are reduced to 11 payments of &pound;{{ policy.premium.adjustedStandardMonthlyPremiumPrice| number_format(2, '.', ',') }} and one final payment of &pound;{{ policy.premium.adjustedFinalMonthlyPremiumPrice| number_format(2, '.', ',') }} due to your policy discount of &pound;{{ policy.premium.annualDiscount| number_format(2, '.', ',') }}"></i>
+                            {% endif %}
                         {% else %}
                             ✍️You have agreed to pay <strong>&pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}</strong> for the policy year
+                            {% if policy.premium.annualDiscount %}
+                                <i class="fal fa-info-circle ml-2 text-primary fa-fw"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Your annual payment of &pound;{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} is reduced to &pound;{{ policy.premium.adjustedYearlyPremiumPrice| number_format(2, '.', ',') }} due to your policy discount of &pound;{{ policy.premium.annualDiscount| number_format(2, '.', ',') }}"></i>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -188,21 +244,25 @@
                     <thead class="thead-light">
                         <tr>
                             <th>Date</th>
+                            <th>Type</th>
                             <th class="text-right">Amount</th>
                             <th></th>
                         </tr>
                     </thead>
-                    {% set invoiceRemaining = policy.getInvoiceAmountTotal %}
+                    {% set invoiceTotal = 0 %}
                     {% for invoiceDate in policy.getInvoiceSchedule %}
+                        {% set invoiceTotal = invoiceTotal + policy.getPremiumInstallmentPrice %}
                         <tr>
                             <td>{{ invoiceDate| date('d/m/Y', 'Europe/London') }}</td>
-                            <td align="right">
-                                {% if invoiceRemaining >= policy.getPremiumInstallmentPrice %}
-                                    {% set invoiceRemaining = invoiceRemaining - policy.getPremiumInstallmentPrice %}
-                                    &pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}
+                            <td>
+                                {% if policy.premiumPlan == 'monthly' %}
+                                    Monthly Premium
                                 {% else %}
-                                    &pound;{{ invoiceRemaining | number_format(2, '.', ',') }}
+                                    Annual Premium
                                 {% endif %}
+                            </td>
+                            <td align="right">
+                                &pound;{{ policy.getPremiumInstallmentPrice | number_format(2, '.', ',') }}
                             </td>
                             {% if invoiceDate|date('U') < 'now'|date('U') %}
                                 <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
@@ -211,6 +271,32 @@
                             {% endif %}
                         </tr>
                     {% endfor %}
+                    {% set invoiceRemaining = policy.getInvoiceAmountTotal - invoiceTotal  %}
+                    {% if  not equal_to_two_dp(0, invoiceRemaining) %}
+                        <tr>
+                            <td>{{ policy.end| date('d/m/Y', 'Europe/London') }}</td>
+                            <td>
+                                {% if invoiceRemaining >= 0 %}
+                                    Additional Premium
+                                {% else %}
+                                    Premium Refund
+                                {% endif %}
+                            </td>
+                            <td align="right">
+                                {% if invoiceRemaining >= 0 %}
+                                    &pound;{{ invoiceRemaining | number_format(2, '.', ',') }}
+                                {% else %}
+                                    &pound;{{ (0 - invoiceRemaining) | number_format(2, '.', ',') }}
+                                    <strong><small>CR</small></strong>
+                                {% endif %}
+                            </td>
+                            {% if policy.end|date('U') < 'now'|date('U') %}
+                                <td align="center"><i class="far fa-check fa-fw fa-lg text-success"></i></td>
+                            {% else %}
+                                <td align="center"></td>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
                 </table>
             </div>
         </div>

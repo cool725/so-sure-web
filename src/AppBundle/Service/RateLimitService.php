@@ -22,6 +22,7 @@ class RateLimitService
     const REPLAY_KEY_FORMAT = 'replay:%s';
 
     const DEVICE_TYPE_ADDRESS = 'address'; // 5p / query
+    const DEVICE_TYPE_BACS = 'bacs'; // 5p / query
     const DEVICE_TYPE_IMEI = 'imei'; // 2p / query
     const DEVICE_TYPE_SERIAL = 'serial'; // 5p / query
     const DEVICE_TYPE_LOGIN = 'login';
@@ -36,6 +37,7 @@ class RateLimitService
         self::DEVICE_TYPE_IMEI => 86400, // 1 day
         self::DEVICE_TYPE_SERIAL => 86400, // 1 day
         self::DEVICE_TYPE_ADDRESS => 86400, // 1 day
+        self::DEVICE_TYPE_BACS => 86400, // 1 day
         self::DEVICE_TYPE_LOGIN => 3600, // 1 hour
         self::DEVICE_TYPE_POLICY => 604800, // 7 days
         self::DEVICE_TYPE_RESET => 3600, // 1 hour
@@ -50,6 +52,7 @@ class RateLimitService
         self::DEVICE_TYPE_IMEI => 2,
         self::DEVICE_TYPE_SERIAL => 2,
         self::DEVICE_TYPE_ADDRESS => 3,
+        self::DEVICE_TYPE_BACS => 3,
         self::DEVICE_TYPE_LOGIN => 10,
         self::DEVICE_TYPE_POLICY => 1,
         self::DEVICE_TYPE_RESET => 2,
@@ -63,6 +66,7 @@ class RateLimitService
         self::DEVICE_TYPE_IMEI => 14,
         self::DEVICE_TYPE_SERIAL => 14,
         self::DEVICE_TYPE_ADDRESS => 21,
+        self::DEVICE_TYPE_BACS => 21,
         self::DEVICE_TYPE_LOGIN => 21,
         self::DEVICE_TYPE_POLICY => 50,
         self::DEVICE_TYPE_RESET => 14,

@@ -895,6 +895,58 @@ class DirectGroupServiceTest extends WebTestCase
         $this->assertEquals(0, count(self::$directGroupService->getErrors()));
     }
 
+    public function testValidateClaimDetailsSettledNoImei()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostcode('se152sz');
+        $user = new User();
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setNumber(self::getRandomClaimNumber());
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber(self::getRandomPolicyNumber('TEST'));
+
+        $directGroupClaim = new DirectGroupHandlerClaim();
+        $directGroupClaim->policyNumber = $policy->getPolicyNumber();
+        $directGroupClaim->claimNumber = $claim->getNumber();
+        $directGroupClaim->reserved = 1;
+        $directGroupClaim->insuredName = 'Mr foo bar';
+        $directGroupClaim->riskPostCode = 'se152sz';
+        $directGroupClaim->excess = 150;
+        $directGroupClaim->totalIncurred = 0;
+        $directGroupClaim->reserved = 0;
+        $directGroupClaim->status = DirectGroupHandlerClaim::STATUS_CLOSED;
+        //$directGroupClaim->type = DaviesClaim::TYPE_LOSS;
+
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->assertEquals(1, count(self::$directGroupService->getErrors()));
+        $this->insureErrorExists('/settled without a replacement imei/');
+
+        self::$directGroupService->clearErrors();
+
+        $directGroupClaim->repairSupplier = 'foo';
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->assertEquals(0, count(self::$directGroupService->getErrors()));
+        $this->insureErrorDoesNotExist('/settled without a replacement imei/');
+
+        self::$directGroupService->clearErrors();
+
+        $directGroupClaim->repairSupplier = null;
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE);
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->assertEquals(0, count(self::$directGroupService->getErrors()));
+        $this->insureErrorDoesNotExist('/settled without a replacement imei/');
+    }
+
     public function testValidateClaimDetailsInvalidPolicyNumber()
     {
         $policy = static::createUserPolicy(true);
@@ -2118,6 +2170,19 @@ class DirectGroupServiceTest extends WebTestCase
             json_encode(self::$directGroupService->getWarnings())
         );
         $this->insureWarningExists('/does not have a replacement IMEI/');
+
+        self::$directGroupService->clearWarnings();
+        self::$directGroupService->postValidateClaimDetails($claim, $directGroupClaim);
+        $this->insureWarningExists('/noted as unobtainable/');
+
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE);
+
+        self::$directGroupService->clearWarnings();
+        self::$directGroupService->validateClaimDetails($claim, $directGroupClaim);
+        $this->insureWarningDoesNotExist('/does not have a replacement IMEI/');
+
+        self::$directGroupService->postValidateClaimDetails($claim, $directGroupClaim);
+        $this->insureWarningDoesNotExist('/noted as unobtainable/');
     }
 
     public function testReportMissingClaims()
