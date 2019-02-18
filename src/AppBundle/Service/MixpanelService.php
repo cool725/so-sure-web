@@ -1348,6 +1348,7 @@ class MixpanelService
             $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
             try {
                 $results = $this->mixpanelData->data('engage', ['where' => $search]);
+                //print_r($results);
             } catch (\Exception $e) {
                 if (mb_stripos($e->getMessage(), "rate limit") !== false) {
                     throw new ExternalRateLimitException("Mixpanel rate limit reached.");
@@ -1362,7 +1363,7 @@ class MixpanelService
         return $results;
     }
 
-    protected function findAttributionsForUser(User $user, $useCache = false)
+    public function findAttributionsForUser(User $user, $useCache = false)
     {
         /** @var Attribution $bestFirstAttribution */
         $firstAttribution = null;
@@ -1386,12 +1387,14 @@ class MixpanelService
                     $result['$properties'],
                     self::ATTRIBUTION_PREFIX_CURRENT
                 );
+                //print $currentFirstAttribution;
 
                 $currentLastAttribution = new Attribution();
                 $hasCurrentLastAttribution = $currentLastAttribution->setMixpanelProperties(
                     $result['$properties'],
                     self::ATTRIBUTION_PREFIX_LATEST
                 );
+                //print $currentLastAttribution;
 
                 // if we have a first attribution but not last, first & last are the same
                 if ($hasCurrentFirstAttribution && !$hasCurrentLastAttribution) {

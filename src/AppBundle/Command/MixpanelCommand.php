@@ -48,7 +48,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent|extend-cache|import-jql-events|reset-campaign-attribution (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|show-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent|extend-cache|import-jql-events|reset-campaign-attribution (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -116,6 +116,13 @@ class MixpanelCommand extends ContainerAwareCommand
                 'Queued update for all %d users duplicated on mixpanel.',
                 count($duplicateUsers)
             ));
+        } elseif ($action == 'show-attribution') {
+            if (!$user) {
+                throw new \Exception('Unable to find user for email address');
+            }
+            list($firstAttribution, $lastAttribution) = $this->mixpanelService->findAttributionsForUser($user);
+            $output->writeln($firstAttribution->stringImplode(' / ', true));
+            $output->writeln($lastAttribution->stringImplode(' / ', true));
         } elseif ($action == 'import-jql-events') {
             $this->mixpanelService->importJqlQueryHistoricEvents($filename);
         } elseif ($action == 'reset-campaign-attribution') {
