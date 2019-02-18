@@ -29,7 +29,7 @@ class AboutController extends BaseController
      * @Route("", name="about_home")
      * @Template
      */
-    public function indexAction(Request $request)
+    public function indexAction()
     {
         return $this->redirectToRoute('social_insurance');
     }
