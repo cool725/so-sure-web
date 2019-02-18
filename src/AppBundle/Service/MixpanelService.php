@@ -357,14 +357,21 @@ class MixpanelService
      * Gets all users that have got multiple mixpanel accounts based on the email.
      * @return array containing the users.
      */
-    public function findDuplicateUsers()
+    public function findDuplicateUsers($useCache = false)
     {
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         $emails = [];
         $users = [];
 
-        $results = $this->findAllUsers(self::USER_QUERY_HAS_EMAIL);
+        $results = $this->findAllUsers(
+            self::USER_QUERY_HAS_EMAIL,
+            null,
+            null,
+            null,
+            null,
+            $useCache
+        );
 
         foreach ($results as $result) {
             if (isset($result['$properties']['$email'])) {
@@ -385,8 +392,14 @@ class MixpanelService
         return $users;
     }
 
-    private function findAllUsers($queryType, $data = null, $page = null, $session = null, $pageSize = null)
-    {
+    private function findAllUsers(
+        $queryType,
+        $data = null,
+        $page = null,
+        $session = null,
+        $pageSize = null,
+        $useCache = true
+    ) {
         if ($queryType == self::USER_QUERY_HAS_EMAIL) {
             $query = ['where' => sprintf('defined(properties["$email"])')];
         } elseif ($queryType == self::USER_QUERY_ALL) {
@@ -396,7 +409,7 @@ class MixpanelService
         }
 
         $key = sprintf('mixpanel:users:%s', $queryType);
-        if ($this->redis->exists($key)) {
+        if ($this->redis->exists($key) && $useCache) {
             return unserialize($this->redis->get($key));
         }
 

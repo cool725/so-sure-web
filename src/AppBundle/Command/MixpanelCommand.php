@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\MixpanelService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -108,7 +109,7 @@ class MixpanelCommand extends ContainerAwareCommand
             }
         }
         if ($action == 'attribution-duplicate-users') {
-            $duplicateUsers = $this->mixpanelService->findDuplicateUsers();
+            $duplicateUsers = $this->mixpanelService->findDuplicateUsers(false);
             foreach ($duplicateUsers as $user) {
                 $this->mixpanelService->queueAttribution($user, true);
             }
@@ -144,7 +145,7 @@ class MixpanelCommand extends ContainerAwareCommand
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
             }
-            $results = $this->mixpanelService->attributionByUser($user);
+            $results = $this->mixpanelService->attributionByUser($user, true);
             $output->writeln(sprintf('Attribution %s', json_encode($results, JSON_PRETTY_PRINT)));
         } elseif ($action == 'sync') {
             if (!$user) {
@@ -207,11 +208,19 @@ class MixpanelCommand extends ContainerAwareCommand
             }
             $date = new \DateTime();
             $startDate = $this->subDays($date, $days);
-            /** @var UserRepository */
+            /** @var UserRepository $userRepo */
             $userRepo = $this->dm->getRepository(User::class);
             $users = $userRepo->findNewUsers($startDate, $date);
             foreach ($users as $user) {
                 $this->mixpanelService->queueAttribution($user, true);
+            }
+
+            /** @var PhonePolicyRepository $policyRepo */
+            $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+            $policies = $policyRepo->findAllNewPolicies(null, $startDate);
+            foreach ($policies as $policy) {
+                /** @var PhonePolicy $policy */
+                $this->mixpanelService->queueAttribution($policy->getUser(), true);
             }
         } elseif ($action == 'extend-cache') {
             $cachedItems = $this->redis->keys("mixpanel:user:*");
