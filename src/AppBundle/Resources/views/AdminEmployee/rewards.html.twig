@@ -43,7 +43,7 @@
                     <tbody>
                         {% for reward in rewards %}
                             <tr>
-                                {# <td>{{ reward.user.name }} ({{ reward.user.email }})</td> #}
+                                <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
                                 <td>{% if reward.sCode %}{{ reward.sCode.code }}{% else %}n/a{% endif %}</td>
                                 <td>{% if reward.defaultValue %}£{{ reward.defaultValue|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
                                 <td>{{ reward.connections|length }}</td>
