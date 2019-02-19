@@ -36,6 +36,7 @@
     "gulp": "^3.9.1",
     "gulp-cli": "^2.0.1",
     "gulp-concat": "^2.6.1",
+    "intersection-observer": "^0.5.1",
     "jquery": "^3.3.1",
     "jquery-circle-progress": "^1.2.2",
     "jquery-mask-plugin": "^1.14.15",
