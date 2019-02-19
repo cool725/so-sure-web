@@ -31,7 +31,7 @@ class AboutController extends BaseController
      */
     public function indexAction()
     {
-        return $this->redirectToRoute('social_insurance');
+        // return $this->redirectToRoute('social_insurance');
     }
 
     /**

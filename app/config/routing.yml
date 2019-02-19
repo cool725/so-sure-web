@@ -472,6 +472,6 @@ redirect_about_us:
     path: /about/social-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: faq
+        route: social_insurance
         permanent: true
 
