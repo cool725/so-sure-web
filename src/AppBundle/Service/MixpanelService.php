@@ -343,6 +343,10 @@ class MixpanelService
         if ($lastAttribution) {
             $user->setLatestAttribution($lastAttribution);
         }
+
+        $this->dm->flush();
+
+        return $user;
     }
 
     public function getUserCount()
@@ -357,14 +361,21 @@ class MixpanelService
      * Gets all users that have got multiple mixpanel accounts based on the email.
      * @return array containing the users.
      */
-    public function findDuplicateUsers()
+    public function findDuplicateUsers($useCache = false)
     {
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         $emails = [];
         $users = [];
 
-        $results = $this->findAllUsers(self::USER_QUERY_HAS_EMAIL);
+        $results = $this->findAllUsers(
+            self::USER_QUERY_HAS_EMAIL,
+            null,
+            null,
+            null,
+            null,
+            $useCache
+        );
 
         foreach ($results as $result) {
             if (isset($result['$properties']['$email'])) {
@@ -385,8 +396,14 @@ class MixpanelService
         return $users;
     }
 
-    private function findAllUsers($queryType, $data = null, $page = null, $session = null, $pageSize = null)
-    {
+    private function findAllUsers(
+        $queryType,
+        $data = null,
+        $page = null,
+        $session = null,
+        $pageSize = null,
+        $useCache = true
+    ) {
         if ($queryType == self::USER_QUERY_HAS_EMAIL) {
             $query = ['where' => sprintf('defined(properties["$email"])')];
         } elseif ($queryType == self::USER_QUERY_ALL) {
@@ -396,7 +413,7 @@ class MixpanelService
         }
 
         $key = sprintf('mixpanel:users:%s', $queryType);
-        if ($this->redis->exists($key)) {
+        if ($this->redis->exists($key) && $useCache) {
             return unserialize($this->redis->get($key));
         }
 
@@ -1348,6 +1365,7 @@ class MixpanelService
             $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
             try {
                 $results = $this->mixpanelData->data('engage', ['where' => $search]);
+                //print_r($results);
             } catch (\Exception $e) {
                 if (mb_stripos($e->getMessage(), "rate limit") !== false) {
                     throw new ExternalRateLimitException("Mixpanel rate limit reached.");
@@ -1362,7 +1380,7 @@ class MixpanelService
         return $results;
     }
 
-    protected function findAttributionsForUser(User $user, $useCache = false)
+    public function findAttributionsForUser(User $user, $useCache = false)
     {
         /** @var Attribution $bestFirstAttribution */
         $firstAttribution = null;
@@ -1386,12 +1404,14 @@ class MixpanelService
                     $result['$properties'],
                     self::ATTRIBUTION_PREFIX_CURRENT
                 );
+                //print $currentFirstAttribution;
 
                 $currentLastAttribution = new Attribution();
                 $hasCurrentLastAttribution = $currentLastAttribution->setMixpanelProperties(
                     $result['$properties'],
                     self::ATTRIBUTION_PREFIX_LATEST
                 );
+                //print $currentLastAttribution;
 
                 // if we have a first attribution but not last, first & last are the same
                 if ($hasCurrentFirstAttribution && !$hasCurrentLastAttribution) {
