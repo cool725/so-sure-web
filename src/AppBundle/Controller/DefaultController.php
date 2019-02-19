@@ -834,68 +834,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/download-app", name="download_app", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
-     * @Template
-     */
-    public function downloadAppAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/text-me-the-app", name="sms_app_link", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
-     * @Template
-     */
-    public function smsAppLinkAction(Request $request)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Lead::class);
-        $form = $this->createForm(SmsAppLinkType::class);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $mobileNumber = $form->get('mobileNumber')->getData();
-            $ukMobileNumber = $this->normalizeUkMobile($mobileNumber, true);
-            $lead = $repo->findOneBy(['mobileNumber' => $ukMobileNumber]);
-            if ($lead) {
-                $this->addFlash(
-                    'error',
-                    "Oops, looks like we already sent you a link."
-                );
-            } elseif (!$this->isValidUkMobile($ukMobileNumber)) {
-                $this->addFlash('error', sprintf(
-                    'Sorry, that number does not appear to be a valid UK Mobile Number'
-                ));
-            } else {
-                $sms = $this->get('app.sms');
-                $message = $this->get('templating')->render(
-                    'AppBundle:Sms:text-me.txt.twig',
-                    ['branch_pot_url' => $this->getParameter('branch_pot_url')]
-                );
-                if ($sms->send($ukMobileNumber, $message)) {
-                    $lead = new Lead();
-                    $lead->setMobileNumber($ukMobileNumber);
-                    $lead->setSource(Lead::SOURCE_TEXT_ME);
-                    $dm->persist($lead);
-                    $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        'You should receive a download link shortly'
-                    );
-                } else {
-                    $this->addFlash(
-                        'error',
-                        'Sorry, we had a problem sending you a sms. Please download the so-sure app from your app store.'
-                    );
-                }
-            }
-        }
-
-        return array(
-            'form' => $form->createView(),
-        );
-    }
-
-    /**
      * @Route("/price/{id}", name="price_item")
      */
     public function priceItemAction($id)
