@@ -1,4 +1,4 @@
-// admin.js
+// picsure.js
 
 // require('../../../sass/pages/picsure.scss');
 
