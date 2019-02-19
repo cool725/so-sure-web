@@ -26,6 +26,7 @@ class InvitationControllerTest extends BaseControllerTest
         $url = sprintf('/invitation/%s', $invitation->getId());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
+        $this->assertContains('<meta name="robots" content="noindex">', $crawler->html());
     }
 
     public function testPhoneSearchInvitation()

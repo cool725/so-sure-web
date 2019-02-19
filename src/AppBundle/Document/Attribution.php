@@ -267,7 +267,7 @@ class Attribution implements EqualsInterface
         return $this->stringImplode(' / ');
     }
 
-    public function stringImplode($glue)
+    public function stringImplode($glue, $includeDate = false)
     {
         $lines = [];
         if (mb_strlen($this->getCampaignName()) > 0) {
@@ -293,6 +293,9 @@ class Attribution implements EqualsInterface
         }
         if (mb_strlen($this->getDeviceOS()) > 0) {
             $lines[] = sprintf("Device OS: %s", $this->getDeviceOS());
+        }
+        if ($includeDate && $this->getDate()) {
+            $lines[] = sprintf("Date: %s", $this->getDate()->format(\DateTime::ATOM));
         }
 
         return implode($glue, $lines);
@@ -436,9 +439,11 @@ class Attribution implements EqualsInterface
         if (!isset($data[$field])) {
             return null;
         }
-        return \DateTime::createFromFormat(
-            \DateTime::ISO8601,
-            urldecode($data[$field])
+        $date = \DateTime::createFromFormat(
+            'Y-m-d\TH:i:s',
+            $data[$field]
         );
+
+        return $date;
     }
 }
