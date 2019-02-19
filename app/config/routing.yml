@@ -475,13 +475,6 @@ redirect_text_me_the_app:
         route: homepage
         permanent: true
 
-redirect_text_me_the_app:
-    path: /text-me-the-app
-    defaults:
-        _controller: FrameworkBundle:Redirect:redirect
-        route: homepage
-        permanent: true
-
 redirect_download_app:
     path: /download-app
     defaults:
