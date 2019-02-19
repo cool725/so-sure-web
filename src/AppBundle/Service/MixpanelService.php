@@ -343,6 +343,10 @@ class MixpanelService
         if ($lastAttribution) {
             $user->setLatestAttribution($lastAttribution);
         }
+
+        $this->dm->flush();
+
+        return $user;
     }
 
     public function getUserCount()
