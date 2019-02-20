@@ -5857,6 +5857,20 @@ abstract class Policy
         return $isConnected;
     }
 
+    public function useForAttribution()
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $attributionPolicy = $this->getUser()->getAttributionPolicy();
+        if (!$attributionPolicy) {
+            return null;
+        }
+
+        return $this->getId() == $attributionPolicy->getId();
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [
