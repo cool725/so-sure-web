@@ -1,83 +1,190 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
-        '@AppBundle/Resources/public/js/Admin/confirmModal.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-affiliates' %}
+
+{% block title %}so-sure - Affiliates{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-    <div class="row">
-        <div class="col-md-8">
-            <h2>Affiliates</h2>
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Affiliates</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary btn-square"
+                       data-toggle="modal"
+                       data-target="#affiliate_form_modal">New Affiliate <i class="fal fa-plus fa-fw"></i></a>
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>CPA</th>
+                            <th>Days</th>
+                            <th>Charge Model</th>
+                            <th>Renewal Days</th>
+                            <th>Campaign Source</th>
+                            <th>Campaign Name</th>
+                            <th>Lead Source</th>
+                            <th>Lead Source Details</th>
+                            <th>Sanctions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies %}
+                            <tr>
+                                <td>
+                                    <a href="{{ path('admin_affiliate_overview', {'id': company.id }) }}">{{ company.name }}</a>
+                                </td>
+                                <td>&pound;{{ company.cpa|number_format(2, '.', ',') }}</td>
+                                <td>{{ company.days }}</td>
+                                <td>{{ company.chargeModel }}</td>
+                                <td>{{ company.renewalDays }}</td>
+                                <td>{{ company.campaignSource }}</td>
+                                <td>{{ company.campaignName }}</td>
+                                <td>{{ company.leadSource }}</td>
+                                <td>{{ company.leadSourceDetails }}</td>
+                                <td>
+                                    <div class="sanctionData" hidden="hidden">
+                                        {% if company.sanctionsChecks|length == 0%}
+                                            No checks run
+                                        {% endif %}
+                                        {% for check in company.sanctionsChecks %}
+                                            Ran: {{ check|date }}
+                                        {% endfor %}
+                                        <br />
+                                        {% if company.sanctionsMatches|length == 0%}
+                                            No matches
+                                        {% endif %}
+                                        {% for match in company.sanctionsMatches %}
+                                        {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
+                                            {% if match.manuallyVerified %}
+                                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                                            {% else %}
+                                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                                            {% endif %}
+                                            <br>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="col-md-2">
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#affiliateForm" style="margin-top: 20px">
-                <i class="fa fa-plus"></i> New Affiliate
-            </button>
-        </div>
-    </div>
-    <div class="row" style="margin-top: 20px">
-        <div class="col-md-12">
-        <table class="table table-stripped" width="100%">
-            <tr>
-                <th>Name</th>
-                <th>CPA</th>
-                <th>Days</th>
-                <th>Charge Model</th>
-                <th>Renewal Days</th>
-                <th>Campaign Source</th>
-                <th>Campaign Name</th>
-                <th>Lead Source</th>
-                <th>Lead Source Details</th>
-                <th>Sanctions</th>
-            </tr>
-            {% for company in companies %}
-                <tr>
-                    <td width="15%">
-                        <a href="{{ path('admin_affiliate_overview', {'id': company.id }) }}">{{ company.name }}</a>
-                    </td>
-                    <td width="5%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
-                    <td width="5%">{{ company.days }}</td>
-                    <td width="10%">{{ company.chargeModel }}</td>
-                    <td width="5%">{{ company.renewalDays }}</td>
-                    <td width="10%">{{ company.campaignSource }}</td>
-                    <td width="10%">{{ company.campaignName }}</td>
-                    <td width="10%">{{ company.leadSource }}</td>
-                    <td width="10%">{{ company.leadSourceDetails }}</td>
-                    <td width="30%">
-                        <div class="sanctionData" hidden="hidden">
-                            {% if company.sanctionsChecks|length == 0%}
-                                No checks run
-                            {% endif %}
-                            {% for check in company.sanctionsChecks %}
-                                Ran: {{ check|date }}
-                            {% endfor %}
-                            <br />
-                            {% if company.sanctionsMatches|length == 0%}
-                                No matches
-                            {% endif %}
-                            {% for match in company.sanctionsMatches %}
-                            {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
-                                {% if match.manuallyVerified %}
-                                Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
-                                {% else %}
-                                Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
-                                {% endif %}
-                                <br>
-                            {% endfor %}
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Admin/adminConfirmModalNew.html.twig' with {
+        'route': 'AppBundle:AdminEmployee:affiliateForm',
+        'id': 'affiliate_form_modal',
+        'title': 'Create New Affiliate',
+        'size': 'modal-lg'
+    } %}
+ {#    <div class="modal fade"
+         id="reward_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="reward_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add reward bonus type</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(rewardForm) }}
+                        <div class="form-group">
+                            {{ form_label(rewardForm.firstName, 'First Name') }}
+                            {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
                         </div>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.lastName, 'Last Name') }}
+                            {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.email, 'Email') }}
+                            {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.email) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.code, 'SCode') }}
+                            {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.defaultValue, 'Default Value') }}
+                            {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(rewardForm) }}
+                </div>
+            </div>
         </div>
     </div>
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:affiliateForm', 'id': 'affiliateForm', 'title': 'Create New Affiliate'} %}
-</div>
+
+    <div class="modal fade"
+         id="connect_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="connect_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Bonus To User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(connectForm) }}
+                        <div class="form-group">
+                            {{ form_label(connectForm.email, 'Email') }}
+                            {{ form_widget(connectForm.email, { 'attr': { 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(connectForm.email) }}</div>
+                        </div>
+                        <h5>Warning! If user has multiple policies, currently implementation will add bonus to each policy!</h5>
+                        <div class="form-group">
+                            {{ form_label(connectForm.amount, 'Bonus Amount') }}
+                            {{ form_widget(connectForm.amount, { 'attr': { 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(connectForm.amount) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(connectForm.rewardId) }}
+                            {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(connectForm) }}
+                </div>
+            </div>
+        </div>
+    </div> #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/rewards.js') }}"></script>
 {% endblock %}
