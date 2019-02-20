@@ -194,6 +194,7 @@ class DefaultController extends BaseController
      * @Route("/money-free-phone-case", name="money_free_phone_case")
      * @Route("/starling-bank", name="starling_bank")
      * @Route("/comparison", name="comparison")
+     * @Route("/vendi-app", name="vendi_app")
      */
     public function affiliateLanding(Request $request)
     {
@@ -353,6 +354,16 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'comparison',
                 'titleH1' => 'Mobile Insurance beyond compare',
                 'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'vendi_app') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'vendi-app',
+                'affiliate_company' => 'Vendi',
+                'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'LICI',
