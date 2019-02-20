@@ -127,6 +127,23 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findUnpaidPoliciesWithCancelledMandates($policyPrefix)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('paymentMethod.bankAccount.mandateStatus')->in([
+                BankAccount::MANDATE_CANCELLED,
+                BankAccount::MANDATE_FAILURE
+            ]);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
     public function findRenewalPoliciesForActivation($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
