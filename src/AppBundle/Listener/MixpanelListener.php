@@ -49,7 +49,8 @@ class MixpanelListener
             'Payment Option' => $policy->getPremiumPlan(),
             'Policy Id' => $policy->getId(),
             'Payment Source' => $source,
-            'Payment Type' => $type
+            'Payment Type' => $type,
+            'Use For Attribution' => $policy->useForAttribution() ? 'Yes' : 'No',
         ]);
     }
 

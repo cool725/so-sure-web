@@ -2042,6 +2042,25 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $diff->invert && $diff->days == 21;
     }
 
+    /**
+     * Only the first purchase policy should count for attribution
+     */
+    public function getAttributionPolicy()
+    {
+        $policies = $this->getAllPolicyPolicies();
+
+        if (count($policies) == 0) {
+            return null;
+        }
+
+        // sort older to recent
+        usort($policies, function ($a, $b) {
+            return $a->getStart() > $b->getStart();
+        });
+
+        return $policies[0];
+    }
+
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
     {
         $addresses = [];

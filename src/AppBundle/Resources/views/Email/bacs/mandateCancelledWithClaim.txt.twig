@@ -1,0 +1,33 @@
+
+Update your payment details
+
+Oh no! Your Direct Debit was recently cancelled for account {{ policy.getPolicyOrUserBacsBankAccount.getDisplayableSortCode }} {{ policy.getPolicyOrUserBacsBankAccount.getDisplayableAccountNumber }} 
+
+Without a valid payment method in place you will lose cover for your {{ policy.phone }} 😱
+
+To stay insured, please login to your account and setup a new Direct Debit 👍
+
+Set up Direct Debit: {{ branch_payment_details_url }}
+
+IMPORTANT LEGAL INFORMATION
+
+Please be aware that cancelling your Direct Debit does not automatically cancel your policy.
+
+As you have had an approved claim you are legally responsible to pay the full cost of your policy premium if you fail to keep up with your payments.
+
+Please login to your account to see your policy Terms and Conditions and review your legal obligations:
+{{ url('user_policy_list_policy', {'id': policy.id}) }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

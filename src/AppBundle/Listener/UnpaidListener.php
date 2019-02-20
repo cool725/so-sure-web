@@ -86,17 +86,13 @@ class UnpaidListener
         if ($number < 1 || $number > 4) {
             return;
         }
-        $folder = $this->selectFolder($policy);
-        if (!$folder) {
-            return;
-        }
 
         $baseTemplate = $this->selectBaseEmail($policy);
         if (!$baseTemplate) {
             return;
         }
-        $htmlTemplate = sprintf("AppBundle:Email:%s/%s-%d.html.twig", $folder, $baseTemplate, $number);
-        $textTemplate = sprintf("AppBundle:Email:%s/%s-%d.txt.twig", $folder, $baseTemplate, $number);
+        $htmlTemplate = sprintf("AppBundle:Email:%s-%d.html.twig", $baseTemplate, $number);
+        $textTemplate = sprintf("AppBundle:Email:%s-%d.txt.twig", $baseTemplate, $number);
 
         $subject = sprintf("Payment failure for your so-sure policy %s", $policy->getPolicyNumber());
         $this->mailerService->sendTemplateToUser(
@@ -131,23 +127,6 @@ class UnpaidListener
     }
 
     /**
-     * Find the folder that the emails that will be in because the folder for judo emails is not called judo for some
-     * reason.
-     * @param Policy $policy is the policy that we are looking for the sake of.
-     * @return string|null containing the name of the folder.
-     */
-    private function selectFolder(Policy $policy)
-    {
-        if ($policy->getPolicyOrUserBacsPaymentMethod()) {
-            return "bacs";
-        } elseif ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
-            return "card";
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Gets the base email template type to be sent to the user. This function differs for different payment method
      * types that the policy may have.
      * @param Policy $policy is the policy that the email is being sent for.
@@ -157,17 +136,17 @@ class UnpaidListener
     {
         if ($policy->getPolicyOrUserBacsPaymentMethod()) {
             if ($policy->hasMonetaryClaimed(true, true)) {
-                return "bacsPaymentFailedWithClaim";
+                return "bacs/bacsPaymentFailedWithClaim";
             } else {
-                return "bacsPaymentFailed";
+                return "bacs/bacsPaymentFailed";
             }
         } elseif ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
             if ($policy->hasMonetaryClaimed(true, true)) {
-                return "failedPaymentWithClaim";
+                return "card/failedPaymentWithClaim";
             } elseif (!$policy->getPolicyOrPayerOrUserJudoPaymentMethod()->isValid()) {
-                return "cardMissing";
+                return "card/cardMissing";
             } else {
-                return "failedPayment";
+                return "card/failedPayment";
             }
         } else {
             return null;
