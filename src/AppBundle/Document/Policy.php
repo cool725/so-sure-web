@@ -5916,7 +5916,10 @@ abstract class Policy
             'bank_account' => $this->getBacsBankAccount() ?
                 $this->getBacsBankAccount()->toApiArray() :
                 null,
-            'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime()
+            'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
+            'card_details' => $this->hasPolicyOrPayerOrUserJudoPaymentMethod() ?
+                $this->getPolicyOrPayerOrUserJudoPaymentMethod()->toApiArray() :
+                JudoPaymentMethod::emptyApiArray(),
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

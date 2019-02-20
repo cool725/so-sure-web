@@ -3133,6 +3133,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals(self::$JUDO_TEST_CARD_NAME, $data['payment_details']);
         $this->assertEquals('judo', $data['payment_method']);
+        $this->assertEquals(self::$JUDO_TEST_CARD_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$JUDO_TEST_CARD_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
 
         $details = $judopay->testRegisterDetails(
             $user,
@@ -3155,6 +3158,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals(self::$JUDO_TEST_CARD2_NAME, $data['payment_details']);
         $this->assertEquals('judo', $data['payment_method']);
+        $this->assertEquals(self::$JUDO_TEST_CARD2_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$JUDO_TEST_CARD2_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$JUDO_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
     }
 
     public function testUpdatePolicyPaymentBacsOk()
@@ -3207,6 +3213,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertContains(PCAService::TEST_ACCOUNT_NUMBER_ADJUSTED_DISPLAY, $data['payment_details']);
         $this->assertEquals('bacs', $data['payment_method']);
+        $this->assertEquals(null, $data['card_details']['end_date']);
+        $this->assertEquals('Unknown', $data['card_details']['type']);
+        $this->assertEquals(null, $data['card_details']['last_four']);
     }
 
     public function testUpdatePolicyPaymentBacsDuplicateMandate()
