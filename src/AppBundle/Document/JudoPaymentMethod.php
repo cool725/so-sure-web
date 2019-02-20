@@ -242,4 +242,20 @@ class JudoPaymentMethod extends PaymentMethod
             return 'Missing';
         }
     }
+
+    public function toApiArray()
+    {
+        return [
+            'type' => $this->getCardType(),
+            'end_date' => $this->getCardEndDate(),
+            'last_four' => $this->getCardLastFour(),
+        ];
+    }
+
+    public static function emptyApiArray()
+    {
+        $paymentMethod = new JudoPaymentMethod();
+
+        return $paymentMethod->toApiArray();
+    }
 }

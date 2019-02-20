@@ -288,7 +288,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START));
+        $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',
@@ -332,6 +332,7 @@ class BICommand extends ContainerAwareCommand
             '"Payment Method"',
             '"Expected Unpaid Cancellation Date"',
             '"Bacs Mandate Status"',
+            '"Use For Attribution"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -399,6 +400,7 @@ class BICommand extends ContainerAwareCommand
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
                         null
                 ),
+                sprintf('"%s"', $policy->useForAttribution() ? 'yes' : 'no'),
             ]);
         }
         if (!$skipS3) {

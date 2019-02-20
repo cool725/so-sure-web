@@ -2896,6 +2896,86 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 
+    public function testNewPolicyJudopayUnpaidRepayBacsOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyJudopayUnpaidRepayBacsOk', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        /** @var JudopayService $judopay */
+        $judopay = $this->getContainer(true)->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200001',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+
+        // Ensure that policy creation didn't run twice
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
+        $policy = $repo->find($policyData['id']);
+        //\Doctrine\Common\Util\Debug::dump($policy->getSuccessfulPayments());
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals(7.15, $policy->getTotalSuccessfulPayments());
+
+        // Now assume an unpaid payment
+        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        $dm->flush();
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
+            'sort_code' => PCAService::TEST_SORT_CODE,
+            'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
+            'account_name' => 'foo bar',
+            'mandate' => self::generateRandomImei(),
+            'initial_amount' => $policy->getPremium()->getMonthlyPremiumPrice(),
+            'recurring_amount' => $policy->getPremium()->getMonthlyPremiumPrice(),
+        ]]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $data['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+        $this->assertEquals(Policy::STATUS_ACTIVE, $data['status']);
+        $this->assertEquals('BX1 1LT', $data['bank_account']['bank_address']['postcode']);
+        $this->assertEquals('pending-init', $data['bank_account']['mandate_status']);
+        $this->assertGreaterThan(5, mb_strlen($data['bank_account']['mandate']));
+        $this->assertGreaterThan(8, mb_strlen($data['bank_account']['initial_notification_date']));
+        $this->assertGreaterThan(0, $data['bank_account']['standard_notification_day']);
+        $this->assertTrue($data['has_time_bacs_payment']);
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        /** @var SalvaPhonePolicy $policy */
+        $policy = $repo->find($policyData['id']);
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        // bacs is pending, so still only 1 payment received
+        $this->assertEquals(7.15 * 1, $policy->getTotalSuccessfulPayments());
+
+        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
+        $this->assertEquals('monthly', $policyData['premium_plan']);
+        $environment = $this->getContainer(true)->getParameter('kernel.environment');
+        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect());
+    }
+
     public function testNewPolicyJudopayMissingReceipt()
     {
         $user = self::createUser(
@@ -3053,6 +3133,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals(self::$JUDO_TEST_CARD_NAME, $data['payment_details']);
         $this->assertEquals('judo', $data['payment_method']);
+        $this->assertEquals(self::$JUDO_TEST_CARD_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$JUDO_TEST_CARD_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
 
         $details = $judopay->testRegisterDetails(
             $user,
@@ -3075,6 +3158,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals(self::$JUDO_TEST_CARD2_NAME, $data['payment_details']);
         $this->assertEquals('judo', $data['payment_method']);
+        $this->assertEquals(self::$JUDO_TEST_CARD2_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$JUDO_TEST_CARD2_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$JUDO_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
     }
 
     public function testUpdatePolicyPaymentBacsOk()
@@ -3127,6 +3213,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         $this->assertContains(PCAService::TEST_ACCOUNT_NUMBER_ADJUSTED_DISPLAY, $data['payment_details']);
         $this->assertEquals('bacs', $data['payment_method']);
+        $this->assertEquals(null, $data['card_details']['end_date']);
+        $this->assertEquals('Unknown', $data['card_details']['type']);
+        $this->assertEquals(null, $data['card_details']['last_four']);
     }
 
     public function testUpdatePolicyPaymentBacsDuplicateMandate()

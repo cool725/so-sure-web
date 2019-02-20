@@ -1210,14 +1210,15 @@ class ApiAuthController extends BaseController
                 // todo: record/bill initial amount
                 $initialAmount = $this->getDataString($bacsData, 'initial_amount');
                 $recurringAmount = $this->getDataString($bacsData, 'recurring_amount');
-                $installments = $policy->getPremium()->getNumberOfMonthlyPayments($recurringAmount);
-                if (!in_array($installments, [1, 12])) {
+                $paidInstallments = $policy->getPremium()->getNumberOfMonthlyPayments($recurringAmount);
+                if (!in_array($paidInstallments, [1, 12])) {
                     throw new InvalidPremiumException(sprintf(
                         '%0.2f is not a monthly/annual price for policy %s',
                         $recurringAmount,
                         $policy->getId()
                     ));
                 }
+                $installments = 13 - $paidInstallments;
                 $policy->setPremiumInstallments($installments);
                 $bankAccount->setAnnual($installments == 1);
 

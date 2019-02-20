@@ -133,7 +133,7 @@
     background-color: $white;
 
     @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png') no-repeat -220px 440px;
         background-size: 480px;
     }
 
