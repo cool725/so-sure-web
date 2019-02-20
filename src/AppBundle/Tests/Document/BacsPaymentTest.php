@@ -133,7 +133,10 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
         $this->assertTrue($bacs->isSuccess());
-        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+        $this->assertNotNull($bacs->getScheduledPayment());
+        if ($bacs->getScheduledPayment()) {
+            $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+        }
 
         $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate(), '', 1);
     }
@@ -185,7 +188,10 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(Bacs::MANDATE_FAILURE, $bacs->getStatus());
         $this->assertFalse($bacs->isSuccess());
-        $this->assertEquals(ScheduledPayment::STATUS_FAILED, $bacs->getScheduledPayment()->getStatus());
+        $this->assertNotNull($bacs->getScheduledPayment());
+        if ($bacs->getScheduledPayment()) {
+            $this->assertEquals(ScheduledPayment::STATUS_FAILED, $bacs->getScheduledPayment()->getStatus());
+        }
     }
 
     /**

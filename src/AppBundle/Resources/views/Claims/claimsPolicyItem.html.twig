@@ -1541,6 +1541,12 @@
                             {%  if payment.status is defined and payment.status %}
                                 ({{  payment.status }})
                             {% endif %}
+                            {% if is_granted('ROLE_ADMIN') and payment.status is defined and payment.status == 'pending' %}
+                                <button title="Skip" type="button" class="btn btn-warning" data-payment-id="{{ payment.id }}"
+                                        data-toggle="modal" data-target="#skipPaymentModal"
+                                ><i class="fa fa-trash"></i> Skip</button>
+                            {% endif %}
+
                         </td>
                     </tr>
                   {% endfor %}
@@ -1700,6 +1706,31 @@
                         {{ form_widget(run_scheduled_payment_form.upload, {'label': 'Reschedule', 'attr': {'class': 'btn btn-success'}}) }}
                     </div>
                     {{ form_end(run_scheduled_payment_form )}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="modal fade" id="skipPaymentModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document" style="width: 60%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Skip payment</h4>
+                    </div>
+                    {{ form_start(skip_payment_form)}}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Change status from pending to skipped</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {{ form_widget(skip_payment_form.skip, {'label': 'Skip', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(skip_payment_form )}}
                 </div>
             </div>
         </div>
