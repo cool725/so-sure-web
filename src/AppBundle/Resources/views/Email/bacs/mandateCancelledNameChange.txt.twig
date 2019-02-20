@@ -1,9 +1,6 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Your Recent Name Change
 
-**
-------------------------------------------------------------
 Hi {{ user.name }},
 
 You recently changed your name on your so-sure policy.
@@ -13,4 +10,20 @@ As part of our security measures, we require that our direct debit bank accounts
 You can easily setup your direct debit again (or switch to debit/credit card payments) by logging into your account at https://wearesosure.com.
 
 Alternatively, if you are in the middle of a name change and your bank account is still in your previous name, please do let us know and we can re-enable direct debit (we may need a document or two).
-{% endblock body %}
+
+Please login to your account to see your policy T&amp;Cs and review your legal obligations:
+{{ url('user_policy_list_policy', {'id': policy.id}) }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom
