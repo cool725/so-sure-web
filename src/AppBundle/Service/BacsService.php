@@ -1019,6 +1019,7 @@ class BacsService
         }
 
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
+
         if ($reason == self::ADDACS_REASON_TRANSFER) {
             return;
         }
@@ -1050,17 +1051,19 @@ class BacsService
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
-        // sendTemplateToUser doesn't work well with listeners
-        $this->mailerService->sendTemplate(
-            'Your recent name change',
-            $user->getEmail(),
-            $templateHtml,
-            ['user' => $user],
-            $templateText,
-            ['user' => $user],
-            null,
-            'bcc@so-sure.com'
-        );
+        foreach ($user->getValidPolicies(true) as $policy) {
+            // sendTemplateToUser doesn't work well with listeners
+            $this->mailerService->sendTemplate(
+                'Your recent name change',
+                $user->getEmail(),
+                $templateHtml,
+                ['user' => $user, 'policy' => $policy],
+                $templateText,
+                ['user' => $user, 'policy' => $policy],
+                null,
+                'bcc@so-sure.com'
+            );
+        }
     }
 
     private function validateMessageHeader($xpath)
