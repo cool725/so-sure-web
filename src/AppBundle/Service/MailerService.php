@@ -64,15 +64,34 @@ class MailerService
      * @var array
      */
     public static $analyticsCampaigns = [
+        'bacs/bacsPaymentFailed-1',
+        'bacs/bacsPaymentFailed-2',
+        'bacs/bacsPaymentFailed-3',
+        'bacs/bacsPaymentFailed-4',
+        'bacs/bacsPaymentFailedMandateCancelled-1',
+        'bacs/bacsPaymentFailedMandateCancelled-2',
+        'bacs/bacsPaymentFailedMandateCancelled-3',
+        'bacs/bacsPaymentFailedMandateCancelled-4',
+        'bacs/bacsPaymentFailedWithClaim-1',
+        'bacs/bacsPaymentFailedWithClaim-2',
+        'bacs/bacsPaymentFailedWithClaim-3',
+        'bacs/bacsPaymentFailedWithClaim-4',
+        'bacs/bacsPaymentFailedWithClaimMandateCancelled-3',
+        'bacs/bacsPaymentFailedWithClaimMandateCancelled-4',
         'card/cardExpiring',
+        'card/cardMissing-1',
+        'card/cardMissing-2',
+        'card/cardMissing-3',
+        'card/cardMissing-4',
+        'card/cardMissingWithClaim-4',
         'card/failedPayment-1',
         'card/failedPayment-2',
         'card/failedPayment-3',
         'card/failedPayment-4',
-        'policy/failedPaymentWithClaim-1',
-        'policy/failedPaymentWithClaim-2',
-        'policy/failedPaymentWithClaim-3',
-        'policy/failedPaymentWithClaim-4',
+        'card/failedPaymentWithClaim-1',
+        'card/failedPaymentWithClaim-2',
+        'card/failedPaymentWithClaim-3',
+        'card/failedPaymentWithClaim-4',
     ];
 
     /**

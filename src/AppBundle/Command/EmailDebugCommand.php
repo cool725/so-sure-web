@@ -130,6 +130,7 @@ class EmailDebugCommand extends ContainerAwareCommand
             'bacs' => [
                 'bacs/notification',
                 'bacs/mandateCancelled',
+                'bacs/mandateCancelledWithClaim',
                 'bacs/mandateCancelledNameChange',
                 'bacs/bacsPaymentFailed',
                 'bacs/bacsPaymentFailedWithClaim',
@@ -232,7 +233,8 @@ class EmailDebugCommand extends ContainerAwareCommand
         }
         $data = [];
         if (in_array($template, $templates['bacs'])) {
-            $claimed = $variation == 'cancelledClaimed' || $template == 'bacs/bacsPaymentFailedWithClaim';
+            $claimed = $variation == 'cancelledClaimed' || $template == 'bacs/bacsPaymentFailedWithClaim' ||
+                $template == 'bacs/mandateCancelledWithClaim';
 
             /** @var PolicyRepository $repo */
             $repo = $this->dm->getRepository(Policy::class);

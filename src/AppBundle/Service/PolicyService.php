@@ -904,10 +904,10 @@ class PolicyService
         // vs renewal which will have the number of payments requested
         $isInitialPurchase = $numPayments === null;
         if (!$date) {
-            if (!$policy->getStartForBilling()) {
+            if (!$policy->getBilling()) {
                 throw new \Exception('Unable to generate payments if policy does not have a start date');
             }
-            $date = clone $policy->getStartForBilling();
+            $date = clone $policy->getBilling();
         }
 
         // To determine any payments made

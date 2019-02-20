@@ -969,6 +969,28 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy2->getRiskReason());
     }
 
+    public function testUseForAttribution()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUseForAttribution', $this),
+            'bar'
+        );
+        $policy1 = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy2 = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy1, new \DateTime('2018-01-02'));
+        static::$policyService->create($policy2, new \DateTime('2018-01-01'));
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy1->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertTrue($policy2->useForAttribution());
+        $this->assertFalse($policy1->useForAttribution());
+    }
+
     /**
      * @expectedException \MongoDuplicateKeyException
      */

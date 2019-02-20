@@ -112,6 +112,7 @@ class GoCompare
 
         1475 => ['make' => 'Huawei', 'model' => 'Honor 8', 'memory' => 32],
         //1476 => ['make' => 'Huawei', 'model' => 'Honor 8 Pro', 'memory' => 32],
+        1477 => ['make' => 'Nokia', 'model' => '7.1', 'memory' => 32],
 
         1479 => ['make' => 'Samsung', 'model' => 'Galaxy A7 (2018)', 'memory' => 64],
         1480 => ['make' => 'Samsung', 'model' => 'Galaxy A9 (2018)', 'memory' => 128],

@@ -2787,7 +2787,7 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount($skipAllowedCheck = false)
+    public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
@@ -2804,13 +2804,13 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffPremiumRefund();
+            return $this->getCooloffPremiumRefund($skipValidate);
         } else {
             return $this->getProratedPremiumRefund($this->getEnd());
         }
     }
 
-    public function getRefundCommissionAmount($skipAllowedCheck = false)
+    public function getRefundCommissionAmount($skipAllowedCheck = false, $skipValidate = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
@@ -2827,20 +2827,20 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffCommissionRefund();
+            return $this->getCooloffCommissionRefund($skipValidate);
         } else {
             return $this->getProratedCommissionRefund($this->getEnd());
         }
     }
 
-    public function getCooloffPremiumRefund()
+    public function getCooloffPremiumRefund($skipValidate = false)
     {
         $amountToRefund = 0;
         // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
         if ($paymentToRefund = $this->getLastSuccessfulUserPaymentCredit()) {
             $amountToRefund = $paymentToRefund->getAmount();
         }
-        if ($amountToRefund > 0) {
+        if ($amountToRefund > 0 && !$skipValidate) {
             $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
         }
         $paid = $this->getPremiumPaid();
@@ -2869,7 +2869,7 @@ abstract class Policy
         return $this->toTwoDp($paid - $used);
     }
 
-    public function getCooloffCommissionRefund()
+    public function getCooloffCommissionRefund($skipValidate = false)
     {
         $amountToRefund = 0;
         $commissionToRefund = 0;
@@ -2878,7 +2878,7 @@ abstract class Policy
             $amountToRefund = $paymentToRefund->getAmount();
             $commissionToRefund = $paymentToRefund->getTotalCommission();
         }
-        if ($amountToRefund > 0) {
+        if ($amountToRefund > 0 && !$skipValidate) {
             $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
         }
 
@@ -5481,7 +5481,7 @@ abstract class Policy
     public function getPremiumPayments()
     {
         return [
-            'paid' => $this->eachApiArray($this->getPayments()),
+            'paid' => $this->eachApiArray($this->getSuccessfulPayments()),
             'scheduled' => $this->eachApiArray($this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED)),
         ];
     }
@@ -5857,6 +5857,20 @@ abstract class Policy
         return $isConnected;
     }
 
+    public function useForAttribution()
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $attributionPolicy = $this->getUser()->getAttributionPolicy();
+        if (!$attributionPolicy) {
+            return null;
+        }
+
+        return $this->getId() == $attributionPolicy->getId();
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [
@@ -5916,7 +5930,10 @@ abstract class Policy
             'bank_account' => $this->getBacsBankAccount() ?
                 $this->getBacsBankAccount()->toApiArray() :
                 null,
-            'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime()
+            'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
+            'card_details' => $this->hasPolicyOrPayerOrUserJudoPaymentMethod() ?
+                $this->getPolicyOrPayerOrUserJudoPaymentMethod()->toApiArray() :
+                JudoPaymentMethod::emptyApiArray(),
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {
