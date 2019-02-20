@@ -96,95 +96,9 @@
         'title': 'Create New Affiliate',
         'size': 'modal-lg'
     } %}
- {#    <div class="modal fade"
-         id="reward_modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="reward_modal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add reward bonus type</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(rewardForm) }}
-                        <div class="form-group">
-                            {{ form_label(rewardForm.firstName, 'First Name') }}
-                            {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.lastName, 'Last Name') }}
-                            {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.email, 'Email') }}
-                            {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.email) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.code, 'SCode') }}
-                            {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.defaultValue, 'Default Value') }}
-                            {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
-                        </div>
-                    {{ form_end(rewardForm) }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="connect_modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="connect_modal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Bonus To User</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(connectForm) }}
-                        <div class="form-group">
-                            {{ form_label(connectForm.email, 'Email') }}
-                            {{ form_widget(connectForm.email, { 'attr': { 'class': 'form-control' }}) }}
-                            <div class="with-errors">{{ form_errors(connectForm.email) }}</div>
-                        </div>
-                        <h5>Warning! If user has multiple policies, currently implementation will add bonus to each policy!</h5>
-                        <div class="form-group">
-                            {{ form_label(connectForm.amount, 'Bonus Amount') }}
-                            {{ form_widget(connectForm.amount, { 'attr': { 'class': 'form-control' }}) }}
-                            <div class="with-errors">{{ form_errors(connectForm.amount) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_widget(connectForm.rewardId) }}
-                            {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square'}}) }}
-                        </div>
-                    {{ form_end(connectForm) }}
-                </div>
-            </div>
-        </div>
-    </div> #}
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/rewards.js') }}"></script>
+    <script src="{{ asset('css-js/confirm-modal.js') }}"></script>
 {% endblock %}
