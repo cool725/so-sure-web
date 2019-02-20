@@ -5481,7 +5481,7 @@ abstract class Policy
     public function getPremiumPayments()
     {
         return [
-            'paid' => $this->eachApiArray($this->getPayments()),
+            'paid' => $this->eachApiArray($this->getSuccessfulPayments()),
             'scheduled' => $this->eachApiArray($this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED)),
         ];
     }
