@@ -26,14 +26,6 @@ use AppBundle\Document\Lead;
 class AboutController extends BaseController
 {
     /**
-     * @Route("", name="about_home")
-     * @Template
-     */
-    public function indexAction(Request $request)
-    {
-    }
-
-    /**
      * @Route("/careers", name="careers", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */

@@ -1,125 +1,160 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/rewards.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-rewards' %}
+
+{% block title %}so-sure - Admin Rewards{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-<div class="row">
-    <div class="col-md-8">
-        <h2>Reward Bonuses</h2>
-    </div>
-    <div class="col-md-2">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#rewardModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Bonus Type</button>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-8">
-    <table class="table table-stripped">
-        <tr>
-            <th>Bonus Type</th>
-            <th>SCode</th>
-            <th>Default Value</th>
-            <th>Number Connections</th>
-            <th>Total</th>
-            <th></th>
-        </tr>
-        {% for reward in rewards %}
-            <tr>
-                <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
-                <td>{% if reward.sCode %}{{ reward.sCode.code }}{% else %}n/a{% endif %}</td>
-                <td>{% if reward.defaultValue %}£{{ reward.defaultValue|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
-                <td>{{ reward.connections|length }}</td>
-                <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
-                <td>
-                    <button type="button" class="btn btn-info" data-user-name="{{ reward.user }}" data-reward-id="{{ reward.id }}" data-toggle="modal" data-target="#connectModal"
-                    ><i class="fa fa-plus"></i> Add Bonus To User</button>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    </div>
-</div>
 
-    <div class="modal fade" id="connectModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add Bonus To User</h4>
-          </div>
-          <div class="modal-body">
-            {{ form_start(connectForm) }}
-                <div class="form-group">
-                    {{ form_label(connectForm.email, 'Email') }}
-                    {{ form_errors(connectForm.email) }}
-                    {{ form_widget(connectForm.email) }}
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Rewards</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary btn-square"
+                       data-toggle="modal"
+                       data-target="#reward_modal">New Bonus Type <i class="fal fa-plus fa-fw"></i></a>
                 </div>
-                <h5>Warning! If user has multiple policies, currently implementation will add bonus to each policy!</h5>
-                <div class="form-group">
-                    {{ form_label(connectForm.amount, 'Bonus Amount') }}
-                    {{ form_errors(connectForm.amount) }}
-                    {{ form_widget(connectForm.amount) }}
-                </div>
-                <div class="form-group">
-                    {{ form_widget(connectForm.rewardId) }}
-                    {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(connectForm) }}
-          </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Bonus Type</th>
+                            <th>SCode</th>
+                            <th>Default Value</th>
+                            <th>Number Connections</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reward in rewards %}
+                            <tr>
+                                <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
+                                <td>{% if reward.sCode %}{{ reward.sCode.code }}{% else %}n/a{% endif %}</td>
+                                <td>{% if reward.defaultValue %}£{{ reward.defaultValue|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                                <td>{{ reward.connections|length }}</td>
+                                <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
+                                <td>
+                                    <a href="#"
+                                       class="btn btn-primary btn-square btn-sm"
+                                       data-user-name="{{ reward.user }}"
+                                       data-reward-id="{{ reward.id }}"
+                                       data-toggle="modal"
+                                       data-target="#connect_modal"
+                                    >Add bonus to user <i class="fal fa-plus fa-fw"></i></a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="modal fade" id="rewardModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add reward bonus type</h4>
-          </div>
-          <div class="modal-body">
-            {{ form_start(rewardForm) }}
-                <div class="form-group">
-                    {{ form_label(rewardForm.firstName, 'First Name') }}
-                    {{ form_errors(rewardForm.firstName) }}
-                    {{ form_widget(rewardForm.firstName) }}
+    {# Page Modals #}
+    <div class="modal fade"
+         id="reward_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="reward_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add reward bonus type</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
-                <div class="form-group">
-                    {{ form_label(rewardForm.lastName, 'Last Name') }}
-                    {{ form_errors(rewardForm.lastName) }}
-                    {{ form_widget(rewardForm.lastName) }}
+                <div class="modal-body">
+                    {{ form_start(rewardForm) }}
+                        <div class="form-group">
+                            {{ form_label(rewardForm.firstName, 'First Name') }}
+                            {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.lastName, 'Last Name') }}
+                            {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.email, 'Email') }}
+                            {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.email) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.code, 'SCode') }}
+                            {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(rewardForm.defaultValue, 'Default Value') }}
+                            {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(rewardForm) }}
                 </div>
-                <div class="form-group">
-                    {{ form_label(rewardForm.email, 'Email') }}
-                    {{ form_errors(rewardForm.email) }}
-                    {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(rewardForm.code, 'SCode') }}
-                    {{ form_errors(rewardForm.code) }}
-                    {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(rewardForm.defaultValue, 'Default Value') }}
-                    {{ form_errors(rewardForm.defaultValue) }}
-                    {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add'}}) }}
-                </div>
-                <div class="form-group">
-                    {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(rewardForm) }}
-          </div>
+            </div>
         </div>
-      </div>
     </div>
 
-</div>
+    <div class="modal fade"
+         id="connect_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="connect_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Bonus To User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(connectForm) }}
+                        <div class="form-group">
+                            {{ form_label(connectForm.email, 'Email') }}
+                            {{ form_widget(connectForm.email, { 'attr': { 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(connectForm.email) }}</div>
+                        </div>
+                        <h5>Warning! If user has multiple policies, currently implementation will add bonus to each policy!</h5>
+                        <div class="form-group">
+                            {{ form_label(connectForm.amount, 'Bonus Amount') }}
+                            {{ form_widget(connectForm.amount, { 'attr': { 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(connectForm.amount) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(connectForm.rewardId) }}
+                            {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(connectForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/rewards.js') }}"></script>
 {% endblock %}
