@@ -2107,6 +2107,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertGreaterThan(8, mb_strlen($data['bank_account']['initial_notification_date']));
         $this->assertGreaterThan(0, $data['bank_account']['standard_notification_day']);
         $this->assertTrue($data['has_time_bacs_payment']);
+        $this->assertEquals(
+            $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
+            $data['premium_payments']['scheduled'][0]['amount']
+        );
     }
 
     public function testNewPolicyPayBacsExisting()
@@ -2927,6 +2931,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
+        $this->assertEquals(7.15, $policyData['premium_payments']['scheduled'][0]['amount']);
 
         // Ensure that policy creation didn't run twice
         $dm = $this->getDocumentManager(true);

@@ -1233,7 +1233,7 @@ class ApiAuthController extends BaseController
                         $policy,
                         $this->now(),
                         true,
-                        $installments,
+                        null,
                         $this->getIdentityLog($request)
                     );
                 }
