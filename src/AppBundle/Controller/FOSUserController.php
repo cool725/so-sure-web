@@ -79,14 +79,17 @@ class FOSUserController extends ResettingController
             $userManager->updateUser($user);
 
             if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('fos_user_profile_show');
+                $url = $this->generateUrl('fos_user_security_login');
                 $response = new RedirectResponse($url);
             }
 
+            /*
+             * do not dispatch this event as it will login a user, which skips the 2fa for admin users
             $dispatcher->dispatch(
                 FOSUserEvents::RESETTING_RESET_COMPLETED,
                 new FilterUserResponseEvent($user, $request, $response)
             );
+            */
 
             return $response;
         } elseif ($user->getPreviousPasswordCheck() === false) {
