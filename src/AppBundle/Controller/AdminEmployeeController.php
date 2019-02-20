@@ -33,6 +33,7 @@ use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PromotionType;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -1189,6 +1190,40 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+    /**
+     * @Route("/policy/{id}/sp", name="admin_scheduled_payment_redirect")
+     */
+    public function scheduledPaymentRedirectAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var ScheduledPaymentRepository $repo */
+        $repo = $dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment $scheduledPayment */
+        $scheduledPayment = $repo->find($id);
+        if (!$scheduledPayment || !$scheduledPayment->getPolicy()) {
+            throw $this->createNotFoundException("Unknown scheduled payment");
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $scheduledPayment->getPolicy()->getId()]);
+    }
+
+    /**
+     * @Route("/policy/{id}/p", name="admin_payment_redirect")
+     */
+    public function paymentRedirectAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var PaymentRepository $repo */
+        $repo = $dm->getRepository(Payment::class);
+        /** @var Payment $payment */
+        $payment = $repo->find($id);
+        if (!$payment || !$payment->getPolicy()) {
+            throw $this->createNotFoundException("Unknown payment");
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $payment->getPolicy()->getId()]);
+    }
+
     /**
      * @Route("/policy/{id}/sp", name="admin_scheduled_payment_redirect")
      */
