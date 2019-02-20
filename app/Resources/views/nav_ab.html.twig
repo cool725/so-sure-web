@@ -61,7 +61,6 @@
                         <span><a href="{{ path('fos_user_security_login') }}?nav=1" class="btn btn-white-hollow">Login</a></span>
                     </li>
                 {% endif %}
-                <li><a href="{{ path('about_home') }}?nav=1">About us</a></li>
                 {# Link to personal or company insurance #}
                 {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
                     <li><a href="{{ path('homepage') }}?nav=1">Personal phones</a></li>
