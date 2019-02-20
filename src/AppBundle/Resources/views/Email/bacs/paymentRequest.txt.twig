@@ -1,0 +1,24 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Payment required - payments are behind for {{ policy.policyNumber }}
+
+**
+------------------------------------------------------------
+Dear {{ policy.user.firstName }},
+
+We hope this email finds you well.
+
+Our Finance department has flagged your account is behind on payments.
+
+You can view your balance on your payment details page:
+{{ url('user_payment_details', {'policyId': policy.id}) }}
+
+To make sure your device remains covered by us, kindly reply to this email and authorize us to bill you for your current outstanding balance.
+
+We look forward to hearing from you.
+
+Kind regards,
+
+The so-sure team
+
+{% endblock body %}

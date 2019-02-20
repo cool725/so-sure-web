@@ -1044,7 +1044,7 @@
                         {{ form_start(resend_email_form, {'attr': {'class': 'form-inline'}}) }}
                         {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to resend the Policy Welcome Email?'}}) }}
                         {{ form_end(resend_email_form) }}
-                      </td>
+                    </td>
                 </tr>
                 <tr>
                     <td>Taste Card</td>
@@ -1176,6 +1176,15 @@
                     </td>
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Request Bacs Payment</td>
+                    <td>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#bacsPaymentRequestForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Request
+                        </button>
+                    </td>
+                </tr>
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Debt Collection</td>
                     <td>
@@ -1895,6 +1904,7 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:serialNumberForm', 'policy': policy, 'id': 'serialNumberForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:bacsPaymentRequestForm', 'policy': policy, 'id': 'bacsPaymentRequestForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
     {% endif %}
     {% if is_granted('ROLE_ADMIN') %}

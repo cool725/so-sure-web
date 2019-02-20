@@ -1079,6 +1079,35 @@ class PolicyService
         return $this->newPolicyEmail($policy, $attachments, 'bcc@so-sure.com');
     }
 
+    public function sendBacsPaymentRequest(Policy $policy)
+    {
+        if (!$this->mailer) {
+            return false;
+        }
+
+        $baseTemplate = 'AppBundle:Email:bacs/paymentRequest';
+
+        try {
+            $this->mailer->sendTemplateToUser(
+                'Request for payment on your so-sure policy',
+                $policy->getUser(),
+                sprintf('%s.html.twig', $baseTemplate),
+                ['policy' => $policy],
+                sprintf('%s.txt.twig', $baseTemplate),
+                ['policy' => $policy]
+            );
+
+            $policy->setLastEmailed(\DateTime::createFromFormat('U', time()));
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending bacs payment request email to %s', $policy->getUser()->getEmail()),
+                ['exception' => $e]
+            );
+        }
+
+        return true;
+    }
+
     public function downloadS3(S3File $s3file)
     {
         $file = sprintf('%s/%s', sys_get_temp_dir(), $s3file->getFilename());

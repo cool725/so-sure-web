@@ -18,6 +18,7 @@ use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\AffiliateType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\BacsPaymentRequestType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\DetectedImeiType;
@@ -1124,6 +1125,66 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'form' => $linkClaimform->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/bacs-payment-request/{id}", name="bacs_payment_request_form")
+     * @Template
+     */
+    public function bacsPaymentRequestFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+
+        /** @var PhonePolicyRepository $repo */
+        $repo = $dm->getRepository(PhonePolicy::class);
+
+        /** @var PolicyService $policyService */
+        $policyService = $this->get('app.policy');
+
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $bacsPaymentRequestForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_payment_request_form', BacsPaymentRequestType::class)
+            ->setAction($this->generateUrl(
+                'bacs_payment_request_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('bacs_payment_request_form')) {
+                $bacsPaymentRequestForm->handleRequest($request);
+                if ($bacsPaymentRequestForm->isValid()) {
+                    $status = $policyService->sendBacsPaymentRequest($policy);
+
+                    if ($status) {
+                        $this->addFlash('success', "Successfully sent bacs payment request");
+
+                        $policy->addNoteDetails(
+                            $bacsPaymentRequestForm->get('note')->getData(),
+                            $this->getUser(),
+                            'Bacs Payment Request'
+                        );
+
+                        $dm->flush();
+                    } else {
+                        $this->addFlash('error', "Error sending bacs payment request");
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $bacsPaymentRequestForm->createView(),
             'policy' => $policy,
         ];
     }
