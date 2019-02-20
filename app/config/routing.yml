@@ -481,3 +481,10 @@ redirect_download_app:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
         permanent: true
+        
+redirect_about_us:
+    path: /about/social-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: social_insurance
+        permanent: true

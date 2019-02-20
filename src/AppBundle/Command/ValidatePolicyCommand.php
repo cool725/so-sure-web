@@ -492,8 +492,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $policy->getPolicyNumber()
                 );
             }
-            $refund = $policy->getRefundAmount();
-            $refundCommission = $policy->getRefundCommissionAmount();
+            $refund = $policy->getRefundAmount(false, true);
+            $refundCommission = $policy->getRefundCommissionAmount(false, true);
             $pendingBacsTotal = abs($policy->getPendingBacsPaymentsTotal(true));
             $pendingBacsTotalCommission = abs($policy->getPendingBacsPaymentsTotalCommission(true));
             $refundMismatch =  $this->greaterThanZero($refund) && $refund > $pendingBacsTotal &&
