@@ -67,7 +67,7 @@
       table td { border-collapse: collapse; }
       </style>
       <![endif]-->
-    <title>Urgent: Your Direct Debit payment failed for the final time</title>
+    <title>There is a problem with your phone insurance</title>
     <style>
       @media only screen and (min-width:641px) {
         .text-left-res {
@@ -127,10 +127,10 @@
                                           <tr class="row__row">
                                             <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
                                               <img src="https://cdn.so-sure.com/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="200px" class="img-center img__block" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
-                                              <h2 class="text-red header h2" style="margin: 20px 0; line-height: 30px; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; margin-bottom: 25px; margin-top: 15px; color: #ED1C23;">Action required to keep your phone insured</h2>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Your monthly Direct Debit payment failed for the final time and your policy will be automatically cancelled in <strong>7 days</strong>.</p>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">If you fail to make payment in time, your policy will be cancelled on <strong>{{ policy.policyExpirationDate|date('M jS','Europe/London') }}</strong></p>
-                                              <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">To avoid losing insurance for your <strong>{{ policy.phone }}</strong>, you need to login to your account and make a payment for the outstanding balance of <strong>&pound;{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice }}</strong></p>
+                                              <h2 class="header h2" style="margin: 20px 0; line-height: 30px; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; color: #2593F3; margin-bottom: 25px; margin-top: 15px;">Direct Debit payment failed</h2>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Not to worry! We’ll try again in a few days 👍</p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">In the meantime, you may need to check your payment details are up-to-date.</p>
+                                              <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">…and you have 💰 in your account!</p>
                                               <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
                                                   <tr>
                                                     <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
@@ -142,7 +142,7 @@
                                                                   <td>
                                                                     <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
                                                                       <tr>
-                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ branch_payment_details_url }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Check payment details</span></a></td>
+                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="#" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Update my payment details</span></a></td>
                                                                       </tr>
                                                                     </table>
                                                                   </td>
@@ -154,10 +154,6 @@
                                                       </table> <!--[if mso | IE]> </td>
                                                   </tr>
                                                 </table> <![endif]--> </div>
-                                              <h4 class="text-red header h4" style="margin: 20px 0; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; color: #ED1C23;">IMPORTANT LEGAL INFORMATION</h4>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><em>If you fail to make payment in time, your policy will be cancelled and, as you have already had a claim approved, you will then be expected to pay in full the remainder of your annual premium.</em></p>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><em>In the unfortunate case that you do not pay the remainder of your policy premium, we will be forced to take legal proceedings against you.</em></p>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><em>Please <a href="{{ url('user_policy_list_policy', {'id': policy.id}) }}" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">login to your account</span></a> to see your policy T&amp;Cs and review your legal obligations</em></p>
                                               <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><em>Have a question or issue? <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;"><span style="color:#3399ff">contact us</span></span></a></em></p>
                                             </td>
                                           </tr>
@@ -177,7 +173,7 @@
                                         <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                                           <tr class="row__row">
                                             <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><small style="color: #777777;">Copyright &copy; 2018 so-sure Limited, All rights reserved.</small></p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><small style="color: #777777;">Copyright &copy; {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.</small></p>
                                             </td>
                                           </tr>
                                         </table>

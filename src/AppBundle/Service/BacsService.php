@@ -638,8 +638,8 @@ class BacsService
                 $this->queueCancelBankAccount($bacs->getBankAccount(), $referenceId);
             }
 
-            if ($referenceUser) {
-                $this->notifyMandateCancelled($referenceUser, $reason);
+            if ($referencePolicy) {
+                $this->notifyMandateCancelled($referencePolicy, $reason);
             }
 
             if ($reason == self::ADDACS_REASON_TRANSFER) {
@@ -1010,29 +1010,32 @@ class BacsService
         return $results;
     }
 
-    private function notifyMandateCancelled(User $user, $reason)
+    private function notifyMandateCancelled(Policy $policy, $reason)
     {
         // If a user doesn't have an active or unpaid policy, there is no need to notify of a mandate cancellation
         // copy would be confusing and there's no value to sending
-        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        if (!$policy->isActive()) {
             return;
         }
 
+        $user = $policy->getUser();
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
+        if ($policy->hasMonetaryClaimed(true, true)) {
+            $baseTemplate = 'AppBundle:Email:bacs/mandateCancelledWithClaim';
+        }
         if ($reason == self::ADDACS_REASON_TRANSFER) {
             return;
         }
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
-        $claimed = $user->getAvgPolicyClaims() > 0;
         $this->mailerService->sendTemplateToUser(
             'Your Direct Debit Cancellation',
             $user,
             $templateHtml,
-            ['user' => $user, 'claimed' => $claimed],
+            ['user' => $user, 'policy' => $policy],
             $templateText,
-            ['user' => $user, 'claimed' => $claimed],
+            ['user' => $user, 'policy' => $policy],
             null,
             'bcc@so-sure.com'
         );
@@ -1050,17 +1053,19 @@ class BacsService
         $templateHtml = sprintf('%s.html.twig', $baseTemplate);
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
-        // sendTemplateToUser doesn't work well with listeners
-        $this->mailerService->sendTemplate(
-            'Your recent name change',
-            $user->getEmail(),
-            $templateHtml,
-            ['user' => $user],
-            $templateText,
-            ['user' => $user],
-            null,
-            'bcc@so-sure.com'
-        );
+        foreach ($user->getValidPolicies(true) as $policy) {
+            // sendTemplateToUser doesn't work well with listeners
+            $this->mailerService->sendTemplate(
+                'Your recent name change',
+                $user->getEmail(),
+                $templateHtml,
+                ['user' => $user, 'policy' => $policy],
+                $templateText,
+                ['user' => $user, 'policy' => $policy],
+                null,
+                'bcc@so-sure.com'
+            );
+        }
     }
 
     private function validateMessageHeader($xpath)
