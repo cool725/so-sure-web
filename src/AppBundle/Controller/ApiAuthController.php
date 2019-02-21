@@ -141,7 +141,6 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/lookup/bacs", name="api_auth_lookup_bacs")
      * @Route("/policy/{id}/lookup/bacs", name="api_auth_policy_lookup_bacs")
      * @Method({"GET"})
      */
@@ -162,18 +161,24 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
-            $policy = null;
-            if ($id) {
-                $repo = $this->getManager()->getRepository(Policy::class);
-                $policy = $repo->find($id);
-                if (!$policy) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_NOT_FOUND,
-                        'Unable to find policy',
-                        404
-                    );
-                }
-                $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+            $repo = $this->getManager()->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            if ($policy->isEnded()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE,
+                    'Only pending/active policies are allowed',
+                    422
+                );
             }
 
             $sortCode = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'sort_code'), 10);
@@ -199,11 +204,11 @@ class ApiAuthController extends BaseController
                 $paymentService->generateBacsReference($bacs, $this->getUser());
             }
 
-            if (!$policy) {
-                $policy = new PhonePolicy();
-                $bacs->setStandardNotificationDate($this->now());
-            } else {
+            if ($policy->isActive(true)) {
                 $bacs->setStandardNotificationDate($policy->getBilling());
+            } else {
+                // pending policies should assume a now billing date
+                $bacs->setStandardNotificationDate($this->now());
             }
 
             $bacs->setInitialNotificationDate($bacs->getFirstPaymentDateForPolicy($policy));
