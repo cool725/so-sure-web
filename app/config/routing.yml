@@ -474,11 +474,3 @@ redirect_about_us:
         _controller: FrameworkBundle:Redirect:redirect
         route: social_insurance
         permanent: true
-
-redirect_about_social_what_is_social_insurance:
-    path: /about/social-insurance
-    defaults:
-        _controller: FrameworkBundle:Redirect:redirect
-        route: social_insurance
-        permanent: true
-
