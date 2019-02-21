@@ -68,16 +68,16 @@
                         <a class="nav-link {% if potential is defined %}active{% endif %}"
                            id="potential_aquisitions_tab"
                            {# data-toggle="tab" #}
-                           href="#{{ path('admin_affiliate_potential', {'id': affiliate.id}) }}"
+                           href="{{ path('admin_affiliate_potential', {'id': affiliate.id}) }}"
                            role="tab"
                            aria-controls="potential_aquisitions"
                            aria-selected="{% if potential is defined %}true{% else %}false{% endif %}se">Potential Aquisitions</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if lost is defined %}active{% endif %}"
-                           id="{{ path('admin_affiliate_lost', {'id': affiliate.id}) }}"
+                           id="lost_aquisitions_tab"
                            {# data-toggle="tab" #}
-                           href="#lost_aquisitions"
+                           href="{{ path('admin_affiliate_lost', {'id': affiliate.id}) }}"
                            role="tab"
                            aria-controls="lost_aquisitions"
                            aria-selected="{% if lost is defined %}true{% else %}false{% endif %}">Lost Aquisitions</a>
@@ -218,14 +218,122 @@
                                     </form>
                                 </div>
                             </div>
+                            <h5 class="my-4">Summary</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>CPA</th>
+                                            <th>Total Charges</th>
+                                            <th>Total Cost</th>
+                                            <th>Charge Model</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for note in affiliate.notesList|reverse %}
+                                            <tr>
+                                                <td>&pound;{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
+                                                <td>{{ charges|length }}</td>
+                                                <td>&pound;{{ cost|number_format(2, '.', ',') }}</td>
+                                                <td>{{ affiliate.chargeModel }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h5 class="my-4">Charges</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>User</th>
+                                            <th>Promotion</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for charge in charges %}
+                                            <tr>
+                                                <td>{{ charge.createdDate|date }}</td>
+                                                <td>
+                                                    {% if charge.user %}
+                                                        <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if charge.participation %}
+                                                        <strong>{{ charge.participation.status }}</strong> in
+                                                        <a href="{{ path('admin_promotion', {'id': affiliate.promotion.id }) }}">{{ affiliate.promotion.name }}</a> -
+                                                        <strong>{{ charge.participation.promotion.reward }}</strong>
+                                                        {% if charge.participation.status == 'completed' %}
+                                                            {% if charge.participation.promotion.reward == 'taste-card'%}
+                                                                {% if charge.policy.tasteCard %}
+                                                                    - {{ charge.policy.tasteCard }}
+                                                                {% else %}
+                                                                    - tastecard not yet set.
+                                                                {% endif %}
+                                                            {% elseif charge.participation.promotion.reward == 'pot' %}
+                                                                £{{ charge.participation.promotion.rewardAmount }}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         {% endif %}
                     </div>
                     <div class="tab-pane fade {% if pending is defined %}show active{% endif %}"
                          id="pending_aquisitions"
                          role="tabpanel"
                          aria-labelledby="pending_aquisitions_tab">
-                         {% if pending is defined %}
-
+                        {% if pending is defined %}
+                            <h5 class="my-4">Details</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>CPA</th>
+                                            <th>Total Pending Aquisitions</th>
+                                            <th>Total Cost Pending</th>
+                                            <th>Charge Model</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>£{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
+                                            <td>{{ pending|length }}</td>
+                                            <td>£{{ pending|length * affiliate.cpa }}</td>
+                                            <td>{{ affiliate.chargeModel }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h5 class="my-4">Pending Aquisitions</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Start Date</th>
+                                            <th>Days Until Aquisition</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in pending %}
+                                            <tr>
+                                                <td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td>
+                                                <td>{{ user.getFirstPolicy.getStart|date }}</td>
+                                                <td>{{ days[user.getId] }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                          {% endif %}
                     </div>
                     <div class="tab-pane fade {% if potential is defined %}show active{% endif %}"
@@ -233,7 +341,36 @@
                          role="tabpanel"
                          aria-labelledby="potential_aquisitions_tab">
                          {% if potential is defined %}
-
+                            <h5 class="my-4">Potential Aquisitions</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Total Potential Aquisitions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>{{ potential|length }}</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h5 class="my-4">Details</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in potential %}
+                                            <tr>
+                                                <td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                          {% endif %}
                     </div>
                     <div class="tab-pane fade {% if lost is defined %}show active{% endif %}"
@@ -241,7 +378,34 @@
                          role="tabpanel"
                          aria-labelledby="lost_aquisitions_tab">
                          {% if lost is defined %}
-
+                            <h5 class="my-4">Lost Aquisitions</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Total Lost Aquisitions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>{{ lost|length }}</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h5 class="my-4">Details</h5>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in lost %}
+                                            <tr><td><a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.name }}</a></td></tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                          {% endif %}
                     </div>
                 </div>
