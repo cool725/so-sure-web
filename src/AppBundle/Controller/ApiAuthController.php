@@ -142,9 +142,10 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/lookup/bacs", name="api_auth_lookup_bacs")
+     * @Route("/policy/{id}/lookup/bacs", name="api_auth_policy_lookup_bacs")
      * @Method({"GET"})
      */
-    public function bacsAction(Request $request)
+    public function bacsAction(Request $request, $id = null)
     {
         $bacs = null;
         try {
@@ -159,6 +160,20 @@ class ApiAuthController extends BaseController
                 $this->getCognitoIdentityId($request)
             )) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
+            $policy = null;
+            if ($id) {
+                $repo = $this->getManager()->getRepository(Policy::class);
+                $policy = $repo->find($id);
+                if (!$policy) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_NOT_FOUND,
+                        'Unable to find policy',
+                        404
+                    );
+                }
+                $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             }
 
             $sortCode = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'sort_code'), 10);
@@ -184,11 +199,21 @@ class ApiAuthController extends BaseController
                 $paymentService->generateBacsReference($bacs, $this->getUser());
             }
 
-            $policy = new PhonePolicy();
+            if (!$policy) {
+                $policy = new PhonePolicy();
+                $bacs->setStandardNotificationDate($this->now());
+            } else {
+                $bacs->setStandardNotificationDate($policy->getBilling());
+            }
+
             $bacs->setInitialNotificationDate($bacs->getFirstPaymentDateForPolicy($policy));
-            $bacs->setAccountName($this->getUser()->getName());
+
+            // TODO: Not sure if we setting. Account name should be what the user passes in
+            //$bacs->setAccountName($this->getUser()->getName());
 
             return new JsonResponse($bacs->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 

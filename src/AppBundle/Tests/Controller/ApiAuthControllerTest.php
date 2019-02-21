@@ -280,14 +280,53 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $this->assertEquals('foo bank', $data['bank_name']);
-        $this->assertEquals('Foo Bar', $data['account_name']);
+        //$this->assertEquals('Foo Bar', $data['account_name']);
+        $this->assertNull($data['account_name']);
         $this->assertEquals('00-00-99', $data['displayable_sort_code']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
         $this->assertEquals('BX1 1LT', $data['bank_address']['postcode']);
         $this->assertEquals('pending-init', $data['mandate_status']);
         $this->assertEquals('', $data['mandate']);
         $this->assertGreaterThan(8, mb_strlen($data['initial_notification_date']));
-        $this->assertEquals('', $data['standard_notification_day']);
+        $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
+    }
+
+    public function testLookupPolicyBacs()
+    {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupPolicyBacs', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
+            PCAService::TEST_SORT_CODE,
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+
+        $this->assertEquals('foo bank', $data['bank_name']);
+        //$this->assertEquals('Bar Foo', $data['account_name']);
+        $this->assertNull($data['account_name']);
+        $this->assertEquals('00-00-99', $data['displayable_sort_code']);
+        $this->assertEquals('XXXX4321', $data['displayable_account_number']);
+        $this->assertEquals('BX1 1LT', $data['bank_address']['postcode']);
+        $this->assertEquals('pending-init', $data['mandate_status']);
+        $this->assertEquals('', $data['mandate']);
+        $this->assertGreaterThan(8, mb_strlen($data['initial_notification_date']));
+        $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
     }
 
     public function testLookupBacsWithMandate()
@@ -302,7 +341,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $this->assertEquals('foo bank', $data['bank_name']);
-        $this->assertEquals('Foo Bar', $data['account_name']);
+        //$this->assertEquals('Foo Bar', $data['account_name']);
+        $this->assertNull($data['account_name']);
         $this->assertEquals('00-00-99', $data['displayable_sort_code']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
@@ -310,7 +350,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('pending-init', $data['mandate_status']);
         $this->assertGreaterThan(5, mb_strlen($data['mandate']));
         $this->assertGreaterThan(8, mb_strlen($data['initial_notification_date']));
-        $this->assertEquals('', $data['standard_notification_day']);
+        $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
     }
 
     public function testLookupBacsInvalidSortCode()
@@ -363,6 +403,62 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = '/api/v1/auth/lookup/bacs?sort_code=&account_number=&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(400);
+    }
+
+    public function testLookupPolicyBacsInvalidPolicy()
+    {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupPolicyBacs', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            sprintf('%s1', $policyData['id']),
+            PCAService::TEST_SORT_CODE,
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testLookupPolicyBacsNoAccessPolicy()
+    {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupPolicyBacs', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
+            PCAService::TEST_SORT_CODE,
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
     }
 
     // POST /detected-imei
