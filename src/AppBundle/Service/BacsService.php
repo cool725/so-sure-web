@@ -684,6 +684,11 @@ class BacsService
         /** @var Policy $policy */
         $policy = $policyRepo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
 
+        if (!$policy) {
+            /** @var Policy $policy */
+            $policy = $policyRepo->findOneBy(['paymentMethod.previousBankAccounts.reference' => $reference]);
+        }
+
         return $policy;
     }
 
