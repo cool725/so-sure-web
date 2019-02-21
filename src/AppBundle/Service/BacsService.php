@@ -1580,8 +1580,15 @@ class BacsService
                 continue;
             }
             $bankAccount = $paymentMethod->getBankAccount();
-            // TODO: How can we determine which mandates are successful vs failure
-            $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            
+            // Mandate may have been cancelled via ARUDD, so only set to success if its pending
+            if (in_array($bankAccount->getMandateStatus(), [
+                BankAccount::MANDATE_PENDING_INIT,
+                BankAccount::MANDATE_PENDING_APPROVAL
+            ])) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            }
+
             if ($actualSerialNumber) {
                 $bankAccount->setMandateSerialNumber($actualSerialNumber);
             }
