@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PCAService;
@@ -410,7 +411,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         /** @var User $user */
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testLookupPolicyBacs', $this),
+            self::generateEmail('testLookupPolicyBacsInvalidPolicy', $this),
             'foo'
         );
         $user->setFirstName('Bar');
@@ -437,7 +438,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         /** @var User $user */
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testLookupPolicyBacs', $this),
+            self::generateEmail('testLookupPolicyBacsNoAccessPolicy', $this),
             'foo'
         );
         $user->setFirstName('Bar');
@@ -2249,11 +2250,25 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'amount' => 5
         ]]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals('5.00', $data['premium_payments']['paid'][0]['amount']);
+        // not yet paid
+        $this->assertEquals(0, count($data['premium_payments']['paid']));
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+        $found = false;
+        foreach ($updatedPolicy->getAllPayments() as $payment) {
+            /** @var Payment $payment */
+            if ($payment->getAmount() == 5) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found);
     }
 
     public function testNewPolicyPayBacsNotEnoughTime()
     {
+        $twoMonthsAgo = $this->now();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P65D'));
+
         /** @var User $user */
         $user = self::createUser(
             self::$userManager,
@@ -2263,38 +2278,22 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $user->setFirstName('foo');
         $user->setLastName('bar');
         static::$dm->flush();
+        $phone = static::getRandomPhone(self::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, $twoMonthsAgo, false);
+        static::$policyService->create($policy, $twoMonthsAgo, true, 12);
+        $this->assertFalse($policy->isPolicyPaidToDate());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
+
         $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
 
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
-            'sort_code' => PCAService::TEST_SORT_CODE,
-            'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
-            'account_name' => 'foo bar',
-            'mandate' => static::generateRandomImei(),
-            'initial_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
-            'recurring_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
-        ]]);
-        $data = $this->verifyResponse(200);
-
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-        $twoMonthsAgo = $this->now();
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $updatedPolicy->setStart($twoMonthsAgo);
-        static::$dm->flush();
-        //$this->assertFalse($updatedPolicy->isPolicyPaidToDate());
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $policy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
             'sort_code' => PCAService::TEST_SORT_CODE,
             'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
             'account_name' => 'foo bar',
             'mandate' => self::generateRandomImei(),
-            'initial_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
-            'recurring_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
+            'initial_amount' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            'recurring_amount' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_NOT_ENOUGH_TIME);
     }
