@@ -312,7 +312,8 @@ class BacsPayment extends Payment
 
         if (!$this->canAction($date)) {
             throw new \Exception(sprintf(
-                'Attempting to action before reversal date (%s) is past',
+                'Attempting to action payment %s before reversal date (%s) is past',
+                $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y')
             ));
         }
