@@ -1,0 +1,26 @@
+<div class="modal fade confirm-modal"
+     id="{{ id }}"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="{{ id }}"
+     aria-hidden="true">
+    <div class="modal-dialog {% if size is defined %}{{ size }}{% endif %}" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{% if title is defined %}{{ title }}{% else %}Warning{% endif %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% if params is defined %}
+                    {{ render(controller(route, params)) }}
+                {% elseif policy is defined %}
+                    {{ render(controller(route, {'id': policy.id})) }}
+                {% else %}
+                    {{ render(controller(route)) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
