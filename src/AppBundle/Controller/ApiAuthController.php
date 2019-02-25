@@ -1318,6 +1318,7 @@ class ApiAuthController extends BaseController
                     $bacsService = $this->get('app.bacs');
                     $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_MOBILE);
                     $payment->setIdentityLog($this->getIdentityLog($request));
+                    $policy->setPolicyStatusActiveIfUnpaid();
                     $dm->flush();
                 } else {
                     throw new ValidationException('Unsupport payment method');
