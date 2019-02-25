@@ -926,6 +926,32 @@ class PhonePolicy extends Policy
         }
     }
 
+    /**
+     * Can renew is for this specific policy
+     * This is different than if a user is allowed to purchase an additional policy
+     * although lines get blurred if a policy expires and then user wants to re-purchase
+     */
+    public function canRenew(\DateTime $date = null, $checkTimeframe = true)
+    {
+        if ($this->hasInvalidImei()) {
+            return false;
+        }
+
+        return parent::canRenew($date, $checkTimeframe);
+    }
+
+    /**
+     * Pending renewal policy is required in order to renew
+     */
+    public function canCreatePendingRenewal(\DateTime $date = null)
+    {
+        if ($this->hasInvalidImei()) {
+            return false;
+        }
+
+        return parent::canCreatePendingRenewal($date);
+    }
+
     public function toApiArray()
     {
         $picSureEnabled = $this->isPicSurePolicy();

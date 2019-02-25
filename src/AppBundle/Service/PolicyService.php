@@ -2006,6 +2006,7 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
