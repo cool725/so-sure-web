@@ -867,6 +867,7 @@ class AdminController extends BaseController
                 'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
                 'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
                 'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+                'withdrawal' => $s3FileRepo->getAllFiles($date, 'bacsReportWithdrawal'),
             ]);
         }
 

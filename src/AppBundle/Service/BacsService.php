@@ -12,6 +12,8 @@ use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportDdicFile;
 use AppBundle\Document\File\BacsReportInputFile;
+use AppBundle\Document\File\BacsReportWithdrawalFile;
+use AppBundle\Document\File\BacsReportWithdrawlFile;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\UploadFile;
@@ -403,6 +405,9 @@ class BacsService
         } elseif (mb_stripos($originalName, "DDIC") !== false) {
             $metadata = $this->ddic($file);
             $uploadFile = new BacsReportDdicFile();
+        } elseif (mb_stripos($originalName, "Withdrawal") !== false) {
+            $metadata = $this->withdrawal($file);
+            $uploadFile = new BacsReportWithdrawalFile();
         } else {
             $this->logger->error(sprintf('Unknown bacs report file %s', $originalName));
 
@@ -909,6 +914,52 @@ class BacsService
         return count($payments);
     }
 
+    public function withdrawal($file)
+    {
+        $results = [
+            'records' => 0,
+            'withdrawal-credit-amount' => 0,
+            'withdrawal-debit-amount' => 0,
+        ];
+
+        /** @var UserRepository $repo */
+        $repo = $this->dm->getRepository(User::class);
+
+        /** @var BacsPaymentRepository $paymentRepo */
+        $paymentRepo = $this->dm->getRepository(BacsPayment::class);
+
+        $xml = file_get_contents($file);
+        $dom = new DOMDocument();
+        $dom->loadXML($xml, LIBXML_NOBLANKS);
+        $xpath = new DOMXPath($dom);
+
+        $serialNumber = $this->validateSubmissionInformation($xpath);
+
+        $elementList = $xpath->query(
+            '//BACSDocument/Data/WithdrawalReport/Submission/UserFile/WithdrawalUserFile/DaySection/Totals'
+        );
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['records']++;
+            $creditAmount = $this->getChildNodeValue($element, 'Credit', 'valueOf');
+            $debitAmount = $this->getChildNodeValue($element, 'Debit', 'valueOf');
+            $results['withdrawal-credit-amount'] += $creditAmount;
+            $results['withdrawal-debit-amount'] += $debitAmount;
+            $results['details'] = $serialNumber;
+        }
+
+        $this->dm->flush();
+
+        $body = sprintf(
+            'Withdrawal(s) recorded [%d]. Please review and verify previous input file has rejected payments.',
+            $results['records']
+        );
+
+        $this->mailer->send('Withdrawal record - Verify', 'tech+ops@so-sure.com', $body);
+
+        return $results;
+    }
+
     public function ddic($file)
     {
         $results = [
@@ -1098,6 +1149,18 @@ class BacsService
         foreach ($elementList as $element) {
             $this->validateSun($element);
         }
+    }
+
+    private function validateSubmissionInformation($xpath)
+    {
+        $elementList = $xpath->query('//BACSDocument/Data/WithdrawalReport/Submission/SubmissionInformation');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element, 'bureauNumber');
+            return $this->getNodeValue($element, 'volumeSerialNumber');
+        }
+
+        return null;
     }
 
     private function validateSun(\DOMElement $element, $userNumberAttribute = null)
