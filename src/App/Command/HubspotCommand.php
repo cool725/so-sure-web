@@ -234,20 +234,14 @@ class HubspotCommand extends ContainerAwareCommand
         $properties = $this->buildContactPropertyList();
         foreach ($properties as $property) {
             $name = $property["name"];
-            if ($this->hubspot->syncContactProperty($property)) {
-                $output->writeln("Created <info>{$name}</info> contact property.");
-            } else {
-                $output->writeln("Skipped <info>{$name}</info> contact property.");
-            }
+            $this->hubspot->syncContactProperty($property);
+            $output->writeln("Created <info>{$name}</info> contact property.");
         }
         $properties = $this->buildDealPropertyList();
         foreach ($properties as $property) {
             $name = $property["name"];
-            if ($this->hubspot->syncDealProperty($property)) {
-                $output->writeln("Created <info>{$name}</info> deal property.");
-            } else {
-                $output->writeln("Skipped <info>{$name}</info> deal property.");
-            }
+            $this->hubspot->syncDealProperty($property);
+            $output->writeln("Created <info>{$name}</info> deal property.");
         }
         $this->hubspot->syncPipeline($this->buildPipeline());
     }
@@ -370,7 +364,15 @@ class HubspotCommand extends ContainerAwareCommand
             $this->buildPropertyPrototype("census_subgroup", "Estimated census_subgroup"),
             $this->buildPropertyPrototype("total_weekly_income", "Estimated total_weekly_income"),
             $this->buildPropertyPrototype("attribution", "attribution"),
-            $this->buildPropertyPrototype("latestattribution", "Latest attribution")
+            $this->buildPropertyPrototype("latestattribution", "Latest attribution"),
+            $this->buildPropertyPrototype(
+                "customer",
+                "Is So-Sure Customer",
+                "enumeration",
+                "checkbox",
+                false,
+                [["label" => "yes", "value" => "yes"], ["label" => "no", "value" => "no"]]
+            )
         ];
     }
 

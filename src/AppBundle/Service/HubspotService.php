@@ -104,18 +104,14 @@ class HubspotService
     public function createOrUpdateContact(User $user)
     {
         $hubspotUserArray = $this->buildHubspotUserData($user);
-        //print_r($hubspotUserArray);
-        if (!$user->getHubspotId()) {
-            $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-            $response = $this->validateResponse($response, 200);
+        print_r($hubspotUserArray);
+        $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
+        $response = $this->validateResponse($response, [200, 204]);
+        if ($user->getHubspotId() !== $response->vid) {
             $user->setHubspotId($response->vid);
             $this->dm->flush();
-            return $response->vid;
-        } else {
-            $response = $this->client->contacts()->update($user->getHubspotId(), $hubspotUserArray);
-            $this->validateResponse($response, 204);
-            return $user->getHubspotId();
         }
+        return $user->getHubspotId();
     }
 
     /**
@@ -131,6 +127,8 @@ class HubspotService
             throw new \Exception("cannot create policy/deal before user/contact. Policy id: ".$policy->getId());
         }
         $hubspotPolicyArray = $this->buildHubspotPolicyData($policy);
+        // TODO: if somebody deletes the deal off hubspot we need to be able to find that out and create rather than
+        //       update.
         if (!$policy->getHubspotId()) {
             $response = $this->client->deals()->create($hubspotPolicyArray);
             $response = $this->validateResponse($response, 200);
@@ -429,7 +427,7 @@ class HubspotService
     {
         $data = [];
         if ($user->getBillingAddress()) {
-            $data[] = $this->buildProperty("billing_address", $user->getBillingAddress());
+            $data[] = $this->buildProperty("billing_address", $user->getBillingAddress()->__toString());
             if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
                 $data[] = $this->buildProperty("census_subgroup", $census->getSubGroup());
             }
@@ -452,9 +450,10 @@ class HubspotService
             $this->buildProperty("attribution", $user->getAttribution()),
             $this->buildProperty("latestattribution", $user->getLatestAttribution()),
             $this->buildProperty("facebook", $hasFacebook ? "yes" : "no"),
+            $this->buildProperty("customer", "yes")
         ];
         if ($hasFacebook) {
-            $data['hs_facebookid'] = $this->buildProperty("hs_facebookid", $user->getFacebookId());
+            $data["hs_facebookid"] = $this->buildProperty("hs_facebookid", $user->getFacebookId());
         }
         return $data;
     }
@@ -467,6 +466,6 @@ class HubspotService
      */
     private function buildProperty($name, $value)
     {
-        return ['property' => $name, 'value' => $value ?: ''];
+        return ["property" => $name, "value" => $value ?: ""];
     }
 }

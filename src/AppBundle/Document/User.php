@@ -366,6 +366,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $intercomId;
 
     /**
+     * Vid of the user's representation as a contact on hubspot. Note that hubspot contacts can be manually deleted, so
+     * this value is not a guarantee that there is currently a contact on hubspot representing this user.
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")

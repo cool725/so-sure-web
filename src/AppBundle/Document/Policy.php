@@ -581,6 +581,8 @@ abstract class Policy
     protected $participations = array();
 
     /**
+     * Vid of the policy's representation as a deal on hubspot. Note that hubspot deals can be manually deleted, so
+     * this value is not a guarantee that there is currently a deal on hubspot representing this policy.
      * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
