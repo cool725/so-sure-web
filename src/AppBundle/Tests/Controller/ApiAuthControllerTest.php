@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PCAService;
@@ -263,16 +264,31 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400);
     }
 
-    // GET /lookup/bacs
+    // GET /policy/{id}/lookup/bacs
 
     /**
      *
      */
-    public function testLookupBacs()
+    public function testLookupPolicyBacs()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupPolicyBacs', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
         $url = sprintf(
-            '/api/v1/auth/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
             PCAService::TEST_SORT_CODE,
             PCAService::TEST_ACCOUNT_NUMBER_OK
         );
@@ -280,21 +296,37 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $this->assertEquals('foo bank', $data['bank_name']);
-        $this->assertEquals('Foo Bar', $data['account_name']);
+        //$this->assertEquals('Bar Foo', $data['account_name']);
+        $this->assertNull($data['account_name']);
         $this->assertEquals('00-00-99', $data['displayable_sort_code']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
         $this->assertEquals('BX1 1LT', $data['bank_address']['postcode']);
         $this->assertEquals('pending-init', $data['mandate_status']);
         $this->assertEquals('', $data['mandate']);
         $this->assertGreaterThan(8, mb_strlen($data['initial_notification_date']));
-        $this->assertEquals('', $data['standard_notification_day']);
+        $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
     }
 
     public function testLookupBacsWithMandate()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupBacsWithMandate', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
         $url = sprintf(
-            '/api/v1/auth/lookup/bacs?sort_code=%s&account_number=%s&include=mandate&_method=GET',
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&include=mandate&_method=GET',
+            $policyData['id'],
             PCAService::TEST_SORT_CODE,
             PCAService::TEST_ACCOUNT_NUMBER_OK
         );
@@ -302,7 +334,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $this->assertEquals('foo bank', $data['bank_name']);
-        $this->assertEquals('Foo Bar', $data['account_name']);
+        //$this->assertEquals('Foo Bar', $data['account_name']);
+        $this->assertNull($data['account_name']);
         $this->assertEquals('00-00-99', $data['displayable_sort_code']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
         $this->assertEquals('XXXX4321', $data['displayable_account_number']);
@@ -310,14 +343,29 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('pending-init', $data['mandate_status']);
         $this->assertGreaterThan(5, mb_strlen($data['mandate']));
         $this->assertGreaterThan(8, mb_strlen($data['initial_notification_date']));
-        $this->assertEquals('', $data['standard_notification_day']);
+        $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
     }
 
     public function testLookupBacsInvalidSortCode()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupBacsInvalidSortCode', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
         $url = sprintf(
-            '/api/v1/auth/lookup/bacs?sort_code=%s&account_number=%s&include=mandate&_method=GET',
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
             PCAService::TEST_SORT_CODE,
             PCAService::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE
         );
@@ -327,9 +375,24 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testLookupBacsInvalidAccountNumber()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupBacsInvalidAccountNumber', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
         $url = sprintf(
-            '/api/v1/auth/lookup/bacs?sort_code=%s&account_number=%s&include=mandate&_method=GET',
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
             PCAService::TEST_SORT_CODE,
             PCAService::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER
         );
@@ -339,9 +402,24 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testLookupBacsNoDD()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupBacsNoDD', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
         $url = sprintf(
-            '/api/v1/auth/lookup/bacs?sort_code=%s&account_number=%s&include=mandate&_method=GET',
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
             PCAService::TEST_SORT_CODE,
             PCAService::TEST_ACCOUNT_NUMBER_NO_DD
         );
@@ -349,20 +427,135 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_DIRECT_DEBIT_UNAVAILABLE);
     }
 
+    public function testLookupBacsCancelledPolicy()
+    {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupBacsCancelledPolicy', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
+        $updatedPolicy->setStatus(Policy::STATUS_CANCELLED);
+        static::$dm->flush();
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
+            PCAService::TEST_SORT_CODE,
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE);
+    }
+
     public function testLookupBacsReqParam()
     {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupBacsReqParam', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&_method=GET',
+            $policyData['id'],
+            PCAService::TEST_SORT_CODE
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?account_number=%s&_method=GET',
+            $policyData['id'],
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=&account_number=&_method=GET',
+            $policyData['id']
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400);
+    }
+
+    public function testLookupPolicyBacsInvalidPolicy()
+    {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupPolicyBacsInvalidPolicy', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
+        $updatedPolicy->setStatus(Policy::STATUS_CANCELLED);
+        static::$dm->flush();
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&include=mandate&_method=GET',
+            sprintf('%s1', $policyData['id']),
+            PCAService::TEST_SORT_CODE,
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testLookupPolicyBacsNoAccessPolicy()
+    {
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testLookupPolicyBacsNoAccessPolicy', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = '/api/v1/auth/lookup/bacs?sort_code=&_method=GET';
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(400);
 
-        $url = '/api/v1/auth/lookup/bacs?account_number=&_method=GET';
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/lookup/bacs?sort_code=%s&account_number=%s&_method=GET',
+            $policyData['id'],
+            PCAService::TEST_SORT_CODE,
+            PCAService::TEST_ACCOUNT_NUMBER_OK
+        );
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(400);
-
-        $url = '/api/v1/auth/lookup/bacs?sort_code=&account_number=&_method=GET';
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
     }
 
     // POST /detected-imei
@@ -2107,6 +2300,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertGreaterThan(8, mb_strlen($data['bank_account']['initial_notification_date']));
         $this->assertGreaterThan(0, $data['bank_account']['standard_notification_day']);
         $this->assertTrue($data['has_time_bacs_payment']);
+        $this->assertEquals(
+            $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
+            $data['premium_payments']['scheduled'][0]['amount']
+        );
     }
 
     public function testNewPolicyPayBacsExisting()
@@ -2149,11 +2346,25 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'amount' => 5
         ]]);
         $data = $this->verifyResponse(200);
-        $this->assertEquals('5.00', $data['premium_payments']['paid'][0]['amount']);
+        // not yet paid
+        $this->assertEquals(0, count($data['premium_payments']['paid']));
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+        $found = false;
+        foreach ($updatedPolicy->getAllPayments() as $payment) {
+            /** @var Payment $payment */
+            if ($payment->getAmount() == 5) {
+                $found = true;
+            }
+        }
+        $this->assertTrue($found);
     }
 
     public function testNewPolicyPayBacsNotEnoughTime()
     {
+        $twoMonthsAgo = $this->now();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P65D'));
+
         /** @var User $user */
         $user = self::createUser(
             self::$userManager,
@@ -2163,38 +2374,22 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $user->setFirstName('foo');
         $user->setLastName('bar');
         static::$dm->flush();
+        $phone = static::getRandomPhone(self::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, $twoMonthsAgo, false);
+        static::$policyService->create($policy, $twoMonthsAgo, true, 12);
+        $this->assertFalse($policy->isPolicyPaidToDate());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
+
         $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
 
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
-            'sort_code' => PCAService::TEST_SORT_CODE,
-            'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
-            'account_name' => 'foo bar',
-            'mandate' => static::generateRandomImei(),
-            'initial_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
-            'recurring_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
-        ]]);
-        $data = $this->verifyResponse(200);
-
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-        $twoMonthsAgo = $this->now();
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $updatedPolicy->setStart($twoMonthsAgo);
-        static::$dm->flush();
-        //$this->assertFalse($updatedPolicy->isPolicyPaidToDate());
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $policy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
             'sort_code' => PCAService::TEST_SORT_CODE,
             'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
             'account_name' => 'foo bar',
             'mandate' => self::generateRandomImei(),
-            'initial_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
-            'recurring_amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice(),
+            'initial_amount' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            'recurring_amount' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_NOT_ENOUGH_TIME);
     }
@@ -2927,6 +3122,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policyData = $this->verifyResponse(200);
         $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
         $this->assertEquals($data['id'], $policyData['id']);
+        $this->assertEquals(7.15, $policyData['premium_payments']['scheduled'][0]['amount']);
 
         // Ensure that policy creation didn't run twice
         $dm = $this->getDocumentManager(true);

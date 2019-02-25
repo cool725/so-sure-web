@@ -98,6 +98,12 @@ class BaseImeiService
 
         foreach ($policies as $policy) {
             /** @var Policy $policy */
+
+            // Partial policies can be ignored
+            if (!$policy->isPolicy()) {
+                continue;
+            }
+
             // Expired policies can be paid for again
             if ($policy->isExpired()) {
                 continue;

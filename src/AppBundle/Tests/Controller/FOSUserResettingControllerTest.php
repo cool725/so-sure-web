@@ -417,9 +417,9 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         $form['fos_user_resetting_form[plainPassword][second]'] = $password;
         $crawler = self::$client->submit($form);
         if ($expectedSuccess) {
-            self::verifyResponse(302, null, $crawler);
+            self::verifyResponse(302, null, $crawler, $password);
         } else {
-            self::verifyResponse(200, null, $crawler);
+            self::verifyResponse(200, null, $crawler, $password);
         }
     }
 }

@@ -1958,6 +1958,56 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(0, count($policies));
     }
 
+    public function testSetUnpaidForCancelledMandate()
+    {
+        $policies = static::$policyService->setUnpaidForCancelledMandate(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSetUnpaidForCancelledMandate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        static::setBacsPaymentMethodForPolicy($policy);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $policy->getPolicyOrUserBacsBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+        static::$dm->flush();
+
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-01-02'), true, false, true));
+        $policies = static::$policyService->setUnpaidForCancelledMandate(
+            'TEST',
+            false,
+            new \DateTime('2016-01-02')
+        );
+        $this->assertEquals(0, count($policies));
+
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2017-01-02'), true, false, true));
+        $policies = static::$policyService->setUnpaidForCancelledMandate(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertGreaterThan(0, count($policies));
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertEquals(Policy::STATUS_UNPAID, $updatedPolicy->getStatus());
+    }
+
     public function testFullyExpireExpiredClaimablePoliciesWithClaim()
     {
         $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(

@@ -1672,6 +1672,40 @@ class PolicyService
         return $expired;
     }
 
+    public function setUnpaidForCancelledMandate($prefix, $dryRun = false, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $unpaid = [];
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findUnpaidPoliciesWithCancelledMandates($prefix);
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isPolicyPaidToDate($date, true, false, true)) {
+                continue;
+            }
+
+            $unpaid[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $policy->setStatus(Policy::STATUS_UNPAID);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error setting policy to unpaid %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $unpaid;
+    }
+
     public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         if (!$date) {

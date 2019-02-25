@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
@@ -32,6 +33,7 @@ use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PromotionType;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -1188,6 +1190,40 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
+    
+    /**
+     * @Route("/policy/{id}/p", name="admin_payment_redirect")
+     */
+    public function paymentRedirectAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var PaymentRepository $repo */
+        $repo = $dm->getRepository(Payment::class);
+        /** @var Payment $payment */
+        $payment = $repo->find($id);
+        if (!$payment || !$payment->getPolicy()) {
+            throw $this->createNotFoundException("Unknown payment");
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $payment->getPolicy()->getId()]);
+    }
+
+    /**
+     * @Route("/policy/{id}/sp", name="admin_scheduled_payment_redirect")
+     */
+    public function scheduledPaymentRedirectAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var ScheduledPaymentRepository $repo */
+        $repo = $dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment $scheduledPayment */
+        $scheduledPayment = $repo->find($id);
+        if (!$scheduledPayment || !$scheduledPayment->getPolicy()) {
+            throw $this->createNotFoundException("Unknown scheduled payment");
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $scheduledPayment->getPolicy()->getId()]);
+    }
 
     /**
      * @Route("/policy/{id}", name="admin_policy")
@@ -1299,6 +1335,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('pay_policy_form')
             ->add('monthly', SubmitType::class)
             ->add('yearly', SubmitType::class)
+            ->getForm();
+        $skipPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('skip_payment_form')
+            ->add('payment_id', HiddenType::class)
+            ->add('skip', SubmitType::class)
             ->getForm();
         $cancelDirectDebitForm = $this->get('form.factory')
             ->createNamedBuilder('cancel_direct_debit_form')
@@ -1792,6 +1833,24 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         'Direct Debit Cancellation has been queued.'
                     ));
                 }
+            } elseif ($request->request->has('skip_payment_form')) {
+                $skipPaymentForm->handleRequest($request);
+                if ($skipPaymentForm->isValid()) {
+                    $paymentId = $skipPaymentForm->getData()['payment_id'];
+                    $paymentRepo = $this->getManager()->getRepository(BacsPayment::class);
+                    /** @var BacsPayment $payment */
+                    $payment = $paymentRepo->find($paymentId);
+                    if (!$payment) {
+                        throw $this->createNotFoundException('Missing payment');
+                    }
+
+                    $payment->setStatus(BacsPayment::STATUS_SKIPPED);
+                    $payment->setScheduledPayment(null);
+                    $this->getManager()->flush();
+                    $this->addFlash('success', sprintf(
+                        'Skipped payment'
+                    ));
+                }
             } elseif ($request->request->has('run_scheduled_payment_form')) {
                 $runScheduledPaymentForm->handleRequest($request);
                 if ($runScheduledPaymentForm->isValid()) {
@@ -1802,6 +1861,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $policy->addPolicyFile($paymentRequestFile);
                         $scheduledPayment->adminReschedule();
+                        if ($scheduledPayment->getRescheduledScheduledPayment()) {
+                            $scheduledPayment->setRescheduledScheduledPayment(null);
+                        }
+                        if ($scheduledPayment->getPayment()) {
+                            $scheduledPayment->setPayment(null);
+                        }
 
                         $this->getManager()->flush();
 
@@ -1885,6 +1950,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'bacs_refund_form' => $bacsRefundForm->createView(),
             'salva_update_form' => $salvaUpdateForm->createView(),
+            'skip_payment_form' => $skipPaymentForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'user_route' => 'admin_user',

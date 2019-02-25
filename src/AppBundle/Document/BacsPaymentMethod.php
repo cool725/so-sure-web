@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -18,6 +19,11 @@ class BacsPaymentMethod extends PaymentMethod
     protected $bankAccount;
 
     /**
+     * @MongoDB\EmbedMany(targetDocument="BankAccount")
+     */
+    protected $previousBankAccounts = [];
+
+    /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
@@ -30,6 +36,7 @@ class BacsPaymentMethod extends PaymentMethod
     public function setBankAccount(BankAccount $bankAccount)
     {
         $this->bankAccount = $bankAccount;
+        $this->addPreviousBankAccount($bankAccount);
     }
 
     /**
@@ -38,6 +45,24 @@ class BacsPaymentMethod extends PaymentMethod
     public function getBankAccount()
     {
         return $this->bankAccount;
+    }
+
+    public function getPreviousBankAccounts()
+    {
+        return $this->previousBankAccounts;
+    }
+
+    public function addPreviousBankAccount(BankAccount $bankAccount)
+    {
+        $prev = $this->previousBankAccounts;
+        if (is_object($this->previousBankAccounts)) {
+            /** @var ArrayCollection $prevCollection */
+            $prevCollection = $this->previousBankAccounts;
+            $prev = $prevCollection->toArray();
+        }
+        if (!in_array($bankAccount, $prev)) {
+            $this->previousBankAccounts[] = $bankAccount;
+        }
     }
 
     public function setSoleSignature($soleSignature)

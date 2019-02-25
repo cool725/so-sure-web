@@ -313,37 +313,6 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->duplicateEmailInvites();
     }
 
-    public function testPolicyImeiOnMultiplePoliciesPending()
-    {
-        $phone = self::getRandomPhone(self::$dm);
-        $imei = self::generateRandomImei();
-
-        for ($i = 0; $i < 3; $i++) {
-            $user = self::createUser(
-                self::$userManager,
-                self::generateEmail('testPolicyImeiOnMultiplePoliciesPending', $this, true),
-                'foo'
-            );
-
-            $policy = self::initPolicy(
-                $user,
-                self::$dm,
-                $phone,
-                null,
-                true,
-                true
-            );
-            $policy->setImei($imei);
-            $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
-
-            self::assertEquals(Policy::STATUS_PENDING, $policy->getStatus());
-        }
-
-        self::$dm->flush();
-
-        self::$monitor->policyImeiOnMultiplePolicies();
-    }
-
     /**
      * @expectedException \AppBundle\Exception\MonitorException
      */

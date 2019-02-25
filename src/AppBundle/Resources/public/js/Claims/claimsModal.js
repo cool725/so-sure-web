@@ -128,4 +128,10 @@ $(function () {
         }
     });
 
+    $('#skipPaymentModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var paymentId = button.data('payment-id');
+        var modal = $(this);
+        $('#skip_payment_form_payment_id').val(paymentId);
+    });
 });

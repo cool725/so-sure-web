@@ -98,7 +98,7 @@ class ScheduledPayment
      * old one.
      * @MongoDB\ReferenceOne(targetDocument="ScheduledPayment")
      * @Gedmo\Versioned
-     * @var ScheduledPayment
+     * @var ScheduledPayment|null
      */
     protected $rescheduledScheduledPayment;
 
@@ -165,9 +165,16 @@ class ScheduledPayment
         return $this->getScheduled() ? $this->getScheduled()->format('j') : null;
     }
 
-    public function setPayment(Payment $payment)
+    public function setPayment(Payment $payment = null)
     {
-        $payment->setScheduledPayment($this);
+        if (!$payment && $this->payment) {
+            $this->payment->setScheduledPayment(null);
+        }
+
+        if ($payment) {
+            $payment->setScheduledPayment($this);
+        }
+
         $this->payment = $payment;
     }
 
@@ -196,7 +203,7 @@ class ScheduledPayment
         return $this->notes;
     }
 
-    public function setRescheduledScheduledPayment(ScheduledPayment $rescheduledScheduledPayment)
+    public function setRescheduledScheduledPayment(ScheduledPayment $rescheduledScheduledPayment = null)
     {
         $this->rescheduledScheduledPayment = $rescheduledScheduledPayment;
     }

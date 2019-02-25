@@ -67,7 +67,7 @@ class BacsServiceTest extends WebTestCase
         self::$dm->clear();
     }
 
-    public function testBacsXmlPolicy()
+    public function testBacsXmlPolicyAndPreviousBankAccounts()
     {
         $now = $this->now();
         $user = static::createUser(
@@ -87,6 +87,16 @@ class BacsServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $this->setValidBacsPaymentMethodForPolicy($policy, 'SOSURE01');
         static::$dm->flush();
+        $this->setValidBacsPaymentMethodForPolicy($policy, 'SOSURE02');
+        static::$dm->flush();
+        $this->assertNotNull($policy->getBacsPaymentMethod());
+        if ($policy->getBacsPaymentMethod()) {
+            $this->assertCount(2, $policy->getBacsPaymentMethod()->getPreviousBankAccounts());
+        }
+        $this->assertNotNull($policy->getBacsBankAccount());
+        if ($policy->getBacsBankAccount()) {
+            $this->assertEquals('SOSURE02', $policy->getBacsBankAccount()->getReference());
+        }
 
         $results = self::$bacsService->addacs(self::$xmlFile);
         $this->assertTrue($results['success']);
@@ -100,13 +110,27 @@ class BacsServiceTest extends WebTestCase
 
     private function setValidBacsPaymentMethodForPolicy(Policy $policy, $reference = null, \DateTime $date = null)
     {
-        $bacs = $this->getBacsPaymentMethod($policy->getUser()->getName(), $reference, $date);
-        $policy->setPaymentMethod($bacs);
+        $bacs = null;
+        $name = $policy->getUser()->getName();
+        if ($policy->getBacsPaymentMethod()) {
+            $policy->getBacsPaymentMethod()->setBankAccount($this->getBankAcccount($name, $reference, $date));
+        } else {
+            $bacs = $this->getBacsPaymentMethod($name, $reference, $date);
+            $policy->setPaymentMethod($bacs);
+        }
 
         return $bacs;
     }
 
     private function getBacsPaymentMethod($name, $reference = null, \DateTime $date = null)
+    {
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($this->getBankAcccount($name, $reference, $date));
+
+        return $bacs;
+    }
+
+    private function getBankAcccount($name, $reference = null, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -121,10 +145,8 @@ class BacsServiceTest extends WebTestCase
         $bankAccount->setAccountNumber('87654321');
         $bankAccount->setAccountName($name);
         $bankAccount->setInitialPaymentSubmissionDate($date);
-        $bacs = new BacsPaymentMethod();
-        $bacs->setBankAccount($bankAccount);
 
-        return $bacs;
+        return $bankAccount;
     }
 
     public function testBacsPayment()
