@@ -255,6 +255,10 @@ class BacsPayment extends Payment
             return false;
         }
 
+        if ($this->inProgress() && !$this->getBacsReversedDate()) {
+            return false;
+        }
+
         $reversedDate = $this->startOfDay($this->getBacsReversedDate());
         $diff = $reversedDate->diff($this->startOfDay($date));
         if ($diff->d == 0 || (!$diff->invert && $diff->d > 0)) {
