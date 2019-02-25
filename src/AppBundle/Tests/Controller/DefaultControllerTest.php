@@ -127,41 +127,6 @@ class DefaultControllerTest extends BaseControllerTest
         );
     }
 
-    public function testTextAppInvalidMobile()
-    {
-        $crawler = self::$client->request('GET', self::$router->generate('sms_app_link'));
-        self::verifyResponse(200);
-
-        $form = $crawler->selectButton('Text me a link')->form();
-        $form['sms_app_link[mobileNumber]'] = '123';
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
-        $this->assertContains(
-            "valid UK Mobile Number",
-            $this->getClientResponseContent()
-        );
-    }
-
-    public function testTextAppLeadPresent()
-    {
-        $lead = new Lead();
-        $lead->setMobileNumber(static::generateRandomMobile());
-        self::$dm->persist($lead);
-        self::$dm->flush();
-
-        $crawler = self::$client->request('GET', self::$router->generate('sms_app_link'));
-        self::verifyResponse(200);
-
-        $form = $crawler->selectButton('Text me a link')->form();
-        $form['sms_app_link[mobileNumber]'] = str_replace('+44', '', $lead->getMobileNumber());
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
-        $this->assertContains(
-            "already sent you a link",
-            $this->getClientResponseContent()
-        );
-    }
-
     public function testPhoneSearchHomepage()
     {
         $crawler = self::$client->request('GET', '/');
@@ -561,7 +526,7 @@ class DefaultControllerTest extends BaseControllerTest
 
         $claimPage = self::$router->generate('claim_login_token', ['tokenId' => 'foo']);
         $crawler = self::$client->request('GET', $claimPage);
-        
+
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect(sprintf('/claim')));
     }
