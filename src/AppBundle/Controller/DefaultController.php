@@ -87,13 +87,13 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:index.html.twig';
 
-        $homeComparison = $this->sixpack(
+        $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_HOME_COMPARISON,
             ['homepage', 'home-comparison']
         );
 
-        if ($homeComparison == 'home-comparison') {
+        if ($exp == 'home-comparison') {
             return $this->redirectToRoute('so_sure_compared');
         }
 
