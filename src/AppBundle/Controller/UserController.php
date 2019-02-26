@@ -1299,6 +1299,8 @@ class UserController extends BaseController
             1
         );
 
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOME_COMPARISON);
+
         return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),

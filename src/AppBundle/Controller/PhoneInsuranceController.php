@@ -448,6 +448,8 @@ class PhoneInsuranceController extends BaseController
             }
         }
 
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOME_COMPARISON);
+
         $data = array(
             'phone'                 => $phone,
             'phone_price'           => $phone->getCurrentPhonePrice(),
