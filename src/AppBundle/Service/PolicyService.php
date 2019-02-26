@@ -1832,15 +1832,9 @@ class PolicyService
 
     public function cashbackPendingReminder($dryRun)
     {
-        $cashbacks = [];
-
         /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
-        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
-
-        foreach ($cashbackItems as $cashbackItem) {
-            $cashbacks[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
-        }
+        $cashbacks = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
 
         if (!$dryRun) {
             $this->mailer->sendTemplate(
@@ -1850,8 +1844,11 @@ class PolicyService
                 ['cashbacks' => $cashbacks]
             );
         }
-
-        return $cashbacks;
+        $ids = [];
+        foreach ($cashbacks as $cashback) {
+            $ids[$cashback->getId()] = $cashback->getPolicy()->getPolicyNumber();
+        }
+        return $ids;
     }
 
     /**
