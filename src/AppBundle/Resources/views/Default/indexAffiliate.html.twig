@@ -24,20 +24,13 @@
     <section class="hero">
         <div class="container container-xtra">
             <div class="hero__intro">
-                {% if affiliate_page == 'money-free-phone-case' %}
-                    <h1 class="mb-2 text-white h2">Protect the one you love this Valentines Day</h1>
-                    <h4 class="text-zaffre mb-2">We're giving away Free Phone cases worth &pound;19. Hurry while stocks last</h4>
-                    <p class="mb-4 text-white">
-                        <a href="#"
-                           class="text-white"
-                           data-toggle="modal"
-                           data-target="#page_terms"
-                           role="button"><small><u>Terms &amp; Conditions</u></small>
-                        </a>
-                   </p>
-                {% elseif affiliate_page == 'comparison' %}
+                {% if affiliate_page == 'comparison' %}
                     <h1 class="mb-2 text-white h2">{{ titleH1 }}</h1>
                     <h4 class="text-zaffre mb-4">{{ leadP|raw }}</h4>
+                {% elseif affiliate_page == 'so-sure-compared' %}
+                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
+                    <h4 class="text-zaffre">Simple terms, pain-free claims, premium cover</h4>
+                    <p class="mb-4 lead text-white">We're a new type of insurer that you can rely on. <br class="d-none d-lg-inline"> We protect you when you need to claim and reward you when you don't.</p>
                 {% else %}
                     <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
                     <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
