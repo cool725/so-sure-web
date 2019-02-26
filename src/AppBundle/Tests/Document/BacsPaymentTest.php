@@ -17,6 +17,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Service\BacsService;
 
 /**
  * @group unit
@@ -90,15 +91,15 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacs = new BacsPayment();
         $bacs->submit(new \DateTime('2018-01-01'));
         $bacs->setStatus(BacsPayment::STATUS_GENERATED);
-        $this->assertTrue($bacs->canAction(new \DateTime('2018-01-08')));
-        $this->assertTrue($bacs->canAction(new \DateTime('2018-02-01')));
-        $this->assertFalse($bacs->canAction(new \DateTime('2018-01-07')));
+        $this->assertTrue($bacs->canAction(BacsPayment::ACTION_APPROVE, new \DateTime('2018-01-08')));
+        $this->assertTrue($bacs->canAction(BacsPayment::ACTION_APPROVE, new \DateTime('2018-02-01')));
+        $this->assertFalse($bacs->canAction(BacsPayment::ACTION_APPROVE, new \DateTime('2018-01-07')));
 
         $bacs->setStatus(BacsPayment::STATUS_FAILURE);
-        $this->assertFalse($bacs->canAction(new \DateTime('2018-01-08')));
+        $this->assertFalse($bacs->canAction(BacsPayment::ACTION_APPROVE, new \DateTime('2018-01-08')));
 
         $bacs->setStatus(BacsPayment::STATUS_SUCCESS);
-        $this->assertFalse($bacs->canAction(new \DateTime('2018-01-08')));
+        $this->assertFalse($bacs->canAction(BacsPayment::ACTION_APPROVE, new \DateTime('2018-01-08')));
     }
 
     public function testApprove()

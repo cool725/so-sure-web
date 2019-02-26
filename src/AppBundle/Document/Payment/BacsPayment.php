@@ -31,6 +31,9 @@ class BacsPayment extends Payment
     const STATUS_FAILURE = 'failure';
     const STATUS_SKIPPED = 'skipped';
 
+    const ACTION_APPROVE = 'approve';
+    const ACTION_REJECT = 'reject';
+
     /**
      * A bacs payment outside the system (e.g. manually sent by the customer)
      * @Assert\Type("bool")
@@ -244,7 +247,7 @@ class BacsPayment extends Payment
         return true;
     }
 
-    public function canAction(\DateTime $date = null)
+    public function canAction($type, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -259,6 +262,12 @@ class BacsPayment extends Payment
             return false;
         }
 
+        // reject can occur at any time
+        if ($type == self::ACTION_REJECT) {
+            return true;
+        }
+
+        // accept should be on or after reversal date
         $reversedDate = $this->startOfDay($this->getBacsReversedDate());
         $diff = $reversedDate->diff($this->startOfDay($date));
         if ($diff->d == 0 || (!$diff->invert && $diff->d > 0)) {
@@ -274,9 +283,9 @@ class BacsPayment extends Payment
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if (!$this->canAction($date) && !$ignoreReversedDate) {
+        if (!$this->canAction(self::ACTION_APPROVE, $date) && !$ignoreReversedDate) {
             throw new \Exception(sprintf(
-                'Attempting to action payment %s before reversal date (%s) is past',
+                'Attempting to approve payment %s before reversal date (%s) is past',
                 $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y')
             ));
@@ -310,9 +319,9 @@ class BacsPayment extends Payment
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if (!$this->canAction($date)) {
+        if (!$this->canAction(self::ACTION_REJECT, $date)) {
             throw new \Exception(sprintf(
-                'Attempting to action payment %s before reversal date (%s) is past',
+                'Attempting to reject payment %s before reversal date (%s) is past',
                 $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y')
             ));

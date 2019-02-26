@@ -612,7 +612,7 @@ class MonitorService
                 continue;
             }
 
-            if ($payment->canAction(\DateTime::createFromFormat('U', time()))) {
+            if ($payment->canAction(BacsPayment::ACTION_APPROVE, \DateTime::createFromFormat('U', time()))) {
                 $errors[] = $payment->getId();
             }
         }

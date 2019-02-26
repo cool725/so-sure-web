@@ -78,11 +78,20 @@
                 {% endif %}
             </td>
             <td width="20%">
-                {% if payment.canAction %}
+                {% set can_action = false %}
+                {% if payment.canAction('approve') %}
                     <button title="Mark as approved" type="button" class="btn btn-success bacs-approve" data-token="{{ csrf_token('default') }}"
                             data-bacs-approve-url="{{ path('admin_bacs_payment_approve', {'id': payment.id}) }}">Approve</button>
+                    {% set can_action = true %}
+                {% endif %}
+                {% if payment.canAction('reject') %}
                     <button title="Mark as rejected" type="button" class="btn btn-danger bacs-reject" data-token="{{ csrf_token('default') }}"
                             data-bacs-reject-url="{{ path('admin_bacs_payment_reject', {'id': payment.id}) }}">Reject</button>
+                    {% set can_action = true %}
+                {% endif %}
+
+                {% if can_action %}
+                    {# nothing to do #}
                 {% elseif not payment.inProgress %}
                     Already actioned
                 {% else %}

@@ -90,7 +90,7 @@
             {% if payments is defined %}
                 {% set paymentsCount = 0 %}
                 {% for payment in payments if payment.serialNumber and payment.submittedDate %}
-                    {% if payment.canAction %}
+                    {% if payment.canAction('accept') %}
                         {% set paymentsCount = paymentsCount + 1 %}
                     {% endif %}
                 {% endfor %}
