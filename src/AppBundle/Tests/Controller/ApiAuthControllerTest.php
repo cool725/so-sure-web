@@ -18,6 +18,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
@@ -1211,7 +1212,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policy->addPayment($discount);
         $policy->getPremium()->setAnnualDiscount($discount->getAmount());
         static::$dm->flush();
-        
+
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
@@ -1529,9 +1530,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        static::$dm->flush();
         $data = $this->verifyResponse(200);
-
         $imei = $data['phone_policy']['imei'];
+        $policyId = $data['id'];
+        $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $repo->find($policyId);
+        $policy->setPremium(new PhonePremium());
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
 
         $this->clearRateLimit();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
@@ -1553,7 +1561,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $policyId = $data['id'];
         $imei = $data['phone_policy']['imei'];
-        
+
         $repo = static::$dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $repo->find($policyId);
@@ -4735,7 +4743,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'policy_id' => $policyB->getId()
         ]);
         $data = $this->verifyResponse(200);
-        
+
         $renewalPolicyA = static::$policyService->createPendingRenewal(
             $policyA,
             \DateTime::createFromFormat('U', time())
@@ -6260,7 +6268,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     public function testUserQuoteYearlyBilling()
     {
         self::populateYearlyPostcodes();
-        
+
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testUserQuoteYearlyBilling', $this),
