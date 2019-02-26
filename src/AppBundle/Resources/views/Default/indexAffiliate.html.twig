@@ -10,16 +10,9 @@
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/landing.css') }}">
-    {% if affiliate_page == 'money-free-phone-case' %}
-        <link rel="stylesheet" href="{{ asset('css-js/homepage-vday.css') }}">
-    {% endif %}
 {% endblock %}
 
 {% block body %}
-
-    {% if affiliate_page == 'money-free-phone-case' %}
-        <div class="snow"></div>
-    {% endif %}
 
     <section class="hero">
         <div class="container container-xtra">
@@ -128,7 +121,4 @@
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/landing.js') }}"></script>
-    {% if affiliate_page == 'money-free-phone-case' %}
-        <script src="{{ asset('css-js/homepage-vday.js') }}"></script>
-    {% endif %}
 {% endblock %}
