@@ -2,7 +2,7 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
@@ -30,7 +30,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Invitation\EmailInvitation;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use Doctrine\ODM\MongoDB\DocumentManager;

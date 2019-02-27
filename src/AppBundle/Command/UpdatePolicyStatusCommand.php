@@ -253,6 +253,20 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
 
+        // set unpaid Cancelled Mandates
+        $unpaid = $this->policyService->setUnpaidForCancelledMandate($prefix, $dryRun);
+        $copy = 'Set Unpaid for Cancelled Mandates';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should set unpaid';
+        }
+        foreach ($unpaid as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s cancelled mandate policies set to unpaid', count($unpaid));
+        $ignoreLineCount++;
+        $lines[] = '';
+        $ignoreLineCount++;
+
         $output->writeln(join(PHP_EOL, $lines));
 
         # 5 lines for each section output

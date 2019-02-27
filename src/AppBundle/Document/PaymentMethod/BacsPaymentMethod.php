@@ -1,7 +1,9 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\PaymentMethod;
 
+use AppBundle\Document\BankAccount;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -11,11 +13,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 class BacsPaymentMethod extends PaymentMethod
 {
     /**
-     * @MongoDB\EmbedOne(targetDocument="BankAccount")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\BankAccount")
      * @Gedmo\Versioned
      * @var BankAccount
      */
     protected $bankAccount;
+
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\BankAccount")
+     */
+    protected $previousBankAccounts = [];
 
     /**
      * @Assert\Type("bool")
@@ -30,6 +37,7 @@ class BacsPaymentMethod extends PaymentMethod
     public function setBankAccount(BankAccount $bankAccount)
     {
         $this->bankAccount = $bankAccount;
+        $this->addPreviousBankAccount($bankAccount);
     }
 
     /**
@@ -38,6 +46,24 @@ class BacsPaymentMethod extends PaymentMethod
     public function getBankAccount()
     {
         return $this->bankAccount;
+    }
+
+    public function getPreviousBankAccounts()
+    {
+        return $this->previousBankAccounts;
+    }
+
+    public function addPreviousBankAccount(BankAccount $bankAccount)
+    {
+        $prev = $this->previousBankAccounts;
+        if (is_object($this->previousBankAccounts)) {
+            /** @var ArrayCollection $prevCollection */
+            $prevCollection = $this->previousBankAccounts;
+            $prev = $prevCollection->toArray();
+        }
+        if (!in_array($bankAccount, $prev)) {
+            $this->previousBankAccounts[] = $bankAccount;
+        }
     }
 
     public function setSoleSignature($soleSignature)

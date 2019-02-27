@@ -2,9 +2,9 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -121,6 +121,23 @@ class PolicyRepository extends BaseDocumentRepository
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('end')->lte($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findUnpaidPoliciesWithCancelledMandates($policyPrefix)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('paymentMethod.bankAccount.mandateStatus')->in([
+                BankAccount::MANDATE_CANCELLED,
+                BankAccount::MANDATE_FAILURE
+            ]);
 
         return $qb
             ->getQuery()

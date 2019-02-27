@@ -183,7 +183,7 @@ abstract class Payment
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ScheduledPayment", inversedBy="payment")
-     * @var ScheduledPayment
+     * @var ScheduledPayment|null
      */
     protected $scheduledPayment;
 
@@ -528,7 +528,7 @@ abstract class Payment
     }
 
     /**
-     * @return ScheduledPayment
+     * @return ScheduledPayment|null
      */
     public function getScheduledPayment()
     {
@@ -536,10 +536,10 @@ abstract class Payment
     }
 
     /**
-     * @param ScheduledPayment $scheduledPayment
+     * @param ScheduledPayment|null $scheduledPayment
      *
      */
-    public function setScheduledPayment(ScheduledPayment $scheduledPayment)
+    public function setScheduledPayment(ScheduledPayment $scheduledPayment = null)
     {
         $this->scheduledPayment = $scheduledPayment;
     }

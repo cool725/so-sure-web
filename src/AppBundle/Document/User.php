@@ -6,6 +6,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -250,7 +251,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $latestWebIdentityLog;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PaymentMethod\PaymentMethod")
      * @Gedmo\Versioned
      * @var PaymentMethod
      */
@@ -1246,6 +1247,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasPolicyCancelledAndPaymentOwed()
     {
         foreach ($this->getAllPolicies() as $policy) {
+            /** @var Policy $policy */
             if ($policy->isCancelledAndPaymentOwed()) {
                 return true;
             }

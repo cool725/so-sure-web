@@ -30,6 +30,7 @@ class Salva
     public static $refundValidationExclusions = [
         '58341bfc1d255d3f0a6641c9', // should not have been upgrade
         '59d47a1496a9626f3c3b8650', // dispossion, but was cancelled much later than should have been
+        '5b808f2bb1e212103e4a6e3f', // Manual verified this is ok
     ];
 
     public static $commissionValidationExclusions = [

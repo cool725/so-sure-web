@@ -44,6 +44,9 @@ Encore
     .addEntry('detected-imei', './src/AppBundle/Resources/public/rebrand/js/pages/admin/detected-imei.js')
     .addEntry('accounts', './src/AppBundle/Resources/public/rebrand/js/pages/admin/accounts.js')
     .addEntry('banking', './src/AppBundle/Resources/public/rebrand/js/pages/admin/banking.js')
+    .addEntry('rewards', './src/AppBundle/Resources/public/rebrand/js/pages/admin/rewards.js')
+    .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
+    .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')

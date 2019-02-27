@@ -591,7 +591,7 @@ class MonitorService
         }
     }
 
-    public function bacsPayments($details = false)
+    public function bacsPayments()
     {
         $errors = [];
         $twoDays = \DateTime::createFromFormat('U', time());
@@ -612,17 +612,17 @@ class MonitorService
                 continue;
             }
 
-            if ($payment->canAction(\DateTime::createFromFormat('U', time()))) {
-                $msg = sprintf('There are bacs payments waiting actioning: %s', $payment->getId());
-                $errors[] = $msg;
-                if (!$details) {
-                    throw new MonitorException($msg);
-                }
+            if ($payment->canAction(BacsPayment::ACTION_APPROVE, \DateTime::createFromFormat('U', time()))) {
+                $errors[] = $payment->getId();
             }
         }
 
         if (count($errors) > 0) {
-            throw new MonitorException($this->quoteSafeArrayToString($errors));
+            throw new MonitorException(sprintf(
+                "Found %d bacs payments. Ids: %s",
+                count($errors),
+                $this->quoteSafeArrayToString($errors)
+            ));
         }
     }
 
@@ -1051,12 +1051,16 @@ class MonitorService
             ->getQuery()
             ->execute();
 
+        $items = [];
         foreach ($results as $result) {
+            $items[] = $result->getId();
+        }
+
+        if (count($items) > 0) {
             throw new MonitorException(sprintf(
-                "Bacs payment (%s) under policy number %s is pending and in the past (%s)",
-                $result->getId(),
-                $result->getPolicy()->getPolicyNumber(),
-                $result->getDate()->format('Y-M-d H:m')
+                "Found %d bacs payments. Ids: %s",
+                count($items),
+                $this->quoteSafeArrayToString($items)
             ));
         }
     }
@@ -1116,7 +1120,7 @@ class MonitorService
 
         if (count($blockedItems) > 0) {
             throw new MonitorException(sprintf(
-                "Found %d blocked scheduled payments. First id: %s",
+                "Found %d blocked scheduled payments. Ids: %s",
                 count($blockedItems),
                 $this->quoteSafeArrayToString($blockedItems)
             ));

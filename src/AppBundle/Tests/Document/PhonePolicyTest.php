@@ -3890,6 +3890,18 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
     }
 
+    public function testCanCreatePendingRenewalInvalidImei()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCanCreatePendingRenewalInvalidImei', $this));
+
+        // 21 day renewal
+        $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2017-01-01 00:01")));
+
+        $policy->setInvalidImei(true);
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+    }
+
     public function testCanRenew()
     {
         $policy = $this->getPolicy(static::generateEmail('testCanRenew', $this));
@@ -3910,6 +3922,17 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
+    }
+
+    public function testCanRenewInvalidImei()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCanRenewInvalidImei', $this));
+
+        $this->getRenewalPolicy($policy);
+        $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
+
+        $policy->setInvalidImei(true);
+        $this->assertFalse($policy->canRenew(new \DateTime("2016-12-10")));
     }
 
     public function testIsRenewed()

@@ -1,156 +1,189 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-companies' %}
+
+{% block title %}so-sure - Companies{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-<div class="row">
-    <div class="col-md-8">
-        <h2>Companies</h2>
-    </div>
-    <div class="col-md-2">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#companyModal" style="margin-top: 20px"
-        ><i class="fa fa-plus"></i> New Company</button>
-    </div>
-</div>
-<div class="row" style="margin-top: 20px">
-    <div class="col-md-12">
-    <table class="table table-stripped" width="100%">
-        <tr>
-            <th>Name</th>
-            <th>Employees</th>
-            <th></th>
-        </tr>
-        {% for company in companies %}
-            <tr>
-                <td width="20%">{{ company.name }}</td>
-                <td width="70%">
-                    {% for user in company.users %}
-                        <a href="{{ path('admin_user', {'id': user.id })}}">{{ user.email }}</a>
-                        -
-                        {% if user.hasActivePolicy %}
-                            Active
-                        {% elseif user.hasUnpaidPolicy %}
-                            Unpaid
-                        {% elseif user.allPolicies|length == 0 %}
-                            No Policies
-                        {% else %}
-                            Expired/Other
-                        {% endif %}
-                        <br />
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Companies</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary btn-square"
+                       data-toggle="modal"
+                       data-target="#company_modal">New Company <i class="fal fa-plus fa-fw"></i></a>
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Employees</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for company in companies %}
+                        <tr>
+                            <td width="20%">{{ company.name }}</td>
+                            <td width="70%">
+                                {% for user in company.users %}
+                                    <a href="{{ path('admin_user', {'id': user.id })}}">{{ user.email }}</a>
+                                    -
+                                    {% if user.hasActivePolicy %}
+                                        Active
+                                    {% elseif user.hasUnpaidPolicy %}
+                                        Unpaid
+                                    {% elseif user.allPolicies|length == 0 %}
+                                        No Policies
+                                    {% else %}
+                                        Expired/Other
+                                    {% endif %}
+                                    <br />
+                                {% endfor %}
+                            </td>
+                            <td width="10%">
+                                <a href="#"
+                                   class="btn btn-primary btn-square btn-sm"
+                                   data-company-name="{{ company.name }}"
+                                   data-company-id="{{ company.id }}"
+                                   data-toggle="modal"
+                                   data-target="#belong_modal">Add User To Company <i class="fal fa-plus fa-fw"></i></a></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                Sanctions:
+                                {% if company.sanctionsChecks|length == 0%}
+                                    No checks run
+                                {% endif %}
+                                {% for check in company.sanctionsChecks %}
+                                    Ran: {{ check|date }}<br>
+                                {% endfor %}
+                                {% if company.sanctionsMatches|length == 0%}
+                                    No matches
+                                {% endif %}
+                                {% for match in company.sanctionsMatches %}
+                                    {% if match.manuallyVerified %}
+                                    Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                                    {% else %}
+                                    Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                                    {% endif %}
+                                    <br>
+                                {% endfor %}
+                            </td>
+                        </tr>
                     {% endfor %}
-                </td>
-                <td width="10%">
-                    <button type="button" class="btn btn-info" data-company-name="{{ company.name }}" data-company-id="{{ company.id }}" data-toggle="modal" data-target="#belongModal"
-                    ><i class="fa fa-plus"></i> Add User To Company</button>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>
-                    Sanctions:
-                        {% if company.sanctionsChecks|length == 0%}
-                            No checks run
-                        {% endif %}
-                        {% for check in company.sanctionsChecks %}
-                            Ran: {{ check|date }}<br>
-                        {% endfor %}
-                        {% if company.sanctionsMatches|length == 0%}
-                            No matches
-                        {% endif %}
-                        {% for match in company.sanctionsMatches %}
-                            {% if match.manuallyVerified %}
-                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
-                            {% else %}
-                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
-                            {% endif %}
-                            <br>
-                        {% endfor %}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    </div>
-</div>
-
-    <div class="modal fade" id="belongModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add User To Company</h4>
-          </div>
-          <div class="modal-body">
-            {{ form_start(belongForm) }}
-                <div class="form-group">
-                    {{ form_label(belongForm.email, 'Email') }}
-                    {{ form_errors(belongForm.email) }}
-                    {{ form_widget(belongForm.email) }}
-                </div>
-                <div class="form-group">
-                    {{ form_widget(belongForm.companyId) }}
-                    {{ form_widget(belongForm.next, {'label': 'Add', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(belongForm) }}
-          </div>
+                    </tbody>
+                </table>
+            </div>
         </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="modal fade" id="companyModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add company</h4>
-          </div>
-          <div class="modal-body">
-            {{ form_start(companyForm) }}
-                <div class="form-group">
-                    {{ form_label(companyForm.name, 'Name') }}
-                    {{ form_errors(companyForm.name) }}
-                    {{ form_widget(companyForm.name) }}
+    {# Page Modals #}
+    <div class="modal fade"
+         id="company_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="company_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add company</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.address1, 'Address Line 1') }}
-                    {{ form_errors(companyForm.address1) }}
-                    {{ form_widget(companyForm.address1) }}
+                <div class="modal-body">
+                    {{ form_start(companyForm) }}
+                        <div class="form-group">
+                            {{ form_label(companyForm.name, 'Name') }}
+                            {{ form_widget(companyForm.name, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(companyForm.name) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(companyForm.address1, 'Address Line 1') }}
+                            {{ form_widget(companyForm.address1, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(companyForm.address1) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(companyForm.address2, 'Address Line 2') }}
+                            {{ form_widget(companyForm.address2, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(companyForm.address2) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(companyForm.address3, 'Address Line 3') }}
+                            {{ form_widget(companyForm.address3, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(companyForm.address3) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(companyForm.city, 'City') }}
+                            {{ form_widget(companyForm.city, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(companyForm.city) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(companyForm.postcode, 'Postcode') }}
+                            {{ form_widget(companyForm.postcode, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(companyForm.postcode) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(companyForm) }}
                 </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.address2, 'Address Line 2') }}
-                    {{ form_errors(companyForm.address2) }}
-                    {{ form_widget(companyForm.address2) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.address3, 'Address Line 3') }}
-                    {{ form_errors(companyForm.address3) }}
-                    {{ form_widget(companyForm.address3) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.city, 'City') }}
-                    {{ form_errors(companyForm.city) }}
-                    {{ form_widget(companyForm.city) }}
-                </div>
-                <div class="form-group">
-                    {{ form_label(companyForm.postcode, 'Postcode') }}
-                    {{ form_errors(companyForm.postcode) }}
-                    {{ form_widget(companyForm.postcode) }}
-                </div>
-                <div class="form-group">
-                    {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
-                </div>
-            {{ form_end(companyForm) }}
-          </div>
+            </div>
         </div>
-      </div>
     </div>
 
-</div>
+    <div class="modal fade"
+         id="belong_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="belong_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add User To Company</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(belongForm) }}
+                        <div class="form-group">
+                            {{ form_label(belongForm.email, 'Email') }}
+                            {{ form_widget(belongForm.email, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(belongForm.email) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(belongForm.companyId) }}
+                            {{ form_widget(belongForm.next, {'label': 'Add', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(belongForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/company.js') }}"></script>
 {% endblock %}

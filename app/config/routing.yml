@@ -191,49 +191,49 @@ redirect_about_home:
     path: /about
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_are_we_regulated_within_the_uk:
     path: /about/are-we-regulated-within-the-uk
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_are_we_regulated_within_the_uk:
     path: /about/social-insurance/are-we-regulated-within-the-uk
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_how_secure_is_so_sure:
     path: /about/how-secure-is-so-sure
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_how_secure_is_so_sure:
     path: /about/social-insurance/how-secure-is-so-sure
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_the_team:
     path: /about/the-team
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_the_team:
     path: /about/social-insurance/the-team
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_how_to_contact_so_sure:
@@ -247,42 +247,42 @@ redirect_about_our_mission:
     path: /about/our-mission
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_our_mission:
     path: /about/social-insurance/our-mission
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_why_we_re_better:
     path: /about/why-we-re-better
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_why_we_re_better:
     path: /about/social-insurance/why-we-re-better
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_what_is_social_insurance:
     path: /about/what-is-social-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_what_is_social_insurance:
     path: /about/social-insurance/what-is-social-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_discount_vouchers:

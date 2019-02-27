@@ -332,7 +332,7 @@ class BICommand extends ContainerAwareCommand
             '"Payment Method"',
             '"Expected Unpaid Cancellation Date"',
             '"Bacs Mandate Status"',
-            '"Use For Attribution"',
+            '"First time policy"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */

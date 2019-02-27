@@ -420,7 +420,7 @@ services:
             - "@security.token_storage"
             - "%sosure_employee_cookie_value%"
             - "%kernel.environment%"
-            - "%sosure_ips%"
+            - "%analytics_ips%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension
@@ -1204,6 +1204,7 @@ services:
             - "@app.judopay"
             - "@logger"
             - "%kernel.environment%"
+            - "@app.bacs"
         tags:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeMonthPromo }

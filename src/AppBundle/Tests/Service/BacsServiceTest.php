@@ -2,10 +2,12 @@
 
 namespace AppBundle\Tests\Service;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\PaymentService;
@@ -67,7 +69,7 @@ class BacsServiceTest extends WebTestCase
         self::$dm->clear();
     }
 
-    public function testBacsXmlPolicy()
+    public function testBacsXmlPolicyAndPreviousBankAccounts()
     {
         $now = $this->now();
         $user = static::createUser(
@@ -87,6 +89,16 @@ class BacsServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $this->setValidBacsPaymentMethodForPolicy($policy, 'SOSURE01');
         static::$dm->flush();
+        $this->setValidBacsPaymentMethodForPolicy($policy, 'SOSURE02');
+        static::$dm->flush();
+        $this->assertNotNull($policy->getBacsPaymentMethod());
+        if ($policy->getBacsPaymentMethod()) {
+            $this->assertCount(2, $policy->getBacsPaymentMethod()->getPreviousBankAccounts());
+        }
+        $this->assertNotNull($policy->getBacsBankAccount());
+        if ($policy->getBacsBankAccount()) {
+            $this->assertEquals('SOSURE02', $policy->getBacsBankAccount()->getReference());
+        }
 
         $results = self::$bacsService->addacs(self::$xmlFile);
         $this->assertTrue($results['success']);
@@ -100,13 +112,27 @@ class BacsServiceTest extends WebTestCase
 
     private function setValidBacsPaymentMethodForPolicy(Policy $policy, $reference = null, \DateTime $date = null)
     {
-        $bacs = $this->getBacsPaymentMethod($policy->getUser()->getName(), $reference, $date);
-        $policy->setPaymentMethod($bacs);
+        $bacs = null;
+        $name = $policy->getUser()->getName();
+        if ($policy->getBacsPaymentMethod()) {
+            $policy->getBacsPaymentMethod()->setBankAccount($this->getBankAcccount($name, $reference, $date));
+        } else {
+            $bacs = $this->getBacsPaymentMethod($name, $reference, $date);
+            $policy->setPaymentMethod($bacs);
+        }
 
         return $bacs;
     }
 
     private function getBacsPaymentMethod($name, $reference = null, \DateTime $date = null)
+    {
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($this->getBankAcccount($name, $reference, $date));
+
+        return $bacs;
+    }
+
+    private function getBankAcccount($name, $reference = null, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -121,21 +147,8 @@ class BacsServiceTest extends WebTestCase
         $bankAccount->setAccountNumber('87654321');
         $bankAccount->setAccountName($name);
         $bankAccount->setInitialPaymentSubmissionDate($date);
-        $bacs = new BacsPaymentMethod();
-        $bacs->setBankAccount($bankAccount);
 
-        return $bacs;
-    }
-
-    public function testBacsPayment()
-    {
-        $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testBacsPayment', $this));
-        $this->setValidBacsPaymentMethodForPolicy($policy);
-        $payment = static::$bacsService->bacsPayment($policy, 'test', 1.01);
-        $this->assertEquals(1.01, $payment->getAmount());
-        $this->assertEquals('test', $payment->getNotes());
-        $this->assertNull($payment->isSuccess());
+        return $bankAccount;
     }
 
     public function testCheckSubmissionFile()
@@ -160,6 +173,11 @@ class BacsServiceTest extends WebTestCase
 
     public function testExportPaymentsDebits()
     {
+        $now = \DateTime::createFromFormat('U', time());
+        $oneYear = clone $now;
+        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
+        self::$bacsService->exportPaymentsDebits('TEST', $oneYear, '1', $metaData);
+
         $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
             static::$userManager,
@@ -220,8 +238,65 @@ class BacsServiceTest extends WebTestCase
         static::$dm->flush();
     }
 
+    public function testExportPaymentsCredits()
+    {
+        $now = \DateTime::createFromFormat('U', time());
+        $oneYear = clone $now;
+        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
+        self::$bacsService->exportPaymentsCredits('TEST', $oneYear, '1', $metaData);
+
+        $now = \DateTime::createFromFormat('U', time());
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testExportPaymentsCredits', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $now,
+            true
+        );
+        static::$policyService->setDispatcher(null);
+        static::$policyService->create($policy, $now);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $bacs = $this->setValidBacsPaymentMethodForPolicy($policy, rand(111111, 999999), $now);
+        //$bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
+        $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
+        self::$paymentService->confirmBacs($policy, $bacs);
+
+        static::$dm->flush();
+
+        $oneMonth = clone $now;
+        $oneMonth = $oneMonth->add(new \DateInterval('P1M'));
+        $twoMonth = clone $now;
+        $twoMonth = $twoMonth->add(new \DateInterval('P2M'));
+        $threeMonth = clone $now;
+        $threeMonth = $threeMonth->add(new \DateInterval('P3M'));
+
+        $metaData = [];
+
+        $credits = self::$bacsService->exportPaymentsCredits('TEST', $oneMonth, '1', $metaData);
+        $this->assertEquals(0, count($credits));
+        static::$dm->flush();
+
+        self::$bacsService->scheduleBacsPayment($policy, -5, ScheduledPayment::TYPE_REFUND, 'test', null, $now);
+        $credits = self::$bacsService->exportPaymentsCredits('TEST', $now, '1', $metaData);
+        $this->assertEquals(1, count($credits));
+
+    }
+
     public function testExportPaymentsDebitsPreventExpirationAfter()
     {
+        $now = \DateTime::createFromFormat('U', time());
+        $oneYear = clone $now;
+        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
+        self::$bacsService->exportPaymentsDebits('TEST', $oneYear, '1', $metaData);
+
         $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
             static::$userManager,
@@ -256,6 +331,10 @@ class BacsServiceTest extends WebTestCase
 
         $scheduledPayment->setScheduled($afterExpire);
         static::$dm->flush();
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        $scheduledPayment->setScheduled($afterExpire);
+        static::$dm->flush();
+
         $debits = self::$bacsService->exportPaymentsDebits('TEST', $afterExpire, '1', $metaData);
         $this->assertEquals(0, count($debits));
     }

@@ -1,12 +1,12 @@
 <?php
 namespace AppBundle\Service;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;

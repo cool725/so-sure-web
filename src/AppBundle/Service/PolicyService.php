@@ -1079,6 +1079,35 @@ class PolicyService
         return $this->newPolicyEmail($policy, $attachments, 'bcc@so-sure.com');
     }
 
+    public function sendBacsPaymentRequest(Policy $policy)
+    {
+        if (!$this->mailer) {
+            return false;
+        }
+
+        $baseTemplate = 'AppBundle:Email:bacs/paymentRequest';
+
+        try {
+            $this->mailer->sendTemplateToUser(
+                'Request for payment on your so-sure policy',
+                $policy->getUser(),
+                sprintf('%s.html.twig', $baseTemplate),
+                ['policy' => $policy],
+                sprintf('%s.txt.twig', $baseTemplate),
+                ['policy' => $policy]
+            );
+
+            $policy->setLastEmailed(\DateTime::createFromFormat('U', time()));
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending bacs payment request email to %s', $policy->getUser()->getEmail()),
+                ['exception' => $e]
+            );
+        }
+
+        return true;
+    }
+
     public function downloadS3(S3File $s3file)
     {
         $file = sprintf('%s/%s', sys_get_temp_dir(), $s3file->getFilename());
@@ -1643,6 +1672,40 @@ class PolicyService
         return $expired;
     }
 
+    public function setUnpaidForCancelledMandate($prefix, $dryRun = false, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $unpaid = [];
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findUnpaidPoliciesWithCancelledMandates($prefix);
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isPolicyPaidToDate($date, true, false, true)) {
+                continue;
+            }
+
+            $unpaid[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $policy->setStatus(Policy::STATUS_UNPAID);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error setting policy to unpaid %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $unpaid;
+    }
+
     public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         if (!$date) {
@@ -1769,15 +1832,9 @@ class PolicyService
 
     public function cashbackPendingReminder($dryRun)
     {
-        $cashbacks = [];
-
         /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
-        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
-
-        foreach ($cashbackItems as $cashbackItem) {
-            $cashbacks[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
-        }
+        $cashbacks = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
 
         if (!$dryRun) {
             $this->mailer->sendTemplate(
@@ -1787,8 +1844,11 @@ class PolicyService
                 ['cashbacks' => $cashbacks]
             );
         }
-
-        return $cashbacks;
+        $ids = [];
+        foreach ($cashbacks as $cashback) {
+            $ids[$cashback->getId()] = $cashback->getPolicy()->getPolicyNumber();
+        }
+        return $ids;
     }
 
     /**
@@ -1943,6 +2003,7 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {

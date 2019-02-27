@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\Note\Note;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
@@ -186,6 +187,50 @@ class AdminControllerTest extends BaseControllerTest
         $this->assertTrue($link, 'Unable to locate linked claim in policy');
     }
     */
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testBacsPaymentRequestFormAction()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testBacsPaymentRequestFormAction', $this, true),
+            'bar'
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            static::getRandomPhone(self::$dm),
+            null,
+            true,
+            true
+        );
+
+        $this->login(LoadUserData::DEFAULT_ADMIN, LoadUserData::DEFAULT_PASSWORD, 'admin');
+
+        $crawler = self::$client->request('GET', '/admin/policy/' . $policy->getId());
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('bacs_payment_request_form_submit')->form();
+
+        $form['bacs_payment_request_form[note]'] = 'A test justification';
+
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+
+        $dm = $this->getDocumentManager(true);
+        $repoPolicy = $dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $repoPolicy->find($policy->getId());
+
+        $this->assertEquals(
+            'A test justification',
+            $updatedPolicy->getLatestNoteByType(Note::TYPE_STANDARD)->getNotes()
+        );
+    }
 
     /**
      * @throws \Exception
