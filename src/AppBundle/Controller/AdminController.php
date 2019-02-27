@@ -959,6 +959,7 @@ class AdminController extends BaseController
      * @Route("/bacs/file/submit/{id}", name="admin_bacs_submit")
      * @Route("/bacs/file/cancel/{id}", name="admin_bacs_cancel")
      * @Route("/bacs/file/serial/{id}", name="admin_bacs_update_serial_number")
+     * @Route("/bacs/file/meta/{id}", name="admin_bacs_update_meta")
      * @Method({"POST"})
      */
     public function bacsEditFileAction(Request $request, $id)
@@ -997,6 +998,20 @@ class AdminController extends BaseController
 
                     return new RedirectResponse($this->generateUrl('admin_bacs'));
                 }
+            } elseif ($request->get('_route') == 'admin_bacs_update_meta') {
+                $debit = $request->get('debit');
+                $credit = $request->get('credit');
+                if ($debit) {
+                    $metadata = $file->getMetadata();
+                    $metadata['debit-amount'] = $debit;
+                    $file->setMetadata($metadata);
+                }
+                if ($credit) {
+                    $metadata = $file->getMetadata();
+                    $metadata['credit-amount'] = $credit;
+                    $file->setMetadata($metadata);
+                }
+                $message = 'Updated metadata';
             } else {
                 throw new \Exception('Unknown route');
             }

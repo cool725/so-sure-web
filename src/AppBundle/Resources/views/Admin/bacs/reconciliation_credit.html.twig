@@ -46,6 +46,10 @@
                                         <span title="{{ file.metadata|json_encode }}">
                                         {% if file.metadata %}
                                             {{ creditAmount|number_format(2, '.', ',') }}
+                                            {% if equal_to_two_dp(paymentAmount, reportAmount) and not equal_to_two_dp(creditAmount, reportAmount) %}
+                                                <button title="Update amount" type="button" class="btn btn-success bacs-meta-update" data-token="{{ csrf_token('default') }}"
+                                                    data-bacs-update-meta-url="{{ path('admin_bacs_update_meta', {'id': file.id, 'credit': paymentAmount}) }}"><i class="fa fa-refresh"></i></button>
+                                            {% endif %}
                                         {% else %}
                                             -
                                         {% endif %}

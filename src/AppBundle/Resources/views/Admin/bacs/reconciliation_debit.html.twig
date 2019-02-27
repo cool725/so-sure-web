@@ -48,6 +48,11 @@
                                             {% if file.metadata['debit-amount-notes'] is defined %}
                                                 <i class="fa fa-warning" title="{{ file.metadata['debit-amount-notes'] }}"></i>
                                             {% endif %}
+                                            {% if equal_to_two_dp(paymentAmount, reportAmount) and not equal_to_two_dp(debitAmount, reportAmount) %}
+                                            <button title="Update amount" type="button" class="btn btn-success bacs-meta-update" data-token="{{ csrf_token('default') }}"
+                                                    data-bacs-update-meta-url="{{ path('admin_bacs_update_meta', {'id': file.id, 'debit': paymentAmount}) }}"><i class="fa fa-refresh"></i></button>
+                                        {% endif %}
+
                                         {% else %}
                                             -
                                         {% endif %}

@@ -58,6 +58,21 @@ $('.bacs-reject').click(function() {
     }
 });
 
+$('.bacs-meta-update').click(function() {
+    if (confirm('Are you sure you wish to update the metadata amount?')) {
+        var url = $(this).data('bacs-update-meta-url');
+        var token = $(this).data('token');
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { token: token },
+            success: function(result) {
+                window.location.reload(false);
+            }
+        });
+    }
+});
+
 $('#editSerialNumberModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
     var url = button.data('serial-number-url');
