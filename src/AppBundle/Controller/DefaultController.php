@@ -83,34 +83,22 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $force = null;
-        $trafficFraction = '0.0000001';
-        if ($request->get('_route') == 'replacement_24_landing') {
-            $force = 'next-working-day';
-            $trafficFraction = 1;
-        } elseif ($request->get('_route') == 'replacement_72_landing') {
-            $force = 'twentyfour-seventy-two';
-            $trafficFraction = 1;
-        }
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $pageType = 'home';
         $template = 'AppBundle:Default:index.html.twig';
 
-        // Valentines Day Promo
-        $now   = \DateTime::createFromFormat('U', time());
-        $start = new \DateTime('2019-02-14 00:00:00', SoSure::getSoSureTimezone());
-        $end   = new \DateTime('2019-02-14 23:59:59', SoSure::getSoSureTimezone());
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOME_COMPARISON,
+            ['homepage', 'home-comparison']
+        );
 
-        if ($now >= $start && $now <= $end) {
-            $pageType = 'vdayphonecase';//
-            $template = 'AppBundle:Default:indexPromotions.html.twig';
+        if ($exp == 'home-comparison') {
+            return $this->redirectToRoute('so_sure_compared');
         }
 
         $data = array(
             // Make sure to check homepage landing below too
-            'page_type' => $pageType,
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
         );
@@ -195,6 +183,7 @@ class DefaultController extends BaseController
      * @Route("/starling-bank", name="starling_bank")
      * @Route("/comparison", name="comparison")
      * @Route("/vendi-app", name="vendi_app")
+     * @Route("/so-sure-compared", name="so_sure_compared")
      */
     public function affiliateLanding(Request $request)
     {
@@ -364,6 +353,14 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'vendi-app',
                 'affiliate_company' => 'Vendi',
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'so_sure_compared') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'so-sure-compared',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'LICI',

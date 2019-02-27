@@ -35,7 +35,7 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_EMAIL_LANDING_TEXT = 'email-landing-text';
     // Exp 3
-    //
+    const EXPERIMENT_HOME_COMPARISON = 'home-comparison';
     // Exp 4
     //
     // Exp 5
@@ -126,7 +126,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
-        //
+        self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
         //
         // Exp 5
@@ -181,7 +181,7 @@ class SixpackService
     public static $purchaseConversionSimple = [
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-
+        //
         // Exp 2
 
         // Exp 3
@@ -214,7 +214,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
-        //
+        self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
         //
         // Exp 5
