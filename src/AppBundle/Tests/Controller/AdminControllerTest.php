@@ -189,7 +189,7 @@ class AdminControllerTest extends BaseControllerTest
     */
 
     /**
-     * @expectedException \Exception
+     *
      */
     public function testBacsPaymentRequestFormAction()
     {

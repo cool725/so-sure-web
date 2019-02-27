@@ -308,6 +308,25 @@ class BaseControllerTest extends WebTestCase
         return null;
     }
 
+    protected function getCrawlerFlash(Crawler $crawler)
+    {
+        $messages = '';
+        $classes = [
+            'alert-success',
+            'flash-success',
+            'alert-warning',
+            'flash-warning',
+            'alert-danger',
+            'flash-danger',
+        ];
+
+        foreach ($classes as $class) {
+            $messages = sprintf('%s %s', $messages, $this->getCrawlerClassHtml($crawler, $class));
+        }
+
+        return $messages;
+    }
+
     protected function expectFlashSuccess(Crawler $crawler, $message)
     {
         $rebrand = $this->getCrawlerClassHtml($crawler, 'alert-success');

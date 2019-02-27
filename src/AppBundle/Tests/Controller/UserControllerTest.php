@@ -563,7 +563,7 @@ class UserControllerTest extends BaseControllerTest
             $count = 1;
         }
 
-        $this->assertEquals($count, $crawler->evaluate(sprintf('count(%s)', $xpath))[0], $crawler->html());
+        $this->assertEquals($count, $crawler->evaluate(sprintf('count(%s)', $xpath))[0], $xpath);
     }
 
     public function testUserUnpaidPolicyPaid()

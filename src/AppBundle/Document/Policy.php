@@ -5816,6 +5816,11 @@ abstract class Policy
             return false;
         }
 
+        // if its not a valid policy, then pending - pending policies can make a bacs payment in time
+        if (!$this->isValidPolicy()) {
+            return true;
+        }
+        
         //print $this->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate(), $date);
         //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;

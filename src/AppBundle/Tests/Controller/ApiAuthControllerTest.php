@@ -130,7 +130,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     public function testAddress()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testAddress', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
         $url = '/api/v1/auth/address?postcode=BX11LT&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
@@ -1555,8 +1564,18 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testNewPolicyExpiredDuplicateImei()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyExpiredDuplicateImei', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
         $policyId = $data['id'];
@@ -1922,8 +1941,17 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     public function testGetNullPolicy()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetNullPolicy', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $createData = $this->verifyResponse(200);
         $policyId = $createData['id'];
 
@@ -2237,12 +2265,18 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testNewPolicyPayNotRegulated()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        self::$testUser->setFirstName('foo');
-        self::$testUser->setLastName('bar');
-        self::$dm->flush();
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyPayNotRegulated', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
 
-        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
         $data = [
             'type' => 'billing',
             'line1' => 'address line 1',
@@ -2252,7 +2286,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $data = $this->verifyResponse(200);
 
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
         $redis = $this->getRedis();
@@ -2371,7 +2405,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     public function testNewPolicyPayBacsNotEnoughTime()
     {
         $twoMonthsAgo = $this->now();
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P65D'));
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P67D'));
 
         /** @var User $user */
         $user = self::createUser(
@@ -4308,11 +4342,17 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testReceivedInvitationAppears()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser2);
-        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser2);
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testReceivedInvitationAppears', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
         $data = $this->verifyResponse(200);
 
-        $this->payPolicy(self::$testUser2, $data['id']);
+        $this->payPolicy($user, $data['id']);
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
         //print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
@@ -5371,11 +5411,20 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     public function testGetCurrentUser()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetCurrentUser', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
+        $this->assertEquals($user->getEmailCanonical(), $data['email']);
     }
 
     public function testGetCurrentUserLocked()
@@ -5553,11 +5602,20 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     public function testGetUser()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s?_method=GET', self::$testUser->getId());
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetUser', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
+        $this->assertEquals($user->getEmailCanonical(), $data['email']);
         $this->assertNull($data['has_mobile_number_verified']);
     }
 
@@ -5961,8 +6019,17 @@ class ApiAuthControllerTest extends BaseApiControllerTest
      */
     public function testUserAddAddress()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserAddAddress', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
         $data = [
             'type' => 'billing',
             'line1' => 'address line 1',
@@ -5971,7 +6038,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
-        $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
+        $this->assertEquals($user->getEmailCanonical(), $result['email']);
         $this->assertTrue(isset($result['addresses']));
         $this->assertTrue(isset($result['addresses'][0]));
         $this->assertEquals($data['type'], $result['addresses'][0]['type']);
@@ -5986,8 +6053,17 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUserAddAddressBadLines()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s/address', self::$testUser->getId());
+        /** @var User $user */
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserAddAddressBadLines', $this),
+            'foo'
+        );
+        $user->setFirstName('Bar');
+        $user->setLastName('Foo');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
         $data = [
             'type' => 'billing',
             'line1' => 'address line 1$',
@@ -5998,7 +6074,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
-        $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
+        $this->assertEquals($user->getEmailCanonical(), $result['email']);
         $this->assertTrue(isset($result['addresses']));
         $this->assertTrue(isset($result['addresses'][0]));
         $this->assertEquals($data['type'], $result['addresses'][0]['type']);
