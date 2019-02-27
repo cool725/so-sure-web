@@ -3,7 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\SoSure;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 
 /**
  * @group unit

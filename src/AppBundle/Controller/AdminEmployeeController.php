@@ -9,9 +9,9 @@ use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\ValidatorTrait;
@@ -1246,6 +1246,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
+        /** @var BacsService $bacsService */
+        $bacsService = $this->get('app.bacs');
 
         $cancel = new Cancel();
         $cancel->setPolicy($policy);
@@ -1823,8 +1825,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('cancel_direct_debit_form')) {
                 $cancelDirectDebitForm->handleRequest($request);
                 if ($cancelDirectDebitForm->isValid()) {
-                    /** @var BacsService $bacsService */
-                    $bacsService = $this->get('app.bacs');
                     $bacsService->queueCancelBankAccount(
                         $policy->getPolicyOrUserBacsBankAccount(),
                         $policy->hasBacsPaymentMethod() ? $policy->getId() : $policy->getPayerOrUser()->getId()
@@ -1883,11 +1883,16 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('bacs_refund_form')) {
                 $bacsRefundForm->handleRequest($request);
                 if ($bacsRefundForm->isValid()) {
-                    $bacsRefund->setAmount(0 - abs($bacsRefund->getAmount()));
-                    $bacsRefund->calculateSplit();
-                    $bacsRefund->setRefundTotalCommission($bacsRefund->getTotalCommission());
-                    $this->getManager()->persist($bacsRefund);
-                    $this->getManager()->flush();
+                    $bacsService->scheduleBacsPayment(
+                        $policy,
+                        0 - abs($bacsRefund->getAmount()),
+                        ScheduledPayment::TYPE_REFUND,
+                        $bacsRefund->getNotes()
+                    );
+                    $this->addFlash('success', sprintf(
+                        'Refund scheduled'
+                    ));
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('salva_update_form')) {
                 $salvaUpdateForm->handleRequest($request);

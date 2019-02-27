@@ -1204,6 +1204,7 @@ services:
             - "@app.judopay"
             - "@logger"
             - "%kernel.environment%"
+            - "@app.bacs"
         tags:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeMonthPromo }

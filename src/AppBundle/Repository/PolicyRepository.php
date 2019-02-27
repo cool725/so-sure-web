@@ -2,9 +2,9 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;

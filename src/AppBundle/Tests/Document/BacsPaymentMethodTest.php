@@ -3,9 +3,9 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\SoSure;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 
 /**
  * @group unit

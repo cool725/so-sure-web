@@ -2,7 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Policy;
 use AppBundle\Event\BacsEvent;

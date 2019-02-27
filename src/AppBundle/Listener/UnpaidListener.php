@@ -11,7 +11,6 @@ use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\PaymentMethod;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Feature;

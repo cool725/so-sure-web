@@ -12,6 +12,9 @@ use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Service\InvitationService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -585,7 +588,7 @@ abstract class Policy
     protected $participations = array();
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PaymentMethod\PaymentMethod")
      * @Gedmo\Versioned
      * @var PaymentMethod
      */

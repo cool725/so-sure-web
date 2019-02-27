@@ -15,7 +15,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Feature;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;

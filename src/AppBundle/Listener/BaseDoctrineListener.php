@@ -3,10 +3,10 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Annotation\DataChange;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;

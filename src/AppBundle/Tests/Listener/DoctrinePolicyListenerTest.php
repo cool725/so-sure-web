@@ -4,8 +4,8 @@ namespace AppBundle\Tests\Listener;
 
 use AppBundle\Classes\Premium;
 use AppBundle\Document\Address;
-use AppBundle\Document\BacsPaymentMethod;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\CardEvent;

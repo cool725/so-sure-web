@@ -2,7 +2,8 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -1643,7 +1644,7 @@ class BacsService
                 continue;
             }
             $bankAccount = $paymentMethod->getBankAccount();
-            
+
             // Mandate may have been cancelled via ARUDD, so only set to success if its pending
             if (in_array($bankAccount->getMandateStatus(), [
                 BankAccount::MANDATE_PENDING_INIT,
@@ -1715,66 +1716,6 @@ class BacsService
         $this->redis->del([self::KEY_BACS_CANCEL]);
 
         return $cancellations;
-    }
-
-    /**
-     * @param Policy         $policy
-     * @param string         $notes
-     * @param float|null     $amount
-     * @param \DateTime|null $date
-     * @param boolean        $update
-     * @param string         $source
-     * @return BacsPayment
-     * @throws \Exception
-     */
-    public function bacsPayment(
-        Policy $policy,
-        $notes,
-        $amount = null,
-        \DateTime $date = null,
-        $update = true,
-        $source = Payment::SOURCE_TOKEN
-    ) {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
-        }
-
-        if (!$amount) {
-            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
-        }
-        $user = $policy->getPayerOrUser();
-
-        $payment = new BacsPayment();
-        $payment->setDate($date);
-        $payment->setAmount($amount);
-        $payment->setNotes($notes);
-        $payment->setUser($policy->getUser());
-        $payment->setStatus(BacsPayment::STATUS_PENDING);
-        $payment->setSource($source);
-        if ($policy->getPolicyOrUserBacsBankAccount()) {
-            $payment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
-        }
-
-        // Admin or user source is always a one off payment
-        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB, Payment::SOURCE_MOBILE])) {
-            $payment->setIsOneOffPayment(true);
-        }
-
-        if (!$policy->hasPolicyOrUserValidPaymentMethod()) {
-            $payment->setStatus(BacsPayment::STATUS_SKIPPED);
-            $this->logger->warning(sprintf(
-                'User %s does not have a valid payment method (Policy %s)',
-                $user->getId(),
-                $policy->getId()
-            ));
-        }
-
-        if ($update) {
-            $policy->addPayment($payment);
-            $this->dm->persist($payment);
-        }
-
-        return $payment;
     }
 
     public function getHeader()
@@ -1970,6 +1911,7 @@ class BacsService
         &$metadata,
         $update = true
     ) {
+        $payments = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
         $advanceDate = clone $date;
@@ -1983,6 +1925,10 @@ class BacsService
         $metadata['debit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
+            if ($scheduledPayment->getAmount() < 0) {
+                continue;
+            }
+
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             $policy = $scheduledPayment->getPolicy();
 
@@ -1991,9 +1937,8 @@ class BacsService
             $validate = $this->validateBacs(
                 $policy,
                 $scheduledDate,
-                $scheduledPayment->getId(),
-                $ignoreNotEnoughTime,
-                $scheduledPayment
+                $scheduledPayment,
+                $ignoreNotEnoughTime
             );
             if ($validate == self::VALIDATE_SKIP) {
                 continue;
@@ -2017,39 +1962,117 @@ class BacsService
 
             $payment = $this->bacsPayment(
                 $scheduledPayment->getPolicy(),
-                $scheduledPayment->getNotes() ?: 'Scheduled Payment',
                 $scheduledPayment->getAmount(),
+                $scheduledPayment->getNotes() ?: 'Scheduled Payment',
                 $scheduledDate,
                 $update,
-                $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ?
-                    Payment::SOURCE_ADMIN :
-                    Payment::SOURCE_TOKEN
+                $scheduledPayment->getPaymentSource(),
+                $scheduledPayment->getIdentityLog()
             );
             $scheduledPayment->setPayment($payment);
             if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
+                $payments[] = $payment;
             }
             if ($update) {
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             }
         }
+
+        return $payments;
+    }
+
+    public function generatePaymentsCredits(
+        $prefix,
+        \DateTime $date,
+        &$metadata,
+        $update = true
+    ) {
+        $payments = [];
+        // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
+        // time for the bacs cycle
+        $advanceDate = clone $date;
+        $advanceDate = $this->addBusinessDays($advanceDate, 3);
+
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            $prefix,
+            BacsPaymentMethod::class,
+            $advanceDate
+        );
+        $metadata['credit-amount'] = 0;
+        foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            if ($scheduledPayment->getAmount() > 0) {
+                continue;
+            }
+
+            $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
+            $policy = $scheduledPayment->getPolicy();
+
+            // If admin has rescheduled, then allow payment to go through, but should be manually approved
+            $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN;
+            $validate = $this->validateBacs(
+                $policy,
+                $scheduledDate,
+                $scheduledPayment,
+                $ignoreNotEnoughTime
+            );
+            if ($validate == self::VALIDATE_SKIP) {
+                continue;
+            } elseif ($validate == self::VALIDATE_CANCEL) {
+                if ($update) {
+                    $scheduledPayment->cancel();
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                }
+
+                continue;
+            } elseif ($validate == self::VALIDATE_RESCHEDULE) {
+                if ($update) {
+                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+                    $rescheduled = $scheduledPayment->reschedule($scheduledDate, 0);
+                    $policy->addScheduledPayment($rescheduled);
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                }
+
+                continue;
+            }
+
+            $payment = $this->bacsPayment(
+                $scheduledPayment->getPolicy(),
+                $scheduledPayment->getAmount(),
+                $scheduledPayment->getNotes() ?: 'Scheduled Payment',
+                $scheduledDate,
+                $update,
+                $scheduledPayment->getPaymentSource(),
+                $scheduledPayment->getIdentityLog()
+            );
+            $scheduledPayment->setPayment($payment);
+            if ($payment->getStatus() != BacsPayment::STATUS_SKIPPED) {
+                $metadata['credit-amount'] += $scheduledPayment->getAmount();
+                $payments[] = $payment;
+            }
+            if ($update) {
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
+        }
+
+        return $payments;
     }
 
     /**
      * Validates that a payment or scheduled payment can go through.
-     * @param Policy                $policy              is the owner of the payment.
-     * @param \DateTime             $scheduledDate       is the date that the payment is set to go through.
-     * @param string                $id                  is the payment or scheduled payment id.
-     * @param boolean               $ignoreNotEnoughTime is whether to skip time related checks.
-     * @param ScheduledPayment|null $scheduledPayment    is the scheduled payment if there is one.
+     * @param Policy           $policy              is the owner of the payment.
+     * @param \DateTime        $scheduledDate       is the date that the payment is set to go through.
+     * @param ScheduledPayment $scheduledPayment    is the scheduled payment if there is one.
+     * @param boolean          $ignoreNotEnoughTime is whether to skip time related checks.
      */
     private function validateBacs(
         Policy $policy,
-        $scheduledDate,
-        $id,
-        $ignoreNotEnoughTime = false,
-        $scheduledPayment = null
+        \DateTime $scheduledDate,
+        ScheduledPayment $scheduledPayment,
+        $ignoreNotEnoughTime = false
     ) {
+        $id = $scheduledPayment->getId();
         /** @var BacsPaymentMethod $bacs */
         $bacs = $policy->getPolicyOrUserBacsPaymentMethod();
 
@@ -2071,6 +2094,11 @@ class BacsService
             $this->logger->warning($msg);
 
             return self::VALIDATE_SKIP;
+        }
+
+        // credits require much less validation
+        if ($scheduledPayment->getAmount() < 0) {
+            return self::VALIDATE_OK;
         }
 
         $bankAccount = $bacs->getBankAccount();
@@ -2190,33 +2218,11 @@ class BacsService
             $lines[] = $this->getHeader();
         }
 
-        $this->generatePaymentsDebits($prefix, $date, $metadata, $update);
-
-        /** @var BacsPaymentRepository $repo */
-        $repo = $this->dm->getRepository(BacsPayment::class);
-        $payments = $repo->getAllPendingDebits();
+        $payments = $this->generatePaymentsDebits($prefix, $date, $metadata, $update);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
             $bankAccount = $payment->getPolicy()->getPolicyOrUserBacsBankAccount();
-
-            $validate = $this->validateBacs(
-                $policy,
-                $payment->getDate(),
-                $payment->getId(),
-                $payment->isOneOffPayment()
-            );
-            // rescheduling doesn't make sense in context of already generated payments
-            if (in_array($validate, [self::VALIDATE_SKIP, self::VALIDATE_RESCHEDULE])) {
-                continue;
-            } elseif ($validate == self::VALIDATE_CANCEL) {
-                if ($update) {
-                    $payment->setStatus(BacsPayment::STATUS_SKIPPED);
-                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                }
-
-                continue;
-            }
 
             // we're unable to process for the current date, so ensure its at least tomorrow
             $processingDate = $payment->getDate();
@@ -2267,6 +2273,7 @@ class BacsService
     }
 
     public function exportPaymentsCredits(
+        $prefix,
         \DateTime $date,
         $serialNumber,
         &$metadata,
@@ -2277,10 +2284,8 @@ class BacsService
         if ($includeHeader) {
             $lines[] = $this->getHeader();
         }
-        /** @var PaymentRepository $repo */
-        $repo = $this->dm->getRepository(BacsPayment::class);
 
-        $credits = $repo->getAllPendingCredits();
+        $credits = $this->generatePaymentsCredits($prefix, $date, $metadata, $update);
 
         $metadata['credit-amount'] = 0;
         foreach ($credits as $payment) {
@@ -2477,5 +2482,106 @@ class BacsService
         }
 
         return $tmpFile;
+    }
+
+    /**
+     * Creates a scheduled payment and persists it.
+     * @param Policy           $policy      is the owner of the payment.
+     * @param float            $amount      is the amount of money for the payment.
+     * @param string           $type        is the type property to give the payment.
+     * @param string           $notes       is the text notes to give to the payment.
+     * @param IdentityLog|null $identityLog
+     * @param \DateTime|null   $scheduled   is the time that the payment is scheduled for, defaulting as now.
+     * @return ScheduledPayment the scheduled payment created.
+     */
+    public function scheduleBacsPayment(
+        Policy $policy,
+        $amount,
+        $type,
+        $notes,
+        IdentityLog $identityLog = null,
+        $scheduled = null
+    ) {
+        if (!$scheduled) {
+            $scheduled = new \DateTime();
+        }
+        $scheduledPayment = new ScheduledPayment();
+        // TODO: Validate amount (unless refund)
+        $scheduledPayment->setAmount($amount);
+        $scheduledPayment->setPolicy($policy);
+        $scheduledPayment->setNotes($notes);
+        $scheduledPayment->setScheduled($scheduled);
+        $scheduledPayment->setType($type);
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        if ($identityLog) {
+            $scheduledPayment->setIdentityLog($identityLog);
+        }
+        $policy->addScheduledPayment($scheduledPayment);
+        $this->dm->flush();
+
+        return $scheduledPayment;
+    }
+
+    /**
+     * @param Policy           $policy      is the policy the payment is being made for.
+     * @param float            $amount      is the amount of the payment.
+     * @param string           $notes       is the string to set the payment's notes as.
+     * @param \DateTime|null   $date        is the date that the payment is taking place at.
+     * @param boolean          $update      whether to persist the payment and flush the db.
+     * @param string           $source      sets the payment's source parameter.
+     * @param IdentityLog|null $identityLog
+     * @return BacsPayment which has just been created.
+     */
+    private function bacsPayment(
+        Policy $policy,
+        $amount,
+        $notes,
+        \DateTime $date = null,
+        $update = true,
+        $source = Payment::SOURCE_TOKEN,
+        IdentityLog $identityLog = null
+    ) {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+
+        if (!$amount) {
+            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        }
+        $user = $policy->getPayerOrUser();
+
+        $payment = new BacsPayment();
+        $payment->setDate($date);
+        $payment->setAmount($amount);
+        $payment->setNotes($notes);
+        $payment->setUser($policy->getUser());
+        $payment->setStatus(BacsPayment::STATUS_PENDING);
+        $payment->setSource($source);
+        if ($identityLog) {
+            $payment->setIdentityLog($identityLog);
+        }
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $payment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
+
+        // Admin or user source is always a one off payment
+        if (in_array($source, [Payment::SOURCE_ADMIN, Payment::SOURCE_WEB, Payment::SOURCE_MOBILE])) {
+            $payment->setIsOneOffPayment(true);
+        }
+
+        if (!$policy->hasPolicyOrUserValidPaymentMethod()) {
+            $payment->setStatus(BacsPayment::STATUS_SKIPPED);
+            $this->logger->warning(sprintf(
+                'User %s does not have a valid payment method (Policy %s)',
+                $user->getId(),
+                $policy->getId()
+            ));
+        }
+
+        if ($update) {
+            $policy->addPayment($payment);
+        }
+
+        return $payment;
     }
 }

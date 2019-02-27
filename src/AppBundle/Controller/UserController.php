@@ -1158,12 +1158,13 @@ class UserController extends BaseController
 
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
-            $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
-            $payment->setIdentityLog($this->getIdentityLogWeb($request));
-
-            $this->getManager()->flush();
-
-
+            $bacsService->scheduleBacsPayment(
+                $policy,
+                $amount,
+                ScheduledPayment::TYPE_USER_WEB,
+                $notes,
+                $this->getIdentityLogWeb($request)
+            );
             $this->addFlash('success', 'We will scheduled your payment within the next 3 business days');
 
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));

@@ -60,12 +60,9 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Stats;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\File\ImeiUploadFile;
-use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonalAddress;
-use AppBundle\Document\Form\PurchaseStepPersonal;
-use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
 
 use AppBundle\Form\Type\ImeiUploadFileType;

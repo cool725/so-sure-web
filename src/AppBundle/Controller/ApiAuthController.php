@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Classes\Salva;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\DirectDebitBankException;
@@ -28,6 +28,7 @@ use AppBundle\Form\Type\LaunchType;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Phone;
@@ -41,7 +42,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Document\Connection\Connection;
@@ -1313,11 +1314,15 @@ class ApiAuthController extends BaseController
                         $amount,
                         $now->format(\DateTime::ATOM)
                     );
-
                     /** @var BacsService $bacsService */
                     $bacsService = $this->get('app.bacs');
-                    $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_MOBILE);
-                    $payment->setIdentityLog($this->getIdentityLog($request));
+                    $bacsService->scheduleBacsPayment(
+                        $policy,
+                        $amount,
+                        ScheduledPayment::TYPE_USER_MOBILE,
+                        $notes,
+                        $this->getIdentityLog($request)
+                    );
                     $policy->setPolicyStatusActiveIfUnpaid();
                     $dm->flush();
                 } else {

@@ -2,11 +2,11 @@
 
 namespace AppBundle\Tests;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\IdentityLog;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;

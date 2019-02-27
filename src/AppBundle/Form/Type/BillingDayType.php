@@ -3,7 +3,6 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\BacsPaymentMethod;
-use AppBundle\Document\PaymentMethod;
 use AppBundle\Document\Policy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

@@ -15,7 +15,7 @@ use Judopay;
 
 use AppBundle\Classes\Salva;
 
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Phone;
