@@ -2,7 +2,7 @@
 
 namespace AppBundle\Listener;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\User;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\CardEvent;

@@ -3,7 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Classes\Salva;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\DirectDebitBankException;
@@ -41,7 +41,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Document\Connection\Connection;

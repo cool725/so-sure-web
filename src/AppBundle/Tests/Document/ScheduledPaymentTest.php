@@ -4,12 +4,12 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Tests\UserClassTrait;
 use AppBundle\Document\DateTrait;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\JudoPayment;
 
 /**

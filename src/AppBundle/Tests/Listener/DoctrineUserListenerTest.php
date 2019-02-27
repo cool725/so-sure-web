@@ -2,10 +2,10 @@
 
 namespace AppBundle\Tests\Listener;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\CardEvent;
 use Doctrine\Common\Annotations\AnnotationReader;

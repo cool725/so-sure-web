@@ -3,7 +3,7 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Annotation\DataChange;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\CardEvent;

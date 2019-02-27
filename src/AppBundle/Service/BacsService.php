@@ -2,7 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;

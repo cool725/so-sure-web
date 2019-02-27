@@ -2,7 +2,7 @@
 
 namespace AppBundle\Document\Payment;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;

@@ -12,12 +12,12 @@ use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\User;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\PaymentMethod;
-use AppBundle\Document\BacsPaymentMethod;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Repository\ScheduledPaymentRepository;
 
 /**

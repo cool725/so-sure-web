@@ -1,7 +1,8 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\PaymentMethod;
 
+use AppBundle\Document\BankAccount;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -12,14 +13,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class BacsPaymentMethod extends PaymentMethod
 {
     /**
-     * @MongoDB\EmbedOne(targetDocument="BankAccount")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\BankAccount")
      * @Gedmo\Versioned
      * @var BankAccount
      */
     protected $bankAccount;
 
     /**
-     * @MongoDB\EmbedMany(targetDocument="BankAccount")
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\BankAccount")
      */
     protected $previousBankAccounts = [];
 
