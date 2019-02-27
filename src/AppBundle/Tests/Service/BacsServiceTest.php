@@ -2,10 +2,12 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\PaymentService;
@@ -149,17 +151,6 @@ class BacsServiceTest extends WebTestCase
         return $bankAccount;
     }
 
-    public function testBacsPayment()
-    {
-        $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testBacsPayment', $this));
-        $this->setValidBacsPaymentMethodForPolicy($policy);
-        $payment = static::$bacsService->bacsPayment($policy, 'test', 1.01);
-        $this->assertEquals(1.01, $payment->getAmount());
-        $this->assertEquals('test', $payment->getNotes());
-        $this->assertNull($payment->isSuccess());
-    }
-
     public function testCheckSubmissionFile()
     {
         $passingFile = [self::$bacsService->getHeader()];
@@ -182,6 +173,11 @@ class BacsServiceTest extends WebTestCase
 
     public function testExportPaymentsDebits()
     {
+        $now = \DateTime::createFromFormat('U', time());
+        $oneYear = clone $now;
+        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
+        self::$bacsService->exportPaymentsDebits('TEST', $oneYear, '1', $metaData);
+
         $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
             static::$userManager,
@@ -242,8 +238,65 @@ class BacsServiceTest extends WebTestCase
         static::$dm->flush();
     }
 
+    public function testExportPaymentsCredits()
+    {
+        $now = \DateTime::createFromFormat('U', time());
+        $oneYear = clone $now;
+        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
+        self::$bacsService->exportPaymentsCredits('TEST', $oneYear, '1', $metaData);
+
+        $now = \DateTime::createFromFormat('U', time());
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testExportPaymentsCredits', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $now,
+            true
+        );
+        static::$policyService->setDispatcher(null);
+        static::$policyService->create($policy, $now);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $bacs = $this->setValidBacsPaymentMethodForPolicy($policy, rand(111111, 999999), $now);
+        //$bacs = $this->setValidBacsPaymentMethod($policy->getUser(), null, $now);
+        $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
+        self::$paymentService->confirmBacs($policy, $bacs);
+
+        static::$dm->flush();
+
+        $oneMonth = clone $now;
+        $oneMonth = $oneMonth->add(new \DateInterval('P1M'));
+        $twoMonth = clone $now;
+        $twoMonth = $twoMonth->add(new \DateInterval('P2M'));
+        $threeMonth = clone $now;
+        $threeMonth = $threeMonth->add(new \DateInterval('P3M'));
+
+        $metaData = [];
+
+        $credits = self::$bacsService->exportPaymentsCredits('TEST', $oneMonth, '1', $metaData);
+        $this->assertEquals(0, count($credits));
+        static::$dm->flush();
+
+        self::$bacsService->scheduleBacsPayment($policy, -5, ScheduledPayment::TYPE_REFUND, 'test', null, $now);
+        $credits = self::$bacsService->exportPaymentsCredits('TEST', $now, '1', $metaData);
+        $this->assertEquals(1, count($credits));
+
+    }
+
     public function testExportPaymentsDebitsPreventExpirationAfter()
     {
+        $now = \DateTime::createFromFormat('U', time());
+        $oneYear = clone $now;
+        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
+        self::$bacsService->exportPaymentsDebits('TEST', $oneYear, '1', $metaData);
+
         $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
             static::$userManager,
@@ -278,6 +331,10 @@ class BacsServiceTest extends WebTestCase
 
         $scheduledPayment->setScheduled($afterExpire);
         static::$dm->flush();
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        $scheduledPayment->setScheduled($afterExpire);
+        static::$dm->flush();
+
         $debits = self::$bacsService->exportPaymentsDebits('TEST', $afterExpire, '1', $metaData);
         $this->assertEquals(0, count($debits));
     }

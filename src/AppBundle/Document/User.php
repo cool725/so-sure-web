@@ -1247,6 +1247,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasPolicyCancelledAndPaymentOwed()
     {
         foreach ($this->getAllPolicies() as $policy) {
+            /** @var Policy $policy */
             if ($policy->isCancelledAndPaymentOwed()) {
                 return true;
             }

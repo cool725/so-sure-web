@@ -29,7 +29,11 @@ class ScheduledPayment
 
     const TYPE_SCHEDULED = 'scheduled';
     const TYPE_RESCHEDULED = 'rescheduled';
+    // Refund cancellations should always occur regardless of policy status
+    const TYPE_REFUND = 'refund';
     const TYPE_ADMIN = 'admin';
+    const TYPE_USER_WEB = 'user-web';
+    const TYPE_USER_MOBILE = 'user-mobile';
 
     /**
      * @MongoDB\Id
@@ -51,7 +55,7 @@ class ScheduledPayment
     protected $status;
 
     /**
-     * @Assert\Choice({"scheduled", "rescheduled", "admin"}, strict=true)
+     * @Assert\Choice({"scheduled", "rescheduled", "admin", "user-web", "user-mobile", "refund"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -66,7 +70,7 @@ class ScheduledPayment
     protected $scheduled;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
@@ -93,6 +97,12 @@ class ScheduledPayment
      * @Gedmo\Versioned
      */
     protected $notes;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     * @Gedmo\Versioned
+     */
+    protected $identityLog;
 
     /**
      * If this scheduled payment is a rescheduling of an older scheduled payment, then this field will contain the
@@ -142,6 +152,21 @@ class ScheduledPayment
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getPaymentSource()
+    {
+        if ($this->getType() == self::TYPE_USER_WEB) {
+            return Payment::SOURCE_WEB;
+        } elseif ($this->getType() == self::TYPE_USER_MOBILE) {
+            return Payment::SOURCE_MOBILE;
+        } elseif ($this->getType() == self::TYPE_ADMIN) {
+            return Payment::SOURCE_ADMIN;
+        } elseif ($this->getType() == self::TYPE_REFUND) {
+            return Payment::SOURCE_SYSTEM;
+        } else {
+            return Payment::SOURCE_TOKEN;
+        }
     }
 
     public function setScheduled($scheduled)
@@ -202,6 +227,16 @@ class ScheduledPayment
     public function getNotes()
     {
         return $this->notes;
+    }
+
+    public function getIdentityLog()
+    {
+        return $this->identityLog;
+    }
+
+    public function setIdentityLog($identityLog)
+    {
+        $this->identityLog = $identityLog;
     }
 
     public function setRescheduledScheduledPayment(ScheduledPayment $rescheduledScheduledPayment = null)

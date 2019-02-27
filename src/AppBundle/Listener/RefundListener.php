@@ -2,6 +2,9 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\ScheduledPayment;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
@@ -34,22 +37,28 @@ class RefundListener
     /** @var string */
     protected $environment;
 
+    /** @var BacsService */
+    protected $bacsService;
+
     /**
      * @param DocumentManager $dm
      * @param JudopayService  $judopayService
      * @param LoggerInterface $logger
      * @param string          $environment
+     * @param BacsService     $bacsService
      */
     public function __construct(
         DocumentManager $dm,
         JudopayService $judopayService,
         LoggerInterface $logger,
-        $environment
+        $environment,
+        BacsService $bacsService
     ) {
         $this->dm = $dm;
         $this->judopayService = $judopayService;
         $this->logger = $logger;
         $this->environment = $environment;
+        $this->bacsService = $bacsService;
     }
 
     /**
@@ -140,22 +149,12 @@ class RefundListener
                     $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
                 } elseif ($payment instanceof BacsPayment) {
                     // Refund is a negative payment
-                    $refund = new BacsPayment();
-                    $refund->setAmount(0 - $refundAmount);
-                    $refund->setNotes($notes);
-                    $refund->setSource(Payment::SOURCE_SYSTEM);
-                    $refund->setRefundTotalCommission($refundCommissionAmount);
-                    if ($policy->hasManualBacsPayment()) {
-                        $refund->setManual(true);
-                    }
-                    $refund->setStatus(BacsPayment::STATUS_PENDING);
-                    // TODO: we need to have the refund be successful in order to have the correct
-                    // amount for the policy to send to salva. This is not ideal as its not a successful payment
-                    $refund->setSuccess(true);
-                    $payment->getPolicy()->addPayment($refund);
-                    $this->dm->persist($refund);
-                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                    $this->logger->warning(sprintf('bacs refund due - id %s', $refund->getId()));
+                    $this->bacsService->scheduleBacsPayment(
+                        $policy,
+                        0 - $refundAmount,
+                        ScheduledPayment::TYPE_REFUND,
+                        $notes
+                    );
                 } else {
                     throw new \Exception(sprintf('Unable to refund %s payments', get_class($payment)));
                 }
