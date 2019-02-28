@@ -296,19 +296,19 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $payment = $this->createScheduledPayments(6, $date);
         $this->assertEquals(false, $payment->rescheduledInTime());
         // payment within 30 days.
-        $payment = $payment->getRescheduledScheduledPayment();
+        $payment = $payment->getPreviousAttempt();
         $this->assertEquals(true, $payment->rescheduledInTime());
         // payment within 30 days.
-        $payment = $payment->getRescheduledScheduledPayment();
+        $payment = $payment->getPreviousAttempt();
         $this->assertEquals(true, $payment->rescheduledInTime());
         // payment within 30 days.
-        $payment = $payment->getRescheduledScheduledPayment();
+        $payment = $payment->getPreviousAttempt();
         $this->assertEquals(true, $payment->rescheduledInTime());
         // payment within 30 days.
-        $payment = $payment->getRescheduledScheduledPayment();
+        $payment = $payment->getPreviousAttempt();
         $this->assertEquals(true, $payment->rescheduledInTime());
         // original payment which is not rescheduled so it is null.
-        $payment = $payment->getRescheduledScheduledPayment();
+        $payment = $payment->getPreviousAttempt();
         $this->assertNull($payment->rescheduledInTime());
     }
 

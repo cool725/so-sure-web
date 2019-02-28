@@ -1190,7 +1190,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
         ];
     }
-    
+
     /**
      * @Route("/policy/{id}/p", name="admin_payment_redirect")
      */
@@ -1861,8 +1861,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $policy->addPolicyFile($paymentRequestFile);
                         $scheduledPayment->adminReschedule();
-                        if ($scheduledPayment->getRescheduledScheduledPayment()) {
-                            $scheduledPayment->setRescheduledScheduledPayment(null);
+                        if ($scheduledPayment->getPreviousAttempt()) {
+                            $scheduledPayment->setPreviousAttempt(null);
                         }
                         if ($scheduledPayment->getPayment()) {
                             $scheduledPayment->setPayment(null);

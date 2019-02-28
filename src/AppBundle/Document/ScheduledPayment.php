@@ -111,7 +111,7 @@ class ScheduledPayment
      * @Gedmo\Versioned
      * @var ScheduledPayment|null
      */
-    protected $rescheduledScheduledPayment;
+    protected $previousAttempt;
 
     public function __construct()
     {
@@ -239,14 +239,14 @@ class ScheduledPayment
         $this->identityLog = $identityLog;
     }
 
-    public function setRescheduledScheduledPayment(ScheduledPayment $rescheduledScheduledPayment = null)
+    public function setPreviousAttempt(ScheduledPayment $previousAttempt = null)
     {
-        $this->rescheduledScheduledPayment = $rescheduledScheduledPayment;
+        $this->previousAttempt = $previousAttempt;
     }
 
-    public function getRescheduledScheduledPayment()
+    public function getPreviousAttempt()
     {
-        return $this->rescheduledScheduledPayment;
+        return $this->previousAttempt;
     }
 
     public function cancel()
@@ -283,7 +283,7 @@ class ScheduledPayment
         $rescheduled->setAmount($this->getAmount());
         $rescheduled->setStatus(self::STATUS_SCHEDULED);
         $rescheduled->setScheduled($date);
-        $rescheduled->setRescheduledScheduledPayment($this);
+        $rescheduled->setPreviousAttempt($this);
         return $rescheduled;
     }
 
@@ -396,8 +396,8 @@ class ScheduledPayment
         }
         $origin = $this;
         $limiter = 0;
-        while ($origin->getRescheduledScheduledPayment() && $limiter < 100) {
-            $origin = $origin->getRescheduledScheduledPayment();
+        while ($origin->getPreviousAttempt() && $limiter < 100) {
+            $origin = $origin->getPreviousAttempt();
             $limiter++;
         }
         if ($origin == $this || $limiter == 100) {
