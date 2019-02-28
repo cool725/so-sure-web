@@ -6,6 +6,9 @@
 {% block title %}so-sure - Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %}{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    {% if affiliate_page == 'so-sure-compared' %}
+        <link rel="canonical" href="{{ url('homepage') }}" />
+    {% endif %}
 {% endblock %}
 
 {% block cssPage %}
