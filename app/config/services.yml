@@ -477,6 +477,14 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.twig.policy:
+        class: AppBundle\Service\PolicyTwigExtension
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     app.twig.request:
         class: AppBundle\Service\RequestTwigExtension
         arguments:

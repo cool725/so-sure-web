@@ -17,6 +17,7 @@
                     <thead class="thead-light">
                     <tr>
                         <th>Policy</th>
+                        <th>Current Status</th>
                         <th>Validation</th>
                         <th>Action</th>
                     </tr>
@@ -34,6 +35,9 @@
                                href="{{ path('admin_policy', {'id': validate.id}) }}">
                                 {{ validate.policyNumber }}
                             </a>
+                        </td>
+                        <td>
+                            {{ get_policy(validate.id).status }}
                         </td>
                         <td>
                             <ul>
