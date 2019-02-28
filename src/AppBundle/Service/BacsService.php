@@ -168,6 +168,8 @@ class BacsService
     /** @var SftpService */
     protected $accesspaySftpService;
 
+    protected $warnings;
+
     /**
      * @param DocumentManager          $dm
      * @param LoggerInterface          $logger
@@ -1917,6 +1919,7 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
+        $this->warnings = [];
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
             $prefix,
             BacsPaymentMethod::class,
@@ -1978,6 +1981,7 @@ class BacsService
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             }
         }
+        $this->notifyWarnings();
 
         return $payments;
     }
@@ -1989,6 +1993,7 @@ class BacsService
         $update = true
     ) {
         $payments = [];
+        $this->warnings = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
         $advanceDate = clone $date;
@@ -2056,7 +2061,24 @@ class BacsService
             }
         }
 
+        $this->notifyWarnings();
+
         return $payments;
+    }
+
+    private function notifyWarnings()
+    {
+        if (!is_array($this->warnings)) {
+            return;
+        }
+
+        $this->mailerService->send(
+            'Bacs Warnings',
+            'tech+ops@so-sure.com',
+            join('<br>', $this->warnings)
+        );
+
+        $this->warnings = null;
     }
 
     /**
@@ -2111,7 +2133,7 @@ class BacsService
                 $id,
                 $bankAccount->getMandateStatus()
             );
-            $this->logger->warning($msg);
+            $this->warnings[] = $msg;
 
             return self::VALIDATE_CANCEL;
         } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
@@ -2124,7 +2146,7 @@ class BacsService
             if ($bankAccount->isFirstPayment()) {
                 $this->logger->info($msg);
             } else {
-                $this->logger->warning($msg);
+                $this->warnings[] = $msg;
             }
 
             return self::VALIDATE_SKIP;
@@ -2137,7 +2159,7 @@ class BacsService
                     $id,
                     $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
                 );
-                $this->logger->error($msg);
+                $this->warnings[] = $msg;
 
                 return self::VALIDATE_RESCHEDULE;
             }
@@ -2147,7 +2169,7 @@ class BacsService
                 $id,
                 $e->getMessage()
             );
-            $this->logger->error($msg);
+            $this->warnings[] = $msg;
 
             return self::VALIDATE_RESCHEDULE;
         }
@@ -2160,7 +2182,7 @@ class BacsService
                     'Skipping (scheduled) payment %s as payment date is after expiration date',
                     $id
                 );
-                $this->logger->error($msg);
+                $this->warnings[] = $msg;
 
                 return self::VALIDATE_SKIP;
             }
@@ -2172,7 +2194,7 @@ class BacsService
                 $policy->getId()
             );
             // @codingStandardsIgnoreEnd
-            $this->logger->error($msg);
+            $this->warnings[] = $msg;
 
             // continue with other logic
         }
@@ -2194,7 +2216,7 @@ class BacsService
                     $bankAccount->isFirstPayment() ? 'yes' : 'no'
                 );
                 // @codingStandardsIgnoreEnd
-                $this->logger->error($msg);
+                $this->warnings[] = $msg;
 
                 return self::VALIDATE_SKIP;
             }
