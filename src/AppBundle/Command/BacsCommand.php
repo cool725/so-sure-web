@@ -168,7 +168,7 @@ class BacsCommand extends ContainerAwareCommand
         }
 
         $creditPayments = [];
-        $runCredits = $this->bacsService->hasPaymentCredit();
+        $runCredits = $this->bacsService->hasPaymentCredits($prefix, $processingDate);
         if ($onlyDebits) {
             $runCredits = false;
         }

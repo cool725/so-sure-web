@@ -1783,14 +1783,33 @@ class BacsService
         return false;
     }
 
-    public function hasPaymentCredit()
+    public function hasPaymentCredits($prefix, \DateTime $date = null)
     {
-        /** @var PaymentRepository $repo */
-        $repo = $this->dm->getRepository(BacsPayment::class);
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
 
-        $credits = $repo->getAllPendingCredits();
+        $advanceDate = clone $date;
+        $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
-        return count($credits) > 0;
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            $prefix,
+            BacsPaymentMethod::class,
+            $advanceDate,
+            false
+        );
+        foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            /** @var BacsPaymentMethod $bacs */
+            $bacs = $scheduledPayment->getPolicy()->getPolicyOrUserBacsPaymentMethod();
+            if (!$bacs || !$bacs->getBankAccount()) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function exportMandates(\DateTime $date, $serialNumber, $includeHeader = false, $update = true)
@@ -2313,7 +2332,7 @@ class BacsService
             /* @var BacsPayment $payment */
 
             /** @var BacsPaymentMethod $bacs */
-            $bacs = $payment->getPolicy()->getPolicyOrUserBacsPaymentMethod();
+            $bacs = $payment->getPolicy() ? $payment->getPolicy()->getPolicyOrUserBacsPaymentMethod() : null;
             if (!$bacs || !$bacs->getBankAccount()) {
                 $msg = sprintf(
                     'Skipping payment %s as unable to determine payment method or missing bank account',

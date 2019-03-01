@@ -84,15 +84,6 @@ class PaymentRepository extends DocumentRepository
             ->execute();
     }
 
-    public function getAllPendingDebits()
-    {
-        return $this->createQueryBuilder()
-            ->field('status')->equals(BacsPayment::STATUS_PENDING)
-            ->field('amount')->gt(0)
-            ->getQuery()
-            ->execute();
-    }
-
     public function getAllPendingCredits()
     {
         return $this->createQueryBuilder()
