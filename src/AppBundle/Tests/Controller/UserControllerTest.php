@@ -888,8 +888,11 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, false);
         self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo, false, 12);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_SUCCESS);
@@ -934,14 +937,16 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $this->assertContains('Payment is processing', $crawler->html());
 
+        /** @var Policy $updatedPolicy */
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var Policy $updatedPolicy */
         $updatedPolicy = $repo->find($policy->getId());
-
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
+
+        $this->assertContains('Payment is processing', $crawler->html());
+
         $crawler = self::$client->request('GET', '/user/payment-details');
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect('/user/unpaid'));
@@ -969,8 +974,11 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
         self::setPaymentMethodForPolicy($policy);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
@@ -1042,8 +1050,11 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
         self::setPaymentMethodForPolicy($policy);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         static::addPayment(
             $policy,
@@ -1057,6 +1068,7 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_FAILED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
@@ -1133,13 +1145,18 @@ class UserControllerTest extends BaseControllerTest
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
+
         self::setPaymentMethodForPolicy($policy, '0101');
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
         $this->assertEquals(Policy::UNPAID_JUDO_CARD_EXPIRED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 

@@ -973,7 +973,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPhone($phone, null, null, ReceperioService::TEST_INVALID_SERIAL);
 
         self::verifyResponse(200);
-        $this->expectFlashError($crawler, 'phone model');
+        $this->expectFlashError($crawler, 'we are unable to insure you');
     }
 
     public function testPurchaseReviewNotIOSWithNoPhoneSession()

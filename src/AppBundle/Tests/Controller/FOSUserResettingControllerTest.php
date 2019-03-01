@@ -219,11 +219,6 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         sleep(1);
         $reset = $this->resetPassword($email);
         $this->setPassword($reset['url'], 'foooBarr3!', true);
-
-        // now 1st complex password - should be re-allowed and succeed and redirect
-        sleep(1);
-        $reset = $this->resetPassword($email);
-        $this->setPassword($reset['url'], 'foooBarr1!', true);
     }
 
     public function testPasswordResetLockedUser()

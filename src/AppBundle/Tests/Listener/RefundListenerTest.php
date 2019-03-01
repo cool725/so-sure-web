@@ -344,29 +344,10 @@ class RefundListenerTest extends WebTestCase
         );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
         $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
-        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
-
-        $total = Payment::sumPayments($policy->getPayments(), false);
-        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-
-        // bacs initial, bacs refund for cancellation
-        $this->assertEquals(2, count($policy->getPayments()));
-
-        $foundRefund = false;
-        foreach ($policy->getPayments() as $payment) {
-            if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
-                $this->assertEquals($now, $payment->getDate());
-                $this->assertTrue($payment->isManual());
-                $this->assertTrue($payment->isSuccess());
-                $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
-                $foundRefund = true;
-            }
-        }
-        $this->assertTrue($foundRefund);
+        $this->assertTrue($this->areEqualToTwoDp(0 - $scheduledPayment->getAmount(), $totalBacs['total']));
     }
 
     public function testRefundListenerBacsCancelledCooloffYearlyNonManual()
@@ -406,29 +387,10 @@ class RefundListenerTest extends WebTestCase
         );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
         $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
-        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
-
-        $total = Payment::sumPayments($policy->getPayments(), false);
-        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-
-        // bacs initial, bacs refund for cancellation
-        $this->assertEquals(2, count($policy->getPayments()));
-
-        $foundRefund = false;
-        foreach ($policy->getPayments() as $payment) {
-            if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
-                $this->assertEquals($now, $payment->getDate());
-                $this->assertNull($payment->isManual());
-                $this->assertTrue($payment->isSuccess());
-                $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
-                $foundRefund = true;
-            }
-        }
-        $this->assertTrue($foundRefund);
+        $this->assertTrue($this->areEqualToTwoDp(0 - $scheduledPayment->getAmount(), $totalBacs['total']));
     }
 
     public function testRefundFreeNovPromo()
