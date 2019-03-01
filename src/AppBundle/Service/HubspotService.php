@@ -29,7 +29,7 @@ class HubspotService
 
     const QUEUE_UPDATE_USER = 'create-user';
     const QUEUE_DELETE_USER = 'delete-user';
-    const QUEUE_UPDATE_DEAL = 'update-deal';
+    const QUEUE_UPDATE_POLICY = 'update-policy';
 
     const PIPELINE_NAME = 'SoSure Policies';
 
@@ -104,7 +104,6 @@ class HubspotService
     public function createOrUpdateContact(User $user)
     {
         $hubspotUserArray = $this->buildHubspotUserData($user);
-        print_r($hubspotUserArray);
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
         $response = $this->validateResponse($response, [200, 204]);
         if ($user->getHubspotId() !== $response->vid) {
@@ -248,6 +247,7 @@ class HubspotService
     {
         // TODO: complains when you make the same pipeline twice, should update the pipeline.
         $response = $this->client->dealPipelines()->create($pipeline);
+        echo $response->getBody();
         $this->validateResponse($response, [200, 409]);
     }
 
@@ -273,7 +273,7 @@ class HubspotService
                     $this->deleteDeal($policy);
                 }
                 break;
-            case self::QUEUE_UPDATE_DEAL:
+            case self::QUEUE_UPDATE_POLICY:
                 $user = $this->userFromMessage($message);
                 $this->createOrUpdateDeal($policy);
                 break;
@@ -372,11 +372,11 @@ class HubspotService
                 "associatedVids" => [$policy->getUser()->getHubspotId()]
             ],
             "properties" => [
-                $this->buildProperty("dealname", $policy->getPolicyNumber()),
-                $this->buildProperty("dealstage", $stage),
-                $this->buildProperty("pipeline", self::PIPELINE_NAME),
-                $this->buildProperty("payment_type", $policy->getPaymentType()),
-                $this->buildProperty("start", $policy->getStart()->format("U"))
+                $this->buildDealProperty("pipeline", "so-sure-policies"),
+                $this->buildDealProperty("dealname", $policy->getPolicyNumber()),
+                $this->buildDealProperty("dealstage", $stage),
+                $this->buildDealProperty("payment_type", $policy->getPaymentType()),
+                $this->buildDealProperty("start", $policy->getStart()->format("U"))
                 // TODO: Probably going to want more deal properties.
                 //       Would be nice to use the premium value as the deal amount maybe.
             ]
@@ -467,5 +467,16 @@ class HubspotService
     private function buildProperty($name, $value)
     {
         return ["property" => $name, "value" => $value ?: ""];
+    }
+
+    /**
+     * Puts a single property into the format that hubspot wants to receive it as for a deal.
+     * @param string $name  is the name of the property.
+     * @param mixed  $value is the object that the property consists of.
+     * @return array with the property.
+     */
+    private function buildDealProperty($name, $value)
+    {
+        return ["name" => $name, "value" => $value ?: ""];
     }
 }

@@ -32,7 +32,7 @@ class HubspotListener
      */
     public function onUserCreatedEvent(UserEvent $event)
     {
-        $this->hubspotService->queueContact($event->getUser());
+        $this->hubspotService->queueUpdateContact($event->getUser());
     }
 
     /**
@@ -41,7 +41,7 @@ class HubspotListener
      */
     public function onUserUpdatedEvent(UserEvent $event)
     {
-        $this->hubspotService->queueContact($event->getUser());
+        $this->hubspotService->queueUpdateContact($event->getUser());
     }
 
     /**
@@ -50,10 +50,10 @@ class HubspotListener
      */
     public function onUserPaymentFailedEvent(UserPaymentEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateContact($event->getPolicy()->getUser());
         /*
         TODO: apparantly event is unused but do this anyway.
-        $this->hubspotService->queueContact(
+        $this->hubspotService->queueUpdateContact(
             $event->getUser(),
             HubspotService::QUEUE_EVENT_USER_PAYMENT_FAILED,
             ['reason' => $event->getReason()]
@@ -67,7 +67,7 @@ class HubspotListener
      */
     public function onPolicyPotEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
         // TODO: hubspot event
     }
 
@@ -77,7 +77,7 @@ class HubspotListener
      */
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
         // $this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_CANCELLED);
     }
 
@@ -87,7 +87,7 @@ class HubspotListener
      */
     public function onPolicyPendingRenewedEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueContact($event->getPolicy());
         //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_PENDING_RENEWAL);
     }
 
@@ -97,7 +97,7 @@ class HubspotListener
      */
     public function onPolicyRenewedEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateDeal($event->getPolicy()->getUser());
         //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_RENEWED);
     }
 
@@ -107,7 +107,7 @@ class HubspotListener
      */
     public function onPolicyStartEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueContact($event->getPolicy());
         //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_START);
 
         // Eventually we want to migrate users to the policy started event
@@ -122,7 +122,7 @@ class HubspotListener
      */
     public function onPolicyUnpaidEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
     }
 
     /**
@@ -131,7 +131,7 @@ class HubspotListener
      */
     public function onPolicyReactivatedEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
     }
 
     /**
@@ -140,8 +140,8 @@ class HubspotListener
      */
     public function onInvitationAcceptedEvent(InvitationEvent $event)
     {
-        $this->hubspotService->queueContact($event->getInvitation()->getInviter());
-        $this->hubspotService->queueContact($event->getInvitation()->getInvitee());
+        $this->hubspotService->queueUpdateContact($event->getInvitation()->getInviter());
+        $this->hubspotService->queueUpdateContact($event->getInvitation()->getInvitee());
     }
 
     /**
@@ -150,7 +150,7 @@ class HubspotListener
      */
     public function onPaymentSuccessEvent(PaymentEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPayment()->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateContact($event->getPayment()->getPolicy()->getUser());
         //$this->hubspotService->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_SUCCESS);
     }
 
@@ -160,7 +160,7 @@ class HubspotListener
      */
     public function onPaymentFailedEvent(PaymentEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPayment()->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateContact($event->getPayment()->getPolicy()->getUser());
         //$this->hubspotService->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_FAILED);
     }
 
@@ -173,7 +173,7 @@ class HubspotListener
         // We have a few new properties on the user that are required for the payment first problem
         // Resync user for now to ensure everything is present.
         // Eventually can be removed if all users are re-synced or if enough time has elapsed (1 year?)
-        $this->hubspotService->queueContact($event->getPayment()->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateContact($event->getPayment()->getPolicy()->getUser());
         //$this->hubspotService->queuePayment($event->getPayment(), HubspotService::QUEUE_EVENT_PAYMENT_FIRST_PROBLEM);
     }
 }

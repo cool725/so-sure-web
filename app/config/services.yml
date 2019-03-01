@@ -1141,6 +1141,8 @@ services:
 
     app.listener.hubspot:
         class: AppBundle\Listener\HubspotListener
+        arguments:
+            - "@app.hubspot"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }

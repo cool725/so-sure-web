@@ -303,18 +303,17 @@ class HubspotCommand extends ContainerAwareCommand
      */
     private function buildPipeline()
     {
-        // TODO: they need to have ordering numbers because they are currently in random order on hubspot.
         return [
-            "pipelineId" => "sosure_policies",
+            "pipelineId" => "bongocom",
             "label" => "So-Sure Policies",
             "active" => true,
             "stages" => [
-                ["stagedId" => "pre-pending", "label" => "Pre Pending"],
-                ["stagedId" => "pending", "label" => "Pending"],
-                ["stagedId" => "active", "label" => "Active"],
-                ["stagedId" => "unpaid", "label" => "Unpaid"],
-                ["stagedId" => "expired", "label" => "Expired"],
-                ["stagedId" => "cancelled", "label" => "Cancelled"]
+                ["stagedId" => "pre-pending", "label" => "Pre Pending", "displayOrder" => 0],
+                ["stagedId" => "pending", "label" => "Pending", "displayOrder" => 1],
+                ["stagedId" => "active", "label" => "Active", "displayOrder" => 2],
+                ["stagedId" => "unpaid", "label" => "Unpaid", "displayOrder" => 3],
+                ["stagedId" => "expired", "label" => "Expired", "displayOrder" => 4],
+                ["stagedId" => "cancelled", "label" => "Cancelled", "displayOrder" => 5]
             ]
         ];
     }
