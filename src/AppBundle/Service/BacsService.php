@@ -2015,13 +2015,11 @@ class BacsService
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             $policy = $scheduledPayment->getPolicy();
 
-            // If admin has rescheduled, then allow payment to go through, but should be manually approved
-            $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN;
             $validate = $this->validateBacs(
                 $policy,
                 $scheduledDate,
                 $scheduledPayment,
-                $ignoreNotEnoughTime
+                true
             );
             if ($validate == self::VALIDATE_SKIP) {
                 continue;
