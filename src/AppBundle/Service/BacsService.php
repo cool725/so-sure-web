@@ -2002,7 +2002,8 @@ class BacsService
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
             $prefix,
             BacsPaymentMethod::class,
-            $advanceDate
+            $advanceDate,
+            false
         );
         $metadata['credit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {

@@ -101,8 +101,12 @@ class PaymentService
         $this->mailer->setMailer($mailer);
     }
 
-    public function getAllValidScheduledPaymentsForType($prefix, $type, \DateTime $scheduledDate = null)
-    {
+    public function getAllValidScheduledPaymentsForType(
+        $prefix,
+        $type,
+        \DateTime $scheduledDate = null,
+        $validateBillable = true
+    ) {
         $results = [];
 
         /** @var ScheduledPaymentRepository $repo */
@@ -110,7 +114,7 @@ class PaymentService
         $scheduledPayments = $repo->findScheduled($scheduledDate);
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
-            if (!$scheduledPayment->isBillable()) {
+            if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
