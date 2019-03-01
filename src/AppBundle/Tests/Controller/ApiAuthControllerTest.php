@@ -2391,11 +2391,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         // not yet paid
         $this->assertEquals(0, count($data['premium_payments']['paid']));
         /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $data['id']);
+        //\Doctrine\Common\Util\Debug::dump($updatedPolicy);
         $found = false;
-        foreach ($updatedPolicy->getAllPayments() as $payment) {
-            /** @var Payment $payment */
-            if ($payment->getAmount() == 5) {
+        foreach ($updatedPolicy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED) as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            if ($this->areEqualToTwoDp($scheduledPayment->getAmount(), 5)) {
                 $found = true;
             }
         }
@@ -2418,7 +2419,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         static::$dm->flush();
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, $twoMonthsAgo, false);
+
+        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, $twoMonthsAgo, true, 12);
+        static::$policyService->setEnvironment('test');
+
         $this->assertFalse($policy->isPolicyPaidToDate());
         $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
 

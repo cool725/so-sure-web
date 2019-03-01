@@ -13,6 +13,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Lead;
@@ -46,6 +47,8 @@ class PhonePolicyTest extends WebTestCase
     protected static $invitationService;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var BacsService */
+    protected static $bacsService;
 
     public static function setUpBeforeClass()
     {
@@ -69,6 +72,10 @@ class PhonePolicyTest extends WebTestCase
         self::$invitationService = $invitationService;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
+
+        /** @var BacsService $bacsService */
+        $bacsService = self::$container->get('app.bacs');
+        self::$bacsService = $bacsService;
     }
 
     public function setUp()
@@ -5539,7 +5546,19 @@ class PhonePolicyTest extends WebTestCase
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
+        $scheduledPayment = self::$bacsService->scheduleBacsPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            ScheduledPayment::TYPE_USER_WEB,
+            ''
+        );
+        $this->assertEquals(
+            Policy::UNPAID_BACS_PAYMENT_PENDING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
         // add an ontime payment
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
         $payment = self::addBacsPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
@@ -5682,7 +5701,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->init($user, self::getLatestPolicyTerms(static::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 9999));
         $policy->setImei(rand(1, 999999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(rand(1, 999999));

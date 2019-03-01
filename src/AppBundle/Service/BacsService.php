@@ -2526,7 +2526,7 @@ class BacsService
         $scheduled = null
     ) {
         if (!$scheduled) {
-            $scheduled = new \DateTime();
+            $scheduled = $this->now();
         }
         $scheduledPayment = new ScheduledPayment();
         // TODO: Validate amount (unless refund)

@@ -507,6 +507,11 @@ class PurchaseController extends BaseController
                             ])
                         );
                     }
+                } else {
+                    //$this->addFlash('error', sprintf('%s', $purchaseForm->getErrors()));
+                    $this->addFlash('error', sprintf(
+                        'Sorry, there seems to be an error. Please check below for further details.'
+                    ));
                 }
             }
         }

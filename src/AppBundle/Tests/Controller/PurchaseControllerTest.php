@@ -266,8 +266,29 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPhone($phone, $policy1->getImei());
 
         self::verifyResponse(302);
+        $this->assertRedirectionPathPartial('/purchase/step-pledge');
+    }
+
+    public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyExisting()
+    {
+        $phone = $this->getRandomPhoneAndSetSession();
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyExisting', $this),
+            'foo',
+            $phone
+        );
+        $policy1 = self::initPolicy($user, self::$dm, $phone);
+        sleep(1);
+        $policy2 = self::initPolicy($user, self::$dm, $phone);
+
+        $this->login($user->getEmail(), 'foo', 'user/invalid');
+
+        $crawler = $this->setPhone($phone, $policy1->getImei(), null, null, $policy1);
+        self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect(
-            sprintf('/purchase/step-phone/%s', $policy1->getId())
+            sprintf('/purchase/step-pledge/%s', $policy1->getId())
         ));
     }
 
@@ -1289,10 +1310,15 @@ class PurchaseControllerTest extends BaseControllerTest
         Phone $phone,
         $imei = null,
         $crawler = null,
-        $serialNumber = null
+        $serialNumber = null,
+        Policy $policy = null
     ) {
         if (!$crawler) {
-            $crawler = self::$client->request('GET', '/purchase/step-phone');
+            if ($policy) {
+                $crawler = self::$client->request('GET', sprintf('/purchase/step-phone/%s', $policy->getId()));
+            } else {
+                $crawler = self::$client->request('GET', '/purchase/step-phone');
+            }
         }
         //print $crawler->html();
         $form = $crawler->selectButton('purchase_form[next]')->form();

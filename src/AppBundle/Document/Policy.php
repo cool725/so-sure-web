@@ -5198,11 +5198,15 @@ abstract class Policy
             return self::UNPAID_PAID;
         }
 
+
+        $nextScheduledPayment = $this->getNextScheduledPayment();
         $lastPaymentCredit = $this->getLastPaymentCredit();
         $lastPaymentInProgress = false;
         $lastPaymentFailure = false;
         if ($this->hasPolicyOrUserBacsPaymentMethod()) {
-            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+            if ($nextScheduledPayment && $nextScheduledPayment->getScheduled() <= $this->now()) {
+                $lastPaymentInProgress = $nextScheduledPayment->getStatus() == ScheduledPayment::TYPE_SCHEDULED;
+            } elseif ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
                 /** @var BacsPayment $lastPaymentCredit */
                 $lastPaymentInProgress = $lastPaymentCredit->inProgress();
                 $lastPaymentFailure = $lastPaymentCredit->getStatus() == BacsPayment::STATUS_FAILURE;

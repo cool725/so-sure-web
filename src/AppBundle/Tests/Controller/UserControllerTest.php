@@ -10,6 +10,7 @@ use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Service\FeatureService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -647,18 +648,23 @@ class UserControllerTest extends BaseControllerTest
         );
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
+        //$oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        //$twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, false);
         self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_FAILURE);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo, false, 12);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         self::$dm->flush();
 
         $this->assertEquals(Policy::UNPAID_BACS_MANDATE_INVALID, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
+        //show_judo and webpay_action and webpay_reference and amount
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
@@ -737,8 +743,11 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, false);
         self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo, false, 12);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_FAILURE);
@@ -783,16 +792,13 @@ class UserControllerTest extends BaseControllerTest
         $updatedPolicy = $this->assertPolicyExists($this->getContainer(true), $policy);
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
-        $payment = $updatedPolicy->getLastPaymentCredit();
-        $this->assertNotNull($payment);
-        if ($payment) {
-            $this->assertTrue($payment instanceof BacsPayment);
-            /** @var BacsPayment $bacsPayment */
-            $bacsPayment = $payment;
-            $this->assertEquals(BacsPayment::STATUS_PENDING, $bacsPayment->getStatus());
-            $this->assertNotNull($payment->getIdentityLog());
-            $this->assertEquals(IdentityLog::SDK_WEB, $payment->getIdentityLog()->getSdk());
-            $this->assertNotNull($payment->getIdentityLog()->getIp());
+        $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
+        $this->assertNotNull($scheduledPayment);
+        if ($scheduledPayment) {
+            $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
+            $this->assertNotNull($scheduledPayment->getIdentityLog());
+            $this->assertEquals(IdentityLog::SDK_WEB, $scheduledPayment->getIdentityLog()->getSdk());
+            $this->assertNotNull($scheduledPayment->getIdentityLog()->getIp());
         }
     }
 
@@ -814,8 +820,11 @@ class UserControllerTest extends BaseControllerTest
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P5D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, false, false);
         self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo, false, 12);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         $payment = static::addBacsPayPayment($policy, $twoMonthsAgo, true);
         $payment->setStatus(BacsPayment::STATUS_SUCCESS);

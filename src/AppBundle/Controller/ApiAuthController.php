@@ -1267,6 +1267,18 @@ class ApiAuthController extends BaseController
                         null,
                         $this->getIdentityLog($request)
                     );
+                } else {
+                    if (!$policy->arePolicyScheduledPaymentsCorrect()) {
+                        /** @var BacsService $bacsService */
+                        $bacsService = $this->get('app.bacs');
+                        $bacsService->scheduleBacsPayment(
+                            $policy,
+                            $initialAmount,
+                            ScheduledPayment::TYPE_USER_MOBILE,
+                            'Payment confirmed via api',
+                            $this->getIdentityLog($request)
+                        );
+                    }
                 }
 
                 /** @var PaymentService $paymentService */

@@ -448,6 +448,13 @@ class BaseControllerTest extends WebTestCase
         $this->assertEquals($path, $responseTargetUrl, "Expected '$path' to match '{$responseTargetUrl}'");
     }
 
+    protected function assertRedirectionPathPartial(string $path)
+    {
+        $responseTargetUrl = $this->getClientResponse()->getTargetUrl();
+
+        $this->assertContains($path, $responseTargetUrl, "Expected '$path' to contain '{$responseTargetUrl}'");
+    }
+
     /**
      * @deprecated prefer assertRedirectionPath
      */
