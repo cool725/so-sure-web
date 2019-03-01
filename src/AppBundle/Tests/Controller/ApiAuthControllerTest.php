@@ -4347,28 +4347,38 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testReceivedInvitationAppears()
     {
-        $user = self::createUser(
+        $userInviter = self::createUser(
             self::$userManager,
-            self::generateEmail('testReceivedInvitationAppears', $this),
+            self::generateEmail('testReceivedInvitationAppears-inviter', $this),
             'foo'
         );
-        $cognitoIdentityId = $this->getAuthUser($user);
+        $userInvitee = self::createUser(
+            self::$userManager,
+            self::generateEmail('testReceivedInvitationAppears-invitee', $this),
+            'foo'
+        );
 
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $cognitoIdentityId = $this->getAuthUser($userInvitee);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $userInvitee);
         $data = $this->verifyResponse(200);
+        $this->payPolicy($userInvitee, $data['id']);
 
-        $this->payPolicy($user, $data['id']);
+        $cognitoIdentityId = $this->getAuthUser($userInviter);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $userInviter);
+        $data = $this->verifyResponse(200);
+        $this->payPolicy($userInviter, $data['id']);
+
         $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $data['id']);
 
-        //print sprintf("Invite from %s to %s", self::$testUser2->getName(), self::$testUser->getName());
+        //print sprintf("Invite from %s to %s", $userInviter->getName(), $userInvitee->getName());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'email' => self::$testUser->getEmail(),
-            'name' => self::$testUser->getName(),
+            'email' => $userInvitee->getEmail(),
+            'name' => $userInvitee->getName(),
         ]);
         $invitationData = $this->verifyResponse(200);
 
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s?_method=GET&debug=true', self::$testUser->getId());
+        $cognitoIdentityId = $this->getAuthUser($userInvitee);
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET&debug=true', $userInvitee->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $userData = $this->verifyResponse(200);
         $this->assertTrue(count($userData['received_invitations']) > 0);
@@ -4376,13 +4386,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         foreach ($userData['received_invitations'] as $invitation) {
             if ($invitation['id'] == $invitationData['id']) {
                 $foundInvitation = true;
-                $this->assertEquals(self::$testUser2->getId(), $invitation['inviter_id']);
-                // http://aruljohn.com/gravatar/
-                // bar@auth-api.so-sure.com (testUser2) -> 0b1cac52ee6250748998bf4e2ccc29b1
-                $this->assertEquals(
-                    'https://www.gravatar.com/avatar/0b1cac52ee6250748998bf4e2ccc29b1?d=404&s=100',
-                    $invitation['image_url']
-                );
+                $this->assertEquals($userInviter->getId(), $invitation['inviter_id']);
             }
         }
         $this->assertTrue($foundInvitation);
