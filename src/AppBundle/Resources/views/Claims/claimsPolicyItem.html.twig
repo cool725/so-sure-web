@@ -873,8 +873,8 @@
                     <td>{{ policy.user.latestAttribution }}</td>
                 </tr>
                 <tr>
-                    <td>Policy Cancelled And Payment Owed</td>
-                    <td>{{ policy.user.hasPolicyCancelledAndPaymentOwed }}</td>
+                    <td>Chase Payment<br> (Policy Cancelled w/Successful Claim)</td>
+                    <td>{% if policy.user.hasPolicyCancelledAndPaymentOwed %}Yes{% else %}No{% endif %}</td>
                 </tr>
             </table>
             {% if policy.namedUser %}
