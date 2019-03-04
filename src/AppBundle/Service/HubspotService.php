@@ -18,7 +18,7 @@ use SevenShores\Hubspot\Factory as HubspotFactory;
 use SevenShores\Hubspot\Resources\Contacts;
 use SevenShores\Hubspot\Resources\DealPipelines;
 use SevenShores\Hubspot\Exceptions\BadRequest;
-use GuzzleHttp\Psr7\Response;
+use SevenShores\Hubspot\Http\Response;
 
 /**
  * Provides the primary hubspot functionality.
@@ -105,9 +105,9 @@ class HubspotService
     {
         $hubspotUserArray = $this->buildHubspotUserData($user);
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        $response = $this->validateResponse($response, [200, 204]);
-        if ($user->getHubspotId() !== $response->vid) {
-            $user->setHubspotId($response->vid);
+        $this->validateResponse($response, [200, 204]);
+        if ($user->getHubspotId() !== $response["\$vid"]) {
+            $user->setHubspotId($response["\$vid"]);
             $this->dm->flush();
         }
         return $user->getHubspotId();
@@ -131,9 +131,9 @@ class HubspotService
         if (!$policy->getHubspotId()) {
             $response = $this->client->deals()->create($hubspotPolicyArray);
             $response = $this->validateResponse($response, 200);
-            $policy->setHubspotId($response->dealId);
+            $policy->setHubspotId($response["\$dealId"]);
             $this->dm->flush();
-            return $response->dealId;
+            return $response["\$dealId"];
         } else {
             $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
             $this->validateResponse($response, 204);
@@ -141,14 +141,14 @@ class HubspotService
         }
     }
 
-    /**
-     * Requests a contact from the hubspot api via their email.
-     * @param string $email is the email address of the contact being looked for.
-     * @return Response containing hubspot's reply.
-     */
-    public function getContactByEmail(string $email)
+    public function deleteContact($user)
     {
-        return $this->client->contacts()->getByEmail($email);
+        // TODO: this.
+    }
+
+    public function deleteDeal($policy)
+    {
+        // TODO: this.
     }
 
     /**
@@ -161,11 +161,11 @@ class HubspotService
         $params = array_merge(["count" => 100], $params);
         do {
             $response = $this->client->contacts()->all($params);
-            foreach ($response->contacts as $contact) {
+            foreach ($response["\$contacts"] as $contact) {
                 yield $contact;
             }
-            $params["vidOffset"] = $contacts["\$vid-offset"];
-        } while ($contacts["\$has-more"]);
+            $params["vidOffset"] = $response["\$vid-offset"];
+        } while ($response["\$has-more"]);
     }
 
     /**
@@ -191,7 +191,7 @@ class HubspotService
                 }
                 break;
             case self::QUEUE_UPDATE_POLICY:
-                $user = $this->userFromMessage($message);
+                $policy = $this->policyFromMessage($message);
                 $this->createOrUpdateDeal($policy);
                 break;
             default:

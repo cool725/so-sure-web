@@ -28,6 +28,7 @@ class HubspotCommand extends ContainerAwareCommand
     protected static $defaultName = self::COMMAND_NAME;
 
     const QUEUE_RATE_DEFAULT = 50;
+    const QUEUE_MAX_SHOW = 100;
 
     const PROPERTY_NAME = "sosure";
     const PROPERTY_DESC = "Custom properties used by SoSure";
@@ -80,7 +81,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var UserRepository */
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         try {
             $action = $input->getArgument("action");
@@ -92,6 +93,7 @@ class HubspotCommand extends ContainerAwareCommand
                     $this->syncAllUsers($output);
                     break;
                 case "sync-user":
+                    /** @var User $user */
                     $user = $userRepo->findOneBy(["email" => $email]);
                     if ($user) {
                         $this->hubspot->createOrUpdateContact($user);
@@ -100,21 +102,18 @@ class HubspotCommand extends ContainerAwareCommand
                     }
                     break;
                 case "queue-count":
-                    $this->queueCount($output, $this->hubspot);
+                    $this->queueCount($output);
                     break;
                 case "queue-show":
-                    $this->queueShow($queueProcessMaxCount, $output, $this->hubspot);
+                    $this->queueShow(self::QUEUE_MAX_SHOW, $output);
                     break;
                 case "queue-clear":
-                    $this->queueClear($input, $output, $this->hubspot);
+                    $this->queueClear($input, $output);
                     break;
                 case "list":
                     switch ($listType) {
                         case "contacts":
                             $this->showContacts($output);
-                            break;
-                        case "properties":
-                            // TODO: implement.
                             break;
                         case "deals":
                             // TODO: implement.
@@ -132,10 +131,6 @@ class HubspotCommand extends ContainerAwareCommand
                 default:
                     throw new \Exception("'{$action}' is not a valid action.");
             }
-        } catch (BadRequest $e) {
-            $output->writeln(
-                "<info>Hubspot returned an error:</info>\n<error>".$e->getMessage()."</error>\n".$e->getTraceAsString()
-            );
         } catch (\Exception $e) {
             $output->writeln(
                 "<info>An error occurred:</info>\n<error>".$e->getMessage()."</error>\n".$e->getTraceAsString()
@@ -212,23 +207,6 @@ class HubspotCommand extends ContainerAwareCommand
     }
 
     /**
-     * Outputs a table of all properties in huubspot.
-     * @param OutputInterface $output is used to output to the commandline.
-     */
-    private function propertiesList(OutputInterface $output)
-    {
-        $properties = $this->hubspot->getProperties();
-        $table = new Table($output);
-        $table->setHeaders(["Name", "Label", "Group", "Type", "Field", "Description"]);
-        sort($properties);
-        foreach ($properties as $property) {
-            $tableRow = $this->fillTableRowWithProperty($property, $output->isVerbose());
-            $table->addRow($tableRow);
-        }
-        $table->render();
-    }
-
-    /**
      * Temporary or testing functionality.
      * @param OutputInterface $output allows output to the commandline.
      */
@@ -277,115 +255,5 @@ class HubspotCommand extends ContainerAwareCommand
             $property["type"],
             $property["fieldType"]
         ];
-    }
-
-    /**
-     * Builds array of the data describing the deal pipeline that we want for policies.
-     * @return array containing this data.
-     */
-    private function buildPipeline()
-    {
-        return [
-            "pipelineId" => "bongocom",
-            "label" => "So-Sure Policies",
-            "active" => true,
-            "stages" => [
-                ["stagedId" => "pre-pending", "label" => "Pre Pending", "displayOrder" => 0],
-                ["stagedId" => "pending", "label" => "Pending", "displayOrder" => 1],
-                ["stagedId" => "active", "label" => "Active", "displayOrder" => 2],
-                ["stagedId" => "unpaid", "label" => "Unpaid", "displayOrder" => 3],
-                ["stagedId" => "expired", "label" => "Expired", "displayOrder" => 4],
-                ["stagedId" => "cancelled", "label" => "Cancelled", "displayOrder" => 5]
-            ]
-        ];
-    }
-
-    /**
-     * Builds the list of custom so sure deal properties.
-     * @return array containing a list that can be sent to hubspot to create the deal properties.
-     */
-    private function buildDealPropertyList()
-    {
-        return [
-            // TODO: sort this out after figuring out the list of properties to have.
-            $this->buildPropertyProtoType("payment_type", "Payment Type"),
-            $this->buildPropertyProtoType("start", "start", "datetime")
-        ];
-    }
-
-    /**
-     * Fields that, if they do not exist, will be created as properties in the 'sosure' group
-     * @return array containing property data formatted for hubspot.
-     */
-    private function buildContactPropertyList()
-    {
-        return [
-            $this->buildPropertyPrototype(
-                "gender",
-                "gender",
-                "enumeration",
-                "radio",
-                false,
-                [
-                    ["label" => "male", "value" => "male"],
-                    ["label" => "female", "value" => "female"],
-                    ["label" => "x/not-known", "value" => "x"]
-                ]
-            ),
-            $this->buildPropertyPrototype("date_of_birth", "Date of birth", "date", "date"),
-            $this->buildPropertyPrototype(
-                "facebook",
-                "Facebook?",
-                "enumeration",
-                "checkbox",
-                false,
-                [["label" => "yes", "value" => "yes"], ["label" => "no", "value" => "no"]]
-            ),
-            $this->buildPropertyPrototype("billing_address", "Billing address", "string", "textarea"),
-            $this->buildPropertyPrototype("census_subgroup", "Estimated census_subgroup"),
-            $this->buildPropertyPrototype("total_weekly_income", "Estimated total_weekly_income"),
-            $this->buildPropertyPrototype("attribution", "attribution"),
-            $this->buildPropertyPrototype("latestattribution", "Latest attribution"),
-            $this->buildPropertyPrototype(
-                "customer",
-                "Is So-Sure Customer",
-                "enumeration",
-                "checkbox",
-                false,
-                [["label" => "yes", "value" => "yes"], ["label" => "no", "value" => "no"]]
-            )
-        ];
-    }
-
-    /**
-     * Builds the form that a new property description must take in order to be synced to hubspot.
-     * @param string $name      is the name of the property internally.
-     * @param string $label     is the name to show to users on hubspot.
-     * @param string $type      is the type of this property.
-     * @param string $fieldType is the type of editing it would use on mixpanel.
-     * @param bool   $formField is TODO: I dunno.
-     * @param array  $options   is the list of choosable options that this property has if it is of a type that has
-     *                          those.
-     * @return array containing the new property data.
-     */
-    private function buildPropertyPrototype(
-        $name,
-        $label,
-        $type = "string",
-        $fieldType = "text",
-        $formField = false,
-        $options = null
-    ) {
-        $data = [
-            "name" => $name,
-            "type" => $type,
-            "fieldType" => $fieldType,
-            "formField" => $formField,
-            "groupName" => self::PROPERTY_NAME
-        ];
-        if ($options) {
-            $data["options"] = $options;
-        }
-        return $data;
     }
 }

@@ -126,7 +126,7 @@ trait QueueTrait
             }
             if ($data["attempts"] >= 3) {
                 $this->logger->error(
-                    "Message in queue {$queueKey} failed repeatedly and has been dropped.",
+                    "Message in queue {$this->queueKey} failed repeatedly and has been dropped.",
                     ["data" => $data]
                 );
                 return false;

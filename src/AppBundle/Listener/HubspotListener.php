@@ -50,7 +50,7 @@ class HubspotListener
      */
     public function onUserPaymentFailedEvent(UserPaymentEvent $event)
     {
-        $this->hubspotService->queueUpdateContact($event->getPolicy()->getUser());
+        $this->hubspotService->queueUpdateContact($event->getUser());
         /*
         TODO: apparantly event is unused but do this anyway.
         $this->hubspotService->queueUpdateContact(
@@ -87,7 +87,7 @@ class HubspotListener
      */
     public function onPolicyPendingRenewedEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy());
+        $this->hubspotService->queueUpdateContact($event->getPolicy());
         //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_PENDING_RENEWAL);
     }
 
@@ -107,7 +107,7 @@ class HubspotListener
      */
     public function onPolicyStartEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueContact($event->getPolicy());
+        $this->hubspotService->queueUpdateContact($event->getPolicy());
         //$this->hubspotService->queuePolicy($event->getPolicy(), HubspotService::QUEUE_EVENT_POLICY_START);
 
         // Eventually we want to migrate users to the policy started event
