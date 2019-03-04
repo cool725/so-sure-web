@@ -58,10 +58,19 @@ class HubspotCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setDescription("Sync data with HubSpot")
-            ->addArgument("action", InputArgument::OPTIONAL, "sync-structures|sync-all-users|sync-user|queue-count|queue-show|queue-clear|list|test|process")
+            ->addArgument(
+                "action",
+                InputArgument::OPTIONAL,
+                "sync-structures|sync-all-users|sync-user|queue-count|queue-show|queue-clear|list|test|process"
+            )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
             ->addOption("process", null, InputOption::VALUE_OPTIONAL, "Messages to process", self::QUEUE_RATE_DEFAULT)
-            ->addOption("type", null, InputOption::VALUE_OPTIONAL, "type of Hubspot things to list. contacts|properties|deals");
+            ->addOption(
+                "type",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "type of Hubspot things to list. contacts|properties|deals"
+            );
     }
 
     /**
@@ -139,7 +148,7 @@ class HubspotCommand extends ContainerAwareCommand
 
     /**
      * Displays all contacts on the commandline.
-     * @param OutputInterface $output  is the commandline output used to display the data.
+     * @param OutputInterface $output is the commandline output used to display the data.
      */
     private function showContacts(OutputInterface $output)
     {
@@ -192,7 +201,7 @@ class HubspotCommand extends ContainerAwareCommand
 
     /**
      * Puts every single user in the database onto the queue.
-     * @param OutputInterface $output  is used to output to the commandline.
+     * @param OutputInterface $output is used to output to the commandline.
      */
     private function syncAllUsers(OutputInterface $output)
     {
@@ -207,7 +216,7 @@ class HubspotCommand extends ContainerAwareCommand
 
     /**
      * Outputs a table of all properties in huubspot.
-     * @param OutputInterface $output  is used to output to the commandline.
+     * @param OutputInterface $output is used to output to the commandline.
      */
     private function propertiesList(OutputInterface $output)
     {
