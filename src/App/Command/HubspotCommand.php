@@ -175,9 +175,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     private function test($output)
     {
-        $response = $this->hubspot->client->deals()->update(123, ["properties" => [["name" => "bongo", "value" => "yeet"]]]);
-        $output->writeln($response->getStatusCode());
-        $output->writeln($response->getBody()->getContents());
+        $output->writeln("test.");
     }
 
     /**
@@ -194,31 +192,5 @@ class HubspotCommand extends ContainerAwareCommand
             $counts["requeued"],
             $counts["dropped"]
         ));
-    }
-
-    /**
-     * Moves some stuff about.
-     * @param array   $property  is filled with properties that must be laid out in a table row.
-     * @param boolean $isVerbose tells whether to pull out the basic set or the big set of properties.
-     * @return array containing the properties you chose in the right order and such.
-     */
-    private function fillTableRowWithProperty($property, $isVerbose)
-    {
-        if ($isVerbose) {
-            return [
-                $property["name"],
-                $property["label"],
-                $property["groupName"],
-                $property["type"],
-                $property["fieldType"],
-                $property["description"]
-            ];
-        }
-        return [
-            $property["name"],
-            $property["groupName"],
-            $property["type"],
-            $property["fieldType"]
-        ];
     }
 }
