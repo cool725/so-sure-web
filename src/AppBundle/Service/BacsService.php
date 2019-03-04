@@ -2266,6 +2266,14 @@ class BacsService
 
             // we're unable to process for the current date, so ensure its at least tomorrow
             $processingDate = $payment->getDate();
+            if (!$processingDate) {
+                $this->logger->warning(sprintf(
+                    'Unable to find payment date for payment %s',
+                    $payment->getId()
+                ));
+                continue;
+            }
+            
             if ($processingDate < $date) {
                 $processingDate = $date;
             }
