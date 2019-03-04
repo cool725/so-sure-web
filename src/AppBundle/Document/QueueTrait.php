@@ -6,7 +6,6 @@ use AppBundle\Exception\Queue\QueueException;
 use AppBundle\Exception\Queue\UnknownMessageException;
 use Psr\Log\LoggerInterface;
 
-
 /**
  * Abstracts generic message queue functionality a bit.
  */
@@ -113,7 +112,7 @@ trait QueueTrait
 
     /**
      * Add a message to the given queue.
-     * @param array   $data is the message to add.
+     * @param array   $data  is the message to add.
      * @param boolean $retry is true if retries of the message should be counted.
      */
     protected function queue($data, $retry = false)

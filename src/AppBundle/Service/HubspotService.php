@@ -217,7 +217,7 @@ class HubspotService
 
     /**
      * Adds a deal property group to hubspot.
-     * @param string $groupName is the technical name of the new property group.
+     * @param string $groupName   is the technical name of the new property group.
      * @param string $displayName is the name that users of hubspot will see.
      */
     public function syncDealPropertyGroup($groupName, $displayName)
@@ -240,8 +240,7 @@ class HubspotService
 
     /**
      * Adds a pipeline onto hubspot.
-     * @param string $name is the name that the pipeline will be given.
-     * @param array  $stages is a list of each pipeline stage which must be formatted as hubspot requires.
+     * @param array $pipeline is the content that the pipeline will be given.
      */
     public function syncPipeline($pipeline)
     {
