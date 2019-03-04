@@ -169,74 +169,6 @@ class HubspotService
     }
 
     /**
-     * Creates a contact list on hubspot if it does not already exist.
-     * @param string $name is the name of the list that it will create.
-     */
-    public function syncList($name)
-    {
-        $response = $this->client->contactLists()->create(["name" => $name, "dynamic" => false]);
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * Synchronises a contact property with hubspot.
-     * @param array $property is the property we are going to create on hubspot in the correct format.
-     */
-    public function syncContactProperty($property)
-    {
-        $response = $this->client->contactProperties()->create($property);
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * Synchronises a property group with hubspot.
-     * @param string $groupName   is the name of the group to run for.
-     * @param string $displayName is the desired display name of the group.
-     */
-    public function syncContactPropertyGroup($groupName, $displayName)
-    {
-        $response = $this->client->contactProperties()->createGroup(
-            ["name" => $groupName, "displayName" => $displayName]
-        );
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * Adds a deal property group to hubspot.
-     * @param string $groupName   is the technical name of the new property group.
-     * @param string $displayName is the name that users of hubspot will see.
-     */
-    public function syncDealPropertyGroup($groupName, $displayName)
-    {
-        $response = $this->client->dealProperties()->createGroup(
-            ["name" => $groupName, "displayName" => $displayName]
-        );
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * Adds a deal property to hubspot.
-     * @param array $property is the content of the new property.
-     */
-    public function syncDealProperty($property)
-    {
-        $response = $this->client->dealProperties()->create($property);
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
-     * Adds a pipeline onto hubspot.
-     * @param array $pipeline is the content that the pipeline will be given.
-     */
-    public function syncPipeline($pipeline)
-    {
-        // TODO: complains when you make the same pipeline twice, should update the pipeline.
-        $response = $this->client->dealPipelines()->create($pipeline);
-        echo $response->getBody();
-        $this->validateResponse($response, [200, 409]);
-    }
-
-    /**
      * Actions a queue message.
      * @param array $message is the message to action.
      * @throws UnknownMessageException if the message lacks an action parameter.
@@ -278,8 +210,9 @@ class HubspotService
         if (!isset($data["userId"])) {
             throw new MalformedMessageException(sprintf("message lacks userId %s", json_encode($data)));
         }
-        /** @var UserRepository*/
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
+        /** @var User $user */
         $user = $userRepo->find($data["userId"]);
         if (!$user) {
             throw new MalformedMessageException(sprintf("userId not valid %s", json_encode($data)));
@@ -298,8 +231,9 @@ class HubspotService
         if (!isset($data["policyId"])) {
             throw new MalformedMessageException(sprintf("message lacks policyId %s", json_encode($data)));
         }
-        /** @var PolicyRepository*/
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($data["policyId"]);
         if (!$policy) {
             throw new MalformedMessageException(sprintf("policyId not valid %s", json_encode($data)));

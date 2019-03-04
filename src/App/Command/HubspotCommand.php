@@ -61,7 +61,7 @@ class HubspotCommand extends ContainerAwareCommand
             ->addArgument(
                 "action",
                 InputArgument::OPTIONAL,
-                "sync-structures|sync-all-users|sync-user|queue-count|queue-show|queue-clear|list|test|process"
+                "sync-all-users|sync-user|queue-count|queue-show|queue-clear|list|test|process"
             )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
             ->addOption("process", null, InputOption::VALUE_OPTIONAL, "Messages to process", self::QUEUE_RATE_DEFAULT)
@@ -88,9 +88,6 @@ class HubspotCommand extends ContainerAwareCommand
             $process = (int) ($input->getOption("process") ?: self::QUEUE_RATE_DEFAULT);
             $listType = $input->getOption("type");
             switch ($action) {
-                case "sync-structures":
-                    $this->syncStructures($output);
-                    break;
                 case "sync-all-users":
                     $this->syncAllUsers($output);
                     break;
@@ -229,30 +226,6 @@ class HubspotCommand extends ContainerAwareCommand
             $table->addRow($tableRow);
         }
         $table->render();
-    }
-
-    /**
-     * Synchronises the so sure custom properties, user list and property pipeline.
-     * @param OutputInterface $output is used to output to the commandline.
-     */
-    private function syncStructures(OutputInterface $output)
-    {
-        $this->hubspot->syncList(self::LIST_NAME);
-        $this->hubspot->syncContactPropertyGroup(self::PROPERTY_NAME, self::PROPERTY_DESC);
-        $this->hubspot->syncDealPropertyGroup(self::PROPERTY_NAME, self::PROPERTY_DESC);
-        $properties = $this->buildContactPropertyList();
-        foreach ($properties as $property) {
-            $name = $property["name"];
-            $this->hubspot->syncContactProperty($property);
-            $output->writeln("Created <info>{$name}</info> contact property.");
-        }
-        $properties = $this->buildDealPropertyList();
-        foreach ($properties as $property) {
-            $name = $property["name"];
-            $this->hubspot->syncDealProperty($property);
-            $output->writeln("Created <info>{$name}</info> deal property.");
-        }
-        $this->hubspot->syncPipeline($this->buildPipeline());
     }
 
     /**
