@@ -169,20 +169,6 @@ class HubspotService
     }
 
     /**
-     * Gets a hubspot list by it's name.
-     * @param string $name is the name of the list on hubspot.
-     * @return array containing the list's parameters.
-     */
-    public function getList($name)
-    {
-        //$response = $this->client->contactLists->
-        // TODO: Seems that you must add contacts to a list rather than being able to specify the list on the contact.
-        //       also, it does not seem you can get a list by name, so we will have to figure out a way of storing the
-        //       list ID.
-        return [];
-    }
-
-    /**
      * Creates a contact list on hubspot if it does not already exist.
      * @param string $name is the name of the list that it will create.
      */
