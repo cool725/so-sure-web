@@ -224,6 +224,7 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "%hubspot_app_key%"
+            - "%hubspot_deal_pipeline%"
             - "@snc_redis.default"
             - "@census.search"
 

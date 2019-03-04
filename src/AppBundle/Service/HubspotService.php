@@ -42,19 +42,23 @@ class HubspotService
     protected $redis;
     /** @var SearchService */
     private $searchService;
+    /** @var string */
+    private $dealPipelineKey;
 
     /**
      * Builds the service.
-     * @param DocumentManager $dm            is the document manager.
-     * @param LoggerInterface $logger        is the logger.
-     * @param string          $hubspotKey    is the hubspot integration API key.
-     * @param RedisClient     $redis         is the client for redis.
-     * @param SearchService   $searchService is used to search.
+     * @param DocumentManager $dm             is the document manager.
+     * @param LoggerInterface $logger         is the logger.
+     * @param string          $hubspotKey     is the hubspot integration API key.
+     * @param string          $hubspotDealKey is the key to the hubspot deal pipeline for policies.
+     * @param RedisClient     $redis          is the client for redis.
+     * @param SearchService   $searchService  is used to search.
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $hubspotKey,
+        $hubspotDealKey,
         RedisClient $redis,
         SearchService $searchService
     ) {
@@ -64,6 +68,7 @@ class HubspotService
         $this->redis = $redis;
         $this->searchService = $searchService;
         $this->queueKey = 'queue:hubspot';
+        $this->dealPipelineKey = $hubspotDealKey;
     }
 
     /**
@@ -259,8 +264,7 @@ class HubspotService
                 "associatedVids" => [$policy->getUser()->getHubspotId()]
             ],
             "properties" => [
-                // TODO: this field should be in parameters.yml and this is the wrong value also.
-                $this->buildDealProperty("pipeline", "so-sure-policies"),
+                $this->buildDealProperty("pipeline", $this->dealPipelineKey),
                 $this->buildDealProperty("dealname", $policy->getPolicyNumber()),
                 $this->buildDealProperty("dealstage", $stage),
                 $this->buildDealProperty("payment_type", $policy->getPaymentType()),
