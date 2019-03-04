@@ -158,3 +158,7 @@ parameters:
 
     recaptcha_public_key: ""
     recaptcha_private_key: ""
+
+    hubspot_app_key: "a65dcd43-d754-4b46-a17c-a8ff66980bfb"
+    hubspot_deal_pipeline: ""
+    hubspot_customer_list: ""
