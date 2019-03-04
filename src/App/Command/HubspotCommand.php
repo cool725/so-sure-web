@@ -62,16 +62,10 @@ class HubspotCommand extends ContainerAwareCommand
             ->addArgument(
                 "action",
                 InputArgument::OPTIONAL,
-                "sync-all-users|sync-user|queue-count|queue-show|queue-clear|list|test|process"
+                "sync-all-users|sync-user|queue-count|queue-show|queue-clear|test|process"
             )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
-            ->addOption("process", null, InputOption::VALUE_OPTIONAL, "Messages to process", self::QUEUE_RATE_DEFAULT)
-            ->addOption(
-                "type",
-                null,
-                InputOption::VALUE_OPTIONAL,
-                "type of Hubspot things to list. contacts|properties|deals"
-            );
+            ->addOption("process", null, InputOption::VALUE_OPTIONAL, "Messages to process", self::QUEUE_RATE_DEFAULT);
     }
 
     /**
@@ -87,7 +81,6 @@ class HubspotCommand extends ContainerAwareCommand
             $action = $input->getArgument("action");
             $email = $input->getOption("email");
             $process = (int) ($input->getOption("process") ?: self::QUEUE_RATE_DEFAULT);
-            $listType = $input->getOption("type");
             switch ($action) {
                 case "sync-all-users":
                     $this->syncAllUsers($output);
@@ -110,18 +103,6 @@ class HubspotCommand extends ContainerAwareCommand
                 case "queue-clear":
                     $this->queueClear($input, $output);
                     break;
-                case "list":
-                    switch ($listType) {
-                        case "contacts":
-                            $this->showContacts($output);
-                            break;
-                        case "deals":
-                            // TODO: implement.
-                            break;
-                        default:
-                            throw new \Exception("'{$listType}' can not be listed.");
-                    }
-                    break;
                 case "test":
                     $this->test($output);
                     break;
@@ -136,24 +117,6 @@ class HubspotCommand extends ContainerAwareCommand
                 "<info>An error occurred:</info>\n<error>".$e->getMessage()."</error>\n".$e->getTraceAsString()
             );
         }
-    }
-
-    /**
-     * Displays all contacts on the commandline.
-     * @param OutputInterface $output is the commandline output used to display the data.
-     */
-    private function showContacts(OutputInterface $output)
-    {
-        $table = new Table($output);
-        $table->setHeaders(["VID", "First Name", "Last Name"]);
-        foreach ($this->hubspot->getAllContacts([]) as $contact) {
-            $table->addRow([
-                $contact['$vid'],
-                $contact->properties->firstname->value,
-                $contact->properties->lastname->value,
-            ]);
-        }
-        $table->render();
     }
 
     /**
@@ -212,7 +175,9 @@ class HubspotCommand extends ContainerAwareCommand
      */
     private function test($output)
     {
-        $output->writeln("gday fellas. this is a test");
+        $response = $this->hubspot->client->deals()->update(123, ["properties" => [["name" => "bongo", "value" => "yeet"]]]);
+        $output->writeln($response->getStatusCode());
+        $output->writeln($response->getBody()->getContents());
     }
 
     /**

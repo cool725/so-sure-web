@@ -30,8 +30,7 @@ class HubspotService
     const QUEUE_UPDATE_USER = 'create-user';
     const QUEUE_DELETE_USER = 'delete-user';
     const QUEUE_UPDATE_POLICY = 'update-policy';
-
-    const PIPELINE_NAME = 'SoSure Policies';
+    const QUEUE_DELETE_POLICY = 'delete-policy';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -121,51 +120,41 @@ class HubspotService
     public function createOrUpdateDeal(Policy $policy)
     {
         if (!$policy->getUser()->getHubspotId()) {
-            // TODO: this is likely to happen when the code is first merged but not everything has been synced yet.
-            //       a logging message would probably be better.
             throw new \Exception("cannot create policy/deal before user/contact. Policy id: ".$policy->getId());
         }
         $hubspotPolicyArray = $this->buildHubspotPolicyData($policy);
-        // TODO: if somebody deletes the deal off hubspot we need to be able to find that out and create rather than
-        //       update.
         if (!$policy->getHubspotId()) {
             $response = $this->client->deals()->create($hubspotPolicyArray);
-            $response = $this->validateResponse($response, 200);
-            $policy->setHubspotId($response["\$dealId"]);
-            $this->dm->flush();
-            return $response["\$dealId"];
-        } else {
-            $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
-            $this->validateResponse($response, 204);
-            return $policy->getHubspotId();
+            $this->validateResponse($response, [200, 404]);
+            if ($response->getResponseCode() != 404) {
+                $policy->setHubspotId($response["\$dealId"]);
+                $this->dm->flush();
+                return $response["\$dealId"];
+            }
         }
-    }
-
-    public function deleteContact($user)
-    {
-        // TODO: this.
-    }
-
-    public function deleteDeal($policy)
-    {
-        // TODO: this.
+        $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
+        $this->validateResponse($response, 204);
+        return $policy->getHubspotId();
     }
 
     /**
-     * Gets list of all the contacts from Hubspot via generator, since only a limited number can be gotten at a time.
-     * @param array $params is an optional list of parameters to add to the request.
-     * @return \Generator yielding all contacts in hubspot.
+     * Deletes a contact off hubspot which represented the given user.
+     * @param User $user is the user represented by the hubspot contact you want to delete.
      */
-    public function getAllContacts($params = [])
+    public function deleteContact($user)
     {
-        $params = array_merge(["count" => 100], $params);
-        do {
-            $response = $this->client->contacts()->all($params);
-            foreach ($response["\$contacts"] as $contact) {
-                yield $contact;
-            }
-            $params["vidOffset"] = $response["\$vid-offset"];
-        } while ($response["\$has-more"]);
+        $response = $this->client->contacts()->delete($user->getHubspotId());
+        $this->validateResponse($response, [204]);
+    }
+
+    /**
+     * Deletes a deal off hubspot which represented the given policy.
+     * @param Policy $policy is the policy represented by the hubspot deal you want to delete.
+     */
+    public function deleteDeal($policy)
+    {
+        $response = $this->client->deals()->delete($policy->getHubspotId());
+        $this->validateResponse($response, [204]);
     }
 
     /**
@@ -185,14 +174,18 @@ class HubspotService
                 break;
             case self::QUEUE_DELETE_USER:
                 $user = $this->userFromMessage($message);
-                $this->deleteContact($user);
                 foreach ($user->getPolicies() as $policy) {
                     $this->deleteDeal($policy);
                 }
+                $this->deleteContact($user);
                 break;
             case self::QUEUE_UPDATE_POLICY:
                 $policy = $this->policyFromMessage($message);
                 $this->createOrUpdateDeal($policy);
+                break;
+            case self::QUEUE_DELETE_POLICY:
+                $policy = $this->policyFromMessage($message);
+                $this->deleteDeal($policy);
                 break;
             default:
                 throw new UnknownMessageException(sprintf('Unknown message in queue %s', json_encode($message)));
@@ -242,31 +235,6 @@ class HubspotService
     }
 
     /**
-     * Check if a response has the correct status code, and if it does not then it throws an exception. If the status
-     * code returned denotes rate limiting then it will tell you of this.
-     * @param Response  $response is the response that you are checking.
-     * @param array|int $desired  is the response code or list containing that you want the response to have.
-     * @throws \Exception when $response's status code is not $desired.
-     */
-    private function validateResponse(Response $response, $desired)
-    {
-        $code = $response->getStatusCode();
-        if (!is_array($desired)) {
-            $desired = [$desired];
-        }
-        if (in_array($code, $desired)) {
-            return json_decode($response->getBody()->getContents());
-        } elseif ($code === 429) {
-            // TODO: next time I merge master there is an exception I made for this and use catch it up in the process
-            //       function like it does in mixpanel service to requeue unconditionally.
-            //       Must also put that in the queue trait.
-            throw new \Exception("Hubspot rate limited.");
-        } else {
-            throw new \Exception("Hubspot request returned status {$code}. ".$response->getBody());
-        }
-    }
-
-    /**
      * Collates the full set of data needed to create or update a hubspot deal based on a policy.
      * @param Policy $policy is the policy whose data is being used.
      * @return array containing the data formatted for sending to the hubspot apis.
@@ -291,13 +259,13 @@ class HubspotService
                 "associatedVids" => [$policy->getUser()->getHubspotId()]
             ],
             "properties" => [
+                // TODO: this field should be in parameters.yml and this is the wrong value also.
                 $this->buildDealProperty("pipeline", "so-sure-policies"),
                 $this->buildDealProperty("dealname", $policy->getPolicyNumber()),
                 $this->buildDealProperty("dealstage", $stage),
                 $this->buildDealProperty("payment_type", $policy->getPaymentType()),
                 $this->buildDealProperty("start", $policy->getStart()->format("U"))
-                // TODO: Probably going to want more deal properties.
-                //       Would be nice to use the premium value as the deal amount maybe.
+                // TODO: there is a list on clubhouse for the desired properties.
             ]
         ];
     }
@@ -364,15 +332,14 @@ class HubspotService
      */
     private function buildHubspotMiscData(User $user)
     {
-        $hasFacebook = $user->getFacebookId() == true;
         $data = [
             $this->buildProperty("attribution", $user->getAttribution()),
             $this->buildProperty("latestattribution", $user->getLatestAttribution()),
-            $this->buildProperty("facebook", $hasFacebook ? "yes" : "no"),
-            $this->buildProperty("customer", "yes")
+            $this->buildProperty("customer", true)
         ];
-        if ($hasFacebook) {
-            $data["hs_facebookid"] = $this->buildProperty("hs_facebookid", $user->getFacebookId());
+        $facebookId = $user->getFacebookId();
+        if ($facebookId) {
+            $data["hs_facebookid"] = $this->buildProperty("hs_facebookid", $facebookId);
         }
         return $data;
     }
@@ -397,5 +364,30 @@ class HubspotService
     private function buildDealProperty($name, $value)
     {
         return ["name" => $name, "value" => $value ?: ""];
+    }
+
+    /**
+     * Check if a response has the correct status code, and if it does not then it throws an exception. If the status
+     * code returned denotes rate limiting then it will tell you of this.
+     * @param Response  $response is the response that you are checking.
+     * @param array|int $desired  is the response code or list containing that you want the response to have.
+     * @throws \Exception when $response's status code is not $desired.
+     */
+    private function validateResponse(Response $response, $desired)
+    {
+        $code = $response->getStatusCode();
+        if (!is_array($desired)) {
+            $desired = [$desired];
+        }
+        if (in_array($code, $desired)) {
+            return json_decode($response->getBody()->getContents());
+        } elseif ($code === 429) {
+            // TODO: next time I merge master there is an exception I made for this and use catch it up in the process
+            //       function like it does in mixpanel service to requeue unconditionally.
+            //       Must also put that in the queue trait.
+            throw new \Exception("Hubspot rate limited.");
+        } else {
+            throw new \Exception("Hubspot request returned status {$code}. ".$response->getBody());
+        }
     }
 }
