@@ -259,18 +259,29 @@ class HubspotService
         } elseif ($status == Policy::STATUS_EXPIRED) {
             $stage = "expired";
         }
+        $phoneProperties = [];
+        if ($policy instanceof PhonePolicy) {
+            $phoneProperties = [
+                $this->buildDealProperty("phone_model", $policy->getPhone()->getModel()),
+                $this->buildDealProperty("phone_make", $policy->getPhone()->getMake()),
+                $this->buildDealProperty("phone_memory", $policy->getPhone()->getMemory()),
+                $this->buildDealProperty("imei", $policy->getImei()),
+                $this->buildDealProperty("serial", $policy->getSerialNumber())
+
+            ];
+        }
+        $properties = [
+            $this->buildDealProperty("pipeline", $this->dealPipelineKey),
+            $this->buildDealProperty("dealname", $policy->getPolicyNumber()),
+            $this->buildDealProperty("dealstage", $stage),
+            $this->buildDealProperty("start", $policy->getStart()),
+            $this->buildDealProperty("end", $policy->getEnd()),
+        ];
         return [
             "associations" => [
                 "associatedVids" => [$policy->getUser()->getHubspotId()]
             ],
-            "properties" => [
-                $this->buildDealProperty("pipeline", $this->dealPipelineKey),
-                $this->buildDealProperty("dealname", $policy->getPolicyNumber()),
-                $this->buildDealProperty("dealstage", $stage),
-                $this->buildDealProperty("payment_type", $policy->getPaymentType()),
-                $this->buildDealProperty("start", $policy->getStart()->format("U"))
-                // TODO: there is a list on clubhouse for the desired properties.
-            ]
+            "properties" => array_merge($properties, $phoneProperties)
         ];
     }
 
