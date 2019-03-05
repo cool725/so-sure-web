@@ -230,14 +230,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for note in affiliate.notesList|reverse %}
-                                            <tr>
-                                                <td>&pound;{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
-                                                <td>{{ charges|length }}</td>
-                                                <td>&pound;{{ cost|number_format(2, '.', ',') }}</td>
-                                                <td>{{ affiliate.chargeModel }}</td>
-                                            </tr>
-                                        {% endfor %}
+                                        <tr>
+                                            <td>&pound;{{ affiliate.cpa|number_format(2, '.', ',') }}</td>
+                                            <td>{{ charges|length }}</td>
+                                            <td>&pound;{{ cost|number_format(2, '.', ',') }}</td>
+                                            <td>{{ affiliate.chargeModel }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
