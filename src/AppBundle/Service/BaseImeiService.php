@@ -77,8 +77,7 @@ class BaseImeiService
     public function isLostImei($imei)
     {
         $repo = $this->dm->getRepository(LostPhone::class);
-        // Errors here
-        // $phones = $repo->findBy(['imei' => (string) $imei]);
+        $phones = $repo->findBy(['imei' => (string) $imei]);
 
         return count($phones) > 0;
     }
