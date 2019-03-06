@@ -928,6 +928,18 @@ abstract class Policy
     }
 
     /**
+     * Gives you the payment type of the last successful user credit payment, or failing that, the payment type of the
+     * policy as a whole, and failing that, null.
+     * @return string|null the payment type of the policy or null if there is no payment type information at all.
+     */
+    public function getUsedPaymentType()
+    {
+        $payment = $this->getLastSuccessfulUserPaymentCredit();
+        $method = $this->getPolicyOrUserPaymentMethod();
+        return $payment ? $payment->getType() : ($method ? $method->getType() : null);
+    }
+
+    /**
      * Payments filtered by credits (pos amount)
      */
     public function getSuccessfulUserPaymentCredits()
@@ -5824,7 +5836,7 @@ abstract class Policy
         if (!$this->isValidPolicy()) {
             return true;
         }
-        
+
         //print $this->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;
         $expirationDate = $this->getCurrentOrPreviousBusinessDay($this->getPolicyExpirationDate(), $date);
         //print $expirationDate->format(\DateTime::ATOM) . PHP_EOL;

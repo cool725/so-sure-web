@@ -384,10 +384,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
-                sprintf(
-                    '"%s"',
-                    $policy->hasPolicyOrUserPaymentMethod() ? $policy->getPolicyOrUserPaymentMethod()->getType() : null
-                ),
+                sprintf('"%s"', $policy->getUsedPaymentType()),
                 sprintf(
                     '"%s"',
                     $policy->getStatus() == Policy::STATUS_UNPAID ?
