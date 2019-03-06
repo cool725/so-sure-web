@@ -489,7 +489,7 @@ redirect_about_us:
         route: social_insurance
         permanent: true
 
-redirect_samsung_s7_mobile_network:
+redirect_samsung_seven_mobile_network:
     path: /samsung-s7-insured-with-your-mobile-network
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
@@ -510,28 +510,28 @@ redirect_iphone_se_mobile_network:
         route: comparison
         permanent: true
 
-redirect_iphone_6_mobile_network:
+redirect_iphone_six_mobile_network:
     path: /iphone-6-insured-with-your-mobile-network
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison
         permanent: true
 
-redirect_iphone_6s_mobile_network:
+redirect_iphone_sixs_mobile_network:
     path: /iphone-6s-insured-with-your-mobile-network
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison
         permanent: true
 
-redirect_iphone_7_mobile_network:
+redirect_iphone_seven_mobile_network:
     path: /iphone-7-insured-with-your-mobile-network
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison
         permanent: true
 
-redirect_iphone_7_plus_mobile_network:
+redirect_iphone_seven_plus_mobile_network:
     path: /iphone-7-plus-insured-with-your-mobile-network
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
