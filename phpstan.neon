@@ -1,11 +1,10 @@
 parameters:
         level:
                 - 0
-        paths: 
+        paths:
                 - src
         ignoreErrors:
                 - '#Function mailparse_msg_.*#'
-                - '#Casting to string something that.*#'
                 - '#Casting to int something that.*#'
                 - '#Argument of an invalid type PHPExcel_Worksheet_CellIterator supplied for foreach, only iterables are supported.#'
                 - '#Call to function is_object\(\) will always evaluate to false#'
