@@ -341,7 +341,6 @@ class AdminController extends BaseController
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         /** @var Phone $phone */
@@ -356,11 +355,43 @@ class AdminController extends BaseController
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
+                $excess = $policyTerms->getDefaultExcess();
+                $picsureExcess = $policyTerms->getDefaultPicSureExcess();
+                if ($request->get('damage-excess')) {
+                    $excess->setDamage($request->get('damage-excess'));
+                }
+                if ($request->get('warranty-excess')) {
+                    $excess->setWarranty($request->get('warranty-excess'));
+                }
+                if ($request->get('extended-warranty-excess')) {
+                    $excess->setExtendedWarranty($request->get('extended-warranty-excess'));
+                }
+                if ($request->get('loss-excess')) {
+                    $excess->setLoss($request->get('loss-excess'));
+                }
+                if ($request->get('theft-excess')) {
+                    $excess->setTheft($request->get('theft-excess'));
+                }
+                if ($request->get('picsure-damage-excess')) {
+                    $picsureExcess->setDamage($request->get('picsure-damage-excess'));
+                }
+                if ($request->get('picsure-warranty-excess')) {
+                    $picsureExcess->setWarranty($request->get('picsure-warranty-excess'));
+                }
+                if ($request->get('picsure-extended-warranty-excess')) {
+                    $picsureExcess->setExtendedWarranty($request->get('picsure-extended-warranty-excess'));
+                }
+                if ($request->get('picsure-loss-excess')) {
+                    $picsureExcess->setLoss($request->get('picsure-loss-excess'));
+                }
+                if ($request->get('picsure-theft-excess')) {
+                    $picsureExcess->setTheft($request->get('picsure-theft-excess'));
+                }
                 $phone->changePrice(
                     $gwp,
                     $from,
-                    $policyTerms->getDefaultExcess(),
-                    $policyTerms->getDefaultPicSureExcess(),
+                    $excess,
+                    $picsureExcess,
                     $to,
                     $notes
                 );
@@ -1972,7 +2003,7 @@ class AdminController extends BaseController
                 foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
                     $redis->zrem('policy:validation', $member);
                 }
-                
+
                 $redis->srem('policy:validation:flags', $policy->getId());
 
                 $this->addFlash('success', sprintf(

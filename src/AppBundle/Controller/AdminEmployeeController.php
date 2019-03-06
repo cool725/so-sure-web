@@ -195,6 +195,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $phones = $repo->createQueryBuilder();
         $phones = $phones->field('make')->notEqual('ALL');
 
+        $policyTerms = $this->getLatestPolicyTerms();
+        $excess = $policyTerms->getDefaultExcess();
+        $picsureExcess = $policyTerms->getDefaultPicSureExcess();
+
         $searchForm = $this->get('form.factory')
             ->createNamedBuilder('email_form', PhoneSearchType::class, null, ['method' => 'GET'])
             ->getForm();
@@ -343,6 +347,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $now = \DateTime::createFromFormat('U', time());
         $oneDay = $this->addBusinessDays($now, 1);
+
+
         return [
             'phones' => $pager->getCurrentPageResults(),
             'form' => $searchForm->createView(),
@@ -352,6 +358,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'additional_phones' => $additionalPhonesForm->createView(),
             'one_day' => $oneDay,
             'policyTerms' => $this->getLatestPolicyTerms(),
+            'excess' => $excess,
+            'picsureExcess' => $picsureExcess
         ];
     }
 
