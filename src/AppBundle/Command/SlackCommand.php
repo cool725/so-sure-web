@@ -271,7 +271,8 @@ class SlackCommand extends ContainerAwareCommand
             $startOfDay
         );
         $total = end($cumulativeReport)["close"];
-        $gross = $total - $repo->countAllActivePolicies($yesterday);
+        $upgrades = $repo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, $yesterday);
+        $gross = $total - $repo->countAllActivePolicies($yesterday) - $upgrades;
         $cooloff = $repo->countAllEndingPolicies(Policy::CANCELLED_COOLOFF, $yesterday, $startOfDay);
         $cancellations = $repo->countEndingByStatus(Policy::STATUS_CANCELLED, $yesterday, $startOfDay);
         $weekStart = $repo->countAllActivePolicies($start);
