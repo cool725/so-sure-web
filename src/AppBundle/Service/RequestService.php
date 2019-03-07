@@ -480,6 +480,11 @@ class RequestService
             return true;
         }
 
+        // crawler on 7/3/19 - unlikely to be a legit user as we don't support IE 8
+        if ($userAgent == 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)') {
+            return true;
+        }
+
         return false;
     }
 }
