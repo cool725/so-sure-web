@@ -62,10 +62,16 @@ class HubspotCommand extends ContainerAwareCommand
             ->addArgument(
                 "action",
                 InputArgument::OPTIONAL,
-                "sync-all-users|sync-user|queue-count|queue-show|queue-clear|test|process"
+                "sync-all|sync-user|queue-count|queue-show|queue-clear|test|process"
             )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
-            ->addOption("process", null, InputOption::VALUE_OPTIONAL, "Messages to process", self::QUEUE_RATE_DEFAULT);
+            ->addOption(
+                "n",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "Number of messages to process (default 50)",
+                self::QUEUE_RATE_DEFAULT
+            );
     }
 
     /**
@@ -80,9 +86,9 @@ class HubspotCommand extends ContainerAwareCommand
         try {
             $action = $input->getArgument("action");
             $email = $input->getOption("email");
-            $process = (int) ($input->getOption("process") ?: self::QUEUE_RATE_DEFAULT);
+            $process = (int) ($input->getOption("n") ?: self::QUEUE_RATE_DEFAULT);
             switch ($action) {
-                case "sync-all-users":
+                case "sync-all":
                     $this->syncAllUsers($output);
                     break;
                 case "sync-user":

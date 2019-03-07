@@ -27,15 +27,6 @@ class HubspotListener
     }
 
     /**
-     * Hubspot actions for when a user is created.
-     * @param UserEvent $event is the event object representing the creation of the user.
-     */
-    public function onUserCreatedEvent(UserEvent $event)
-    {
-        $this->hubspotService->queueUpdateContact($event->getUser());
-    }
-
-    /**
      * Hubspot actions for when a user is updated.
      * @param UserEvent $event is the event object representing the user update.
      */
@@ -45,31 +36,12 @@ class HubspotListener
     }
 
     /**
-     * Hubspot actions for when a user has a failed payment.
-     * @param UserPaymentEvent $event represents the failure.
+     * Hubspot actions for when a policy starts.
+     * @param PolicyEvent $event represents the policy starting.
      */
-    public function onUserPaymentFailedEvent(UserPaymentEvent $event)
+    public function onPolicyStartEvent(PolicyEvent $event)
     {
-        $this->hubspotService->queueUpdateContact($event->getUser());
-        /*
-        TODO: apparantly event is unused but do this anyway.
-        $this->hubspotService->queueUpdateContact(
-            $event->getUser(),
-            HubspotService::QUEUE_EVENT_USER_PAYMENT_FAILED,
-            ['reason' => $event->getReason()]
-        );
-        */
-    }
-
-    /**
-     * Hubspot actions for when a reward pot is changed.
-     * @param PolicyEvent $event is the event object representing the reward pot change.
-     */
-    public function onPolicyPotEvent(PolicyEvent $event)
-    {
-        if ($event->getPolicy()->getUser()->getHubspotId()) {
-            $this->hubspotService->queueUpdateDeal($event->getPolicy());
-        }
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
     }
 
     /**
@@ -78,38 +50,7 @@ class HubspotListener
      */
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
-        if ($event->getPolicy()->getUser()->getHubspotId()) {
-            $this->hubspotService->queueUpdateDeal($event->getPolicy());
-        }
-    }
-
-    /**
-     * Hubspot actions for when a pending policy is renewed.
-     * @param PolicyEvent $event represents the renewal.
-     */
-    public function onPolicyPendingRenewedEvent(PolicyEvent $event)
-    {
-        $this->hubspotService->queueUpdateContact($event->getPolicy());
-    }
-
-    /**
-     * Hubspot actions for when policy is renewed.
-     * @param PolicyEvent $event represents the renewal.
-     */
-    public function onPolicyRenewedEvent(PolicyEvent $event)
-    {
-        if ($event->getPolicy()->getUser()->getHubspotId()) {
-            $this->hubspotService->queueUpdateDeal($event->getPolicy());
-        }
-    }
-
-    /**
-     * Hubspot actions for when a policy starts.
-     * @param PolicyEvent $event represents the policy starting.
-     */
-    public function onPolicyStartEvent(PolicyEvent $event)
-    {
-        $this->hubspotService->queueUpdateContact($event->getPolicy());
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
     }
 
     /**
@@ -128,33 +69,5 @@ class HubspotListener
     public function onPolicyReactivatedEvent(PolicyEvent $event)
     {
         $this->hubspotService->queueUpdateDeal($event->getPolicy());
-    }
-
-    /**
-     * Hubspot actions for when an invitation is accepted.
-     * @param InvitationEvent $event represents the acceptance.
-     */
-    public function onInvitationAcceptedEvent(InvitationEvent $event)
-    {
-        $this->hubspotService->queueUpdateContact($event->getInvitation()->getInviter());
-        $this->hubspotService->queueUpdateContact($event->getInvitation()->getInvitee());
-    }
-
-    /**
-     * Hubspot actions for when a payment has been successful.
-     * @param PaymentEvent $event represents the payment being successful.
-     */
-    public function onPaymentSuccessEvent(PaymentEvent $event)
-    {
-        $this->hubspotService->queueUpdateContact($event->getPayment()->getPolicy()->getUser());
-    }
-
-    /**
-     * Hubspot actions for when a payment fails.
-     * @param PaymentEvent $event represents the payment failure.
-     */
-    public function onPaymentFailedEvent(PaymentEvent $event)
-    {
-        $this->hubspotService->queueUpdateContact($event->getPayment()->getPolicy()->getUser());
     }
 }

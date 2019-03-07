@@ -61,7 +61,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @Assert\Email(strict=false)
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom,invitation-link", comparison="case-insensitive")
+     * @DataChange(categories="intercom,invitation-link,hubspot", comparison="case-insensitive")
      */
     protected $email;
 
@@ -141,7 +141,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom")
+     * @DataChange(categories="intercom,hubspot")
      */
     protected $firstName;
 
@@ -150,7 +150,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom")
+     * @DataChange(categories="intercom,hubspot")
      */
     protected $lastName;
 
@@ -158,6 +158,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Choice({"male", "female", "unknown"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $gender;
 
@@ -167,6 +168,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $facebookId;
 
@@ -253,7 +255,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @AppAssert\Mobile()
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom,invitation-link")
+     * @DataChange(categories="intercom,invitation-link,hubspot")
      */
     protected $mobileNumber;
 
@@ -335,12 +337,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\EmbedOne(targetDocument="Attribution")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false)
+     * @DataChange(categories="hubspot")
      */
     protected $attribution;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="Attribution")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $latestAttribution;
 
@@ -348,6 +352,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $birthday;
 

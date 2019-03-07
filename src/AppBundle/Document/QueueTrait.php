@@ -102,7 +102,7 @@ trait QueueTrait
      * @param int $max is the maximum number of messages to return.
      * @return array containing the messages.
      */
-    public function getQueueData(int $max): array
+    public function getQueueData(int $max = 100): array
     {
         if (!isset($this->queueKey)) {
             throw new QueueException("Trying to use queue without defining \$queueKey.");

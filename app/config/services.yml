@@ -1145,20 +1145,11 @@ services:
         arguments:
             - "@app.hubspot"
         tags:
-            -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
-            -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
+            -  { name: kernel.event_listener, event: event.user.updated.hubspot, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
-            -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewedEvent }
-            -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyStartEvent }
             -  { name: kernel.event_listener, event: event.policy.unpaid, method: onPolicyUnpaidEvent }
             -  { name: kernel.event_listener, event: event.policy.reactivated, method: onPolicyReactivatedEvent }
-            -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
-            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
-            -  { name: kernel.event_listener, event: event.payment.failed, method: onPaymentFailedEvent }
-            -  { name: kernel.event_listener, event: event.payment.first-problem, method: onPaymentFirstProblemEvent }
-            -  { name: kernel.event_listener, event: event.user.payment.failed, method: onUserPaymentFailedEvent }
 
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener

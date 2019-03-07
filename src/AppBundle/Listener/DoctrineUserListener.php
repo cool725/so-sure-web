@@ -145,6 +145,10 @@ class DoctrineUserListener extends BaseDoctrineListener
             $this->dispatcher->dispatch(UserEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
         }
 
+        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT)) {
+            $this->triggerEvent($user, UserEvent::EVENT_UPDATED_HUBSPOT);
+        }
+
         if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_INTERCOM)) {
             $this->triggerEvent($user, UserEvent::EVENT_UPDATED_INTERCOM);
         }

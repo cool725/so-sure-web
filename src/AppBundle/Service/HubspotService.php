@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\QueueTrait;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -27,7 +28,9 @@ class HubspotService
 {
     use QueueTrait;
 
-    const QUEUE_UPDATE_USER = 'create-user';
+    const DEAL_STAGE_CACHE_KEY = "hubspot:dealstages";
+
+    const QUEUE_UPDATE_USER = 'update-user';
     const QUEUE_DELETE_USER = 'delete-user';
     const QUEUE_UPDATE_POLICY = 'update-policy';
     const QUEUE_DELETE_POLICY = 'delete-policy';
@@ -109,9 +112,9 @@ class HubspotService
     {
         $hubspotUserArray = $this->buildHubspotUserData($user);
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        $this->validateResponse($response, [200, 204]);
-        if ($user->getHubspotId() !== $response["\$vid"]) {
-            $user->setHubspotId($response["\$vid"]);
+        $response = $this->validateResponse($response, [200, 204]);
+        if ($user->getHubspotId() !== $response["vid"]) {
+            $user->setHubspotId($response["vid"]);
             $this->dm->flush();
         }
         return $user->getHubspotId();
@@ -130,15 +133,15 @@ class HubspotService
         $hubspotPolicyArray = $this->buildHubspotPolicyData($policy);
         if (!$policy->getHubspotId()) {
             $response = $this->client->deals()->create($hubspotPolicyArray);
-            $this->validateResponse($response, [200, 404]);
-            if ($response->getResponseCode() != 404) {
-                $policy->setHubspotId($response["\$dealId"]);
+            $response = $this->validateResponse($response, [200, 404]);
+            if ($response["responseCode"] != 404) {
+                $policy->setHubspotId($response["dealId"]);
                 $this->dm->flush();
-                return $response["\$dealId"];
+                return $response["dealId"];
             }
         }
         $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
-        $this->validateResponse($response, 204);
+        $response = $this->validateResponse($response, 200);
         return $policy->getHubspotId();
     }
 
@@ -149,7 +152,7 @@ class HubspotService
     public function deleteContact($user)
     {
         $response = $this->client->contacts()->delete($user->getHubspotId());
-        $this->validateResponse($response, [204]);
+        $this->validateResponse($response, 204);
     }
 
     /**
@@ -159,7 +162,7 @@ class HubspotService
     public function deleteDeal($policy)
     {
         $response = $this->client->deals()->delete($policy->getHubspotId());
-        $this->validateResponse($response, [204]);
+        $this->validateResponse($response, 204);
     }
 
     /**
@@ -259,29 +262,28 @@ class HubspotService
         } elseif ($status == Policy::STATUS_EXPIRED) {
             $stage = "expired";
         }
-        $phoneProperties = [];
-        if ($policy instanceof PhonePolicy) {
-            $phoneProperties = [
-                $this->buildDealProperty("phone_model", $policy->getPhone()->getModel()),
-                $this->buildDealProperty("phone_make", $policy->getPhone()->getMake()),
-                $this->buildDealProperty("phone_memory", $policy->getPhone()->getMemory()),
-                $this->buildDealProperty("imei", $policy->getImei()),
-                $this->buildDealProperty("serial", $policy->getSerialNumber())
-
-            ];
+        $data = [];
+        $this->addProperty("pipeline", $this->dealPipelineKey, $data, true);
+        $this->addProperty("dealname", $policy->getPolicyNumber(), $data, true);
+        $this->addProperty("dealstage", $this->getDealStageId($stage), $data, true);
+        if ($policy->getStart()) {
+            $data[] = $this->buildProperty("start", $policy->getStart()->format("d-m-Y H:i"), true);
         }
-        $properties = [
-            $this->buildDealProperty("pipeline", $this->dealPipelineKey),
-            $this->buildDealProperty("dealname", $policy->getPolicyNumber()),
-            $this->buildDealProperty("dealstage", $stage),
-            $this->buildDealProperty("start", $policy->getStart()),
-            $this->buildDealProperty("end", $policy->getEnd()),
-        ];
+        if ($policy->getEnd()) {
+            $data[] = $this->buildProperty("end", $policy->getEnd()->format("d-m-Y H:i"), true);
+        }
+        if ($policy instanceof PhonePolicy) {
+            $this->addProperty("phone_model", $policy->getPhone()->getModel(), $data, true);
+            $this->addProperty("phone_make", $policy->getPhone()->getMake(), $data, true);
+            $this->addProperty("phone_memory", $policy->getPhone()->getMemory(), $data, true);
+            $this->addProperty("imei", $policy->getImei(), $data, true);
+            $this->addProperty("serial", $policy->getSerialNumber(), $data, true);
+        }
         return [
             "associations" => [
                 "associatedVids" => [$policy->getUser()->getHubspotId()]
             ],
-            "properties" => array_merge($properties, $phoneProperties)
+            "properties" => $data
         ];
     }
 
@@ -292,42 +294,19 @@ class HubspotService
      */
     private function buildHubspotUserData(User $user)
     {
-        $data = array_merge(
-            $this->buildHubspotUserDetailsData($user),
-            $this->buildHubspotAddressData($user),
-            $this->buildHubspotMiscData($user)
-        );
-        return $data;
-    }
-
-    /**
-     * Builds array of user general data for hubspot.
-     * @param User $user is the user we are building the data array on.
-     * @return array containing the data we just collated.
-     */
-    private function buildHubspotUserDetailsData(User $user)
-    {
-        $data = [
-            $this->buildProperty("firstname", $user->getFirstName()),
-            $this->buildProperty("lastname", $user->getLastName()),
-            $this->buildProperty("email", $user->getEmailCanonical()),
-            $this->buildProperty("mobilephone", $user->getMobileNumber()),
-            $this->buildProperty("gender", $user->getGender() ?: "no"),
-        ];
+        $data = [];
+        $this->addProperty("firstname", $user->getFirstName(), $data);
+        $this->addProperty("lastname", $user->getLastName(), $data);
+        $this->addProperty("email", $user->getEmailCanonical(), $data);
+        $this->addProperty("mobilephone", $user->getMobileNumber(), $data);
+        $this->addProperty("gender", $user->getGender(), $data);
+        $this->addProperty("attribution", $user->getAttribution(), $data);
+        $this->addProperty("lastest_attribution", $user->getLatestAttribution(), $data);
+        $this->addProperty("customer", true, $data);
+        $this->addProperty("hs_facebookid", $user->getFacebookId(), $data);
         if ($user->getBirthday()) {
             $data[] = $this->buildProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
         }
-        return $data;
-    }
-
-    /**
-     * Builds array of data related to user's address.
-     * @param User $user is the user that the data is on.
-     * @return array containing the data.
-     */
-    private function buildHubspotAddressData(User $user)
-    {
-        $data = [];
         if ($user->getBillingAddress()) {
             $data[] = $this->buildProperty("billing_address", $user->getBillingAddress()->__toString());
             if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
@@ -341,44 +320,29 @@ class HubspotService
     }
 
     /**
-     * Builds array of miscellanious user data.
-     * @param User $user is the user that we are building the data on.
-     * @return array containing the collected data.
+     * Add a hubspot property to a list of properties if the value is not null.
+     * @param string  $name  is the name of the property.
+     * @param mixed   $value is the value of the property.
+     * @param array   $array is the array to add it to.
+     * @param boolean $deal  is whether the property is a deal or customer property.
      */
-    private function buildHubspotMiscData(User $user)
+    private function addProperty($name, $value, &$array, $deal = false)
     {
-        $data = [
-            $this->buildProperty("attribution", $user->getAttribution()),
-            $this->buildProperty("latestattribution", $user->getLatestAttribution()),
-            $this->buildProperty("customer", true)
-        ];
-        $facebookId = $user->getFacebookId();
-        if ($facebookId) {
-            $data["hs_facebookid"] = $this->buildProperty("hs_facebookid", $facebookId);
+        if ($value) {
+            $array[] = $this->buildProperty($name, $value, $deal);
         }
-        return $data;
     }
 
     /**
-     * Puts a single property into the format that hubspot wants to receive it as.
-     * @param string $name  is the name of the property.
-     * @param mixed  $value is the object that the property consists of.
-     * @return array with the property.
+     * Builds the prototype of a property needed to be sent in to describe an object to hubspot.
+     * @param string  $name  is the name of the property.
+     * @param mixed   $value is the value of the property.
+     * @param boolean $deal  is whether it is a deal property or a contact property is there is a slight difference.
+     * @return array containing the property prototype.
      */
-    private function buildProperty($name, $value)
+    private function buildProperty($name, $value, $deal = false)
     {
-        return ["property" => $name, "value" => $value ?: ""];
-    }
-
-    /**
-     * Puts a single property into the format that hubspot wants to receive it as for a deal.
-     * @param string $name  is the name of the property.
-     * @param mixed  $value is the object that the property consists of.
-     * @return array with the property.
-     */
-    private function buildDealProperty($name, $value)
-    {
-        return ["name" => $name, "value" => $value ?: ""];
+        return [($deal ? "name" : "property") => $name, "value" => $value];
     }
 
     /**
@@ -386,16 +350,19 @@ class HubspotService
      * code returned denotes rate limiting then it will tell you of this.
      * @param Response  $response is the response that you are checking.
      * @param array|int $desired  is the response code or list containing that you want the response to have.
+     * @return array the response body converted into an array from json.
      * @throws \Exception when $response's status code is not $desired.
      */
-    private function validateResponse(Response $response, $desired)
+    private function validateResponse($response, $desired)
     {
         $code = $response->getStatusCode();
         if (!is_array($desired)) {
             $desired = [$desired];
         }
         if (in_array($code, $desired)) {
-            return json_decode($response->getBody()->getContents());
+            $data = json_decode($response->getBody()->getContents(), true);
+            $data["responseCode"] = $code;
+            return $data;
         } elseif ($code === 429) {
             // TODO: next time I merge master there is an exception I made for this and use catch it up in the process
             //       function like it does in mixpanel service to requeue unconditionally.
@@ -404,5 +371,30 @@ class HubspotService
         } else {
             throw new \Exception("Hubspot request returned status {$code}. ".$response->getBody());
         }
+    }
+
+    /**
+     * Gets the id code of a desired deal stage. This information has to be downloaded from hubspot but can then be
+     * cached, so this just downloads and caches it when necessary.
+     * @param string $name is the name of the desired stage.
+     * @return string the id code of the desired deal stage so long as it's a valid deal stage.
+     * @throws \Exception if you try to get a deal stage that does not exist.
+     */
+    private function getDealStageId($name)
+    {
+        $value = $this->redis->hget(self::DEAL_STAGE_CACHE_KEY, $name);
+        if ($value) {
+            return $value;
+        }
+        $response = $this->client->dealPipelines()->getPipeline($this->dealPipelineKey);
+        $response = $this->validateResponse($response, 200);
+        foreach ($response["stages"] as $stage) {
+            $this->redis->hset(self::DEAL_STAGE_CACHE_KEY, $stage["label"], $stage["stageId"]);
+        }
+        $value = $this->redis->hget(self::DEAL_STAGE_CACHE_KEY, $name);
+        if ($value) {
+            return $value;
+        }
+        throw new \Exception("{$name} is not a deal stage in the sosure deal pipeline");
     }
 }
