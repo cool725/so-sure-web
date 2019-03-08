@@ -831,6 +831,7 @@ services:
             - "@logger"
             - "@snc_redis.default"
             - "@app.intercom"
+            - "@app.hubspot"
             - "@app.mixpanel"
             - "@app.judopay"
 

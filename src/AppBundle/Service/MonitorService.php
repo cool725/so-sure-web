@@ -53,6 +53,9 @@ class MonitorService
     /** @var IntercomService */
     protected $intercom;
 
+    /** @var HubspotService */
+    protected $hubspot;
+
     /** @var MixpanelService */
     protected $mixpanel;
 
@@ -64,6 +67,7 @@ class MonitorService
      * @param LoggerInterface $logger
      * @param \Predis\Client  $redis
      * @param IntercomService $intercom
+     * @param HubspotService  $hubspot
      * @param MixpanelService $mixpanel
      * @param JudopayService  $judopay
      */
@@ -72,6 +76,7 @@ class MonitorService
         LoggerInterface $logger,
         \Predis\Client $redis,
         IntercomService $intercom,
+        HubspotService $hubspot,
         MixpanelService $mixpanel,
         JudopayService $judopay
     ) {
@@ -282,7 +287,7 @@ class MonitorService
                 continue;
             }
             */
-            
+
             /** @var mixed $intercomUser */
             $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
             if (is_object($intercomUser)) {
@@ -482,6 +487,14 @@ class MonitorService
     public function checkIntercomQueue()
     {
         $count = $this->intercom->countQueue();
+        if ($count > 150) {
+            throw new MonitorException(sprintf('There are %d outstanding messages in the queue', $count));
+        }
+    }
+
+    public function checkHubspotQueue()
+    {
+        $count = $this->hubspot->countQueue();
         if ($count > 150) {
             throw new MonitorException(sprintf('There are %d outstanding messages in the queue', $count));
         }
