@@ -46,10 +46,11 @@ Encore
     .addEntry('banking', './src/AppBundle/Resources/public/rebrand/js/pages/admin/banking.js')
     .addEntry('rewards', './src/AppBundle/Resources/public/rebrand/js/pages/admin/rewards.js')
     .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
-    .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
+    .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
+    .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
 
     // User files
     .addEntry('user', './src/AppBundle/Resources/public/rebrand/js/pages/user/user.js')
