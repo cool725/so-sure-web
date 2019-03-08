@@ -84,6 +84,7 @@ class MonitorService
         $this->logger = $logger;
         $this->redis = $redis;
         $this->intercom = $intercom;
+        $this->hubspot = $hubspot;
         $this->mixpanel = $mixpanel;
         $this->judopay = $judopay;
     }
