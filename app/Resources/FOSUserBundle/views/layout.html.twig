@@ -6,6 +6,9 @@
 {% set light_nav  = 1 %}
 {# TODO: Do we need to hide the nav or at least the login button #}
 {% set quote_mode = 1 %}
+{% block meta %}
+    <meta name="robots" content="noindex">
+{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
