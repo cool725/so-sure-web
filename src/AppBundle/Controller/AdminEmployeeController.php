@@ -435,7 +435,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         $this->addFlash('error', 'Unable to record call');
                     }
-
                     return new RedirectResponse($request->getUri());
                 }
             }
@@ -448,54 +447,31 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return array_merge($data, [
             'policy_route' => 'admin_policy',
             'call_form' => $callForm->createView(),
+            'periods' => ReportingService::getPeriodList()
         ]);
     }
 
     /**
-     * @Route("/policies/called-list", name="admin_policies_called_list")
+     * @Route("/policies/called-list/", name="admin_policies_called_list")
      */
     public function adminPoliciesCalledListAction(Request $request)
     {
+        $period = $request->query->get('period');
+        $start = new \DateTime(ReportingService::REPORT_PERIODS[$period]['start']);
+        $end = new \DateTime(ReportingService::REPORT_PERIODS[$period]['end']);
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
-
         /** @var Builder $policiesQb */
-        $policiesQb = $policyRepo->createQueryBuilder()
-            ->eagerCursor(true)
-            ->field('user')->prime(true);
-        $policiesQb = $policiesQb->addAnd(
-            $policiesQb->expr()->field('notesList.type')->equals('call')
-        );
-
-        $now = new \DateTime();
-        $year = $now->format('Y');
-        $weekNum = $now->format('W');
-
-        $startWeek = new \DateTime();
-        $startWeek->setISODate($year, $weekNum - 1);
-        $endWeek = new \DateTime();
-        $endWeek->setISODate($year, $weekNum);
-        if ($request->get('week') == 'now') {
-            $startWeek = new \DateTime();
-            $startWeek->setISODate($year, $weekNum);
-            $endWeek = new \DateTime();
-            $endWeek->setISODate($year, $weekNum + 1);
-        }
-
-        $policiesQb = $policiesQb->addAnd(
-            $policiesQb->expr()->field('notesList.date')->gte($startWeek)
-        );
-        $policiesQb = $policiesQb->addAnd(
-            $policiesQb->expr()->field('notesList.date')->lt($endWeek)
-        );
+        $policiesQb = $policyRepo->createQueryBuilder()->eagerCursor(true)->field('user')->prime(true);
+        $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.type')->equals('call'));
+        $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.date')->gte($start));
+        $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.date')->lt($end));
         $policies = $policiesQb->getQuery()->execute();
-
+        // Build the response content.
         $response = new StreamedResponse();
         $response->setCallback(function () use ($policies) {
             $handle = fopen('php://output', 'w+');
-
-            // Add the header of the CSV file
             fputcsv($handle, [
                 'Date',
                 'Name',
@@ -516,7 +492,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 'Termination week number',
                 'Call week number',
                 'Call month',
-                'Cancellation month',
+                'Cancellation month'
             ]);
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
@@ -550,21 +526,19 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
                     $note->getDate()->format('W'),
                     $note->getDate()->format('M'),
-                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null,
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null
                 ];
                 fputcsv(
                     $handle, // The file pointer
                     $line
                 );
             }
-
             fclose($handle);
         });
-
+        // response stuff.
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-connections.csv"');
-
         return $response;
     }
 

@@ -1305,6 +1305,25 @@ class ReportingService
     }
 
     /**
+     * Gives a list of time periods to report on.
+     * @return array which associates a name for each period to another array containing string representations of the
+     *               start and end of that period.
+     */
+    public function getPeriodList()
+    {
+        $periods = [];
+        foreach (self::REPORT_PERIODS as $key => $periodChoice) {
+            if (array_key_exists("month", $periodChoice)) {
+                $start = (new \DateTime($periodChoice["start"]))->format("F Y");
+                $periods[$start] = $key;
+            } else {
+                $periods[$key] = $key;
+            }
+        }
+        return $periods;
+    }
+
+    /**
      * gives you a period of time with an optional starting date and an optional
      * ending date, start date is rounded to the beginning of the given day, and
       * end date is rounded to the end of the preceding day.
