@@ -452,7 +452,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/policies/called-list/", name="admin_policies_called_list")
+     * @Route("/policies/called-list", name="admin_policies_called_list")
      */
     public function adminPoliciesCalledListAction(Request $request)
     {
