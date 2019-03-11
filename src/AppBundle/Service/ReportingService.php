@@ -1309,7 +1309,7 @@ class ReportingService
      * @return array which associates a name for each period to another array containing string representations of the
      *               start and end of that period.
      */
-    public function getPeriodList()
+    public static function getPeriodList()
     {
         $periods = [];
         foreach (self::REPORT_PERIODS as $key => $periodChoice) {
