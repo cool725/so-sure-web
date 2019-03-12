@@ -1,7 +1,13 @@
 {% extends 'admin_claims_base_rebrand.html.twig' %}
-{% form_theme reset_form with ['AppBundle:Form:submit.html.twig'] %}
-{% form_theme user_permission_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
-{% form_theme user_high_risk_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
+{% if reset_form is defined %}
+    {% form_theme reset_form with ['AppBundle:Form:submit.html.twig'] %}
+{% endif %}
+{% if user_permission_form is defined %}
+    {% form_theme user_permission_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
+{% endif %}
+{% if user_high_risk_form is defined %}
+    {% form_theme user_high_risk_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
+{% endif %}
 
 {# Set vars #}
 {% set body_class = 'admin-user' %}
