@@ -1,148 +1,157 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme email_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
+{% form_theme sms_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
 
-    {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8">
-                <h2>so-sure Opt Outs</h2>
+{# Set vars #}
+{% set body_class = 'admin-opt-outs' %}
+
+{% block title %}so-sure - Opt Outs{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Opt Outs</h1>
             </div>
-            <div class="col-sm-4" style="padding-top:20px;">
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addEmailModal"
-                    ><i class="fa fa-envelope"></i></button>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addSmsModal"
-                    ><i class="fa fa-phone"></i></button>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary btn-square mr-md-2"
+                       data-toggle="modal"
+                       data-target="#add_email_modal">
+                       <i class="fal fa-envelope fa-fw"></i> Add email</a>
+                    <a href="#"
+                       class="btn btn-primary btn-square mr-md-2"
+                       data-toggle="modal"
+                       data-target="#add_sms_modal">
+                       <i class="fal fa-phone fa-fw"></i> Add SMS</a>
+                </div>
+            </div>
+            {% if optouts|length == 0 %}
+                <p class="mb-5">No opt outs found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Category</th>
+                                <th>Location</th>
+                                <th>Date</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for optout in optouts %}
+                                <tr>
+                                    <td>{% if optout.email is defined %}{{ optout.email }}{% endif %}</td>
+                                    <td>{% if optout.mobile is defined %}{{ optout.mobile }}{% endif %}</td>
+                                    <td>{{ optout.categories|json_encode }}</td>
+                                    <td>{{ optout.location }}</td>
+                                    <td>{{ optout.created|date }}</td>
+                                    <td>{{ optout.notes }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
         </div>
+    </section>
 
-    {% if optouts|length == 0 %}
-    <div class="row-fluid">
-        <h2>No opt outs found</h2>
-    </div>
-    {% else %}
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Mobile</th>
-                        <th>Category</th>
-                        <th>Location</th>
-                        <th>Date</th>
-                        <th>Notes</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for optout in optouts %}
-                        <tr>
-                            <td>{% if optout.email is defined %}{{ optout.email }}{% endif %}</td>
-                            <td>{% if optout.mobile is defined %}{{ optout.mobile }}{% endif %}</td>
-                            <td>{{ optout.categories|json_encode }}</td>
-                            <td>{{ optout.location }}</td>
-                            <td>{{ optout.created|date }}</td>
-                            <td>{{ optout.notes }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    {# Page Modals #}
+    <div class="modal fade"
+         id="add_email_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="add_email_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Email OptOut</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(email_form) }}
+                        <div class="form-group">
+                            {{ form_label(email_form.email, 'Email') }}
+                            {{ form_widget(email_form.email, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(email_form.email) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(email_form.categories, 'Categories') }}
+                            {{ form_widget(email_form.categories, {'attr': {'class': 'custom-control-input'}}) }}
+                            <div class="with-errors">{{ form_errors(email_form.categories) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(email_form.notes, 'Notes') }}
+                            {{ form_widget(email_form.notes, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(email_form.notes) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(email_form.update, {'label': 'Add', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(email_form) }}
+                </div>
             </div>
         </div>
     </div>
-    {% endif %}
-</div>
 
-    <div class="modal fade" id="addEmailModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            {{ form_start(email_form) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add Email OptOut</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(email_form.email, 'Email') }}
+    {# Page Modals #}
+    <div class="modal fade"
+         id="add_sms_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="add_sms_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add SMS OptOut</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(email_form.email) }}
-                    {{ form_widget(email_form.email) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(email_form.categories, 'Categories') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(email_form.categories) }}
-                    {{ form_widget(email_form.categories) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(email_form.notes, 'Notes') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(email_form.notes) }}
-                    {{ form_widget(email_form.notes) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
-                    {{ form_widget(email_form.update, {'label': 'Add OptOut', 'attr': {'class': 'btn btn-warning'}}) }}
+                <div class="modal-body">
+                    {{ form_start(sms_form) }}
+                        <div class="form-group">
+                            {{ form_label(sms_form.mobile, 'Mobile') }}
+                            {{ form_widget(sms_form.mobile, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(sms_form.mobile) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(sms_form.categories, 'Categories') }}
+                            {{ form_widget(sms_form.categories, {'attr': {'class': 'custom-control-input'}}) }}
+                            <div class="with-errors">{{ form_errors(sms_form.categories) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(sms_form.notes, 'Notes') }}
+                            {{ form_widget(sms_form.notes, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(sms_form.notes) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(sms_form.update, {'label': 'Add', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(sms_form) }}
                 </div>
             </div>
-          </div>
-            {{ form_end(email_form) }}
         </div>
-      </div>
     </div>
 
-    <div class="modal fade" id="addSmsModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-        {{ form_start(sms_form) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add SMS OptOut</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(sms_form.mobile, 'Mobile') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(sms_form.mobile) }}
-                    {{ form_widget(sms_form.mobile) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(sms_form.categories, 'Categories') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(sms_form.categories) }}
-                    {{ form_widget(sms_form.categories) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(sms_form.notes, 'Notes') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(sms_form.notes) }}
-                    {{ form_widget(sms_form.notes) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
-                    {{ form_widget(sms_form.update, {'label': 'Add OptOut', 'attr': {'class': 'btn btn-warning'}}) }}
-                </div>
-            </div>
-          </div>
-          {{ form_end(sms_form) }}
-        </div>
-      </div>
-    </div>
+{% endblock %}
+
+{% block javascriptsPage %}
+   {# <script src="{{ asset('css-js/company.js') }}"></script> #}
 {% endblock %}
