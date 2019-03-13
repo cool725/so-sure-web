@@ -26,18 +26,14 @@
                     <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
                         <h1 class="qpw__h1 text-columbia-blue-e">
                             <span class="sub">
-                                {{ phone.make }} {{ phone.model }}
-                                <small>({{ phone.memory }}GB)</small>
+                                {{ policy.phone.make }} {{ policy.phone.model }}
+                                <small>({{ policy.phone.memory }}GB)</small>
                             </span>
                         </h1>
                     </div>
                     <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                         <span class="sub">For only</span>
-                        {% if not app.user or app.user.allowedMonthlyPayments %}
-                            &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
-                        {% else %}
-                            &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
-                        {% endif %}
+                         &pound;{{ policy.getPremiumInstallmentPrice(true, true)|number_format(2, '.', ',') }} {% if bacs.annual %}a year{% else %}a month{% endif %}
                     </div>
                     <div class="qpw__h5 h5 d-block d-lg-none text-center">
                         <a href="#qpw-info-mobile"
