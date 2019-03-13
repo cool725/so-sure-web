@@ -19,23 +19,25 @@
 
     <section class="qpw">
         <div class="d-lg-flex">
-
             {# Main Content #}
             <div class="qpw__main__container">
                 <div class="qpw__main px-4 px-lg-5">
-                    <h5 class="text-white mb-4 text-center text-lg-left">Almost there, enter your payment details:</h5>
+                    <div class="qpw__h5 h5 text-center text-lg-left text-white mb-4">Almost there, check your payment details:</div>
                     <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
-                        <h1 class="qpw__h1 qpw__h1-policy text-columbia-blue-e">
-                            <i class="far fa-check text-white"></i>
+                        <h1 class="qpw__h1 text-columbia-blue-e">
                             <span class="sub">
-                                {{ policy.phone.make }} {{ policy.phone.model }}
-                                <small>({{ policy.phone.memory }}GB)</small>
+                                {{ phone.make }} {{ phone.model }}
+                                <small>({{ phone.memory }}GB)</small>
                             </span>
                         </h1>
                     </div>
                     <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                         <span class="sub">For only</span>
-                        &pound;{{ policy.getPremiumInstallmentPrice(true, true)|number_format(2, '.', ',') }} {% if bacs.annual %}a year{% else %}a month{% endif %}
+                        {% if not app.user or app.user.allowedMonthlyPayments %}
+                            &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                        {% else %}
+                            &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                        {% endif %}
                     </div>
                     <div class="qpw__h5 h5 d-block d-lg-none text-center">
                         <a href="#qpw-info-mobile"
@@ -106,7 +108,8 @@
                 </div>
             </div>
 
-            <div id="qpw-info-mobile" class="qpw__info__container__mobile  d-block d-lg-none">
+            {# Mobile Info #}
+            <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
                 <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                         <g id="Artboard" fill="#FFFFFF">
