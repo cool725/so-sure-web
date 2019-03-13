@@ -109,10 +109,4 @@ sosure.purchaseStepBacs = (function() {
 $(function() {
     sosure.purchaseStepBacs.init();
 
-    $('.nopaste').bind('cut copy paste', function(e) {
-        e.preventDefault();
-        $('.nopaste').bind("contextmenu", function(e) {
-            e.preventDefault();
-        });
-    });
 });

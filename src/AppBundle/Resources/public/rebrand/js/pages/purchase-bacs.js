@@ -116,11 +116,4 @@ $(function() {
         sosure.purchaseStepBacs.loader.show();
         webpay.submit();
     }
-
-    $('.nopaste').bind('cut copy paste', function(e) {
-        e.preventDefault();
-        $('.nopaste').bind("contextmenu", function(e) {
-            e.preventDefault();
-        });
-    });
 });

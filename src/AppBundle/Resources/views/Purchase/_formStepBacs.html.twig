@@ -57,7 +57,7 @@
                 </a>
             </span>
         </label>
-        {{ form_widget(bacs_form.validateSortCode, {'attr': {'placeholder': '👆', 'class': 'form-control nopaste sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
+        {{ form_widget(bacs_form.validateSortCode, {'attr': {'placeholder': '👆', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.validateSortCode) }}</div>
     </div>
 
@@ -80,7 +80,7 @@
                 </a>
             </span>
         </label>
-        {{ form_widget(bacs_form.validateAccountNumber, {'attr': {'placeholder': '👆', 'class': 'form-control nopaste', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
+        {{ form_widget(bacs_form.validateAccountNumber, {'attr': {'placeholder': '👆', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.validateAccountNumber) }}</div>
     </div>
 
