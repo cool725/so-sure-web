@@ -11,9 +11,9 @@ $(function() {
         // Add tracking
         let name = $(this).data('event');
 
-        tracking(name, function() {
-             close.parent().slideUp();
-        });
+        tracking(name);
+
+        $(this).parent().slideUp();
 
     });
 });

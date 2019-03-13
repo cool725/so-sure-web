@@ -21,8 +21,6 @@ const tracking = (name, type, location, callback) => {
         url = '/ops/track/' + name;
     }
 
-    // console.log(name, type, location);
-
     $.get(url).always(callback);
 }
 
