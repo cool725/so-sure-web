@@ -12,6 +12,12 @@ body {
     @include blue-gradient;
 }
 
+.qpw {
+    &__main {
+        background-color: $crayon-blue;
+    }
+}
+
 // Old Form CSS
 .step {
 
