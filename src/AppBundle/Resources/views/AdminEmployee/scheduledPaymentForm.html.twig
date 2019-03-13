@@ -1,0 +1,17 @@
+{% block body %}
+    {{ form_start(form, {"attr": {"novalidate": "novalidate"}}) }}
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="form-row">
+                    <label for="notes" class="col-sm-2 col-form-label">Notes</label>
+                    <div class="col-sm-10">{{ form_widget(form.notes, {"attr": {"id": "notes", "class": "form-control col-sm-10"}}) }}</div>
+                </div>
+                <div class="form-row">
+                    <label for="scheduled" class="col-sm-2 col-form-label">Scheduled Date</label>
+                    <div class="col-sm-10">{{ form_widget(form.scheduled, {"attr": {"id": "scheduled", "class": "form-control"}}) }}</div>
+                </div>
+                <div class="form-row">{{ form_widget(form.submit, {"attr": {"class": "form-control btn btn-primary", "label": "Update"}}) }}</div>
+            </div>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
