@@ -9,13 +9,11 @@
 
 body {
     background-color: $crayon-blue;
-    @include blue-gradient;
+    // @include blue-gradient;
 }
 
 .qpw {
-    &__main {
-        background-color: $crayon-blue;
-    }
+
 }
 
 // Old Form CSS

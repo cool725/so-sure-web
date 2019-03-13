@@ -9,15 +9,11 @@
 
 body {
     background-color: $crayon-blue;
-    @include blue-gradient;
+    // @include blue-gradient;
 }
 
 .qpw {
     padding-bottom: 6rem;
-
-    &__main {
-        background-color: $crayon-blue;
-    }
 
     @include media-breakpoint-up(md) {
         padding-bottom: 0;
