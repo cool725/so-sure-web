@@ -140,7 +140,7 @@ class BaseControllerTest extends WebTestCase
 
         if (!$errorMessage) {
             if ($crawler) {
-                $errorMessage = sprintf("%s %s", $errorMessage, $crawler->html());
+                $errorMessage = sprintf("%s %s", $errorMessage, $this->getCrawlerFlash($crawler));
             }
         }
 

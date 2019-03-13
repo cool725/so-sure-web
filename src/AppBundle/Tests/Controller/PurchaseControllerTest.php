@@ -965,30 +965,30 @@ class PurchaseControllerTest extends BaseControllerTest
             new \DateTime('1980-01-01')
         );
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, 'create Purchase');
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone);
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, sprintf('Set Phone %s', $phone->__toString()));
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, 'pledge');
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, 'payment');
         $crawler = self::$client->followRedirect();
 
         $cardButton = $crawler->selectButton('to_judo_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, $crawler, 'card');
         $this->verifyPurchaseReady($crawler);
     }
 
