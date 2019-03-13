@@ -279,9 +279,20 @@ class PurchaseControllerTest extends BaseControllerTest
             'foo',
             $phone
         );
-        $policy1 = self::initPolicy($user, self::$dm, $phone);
-        sleep(1);
-        $policy2 = self::initPolicy($user, self::$dm, $phone);
+        $imei1 = self::generateRandomImei();
+        $policy1 = self::initPolicy($user, self::$dm, $phone, null, false, false, true, $imei1);
+        $infiniteLoopCount = 0;
+        $imei2 = self::generateRandomImei();
+        while ($imei1 == $imei2) {
+            usleep(100);
+            $imei2 = self::generateRandomImei();
+            $infiniteLoopCount++;
+            if ($infiniteLoopCount > 100) {
+                break;
+            }
+        }
+        $this->assertNotEquals($imei1, $imei2);
+        $policy2 = self::initPolicy($user, self::$dm, $phone, null, false, false, true, $imei1);
 
         $this->login($user->getEmail(), 'foo', 'user/invalid');
 
@@ -289,7 +300,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect(
             sprintf('/purchase/step-pledge/%s', $policy1->getId())
-        ));
+        ), $crawler->html());
     }
 
     public function testStarlingLead()
@@ -766,11 +777,21 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
         $this->assertContains($phone->getModel(), $crawler->html());
 
+        $infiniteLoopCount = 0;
         $phone2 = $this->getRandomPhone(static::$dm);
+        while ($phone->getId() == $phone2->getId()) {
+            usleep(100);
+            $phone2 = $this->getRandomPhone(static::$dm);
+            $infiniteLoopCount++;
+            if ($infiniteLoopCount > 100) {
+                break;
+            }
+        }
+        $this->assertNotEquals($phone2->getId(), $phone->getId());
+
         $crawler = $this->changePhone($phone2);
         self::verifyResponse(200);
         $this->assertContains($phone2->getModel(), $crawler->html());
-        $this->assertNotEquals($phone2->getId(), $phone->getId());
     }
 
     public function testRePurchase()
