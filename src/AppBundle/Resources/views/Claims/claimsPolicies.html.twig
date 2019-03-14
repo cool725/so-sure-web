@@ -137,13 +137,13 @@
         </div>
         <div class="col-sm-6" class="pull-right" style="margin-top: 20px">
             {% if is_granted('ROLE_EMPLOYEE') and (status == 'call' or status == 'called') %}
-                <form class="form-row" method='GET' action={{ path('admin_policies_called_list') }}>
+                <form class="form-row" method='GET' action="{{ path('admin_policies_called_list') }}">
                     <div class="col-sm-9">
                         <select name="period">
                             {% for key, period in periods %}<option value="{{ period }}">{{ key }}</option>{% endfor %}
                         </select>
                     </div>
-                    <div class="col-sm-3"><button class="btn btn-primary">Build Report</button></div>
+                    <div class="col-sm-3"><button class="btn btn-primary">Unpaid Calls Report</button></div>
                 </form>
             {% endif %}
         </div>

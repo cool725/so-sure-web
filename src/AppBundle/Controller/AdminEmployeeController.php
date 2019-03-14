@@ -430,7 +430,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if ($policy) {
                         $policy->addNotesList($callNote->toCallNote());
                         $this->getManager()->flush();
-
                         $this->addFlash('success', 'Recorded call');
                     } else {
                         $this->addFlash('error', 'Unable to record call');
@@ -447,7 +446,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return array_merge($data, [
             'policy_route' => 'admin_policy',
             'call_form' => $callForm->createView(),
-            'periods' => ReportingService::getPeriodList()
+            'periods' => [
+                'Week '.(new \DateTime('-1 week'))->format('W') => 'week-1',
+                'Week '.(new \DateTime('-2 week'))->format('W') => 'week-2',
+                'Week '.(new \DateTime('-3 week'))->format('W') => 'week-3',
+                $this->monthName('-1 month') => 'month-1',
+                $this->monthName('-2 month') => 'month-2',
+                $this->monthName('-3 month') => 'month-3'
+            ]
         ]);
     }
 
@@ -456,9 +462,30 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function adminPoliciesCalledListAction(Request $request)
     {
-        $period = $request->query->get('period');
-        $start = new \DateTime(ReportingService::REPORT_PERIODS[$period]['start']);
-        $end = new \DateTime(ReportingService::REPORT_PERIODS[$period]['end']);
+        $period = mb_split('-', $request->query->get('period'));
+        $periodType = $period[0];
+        $periodNumber = $period[1];
+        $start = null;
+        $end = null;
+        $response = new StreamedResponse();
+        if ($periodType == 'week') {
+            $start = $this->startOfWeek(null, 0 - $periodNumber);
+            $end = $this->startOfWeek(null, 0 - $periodNumber + 1);
+            $response->headers->set(
+                'Content-Disposition',
+                'attachment; filename="so-sure-connections-week-'.$start->format('W').'-'.$start->format('Y').'.csv"'
+            );
+        } elseif ($periodType == 'month') {
+            $month = (new \DateTime())->sub(new \DateInterval("P{$periodNumber}M"));
+            $start = $this->startOfMonth($month);
+            $end = $this->endOfMonth($month);
+            $response->headers->set(
+                'Content-Disposition',
+                'attachment; filename="so-sure-connections-'.$start->format('F-Y').'.csv"'
+            );
+        } else {
+            throw new \Exception($periodType.' is not week/month');
+        }
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
@@ -469,7 +496,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.date')->lt($end));
         $policies = $policiesQb->getQuery()->execute();
         // Build the response content.
-        $response = new StreamedResponse();
         $response->setCallback(function () use ($policies) {
             $handle = fopen('php://output', 'w+');
             fputcsv($handle, [
@@ -538,7 +564,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         // response stuff.
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-connections.csv"');
         return $response;
     }
 

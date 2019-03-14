@@ -514,7 +514,7 @@
                                     <div class="col-sm-8">
                                         <b>{{ note.date|date }} by {{ note.userName }}</b>
                                     </div>
-                                    {% if note.action is not null %}
+                                    {% if note.action is defined and note.action is not null %}
                                         <div class="col-sm-4">
                                             Action: {{ note.action }}
                                         </div>
