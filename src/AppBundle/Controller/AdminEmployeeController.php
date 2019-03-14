@@ -145,6 +145,7 @@ use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -2935,6 +2936,64 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             "form" => $tasteCardForm->createView(),
             "policy" => $policy
         ];
+    }
+
+    /**
+     * @Route("/scheduled-payment-form/{id}/{scheduledPaymentId}", name="scheduled_payment_form")
+     * @Template
+     */
+    public function scheduledPaymentFormAction(Request $request, $id, $scheduledPaymentId)
+    {
+
+        $dm = $this->getManager();
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+        $scheduledPayment = $scheduledPaymentRepo->find($scheduledPaymentId);
+        if (!$scheduledPayment) {
+            $this->addFlash(
+                "error",
+                "Attempted to modify nonexistent scheduled payment with id '{$scheduledPaymentId}'."
+            );
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+        $scheduledPaymentForm = $this->get("form.factory")
+            ->createNamedBuilder("scheduled_payment_form")
+            ->add("notes", TextType::class, ["data" => $scheduledPayment->getNotes()])
+            ->add(
+                "scheduled",
+                DateTimeType::class,
+                [
+                    "data" => $scheduledPayment->getScheduled(),
+                    "html5" => false,
+                    "widget" => "single_text",
+                    "format" => "dd-MM-yyyy HH:mm",
+                    "attr" => ["class" => "datetimepickerfuture", "autocomplete" => "off"]
+                ]
+            )
+            ->add("submit", SubmitType::class)
+            ->setAction(
+                $this->generateUrl("scheduled_payment_form", ["id" => $id, "scheduledPaymentId" => $scheduledPaymentId])
+            )
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            // TODO: permissions
+            if ($request->request->has("scheduled_payment_form")) {
+                $scheduledPaymentForm->handleRequest($request);
+                if ($scheduledPaymentForm->isValid()) {
+                    $notes = $scheduledPaymentForm->get("notes")->getData();
+                    $scheduled = $scheduledPaymentForm->get("scheduled")->getData();
+                    if ($notes) {
+                        $scheduledPayment->setNotes($notes);
+                    }
+                    if ($scheduled) {
+                        $scheduledPayment->setScheduled($scheduled);
+                    }
+                    $dm->flush();
+                    $this->addFlash("success", "Scheduled Payment updated.");
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return ["form" => $scheduledPaymentForm->createView()];
     }
 
     /**

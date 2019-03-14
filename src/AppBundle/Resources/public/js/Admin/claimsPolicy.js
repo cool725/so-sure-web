@@ -48,11 +48,20 @@ $(document).ready(function(){
         minDate: moment().add(20, 'days')
     });
 
+    // date picker only for future dates or now.
+    $('.datetimepickerfuture').datetimepicker({
+        format: "DD-MM-YYYY HH:mm",
+        allowInputToggle: true,
+        showTodayButton: true,
+        useCurrent: false,
+        minDate: moment()
+    });
+
     // Copy button on scode
     var clipboard = new Clipboard('.btn-copy');
 
     $('.btn-copy').tooltip({
-        'title':'Copied', 
+        'title':'Copied',
         'trigger':'manual'
     });
 
@@ -63,6 +72,6 @@ $(document).ready(function(){
     clipboard.on('success', function(event) {
         console.log(event);
         $('.btn-copy').tooltip('show');
-        setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);        
+        setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
 });

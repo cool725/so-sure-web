@@ -4,6 +4,10 @@
 {% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
 
+{% block meta %}
+    <meta name="robots" content="noindex">
+{% endblock %}
+
 {% block body %}
     <section class="section--pad">
         <div class="container">

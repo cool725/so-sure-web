@@ -1,17 +1,36 @@
-{% extends '::base.html.twig' %}
-{% block body %}
+{% extends 'base_rebrand.html.twig' %}
 
-<section class="section--pad login">
-    <div class="container text-center">
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
-
-                {% block hwi_oauth_content %}
-                {% endblock hwi_oauth_content %}
-
-            </div>
-        </div>
-    </div>
-</section>
-
+{# Set vars #}
+{% set body_class = 'login' %}
+{% set light_nav  = 1 %}
+{# TODO: Do we need to hide the nav or at least the login button #}
+{% set quote_mode = 1 %}
+{% block meta %}
+    <meta name="robots" content="noindex">
 {% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="login  p-3 d-flex align-items-center">
+        <div class="login__inner">
+
+            {% block hwi_oauth_content %}
+            {% endblock hwi_oauth_content %}
+
+        </div>
+        <span class="login__phone__background animated fadeInLeft"></span>
+        <span class="login__money__background animated jackInTheBox"></span>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{# {% block javascriptsPage %}
+    <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
+    <script src="{{ asset('css-js/login.js') }}"></script>
+{% endblock %} #}

@@ -550,7 +550,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $bankAccount->setReference($reference);
             $bankAccount->setSortCode('000099');
             $bankAccount->setAccountNumber('87654321');
-            $bankAccount->setAccountName($policy->getUser()->getName());
+            if ($policy->getUser()) {
+                $bankAccount->setAccountName($policy->getUser()->getName());
+            }
             $bankAccount->setMandateSerialNumber(0);
             $status = rand(0, 4);
             if ($status == 0) {
