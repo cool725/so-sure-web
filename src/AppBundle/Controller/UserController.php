@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
@@ -1171,30 +1172,32 @@ class UserController extends BaseController
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
 
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
 
-        $includeJudoWebpay = false;
+        $includeCard = false;
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
-            Policy::UNPAID_JUDO_CARD_EXPIRED,
-            Policy::UNPAID_JUDO_PAYMENT_FAILED,
-            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            Policy::UNPAID_CARD_EXPIRED,
+            Policy::UNPAID_CARD_PAYMENT_FAILED,
+            Policy::UNPAID_CARD_PAYMENT_MISSING,
             Policy::UNPAID_PAYMENT_METHOD_MISSING,
         ])) {
-            $includeJudoWebpay = true;
+            $includeCard = true;
         } elseif (!$policy->canBacsPaymentBeMadeInTime() && in_array($unpaidReason, [
             Policy::UNPAID_BACS_MANDATE_INVALID,
             Policy::UNPAID_BACS_PAYMENT_FAILED,
             Policy::UNPAID_BACS_PAYMENT_MISSING,
         ])) {
-            $includeJudoWebpay = true;
+            $includeCard = true;
         }
 
-        if ($includeJudoWebpay && $amount > 0) {
+        if ($includeCard && $amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
@@ -1206,7 +1209,7 @@ class UserController extends BaseController
 
         if (in_array($unpaidReason, [
             Policy::UNPAID_BACS_UNKNOWN,
-            Policy::UNPAID_JUDO_UNKNOWN,
+            Policy::UNPAID_CARD_UNKNOWN,
             Policy::UNPAID_UNKNOWN
         ])) {
             $this->get('logger')->warning(sprintf(
@@ -1360,6 +1363,9 @@ class UserController extends BaseController
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $swapFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_SWAP_FROM_BACS);
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
 
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
@@ -1375,15 +1381,17 @@ class UserController extends BaseController
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
-        try {
-            $webpay = $this->get('app.judopay')->webRegister(
-                $user,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent'),
-                $policy
-            );
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
+        if ($cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
+            try {
+                $webpay = $this->get('app.judopay')->webRegister(
+                    $user,
+                    $request->getClientIp(),
+                    $request->headers->get('User-Agent'),
+                    $policy
+                );
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
+            }
         }
         $billing = new BillingDay();
         if ($policy) {

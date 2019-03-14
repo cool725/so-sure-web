@@ -9,6 +9,7 @@ use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\DirectDebitBankException;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
@@ -1144,6 +1145,7 @@ class ApiAuthController extends BaseController
         $dm = $this->getManager();
         $judoData = null;
         $bacsData = null;
+        $checkoutData = null;
         $existingData = null;
         try {
             $this->get('statsd')->startTiming("api.payPolicy");
@@ -1170,6 +1172,11 @@ class ApiAuthController extends BaseController
                 }
 
                 $existingData = $data['existing'];
+            } elseif (isset($data['checkout'])) {
+                if (!$this->validateFields($data['checkout'], ['token', 'amount'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $checkoutData = $data['checkout'];
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -1340,6 +1347,17 @@ class ApiAuthController extends BaseController
                 } else {
                     throw new ValidationException('Unsupport payment method');
                 }
+            } elseif ($checkoutData) {
+                /** @var CheckoutService $checkout */
+                $checkout = $this->get('app.checkout');
+                $checkout->pay(
+                    $policy,
+                    $this->getDataString($checkoutData, 'token'),
+                    $this->getDataString($checkoutData, 'amount'),
+                    Payment::SOURCE_MOBILE,
+                    null,
+                    $this->getIdentityLog($request)
+                );
             } else {
                 throw new \Exception('Unknown payment method');
             }
@@ -1451,6 +1469,7 @@ class ApiAuthController extends BaseController
         $bankAccount = null;
         $judoData = null;
         $bacsData = null;
+        $checkoutData = null;
         try {
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['bank_account'])) {
@@ -1466,6 +1485,11 @@ class ApiAuthController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
                 $judoData = $data['judo'];
+            } elseif (isset($data['checkout'])) {
+                if (!$this->validateFields($data['checkout'], ['token'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $checkoutData = $data['checkout'];
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -1549,6 +1573,13 @@ class ApiAuthController extends BaseController
                     $this->getDataString($judoData, 'card_token'),
                     $this->getDataString($judoData, 'device_dna'),
                     $policy
+                );
+            } elseif ($checkoutData) {
+                /** @var CheckoutService $checkout */
+                $checkout = $this->get('app.checkout');
+                $checkout->updatePaymentMethod(
+                    $policy,
+                    $this->getDataString($checkoutData, 'token')
                 );
             }
 

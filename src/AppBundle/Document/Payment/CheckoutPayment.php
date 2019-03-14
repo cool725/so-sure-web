@@ -2,23 +2,37 @@
 
 namespace AppBundle\Document\Payment;
 
+use AppBundle\Classes\NoOp;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\JudoPaymentRepository")
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\CheckoutPaymentRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
-class JudoPayment extends Payment
+class CheckoutPayment extends Payment
 {
-    const RESULT_SUCCESS = "Success";
+    const RESULT_AUTHORIZED = "Authorised";
+    const RESULT_AUTHORIZED_3D = "Authorised 3-D";
+    const RESULT_CARD_VERIFIED = 'Card Verified';
+    const RESULT_CAPTURED = "Captured";
+    const RESULT_REFUNDED = "Refunded";
+    const RESULT_CANCELLED = "Cancelled";
+    const RESULT_CHARGEBACK = "Chargeback";
     const RESULT_DECLINED = "Declined";
-    const RESULT_SKIPPED = "Skipped";
-    const RESULT_ERROR = "Error";
+    const RESULT_DEFERRED = "Deferred Refund";
+    const RESULT_EXPIRED = "Expired";
+    const RESULT_PENDING = "Pending";
+    const RESULT_TIMEOUT = "Timeout";
+    const RESULT_VOID = "Voided";
 
+    const RESULT_SKIPPED = "Skipped";
+
+    // TODO
     const TYPE_PAYMENT = 'Payment';
+    // TODO
     const TYPE_REFUND = 'Refund';
 
     /**
@@ -75,9 +89,24 @@ class JudoPayment extends Payment
     public function setResult($result)
     {
         $this->result = $result;
-        if ($result == self::RESULT_SUCCESS) {
+        if (in_array($result, [self::RESULT_CAPTURED, self::RESULT_REFUNDED, self::RESULT_CARD_VERIFIED])) {
             $this->setSuccess(true);
-        } elseif (in_array($result, [self::RESULT_DECLINED, self::RESULT_SKIPPED, self::RESULT_ERROR])) {
+        } elseif (in_array($result, [
+            self::RESULT_AUTHORIZED,
+            self::RESULT_AUTHORIZED_3D,
+            self::RESULT_PENDING,
+            self::RESULT_DEFERRED,
+            self::RESULT_TIMEOUT,
+        ])) {
+            // we don't have a defined success/failure yet
+            NoOp::ignore([]);
+        } elseif (in_array($result, [
+            self::RESULT_DECLINED,
+            self::RESULT_SKIPPED,
+            self::RESULT_EXPIRED,
+            self::RESULT_VOID,
+            self::RESULT_CANCELLED
+        ])) {
             $this->setSuccess(false);
         } else {
             throw new \Exception(sprintf('Unknown result %s', $result));
@@ -130,7 +159,7 @@ class JudoPayment extends Payment
             return $this->success;
         }
 
-        return $this->getResult() == self::RESULT_SUCCESS;
+        return in_array($this->result, [self::RESULT_CAPTURED, self::RESULT_REFUNDED, self::RESULT_CARD_VERIFIED]);
     }
 
     public function getRiskScore()
@@ -172,5 +201,13 @@ class JudoPayment extends Payment
         } else {
             return "Card Payment";
         }
+    }
+
+    public static function isSuccessfulResult($status)
+    {
+        $checkout = new CheckoutPayment();
+        $checkout->setResult($status);
+
+        return $checkout->isSuccess();
     }
 }

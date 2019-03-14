@@ -1,31 +1,45 @@
+
+{% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+
+<h4 class="text-dodger-blue">
+    Pay via Direct Debit
+    {% if to_card_form is defined %}
+        <span class="sub h5">(Recommended)</span>
+    {% endif %}
+</h4>
+
+{% if to_card_form is defined %}
+    <p class="mb-4">
+    <form class="payment-form" method="POST"
+          data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
+          data-value="{{ convert_to_pennies(amount) }}" data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
+          data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+    </form>
+    </p>
+
+    <p class="mb-4">
+        <small class="text-zaffre">
+            💳 Prefer to pay by card?
+            {% block to_card_form %}
+                {{ form_start(to_card_form) }}
+                {% set card_classes = "btn-simple-link" %}
+                {% if card_provider == "checkout" %}
+                    {% set card_classes = "btn-simple-link btn-card-pay" %}
+                {% endif %}
+
+                {{ form_widget(to_card_form.submit, {'label': 'Click here', 'attr': {'class': card_classes}}) }}
+                {{ form_end(to_card_form) }}
+            {% endblock to_card_form %}
+        </small>
+    </p>
+{% endif %}
+
 {{ form_start(bacs_form, {'attr': {
     'data-toggle': 'validator',
     'class': 'validate-form form-400',
     'data-client-validation': form_client_validation,
     'autocomplete': 'off'
 }}) }}
-
-    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-
-    <h4 class="text-dodger-blue">
-        Pay via Direct Debit
-        {% if to_judo_form is defined %}
-            <span class="sub h5">(Recommended)</span>
-        {% endif %}
-    </h4>
-
-    {% if to_judo_form is defined %}
-        <p class="mb-4">
-            <smalll class="text-zaffre">
-                💳 Prefer to pay by card?
-                {% block to_judo_form %}
-                    {{ form_start(to_judo_form) }}
-                    {{ form_widget(to_judo_form.submit, {'label': 'Click here', 'attr': {'class': 'btn-simple-link'}}) }}
-                    {{ form_end(to_judo_form) }}
-                {% endblock to_judo_form %}
-            </smalll>
-        </p>
-    {% endif %}
 
     <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
         {{ form_label(bacs_form.accountName, 'Name on account') }}

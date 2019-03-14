@@ -134,6 +134,11 @@
 {% endblock %}
 
 {% block javascriptsPage %}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
     <script src="{{ asset('css-js/purchase-bacs.js') }}"></script>
 {% endblock %}

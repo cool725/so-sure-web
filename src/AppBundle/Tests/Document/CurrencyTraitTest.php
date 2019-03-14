@@ -51,4 +51,14 @@ class CurrencyTraitTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals('1298.02', $this->staticToTwoDp(1298.02));
     }
+
+    public function testConvertToPennies()
+    {
+        $this->assertEquals(6732, $this->convertToPennies(67.32));
+    }
+
+    public function testConvertFromPennies()
+    {
+        $this->assertEquals(67.32, $this->convertFromPennies(6732));
+    }
 }

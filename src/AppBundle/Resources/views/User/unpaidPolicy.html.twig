@@ -2,7 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'user-unpaid' %}
-{% set show_judo = false %}
+{% set show_card = false %}
 {% set show_bacs_setup = false %}
 {% set show_bacs_retry = false %}
 {% set judo_btn_text = 'Update my card details' %}
@@ -21,11 +21,11 @@
         - Payment failed
     {% elseif unpaid_reason == 'unpaid_bacs_payment_missing' %}
         - Payment missing
-    {% elseif unpaid_reason == 'unpaid_judo_card_expired' %}
+    {% elseif unpaid_reason == 'unpaid_card_expired' %}
         - Card Expired
-    {% elseif unpaid_reason == 'unpaid_judo_payment_failed' %}
+    {% elseif unpaid_reason == 'unpaid_card_payment_failed' %}
         - Unpaid Policy
-    {% elseif unpaid_reason == 'unpaid_judo_payment_missing' %}
+    {% elseif unpaid_reason == 'unpaid_card_payment_missing' %}
         - Unpaid Policy
     {% else %}
         - Unknown payment problem
@@ -72,7 +72,7 @@
                     {# MANDATE FAILED OR CANCELLED #}
                     {% set show_bacs_setup = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
-                        {% set show_judo = true %}
+                        {% set show_card = true %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Direct Debit invalid </h1>
@@ -84,7 +84,7 @@
                     {# PAYMENT FAILED #}
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
-                        {% set show_judo = true %}
+                        {% set show_card = true %}
                     {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment failed</h1>
@@ -97,7 +97,7 @@
                     {% set show_bacs_setup = true %}
                     {% set show_bacs_retry = true %}
                     {% if not policy.canBacsPaymentBeMadeInTime %}
-                        {% set show_judo = true %}
+                        {% set show_card = true %}
                     {% endif %}
 
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
@@ -106,10 +106,10 @@
                     {# END - PAYMENT MISSING #}
 
                 {# CARD / JUDO PAY #}
-                {% elseif unpaid_reason == 'unpaid_judo_card_expired' %}
+                {% elseif unpaid_reason == 'unpaid_card_expired' %}
 
                     {# CARD EXPIRED #}
-                    {% set show_judo = true %}
+                    {% set show_card = true %}
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
@@ -117,7 +117,7 @@
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Card Expired</h1>
-                    <p>We were unable to take payment because your card ending <strong>{{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }}</strong> has expired.</p>
+                    <p>We were unable to take payment because your card ending <strong>{{ policy.getCardPaymentMethod.cardLastFour }}</strong> has expired.</p>
 
                     {% if not show_bacs_setup %}
                         <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
@@ -125,24 +125,24 @@
 
                     {# END - CARD EXPIRED #}
 
-                {% elseif unpaid_reason == 'unpaid_judo_payment_failed' %}
+                {% elseif unpaid_reason == 'unpaid_card_payment_failed' %}
 
                     {# PAYMENT FAILED #}
-                    {% set show_judo = true %}
+                    {% set show_card = true %}
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
 
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment Failed</h1>
-                    <p>We were unable to take payment because your card ending <strong>{{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }}</strong> was declined.</p>
+                    <p>We were unable to take payment because your card ending <strong>{{ policy.getCardPaymentMethod.cardLastFour }}</strong> was declined.</p>
                     <p>To avoid your policy being cancelled update your card details and pay the outstanding balance of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> now.</p>
                     {# END - PAYMENT FAILED #}
 
-                {% elseif unpaid_reason == 'unpaid_judo_payment_missing' %}
+                {% elseif unpaid_reason == 'unpaid_card_payment_missing' %}
 
                     {# PAYMENT MISSING #}
-                    {% set show_judo = true %}
+                    {% set show_card = true %}
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
@@ -156,7 +156,7 @@
                 {% elseif unpaid_reason == 'unpaid_payment_method_missing' %}
 
                     {# PAYMENT MISSING #}
-                    {% set show_judo = true %}
+                    {% set show_card = true %}
                     {% if policy.canBacsPaymentBeMadeInTime and bacs_feature %}
                         {% set show_bacs_setup = true %}
                     {% endif %}
@@ -168,18 +168,18 @@
 
                 {% else %}
 
-                    {# UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
+                    {# UNPAID_BACS_UNKNOWN, UNPAID_CARD_UNKNOWN, UNPAID_UNKNOWN #}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Payment problem</h1>
                     <p>Please <a href="mailto:support@spam.so-sure.net" class="mailto open-intercom">contact us</a>.</p>
-                    {# END - UNPAID_BACS_UNKNOWN, UNPAID_JUDO_UNKNOWN, UNPAID_UNKNOWN #}
+                    {# END - UNPAID_BACS_UNKNOWN, UNPAID_CARD_UNKNOWN, UNPAID_UNKNOWN #}
 
                 {% endif %}
             </div>
         </div>
     </section>
 
-    {% if show_judo %}
+    {% if show_card %}
         {% if show_bacs_setup %}
             {% set judo_btn_text = 'Continue to card payment' %}
         {% else %}
@@ -202,7 +202,7 @@
                         {{ form_end(form) }}
                     {% else %}
                         <p>Sorry, there is not enough time to retry a Direct Debit payment before your policy will expire.</p>
-                        {% if not show_judo %}
+                        {% if not show_card %}
                             <p>Please <a href="mailto:support@spam.so-sure.net" class="mailto open-intercom">contact us</a>.</p>
                         {% endif %}
                     {% endif %}
@@ -224,22 +224,36 @@
                             {% endif %}
                         </p>
                     {% else %}
-                        {% if not show_judo %}
+                        {% if not show_card %}
                             <p>Please <a href="mailto:support@spam.so-sure.net" class="mailto open-intercom">contact us</a>.</p>
                         {% endif %}
                     {% endif %}
                 {% endif %}
                 {# END - IF CAN SETUP BACS #}
-                {% if show_judo and webpay_action and webpay_reference and amount > 0 %}
-                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                        <div class="form-group">
-                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                            {% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}
-                                <p class="mt-4 mb-0">Rather pay by card?</p>
-                            {% endif %}
-                            <input type="submit" class="{% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}btn-simple-link{% else %}btn btn-success{% endif %}" value="{{ judo_btn_text }}">
-                        </div>
-                    </form>
+                {% if show_card and amount > 0 %}
+                    {% if webpay_action and webpay_reference %}
+                        <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                            <div class="form-group">
+                                <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                {% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}
+                                    <p class="mt-4 mb-0">Rather pay by card?</p>
+                                {% endif %}
+                                <input type="submit" class="{% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}btn-simple-link{% else %}btn btn-success{% endif %}" value="{{ judo_btn_text }}">
+                            </div>
+                        </form>
+                    {% else %}
+                        <form class="payment-form" method="POST"
+                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}" data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id }) }}"
+                              data-csrf="{{ csrf_token('checkout') }}"
+                              data-title="so-sure" data-subtitle="Bring your Policy {{ policy.policyNumber }} up to date"
+                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-success btn-card-pay" value="Pay now">
+                            </div>
+                        </form>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
@@ -250,5 +264,10 @@
 {% endblock %}
 
 {% block javascriptsPage %}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
     <script src="{{ asset('css-js/user-unpaid.js') }}"></script>
 {% endblock %}

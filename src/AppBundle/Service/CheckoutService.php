@@ -1,13 +1,32 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use Checkout\CheckoutApi;
+use com\checkout\ApiClient;
+use com\checkout\ApiServices\Cards\RequestModels\BaseCardCreate;
+use com\checkout\ApiServices\Cards\RequestModels\CardCreate;
+use com\checkout\ApiServices\Cards\ResponseModels\Card;
+use com\checkout\ApiServices\Charges\RequestModels\CardChargeCreate;
+use com\checkout\ApiServices\Charges\RequestModels\CardIdChargeCreate;
+use com\checkout\ApiServices\Charges\RequestModels\CardTokenChargeCreate;
+use com\checkout\ApiServices\Charges\RequestModels\ChargeCapture;
+use com\checkout\ApiServices\Charges\RequestModels\ChargeRefund;
+use com\checkout\ApiServices\Customers\RequestModels\CustomerCreate;
+use com\checkout\ApiServices\Reporting\RequestModels\TransactionFilter;
+use com\checkout\ApiServices\SharedModels\Address;
+use com\checkout\ApiServices\SharedModels\Transaction;
+use com\checkout\ApiServices\Tokens\RequestModels\PaymentTokenCreate;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -15,7 +34,7 @@ use Judopay;
 
 use AppBundle\Classes\Salva;
 
-use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Phone;
@@ -38,7 +57,7 @@ use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SameDayPaymentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class JudopayService
+class CheckoutService
 {
     use CurrencyTrait;
     use DateTrait;
@@ -59,15 +78,6 @@ class JudopayService
 
     /** @var LoggerInterface */
     protected $logger;
-
-    /** @var Judopay */
-    protected $apiClient;
-
-    /** @var Judopay */
-    protected $webClient;
-
-    /** @var string */
-    protected $judoId;
 
     /** @var DocumentManager */
     protected $dm;
@@ -93,6 +103,12 @@ class JudopayService
     /** @var FeatureService */
     protected $featureService;
 
+    /** @var ApiClient */
+    protected $client;
+
+    /** @var CheckoutApi */
+    protected $api;
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -103,13 +119,10 @@ class JudopayService
      * @param LoggerInterface          $logger
      * @param PolicyService            $policyService
      * @param MailerService            $mailer
-     * @param string                   $apiToken
      * @param string                   $apiSecret
-     * @param string                   $judoId
+     * @param string                   $apiPublic
      * @param string                   $environment
      * @param \Domnikl\Statsd\Client   $statsd
-     * @param string                   $webToken
-     * @param string                   $webSecret
      * @param EventDispatcherInterface $dispatcher
      * @param SmsService               $sms
      * @param FeatureService           $featureService
@@ -119,13 +132,10 @@ class JudopayService
         LoggerInterface $logger,
         PolicyService $policyService,
         MailerService $mailer,
-        $apiToken,
         $apiSecret,
-        $judoId,
+        $apiPublic,
         $environment,
         \Domnikl\Statsd\Client $statsd,
-        $webToken,
-        $webSecret,
         EventDispatcherInterface $dispatcher,
         SmsService $sms,
         FeatureService $featureService
@@ -133,57 +143,41 @@ class JudopayService
         $this->dm = $dm;
         $this->logger = $logger;
         $this->policyService = $policyService;
-        $this->judoId = $judoId;
         $this->mailer = $mailer;
         $this->dispatcher = $dispatcher;
         $this->sms = $sms;
-        $apiData = array(
-           'apiToken' => $apiToken,
-           'apiSecret' => $apiSecret,
-           'judoId' => $judoId,
-           'useProduction' => $environment == 'prod',
-           'apiVersion' => '5.6'
-           // endpointUrl is overwriten in Judopay Configuration Constructor
-           // 'endpointUrl' => ''
-        );
-        $this->apiClient = new Judopay($apiData);
-        $webData = array(
-           'apiToken' => $webToken,
-           'apiSecret' => $webSecret,
-           'judoId' => $judoId,
-           'useProduction' => $environment == 'prod',
-           // endpointUrl is overwriten in Judopay Configuration Constructor
-           // 'endpointUrl' => ''
-        );
-        $this->webClient = new Judopay($webData);
         $this->statsd = $statsd;
         $this->environment = $environment;
         $this->featureService = $featureService;
+
+        $isProd = $environment == 'prod';
+        $this->client = new ApiClient($apiSecret, $isProd ? 'live' : 'sandbox', !$isProd);
+        $this->api = new CheckoutApi($apiSecret, -1, $apiPublic);
     }
 
-    public function getTransaction($receiptId)
+    /**
+     * @param string $chargeId
+     * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge
+     */
+    public function getTransaction($chargeId)
     {
-        /** @var Judopay\Model $transaction */
-        $transaction = $this->apiClient->getModel('Transaction');
-        $data = array(
-            'judoId' => $this->judoId,
-        );
-        $transaction->setAttributeValues($data);
-        $details = $transaction->find($receiptId);
+        $charge = $this->client->chargeService();
+        /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
+        $details = $charge->getCharge($chargeId);
 
         return $details;
     }
 
-    public function getTransactionWebType($receiptId)
+    public function getTransactionWebType($chargeId)
     {
         try {
-            $data = $this->getTransaction($receiptId);
-            if (isset($data['yourPaymentMetaData']) && isset($data['yourPaymentMetaData']['web_type'])) {
-                return $data['yourPaymentMetaData']['web_type'];
+            $data = $this->getTransaction($chargeId);
+            if ($data->getMetadata() && isset($data->getMetadata()['web_type'])) {
+                return $data->getMetadata()['web_type'];
             }
         } catch (\Exception $e) {
             $this->logger->warning(
-                sprintf('Unable to find transaction receipt %s', $receiptId),
+                sprintf('Unable to find transaction charge %s', $chargeId),
                 ['exception' => $e]
             );
         }
@@ -193,16 +187,16 @@ class JudopayService
 
     public function getTransactions($pageSize, $logMissing = true)
     {
-        $policies = [];
-        $repo = $this->dm->getRepository(JudoPayment::class);
-        /** @var Judopay\Model $transactions */
-        $transactions = $this->apiClient->getModel('Transaction');
-        $data = array(
-            'judoId' => $this->judoId,
-        );
+        NoOp::ignore([$pageSize]);
 
-        $transactions->setAttributeValues($data);
-        $details = $transactions->all(0, $pageSize);
+        $policies = [];
+        $repo = $this->dm->getRepository(CheckoutPayment::class);
+
+        $filter = new TransactionFilter();
+        $filter->setPageSize($pageSize);
+        //$filter->setSearch()
+
+        $transactions = $this->client->reportingService()->queryTransaction($filter);
         $data = [
             'validated' => 0,
             'missing' => [],
@@ -211,82 +205,85 @@ class JudopayService
             'skipped-too-soon' => 0,
             'additional-payments' => []
         ];
-        foreach ($details['results'] as $receipt) {
+        foreach ($transactions->getData() as $transaction) {
+            /** @var Transaction $transaction */
             $policyId = null;
-            $result = isset($reciept['result']) ? $receipt['result'] : null;
-            if (isset($receipt['yourPaymentMetaData']) && isset($receipt['yourPaymentMetaData']['policy_id'])) {
+            $result = $transaction->getStatus();
+            $details = $this->getTransaction($transaction->getId());
+            if ($result == CheckoutPayment::RESULT_CAPTURED &&
+                $details->getMetadata() && isset($details->getMetadata()['policy_id'])) {
                 // Non-token payments (eg. user) may be tried several times in a row
                 // Ideally would seperate out the user/token payments, but for now
                 // use success as a proxy for that
-                if ($result == JudoPayment::RESULT_SUCCESS) {
-                    $policyId = $receipt['yourPaymentMetaData']['policy_id'];
-                    if (!isset($policies[$policyId])) {
-                        $policies[$policyId] = true;
-                    } else {
-                        if (!isset($data['additional-payments'][$policyId])) {
-                            $data['additional-payments'][$policyId] = 0;
-                        }
-                        //$data['additional-payments'][$policyId]++;
-                        $data['additional-payments'][$policyId] = json_encode($receipt);
+                $policyId = $details->getMetadata()['policy_id'];
+                if (!isset($policies[$policyId])) {
+                    $policies[$policyId] = true;
+                } else {
+                    if (!isset($data['additional-payments'][$policyId])) {
+                        $data['additional-payments'][$policyId] = 0;
                     }
+                    //$data['additional-payments'][$policyId]++;
+                    $data['additional-payments'][$policyId] = json_encode($transaction->getObject());
                 }
             }
 
-            $receiptId = $receipt['receiptId'];
+            $chargeId = $transaction->getId();
             /** @var JudoPayment $payment */
-            $payment = $repo->findOneBy(['receipt' => $receiptId]);
+            $payment = $repo->findOneBy(['receipt' => $chargeId]);
 
-            $created = new \DateTime($receipt['createdAt']);
+            $created = null;
+            if ($transaction->getDate()) {
+                $created = \DateTime::createFromFormat('Y-m-d\TH:i:s.uP', $transaction->getDate());
+            }
+
+            if (!$created) {
+                $created = $this->now();
+            }
             $now = \DateTime::createFromFormat('U', time());
             $diff = $now->getTimestamp() - $created->getTimestamp();
+
+            $success = CheckoutPayment::isSuccessfulResult($transaction->getStatus());
+
             // allow a few (5) minutes before warning if missing receipt
             if ($diff < 300) {
                 $data['skipped-too-soon']++;
-            } elseif (in_array($receipt['type'], [JudoPayment::TYPE_PAYMENT, JudoPayment::TYPE_REFUND]) &&
-                $receipt['result'] == JudoPayment::RESULT_SUCCESS) {
+            } elseif ($success) {
                 if (!$payment) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
-                            'INVESTIGATE!! Missing db judo payment for received payment. receipt %s on %s [%s]',
-                            $receiptId,
-                            $receipt['createdAt'],
-                            json_encode($receipt)
+                            'INVESTIGATE!! Missing db checkout payment for received payment. id %s on %s [%s]',
+                            $chargeId,
+                            $transaction->getDate(),
+                            json_encode($transaction->getObject())
                         ));
                     }
-                    $data['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
-                        $receipt['yourPaymentReference'] :
-                        $receiptId;
+                    $data['missing'][$chargeId] = $transaction->getTrackId();
                 } elseif (!$payment->isSuccess()) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
-                            'INVESTIGATE!! Judo payment status in db does not match judo. receipt %s on %s [%s]',
-                            $receiptId,
-                            $receipt['createdAt'],
-                            json_encode($receipt)
+                            'INVESTIGATE!! Checkout payment status in db does not match checkout id %s on %s [%s]',
+                            $chargeId,
+                            $transaction->getDate(),
+                            json_encode($transaction->getObject())
                         ));
                     }
-                    $data['invalid'][$receiptId] = isset($receipt['yourPaymentReference']) ?
-                        $receipt['yourPaymentReference'] :
-                        $receiptId;
+                    $data['invalid'][$chargeId] = $transaction->getTrackId();
                 } else {
                     $data['validated']++;
                 }
-            } elseif (in_array($receipt['type'], [JudoPayment::TYPE_PAYMENT, JudoPayment::TYPE_REFUND]) &&
-                $receipt['result'] != JudoPayment::RESULT_SUCCESS) {
+            } elseif (!$success) {
                 // can ignore failed missing payments
                 // however if our db thinks it successful and judo says its not, that's problematic
                 if ($payment && $payment->isSuccess()) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
-                            'INVESTIGATE!! Judo payment status in db does not match judo. receipt %s on %s [%s]',
-                            $receiptId,
-                            $receipt['createdAt'],
-                            json_encode($receipt)
+                            'INVESTIGATE!! Checkout payment status in db does not match checkout. id %s on %s [%s]',
+                            $chargeId,
+                            $transaction->getDate(),
+                            json_encode($transaction->getObject())
                         ));
                     }
-                    $data['invalid'][$receiptId] = isset($receipt['yourPaymentReference']) ?
-                        $receipt['yourPaymentReference'] :
-                        $receiptId;
+                    $data['invalid'][$chargeId] = $transaction->getTrackId();
                 }
             } else {
                 $data['non-payment']++;
@@ -296,23 +293,32 @@ class JudopayService
         return $data;
     }
 
+    public function pay(
+        Policy $policy,
+        $token,
+        $amount,
+        $source,
+        \DateTime $date = null,
+        IdentityLog $identityLog = null
+    ) {
+        $this->updatePaymentMethod($policy, $token, $amount);
+
+        $charge = $this->runTokenPayment($policy, $amount, rand(1, 999999), $policy->getId());
+
+        return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
+    }
+
     /**
      * @param Policy      $policy
-     * @param string      $receiptId
-     * @param string      $consumerToken
-     * @param string      $cardToken     Can be null if card is declined
-     * @param string      $source        Source of the payment
-     * @param string      $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @param string      $chargeId
+     * @param string      $source      Source of the payment
      * @param \DateTime   $date
      * @param IdentityLog $identityLog
      */
     public function add(
         Policy $policy,
-        $receiptId,
-        $consumerToken,
-        $cardToken,
+        $chargeId,
         $source,
-        $deviceDna = null,
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
@@ -349,11 +355,8 @@ class JudopayService
 
             $payment = $this->createPayment(
                 $policy,
-                $receiptId,
-                $consumerToken,
-                $cardToken,
+                $chargeId,
                 $source,
-                $deviceDna,
                 $date
             );
 
@@ -363,11 +366,8 @@ class JudopayService
             // Existing policy - add payment + prevent duplicate billing
             $payment = $this->createPayment(
                 $policy,
-                $receiptId,
-                $consumerToken,
-                $cardToken,
+                $chargeId,
                 $source,
-                $deviceDna,
                 $date
             );
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
@@ -393,26 +393,13 @@ class JudopayService
 
     protected function createPayment(
         Policy $policy,
-        $receiptId,
-        $consumerToken,
-        $cardToken,
+        $chargeId,
         $source,
-        $deviceDna = null,
         \DateTime $date = null
     ) {
         $user = $policy->getUser();
 
-        $judo = new JudoPaymentMethod();
-        $judo->setCustomerToken($consumerToken);
-        if ($cardToken) {
-            $judo->addCardToken($cardToken, null);
-        }
-        if ($deviceDna) {
-            $judo->setDeviceDna($deviceDna);
-        }
-        $policy->setPaymentMethod($judo);
-
-        $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
+        $payment = $this->validateCharge($policy, $chargeId, $source, $date);
 
         $this->triggerPaymentEvent($payment);
 
@@ -456,99 +443,176 @@ class JudopayService
         }
     }
 
-    public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
+    public function testPay(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
-        return $this->testPayDetails($user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId)['receiptId'];
+        $charge = $this->testPayDetails($policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId);
+        if (!$charge) {
+            return null;
+        }
+
+        return $charge->getId();
     }
 
-    public function testPayDetails(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
+    private function getCheckoutAddress(User $user)
     {
-        $data = array(
-            'judoId' => $this->judoId,
-            'yourConsumerReference' => $user->getId(),
-            'yourPaymentReference' => $ref,
-            'amount' => $this->toTwoDp($amount),
-            'currency' => 'GBP',
-            'cardNumber' => $cardNumber,
-            'expiryDate' => $expiryDate,
-            'cv2' => $cv2,
-        );
-
-        if ($policyId) {
-            $data['yourPaymentMetaData'] = ['policy_id' => $policyId];
+        $address = new Address();
+        if ($user->getBillingAddress()) {
+            $address->setAddressLine1($user->getBillingAddress()->getLine1());
+            $address->setAddressLine2($user->getBillingAddress()->getLine2());
+            $address->setCity($user->getBillingAddress()->getCity());
+            $address->setPostcode($user->getBillingAddress()->getPostcode());
         }
+        $address->setCountry('GB');
 
-        // simple way of cloning an array
-        $dataCopy = json_decode(json_encode($data), true);
-        if (!$data) {
-            throw new \Exception('Missing data array');
-        }
+        $phone = new \com\checkout\ApiServices\SharedModels\Phone();
+        $phone->setNumber(str_replace('+44', '', $user->getMobileNumber()));
+        $phone->setCountryCode('44');
+        $address->setPhone($phone);
 
+        return $address;
+    }
+
+    /**
+     * @param Policy      $policy
+     * @param string      $ref
+     * @param string      $amount
+     * @param string      $cardNumber
+     * @param string      $expiryDate
+     * @param string      $cv2
+     * @param string|null $policyId
+     * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge|null
+     * @throws \Exception
+     */
+    public function testPayDetails(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
+    {
+        $user = $policy->getUser();
+        $details = null;
         try {
-            /** @var Judopay\Model $payment */
-            $payment = $this->apiClient->getModel('CardPayment');
-            $payment->setAttributeValues($data);
-            $details = $payment->create();
+            $exp = explode('/', $expiryDate);
+
+
+            $cardCreate = new BaseCardCreate();
+            $cardCreate->setNumber(str_replace(' ', '', $cardNumber));
+            $cardCreate->setExpiryMonth($exp[0]);
+            $cardCreate->setExpiryYear($exp[1]);
+            $cardCreate->setCvv($cv2);
+
+            $cardCreate->setBillingDetails($this->getCheckoutAddress($user));
+
+            /*
+            $cardCreate = new CardCreate();
+            $cardCreate->setBaseCardCreate($card);
+            $cardCreate->setCustomerId($user->getId());
+
+            $cardService = $this->client->cardService();
+            $card = $cardService->createCard($cardCreate);
+
+            $customerCreate = new CustomerCreate();
+            $customerCreate->setBaseCardCreate($cardCreate);
+            $customerCreate->setEmail($user->getEmail());
+
+            $customerService = $this->client->customerService();
+            $customerResponse = $customerService->createCustomer($customerCreate);
+
+            $this->setCardToken($policy, $customerResponse->getDefaultCard());
+
+            $details = $this->runTokenPayment($policy, $amount, $ref, $policyId);
+            */
+            $pennies = $this->convertToPennies($amount);
+            $charge = new CardChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setValue($pennies);
+            $charge->setCurrency('GBP');
+            $charge->setTrackId($ref);
+            // Don't use for testing - ids will be changing constantly
+            //$charge->setCustomerId($user->getId());
+            $charge->setMetadata(['policy_id' => $policyId]);
+            $charge->setBaseCardCreate($cardCreate);
+
+            $service = $this->client->chargeService();
+            $details = $service->chargeWithCard($charge);
+            if ($details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
+                return $details;
+            }
+
+            $capture = new ChargeCapture();
+            $capture->setChargeId($details->getId());
+            $capture->setValue($this->convertToPennies($amount));
+
+            $service = $this->client->chargeService();
+            $details = $service->CaptureCardCharge($capture);
         } catch (\Exception $e) {
             $this->logger->error(
-                sprintf('Failed sending test payment: %s', json_encode($dataCopy)),
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
                 ['exception' => $e]
             );
-
-            // retry
-            /** @var Judopay\Model $payment */
-            $payment = $this->apiClient->getModel('CardPayment');
-            $payment->setAttributeValues($dataCopy);
-            $details = $payment->create();
         }
 
         return $details;
     }
 
-    public function testRegisterDetails(User $user, $ref, $cardNumber, $expiryDate, $cv2)
+    public function createCardToken($cardNumber, $expiryDate, $cv2)
     {
-        /** @var Judopay\Model $register */
-        $register = $this->apiClient->getModel('RegisterCard');
-        $data = array(
-            'judoId' => $this->judoId,
-            'yourConsumerReference' => $user->getId(),
-            'yourPaymentReference' => $ref,
-            'amount' => 1.01,
-            'currency' => 'GBP',
-            'cardNumber' => $cardNumber,
-            'expiryDate' => $expiryDate,
-            'cv2' => $cv2,
-        );
+        $token = null;
+        try {
+            $exp = explode('/', $expiryDate);
 
-        $register->setAttributeValues($data);
-        $details = $register->create();
+            $cardNumber = str_replace(' ', '', $cardNumber);
 
-        return $details;
+            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
+            //NoOp::ignore([$cv2]);
+            $card->cvv = $cv2;
+            $service = $this->api->tokens();
+            $token = $service->request($card);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed creating card token. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+        }
+
+        return $token;
     }
 
-    public function getReceipt($receiptId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
+    public function getCharge($chargeId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
     {
-        /** @var Judopay\Model $transaction */
-        $transaction = $this->apiClient->getModel('Transaction');
+        $service = $this->client->chargeService();
 
         try {
-            $transactionDetails = $transaction->find($receiptId);
+            /**  @var \com\checkout\ApiServices\Charges\ResponseModels\ChargeHistory  $transactionDetails **/
+            $transactionDetails = $service->getChargeHistory($chargeId);
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
-                'Error retrieving receipt %s. Ex: %s',
-                $receiptId,
+                'Error retrieving charge %s. Ex: %s',
+                $chargeId,
                 $e
             ));
 
             throw $e;
         }
 
-        if ($transactionDetails['amount'] != $transactionDetails['netAmount']) {
+        $hasRefund = false;
+        $refundedAmount = 0;
+        $amount = 0;
+        foreach ($transactionDetails->getCharges() as $charge) {
+            /** @var \com\checkout\ApiServices\SharedModels\Charge $charge */
+            if ($charge->getStatus() == CheckoutPayment::RESULT_REFUNDED) {
+                $hasRefund = true;
+                $refundedAmount += $charge->getValue();
+            } elseif ($charge->getStatus() == CheckoutPayment::RESULT_CAPTURED) {
+                $amount += $charge->getValue();
+            }
+        }
+
+
+        if ($hasRefund) {
             $msg = sprintf(
-                'Judo receipt %s has a refund applied (net %s of %s).',
-                $receiptId,
-                $transactionDetails['netAmount'],
-                $transactionDetails['amount']
+                'Checkout receipt %s has a refund applied (refunded %s of %s).',
+                $chargeId,
+                $this->convertFromPennies($refundedAmount),
+                $this->convertFromPennies($amount)
             );
             if ($enforceFullAmount) {
                 $this->logger->error($msg);
@@ -559,16 +623,19 @@ class JudopayService
             }
         }
 
-        // "2018-02-22T22:46:10.9625+00:00"
-        $created = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $transactionDetails['createdAt']);
+
+        /**  @var \com\checkout\ApiServices\Charges\ResponseModels\Charge  $transactionDetails **/
+        $transactionDetails = $service->verifyCharge($chargeId);
+        $created = \DateTime::createFromFormat(\DateTime::ATOM, $transactionDetails->getCreated());
+
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
         $diff = $date->diff($created);
         if ($diff->days > 0 || $diff->h >= self::MAX_HOUR_DELAY_FOR_RECEIPTS) {
             $msg = sprintf(
-                'Judo receipt %s is older than expected (%d:%d hours).',
-                $receiptId,
+                'Checkout chage %s is older than expected (%d:%d hours).',
+                $chargeId,
                 $diff->days,
                 $diff->h
             );
@@ -585,82 +652,156 @@ class JudopayService
     }
 
     /**
-     * @param User   $user
-     * @param string $receiptId
-     * @param string $consumerToken
-     * @param string $cardToken     Can be null if card is declined
-     * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
-     * @parma Policy $policy
+     * @param Policy $policy
+     * @param string $token
      */
     public function updatePaymentMethod(
-        User $user,
-        $receiptId,
-        $consumerToken,
-        $cardToken,
-        $deviceDna = null,
-        Policy $policy = null
+        Policy $policy,
+        $token,
+        $amount = null
     ) {
-        $transactionDetails = $this->getReceipt($receiptId);
-        if ($transactionDetails["result"] != JudoPayment::RESULT_SUCCESS) {
-            throw new PaymentDeclinedException();
-        }
-        /** @var JudoPaymentRepository $repo */
-        $repo = $this->dm->getRepository(JudoPayment::class);
-        /** @var JudoPayment $payment */
-        $payment = $repo->findOneBy(['receipt' => $receiptId]);
-        if ($payment) {
-            $payment->setResult($transactionDetails["result"]);
-            $payment->setMessage($transactionDetails["message"]);
-        }
+        $user = $policy->getUser();
+        $details = null;
+        $payment = null;
+        try {
+            if ($amount) {
+                $payment = new CheckoutPayment();
+                $payment->setAmount($amount);
+                $payment->setUser($policy->getUser());
+                $payment->setSource(Payment::SOURCE_WEB);
+                $policy->addPayment($payment);
+                $this->dm->persist($payment);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
 
-        // TODO: This should update on all policies
-        $judo = null;
-        if ($policy && $policy->getJudoPaymentMethod()) {
-            $judo = $policy->getJudoPaymentMethod();
-        }
-        if (!$judo || !$judo instanceof JudoPaymentMethod) {
-            $judo = new JudoPaymentMethod();
-            if ($policy) {
-                $policy->setPaymentMethod($judo);
-            } else {
-                foreach ($user->getValidPolicies(true) as $userPolicy) {
-                    $userPolicy->setPaymentMethod($judo);
+            $service = $this->client->chargeService();
+
+            $charge = new CardTokenChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setCurrency('GBP');
+            $charge->setMetadata(['policy_id' => $policy->getId()]);
+            $charge->setCardToken($token);
+            if ($amount) {
+                $charge->setValue($this->convertToPennies($amount));
+            }
+            if ($payment) {
+                $charge->setTrackId($payment->getId());
+            }
+
+            /*
+            $charge = new CardIdChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setCurrency('GBP');
+            $charge->setMetadata(['policy_id' => $policy->getId()]);
+            $charge->setCardId($token);
+            $details = $service->chargeWithCardId($charge);
+            */
+
+            $details = $service->chargeWithCardToken($charge);
+            $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+
+            if ($details && $payment) {
+                $payment->setReceipt($details->getId());
+                $payment->setAmount($this->convertFromPennies($details->getValue()));
+                $payment->setResult($details->getStatus());
+                $payment->setMessage($details->getResponseMessage());
+                $payment->setRiskScore($details->getRiskCheck());
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
+
+            if (!$details || $details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
+                throw new PaymentDeclinedException($details->getResponseMessage());
+            }
+
+            if ($amount) {
+                $capture = new ChargeCapture();
+                $capture->setChargeId($details->getId());
+                $details = $service->CaptureCardCharge($capture);
+                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+
+                if ($details && $payment) {
+                    $payment->setReceipt($details->getId());
+                    $payment->setAmount($this->convertFromPennies($details->getValue()));
+                    $payment->setResult($details->getStatus());
+                    $payment->setMessage($details->getResponseMessage());
+                    $payment->setRiskScore($details->getRiskCheck());
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
             }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+
+            throw $e;
         }
-        $judo->setCustomerToken($consumerToken);
-        if ($cardToken) {
-            $judo->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
-        }
-        if ($deviceDna) {
-            $judo->setDeviceDna($deviceDna);
+
+        if ($details) {
+            $card = $details->getCard();
+            if ($card) {
+                $this->setCardToken($policy, $card);
+            }
         }
 
         // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
         if ($policy && $policy->isDifferentPayer()) {
             // don't use $user as not validated that policy belongs to user
             $policy->setPayer($policy->getUser());
-            $this->dm->flush();
         }
+
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $details;
+    }
+
+    private function setCardToken(Policy $policy, Card $card)
+    {
+        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
+        $checkoutPaymentMethod = $policy->getCheckoutPaymentMethod();
+        if (!$checkoutPaymentMethod) {
+            $checkoutPaymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($checkoutPaymentMethod);
+        }
+
+        if (!$checkoutPaymentMethod->getCustomerId()) {
+            $checkoutPaymentMethod->setCustomerId($card->getCustomerId());
+        }
+
+        $tokens = $checkoutPaymentMethod->getCardTokens();
+        if (!isset($tokens[$card->getId()])) {
+            $cardDetails = [
+                'cardLastFour' => $card->getLast4(),
+                'endDate' => sprintf('%s%s', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
+                'cardType' => $card->getPaymentMethod(),
+                'fingerprint' => $card->getFingerprint(),
+                'authCode' => $card->getAuthCode(),
+                'cvvCheck' => $card->getCvvCheck(),
+                'avsCheck' => $card->getAvsCheck(),
+            ];
+            $checkoutPaymentMethod->addCardToken($card->getId(), json_encode($cardDetails));
+        }
     }
 
     /**
      * @param Policy    $policy
-     * @param string    $receiptId
-     * @param string    $cardToken Can be null if card is declined
+     * @param string    $chargeId
      * @param string    $source
      * @param \DateTime $date
      */
-    public function validateReceipt(Policy $policy, $receiptId, $cardToken, $source, \DateTime $date = null)
+    public function validateCharge(Policy $policy, $chargeId, $source, \DateTime $date = null)
     {
-        $transactionDetails = $this->getReceipt($receiptId);
-        $repo = $this->dm->getRepository(JudoPayment::class);
-        $exists = $repo->findOneBy(['receipt' => $transactionDetails["receiptId"]]);
+        $transactionDetails = $this->getCharge($chargeId);
+        $repo = $this->dm->getRepository(CheckoutPayment::class);
+        $exists = $repo->findOneBy(['receipt' => $transactionDetails->getId()]);
         if ($exists) {
             throw new ProcessedException(sprintf(
-                "Receipt %s has already been used to pay for a policy",
-                $transactionDetails['receiptId']
+                "Charge %s has already been used to pay for a policy",
+                $transactionDetails->getId()
             ));
         }
 
@@ -669,86 +810,75 @@ class JudopayService
         // Try to find payment via policy object, so that there isn't any inconsistencies
         // Uncertain if this is doing anything productive or not, but there was an error
         // that seems like it could only be causes by loading an unflush db record - ch4972
-        /** @var JudoPayment $payment */
+        /** @var CheckoutPayment $payment */
         $payment = null;
         foreach ($policy->getPayments() as $payment) {
-            if ($payment->getId() == $transactionDetails["yourPaymentReference"]) {
+            if ($payment->getId() == $transactionDetails->getTrackId()) {
                 break;
             }
 
-            /** @var JudoPayment $payment */
+            /** @var CheckoutPayment $payment */
             $payment = null;
         }
         // Fallback to db query if unable to find
         if (!$payment) {
-            /** @var JudoPayment $payment */
-            $payment = $repo->find($transactionDetails["yourPaymentReference"]);
+            /** @var CheckoutPayment $payment */
+            $payment = $repo->find($transactionDetails->getTrackId());
         }
 
+        $transactionAmount = $this->convertFromPennies($transactionDetails->getValue());
         if (!$payment) {
-            $payment = new JudoPayment();
-            $payment->setReference($transactionDetails["yourPaymentReference"]);
-            $payment->setAmount($transactionDetails["amount"]);
+            $payment = new CheckoutPayment();
+            $payment->setReference($transactionDetails->getTrackId());
+            $payment->setAmount($transactionAmount);
+            $payment->setUser($policy->getUser());
+            $policy->addPayment($payment);
             $this->dm->persist($payment);
             //\Doctrine\Common\Util\Debug::dump($payment);
-            $policy->addPayment($payment);
         } else {
-            if (!$this->areEqualToTwoDp($payment->getAmount(), $transactionDetails["amount"])) {
+            if (!$this->areEqualToTwoDp($payment->getAmount(), $transactionAmount)) {
                 $this->logger->error(sprintf(
                     'Payment %s Expected Matching Payment Amount %f',
                     $payment->getId(),
-                    $transactionDetails["amount"]
+                    $transactionAmount
                 ));
             }
         }
 
-        $payment->setReceipt($transactionDetails["receiptId"]);
-        $payment->setResult($transactionDetails["result"]);
-        $payment->setMessage($transactionDetails["message"]);
-        if (isset($transactionDetails["riskScore"])) {
-            $payment->setRiskScore($transactionDetails["riskScore"]);
-        }
-        // If wallet field is present, use that
-        if (isset($transactionDetails["walletType"]) && $transactionDetails["walletType"] == 1) {
-            $payment->setSource(Payment::SOURCE_APPLE_PAY);
-        } elseif (isset($transactionDetails["walletType"]) && $transactionDetails["walletType"] == 2) {
-            $payment->setSource(Payment::SOURCE_ANDROID_PAY);
-        } else {
-            $payment->setSource($source);
-        }
+        $payment->setReceipt($transactionDetails->getId());
+        $payment->setResult($transactionDetails->getStatus());
+        $payment->setMessage($transactionDetails->getResponseMessage());
+        $payment->setRiskScore($transactionDetails->getRiskCheck());
+        $payment->setSource($source);
 
         if ($date) {
             $payment->setDate($date);
         }
 
-        /** @var JudoPaymentMethod $judoPaymentMethod */
-        $judoPaymentMethod = $policy->getPolicyOrUserPaymentMethod();
-        if ($cardToken) {
-            $tokens = $judoPaymentMethod->getCardTokens();
-            if (!isset($tokens[$cardToken]) || !$tokens[$cardToken]) {
-                $judoPaymentMethod->addCardToken($cardToken, json_encode($transactionDetails['cardDetails']));
-                if (isset($transactionDetails['cardDetails']['cardLastfour'])) {
-                    $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastfour']);
-                } elseif (isset($transactionDetails['cardDetails']['cardLastFour'])) {
-                    $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastFour']);
-                }
-            }
+        /** @var Card $card */
+        $card = $transactionDetails->getCard();
+
+        if ($card) {
+            $this->setCardToken($policy, $card);
+            $payment->setCardLastFour($card->getLast4());
         }
 
-        if ($judoPaymentMethod && !$payment->getDetails()) {
-            $payment->setDetails($judoPaymentMethod->__toString());
+        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
+        $checkoutPaymentMethod = $policy->getCheckoutPaymentMethod();
+        if ($checkoutPaymentMethod && !$payment->getDetails()) {
+            $payment->setDetails($checkoutPaymentMethod->__toString());
         }
-
+        //\Doctrine\Common\Util\Debug::dump($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        if (!isset($transactionDetails["yourPaymentMetaData"]) ||
-            !isset($transactionDetails["yourPaymentMetaData"]["policy_id"])) {
+        $metadata = $transactionDetails->getMetadata();
+        if (!$metadata || !isset($metadata["policy_id"])) {
             $this->logger->warning(sprintf('Unable to find policy id metadata for payment id %s', $payment->getId()));
-        } elseif ($transactionDetails["yourPaymentMetaData"]["policy_id"] != $policy->getId()) {
+        } elseif ($metadata["policy_id"] != $policy->getId()) {
             $this->logger->error(sprintf(
                 'Payment id %s metadata [%s] does not match policy id %s',
                 $payment->getId(),
-                json_encode($transactionDetails["yourPaymentMetaData"]),
+                json_encode($metadata),
                 $policy->getId()
             ));
         }
@@ -756,7 +886,7 @@ class JudopayService
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
-        if ($payment->getResult() != JudoPayment::RESULT_SUCCESS) {
+        if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED) {
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
         }
@@ -766,7 +896,7 @@ class JudopayService
         return $payment;
     }
 
-    protected function validatePaymentAmount(JudoPayment $payment)
+    protected function validatePaymentAmount(CheckoutPayment $payment)
     {
         // TODO: Should we issue a refund in this case??
         $premium = $payment->getPolicy()->getPremium();
@@ -836,9 +966,9 @@ class JudopayService
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
         try {
-            if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
+            if (!$paymentMethod || !$paymentMethod instanceof CheckoutPaymentMethod) {
                 throw new \Exception(sprintf(
                     'Payment method not valid for scheduled payment %s',
                     $scheduledPayment->getId()
@@ -857,7 +987,7 @@ class JudopayService
 
             throw $e;
         } catch (\Exception $e) {
-            // TODO: Nicer handling if Judo has an issue
+            // TODO: Nicer handling if Checkout has an issue
             $this->logger->error(sprintf(
                 'Error running scheduled payment %s. Ex: %s',
                 $scheduledPayment->getId(),
@@ -866,11 +996,11 @@ class JudopayService
         }
 
         if (!$payment) {
-            $payment = new JudoPayment();
+            $payment = new CheckoutPayment();
             $payment->setAmount(0);
-            $payment->setResult(JudoPayment::RESULT_SKIPPED);
-            if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
-                $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+            $payment->setResult(CheckoutPayment::RESULT_SKIPPED);
+            if ($policy->getCheckoutPaymentMethod()) {
+                $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
             }
             $policy->addPayment($payment);
         }
@@ -911,8 +1041,11 @@ class JudopayService
         return $this->mailer;
     }
 
-    public function processScheduledPaymentResult(ScheduledPayment $scheduledPayment, $payment, \DateTime $date = null)
-    {
+    public function processScheduledPaymentResult(
+        ScheduledPayment $scheduledPayment,
+        CheckoutPayment $payment = null,
+        \DateTime $date = null
+    ) {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
@@ -921,7 +1054,7 @@ class JudopayService
         if ($payment) {
             $scheduledPayment->setPayment($payment);
         }
-        if ($payment && $payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+        if ($payment && $payment->isSuccess()) {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
 
             // will only be sent if card is expiring
@@ -959,8 +1092,8 @@ class JudopayService
         }
         $nextMonth->add(new \DateInterval('P1M'));
 
-        if (!$policy->hasPolicyOrPayerOrUserJudoPaymentMethod() ||
-            !$policy->getPolicyOrPayerOrUserJudoPaymentMethod()->isCardExpired($nextMonth)) {
+        if (!$policy->getCheckoutPaymentMethod() ||
+            !$policy->getCheckoutPaymentMethod()->isCardExpired($nextMonth)) {
             return false;
         }
 
@@ -1042,10 +1175,10 @@ class JudopayService
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
-    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $customerRef = null)
+    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId)
     {
-        /** @var JudoPaymentMethod $paymentMethod */
-        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
+        /** @var CheckoutPaymentMethod $paymentMethod */
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             throw new \Exception(sprintf(
                 'Unknown payment method for policy %s user %s',
@@ -1053,67 +1186,43 @@ class JudopayService
                 $policy->getPayerOrUser()->getId()
             ));
         }
-        if (!$customerRef) {
-            $customerRef = $policy->getPayerOrUser()->getId();
-        }
-
-        // add payment
-        /** @var Judopay\Model $tokenPayment */
-        $tokenPayment = $this->apiClient->getModel('TokenPayment');
-
-        $data = array(
-                'judoId' => $this->judoId,
-                'yourConsumerReference' => $customerRef,
-                'yourPaymentReference' => $paymentRef,
-                'yourPaymentMetaData' => [
-                    'policy_id' => $policyId,
-                ],
-                'amount' => $this->toTwoDp($amount),
-                'currency' => 'GBP',
-                'cardToken' => $paymentMethod->getCardToken(),
-                'emailAddress' => $policy->getUser()->getEmail(),
-                'mobileNumber' => $policy->getUser()->getMobileNumber(),
-        );
-        if ($this->featureService->isEnabled(Feature::FEATURE_JUDO_RECURRING)) {
-            $data['recurringPayment'] = true;
-        }
-        // For webpayments, we won't have the customer token, but its optoinal anyway
-        if ($paymentMethod->getCustomerToken()) {
-            $data['consumerToken'] = $paymentMethod->getCustomerToken();
-        }
-        if ($paymentMethod->getDecodedDeviceDna() && is_array($paymentMethod->getDecodedDeviceDna())) {
-            $data['clientDetails'] = $paymentMethod->getDecodedDeviceDna();
-        } elseif ($paymentMethod->getDeviceDna() &&
-            $paymentMethod->getDeviceDna() == JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT) {
-            // web payment, so no device dna
-            \AppBundle\Classes\NoOp::ignore([]);
-        } else {
-            // May not have for older customers
-            $this->logger->info(sprintf('Missing JudoPay DeviceDna for policy %s', $policy->getId()));
-        }
-
-        // populate the required data fields.
-        $tokenPayment->setAttributeValues($data);
 
         try {
-            $tokenPaymentDetails = $tokenPayment->create();
-        } catch (\Judopay\Exception\ApiException $e) {
-            $this->logger->warning(sprintf('Error running token payment (retrying) %s. Ex: %s', $paymentRef, $e));
-            sleep(1);
-            try {
-                $tokenPaymentDetails = $tokenPayment->create();
-            } catch (\Exception $e) {
-                $this->logger->error(sprintf('Error running retried token payment %s. Ex: %s', $paymentRef, $e));
+            $user = $policy->getUser();
 
-                throw $e;
+            $chargeService = $this->client->chargeService();
+            $chargeCreate = new CardIdChargeCreate();
+            $chargeCreate->setBillingDetails($this->getCheckoutAddress($user));
+
+            // Can only use 1
+            if ($paymentMethod->getCustomerId()) {
+                $chargeCreate->setCustomerId($paymentMethod->getCustomerId());
+            } else {
+                $chargeCreate->setEmail($user->getEmail());
             }
+            $chargeCreate->setAutoCapTime(0);
+            $chargeCreate->setAutoCapture('N');
+            $chargeCreate->setValue($this->convertToPennies($amount));
+            $chargeCreate->setCurrency('GBP');
+            $chargeCreate->setTrackId($paymentRef);
+            $chargeCreate->setMetadata(['policy_id' => $policyId]);
+            $chargeCreate->setCardId($paymentMethod->getCardToken());
+
+            $chargeResponse = $chargeService->chargeWithCardId($chargeCreate);
+
+            $capture = new ChargeCapture();
+            $capture->setChargeId($chargeResponse->getId());
+            $capture->setValue($this->convertToPennies($amount));
+
+            /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
+            $chargeResponse = $chargeService->CaptureCardCharge($capture);
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $paymentRef, $e));
 
             throw $e;
         }
 
-        return $tokenPaymentDetails;
+        return $chargeResponse;
     }
 
     protected function tokenPay(
@@ -1128,7 +1237,7 @@ class JudopayService
         }
         foreach ($policy->getAllPayments() as $payment) {
             $diff = $date->diff($payment->getDate());
-            if ($payment instanceof JudoPayment && $payment->getAmount() > 0 &&
+            if ($payment instanceof CheckoutPayment && $payment->getAmount() > 0 &&
                 $diff->days == 0 && $payment->getSource() == Payment::SOURCE_TOKEN) {
                 $msg = sprintf(
                     'Attempting to run addition payment for policy %s on the same day. %s',
@@ -1154,13 +1263,13 @@ class JudopayService
         }
         $user = $policy->getPayerOrUser();
 
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
         $payment->setAmount($amount);
         $payment->setNotes($notes);
         $payment->setUser($policy->getUser());
         $payment->setSource(Payment::SOURCE_TOKEN);
-        if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
-            $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+        if ($policy->getCheckoutPaymentMethod()) {
+            $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
         }
         $policy->addPayment($payment);
         $this->dm->persist($payment);
@@ -1169,21 +1278,18 @@ class JudopayService
         if ($policy->hasPolicyOrUserValidPaymentMethod()) {
             $tokenPaymentDetails = $this->runTokenPayment($policy, $amount, $payment->getId(), $policy->getId());
 
-            $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
-            $payment->setReceipt($tokenPaymentDetails["receiptId"]);
-            $payment->setAmount($tokenPaymentDetails["amount"]);
-            $payment->setResult($tokenPaymentDetails["result"]);
-            $payment->setMessage($tokenPaymentDetails["message"]);
-            if (isset($tokenPaymentDetails["riskScore"])) {
-                $payment->setRiskScore($tokenPaymentDetails["riskScore"]);
-            }
+            $payment->setReceipt($tokenPaymentDetails->getId());
+            $payment->setAmount($this->convertFromPennies($tokenPaymentDetails->getValue()));
+            $payment->setResult($tokenPaymentDetails->getStatus());
+            $payment->setMessage($tokenPaymentDetails->getResponseMessage());
+            $payment->setRiskScore($tokenPaymentDetails->getRiskCheck());
         } else {
             $this->logger->info(sprintf(
                 'User %s does not have a valid payment method (Policy %s)',
                 $user->getId(),
                 $policy->getId()
             ));
-            $payment->setResult(JudoPayment::RESULT_SKIPPED);
+            $payment->setResult(CheckoutPayment::RESULT_SKIPPED);
         }
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1210,114 +1316,23 @@ class JudopayService
     }
 
     /**
-     *
-     */
-    public function webpay(Policy $policy, $amount, $ipAddress, $userAgent, $type = null)
-    {
-        if ($this->areEqualToTwoDp(0, $amount)) {
-            throw new \Exception(sprintf('Amount must be > 0 for policy %s', $policy->getId()));
-        }
-
-        $payment = new JudoPayment();
-        $payment->setAmount($amount);
-        $payment->setUser($policy->getUser());
-        $payment->setSource(Payment::SOURCE_WEB);
-        $payment->setWebType($type);
-
-        if ($type == self::WEB_TYPE_REMAINDER) {
-            $payment->setNotes(sprintf('User was requested to pay the remainder of their policy'));
-        }
-        $this->dm->persist($payment);
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-        // add payment
-        /** @var Judopay\Model $webPayment */
-        $webPayment = $this->webClient->getModel('WebPayments\Payment');
-
-        // populate the required data fields.
-        $webPayment->setAttributeValues(
-            array(
-                'judoId' => $this->judoId,
-                'yourConsumerReference' => $policy->getUser()->getId(),
-                'yourPaymentReference' => $payment->getId(),
-                'yourPaymentMetaData' => [
-                    'policy_id' => $policy->getId(),
-                    'web_type' => $type ? $type : null,
-                ],
-                'amount' => $this->toTwoDp($amount),
-                'currency' => 'GBP',
-                'clientIpAddress' => $ipAddress,
-                'clientUserAgent' => $userAgent,
-            )
-        );
-
-        $webpaymentDetails = $webPayment->create();
-        $this->logger->info(sprintf('Judo Webpayment %s', json_encode($webpaymentDetails)));
-        $payment->setReference($webpaymentDetails["reference"]);
-
-        $policy->addPayment($payment);
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-        return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
-    }
-
-    public function webRegister(User $user, $ipAddress, $userAgent, Policy $policy = null)
-    {
-        $payment = new JudoPayment();
-        $payment->setAmount(0);
-        $payment->setUser($user);
-        $payment->setSource(Payment::SOURCE_WEB);
-        $payment->setWebType(self::WEB_TYPE_CARD_DETAILS);
-        if ($policy) {
-            $payment->setPolicy($policy);
-        }
-        $this->dm->persist($payment);
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-        /** @var Judopay\Model $webPreAuth */
-        $webPreAuth = $this->webClient->getModel('WebPayments\Preauth');
-        $date = \DateTime::createFromFormat('U', time());
-        $paymentRef = sprintf('%s-%s', $user->getId(), $date->format('Ym'));
-
-        // populate the required data fields.
-        $webPreAuth->setAttributeValues(
-            array(
-                'judoId' => $this->judoId,
-                'yourConsumerReference' => $user->getId(),
-                'yourPaymentReference' => $paymentRef,
-                'amount' => '1.01',
-                'currency' => 'GBP',
-                'clientIpAddress' => $ipAddress,
-                'clientUserAgent' => $userAgent,
-                'webPaymentOperation' => 'register',
-                'yourPaymentMetaData' => [
-                    'web_type' => self::WEB_TYPE_CARD_DETAILS,
-                ],
-            )
-        );
-
-        $webpaymentDetails = $webPreAuth->create();
-        $this->logger->info(sprintf('Judo Webpayment %s', json_encode($webpaymentDetails)));
-        $payment->setReference($webpaymentDetails["reference"]);
-
-        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-        return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
-    }
-
-    /**
      * Refund a payment
      *
-     * @param JudoPayment $payment
-     * @param float       $amount         Amount to refund (or null for entire initial amount)
-     * @param float       $totalCommision Total commission amount to refund (or null for entire amount from payment)
-     * @param string      $notes
-     * @param string      $source
+     * @param CheckoutPayment $payment
+     * @param float           $amount         Amount to refund (or null for entire initial amount)
+     * @param float           $totalCommision Total commission amount to refund (or null for entire amount from payment)
+     * @param string          $notes
+     * @param string          $source
      *
-     * @return JudoPayment
+     * @return CheckoutPayment
      */
-    public function refund(JudoPayment $payment, $amount = null, $totalCommision = null, $notes = null, $source = null)
-    {
+    public function refund(
+        CheckoutPayment $payment,
+        $amount = null,
+        $totalCommision = null,
+        $notes = null,
+        $source = null
+    ) {
         if (!$amount) {
             $amount = $payment->getAmount();
         }
@@ -1327,62 +1342,49 @@ class JudopayService
         $policy = $payment->getPolicy();
 
         // Refund is a negative payment
-        $refund = new JudoPayment();
+        $refund = new CheckoutPayment();
         $refund->setAmount(0 - $amount);
         $refund->setNotes($notes);
         $refund->setSource($source);
-        if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
-            $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+        if ($policy->getCheckoutPaymentMethod()) {
+            $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
         }
         $policy->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        // add refund
-        /** @var Judopay\Model $refundModel */
-        $refundModel = $this->apiClient->getModel('Refund');
-
-        $data = array(
-                'judoId' => $this->judoId,
-                'receiptId' => $payment->getReceipt(),
-                'yourPaymentReference' => $refund->getId(),
-                'amount' => $this->toTwoDp(abs($refund->getAmount())),
-        );
-
-        // populate the required data fields.
-        $refundModel->setAttributeValues($data);
-
+        $chargeService = $this->client->chargeService();
+        $chargeRefund = new ChargeRefund();
+        $chargeRefund->setChargeId($payment->getReceipt());
+        $chargeRefund->setValue($this->convertToPennies($amount));
         try {
-            $refundModelDetails = $refundModel->create();
+            $refundDetails = $chargeService->refundCardChargeRequest($chargeRefund);
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
-                'Error running refund %s (%0.2f >? %0.2f) Data: %s',
+                'Error running refund %s (%0.2f >? %0.2f)',
                 $refund->getId(),
                 $this->toTwoDp(abs($refund->getAmount())),
-                $payment->getAmount(),
-                json_encode($data)
+                $payment->getAmount()
             ), ['exception' => $e]);
 
             throw $e;
         }
 
-        // seems like in the past, potentially  the refund receipt is the same receipt id as the initial payment
-        // I'm not sure if this is still the case, however, we can add a prefix if it exists in the DB, just in case
-        $receiptId = $refundModelDetails["receiptId"];
+        $receiptId = $refundDetails->getId();
         $repo = $this->dm->getRepository(Payment::class);
         $payment = $repo->findOneBy(['receiptId' => $receiptId]);
         if ($payment) {
             $receiptId = sprintf('R-%s', $receiptId);
         }
 
-        $refund->setReference($refundModelDetails["yourPaymentReference"]);
         $refund->setReceipt($receiptId);
-        $refund->setAmount(0 - $refundModelDetails["amount"]);
-        $refund->setResult($refundModelDetails["result"]);
-        $refund->setMessage($refundModelDetails["message"]);
-        if (isset($refundModelDetails["riskScore"])) {
-            $refund->setRiskScore($refundModelDetails["riskScore"]);
-        }
+        $refund->setResult($refundDetails->getStatus());
+        $refund->setMessage($refundDetails->getResponseMessage());
+        $refund->setRiskScore($refundDetails->getRiskCheck());
+
+        $refundAmount = $this->convertFromPennies($refundDetails->getValue());
+        $refund->setAmount(0 - $refundAmount);
+        //$refund->setReference($refundModelDetails["yourPaymentReference"]);
 
         $refund->setRefundTotalCommission($totalCommision);
 
