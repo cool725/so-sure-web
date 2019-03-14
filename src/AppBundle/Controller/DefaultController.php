@@ -171,6 +171,18 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/snapchat", name="snapchat")
+     */
+    public function snapchatLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'snapchat'
+        ]);
+
+        return $this->render('AppBundle:Default:indexSnapchat.html.twig');
+    }
+
+    /**
      * @Route("/topcashback", name="topcashback")
      * @Route("/vouchercodes", name="vouchercodes")
      * @Route("/quidco", name="quidco")
