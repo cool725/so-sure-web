@@ -44,9 +44,9 @@ use AppBundle\Exception\ConnectedInvitationException;
 use AppBundle\Exception\DuplicateInvitationException;
 
 /**
- * @group functional-nonet
+ * @group cover-nonet
  *
- * AppBundle\\Tests\\Service\\SCodeServiceTest
+ * AppBundle\\Tests\\Service\\AffiliateServiceTest
  */
 class AffiliateServiceTest extends WebTestCase
 {
