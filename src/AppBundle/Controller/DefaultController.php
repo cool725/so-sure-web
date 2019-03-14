@@ -87,20 +87,18 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:index.html.twig';
 
+        // A/B Homepage USPS test
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOME_COMPARISON,
-            ['homepage', 'home-comparison']
+            SixpackService::EXPERIMENT_HOMEPAGE_USPS,
+            ['homepage', 'homepage-usps']
         );
-
-        if ($exp == 'home-comparison') {
-            return $this->redirectToRoute('so_sure_compared');
-        }
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
+            'exp'       => $exp,
         );
 
         return $this->render($template, $data);
