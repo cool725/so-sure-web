@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2ba5e237b105120d0bf14f8a35ae139d",
+    "content-hash": "f89e31915564bde093f3aa65995d9d53",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -193,6 +193,111 @@
                 "transliterator"
             ],
             "time": "2015-09-28T16:26:35+00:00"
+        },
+        {
+            "name": "checkout/checkout-php-api",
+            "version": "1.2.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/checkout/checkout-php-library.git",
+                "reference": "cd70a25391eac2f0fdb52e70c9442a16e9d40d29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/checkout/checkout-php-library/zipball/cd70a25391eac2f0fdb52e70c9442a16e9d40d29",
+                "reference": "cd70a25391eac2f0fdb52e70c9442a16e9d40d29",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "com\\checkout\\": "com/checkout"
+                },
+                "psr-0": {
+                    "CheckoutApi_": "com/checkout/packages"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dhiraj Gangoosirdar",
+                    "email": "integration@checkout.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Checkout PHP API Library",
+            "homepage": "https://github.com/checkout/checkout-php-library",
+            "keywords": [
+                "CKO",
+                "GW3",
+                "checkout.com",
+                "checkoutcom",
+                "gateway",
+                "online payment",
+                "payment"
+            ],
+            "time": "2018-09-03T10:40:03+00:00"
+        },
+        {
+            "name": "checkout/checkout-sdk-php",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/checkout/checkout-sdk-php.git",
+                "reference": "2260afb51d32e3625522d9d1f27d0c2e654a82a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/checkout/checkout-sdk-php/zipball/2260afb51d32e3625522d9d1f27d0c2e654a82a9",
+                "reference": "2260afb51d32e3625522d9d1f27d0c2e654a82a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Checkout\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Checkout.com",
+                    "email": "platforms@checkout.com",
+                    "homepage": "https://github.com/checkout/checkout-sdk-php/graphs/contributors"
+                }
+            ],
+            "description": "Checkout.com SDK for PHP",
+            "homepage": "https://github.com/checkout/checkout-sdk-php",
+            "keywords": [
+                "CKO",
+                "GW3",
+                "Reboot",
+                "api",
+                "checkout",
+                "checkout.com",
+                "checkoutcom",
+                "gateway",
+                "library",
+                "payment",
+                "php",
+                "sdk"
+            ],
+            "time": "2019-03-05T15:45:30+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -9248,6 +9353,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-01-06T05:45:45+00:00"
         },
         {

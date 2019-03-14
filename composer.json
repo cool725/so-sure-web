@@ -72,7 +72,9 @@
         "friendsofsymfony/oauth-server-bundle": "^1.6",
         "excelwebzone/recaptcha-bundle": "^1.5",
         "rollbar/rollbar": "^1.7",
-        "rollbar/rollbar-php-symfony-bundle": "^3.1"
+        "rollbar/rollbar-php-symfony-bundle": "^3.1",
+        "checkout/checkout-php-api": "^1.2",
+        "checkout/checkout-sdk-php": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

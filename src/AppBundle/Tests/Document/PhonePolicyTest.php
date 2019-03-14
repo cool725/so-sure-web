@@ -5472,14 +5472,14 @@ class PhonePolicyTest extends WebTestCase
 
         self::setPaymentMethodForPolicy($policy, '0116');
         $this->assertEquals(
-            Policy::UNPAID_JUDO_CARD_EXPIRED,
+            Policy::UNPAID_CARD_EXPIRED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
         self::setPaymentMethodForPolicy($policy, '0120');
         //\Doctrine\Common\Util\Debug::dump($policy->getLastPaymentCredit(), 3);
         $this->assertEquals(
-            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            Policy::UNPAID_CARD_PAYMENT_MISSING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
@@ -5493,7 +5493,7 @@ class PhonePolicyTest extends WebTestCase
             JudoPayment::RESULT_DECLINED
         );
         $this->assertEquals(
-            Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            Policy::UNPAID_CARD_PAYMENT_FAILED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
     }

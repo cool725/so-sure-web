@@ -80,6 +80,8 @@ abstract class Payment
             return 'sosurePotReward';
         } elseif ($this instanceof PolicyDiscountPayment) {
             return 'policyDiscount';
+        } elseif ($this instanceof CheckoutPayment) {
+            return 'checkout';
         } else {
             return null;
         }

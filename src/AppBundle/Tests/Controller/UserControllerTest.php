@@ -991,7 +991,7 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
-        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_MISSING, $policy->getUnpaidReason());
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_MISSING, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
 
         $crawler = $this->login($email, $password, 'user/unpaid');
@@ -1022,7 +1022,7 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
-        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_MISSING, $policy->getUnpaidReason());
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_MISSING, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
 
         // bacs feature flag conditions
@@ -1075,7 +1075,7 @@ class UserControllerTest extends BaseControllerTest
         );
         self::$dm->flush();
 
-        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_FAILED, $policy->getUnpaidReason());
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
 
@@ -1117,7 +1117,7 @@ class UserControllerTest extends BaseControllerTest
         );
         self::$dm->flush();
 
-        $this->assertEquals(Policy::UNPAID_JUDO_PAYMENT_FAILED, $policy->getUnpaidReason());
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
 
         // bacs feature flag conditions
@@ -1163,7 +1163,7 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
-        $this->assertEquals(Policy::UNPAID_JUDO_CARD_EXPIRED, $policy->getUnpaidReason());
+        $this->assertEquals(Policy::UNPAID_CARD_EXPIRED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
 
@@ -1195,7 +1195,7 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
 
-        $this->assertEquals(Policy::UNPAID_JUDO_CARD_EXPIRED, $policy->getUnpaidReason());
+        $this->assertEquals(Policy::UNPAID_CARD_EXPIRED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
 
         // bacs feature flag conditions

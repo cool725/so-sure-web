@@ -413,7 +413,9 @@ class ScheduledPayment
         return [
             'date' => $this->getScheduled() ? $this->getScheduled()->format(\DateTime::ATOM) : null,
             'amount' => $this->getAmount() ? $this->toTwoDp($this->getAmount()) : null,
-            'type' => 'judo', // TODO: scheduled payments are only judo for now, but this isn't great
+            'type' => $this->getPolicy() && $this->getPolicy()->getPaymentMethod() ?
+                $this->getPolicy()->getPaymentMethod()->getType() :
+                null
         ];
     }
 

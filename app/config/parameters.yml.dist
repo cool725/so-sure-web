@@ -78,6 +78,9 @@ parameters:
     judopay_websecret:
     judopay_id:
 
+    checkout_apisecret:
+    checkout_apipublic:
+
     mongodb_db: so-sure
     mongodb_url: mongodb://root:root@localhost
     census_mongodb_url: mongodb://root:root@localhost

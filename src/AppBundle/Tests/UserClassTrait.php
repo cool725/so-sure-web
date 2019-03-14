@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Cashback;
@@ -64,6 +65,33 @@ trait UserClassTrait
     public static $JUDO_TEST_CARD2_PIN = '452';
     public static $JUDO_TEST_CARD2_NAME = 'Visa Debit **** 3436 (Exp: 1220)';
     public static $JUDO_TEST_CARD2_TYPE = 'Visa Debit';
+
+    public static $JUDO_TEST_CARD_FAIL_NUM = '4221 6900 0000 4963';
+    public static $JUDO_TEST_CARD_FAIL_EXP = '12/20';
+    public static $JUDO_TEST_CARD_FAIL_PIN = '125';
+
+    // https://docs.checkout.com/docs/testing
+    public static $CHECKOUT_TEST_CARD_NUM = '4242 4242 4242 4242';
+    public static $CHECKOUT_TEST_CARD_LAST_FOUR = '4242';
+    public static $CHECKOUT_TEST_CARD_EXP = '01/99';
+    public static $CHECKOUT_TEST_CARD_EXP_DATE = '0199';
+    public static $CHECKOUT_TEST_CARD_PIN = '100';
+    public static $CHECKOUT_TEST_CARD_NAME = 'Visa **** 4242 (Exp: 0199)';
+    public static $CHECKOUT_TEST_CARD_TYPE = 'Visa';
+
+    public static $CHECKOUT_TEST_CARD2_NUM = '4543 4740 0224 9996';
+    public static $CHECKOUT_TEST_CARD2_LAST_FOUR = '9996';
+    public static $CHECKOUT_TEST_CARD2_EXP = '02/99';
+    public static $CHECKOUT_TEST_CARD2_EXP_DATE = '0299';
+    public static $CHECKOUT_TEST_CARD2_PIN = '956';
+    public static $CHECKOUT_TEST_CARD2_NAME = 'Visa **** 9996 (Exp: 0299)';
+    public static $CHECKOUT_TEST_CARD2_TYPE = 'Visa';
+
+    public static $CHECKOUT_TEST_CARD_FAIL_NUM = '4242 4242 4242 4242';
+    public static $CHECKOUT_TEST_CARD_FAIL_EXP = '12/30';
+    public static $CHECKOUT_TEST_CARD_FAIL_PIN = '100';
+    public static $CHECKOUT_TEST_CARD_FAIL_AMOUNT = '40.08';
+
 
     public static function generateEmail($name, $caller, $rand = false)
     {
@@ -213,6 +241,50 @@ trait UserClassTrait
             $query['make'] = $make;
         }
         $phones = $phoneRepo->findBy($query);
+        $phone = null;
+        $infiniteLoopPrevention = 0;
+        while ($phone == null) {
+            /** @var Phone $phone */
+            $phone = $phones[random_int(0, count($phones) - 1)];
+
+            // Many tests rely on past dates, so ensure the date is ok for the past
+            if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
+                $phone = null;
+            } elseif (!$phone->getCurrentPhonePrice($date) || !$phone->getCurrentPhonePrice($date)->getExcess()) {
+                $phone = null;
+            }
+
+            $infiniteLoopPrevention++;
+            if ($infiniteLoopPrevention > 50) {
+                throw new \Exception(sprintf(
+                    'Infinite loop prevention in getRandomPhone (date: %s)',
+                    $date ? $date->format(\DateTime::ATOM) : 'null'
+                ));
+            }
+        }
+
+        return $phone;
+    }
+
+    public static function getPhoneByPrice(DocumentManager $dm, $monthlyPrice, \DateTime $date = null)
+    {
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $query = [
+            'active' => true,
+            'devices' => ['$nin' => ['A0001', 'iPhone 6']],
+        ];
+        $allPhones = $phoneRepo->findBy($query);
+        $phones = array_values(array_filter($allPhones, function ($phone) use ($monthlyPrice, $date) {
+            /** @var Phone $phone */
+            $currentPrice = $phone->getCurrentPhonePrice($date);
+            if (!$currentPrice) {
+                return false;
+            }
+            return self::staticAreEqualToTwoDp($currentPrice->getMonthlyPremiumPrice(), $monthlyPrice);
+        }));
+        if (count($phones) == 0) {
+            throw new \Exception('Unable to find phone w/Monthly Price');
+        }
         $phone = null;
         $infiniteLoopPrevention = 0;
         while ($phone == null) {

@@ -14,29 +14,54 @@
             <div class="text-center pt-5 pb-3">
                 <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_card-reader.png" alt="so-sure" width="180px">
                 <h1 class="h2 mb-4">Pay the Remainder of Your Policy Premium</h1>
-                {% if webpay_action and webpay_reference and amount > 0 %}
+                {% if amount > 0 %}
                     <p>Click below to pay for the remainder <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> of your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong>.</p>
-                    <form action="{{ webpay_action }}"
-                          method="post"
-                          id="webpay-form"
-                          class="mb-4">
-                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                        {% if policy.displayRepurchase %}
-                            <div class="form-row">
-                                <div class="col">
-                                    <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-primary btn-block-xs">Repurchase your policy</a>
+
+                    {%  if webpay_action and webpay_reference %}
+                        <form action="{{ webpay_action }}"
+                              method="post"
+                              id="webpay-form"
+                              class="mb-4">
+                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                            {% if policy.displayRepurchase %}
+                                <div class="form-row">
+                                    <div class="col">
+                                        <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-primary btn-block-xs">Repurchase your policy</a>
+                                    </div>
+                                    <div class="col">
+                                        <input type="submit" class="btn btn-success btn-block-xs" value="Pay remainder now">
+                                    </div>
                                 </div>
-                                <div class="col">
+                            {% else %}
+                                <div class="form-group">
                                     <input type="submit" class="btn btn-success btn-block-xs" value="Pay remainder now">
                                 </div>
-                            </div>
-                        {% else %}
-                            <div class="form-group">
-                                <input type="submit" class="btn btn-success btn-block-xs" value="Pay remainder now">
-                            </div>
-                        {% endif %}
-                        </div>
-                    </form>
+                            {% endif %}
+                        </form>
+                    {% else %}
+                        <form class="payment-form" method="POST"
+                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}" data-url="{{ url('purchase_checkout_remainder', {'id': policy.id }) }}"
+                              data-csrf="{{ csrf_token('checkout') }}"
+                              data-title="so-sure" data-subtitle="Pay remainder of premium for {{ policy.policyNumber }}"
+                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                            {% if policy.displayRepurchase %}
+                                <div class="form-row">
+                                    <div class="col">
+                                        <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-primary btn-block-xs">Repurchase your policy</a>
+                                    </div>
+                                    <div class="col">
+                                        <input type="submit" class="btn btn-success btn-block-xs btn-card-pay" value="Pay remainder now">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="form-group">
+                                    <input type="submit" class="btn btn-success btn-block-xs btn-card-pay" value="Pay remainder now">
+                                </div>
+                            {% endif %}
+                        </form>
+                    {% endif %}
                 {% elseif amount == 0 %}
                     <p class="mb-4">Your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong> has been fully paid.</p>
                 {% endif %}
@@ -49,5 +74,11 @@
 {% endblock %}
 
 {% block javascriptsPage %}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
+    <script src="{{ asset('css-js/purchase-remainder.js') }}"></script>
 
 {% endblock %}

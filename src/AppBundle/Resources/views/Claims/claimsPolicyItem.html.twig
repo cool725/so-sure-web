@@ -1480,6 +1480,8 @@
                         <td>
                             {% if payment.type == 'judo' %}
                                 <i class="fa fa-credit-card" title="JudoPay"></i>
+                            {% elseif payment.type == 'checkout' %}
+                                <i class="fa fa-credit-card" title="Checkout"></i>
                             {% elseif payment.type == 'sosure' %}
                                 <i class="fa fa-smile-o" title="so-sure Credit/Debit"></i>
                             {% elseif payment.type == 'bacs' %}

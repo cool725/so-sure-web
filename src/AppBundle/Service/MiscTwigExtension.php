@@ -57,6 +57,7 @@ class MiscTwigExtension extends \Twig_Extension
             new \Twig_SimpleFunction('day', [$this, 'getDayByString']),
             new \Twig_SimpleFunction('next_business_day_historical', [$this, 'getNextBusinessDayByString']),
             new \Twig_SimpleFunction('unserialise', [$this, 'unserialise']),
+            new \Twig_SimpleFunction('convert_to_pennies', [$this, 'convertToPennies']),
         );
     }
 
