@@ -489,12 +489,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
-        /** @var Builder $policiesQb */
-        $policiesQb = $policyRepo->createQueryBuilder()->eagerCursor(true)->field('user')->prime(true);
-        $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.type')->equals('call'));
-        $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.date')->gte($start));
-        $policiesQb = $policiesQb->addAnd($policiesQb->expr()->field('notesList.date')->lt($end));
-        $policies = $policiesQb->getQuery()->execute();
+        $policies = $policyRepo->createQueryBuilder()->eagerCursor(true)->field('user')->prime(true)
+            ->field('notesList.type')->equals('call')
+            ->field('notesList.date')->gte($start)
+            ->field('notesList.date')->lt($end)
+            ->getQuery()->execute();
         // Build the response content.
         $response->setCallback(function () use ($policies) {
             $handle = fopen('php://output', 'w+');
@@ -538,9 +537,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->getUser()->getMobileNumber(),
                     count($approvedClaims),
                     $claimsCost,
-                    $policy->getPolicyExpirationDate() ?
-                        $policy->getPolicyExpirationDate()->format('Y-m-d') :
-                        null,
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('Y-m-d') : null,
                     'FORMULA',
                     $policy->getStatus(),
                     'Yes',
@@ -555,13 +552,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null
                 ];
                 fputcsv(
-                    $handle, // The file pointer
+                    $handle,
                     $line
                 );
             }
             fclose($handle);
         });
-        // response stuff.
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         return $response;
