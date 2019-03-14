@@ -4677,11 +4677,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     /**
      *
      */
-    public function testPicsureWithValidS3File()
+    public function testPicsureWithValidS3FileApi()
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testPicsureWithValidS3File', $this),
+            self::generateEmail('testPicsureWithValidS3FileApi', $this),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
@@ -4698,7 +4698,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         /** @var PhonePolicy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policyData['id']);
 
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
     }

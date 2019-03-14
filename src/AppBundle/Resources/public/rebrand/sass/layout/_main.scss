@@ -57,6 +57,7 @@
 
     &__sub__container {
         background-color: $white;
+        overflow: hidden;
 
         @include media-breakpoint-up(lg) {
             width: 35vw; height: 100vh;
