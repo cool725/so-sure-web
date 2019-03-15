@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/landing-snapchat.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -19,22 +19,22 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
-                        <h1 class="mb-4 text-white fit">It really is Hassle Free 😉</h1>
-                        <ul class="list-unstyled mb-5">
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-bright-yellow mr-2"></i>
+                        <h1 class="mb-4 text-white fit">It really is <br class="d-lg-none"> Hassle Free 😉</h1>
+                        <ul class="list-unstyled icn-fa-list mb-5">
+                            <li class="mb-3 h5 text-zaffre">
+                                <i class="far fa-check fa-lg fa-fw text-bright-yellow"></i>
                                 24-72 hour replace or repair
                             </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-bright-yellow mr-2"></i>
+                            <li class="mb-3 h5 text-zaffre">
+                                <i class="far fa-check fa-lg fa-fw text-bright-yellow"></i>
                                 Low excess from just &pound;50
                             </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-bright-yellow mr-2"></i>
+                            <li class="mb-3 h5 text-zaffre">
+                                <i class="far fa-check fa-lg fa-fw text-bright-yellow"></i>
                                 Up to 80% money back
                             </li>
-                            <li class="h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-bright-yellow mr-2"></i>
+                            <li class="h5 text-zaffre">
+                                <i class="far fa-check fa-lg fa-fw text-bright-yellow"></i>
                                 Secondhand &amp; refurbished phones
                             </li>
                         </ul>
@@ -55,15 +55,8 @@
         </div>
     </section>
 
-    <section class="cred">
-        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times" class="lozad">
-        </div>
-    </section>
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     <section class="intro py-lg-5">
         <div class="container container-xtra py-5">
@@ -230,5 +223,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    <script src="{{ asset('css-js/landing-snapchat.js') }}"></script>
 {% endblock %}
