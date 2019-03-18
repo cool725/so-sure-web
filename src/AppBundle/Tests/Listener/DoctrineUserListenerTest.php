@@ -2,10 +2,10 @@
 
 namespace AppBundle\Tests\Listener;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\CardEvent;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -177,7 +177,6 @@ class DoctrineUserListenerTest extends WebTestCase
         $bankAccount->setAccountNumber('12345678');
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
         $user->setEmail(static::generateEmail($email, $this));
         static::$dm->persist($user);
 
@@ -190,218 +189,10 @@ class DoctrineUserListenerTest extends WebTestCase
         $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => '1225'];
         $judo = new JudoPaymentMethod();
         $judo->addCardTokenArray(random_int(1, 999999), $account);
-        $user->setPaymentMethod($judo);
         $user->setEmail(static::generateEmail($email, $this));
         static::$dm->persist($user);
 
         return $user;
-    }
-
-    public function testPreUpdateJudo()
-    {
-        $user = $this->judoAccount('testPreUpdateJudo');
-        /** @var JudoPaymentMethod $judo */
-        $judo = $user->getPaymentMethod();
-
-        $cardEvent = new CardEvent($user);
-        $userEvent = new UserEvent($user);
-        $listener = $this->createCardEventListener(
-            $user,
-            $this->exactly(2),
-            CardEvent::EVENT_UPDATED,
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedJudo = clone $judo;
-        $account = ['type' => '2', 'lastfour' => '1234', 'endDate' => '1225'];
-        $updatedJudo->addCardTokenArray(random_int(1, 999999), $account);
-        $changeSet = ['paymentMethod' => [$judo, $updatedJudo]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-
-        $changeSet = ['paymentMethod' => [$updatedJudo, $updatedJudo]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdatePaymentMethod()
-    {
-        $judoUser = $this->judoAccount('testPreUpdatePaymentMethodJudo');
-        $bacsUser = $this->account('testPreUpdatePaymentMethodBacs');
-
-        /** @var JudoPaymentMethod $judo */
-        $judo = $judoUser->getPaymentMethod();
-
-        /** @var BacsPaymentMethod $judo */
-        $bacs = $bacsUser->getPaymentMethod();
-
-        $listener = $this->createUserEventListener(
-            $judoUser,
-            $this->exactly(2),
-            UserEvent::EVENT_PAYMENT_METHOD_CHANGED,
-            UserEvent::EVENT_UPDATED_INTERCOM,
-            null,
-            'judo'
-        );
-
-        $changeSet = ['paymentMethod' => [$judo, $bacs]];
-        $events = new PreUpdateEventArgs($judoUser, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-
-        $changeSet = ['paymentMethod' => [$judo, $judo]];
-        $events = new PreUpdateEventArgs($judoUser, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-
-        $listener = $this->createUserEventListener(
-            $bacsUser,
-            $this->exactly(2),
-            UserEvent::EVENT_PAYMENT_METHOD_CHANGED,
-            UserEvent::EVENT_UPDATED_INTERCOM,
-            null,
-            'bacs'
-        );
-
-        $changeSet = ['paymentMethod' => [$bacs, $judo]];
-        $events = new PreUpdateEventArgs($bacsUser, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-
-        $changeSet = ['paymentMethod' => [$bacs, $bacs]];
-        $events = new PreUpdateEventArgs($bacsUser, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdateBankAccountSortCode()
-    {
-        $user = $this->account('testPreUpdateBankAccountSortCode');
-        /** @var BacsPaymentMethod $bacs */
-        $bacs = $user->getPaymentMethod();
-
-        $listener = $this->createBacsEventListener(
-            $user,
-            $bacs->getBankAccount(),
-            $this->exactly(2),
-            BacsEvent::EVENT_UPDATED,
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedBacs = clone $bacs;
-        $updatedBankAccount = clone $bacs->getBankAccount();
-        $updatedBankAccount->setSortCode('000098');
-        $updatedBacs->setBankAccount($updatedBankAccount);
-        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdateBankAccountSameSortCode()
-    {
-        $user = $this->account('testPreUpdateBankAccountSameSortCode');
-        /** @var BacsPaymentMethod $bacs */
-        $bacs = $user->getPaymentMethod();
-
-        $listener = $this->createUserEventListener(
-            $user,
-            $this->once(),
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedBacs = clone $bacs;
-        $updatedBankAccount = clone $bacs->getBankAccount();
-        $updatedBankAccount->setSortCode('000099');
-        $updatedBacs->setBankAccount($updatedBankAccount);
-        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdateBankAccountNumber()
-    {
-        $user = $this->account('testPreUpdateBankAccountNumber');
-        /** @var BacsPaymentMethod $bacs */
-        $bacs = $user->getPaymentMethod();
-
-        $listener = $this->createBacsEventListener(
-            $user,
-            $bacs->getBankAccount(),
-            $this->exactly(2),
-            BacsEvent::EVENT_UPDATED,
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedBacs = clone $bacs;
-        $updatedBankAccount = clone $bacs->getBankAccount();
-        $updatedBankAccount->setAccountNumber('87654321');
-        $updatedBacs->setBankAccount($updatedBankAccount);
-        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdateBankAccountSameNumber()
-    {
-        $user = $this->account('testPreUpdateBankAccountSameNumber');
-        /** @var BacsPaymentMethod $bacs */
-        $bacs = $user->getPaymentMethod();
-
-        $listener = $this->createUserEventListener(
-            $user,
-            $this->once(),
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedBacs = clone $bacs;
-        $updatedBankAccount = clone $bacs->getBankAccount();
-        $updatedBankAccount->setAccountNumber('12345678');
-        $updatedBacs->setBankAccount($updatedBankAccount);
-        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdateBankAccountReference()
-    {
-        $user = $this->account('testPreUpdateBankAccountReference');
-        /** @var BacsPaymentMethod $bacs */
-        $bacs = $user->getPaymentMethod();
-
-        $listener = $this->createBacsEventListener(
-            $user,
-            $bacs->getBankAccount(),
-            $this->exactly(2),
-            BacsEvent::EVENT_UPDATED,
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedBacs = clone $bacs;
-        $updatedBankAccount = clone $bacs->getBankAccount();
-        $updatedBankAccount->setReference('999');
-        $updatedBacs->setBankAccount($updatedBankAccount);
-        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
-    }
-
-    public function testPreUpdateBankAccountName()
-    {
-        $user = $this->account('testPreUpdateBankAccountName');
-        /** @var BacsPaymentMethod $bacs */
-        $bacs = $user->getPaymentMethod();
-
-        $listener = $this->createBacsEventListener(
-            $user,
-            $bacs->getBankAccount(),
-            $this->exactly(2),
-            BacsEvent::EVENT_UPDATED,
-            UserEvent::EVENT_UPDATED_INTERCOM
-        );
-
-        $updatedBacs = clone $bacs;
-        $updatedBankAccount = clone $bacs->getBankAccount();
-        $updatedBankAccount->setAccountName('a boo');
-        $updatedBacs->setBankAccount($updatedBankAccount);
-        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
-        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
-        $listener->preUpdate($events);
     }
 
     public function testPostPersist()
@@ -517,7 +308,8 @@ class DoctrineUserListenerTest extends WebTestCase
     private function createBacsEventListener($user, $bankAccount, $count, $eventType, $eventType2 = null)
     {
         \AppBundle\Classes\NoOp::ignore([$eventType]);
-        $event = new BacsEvent($user, $bankAccount);
+        $event = new BacsEvent($bankAccount);
+        $event->setUser($user);
         $userEvent = new UserEvent($user);
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
@@ -543,7 +335,8 @@ class DoctrineUserListenerTest extends WebTestCase
 
     private function createCardEventListener($user, $count, $eventType, $eventType2 = null)
     {
-        $event = new CardEvent($user);
+        $event = new CardEvent();
+        $event->setUser($user);
         $userEvent = new UserEvent($user);
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
             ->setMethods(array('dispatch'))

@@ -94,3 +94,21 @@
         @include border-radius(0);
     }
 }
+
+// Table in modal
+.modal-body {
+
+    tr {
+        &:last-of-type {
+            td {
+                &:first-of-type {
+                    border-bottom-left-radius: 11px;
+                }
+                &:last-of-type {
+                    border-bottom-right-radius: 11px;
+                }
+            }
+        }
+    }
+
+}

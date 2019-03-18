@@ -28,9 +28,6 @@ class SixpackService
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
-    const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
-    const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
-    const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
@@ -38,9 +35,9 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_EMAIL_LANDING_TEXT = 'email-landing-text';
     // Exp 3
-    //
+    // const EXPERIMENT_HOME_COMPARISON = 'home-comparison';
     // Exp 4
-    //
+    const EXPERIMENT_HOMEPAGE_USPS = 'homepage-usps';
     // Exp 5
     //
     // Exp 6
@@ -117,21 +114,22 @@ class SixpackService
         'ad-landing-2',
         'homepage-new-copy',
         'bacs',
+        'ebay-landing',
+        'ebay-landing-1',
+        'ebay-landing-2',
+        'home-comparison',
     ];
 
     public static $unauthExperiments = [
-        self::EXPERIMENT_EBAY_LANDING,
-        self::EXPERIMENT_EBAY_LANDING_1,
-        self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
         self::EXPERIMENT_SCODE_LANDING_TEXT,
         // Exp 2
         self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
-        //
+        // self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
-        //
+        self::EXPERIMENT_HOMEPAGE_USPS,
         // Exp 5
         //
         // Exp 6
@@ -182,12 +180,9 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        self::EXPERIMENT_EBAY_LANDING,
-        self::EXPERIMENT_EBAY_LANDING_1,
-        self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-
+        //
         // Exp 2
 
         // Exp 3
@@ -220,9 +215,9 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
-        //
+        // self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
-        //
+        self::EXPERIMENT_HOMEPAGE_USPS,
         // Exp 5
         //
         // Exp 6

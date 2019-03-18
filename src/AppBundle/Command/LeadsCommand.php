@@ -88,12 +88,16 @@ class LeadsCommand extends ContainerAwareCommand
             }
 
             $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($lead->getEmail())]);
+            $intercomUser = null;
+            if ($lead->getIntercomId()) {
+                $intercomUser = $userRepo->findOneBy(['intercomId' => $lead->getIntercomId()]);
+            }
             $usersMobile = [];
             if ($lead->getMobileNumber()) {
                 $usersMobile = $userRepo->findBy(['mobileNumber' => $lead->getMobileNumber()]);
             }
             // user exists, so lead can be removed
-            if ($user || in_array(mb_strtolower($lead->getEmail()), $newUsers)) {
+            if ($user || $intercomUser || in_array(mb_strtolower($lead->getEmail()), $newUsers)) {
                 $output->writeln(sprintf('Deleting lead %s as user exists', $lead->getEmail()));
                 $this->dm->remove($lead);
             } else {

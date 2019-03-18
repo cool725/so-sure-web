@@ -6,6 +6,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -33,6 +34,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     use PhoneTrait;
     use GravatarTrait;
     use CurrencyTrait;
+    use DateTrait;
 
     const MAX_POLICIES_PER_USER = 2;
 
@@ -52,6 +54,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const AQUISITION_PENDING = 'pending'; // This is for aquisitions that are active.
     const AQUISITION_POTENTIAL = 'potential'; // this is for aquired users with no policy.
     const AQUISITION_LOST = 'lost'; // this is for aquired users with a cancelled policy.
+
+    const DPA_VALIDATION_VALID = 'dpa-valid';
+    const DPA_VALIDATION_NOT_VALID = 'dpa-not-valid';
+    const DPA_VALIDATION_FAIL_DOB = 'dpa-fail-dob';
+    const DPA_VALIDATION_FAIL_LASTNAME = 'dpa-fail-lastname';
+    const DPA_VALIDATION_FAIL_FIRSTNAME = 'dpa-fail-firstname';
+    const DPA_VALIDATION_FAIL_MOBILE = 'dpa-fail-mobile';
 
     /**
      * @MongoDB\Id
@@ -244,10 +253,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $latestWebIdentityLog;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PaymentMethod\PaymentMethod")
      * @Gedmo\Versioned
      * @var PaymentMethod
-     * @DataChange(categories="intercom")
      */
     protected $paymentMethod;
 
@@ -338,6 +346,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false)
      * @DataChange(categories="hubspot")
+     * @var Attribution
      */
     protected $attribution;
 
@@ -353,6 +362,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @DataChange(categories="hubspot")
+     * @var \DateTime
      */
     protected $birthday;
 
@@ -367,6 +377,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @MongoDB\Index(unique=true, sparse=true)
      */
     protected $intercomId;
 
@@ -379,6 +390,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      */
     protected $hubspotId;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $intercomUserId;
 
     /**
      * @AppAssert\Token()
@@ -730,6 +749,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getAllPolicies()
     {
         return $this->policies;
+    }
+
+    public function getAllPolicyPolicies($prefix = null)
+    {
+        $policies = [];
+        foreach ($this->getAllPolicies() as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isValidPolicy($prefix)) {
+                $policies[] = $policy;
+            }
+        }
+        return $policies;
     }
 
     public function getPayerPolicies()
@@ -1194,9 +1225,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @return Policy|null
      */
-    public function getLatestPolicy()
+    public function getLatestPolicy($valid = true)
     {
-        $policies = $this->getValidPolicies(true);
+        if ($valid) {
+            $policies = $this->getValidPolicies(true);
+        } else {
+            $policies = $this->getAllPolicyPolicies();
+        }
         if (!is_array($policies)) {
             $policies = $policies->getValues();
         }
@@ -1226,6 +1261,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasPolicyCancelledAndPaymentOwed()
     {
         foreach ($this->getAllPolicies() as $policy) {
+            /** @var Policy $policy */
             if ($policy->isCancelledAndPaymentOwed()) {
                 return true;
             }
@@ -1246,62 +1282,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
-    public function hasBacsPaymentMethod()
-    {
-        return $this->getPaymentMethod() instanceof BacsPaymentMethod;
-    }
-
-    /**
-     * @return BacsPaymentMethod|null
-     */
-    public function getBacsPaymentMethod()
-    {
-        if ($this->hasBacsPaymentMethod()) {
-            /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $this->getPaymentMethod();
-
-            return $paymentMethod;
-        }
-
-        return null;
-    }
-
-    public function hasJudoPaymentMethod()
-    {
-        return $this->getPaymentMethod() instanceof JudoPaymentMethod;
-    }
-
-    /**
-     * @return JudoPaymentMethod|null
-     */
-    public function getJudoPaymentMethod()
-    {
-        if ($this->hasJudoPaymentMethod()) {
-            /** @var JudoPaymentMethod $paymentMethod */
-            $paymentMethod = $this->getPaymentMethod();
-
-            return $paymentMethod;
-        }
-
-        return null;
-    }
-
-    public function canUpdateBacsDetails()
-    {
-        /** @var BacsPaymentMethod $bacsPaymentMethod */
-        $bacsPaymentMethod = $this->getPaymentMethod();
-        if ($bacsPaymentMethod instanceof BacsPaymentMethod &&
-            $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
-                return false;
-        }
-
-        if ($this->hasPolicyBacsPaymentInProgress()) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function getAnalytics()
     {
         $data = [];
@@ -1320,22 +1300,31 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['accountPaidToDate'] = true;
         $data['renewalMonthlyPremiumNoPot'] = 0;
         $data['renewalMonthlyPremiumWithPot'] = 0;
-        $data['paymentMethod'] = $this->getPaymentMethod() ? $this->getPaymentMethod()->getType() : null;
         $data['hasOutstandingPicSurePolicy'] = false;
         $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
-        if ($this->hasBacsPaymentMethod()) {
-            $data['paymentMethod'] = 'bacs';
-        } elseif ($this->hasJudoPaymentMethod()) {
-                $data['paymentMethod'] = 'judo';
-        } else {
-            $data['paymentMethod'] = 'none';
-        }
+
+        $data['paymentMethod'] = 'none';
         foreach ($this->getValidPolicies(true) as $policy) {
             /** @var PhonePolicy $policy */
             if (!$policy->isActive()) {
                 continue;
             }
+
+            if ($policy->hasBacsPaymentMethod()) {
+                if ($data['paymentMethod'] == 'judo') {
+                    $data['paymentMethod'] = 'multiple';
+                } elseif ($data['paymentMethod'] == 'none') {
+                    $data['paymentMethod'] = 'bacs';
+                }
+            } elseif ($policy->hasJudoPaymentMethod()) {
+                if ($data['paymentMethod'] == 'bacs') {
+                    $data['paymentMethod'] = 'multiple';
+                } elseif ($data['paymentMethod'] == 'none') {
+                    $data['paymentMethod'] = 'judo';
+                }
+            }
+
             if ($policy->getPolicyTerms()->isPicSureEnabled() && in_array($policy->getPicSureStatus(), [
                 PhonePolicy::PICSURE_STATUS_INVALID,
                 PhonePolicy::PICSURE_STATUS_MANUAL,
@@ -1379,6 +1368,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['accountPaidToDate'] = false;
             }
         }
+
         foreach ($this->getPendingRenewalPolicies() as $policy) {
             $data['renewalMonthlyPremiumNoPot'] += $policy->getPremium()->getMonthlyPremiumPrice();
             $data['renewalMonthlyPremiumWithPot'] +=
@@ -1662,32 +1652,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->userFiles[] = $file;
     }
 
-    /**
-     * @return PaymentMethod
-     */
-    public function getPaymentMethod()
-    {
-        return $this->paymentMethod;
-    }
-
-    public function setPaymentMethod($paymentMethod)
-    {
-        $this->paymentMethod = $paymentMethod;
-    }
-
     public function hasEmail()
     {
         return mb_strlen(trim($this->getEmail())) > 0;
-    }
-
-    public function hasPaymentMethod()
-    {
-        return $this->getPaymentMethod() != null;
-    }
-
-    public function hasValidPaymentMethod()
-    {
-        return $this->hasPaymentMethod() && $this->getPaymentMethod()->isValid();
     }
 
     public function hasValidBillingDetails()
@@ -1812,6 +1779,21 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setHubspotId($hubspotId)
     {
         $this->hubspotId = $hubspotId;
+    }
+
+    public function getIntercomUserId()
+    {
+        return $this->intercomUserId;
+    }
+
+    public function setIntercomUserId($intercomUserId)
+    {
+        $this->intercomUserId = $intercomUserId;
+    }
+
+    public function getIntercomUserIdOrId()
+    {
+        return $this->getIntercomUserId() ?: $this->getId();
     }
 
     public function getDigitsId()
@@ -2086,6 +2068,25 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $diff->invert && $diff->days == 21;
     }
 
+    /**
+     * Only the first purchase policy should count for attribution
+     */
+    public function getAttributionPolicy($prefix = null)
+    {
+        $policies = $this->getAllPolicyPolicies($prefix);
+
+        if (count($policies) == 0) {
+            return null;
+        }
+
+        // sort older to recent
+        usort($policies, function ($a, $b) {
+            return $a->getStart() > $b->getStart();
+        });
+
+        return $policies[0];
+    }
+
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
     {
         $addresses = [];
@@ -2095,6 +2096,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if ($this->getPolicyAddress()) {
             $addresses[] = $this->getPolicyAddress()->toApiArray();
         }
+        $policy = $this->getLatestPolicy();
         return [
             'id' => $this->getId(),
             'email' => $this->getEmailCanonical(),
@@ -2122,12 +2124,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 false
             ),
             'can_purchase_policy' => $this->canPurchasePolicy(),
-            'has_payment_method' => $this->hasValidPaymentMethod(),
-            'card_details' => $this->getPaymentMethod() && $this->getPaymentMethod()->getType() == 'judo' ?
-                $this->getPaymentMethod()->__toString() :
+            'has_payment_method' => $policy ? $policy->hasValidPaymentMethod() : false,
+            'card_details' => $policy && $policy->getPaymentMethod() &&
+                $policy->getPaymentMethod()->getType() == 'judo' ?
+                $policy->getPaymentMethod()->__toString() :
                 'Please update your card',
-            'payment_method' => $this->getPaymentMethod() ?
-                $this->getPaymentMethod()->getType() :
+            'payment_method' => $policy && $policy->getPaymentMethod() ?
+                $policy->getPaymentMethod()->getType() :
                 null,
             'has_mobile_number_verified' => $this->getMobileNumberVerified()
         ];
@@ -2152,5 +2155,29 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         } else {
             return static::AQUISITION_POTENTIAL;
         }
+    }
+
+    public function validateDpa($firstName = null, $lastName = null, $dob = null, $mobile = null)
+    {
+        if (!$firstName || !$lastName || !$dob || !$mobile) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        } elseif (!$this->isValidDate($dob)) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        } elseif (!$this->isValidUkMobile($mobile)) {
+            return self::DPA_VALIDATION_NOT_VALID;
+        }
+
+        if ($this->normalizeUkMobile($mobile) != $this->normalizeUkMobile($this->getMobileNumber())) {
+            return self::DPA_VALIDATION_FAIL_MOBILE;
+        } elseif (!$this->createValidDate($dob) || !$this->getBirthday() ||
+            $this->createValidDate($dob)->diff($this->getBirthday())->days != 0) {
+            return self::DPA_VALIDATION_FAIL_DOB;
+        } elseif (mb_strtolower($lastName) != mb_strtolower($this->getLastName())) {
+            return self::DPA_VALIDATION_FAIL_LASTNAME;
+        } elseif (mb_strtolower($firstName) != mb_strtolower($this->getFirstName())) {
+            return self::DPA_VALIDATION_FAIL_FIRSTNAME;
+        }
+
+        return self::DPA_VALIDATION_VALID;
     }
 }

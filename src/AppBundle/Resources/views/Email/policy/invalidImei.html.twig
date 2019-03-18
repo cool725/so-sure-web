@@ -1,0 +1,30 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Important Information regarding your so-sure Policy{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Hello {{ policy.user.firstName }},
+				<br><br>
+					It appears we no longer have the correct IMEI number for your phone. It's likely that this is because you've recently had your phone replaced.
+			   <br><br>
+					Having the correct IMEI number is required as per your policy terms and conditions and, should you need to claim, we would require proof of purchase before we would be able to process your claim.
+			   <br><br>
+					Please contact us to resolve this matter now.
+			   <br><br>
+				   Best,
+			   <br><br>
+					The so-sure team
+			   <br><br>
+               If you have any questions, please don't hesitate to
+				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+				<br><br>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

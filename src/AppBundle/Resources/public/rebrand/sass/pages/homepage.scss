@@ -22,14 +22,14 @@
     &__intro {
 
         h1 {
-            font-size: 1.4rem;
+            // font-size: 1.4rem;
 
             @include media-breakpoint-up(ss) {
-                font-size: 1.86rem;
+                // font-size: 1.86rem;
             }
 
             @include media-breakpoint-up(sm) {
-                font-size: 2.2rem;
+                // font-size: 2.2rem;
             }
         }
 
@@ -133,7 +133,7 @@
     background-color: $white;
 
     @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png ') no-repeat -220px 440px;
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png') no-repeat -220px 440px;
         background-size: 480px;
     }
 

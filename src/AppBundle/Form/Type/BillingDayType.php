@@ -3,7 +3,6 @@
 namespace AppBundle\Form\Type;
 
 use AppBundle\Document\BacsPaymentMethod;
-use AppBundle\Document\PaymentMethod;
 use AppBundle\Document\Policy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,13 +23,16 @@ class BillingDayType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $enabled = false;
         /** @var Policy $policy */
         $policy = $builder->getData()->getPolicy();
-        if ($policy->getUser()->hasBacsPaymentMethod()) {
-            $enabled = false;
-        } else {
-            $enabled = $policy->isPolicyPaidToDate() &&
-                !$policy->isWithinCooloffPeriod();
+        if ($policy) {
+            if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
+                $enabled = false;
+            } else {
+                $enabled = $policy->isPolicyPaidToDate() &&
+                    !$policy->isWithinCooloffPeriod();
+            }
         }
 
         $days = [];

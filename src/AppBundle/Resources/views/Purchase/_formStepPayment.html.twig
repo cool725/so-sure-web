@@ -49,27 +49,15 @@
                     <i class="far fa-arrow-left"></i>
                 </a>
             </div>
-            {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
-                <div class="col">
-                    {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-success btn-green-gradient'}}) }}
-                </div>
-                <div class="col">
-                    {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-success btn-green-gradient'}}) }}
-                </div>
-            {% else %}
-                <div class="col-9 text-right">
-                    {% if purchase_form.existing is defined %}
-                        {% do purchase_form.existing.setRendered %}
-                    {% endif %}
-                    {{ form_widget(purchase_form.next, {
-                        'label': 'Proceed to payment',
-                        'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                        'right': true,
-                        'attr': {
-                            'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                    }}) }}
-                </div>
-            {% endif %}
+            <div class="col-9 text-right">
+                {{ form_widget(purchase_form.next, {
+                    'label': 'Proceed to payment',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
+                    'attr': {
+                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                }}) }}
+            </div>
         </div>
     </div>
 
@@ -82,6 +70,12 @@
         <div class="form-group text-center mt-5">
             <small class="text-grey">Payments via</small><br>
             <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px" class="mt-2">
+        </div>
+    {% elseif payment_provider == 'checkout' %}
+        <div class="form-group text-center mt-5">
+            <small class="text-grey">Payments powered by</small><br>
+            {# TODO: Checkout logo #}
+            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Checkout" title="Powered by - Checkout" width="80px" class="mt-2">
         </div>
     {% endif %}
 

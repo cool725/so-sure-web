@@ -1,66 +1,87 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{# {% form_theme promotionForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/month.js'
-        '@AppBundle/Resources/public/js/Admin/adminAccounts.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-accounts' %}
+
+{% block title %}so-sure - Accounts {{ month }} / {{ year }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-4">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_accounts') }}">
-                <input name="accounts" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">so-sure accounts {{ month }} / {{ year }}</h1>
             </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="GET"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-md-2">Choose date:</label>
+                            <div class="input-group date mr-md-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_accounts') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-md-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            {{ form_start(salvaForm) }}
+                                <a class="btn btn-info btn-square mr-md-2" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
+                                    <i class="fa fa-print fa-fw"></i></a>
+                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': "btn btn-warning salva-export btn-square"}}) }}
+                            {{ form_end(salvaForm) }}
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="input-group" style="margin-left: 10px;">
-                <div class="input-group-btn">
-                    {{ form_start(salvaForm) }}
-                    <a class="btn btn-info" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
-                        &nbsp;<i class="fa fa-print"></i>&nbsp;
-                    </a>
-                    {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': "btn btn-warning salva-export"}}) }}
-                    {{ form_end(salvaForm) }}
-                </div>
-            </div>
-        </div>
-    </div>
-    </form>
-</div>
 
-{% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
+            {% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
 
-    {% for file in files %}
-        {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' %}
-        {% set filename = file.filename|split('.') %}
-        {% set file_dates = filename[0]|split('-') %}
-        {% set file_date = file_dates[file_dates|length - 1] %}
-        <h3>{{ file.filename }} [From {{ file_date|date }}]</h3>
-        <ul>
-            {% for key, value in file.metadata %}
-                <li>{{ key }}: {{ value }}</li>
+            {% for file in files %}
+                {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' %}
+                {% set filename = file.filename|split('.') %}
+                {% set file_dates = filename[0]|split('-') %}
+                {% set file_date = file_dates[file_dates|length - 1] %}
+                <h3>{{ file.filename }} [From {{ file_date|date }}]</h3>
+                <ul>
+                    {% for key, value in file.metadata %}
+                        <li>{{ key }}: {{ value }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
             {% endfor %}
-        </ul>
-        {% endif %}
-    {% endfor %}
+        </div>
+    </section>
 
-</div>
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/accounts.js') }}"></script>
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}

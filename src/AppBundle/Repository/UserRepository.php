@@ -145,30 +145,6 @@ class UserRepository extends DocumentRepository
             ->count();
     }
 
-    public function findBankAccount(User $user)
-    {
-        $qb = $this->createQueryBuilder();
-        $qb->field('id')->notEqual($user->getId());
-
-        if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
-            $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
-            if (!$accountHash) {
-                $accountHash = ['NotAHash'];
-            }
-            $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
-        } elseif ($user->getPaymentMethod() instanceof BacsPaymentMethod) {
-            $accountHash = $user->getPaymentMethod()->getBankAccount() ?
-                $user->getPaymentMethod()->getBankAccount()->getHashedAccount() : 'NotAHash';
-            $qb->field('paymentMethod.bankAccount.hashedAccount')->equals($accountHash);
-        } else {
-            throw new \Exception('User is missing a payment type');
-        }
-
-        return $qb
-            ->getQuery()
-            ->execute();
-    }
-
     public function findIp(User $user)
     {
         $qb = $this->createQueryBuilder();

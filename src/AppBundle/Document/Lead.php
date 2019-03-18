@@ -105,6 +105,14 @@ class Lead
     protected $intercomId;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $intercomUserId;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="lead", cascade={"persist"})
      */
     protected $opts = array();
@@ -209,6 +217,21 @@ class Lead
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function getIntercomUserId()
+    {
+        return $this->intercomUserId;
+    }
+
+    public function setIntercomUserId($intercomUserId)
+    {
+        $this->intercomUserId = $intercomUserId;
+    }
+
+    public function getIntercomUserIdOrId()
+    {
+        return $this->getIntercomUserId() ?: $this->getId();
     }
 
     public function addOpt(Opt $opt)

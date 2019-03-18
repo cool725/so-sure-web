@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Exception\ExternalRateLimitException;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
@@ -13,6 +15,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Stats;
 use AppBundle\Document\Attribution;
+use AppBundle\Repository\UserRepository;
 use Mixpanel;
 use UAParser\Parser;
 use Jaam\Mixpanel\DataExportApi;
@@ -22,8 +25,18 @@ use CensusBundle\Service\SearchService;
 class MixpanelService
 {
     use ValidatorTrait;
+    use DateTrait;
+
+    const CACHE_TIME = 172800;
 
     const KEY_MIXPANEL_QUEUE = 'queue:mixpanel';
+    const KEY_MIXPANEL_USER_EARLIEST_EVENTS = 'mixpanel:user:earlist-events';
+
+    const ATTRIBUTION_PREFIX_CURRENT = '';
+    const ATTRIBUTION_PREFIX_LATEST = 'Latest ';
+
+    const USER_QUERY_HAS_EMAIL = 'query-has-email';
+    const USER_QUERY_ALL = 'query-all';
 
     const QUEUE_PERSON_PROPERTIES = 'person';
     const QUEUE_PERSON_PROPERTIES_ONCE = 'person-once';
@@ -65,6 +78,7 @@ class MixpanelService
     const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
     const EVENT_POLICY_READY = 'Policy Ready For Purchase';
+    const EVENT_COMPLETE_PLEDGE = 'Completed Pledge';
     const EVENT_LOGIN = 'Login';
     const EVENT_APP_DOWNLOAD = 'App Download';
     const EVENT_TEST = 'Tracking Test Event';
@@ -125,6 +139,41 @@ class MixpanelService
         'money.co.uk' => 'money',
         //'Affiliate',
         //'MoneySupermarket',
+    ];
+
+    public static $trackedEvents = [
+        self::EVENT_HOME_PAGE,
+        self::EVENT_QUOTE_PAGE,
+        self::EVENT_MANUFACTURER_PAGE,
+        self::EVENT_LANDING_PAGE,
+        self::EVENT_CPC_QUOTE_PAGE,
+        self::EVENT_CPC_MANUFACTURER_PAGE,
+        self::EVENT_CPC_COMPETITOR_PAGE,
+        self::EVENT_RECEIVE_DETAILS,
+        self::EVENT_PURCHASE_POLICY,
+        self::EVENT_PAYMENT,
+        self::EVENT_INVITE,
+        self::EVENT_CONNECTION_COMPLETE,
+        self::EVENT_BUY_BUTTON_CLICKED,
+        self::EVENT_POLICY_READY,
+        self::EVENT_LOGIN,
+        self::EVENT_APP_DOWNLOAD,
+        self::EVENT_TEST ,
+        self::EVENT_INVITATION_PAGE,
+        self::EVENT_CANCEL_POLICY,
+        self::EVENT_LEAD_CAPTURE,
+        self::EVENT_CANCEL_POLICY_PAGE,
+        self::EVENT_REQUEST_CANCEL_POLICY,
+        self::EVENT_RENEWAL,
+        self::EVENT_RENEW,
+        self::EVENT_CASHBACK,
+        self::EVENT_DECLINE_RENEW,
+        self::EVENT_SIXPACK,
+        self::EVENT_ONBOARDING,
+        self::EVENT_POLICY_STATUS,
+        self::EVENT_PAYMENT_METHOD_CHANGED,
+        self::EVENT_EMAIL,
+        self::EVENT_SMS
     ];
 
     public static function getCampaignSources($event)
@@ -258,144 +307,149 @@ class MixpanelService
         return $this->redis->llen(self::KEY_MIXPANEL_QUEUE);
     }
 
-    public function attribution($userId)
+    public function attribution($userId, $overrideAttribution = false)
     {
         $repo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->find($userId);
 
-        return $this->attributionByUser($user);
+        return $this->attributionByUser($user, $overrideAttribution);
     }
 
-    public function attributionByEmail($email)
+    public function attributionByEmail($email, $overrideAttribution = false)
     {
         $repo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
-        return $this->attributionByUser($user);
+        return $this->attributionByUser($user, $overrideAttribution);
     }
 
-    public function attributionByUser(User $user = null)
+    public function attributionByUser(User $user = null, $overrideAttribution = false)
     {
-        $data = null;
         if (!$user) {
-            return null;
+            return;
         }
-        $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
-        $results = $this->mixpanelData->data('engage', [
-            'where' => $search
-        ]);
-        foreach ($results['results'] as $result) {
-            $data = $result['$properties'];
-            if (mb_strtolower($data['$email']) == $user->getEmailCanonical()) {
-                $attribution = new Attribution();
-                $dataPresent = false;
-                if (isset($data['Campaign Name'])) {
-                    $attribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
-                        urldecode($data['Campaign Name']),
-                        250
-                    ));
-                    $dataPresent = true;
-                }
-                if (isset($data['Campaign Source'])) {
-                    $attribution->setCampaignSource($this->conformAlphanumericSpaceDot(
-                        urldecode($data['Campaign Source']),
-                        250
-                    ));
-                    $dataPresent = true;
-                }
-                if (isset($data['Campaign Medium'])) {
-                    $attribution->setCampaignMedium($this->conformAlphanumericSpaceDot(
-                        urldecode($data['Campaign Medium']),
-                        250
-                    ));
-                    $dataPresent = true;
-                }
-                if (isset($data['Campaign Term'])) {
-                    $attribution->setCampaignTerm($this->conformAlphanumericSpaceDot(
-                        urldecode($data['Campaign Term']),
-                        250
-                    ));
-                    $dataPresent = true;
-                }
-                if (isset($data['Campaign Content'])) {
-                    $attribution->setCampaignContent($this->conformAlphanumericSpaceDot(
-                        urldecode($data['Campaign Content']),
-                        250
-                    ));
-                    $dataPresent = true;
-                }
-                if (isset($data['Referer'])) {
-                    $attribution->setReferer($data['Referer']);
-                    $dataPresent = true;
-                }
-                if (isset($data['Device Category'])) {
-                    $attribution->setDeviceCategory($data['Device Category']);
-                    $dataPresent = true;
-                }
-                if (isset($data['Device OS'])) {
-                    $attribution->setDeviceOS($data['Device OS']);
-                    $dataPresent = true;
-                }
-                // Only set the attribution if the user lacks one.
-                if (!$user->getAttribution() && $dataPresent) {
-                    $user->setAttribution($attribution);
-                }
-                $latestAttribution = new Attribution();
-                $dataPresent = false;
-                if (isset($data['Latest Campaign Name'])) {
-                    $latestAttribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
-                        urldecode($data['Latest Campaign Name']),
-                        250
-                    ));
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Campaign Source'])) {
-                    $latestAttribution->setCampaignSource(urldecode($data['Latest Campaign Source']));
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Campaign Medium'])) {
-                    $latestAttribution->setCampaignMedium(urldecode($data['Latest Campaign Medium']));
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Campaign Term'])) {
-                    $latestAttribution->setCampaignTerm(urldecode($data['Latest Campaign Term']));
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Campaign Content'])) {
-                    $latestAttribution->setCampaignContent(urldecode($data['Latest Campaign Content']));
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Referer'])) {
-                    $latestAttribution->setReferer($data['Latest Referer']);
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Device Category'])) {
-                    $latestAttribution->setDeviceCategory($data['Latest Device Category']);
-                    $dataPresent = true;
-                }
-                if (isset($data['Latest Device OS'])) {
-                    $latestAttribution->setDeviceOS($data['Latest Device OS']);
-                    $dataPresent = true;
-                }
-                if ($dataPresent) {
-                    $user->setLatestAttribution($latestAttribution);
-                }
-                $this->dm->flush();
+        
+        list($firstAttribution, $lastAttribution) = $this->findAttributionsForUser($user);
+
+        if ($firstAttribution) {
+            // Only set the attribution if the user lacks one.
+            if ($overrideAttribution || !$user->getAttribution()) {
+                $user->setAttribution($firstAttribution);
             }
         }
 
-        return $data;
+        if ($lastAttribution) {
+            $user->setLatestAttribution($lastAttribution);
+        }
+
+        $this->dm->flush();
+
+        return $user;
     }
 
     public function getUserCount()
     {
-        $query = [
-        ];
+        $query = [];
         $data = $this->mixpanelData->data('engage', $query);
 
         return $data['total'];
+    }
+
+    /**
+     * Gets all users that have got multiple mixpanel accounts based on the email.
+     * @return array containing the users.
+     */
+    public function findDuplicateUsers($useCache = false)
+    {
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+        $emails = [];
+        $users = [];
+
+        $results = $this->findAllUsers(
+            self::USER_QUERY_HAS_EMAIL,
+            null,
+            null,
+            null,
+            null,
+            $useCache
+        );
+
+        foreach ($results as $result) {
+            if (isset($result['$properties']['$email'])) {
+                $email = $result['$properties']['$email'];
+                if (array_key_exists($email, $emails)) {
+                    if ($emails[$email] == 1) {
+                        if ($user = $userRepo->findOneBy(['email' => $email])) {
+                            $users[] = $user;
+                        }
+                    }
+                    $emails[$email]++;
+                } else {
+                    $emails[$email] = 1;
+                }
+            }
+        }
+
+        return $users;
+    }
+
+    private function findAllUsers(
+        $queryType,
+        $data = null,
+        $page = null,
+        $session = null,
+        $pageSize = null,
+        $useCache = true
+    ) {
+        if ($queryType == self::USER_QUERY_HAS_EMAIL) {
+            $query = ['where' => sprintf('defined(properties["$email"])')];
+        } elseif ($queryType == self::USER_QUERY_ALL) {
+            $query = [];
+        } else {
+            throw new \Exception('Unknown query type');
+        }
+
+        $key = sprintf('mixpanel:users:%s', $queryType);
+        if ($this->redis->exists($key) && $useCache) {
+            return unserialize($this->redis->get($key));
+        }
+
+        if (!$data) {
+            $data = [];
+        }
+
+        if ($page) {
+            $query['page'] = $page;
+        }
+        if ($session) {
+            $query['session_id'] = $session;
+        }
+        $results = $this->mixpanelData->data('engage', $query);
+        if (!$results || !$results['results']) {
+            return $data;
+        }
+        // only set on the first page
+        if (isset($results['page_size'])) {
+            $pageSize = $results['page_size'];
+        }
+        $data = array_merge($data, $results['results']);
+
+        if (count($results['results']) >= $pageSize) {
+            return $this->findAllUsers(
+                $queryType,
+                $data,
+                $results['page']+1,
+                $results['session_id'],
+                $pageSize
+            );
+        }
+
+        $this->redis->setex($key, self::CACHE_TIME, serialize($data));
+
+        return $data;
     }
 
     private function runDelete($query)
@@ -426,6 +480,7 @@ class MixpanelService
         }
         $data = null;
         $count = 0;
+
         $count += $this->deleteOldUsersByDays($days);
         $count += $this->deleteQuotePageMissingBotUserAgentUser();
         $count += $this->deleteHomepagePageMissingBotUserAgentUser();
@@ -434,6 +489,7 @@ class MixpanelService
         $count += $this->deleteFacebookPreview();
         $count += $this->deleteSixpack();
         $count += $this->deleteHappyApp();
+        $count += $this->deleteLittleValueUsers(30);
 
         return ['count' => $count, 'total' => $this->getUserCount()];
     }
@@ -465,6 +521,25 @@ class MixpanelService
                 $time->format('U')
             )
             ];
+        // @codingStandardsIgnoreEnd
+        //print_r($query);
+
+        return $this->runDelete($query);
+    }
+
+    private function deleteLittleValueUsers($days)
+    {
+        // users are primarily for attribution
+        // if there is no attribution and no name, then there is little reason to keep around so long
+        $time = \DateTime::createFromFormat('U', time());
+        $time = $time->sub(new \DateInterval(sprintf('P%dD', $days)));
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(datetime(%s) > user["$last_seen"] and not defined(user["$first_name"]) and not defined(user["$last_name"]) and not defined(user["Device Category"]) and user["Country"] != "United Kingdom")',
+                $time->format('U')
+            )
+        ];
         // @codingStandardsIgnoreEnd
         //print_r($query);
 
@@ -793,22 +868,25 @@ class MixpanelService
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
                     $ip = isset($data['ip']) ? $data['ip'] : null;
+                    $ignoreTime = isset($data['ignoreTime']) ? $data['ignoreTime'] : false;
 
-                    $this->setPersonProperties($data['userId'], $data['properties'], $ip);
+                    $this->setPersonProperties($data['userId'], $data['properties'], $ip, $ignoreTime);
                 } elseif ($action == self::QUEUE_PERSON_PROPERTIES_ONCE) {
                     if (!isset($data['userId']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
                     $ip = isset($data['ip']) ? $data['ip'] : null;
+                    $ignoreTime = isset($data['ignoreTime']) ? $data['ignoreTime'] : false;
 
-                    $this->setPersonPropertiesOnce($data['userId'], $data['properties'], $ip);
+                    $this->setPersonPropertiesOnce($data['userId'], $data['properties'], $ip, $ignoreTime);
                 } elseif ($action == self::QUEUE_PERSON_PROPERTIES_UNION) {
                     if (!isset($data['userId']) || !isset($data['properties'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
                     $ip = isset($data['ip']) ? $data['ip'] : null;
+                    $ignoreTime = isset($data['ignoreTime']) ? $data['ignoreTime'] : false;
 
-                    $this->unionPersonProperties($data['userId'], $data['properties'], $ip);
+                    $this->unionPersonProperties($data['userId'], $data['properties'], $ip, $ignoreTime);
                 } elseif ($action == self::QUEUE_PERSON_INCREMENT) {
                     if (!isset($data['userId']) || !isset($data['properties']) ||
                         !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
@@ -837,8 +915,7 @@ class MixpanelService
                     if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
-
-                    $this->attribution($data['userId']);
+                    $this->attribution($data['userId'], isset($data['override']) ? $data['override'] : false);
                 } elseif ($action == self::QUEUE_DELETE) {
                     if (!isset($data['userId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -860,6 +937,9 @@ class MixpanelService
                     json_encode($data),
                     $e->getMessage()
                 ));
+            } catch (ExternalRateLimitException $e) {
+                $data['processTime'] = time() + 60;
+                $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
             } catch (\Exception $e) {
                 if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
                     $data['retryAttempts'] += 1;
@@ -877,12 +957,12 @@ class MixpanelService
         return ['processed' => $processed, 'requeued' => $requeued];
     }
 
-    public function queueAttribution(User $user)
+    public function queueAttribution(User $user, $overrideAttribution = false)
     {
-        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), []);
+        return $this->queue(self::QUEUE_ATTRIBUTION, $user->getId(), ['override' => $overrideAttribution]);
     }
 
-    public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0)
+    public function queue($action, $userId, $properties, $event = null, $retryAttempts = 0, $ignoreTime = false)
     {
         if (!$this->canSend() || !$userId) {
             return;
@@ -905,6 +985,7 @@ class MixpanelService
             'retryAttempts' => $retryAttempts,
             'properties' => $properties,
             'ip' => $this->requestService->getClientIp(),
+            'ignoreTime' => $ignoreTime,
         ];
         $this->redis->rpush(self::KEY_MIXPANEL_QUEUE, serialize($data));
     }
@@ -927,8 +1008,13 @@ class MixpanelService
         ]);
     }
 
-    public function queuePersonProperties(array $personProperties, $setOnce = false, $user = null, $union = false)
-    {
+    public function queuePersonProperties(
+        array $personProperties,
+        $setOnce = false,
+        $user = null,
+        $union = false,
+        $ignoreTime = false
+    ) {
         // don't send empty data
         if (count($personProperties) == 0) {
             return;
@@ -945,11 +1031,11 @@ class MixpanelService
         }
 
         if ($setOnce) {
-            $this->queue(self::QUEUE_PERSON_PROPERTIES_ONCE, $userId, $personProperties);
+            $this->queue(self::QUEUE_PERSON_PROPERTIES_ONCE, $userId, $personProperties, null, 0, $ignoreTime);
         } elseif ($union) {
-            $this->queue(self::QUEUE_PERSON_PROPERTIES_UNION, $userId, $personProperties);
+            $this->queue(self::QUEUE_PERSON_PROPERTIES_UNION, $userId, $personProperties, null, 0, $ignoreTime);
         } else {
-            $this->queue(self::QUEUE_PERSON_PROPERTIES, $userId, $personProperties);
+            $this->queue(self::QUEUE_PERSON_PROPERTIES, $userId, $personProperties, null, 0, $ignoreTime);
         }
     }
 
@@ -967,7 +1053,7 @@ class MixpanelService
         $people->increment($userId, $field, $incrementBy, null, true);
     }
 
-    private function setPersonProperties($userId, array $personProperties, $ip = null)
+    private function setPersonProperties($userId, array $personProperties, $ip = null, $ignoreTime = false)
     {
         if (!$this->canSend()) {
             return;
@@ -976,10 +1062,10 @@ class MixpanelService
         //$this->mixpanel->identify($userId);
         /** @var \Producers_MixpanelPeople $people */
         $people = $this->mixpanel->people;
-        $people->set($userId, $personProperties, $ip);
+        $people->set($userId, $personProperties, $ip, $ignoreTime);
     }
 
-    private function setPersonPropertiesOnce($userId, array $personProperties, $ip = null)
+    private function setPersonPropertiesOnce($userId, array $personProperties, $ip = null, $ignoreTime = false)
     {
         if (!$this->canSend()) {
             return;
@@ -988,10 +1074,10 @@ class MixpanelService
         //$this->mixpanel->identify($userId);
         /** @var \Producers_MixpanelPeople $people */
         $people = $this->mixpanel->people;
-        $people->setOnce($userId, $personProperties, $ip);
+        $people->setOnce($userId, $personProperties, $ip, $ignoreTime);
     }
 
-    private function unionPersonProperties($userId, array $personProperties, $ip = null)
+    private function unionPersonProperties($userId, array $personProperties, $ip = null, $ignoreTime = false)
     {
         if (!$this->canSend()) {
             return;
@@ -1005,7 +1091,7 @@ class MixpanelService
             }
             /** @var \Producers_MixpanelPeople $people */
             $people = $this->mixpanel->people;
-            $people->append($userId, $key, $value, $ip);
+            $people->append($userId, $key, $value, $ip, $ignoreTime);
         }
     }
 
@@ -1138,8 +1224,12 @@ class MixpanelService
             $this->queuePersonProperties($utmLatest, false, $user);
 
             $utm = $this->transformUtm();
-            $this->queuePersonProperties($utm, true, $user);
-
+            // TODO: this logic is temporary to stop old accounts without attribution date from getting overwritten.
+            //       after 90 days (by june 2019) should be revert back and remove this if statement (keeping queue)
+            if (!$user || !$user->getAttribution() || $user->getAttribution()->getDate() ||
+                $user->getAttribution()->getGoCompareQuote()) {
+                $this->queuePersonProperties($utm, true, $user);
+            }
             $properties = array_merge($properties, $utm);
         }
 
@@ -1244,56 +1334,189 @@ class MixpanelService
 
     private function transformUtm($setOnce = true)
     {
-        $prefix = '';
+        $prefix = self::ATTRIBUTION_PREFIX_CURRENT;
         if (!$setOnce) {
-            $prefix = 'Latest ';
-        }
-        $utm = $this->requestService->getUtm();
-        $referer = $this->requestService->getReferer();
-        $deviceCategory = null;
-        $deviceOS = null;
-        if ($userAgent = $this->requestService->getUserAgent()) {
-            $parser = Parser::create();
-            $userAgentDetails = $parser->parse($userAgent);
-            $deviceCategory = $this->requestService->getDeviceCategory();
-            $deviceOS = $this->requestService->getDeviceOS();
+            $prefix = self::ATTRIBUTION_PREFIX_LATEST;
         }
 
-        $transform = [];
-        if ($utm) {
-            if (isset($utm['source']) && $utm['source']) {
-                $transform[sprintf('%sCampaign Source', $prefix)] = $utm['source'];
-            }
-            if (isset($utm['medium']) && $utm['medium']) {
-                $transform[sprintf('%sCampaign Medium', $prefix)] = $utm['medium'];
-            }
-            if (isset($utm['campaign']) && $utm['campaign']) {
-                $transform[sprintf('%sCampaign Name', $prefix)] = $utm['campaign'];
-            }
-            if (isset($utm['term']) && $utm['term']) {
-                $transform[sprintf('%sCampaign Term', $prefix)] = $utm['term'];
-            }
-            if (isset($utm['content']) && $utm['content']) {
-                $transform[sprintf('%sCampaign Content', $prefix)] = $utm['content'];
+        $attribution = $this->requestService->getAttribution();
+
+        return $attribution->getMixpanelProperties($prefix);
+    }
+
+    /**
+     * Gets all events for a users
+     * @param User $user     user to find
+     * @param bool $useCache
+     * @return array containing the response.
+     * @throws \Exception when there is an error in the mixpanel query other than rate limiting.
+     */
+    protected function getUsersByEmail(User $user, $useCache = false)
+    {
+        $cacheKey = sprintf("mixpanel:user:%s", $user->getId());
+        $results = null;
+        if ($useCache) {
+            if ($results = $this->redis->get($cacheKey)) {
+                $results = unserialize($results);
             }
         }
 
-        if ($referer) {
-            $refererDomain = parse_url($referer, PHP_URL_HOST);
-            $currentDomain = parse_url($this->requestService->getUri(), PHP_URL_HOST);
-            if (mb_strtolower($refererDomain) != mb_strtolower($currentDomain)) {
-                $transform[sprintf('%sReferer', $prefix)] = $referer;
+        if (!$results) {
+            $search = sprintf('(properties["$email"] == "%s")', $user->getEmailCanonical());
+            try {
+                $results = $this->mixpanelData->data('engage', ['where' => $search]);
+                //print_r($results);
+            } catch (\Exception $e) {
+                if (mb_stripos($e->getMessage(), "rate limit") !== false) {
+                    throw new ExternalRateLimitException("Mixpanel rate limit reached.");
+                } else {
+                    throw $e;
+                }
+            }
+
+            $this->redis->setex($cacheKey, self::CACHE_TIME, serialize($results));
+        }
+
+        return $results;
+    }
+
+    public function findAttributionsForUser(User $user, $useCache = false)
+    {
+        /** @var Attribution $bestFirstAttribution */
+        $firstAttribution = null;
+        /** @var Attribution $bestLastAttribution */
+        $lastAttribution = null;
+        $results = $this->getUsersByEmail($user, $useCache);
+        //print_r($results);
+        foreach ($results['results'] as $result) {
+            // Write in the data from the user account.
+            if (mb_strtolower($result['$properties']['$email']) != $user->getEmailCanonical()) {
+                throw new \Exception(
+                    'Email mismatch %s / %s',
+                    $result['$properties']['$email'],
+                    $user->getEmailCanonical()
+                );
+            }
+
+            if (is_array($result) && isset($result['$properties'])) {
+                $currentFirstAttribution = new Attribution();
+                $hasCurrentFirstAttribution = $currentFirstAttribution->setMixpanelProperties(
+                    $result['$properties'],
+                    self::ATTRIBUTION_PREFIX_CURRENT
+                );
+                //print $currentFirstAttribution;
+
+                $currentLastAttribution = new Attribution();
+                $hasCurrentLastAttribution = $currentLastAttribution->setMixpanelProperties(
+                    $result['$properties'],
+                    self::ATTRIBUTION_PREFIX_LATEST
+                );
+                //print $currentLastAttribution;
+
+                // if we have a first attribution but not last, first & last are the same
+                if ($hasCurrentFirstAttribution && !$hasCurrentLastAttribution) {
+                    $currentLastAttribution = $currentFirstAttribution;
+                    $hasCurrentFirstAttribution = true;
+                }
+
+                // if we have a last attribution but not first, first & last are the same
+                if (!$hasCurrentFirstAttribution && $hasCurrentLastAttribution) {
+                    $currentFirstAttribution = $currentLastAttribution;
+                    $hasCurrentLastAttribution = true;
+                }
+
+                if ($hasCurrentFirstAttribution) {
+                    if (!$firstAttribution || $firstAttribution->getDate() > $currentFirstAttribution->getDate()) {
+                        $firstAttribution = $currentFirstAttribution;
+                    }
+                }
+
+                if ($hasCurrentLastAttribution) {
+                    if (!$lastAttribution || $lastAttribution->getDate() < $currentLastAttribution->getDate()) {
+                        $lastAttribution = $currentLastAttribution;
+                    }
+                }
+
+                //print $currentFirstAttribution . PHP_EOL;
+                //print $currentLastAttribution . PHP_EOL;
             }
         }
 
-        if ($deviceCategory) {
-            $transform[sprintf('%sDevice Category', $prefix)] = $deviceCategory;
+        //print $firstAttribution . PHP_EOL;
+        //print $lastAttribution . PHP_EOL;
+        return [$firstAttribution, $lastAttribution];
+    }
+
+    /**
+     * Use JQL to get an export of all events group by distinct_id with the min time
+     * This will get us the earliest event for each person, which can be used as a best guess for the
+     * first campaign source attribution date to populate this data as it was never initially set
+     *
+     * @param string $filename
+     */
+    public function importJqlQueryHistoricEvents($filename)
+    {
+        $data = file_get_contents($filename);
+        $json = json_decode($data, true);
+        $count = 0;
+        foreach ($json as $item) {
+            if (isset($item['key'][0])) {
+                $guid = $item['key'][0];
+                $date = \DateTime::createFromFormat('U', $item['value']/1000);
+                if ($date >= new \DateTime('2017-01-01') && $date <= $this->now()) {
+                    $this->redis->hset(self::KEY_MIXPANEL_USER_EARLIEST_EVENTS, $guid, $date->format('U'));
+                    $count++;
+                } else {
+                    throw new \Exception(sprintf('Unknow date %s for %s', $item['value'], $guid));
+                }
+            }
         }
 
-        if ($deviceOS) {
-            $transform[sprintf('%sDevice OS', $prefix)] = $deviceOS;
+        return $count;
+    }
+
+    public function resetCampaignAttributionData($resetFirst = true, $resetLast = true, $maxNumberToProcess = null)
+    {
+        if ($resetFirst && !$this->redis->exists(self::KEY_MIXPANEL_USER_EARLIEST_EVENTS)) {
+            throw new \Exception('Missing user events data');
+        }
+        $updated = [];
+        $results = $this->findAllUsers(self::USER_QUERY_ALL);
+        foreach ($results as $result) {
+            $updateFirst = [];
+            $id = $result['$distinct_id'];
+            if ($resetFirst) {
+                if ($this->redis->hexists(self::KEY_MIXPANEL_USER_EARLIEST_EVENTS, $id)) {
+                    $date = \DateTime::createFromFormat(
+                        'U',
+                        $this->redis->hget(self::KEY_MIXPANEL_USER_EARLIEST_EVENTS, $id)
+                    );
+                    $updateFirst[sprintf('%sCampaign Attribution Date', self::ATTRIBUTION_PREFIX_CURRENT)] =
+                        $date->format(\DateTime::ISO8601);
+
+                    $this->queue(self::QUEUE_PERSON_PROPERTIES, $id, $updateFirst, null, 0, true);
+                    //print_r($updateFirst);
+                }
+            }
+
+            $updateLast = [];
+            if ($resetLast) {
+                $time = $result['$properties']['$last_seen'];
+
+                $updateLast[sprintf('%sCampaign Attribution Date', self::ATTRIBUTION_PREFIX_LATEST)] =
+                    $time;
+
+                $this->queue(self::QUEUE_PERSON_PROPERTIES, $id, $updateLast, null, 0, true);
+                //print_r($updateLast);
+            }
+            $updated[] = $id;
+
+            if ($maxNumberToProcess && $maxNumberToProcess > 0 && $maxNumberToProcess >= count($updated)) {
+                return $updated;
+            }
         }
 
-        return $transform;
+
+        return $updated;
     }
 }

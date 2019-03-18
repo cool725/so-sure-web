@@ -13,9 +13,17 @@
 {% block body %}
     <section class="exception d-flex align-items-center text-center">
         <div class="container">
-            <img class="logo" src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Unhappy so-sure" width="200px" class="d-block" />
-            <h1 class="text-white">Access Denied</h1>
-            <p class="text-white">Looks like you're trying to view something you're not currently allowed to view. Maybe you're not logged in?  Or logged in with the wrong account?</p>
+            <img class="logo" src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Unhappy so-sure" width="200px" class="d-block" alt="Broken phone logo" />
+            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                <h1 class="text-white">Access Denied</h1>
+                <h2 class="text-white">Impersonating a User</h2>
+                <p class="text-white">
+                  You're current impersonating <strong>{{ app.user.email }}</strong> <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Logout?</a>
+                </p>
+            {% else %}
+                <h1 class="text-white">Access Denied</h1>
+                <p class="text-white">Looks like you're trying to view something you're not currently allowed to view. Maybe you're not logged in?  Or logged in with the wrong account?</p>
+            {% endif %}
         </div>
     </section>
 {% endblock %}

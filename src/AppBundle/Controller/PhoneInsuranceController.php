@@ -99,32 +99,6 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/phone-insurance/{make}", name="quote_make", requirements={"make":"[a-zA-Z]+"})
-     * @Route("/insure/{make}", name="insure_make", requirements={"make":"[a-zA-Z]+"})
-     */
-    public function makeInsurance(Request $request, $make)
-    {
-        $phones = $this->getAllPhonesByMake($make);
-        $phonesMem = $this->sortPhoneNamesByMemory($phones);
-
-        $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
-        if ($request->get('_route') === 'insure_make') {
-             $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
-        }
-
-        $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
-        if ($request->get('_route') === 'insure_make') {
-             $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
-        }
-
-        $this->get('app.mixpanel')->queueTrackWithUtm($event, ['Manufacturer' => $make,]);
-
-        $data = ['phones' => $phonesMem, 'make' => $make];
-
-        return $this->render($template, $data);
-    }
-
-    /**
      * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
@@ -164,7 +138,6 @@ class PhoneInsuranceController extends BaseController
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
-     *
      * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
      * @Route("/phone-insurance/{make}+{model}+{memory}GB", name="quote_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
@@ -473,6 +446,9 @@ class PhoneInsuranceController extends BaseController
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                 ]);
             }
+
+            // A/B Homepage USPS test
+            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USPS);
         }
 
         $data = array(

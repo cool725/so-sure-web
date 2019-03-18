@@ -1,44 +1,56 @@
-<section class="user-homepage--content section--pad">
-    <div class="container">
+<h1 class="h2">Payment details</h1>
+{% if policy is defined and policy %}
+    <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
+{% endif %}
 
-        <h2>Your Payment Details</h2>
-
-        {% if bacs %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Your current payment method:</h4>
-                <p>{% if user.paymentMethod and user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod and user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
-                {% if not bacs_last_payment_in_progress %}
-                    {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
-                    <a href="#tab-card" class="btn btn-blue-hollow" data-toggle="tab">Change to Credit/Debit Card</a>
-                {% endif %}
+<div class="row">
+    {% if bacs %}
+        <div class="col-12 col-lg-4">
+            <div class="cardbox cardbox-100 mb-4">
+                <div class="cardbox__body">
+                    <h5 class="cardbox__title">Current payment method</h5>
+                    <div class="cardbox__text">
+                        <p>{% if policy.getPolicyOrUserPaymentMethod and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}Credit/Debit Card{% elseif policy.hasPolicyOrUserBacsPaymentMethod %}Direct Debit{% else %}Unknown{% endif %}</p>
+                        {% if not bacs_last_payment_in_progress %}
+                            {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
+                            <a href="#"
+                               data-tab-to="#payment_card_tab"
+                               class="btn btn-outline-primary show-tab">Change to Card</a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Your direct debit:</h4>
-                <p>{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
-                {% if user.canUpdateBacsDetails %}
-                    <a href="#tab-bacs-setup" class="btn btn-blue-hollow" data-toggle="tab">Upate Details</a>
-                {% else %}
-                    <a href="#" class="btn btn-blue-hollow btn-disabled disabled" title="Bacs Payment Pending">Unable to Upate Details</a>
-                {% endif %}
+    {% endif %}
+    <div class="col-12 col-lg-4">
+        <div class="cardbox cardbox-100 mb-4">
+            <div class="cardbox__body">
+                <h5 class="cardbox__title">Direct Debit details</h5>
+                <div class="cardbox__text">
+                    <p>{% if policy.hasPolicyOrUserBacsPaymentMethod %}{{ policy.getPolicyOrUserBacsPaymentMethod }}{% else %}Not setup{% endif %}</p>
+                    {% if policy.canUpdateBacsDetails %}
+                        <a href="#"
+                           data-tab-to="#bacs_setup_tab"
+                           class="btn btn-outline-primary show-tab">Update account details</a>
+                    {% else %}
+                        <a class="btn btn-outline-primary disabled" title="Bacs Payment Pending mr-1">Unable to Update Details</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% if policy.premiumPlan == 'monthly' %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Billing date:</h4>
-                <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }}</p>
-                <p>(or next working day after in the case of weekends/bank holidays)</p>
-                {#
-                <button title="Change" type="button" class="btn btn-blue-hollow"
-                        data-toggle="modal" data-target="#billingModal">
-                    <i class="fa fa-edit"></i> Change</button>
-                 #}
-            </div>
-        </div>
-        {% endif %}
     </div>
-</section>
+    {% if bacs %}
+        {% if policy and policy.premiumPlan == 'monthly' %}
+            <div class="col-12 col-lg-4">
+                <div class="cardbox cardbox-100 mb-4">
+                    <div class="cardbox__body">
+                        <h5 class="cardbox__title">Billing date</h5>
+                        <div class="cardbox__text">
+                            <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> of the month <br><small>(or within a few days in the case of weekends/bank holidays)</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>

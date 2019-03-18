@@ -1,0 +1,132 @@
+<h2>Input Files <span class="small">(confirmation of debit/credit)</span></h2>
+{% if input|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="50%">File name</th>
+            <th width="50%">Details</th>
+        </tr>
+        {% for file in input %}
+            <tr>
+                <td width="50%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                </td>
+                <td width="50%">
+                    {{ file.metadata|json_encode }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+<h2>Auddis <span class="small">(Direct debit setups)</span></h2>
+{% if auddis|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="50%">File name</th>
+            <th width="50%">Details</th>
+        </tr>
+        {% for file in auddis %}
+            <tr>
+                <td width="50%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                </td>
+                <td width="50%">
+                    {{ file.metadata|json_encode }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+<h2>Addacs <span class="small">(Direct debit cancellations)</span></h2>
+{% if addacs|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="50%">File name</th>
+            <th width="50%">Details</th>
+        </tr>
+        {% for file in addacs %}
+            <tr>
+                <td width="50%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                </td>
+                <td width="50%">
+                    {{ file.metadata|json_encode }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+<h2>Arudd <span class="small">(Direct debit failures after submission)</span></h2>
+{% if arudds|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="50%">File name</th>
+            <th width="50%">Details</th>
+        </tr>
+        {% for file in arudds %}
+            <tr>
+                <td width="50%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                </td>
+                <td width="50%">
+                    {{ file.metadata|json_encode }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+<h2>DDIC <span class="small">(Direct debit indemnity claims)</span></h2>
+{% if ddic|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="50%">File name</th>
+            <th width="50%">Details</th>
+        </tr>
+        {% for file in ddic %}
+            <tr>
+                <td width="50%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                </td>
+                <td width="50%">
+                    {{ file.metadata|json_encode }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+<h2>Withdrawal <span class="small">(Direct debit immediate failures)</span></h2>
+{% if withdrawal|length == 0 %}
+    <p>No files present</p>
+{% else %}
+    <table class="table table-striped">
+        <tr>
+            <th width="50%">File name</th>
+            <th width="50%">Details</th>
+        </tr>
+        {% for file in withdrawal %}
+            <tr>
+                <td width="50%">
+                    {{ file.key }}
+                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-download"></i></a>
+                </td>
+                <td width="50%">
+                    {{ file.metadata|json_encode }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}

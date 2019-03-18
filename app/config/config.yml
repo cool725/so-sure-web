@@ -25,8 +25,15 @@ parameters:
         - '82.163.118.154' # so-sure ip @ frameworks
         - '82.163.117.184' # frameworks ip
         - '10.0.2.2'
+    analytics_ips:
+        - '82.16.104.75' # patrick
+        - '82.163.118.154' # so-sure ip @ frameworks
+        - '82.163.117.184' # frameworks ip
+        - '10.0.2.2'
+        - '87.242.130.154' # seo works
     pos_ips:
         - '172.16.0.0' # Temp. HelloZ should go here
+    online: true
 
 framework:
     #esi:             ~
@@ -68,8 +75,8 @@ twig:
         pca_webkey: "%pca_webkey%"
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
-        use_cdn: true
-        use_fa_cdn: true
+        use_cdn: "%online%"
+        use_fa_cdn: "%online%"
         #default_login_method: "accountkit"
         default_login_method: "accountkit"
         branch_pot_url: "%branch_pot_url%"
@@ -91,6 +98,7 @@ twig:
         web_base_url: "%web_base_url%"
         cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
         rollbar_client_access_token: "%rollbar_client_access_token%"
+        checkout_public_key: "%checkout_apipublic%"
 
 doctrine_mongodb:
     connections:
@@ -437,10 +445,12 @@ nelmio_security:
                 - wss://*.hotjar.com # necessary?
                 - https://*.hotjar.com
                 - https://app.getsentry.com # necessary?
+                - https://secure.checkout.com
                 - https://player.vimeo.com
                 - https://*.facebook.com
                 - http://*.facebook.com
                 - https://connect.facebook.net
+                - https://tr.snapchat.com
                 - https://api.prodpad.com # necessary?
                 - https://*.postcodeanywhere.co.uk
                 - gsa://onpageload # necessary?
@@ -470,6 +480,10 @@ nelmio_security:
                 - https://api.intercom.io
                 - https://api-iam.intercom.io
                 - https://api-ping.intercom.io
+                - https://api.checkout.com
+                - https://api2.checkout.com
+                - https://secure.checkout.com
+                - https://sandbox.checkout.com
                 - https://nexus-websocket-a.intercom.io
                 - https://nexus-websocket-b.intercom.io
                 - https://nexus-long-poller-a.intercom.io
@@ -712,6 +726,7 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://*.gstatic.com
                 - https://js.intercomcdn.com
+                - https://cdn.checkout.com
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
                 - https://fonts.googleapis.com
@@ -725,7 +740,9 @@ nelmio_security:
                 - https://*.facebook.com
                 - https://connect.facebook.net
                 - http://*.facebook.com
+                - https://tr.snapchat.com
                 - https://vimeo.com
+                - https://secure.checkout.com
                 - https://*.vimeo.com
                 - https://*.hotjar.com
                 - https://*.doubleclick.net
@@ -762,12 +779,15 @@ nelmio_security:
                 - http://*.facebook.net
                 - https://*.facebook.com
                 - http://*.facebook.com
+                - https://sc-static.net
+                - https://tr.snapchat.com
                 - https://cdn.optimizely.com
                 - http://cdn.optimizely.com
                 - https://*.intercom.io
                 - https://app.intercom.io
                 - https://widget.intercom.io
                 - https://js.intercomcdn.com
+                - https://cdn.checkout.com
                 - https://*.hotjar.com
                 - http://*.hotjar.com
                 - https://js.hs-scripts.com
@@ -1012,6 +1032,7 @@ nelmio_security:
                 - https://maxcdn.bootstrapcdn.com
                 - https://app.prodpad.com
                 - https://cdn.digits.com
+                - https://cdn.checkout.com
                 - https://*.twitter.com
                 - http://*.twitter.com
                 - https://*.fastly.net
@@ -1032,6 +1053,7 @@ nelmio_security:
                 - https://*.wp.com
                 - https://cdn.mxpnl.com
                 - http://cdn.mxpnl.com
+                - https://cdn.checkout.com
                 - https://www.google-analytics.com
                 - http://www.google-analytics.com
                 - https://stats.g.doubleclick.net
@@ -1301,10 +1323,6 @@ nelmio_security:
     #flexible_ssl:
     #    cookie_name: auth
     #    unsecured_logout: false
-
-dpn_xml_sitemap:
-    additional_sitemaps:
-        - help/sitemap.xml
 
 fos_oauth_server:
     db_driver: mongodb

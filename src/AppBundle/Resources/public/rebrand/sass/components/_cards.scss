@@ -36,6 +36,12 @@
     }
 }
 
+.cardbox-100 {
+    width: 100%;
+    max-width: none;
+}
+
+
 // Only using px here for consistency
 .expanding-cardbox {
     border: 2px solid rgba(37,147,243, 0.2);
@@ -175,6 +181,49 @@
                     text-decoration: none;
                 }
             }
+        }
+    }
+}
+
+// Tabbed Cardbox
+.tabbed-cardbox {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    border: 2px solid $selago;
+    @include border-radius(0.85rem);
+    overflow: hidden;
+
+    &__header {
+        padding: 0rem;
+        border-bottom: 2px solid $selago;
+
+        // Using BS nav-pills
+        .nav-pills {
+
+            .nav-link {
+                padding-top: 0.8rem;
+                padding-bottom: 0.8rem;
+                opacity: 0.6;
+
+                &:hover {
+                    background-color: lighten($link-water, 10%);
+                }
+
+                &.active {
+                    opacity: 1;
+                    // @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
+                    &:hover {
+                        background-color: $dodger-blue;
+                    }
+                }
+
+                @include media-breakpoint-up(md) {
+                    padding-top: 1rem;
+                    padding-bottom: 1rem;
+                }
+            }
+
         }
     }
 }

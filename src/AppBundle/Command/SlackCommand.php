@@ -2,8 +2,11 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\DateTrait;
+use AppBundle\Classes\SoSure;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\RouterService;
+use AppBundle\Service\ReportingService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Maknz\Slack\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -18,20 +21,30 @@ use Symfony\Component\Routing\RouterInterface;
 
 class SlackCommand extends ContainerAwareCommand
 {
+    use DateTrait;
+
     /** @var DocumentManager  */
     protected $dm;
 
     /** @var RouterService */
     protected $routerService;
 
+    /** @var ReportingService */
+    protected $reportingService;
+
     /** @var Client */
     protected $slackClient;
 
-    public function __construct(DocumentManager $dm, RouterService $routerService, Client $slackClient)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        RouterService $routerService,
+        ReportingService $reportingService,
+        Client $slackClient
+    ) {
         parent::__construct();
         $this->dm = $dm;
         $this->routerService = $routerService;
+        $this->reportingService = $reportingService;
         $this->slackClient = $slackClient;
     }
 
@@ -228,14 +241,14 @@ class SlackCommand extends ContainerAwareCommand
         $repo = $this->dm->getRepository(PhonePolicy::class);
 
         $weekText = '';
-        $start = new \DateTime('2016-12-05');
-        $targetEnd = new \DateTime('2019-09-01');
+        $start = new \DateTime('2016-12-05', SoSure::getSoSureTimezone());
+        $targetEnd = new \DateTime('2019-09-01', SoSure::getSoSureTimezone());
         $dowOffset = 0;
 
-        $now = \DateTime::createFromFormat('U', time());
-        $dow = $now->diff($start)->days % 7;
+        $startOfDay = $this->startOfDay(new \DateTime("now", SoSure::getSoSureTimezone()));
+        $dow = $startOfDay->diff($start)->days % 7;
         $offset = $dow - $dowOffset >= 0 ? $dow - $dowOffset : (7 - $dowOffset) + $dow;
-        $start = clone $now;
+        $start = clone $startOfDay;
         $start = $start->sub(new \DateInterval(sprintf('P%dD', $offset)));
         $end = clone $start;
         $end = $end->add(new \DateInterval('P6D'));
@@ -250,23 +263,29 @@ class SlackCommand extends ContainerAwareCommand
         );
         $growthTarget = 10000;
 
-        $yesterday = \DateTime::createFromFormat('U', time());
-        $yesterday->sub(new \DateInterval('P1D'));
-        $oneWeekAgo = \DateTime::createFromFormat('U', time());
-        $oneWeekAgo->sub(new \DateInterval('P7D'));
+        $yesterday = $this->subDays($startOfDay, 1);
+        $oneWeekAgo = $this->subDays($startOfDay, 7);
 
-        $total = $repo->countAllActivePolicies();
-        $daily = $total - $repo->countAllActivePolicies($yesterday);
+        $cumulativeReport = $this->reportingService->getCumulativePolicies(
+            new \DateTime(SoSure::POLICY_START, SoSure::getSoSureTimezone()),
+            $startOfDay
+        );
+        $total = end($cumulativeReport)["close"];
+        $upgrades = $repo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, $yesterday);
+        $gross = $total - $repo->countAllActivePolicies($yesterday) - $upgrades;
+        $cooloff = $repo->countAllEndingPolicies(Policy::CANCELLED_COOLOFF, $yesterday, $startOfDay);
+        $cancellations = $repo->countEndingByStatus(Policy::STATUS_CANCELLED, $yesterday, $startOfDay);
         $weekStart = $repo->countAllActivePolicies($start);
-
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
         $weekTargetIncCancellations = 1.2 * $weekTarget;
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\n\nLast 24 hours: *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: %d\nWeekly Remaining: %d\n\nOverall Target (%s): %d\nOverall Actual: %d\nOverall Remaining: %d",
+            "*%s*\n\nGross Policies (last 24 hours): *%d*\nNet Policies (last 24 hours): *%d*\nNon cooloff cancellations (last 24 hours): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
             $weekText,
-            $daily,
+            $gross,
+            $gross - $cooloff,
+            $cancellations - $cooloff,
             $weekTarget,
             $weekTargetIncCancellations,
             $total - $weekStart,
@@ -274,7 +293,8 @@ class SlackCommand extends ContainerAwareCommand
             $targetEnd->format('d/m/Y'),
             $growthTarget,
             $total,
-            $growthTarget - $total
+            $growthTarget - $total,
+            $startOfDay->format('d/m/Y H:i')
         );
         // @codingStandardsIgnoreEnd
         if (!$skipSlack) {

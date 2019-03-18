@@ -27,7 +27,7 @@
         "symfony/assetic-bundle": "^2.7",
         "drewm/mailchimp-api": "dev-api-v3",
         "google/apiclient": "^2.2",
-        "judopay/judopay-sdk": "2.0.1.5",
+        "judopay/judopay-sdk": "2.0.1.8",
         "aws/aws-sdk-php": "^3.15",
         "white-october/pagerfanta-bundle": "^1.2",
         "geoip2/geoip2": "^2.0",
@@ -53,8 +53,9 @@
         "nexylan/slack-bundle": "^1.0",
         "rollerworks/password-strength-bundle": "^2.0",
         "nelmio/security-bundle": "^2.0",
-        "intercom/intercom-php": "^3.0",
+        "intercom/intercom-php": "^3.2",
         "facebook/graph-sdk": "^5.4",
+	"facebook/php-business-sdk": "^3.1",
         "mixpanel/mixpanel-php": "^2.6",
         "ua-parser/uap-php": "^3.4",
         "ramsey/uuid": "^3.5",
@@ -72,7 +73,9 @@
         "excelwebzone/recaptcha-bundle": "^1.5",
         "rollbar/rollbar": "^1.7",
         "rollbar/rollbar-php-symfony-bundle": "^3.1",
-        "ryanwinchester/hubspot-php": "^1.1"
+        "ryanwinchester/hubspot-php": "^1.1",
+        "checkout/checkout-php-api": "^1.2",
+        "checkout/checkout-sdk-php": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

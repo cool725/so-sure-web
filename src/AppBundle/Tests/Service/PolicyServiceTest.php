@@ -8,6 +8,7 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Exception\DuplicateImeiException;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -92,7 +93,7 @@ class PolicyServiceTest extends WebTestCase
     public function setUp()
     {
         parent::setUp();
-        set_time_limit(480);
+        set_time_limit(1600);
     }
 
     public function tearDown()
@@ -511,11 +512,11 @@ class PolicyServiceTest extends WebTestCase
             null,
             static::$dm
         );
-        static::setBacsPaymentMethod($user, BankAccount::MANDATE_SUCCESS, true);
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
+        static::setBacsPaymentMethodForPolicy($policy);
         $phone = $policy->getPhone();
-        static::$paymentService->confirmBacs($policy, $user->getBacsPaymentMethod(), $date);
-        $user->getBacsPaymentMethod()->getBankAccount()->setInitialPaymentSubmissionDate($date);
+        static::$paymentService->confirmBacs($policy, $policy->getPolicyOrUserBacsPaymentMethod(), $date);
+        $policy->getPolicyOrUserBacsBankAccount()->setInitialPaymentSubmissionDate($date);
 
         $payment = new BacsPayment();
         $payment->setAmount($phone->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
@@ -528,12 +529,12 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $scheduledPayment = $policy->getScheduledPayments()[1];
-        $scheduledPayment->setScheduled($user->getBacsPaymentMethod()->getBankAccount()->getInitialNotificationDate());
+        $scheduledPayment->setScheduled($policy->getPolicyOrUserBacsBankAccount()->getInitialNotificationDate());
         static::$dm->flush();
 
         $this->assertNotEquals(
             $date,
-            $user->getBacsPaymentMethod()->getBankAccount()->getInitialNotificationDate(),
+            $policy->getPolicyOrUserBacsBankAccount()->getInitialNotificationDate(),
             '',
             1
         );
@@ -1955,6 +1956,56 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2017-02-02')
         );
         $this->assertEquals(0, count($policies));
+    }
+
+    public function testSetUnpaidForCancelledMandate()
+    {
+        $policies = static::$policyService->setUnpaidForCancelledMandate(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSetUnpaidForCancelledMandate', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        static::setBacsPaymentMethodForPolicy($policy);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $policy->getPolicyOrUserBacsBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+        static::$dm->flush();
+
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-01-02'), true, false, true));
+        $policies = static::$policyService->setUnpaidForCancelledMandate(
+            'TEST',
+            false,
+            new \DateTime('2016-01-02')
+        );
+        $this->assertEquals(0, count($policies));
+
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2017-01-02'), true, false, true));
+        $policies = static::$policyService->setUnpaidForCancelledMandate(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertGreaterThan(0, count($policies));
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertEquals(Policy::STATUS_UNPAID, $updatedPolicy->getStatus());
     }
 
     public function testFullyExpireExpiredClaimablePoliciesWithClaim()
@@ -3806,6 +3857,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             4
         );
+        self::setPaymentMethodForPolicy($policyA);
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(50, $policyA->getPotValue());
@@ -3904,6 +3956,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             new \DateTime('2016-01-01')
         );
+        self::setPaymentMethodForPolicy($policyA);
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(10, $policyA->getPotValue());
@@ -3981,6 +4034,190 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(
             $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
             $paymentA->getAmount() + $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
+        );
+    }
+
+    public function testPolicyRenewalNetworkClaim10WithDiscountBacs()
+    {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountBacsA', $this),
+            static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountBacsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01')
+        );
+        self::setBacsPaymentMethodForPolicy($policyA);
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(10, $policyA->getPotValue());
+
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SETTLED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $claimB->setProcessed(true);
+        $policyB->addClaim($claimB);
+
+        $paymentA = new JudoPayment();
+        $paymentA->setDate(new \DateTime('2017-01-01'));
+        $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentA = $renewalPolicyA->getNextScheduledPayment();
+        $scheduledPaymentA->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentA->setPayment($paymentA);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyA->getNextPolicy()->addPayment($paymentA);
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $paymentB = new JudoPayment();
+        $paymentB->setDate(new \DateTime('2017-01-01'));
+        $paymentB->setAmount($renewalPolicyB->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentB->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentB = $renewalPolicyB->getNextScheduledPayment();
+        $scheduledPaymentB->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentB->setPayment($paymentB);
+        $paymentB->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyB->getNextPolicy()->addPayment($paymentB);
+        static::$dm->flush();
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice() - $paymentA->getAmount(),
+            $renewalPolicyA->getOutstandingPremium()
+        );
+
+        // 12 original scheduled (1 paid, 11 cancelled)
+        // 11 new scheduled (monthly) as 1 already paid
+        // 0 adjustments to rebate
+        $this->assertEquals(23, count($renewalPolicyA->getScheduledPayments()));
+        $this->assertEquals(
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
+        );
+    }
+
+    public function testPolicyRenewalNetworkClaimOpenWithDiscount()
+    {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalNetworkClaimOpenWithDiscount-A', $this),
+            static::generateEmail('testPolicyRenewalNetworkClaimOpenWithDiscount-B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01')
+        );
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $claimB->setProcessed(true);
+        $policyB->addClaim($claimB);
+
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(10, $policyA->getPotValue());
+
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $paymentA = new JudoPayment();
+        $paymentA->setDate(new \DateTime('2017-01-01'));
+        $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentA = $renewalPolicyA->getNextScheduledPayment();
+        $scheduledPaymentA->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentA->setPayment($paymentA);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyA->getNextPolicy()->addPayment($paymentA);
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policyA->getStatus());
+
+        $paymentB = new JudoPayment();
+        $paymentB->setDate(new \DateTime('2017-01-01'));
+        $paymentB->setAmount($renewalPolicyB->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentB->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentB = $renewalPolicyB->getNextScheduledPayment();
+        $scheduledPaymentB->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentB->setPayment($paymentB);
+        $paymentB->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyB->getNextPolicy()->addPayment($paymentB);
+        static::$dm->flush();
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policyB->getStatus());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $this->assertFalse($policyA->getNextPolicy()->getPremium()->hasAnnualDiscount());
+        $this->assertFalse($policyB->getNextPolicy()->getPremium()->hasAnnualDiscount());
+
+        // 12 original scheduled (1 paid, 11 cancelled)
+        $this->assertEquals(12, count($renewalPolicyA->getScheduledPayments()));
+        $this->assertEquals(
+            $policyA->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $policyB->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            $policyB->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
         );
     }
 
@@ -4416,7 +4653,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-01-01'),
             true
         );
-
+        self::setPaymentMethodForPolicy($policyA);
         $policyA->setStatus(PhonePolicy::STATUS_PENDING);
         $policyB->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -5476,5 +5713,55 @@ class PolicyServiceTest extends WebTestCase
         $payment->setSuccess(true);
         $policy->addPayment($payment);
         static::$policyService->create($policy);
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\DuplicateImeiException
+     */
+    public function testCreateWithDuplicateImei()
+    {
+        $imei = static::generateRandomImei();
+
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateWithDuplicateImeiA', $this),
+            'bar',
+            static::$dm
+        );
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateWithDuplicateImeiB', $this),
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true,
+            false,
+            true,
+            $imei
+        );
+        self::setPaymentMethodForPolicy($policyA);
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $policyB = static::initPolicy(
+            $userB,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true,
+            false,
+            true,
+            $imei
+        );
+        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policyB, new \DateTime('2016-01-01'), true);
     }
 }

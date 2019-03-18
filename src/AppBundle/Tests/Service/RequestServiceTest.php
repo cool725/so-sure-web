@@ -166,6 +166,7 @@ class RequestServiceTest extends WebTestCase
             'HappyApps-WebCheck/1.0',
             'Mozilla/5.0 (compatible; YandexVideoParser/1.0; +http://yandex.com/bots)',
             'Branch Metrics API',
+            'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)',
             //'Mozilla/5.0 (Linux; Android 8.0.0; SM-G950F Build/R16NW; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.158 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/172.0.0.66.93;]' // facebook
         ];
         // @codingStandardsIgnoreEnd

@@ -1,84 +1,114 @@
-<section class="user-homepage--content section--pad">
-    <div class="container">
+<h1 class="h2 mb-4">Confirm Direct Debit Setup</h1>
+{% if policy is defined and policy %}
+    <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
+{% endif %}
 
-        <h2><span class="sr-only">Setup Direct Debit</span><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit"></h2>
-        <p class="lead">Please <u>DOUBLE CHECK</u> your details before confirming!</p>
+{{ form_start(bacs_confirm_form, {'attr': {'class': 'form-400 mx-0 mb-5'}}) }}
 
-        <div class="row">
-            <div class="col-sm-6 col-md-4">
-                <ul class="list-unstyled bacs-list" data-hj-suppress="">
-                    <li>
-                        <small class="text-dark-grey">Name of account holder</small><br>
-                        <span class="h4">{{ bacs.accountName }}</span>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Sort code</small><br>
-                        <span class="h4">{{ bacs.getDisplayableSortCode }}</span>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Account number</small><br>
-                        <span class="h4">{{ bacs.getAccountNumber }}</span>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Bank/Building society</small><br>
-                        <span class="h4">{{ bacs.bankName }}</span>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Bank/Building society address</small><br>
-                        <span class="h4">
-                            {% if bacs.bankAddress %}
-                            {{ bacs.bankAddress.stringImplode('<br>')|raw }}
-                            {% endif %}
-                        </span>
-                    </li>
-                </ul>
+    <h6 class="mb-4">Please <u>check your details</u> before continuing 🤓</h6>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-6">
+                <small class="text-grey">Name of account holder</small><br>
+                <span class="h6">{{ bacs.accountName }}</span>
             </div>
-            <div class="col-sm-6 col-md-4">
-                <ul class="list-unstyled bacs-list" data-hj-suppress="">
-                    <li>
-                        <small class="text-dark-grey">Email</small><br>
-                        <span class="h4">{{  user.email }}</span>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Reference Number</small><br>
-                        <span class="h4">{{  bacs.reference }}</span>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Collection frequency</small><br>
-                        <span class="h4">First collection: {{ bacs.getFirstPaymentDate(app.user)|date('d F','Europe/London') }}</span><br>
-                        <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
-                    </li>
-                    <li>
-                        <small class="text-dark-grey">Payment amount</small><br>
-                        <span class="h4">£{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</span>
-                    </li>
-                </ul>
-                <p>
-                    I confirm that the above details are correct and payment to SO-SURE LIMITED will be first
-                    collected on {{ bacs.getFirstPaymentDate(app.user)|date('d F','Europe/London') }}. You will receive confirmation of this direct debit along
-                    with any future notices via <strong>email</strong>.
-                </p>
+            <div class="col-6">
+                <small class="text-grey">Email</small><br>
+                <span class="h6">{% if policy %}{{ policy.user.name }}{% else %}{{ app.user.name }}{% endif %}</span>
             </div>
         </div>
-        {{ form_start(bacs_confirm_form) }}
-        <div class="row">
-            <div class="col-sm-6 col-md-4">
-                <div class="form-group">
-                    {{ form_widget(bacs_confirm_form.save, {'label': 'Confirm', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                </div>
-                <div class="form-group">
-                    <a href="#tab-bacs-setup" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">Back</a>
-                    {% do bacs_confirm_form.back.setRendered %}
-                </div>
-                <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
-                <address>
-                    <strong>SO-SURE Limited</strong><br>
-                    Martin House, 5 Martin Lane, London EC4R 0DP<br>
-                    +44 330 223 4948, <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">hello</a>
-                </address>
-                <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
-            </div>
-        </div>
-        {{ form_end(bacs_confirm_form) }}
     </div>
-</section>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-6">
+                <small class="text-grey">Sort code</small><br>
+                <span class="h6">{{ bacs.getDisplayableSortCode }}</span>
+            </div>
+            <div class="col-6">
+                <small class="text-grey">Account number</small><br>
+                <span class="h6">{{ bacs.getAccountNumber }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-6">
+                <small class="text-grey">Bank/Building society</small><br>
+                <span class="h6">{{ bacs.bankName }}</span>
+            </div>
+            <div class="col-6">
+                <small class="text-grey">Reference Number</small><br>
+                <span class="h6">{{  bacs.reference }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if bacs.bankAddress %}
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-12">
+                <small class="text-grey">Bank/Building society address</small><br>
+                <span class="h6">{{ bacs.bankAddress.stringImplode('<br>')|raw }}</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="col-6">
+                <small class="text-grey">Payment amount</small><br>
+                <span class="h5">&pound;{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</span>
+            </div>
+            <div class="col-6">
+                <small class="text-grey">Collection frequency:</small><br>
+                <span class="h6">First collection: {{ bacs.getFirstPaymentDateForPolicy(policy)|date('d/m/y','Europe/London') }}</span><br>
+                {% if bacs.annual %}
+                    <small>(Collected on the {{ policy.billing|date('jS M','Europe/London') }} of each year thereafter)</small><br>
+                {% else %}
+                    <small class="form-text">Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter</small><br>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <small class="form-text">I confirm that the above details are correct and payment to so-sure Limited will be <u>first collected on {{ bacs.getFirstPaymentDateForPolicy(policy)|date('d F','Europe/London') }}</u>. You will receive confirmation of this direct debit along with any future notices via <strong>email</strong>.</small>
+    </div>
+
+    <div class="form-group my-5">
+        <div class="form-row">
+            <div class="col-3">
+                <a href="#"
+                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center show-tab"
+                   data-tab-to="#bacs_setup_tab">
+                    <span class="sr-only">back</span>
+                    <i class="far fa-arrow-left"></i>
+                </a>
+                {% do bacs_confirm_form.back.setRendered %}
+            </div>
+            <div class="col-9 text-right">
+                {{ form_widget(bacs_confirm_form.save, {
+                    'label': 'Confirm',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
+                    'attr': {
+                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                }}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group d-flex align-items-center">
+        <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
+        <small class="form-text mb-2 ml-2">
+            Payments protected by the <a href="#" data-toggle="modal" data-target="#direct_debit_guarantee"><u>Direct Debit Guarantee</u></a>.
+            so-sure Ltd, Martin House, 5 Martin Lane, London EC4R 0DP <br>
+            <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>
+        </small>
+    </div>
+
+{{ form_end(bacs_confirm_form) }}

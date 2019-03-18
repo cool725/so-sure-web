@@ -168,7 +168,7 @@ class BacsCommand extends ContainerAwareCommand
         }
 
         $creditPayments = [];
-        $runCredits = $this->bacsService->hasPaymentCredit();
+        $runCredits = $this->bacsService->hasPaymentCredits($prefix, $processingDate);
         if ($onlyDebits) {
             $runCredits = false;
         }
@@ -286,13 +286,13 @@ class BacsCommand extends ContainerAwareCommand
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
+        $prefix = $input->getArgument('prefix');
 
         if ($debug) {
             $skipS3 = true;
             $skipSftp = true;
             $output->writeln('Debug option is set. Skipping sftp & s3 upload');
         }
-        //$prefix = $input->getArgument('prefix');
 
         $serialNumber = $this->sequenceService->getSequenceId(
             SequenceService::SEQUENCE_BACS_SERIAL_NUMBER,
@@ -307,6 +307,7 @@ class BacsCommand extends ContainerAwareCommand
 
         $output->writeln('Exporting Credit Payments');
         $creditPayments = $this->bacsService->exportPaymentsCredits(
+            $prefix,
             $processingDate,
             $serialNumber,
             $data,

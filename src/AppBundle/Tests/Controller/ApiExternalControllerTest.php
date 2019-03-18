@@ -674,4 +674,126 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
         $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
     }
+
+
+    public function testIntercomMessengerInit()
+    {
+        $this->clearRateLimit();
+        $url = sprintf(
+            '/external/intercom/messenger/init'
+        );
+        $data = [
+            'app_id' => 'hp8z6qfh',
+            'admin' => [
+                'type' => 'admin',
+                'id' =>' "775999',
+            ],
+            'component_id' => 'verify',
+            'context' => [
+                'conversation_id' => 20387006809,
+            ]
+        ];
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X-Body-Signature' => $this->getDpaAppSignature($data),
+            ),
+            json_encode($data)
+        );
+
+        //print_r($this->getClientResponseContent());
+        $data = $this->verifyResponse(200);
+        //print_r($data);
+        $this->assertEquals('firstName', $data['canvas']['content']['components'][3]['id']);
+    }
+
+    public function testIntercomMessengerConfig()
+    {
+        $this->clearRateLimit();
+        $url = sprintf(
+            '/external/intercom/messenger/config'
+        );
+        $data = [
+            'app_id' => 'hp8z6qfh',
+            'admin' => [
+                'type' => 'admin',
+                'id' =>' "775999',
+            ],
+            'component_id' => 'verify',
+            'context' => [
+                'conversation_id' => 20387006809,
+            ]
+        ];
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X-Body-Signature' => $this->getDpaAppSignature($data),
+            ),
+            json_encode($data)
+        );
+
+        //print_r($this->getClientResponseContent());
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('', $data['results']['name']);
+        //print_r($data);
+    }
+
+    public function testIntercomMessengerSubmit()
+    {
+        $this->clearRateLimit();
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('testIntercomMessengerSubmit', $this, true),
+            'bar'
+        );
+        $url = sprintf(
+            '/external/intercom/messenger/submit'
+        );
+        $data = [
+            'app_id' => 'hp8z6qfh',
+            'user' => [
+                'type' => 'user',
+                'id' =>' "775999',
+            ],
+            'context' => [
+                'conversation_id' => 20387006809,
+            ],
+            'component_id' => 'verify',
+            'input_values' => [
+                'firstName' => 'foo',
+                'lastName' => 'bar',
+                'dob' => '30/12/1980',
+                'mobile' => '07775700123'
+            ],
+        ];
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_X-Body-Signature' => $this->getDpaAppSignature($data),
+            ),
+            json_encode($data)
+        );
+
+        //print_r($this->getClientResponseContent());
+        $data = $this->verifyResponse(200);
+        //print_r($data);
+        $this->assertEquals('text', $data['canvas']['content']['components'][0]['type']);
+    }
+
+    private function getDpaAppSignature($data)
+    {
+        return hash_hmac('sha256', json_encode($data), self::$container->getParameter('intercom_dpa_app_secret'));
+    }
 }

@@ -2,6 +2,9 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -124,6 +127,23 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findUnpaidPoliciesWithCancelledMandates($policyPrefix)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('paymentMethod.bankAccount.mandateStatus')->in([
+                BankAccount::MANDATE_CANCELLED,
+                BankAccount::MANDATE_FAILURE
+            ]);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
     public function findRenewalPoliciesForActivation($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
@@ -203,6 +223,58 @@ class PolicyRepository extends BaseDocumentRepository
         }
 
         return $qb->getQuery()
+            ->execute();
+    }
+
+    public function findPendingMandates(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $date = $this->endOfDay($date);
+
+        $qb = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.mandateStatus')->equals(BankAccount::MANDATE_PENDING_APPROVAL)
+            ->field('paymentMethod.bankAccount.initialPaymentSubmissionDate')->lt($date)
+        ;
+
+        return $qb;
+    }
+
+    public function findDuplicateMandates($mandate)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.reference')->equals($mandate)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
+    public function findBankAccount(Policy $policy)
+    {
+        $qb = $this->createQueryBuilder();
+        if ($policy->getUser()) {
+            $qb->field('user.$id')->notIn([new \MongoId($policy->getUser()->getId())]);
+        }
+
+        if ($policy->getPaymentMethod() instanceof JudoPaymentMethod) {
+            $accountHash = $policy->getJudoPaymentMethod() ?
+                $policy->getJudoPaymentMethod()->getCardTokenHash() :
+                ['NotAHash'];
+            if (!$accountHash) {
+                $accountHash = ['NotAHash'];
+            }
+            $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
+        } elseif ($policy->getPaymentMethod() instanceof BacsPaymentMethod) {
+            $accountHash = $policy->getBacsBankAccount() ?
+                $policy->getBacsBankAccount()->getHashedAccount() : 'NotAHash';
+            $qb->field('paymentMethod.bankAccount.hashedAccount')->equals($accountHash);
+        } else {
+            throw new \Exception('Policy is missing a payment type');
+        }
+
+        return $qb
+            ->getQuery()
             ->execute();
     }
 }

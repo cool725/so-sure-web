@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Form\Bacs;
@@ -11,10 +12,12 @@ use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
+use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\PurchaseStepPaymentType;
 use AppBundle\Form\Type\PurchaseStepPledgeType;
+use AppBundle\Form\Type\PurchaseStepToCardType;
 use AppBundle\Form\Type\PurchaseStepToJudoType;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
@@ -22,6 +25,7 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Security\PolicyVoter;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
@@ -60,12 +64,9 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Stats;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\File\ImeiUploadFile;
-use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonalAddress;
-use AppBundle\Document\Form\PurchaseStepPersonal;
-use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
 
 use AppBundle\Form\Type\ImeiUploadFileType;
@@ -318,8 +319,7 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -346,6 +346,12 @@ class PurchaseController extends BaseController
         // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
 
         if ($policy) {
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+        } else {
+            $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
+        }
+
+        if ($policy) {
             if (!$phone && $policy->getPhone()) {
                 $phone = $policy->getPhone();
                 $this->setSessionQuotePhone($request, $phone);
@@ -370,12 +376,6 @@ class PurchaseController extends BaseController
 
                 // as we may recreate the form, make sure to get everything we need from the form first
                 $purchaseFormValid = $purchaseForm->isValid();
-                $purchaseFormExistingClicked = false;
-                if ($purchaseForm->has('existing')) {
-                    /** @var SubmitButton $existingButton */
-                    $existingButton = $purchaseForm->get('existing');
-                    $purchaseFormExistingClicked = $existingButton->isClicked();
-                }
 
                 // If there's a file upload, the form submit event bind should have already run the ocr
                 // and data object has the imei/serial
@@ -505,6 +505,11 @@ class PurchaseController extends BaseController
                             ])
                         );
                     }
+                } else {
+                    //$this->addFlash('error', sprintf('%s', $purchaseForm->getErrors()));
+                    $this->addFlash('error', sprintf(
+                        'Sorry, there seems to be an error. Please check below for further details.'
+                    ));
                 }
             }
         }
@@ -550,7 +555,7 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -560,7 +565,9 @@ class PurchaseController extends BaseController
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
-        $judoFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
+        $cardFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
 
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
@@ -570,6 +577,7 @@ class PurchaseController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
         $amount = null;
         $bacs = new Bacs();
+        $bacs->setValidateName($user->getName());
         $bacsConfirm = new Bacs();
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
@@ -589,17 +597,19 @@ class PurchaseController extends BaseController
         $paymentService = $this->get('app.payment');
         /** @var PolicyService $policyService */
         $policyService = $this->get('app.policy');
-        /** @var Form $toJudoForm */
-        $toJudoForm = null;
-        if ($judoFeature) {
-            $toJudoForm =  $this->get("form.factory")
-                ->createNamedBuilder('to_judo_form', PurchaseStepToJudoType::class)
+
+        /** @var Form $toCardForm */
+        $toCardForm = null;
+        if ($cardFeature) {
+            $toCardForm =  $this->get("form.factory")
+                ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
                 ->getForm();
         }
 
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
+            // ->setValidationName('asdasdasd')
             ->getForm();
         /** @var FormInterface $bacsConfirmForm */
         $bacsConfirmForm = $this->get('form.factory')
@@ -648,18 +658,23 @@ class PurchaseController extends BaseController
 
                     return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
                 }
-            } elseif ($request->request->has('to_judo_form')) {
-                $this->get('app.mixpanel')->queueTrack(
-                    MixpanelService::EVENT_TEST,
-                    ['Test Name' => 'Bacs to Card']
-                );
-                $webpay = $this->get('app.judopay')->webpay(
-                    $policy,
-                    $amount,
-                    $request->getClientIp(),
-                    $request->headers->get('User-Agent'),
-                    JudopayService::WEB_TYPE_STANDARD
-                );
+            } elseif ($request->request->has('to_card_form')) {
+                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, [
+                    'Test Name' => 'Bacs to Card',
+                    'Payment Provider' => $cardProvider,
+                ]);
+                if ($checkoutFeature) {
+                    // TODO
+                    NoOp::ignore([]);
+                } else {
+                    $webpay = $this->get('app.judopay')->webpay(
+                        $policy,
+                        $amount,
+                        $request->getClientIp(),
+                        $request->headers->get('User-Agent'),
+                        JudopayService::WEB_TYPE_STANDARD
+                    );
+                }
             }
         }
 
@@ -680,7 +695,8 @@ class PurchaseController extends BaseController
             'step' => 4,
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
-            'bacs' => $bacs
+            'bacs' => $bacs,
+            'amount' => $amount,
         );
 
         if ($webpay) {
@@ -688,8 +704,9 @@ class PurchaseController extends BaseController
             $data['webpay_reference'] = $webpay ? $webpay['payment']->getReference() : null;
         }
 
-        if ($toJudoForm) {
-            $data['to_judo_form'] = $toJudoForm->createView();
+        if ($toCardForm) {
+            $data['to_card_form'] = $toCardForm->createView();
+            $data['card_provider'] = $cardProvider;
         }
 
 
@@ -718,8 +735,7 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -740,6 +756,9 @@ class PurchaseController extends BaseController
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
         }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
         if ($policy && !$phone && $policy->getPhone()) {
             $phone = $policy->getPhone();
             $this->setSessionQuotePhone($request, $phone);
@@ -754,6 +773,12 @@ class PurchaseController extends BaseController
                 $purchaseForm->handleRequest($request);
 
                 if ($purchaseForm->isValid() && $purchase->areAllAgreed()) {
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_COMPLETE_PLEDGE, [
+                        'Device Insured' => $phone ? $phone->__toString() : null,
+                        'OS' => $phone ? $phone->getOs() : null,
+                        'Policy Id' => $policy->getId(),
+                    ]);
+
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
@@ -803,8 +828,7 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('user_home');
         }
 
-        $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
-        if (!$user->hasValidBillingDetails()) {
+        if (!$user->hasValidBillingDetails() || !$user->hasValidDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
         }
 
@@ -825,6 +849,9 @@ class PurchaseController extends BaseController
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
         }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
         if ($policy && !$phone && $policy->getPhone()) {
             $phone = $policy->getPhone();
             $this->setSessionQuotePhone($request, $phone);
@@ -850,15 +877,16 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $paymentProviderTest = 'bacs';
-
+        $paymentProvider = null;
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
-            $bacsFeature = false;
-        }
-        if (!$bacsFeature) {
-            $paymentProviderTest = 'judo';
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        // bacs overrides any type of card payment
+        if ($bacsFeature) {
+            $paymentProvider = SoSure::PAYMENT_PROVIDER_BACS;
+        } elseif ($checkoutFeature) {
+            $paymentProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
+        } else {
+            $paymentProvider = SoSure::PAYMENT_PROVIDER_JUDO;
         }
 
         if ('POST' === $request->getMethod()) {
@@ -867,12 +895,6 @@ class PurchaseController extends BaseController
 
                 // as we may recreate the form, make sure to get everything we need from the form first
                 $purchaseFormValid = $purchaseForm->isValid();
-                $purchaseFormExistingClicked = false;
-                if ($purchaseForm->has('existing')) {
-                    /** @var SubmitButton $existingButton */
-                    $existingButton = $purchaseForm->get('existing');
-                    $purchaseFormExistingClicked = $existingButton->isClicked();
-                }
 
                 if ($purchaseFormValid) {
                     if ($allowPayment) {
@@ -892,44 +914,33 @@ class PurchaseController extends BaseController
 
                         if ($monthly || $yearly) {
                             $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
-                            if ($paymentProviderTest == 'bacs') {
+                            if ($paymentProvider == SoSure::PAYMENT_PROVIDER_BACS) {
                                 return new RedirectResponse(
                                     $this->generateUrl('purchase_step_payment_bacs_id', [
                                         'id' => $policy->getId(),
                                         'freq' => $monthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
                                     ])
                                 );
-                            } else {
-                                // There was an odd case of next not being detected as clicked
-                                // perhaps a brower issue with multiple buttons
-                                // just in case, assume judo pay if we don't detect existing
-                                if ($purchaseFormExistingClicked) {
-                                    // TODO: Try/catch
-                                    if ($this->get('app.judopay')->existing(
-                                        $policy,
-                                        $purchase->getAmount()
-                                    )) {
-                                        return $this->redirectToRoute(
-                                            'user_welcome_policy_id',
-                                            ['id' => $policy->getId()]
-                                        );
-                                    } else {
-                                        // @codingStandardsIgnoreStart
-                                        $this->addFlash(
-                                            'warning',
-                                            "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
-                                        );
-                                        // @codingStandardsIgnoreEnd
-                                    }
-                                } else {
-                                    $webpay = $this->get('app.judopay')->webpay(
-                                        $policy,
-                                        $purchase->getAmount(),
-                                        $request->getClientIp(),
-                                        $request->headers->get('User-Agent'),
-                                        JudopayService::WEB_TYPE_STANDARD
-                                    );
-                                }
+                            } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
+                                $webpay = $this->get('app.judopay')->webpay(
+                                    $policy,
+                                    $purchase->getAmount(),
+                                    $request->getClientIp(),
+                                    $request->headers->get('User-Agent'),
+                                    JudopayService::WEB_TYPE_STANDARD
+                                );
+                            } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_CHECKOUT) {
+                                // TODO
+                                NoOp::ignore([]);
+                                /*
+                                $webpay = $this->get('app.checkout')->webpay(
+                                    $policy,
+                                    $purchase->getAmount(),
+                                    $request->getClientIp(),
+                                    $request->headers->get('User-Agent'),
+                                    JudopayService::WEB_TYPE_STANDARD
+                                );
+                                */
                             }
                         } else {
                             $this->addFlash(
@@ -963,7 +974,7 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'billing_date' => $billingDate,
-            'payment_provider' => $paymentProviderTest,
+            'payment_provider' => $paymentProvider,
         );
 
         return $this->render($template, $data);
@@ -1423,7 +1434,10 @@ class PurchaseController extends BaseController
         $amount = $policy->getRemainderOfPolicyPrice();
         $webpay = null;
 
-        if ($amount > 0) {
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
+
+        if ($amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
@@ -1442,5 +1456,88 @@ class PurchaseController extends BaseController
         ];
 
         return $data;
+    }
+
+    /**
+     * @Route("/checkout/{id}", name="purchase_checkout")
+     * @Route("/checkout/{id}/update", name="purchase_checkout_update")
+     * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
+     * @Route("/checkout/{id}/unpaid", name="purchase_checkout_unpaid")
+     * @Method({"POST"})
+     */
+    public function checkoutAction(Request $request, $id)
+    {
+        $successMessage = 'Payment is successful.';
+        $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+        if ($request->get('_route') == 'purchase_checkout_update') {
+            $successMessage = 'Your card is now updated.';
+            $errorMessage = 'Sorry, we are unable to update your card. Please try again.';
+        } elseif ($request->get('_route') == 'purchase_checkout_remainder') {
+            $successMessage = 'The remainder of policy is now paid.';
+            $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+        } elseif ($request->get('_route') == 'purchase_checkout_unpaid') {
+            $successMessage = 'Payment is successful.';
+            $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+        }
+
+        try {
+            $logger = $this->get('logger');
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                $logger->info(sprintf('Missing policy'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
+            }
+
+            //$this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            $token = $request->get("token");
+            if (!$token) {
+                $logger->info(sprintf('Missing token'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Token parameter missing.");
+            } elseif (!$this->isCsrfTokenValid("checkout", $request->request->get('csrf'))) {
+                $logger->info(sprintf('Failed csrf'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
+            }
+
+            $pennies = $request->get("pennies");
+            $amount = null;
+            if (mb_strlen($pennies) > 0) {
+                $amount = $this->convertFromPennies($pennies);
+                // Update card details with 0.01 is a hack for checkout.js implementation
+                if ($request->get('_route') == 'purchase_checkout_update' &&
+                    $this->areEqualToTwoDp(0.01, $amount)) {
+                    $amount = null;
+                }
+            }
+            $logger->info(sprintf('Token: %s / Pennies; %s', $token, $pennies));
+            /** @var CheckoutService $checkout */
+            $checkout = $this->get('app.checkout');
+            $checkout->updatePaymentMethod(
+                $policy,
+                $token,
+                $amount
+            );
+
+            /*
+            if ($amount > 0) {
+                $checkout->pay($policy, $charge->getId(), $amount, Payment::SOURCE_WEB);
+            }
+            */
+
+            $this->addFlash('success', $successMessage);
+
+            return $this->getSuccessJsonResponse("Updated payment token.");
+        } catch (PaymentDeclinedException $e) {
+            $this->addFlash('error', $errorMessage);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
+        } catch (AccessDeniedException $e) {
+            $this->addFlash('error', $errorMessage);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+        } catch (\Exception $e) {
+            $this->addFlash('error', $errorMessage);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown error');
+        }
     }
 }

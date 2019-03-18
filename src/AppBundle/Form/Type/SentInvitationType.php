@@ -30,7 +30,7 @@ class SentInvitationType extends AbstractType
                 $form->add(
                     sprintf('reinvite_%s', $invitation->getId()),
                     SubmitType::class,
-                    ['label' => 'Re-send', 'attr' => [
+                    ['label' => 'Resend', 'attr' => [
                         'class' => 'btn btn-primary',
                         'disabled' => !$invitation->canReinvite()
                     ]]

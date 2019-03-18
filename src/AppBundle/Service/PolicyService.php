@@ -4,8 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
 use AppBundle\Document\Feature;
-use AppBundle\Document\Promotion;
-use AppBundle\Document\Participation;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -32,6 +31,8 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Promotion;
+use AppBundle\Document\Participation;
 use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
@@ -330,7 +331,10 @@ class PolicyService
                 }
             }
 
-            $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+            $checkmend = null;
+            if (!$user->hasSoSureEmail()) {
+                $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
+            }
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
@@ -345,11 +349,12 @@ class PolicyService
             /** @var PolicyTerms $latestTerms */
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
             $policy->init($user, $latestTerms);
-
-            $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
-            $policy->addCheckmendSerialData($checkmend['serialResponse']);
-            // saving final finaly checkmendcert based status
-            $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            if ($checkmend) {
+                $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
+                $policy->addCheckmendSerialData($checkmend['serialResponse']);
+                // saving final finaly checkmendcert based status
+                $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            }
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->logger->warning(
@@ -460,6 +465,12 @@ class PolicyService
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
 
                 return false;
+            }
+            // validate the IMEI if this is a phone policy.
+            if ($policy instanceof PhonePolicy &&
+                $this->imeiValidator->isDuplicatePolicyImei($policy->getImei(), $policy)
+            ) {
+                throw new DuplicateImeiException("Given IMEI '".$policy->getImei()."' is already in use.");
             }
 
             if (count($policy->getScheduledPayments()) > 0) {
@@ -893,10 +904,10 @@ class PolicyService
         // vs renewal which will have the number of payments requested
         $isInitialPurchase = $numPayments === null;
         if (!$date) {
-            if (!$policy->getStartForBilling()) {
+            if (!$policy->getBilling()) {
                 throw new \Exception('Unable to generate payments if policy does not have a start date');
             }
-            $date = clone $policy->getStartForBilling();
+            $date = clone $policy->getBilling();
         }
 
         // To determine any payments made
@@ -1068,6 +1079,35 @@ class PolicyService
         return $this->newPolicyEmail($policy, $attachments, 'bcc@so-sure.com');
     }
 
+    public function sendBacsPaymentRequest(Policy $policy)
+    {
+        if (!$this->mailer) {
+            return false;
+        }
+
+        $baseTemplate = 'AppBundle:Email:bacs/paymentRequest';
+
+        try {
+            $this->mailer->sendTemplateToUser(
+                'Request for payment on your so-sure policy',
+                $policy->getUser(),
+                sprintf('%s.html.twig', $baseTemplate),
+                ['policy' => $policy],
+                sprintf('%s.txt.twig', $baseTemplate),
+                ['policy' => $policy]
+            );
+
+            $policy->setLastEmailed(\DateTime::createFromFormat('U', time()));
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending bacs payment request email to %s', $policy->getUser()->getEmail()),
+                ['exception' => $e]
+            );
+        }
+
+        return true;
+    }
+
     public function downloadS3(S3File $s3file)
     {
         $file = sprintf('%s/%s', sys_get_temp_dir(), $s3file->getFilename());
@@ -1120,6 +1160,85 @@ class PolicyService
         }
 
         return true;
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     * @param string      $detectedImei
+     * @param User        $adminUser
+     * @param string      $notes
+     */
+    public function setDetectedImei(PhonePolicy $policy, $detectedImei, User $adminUser, $notes)
+    {
+        $policy->setDetectedImei($detectedImei);
+
+        $policy->addNoteDetails(
+            $notes,
+            $adminUser,
+            'Detected IMEI Update'
+        );
+        $this->dm->flush();
+
+        $this->detectedImeiEmail($policy);
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     * @param boolean     $invalidImei
+     * @param User        $adminUser
+     * @param string      $notes
+     */
+    public function setInvalidImei(PhonePolicy $policy, $invalidImei, User $adminUser, $notes)
+    {
+        $policy->setInvalidImei($invalidImei);
+
+        $policy->addNoteDetails(
+            $notes,
+            $adminUser,
+            'Invalid IMEI Update'
+        );
+        $this->dm->flush();
+
+        // only email user if its invalid
+        if ($invalidImei) {
+            $this->invalidImeiEmail($policy);
+        }
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     */
+    public function detectedImeiEmail(PhonePolicy $policy)
+    {
+        $baseTemplate = 'AppBundle:Email:policy/detectedImei';
+
+        $this->mailer->sendTemplateToUser(
+            sprintf('You can now login to the so-sure app!'),
+            $policy->getUser(),
+            sprintf('%s.html.twig', $baseTemplate),
+            ['policy' => $policy],
+            sprintf('%s.txt.twig', $baseTemplate),
+            ['policy' => $policy]
+        );
+    }
+
+    /**
+     * @param PhonePolicy $policy
+     */
+    public function invalidImeiEmail(PhonePolicy $policy)
+    {
+        $baseTemplate = 'AppBundle:Email:policy/invalidImei';
+
+        $this->mailer->sendTemplateToUser(
+            sprintf('Important Information regarding your so-sure Policy %s', $policy->getPolicyNumber()),
+            $policy->getUser(),
+            sprintf('%s.html.twig', $baseTemplate),
+            ['policy' => $policy],
+            sprintf('%s.txt.twig', $baseTemplate),
+            ['policy' => $policy],
+            null,
+            'bcc@sosure.com'
+        );
     }
 
     /**
@@ -1233,9 +1352,9 @@ class PolicyService
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $connection->getLinkedPolicy()->getUser();
-        $this->mailer->sendTemplateToUser(
+        $this->mailer->sendTemplate(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getUser(),
+            $policy->getUser()->getEmail(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
@@ -1553,6 +1672,40 @@ class PolicyService
         return $expired;
     }
 
+    public function setUnpaidForCancelledMandate($prefix, $dryRun = false, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $unpaid = [];
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findUnpaidPoliciesWithCancelledMandates($prefix);
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            if ($policy->isPolicyPaidToDate($date, true, false, true)) {
+                continue;
+            }
+
+            $unpaid[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $policy->setStatus(Policy::STATUS_UNPAID);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error setting policy to unpaid %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $unpaid;
+    }
+
     public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         if (!$date) {
@@ -1679,15 +1832,9 @@ class PolicyService
 
     public function cashbackPendingReminder($dryRun)
     {
-        $cashbacks = [];
-
         /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
-        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
-
-        foreach ($cashbackItems as $cashbackItem) {
-            $cashbacks[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
-        }
+        $cashbacks = $cashbackRepo->findBy(['status' => Cashback::STATUS_PENDING_PAYMENT]);
 
         if (!$dryRun) {
             $this->mailer->sendTemplate(
@@ -1697,8 +1844,11 @@ class PolicyService
                 ['cashbacks' => $cashbacks]
             );
         }
-
-        return $cashbacks;
+        $ids = [];
+        foreach ($cashbacks as $cashback) {
+            $ids[$cashback->getId()] = $cashback->getPolicy()->getPolicyNumber();
+        }
+        return $ids;
     }
 
     /**
@@ -1758,14 +1908,22 @@ class PolicyService
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
                 $date ? $date : \DateTime::createFromFormat('U', time())
             );
-            $scheduledPayment = new ScheduledPayment();
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-            $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
-            $scheduledPayment->setAmount($outstanding);
-            $scheduledPayment->setNotes(sprintf(
-                'Claw-back applied discount (discount was removed following success claim for previous policy)'
-            ));
-            $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            if ($policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
+                $scheduledPayment = new ScheduledPayment();
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
+                $scheduledPayment->setAmount($outstanding);
+                $scheduledPayment->setNotes(sprintf(
+                    'Claw-back applied discount (discount was removed following success claim for previous policy)'
+                ));
+                $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            } else {
+                $this->logger->warning(sprintf(
+                    'Failed to schedule claw back discount for policy %s as on bacs. Owed %0.2f',
+                    $policy->getId(),
+                    $outstanding
+                ));
+            }
             $this->dm->flush();
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
 
@@ -1845,6 +2003,7 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
@@ -2084,7 +2243,10 @@ class PolicyService
         //$startDate = $this->endOfDay($policy->getEnd());
         $discount = 0;
         if (!$cashback && $policy->getPotValue() > 0) {
-            $discount = $policy->getPotValue();
+            // for open claims, we should assume that they are going to be settled, so don't provide a discount
+            if (!$policy->hasOpenClaim() && !$policy->hasOpenNetworkClaim()) {
+                $discount = $policy->getPotValue();
+            }
         }
 
         if ($payer = $policy->getPayer()) {

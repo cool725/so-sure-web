@@ -419,24 +419,154 @@
                         <div class="panel-heading">
                             <h3 class="panel-title">Excess</h3>
                         </div>
+                        {# normal premium #}
                         <div class="panel-body">
-                          <div class="row">
-                              <div class="col-sm-12">
-                                  Ability to adjust excess coming in the future. For now, default excess of:
-                                  {{ policyTerms.getDefaultExcess }} will be used.
-                              </div>
-                          </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="damage-excess" class="control-label col-sm-3">Damage:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="damage-excess" name="damage-excess"
+                                                    autocomplete="off" placeholder="default: {{ excess.damage }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="warranty-excess" class="control-label col-sm-3">Warranty:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="warranty-excess" name="warranty-excess"
+                                                    autocomplete="off" placeholder="default: {{ excess.warranty }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="extended-warranty-excess" class="control-label col-sm-3">Extended Warranty:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="extended-warranty-excess" name="extended-warranty-excess"
+                                                    autocomplete="off" placeholder="default: {{ excess.extendedWarranty }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="loss-excess" class="control-label col-sm-3">Loss:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="loss-excess" name="loss-excess"
+                                                    autocomplete="off" placeholder="default: {{ excess.loss }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="theft-excess" class="control-label col-sm-3">Theft:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="theft-excess" name="theft-excess"
+                                                    autocomplete="off" placeholder="default: {{ excess.theft }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">pic-sure Excess</h3>
                         </div>
+                        {# picsure premium #}
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    Ability to adjust excess coming in the future. For now, default pic-sure approved excess of:
-                                    {{ policyTerms.getDefaultPicSureExcess }}  will be used.
+                                    <div class="form-group">
+                                        <label for="picsure-damage-excess" class="control-label col-sm-3">Damage:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="picsure-damage-excess" name="picsure-damage-excess"
+                                                    autocomplete="off" placeholder="default: {{ picsureExcess.damage }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="picsure-warranty-excess" class="control-label col-sm-3">Warranty:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="picsure-warranty-excess" name="picsure-warranty-excess"
+                                                    autocomplete="off" placeholder="default: {{ picsureExcess.warranty }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="picsure-extended-warranty-excess" class="control-label col-sm-3">Extended Warranty:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="picsure-extended-warranty-excess" name="picsure-extended-warranty-excess"
+                                                    autocomplete="off" placeholder="default: {{ picsureExcess.extendedWarranty }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="picsure-loss-excess" class="control-label col-sm-3">Loss:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="picsure-loss-excess" name="picsure-loss-excess"
+                                                    autocomplete="off" placeholder="default: {{ picsureExcess.loss }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="picsure-theft-excess" class="control-label col-sm-3">Theft:</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><span>£</span></span>
+                                                <input type="text" class="form-control" id="picsure-theft-excess" name="picsure-theft-excess"
+                                                    autocomplete="off" placeholder="default: {{ picsureExcess.theft }}">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

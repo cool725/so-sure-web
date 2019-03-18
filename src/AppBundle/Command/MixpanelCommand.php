@@ -2,11 +2,12 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\MixpanelService;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,20 +16,28 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 
 class MixpanelCommand extends ContainerAwareCommand
 {
+    use DateTrait;
+
     /** @var DocumentManager  */
     protected $dm;
 
     /** @var MixpanelService */
     protected $mixpanelService;
 
-    public function __construct(DocumentManager $dm, MixpanelService $mixpanelService)
+    /** @var Client  */
+    protected $redis;
+
+    public function __construct(DocumentManager $dm, MixpanelService $mixpanelService, Client $redis)
     {
         parent::__construct();
         $this->dm = $dm;
         $this->mixpanelService = $mixpanelService;
+        $this->redis = $redis;
     }
 
     protected function configure()
@@ -40,7 +49,7 @@ class MixpanelCommand extends ContainerAwareCommand
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|count-users|count-queue (or blank for process)'
+                'delete|delete-old-users|test|clear|show|sync|sync-all|data|attribution|freeze-attribution|show-attribution|attribution-duplicate-users|count-users|count-queue|reattribute-recent|extend-cache|import-jql-events|reset-campaign-attribution (or blank for process)'
             )
             // @codingStandardsIgnoreEnd
             ->addOption(
@@ -75,6 +84,12 @@ class MixpanelCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Type of mixpanel queue item to clear'
             )
+            ->addOption(
+                'filename',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'filename to import'
+            )
         ;
     }
 
@@ -86,18 +101,37 @@ class MixpanelCommand extends ContainerAwareCommand
         $process = $input->getOption('process');
         $days = $input->getOption('days');
         $type = $input->getOption('type');
+        $filename = $input->getOption('filename');
         $user = null;
         if ($email) {
             if ($user = $this->getUser($email)) {
                 $id = $user->getId();
             }
         }
-        if ($action == 'test') {
-            if (!$user) {
-                throw new \Exception('Requires user; add --email');
+        if ($action == 'attribution-duplicate-users') {
+            $duplicateUsers = $this->mixpanelService->findDuplicateUsers(false);
+            foreach ($duplicateUsers as $user) {
+                $this->mixpanelService->queueAttribution($user, true);
             }
-            $this->mixpanelService->queueTrackWithUser($user, "button clicked", array("label" => "sign-up"));
-            $output->writeln(sprintf('Queued test event'));
+            $output->writeln(sprintf(
+                'Queued update for all %d users duplicated on mixpanel.',
+                count($duplicateUsers)
+            ));
+        } elseif ($action == 'show-attribution') {
+            if (!$user) {
+                throw new \Exception('Unable to find user for email address');
+            }
+            list($firstAttribution, $lastAttribution) = $this->mixpanelService->findAttributionsForUser($user);
+            $output->writeln($firstAttribution->stringImplode(' / ', true));
+            $output->writeln($lastAttribution->stringImplode(' / ', true));
+        } elseif ($action == 'import-jql-events') {
+            $this->mixpanelService->importJqlQueryHistoricEvents($filename);
+        } elseif ($action == 'reset-campaign-attribution') {
+            $results = $this->mixpanelService->resetCampaignAttributionData(true, true, $process);
+            if (count($results) <= 50) {
+                $output->writeln(sprintf('Queued %s', json_encode($results, JSON_PRETTY_PRINT)));
+            }
+            $output->writeln(sprintf('%d records queued', count($results)));
         } elseif ($action == 'data') {
             $end = \DateTime::createFromFormat('U', time());
             $end->sub(new \DateInterval(sprintf('P%dD', $end->format('N'))));
@@ -105,14 +139,21 @@ class MixpanelCommand extends ContainerAwareCommand
             $start->sub(new \DateInterval('P6D'));
             $output->writeln(sprintf('Running from %s to %s', $start->format('Y-m-d'), $end->format('Y-m-d')));
             $results = $this->mixpanelService->stats($start, $end);
-            print_r($results);
+            //print_r($results);
             $output->writeln('Finished');
         } elseif ($action == 'attribution') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
             }
-            $results = $this->mixpanelService->attributionByUser($user);
-            $output->writeln(sprintf('Attribution %s', json_encode($results, JSON_PRETTY_PRINT)));
+            $user = $this->mixpanelService->attributionByUser($user, true);
+            $output->writeln(sprintf(
+                'First Attribution %s',
+                json_encode($user->getAttribution()->__toString(), JSON_PRETTY_PRINT)
+            ));
+            $output->writeln(sprintf(
+                'Last Attribution %s',
+                json_encode($user->getLatestAttribution()->__toString(), JSON_PRETTY_PRINT)
+            ));
         } elseif ($action == 'sync') {
             if (!$user) {
                 throw new \Exception('Requires user; add --email');
@@ -168,6 +209,32 @@ class MixpanelCommand extends ContainerAwareCommand
         } elseif ($action == 'freeze-attribution') {
             $n = $this->freezeAttributions($days);
             $output->writeln("Queued {$n} users to have blank attribution set.");
+        } elseif ($action == 'reattribute-recent') {
+            if (!$days) {
+                throw new \Exception('Requires time period; add --days');
+            }
+            $date = new \DateTime();
+            $startDate = $this->subDays($date, $days);
+            /** @var UserRepository $userRepo */
+            $userRepo = $this->dm->getRepository(User::class);
+            $users = $userRepo->findNewUsers($startDate, $date);
+            foreach ($users as $user) {
+                $this->mixpanelService->queueAttribution($user, true);
+            }
+
+            /** @var PhonePolicyRepository $policyRepo */
+            $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+            $policies = $policyRepo->findAllNewPolicies(null, $startDate);
+            foreach ($policies as $policy) {
+                /** @var PhonePolicy $policy */
+                $this->mixpanelService->queueAttribution($policy->getUser(), true);
+            }
+        } elseif ($action == 'extend-cache') {
+            $cachedItems = $this->redis->keys("mixpanel:user:*");
+            array_merge($cachedItems, $this->redis->keys("mixpanel:oldest:*"));
+            foreach ($cachedItems as $item) {
+                $this->redis->setex($item, MixpanelService::CACHE_TIME, $this->redis->get($item));
+            }
         } else {
             $data = $this->mixpanelService->process($process);
             $output->writeln(sprintf("Processed %d Requeued: %d", $data['processed'], $data['requeued']));

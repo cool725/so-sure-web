@@ -46,15 +46,20 @@ class PaymentRepository extends DocumentRepository
         return $qb->execute();
     }
 
-    public function getAllPaymentsForReport(\DateTime $date)
+    public function getAllPaymentsForReport(\DateTime $date, $judoOnly = false)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
 
+        $payments = ['judo', 'bacs', 'sosure'];
+        if ($judoOnly) {
+            $payments = ['judo'];
+        }
+
         return $this->createQueryBuilder()
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
-            ->field('type')->in(['judo', 'bacs', 'sosure'])
+            ->field('type')->in($payments)
             ->getQuery()
             ->execute();
     }
@@ -75,15 +80,6 @@ class PaymentRepository extends DocumentRepository
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
             ->field('type')->in($type)
-            ->getQuery()
-            ->execute();
-    }
-
-    public function getAllPendingDebits()
-    {
-        return $this->createQueryBuilder()
-            ->field('status')->equals(BacsPayment::STATUS_PENDING)
-            ->field('amount')->gt(0)
             ->getQuery()
             ->execute();
     }

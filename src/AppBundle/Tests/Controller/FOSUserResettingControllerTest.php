@@ -219,11 +219,6 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         sleep(1);
         $reset = $this->resetPassword($email);
         $this->setPassword($reset['url'], 'foooBarr3!', true);
-
-        // now 1st complex password - should be re-allowed and succeed and redirect
-        sleep(1);
-        $reset = $this->resetPassword($email);
-        $this->setPassword($reset['url'], 'foooBarr1!', true);
     }
 
     public function testPasswordResetLockedUser()
@@ -416,10 +411,12 @@ class FOSUserResettingControllerTest extends BaseControllerTest
         $form['fos_user_resetting_form[plainPassword][first]'] = $password;
         $form['fos_user_resetting_form[plainPassword][second]'] = $password;
         $crawler = self::$client->submit($form);
+        $messages = $this->getCrawlerFlash($crawler);
+        $err = sprintf('%s %s', $password, $messages);
         if ($expectedSuccess) {
-            self::verifyResponse(302, null, $crawler);
+            self::verifyResponse(302, null, $crawler, $err);
         } else {
-            self::verifyResponse(200, null, $crawler);
+            self::verifyResponse(200, null, $crawler, $err);
         }
     }
 }

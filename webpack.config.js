@@ -22,6 +22,7 @@ Encore
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
     .addEntry('homepage-xmas', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-xmas.js')
+    .addEntry('homepage-vday', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-vday.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
     .addEntry('purchase-personal', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal.js')
@@ -29,22 +30,41 @@ Encore
     .addEntry('purchase-pledge', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge.js')
     .addEntry('purchase-payment', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment.js')
     .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
+    .addEntry('purchase-remainder', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-remainder.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
     .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
     .addEntry('onboarding', './src/AppBundle/Resources/public/rebrand/js/pages/onboarding.js')
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
+    .addEntry('careers', './src/AppBundle/Resources/public/rebrand/js/pages/careers.js')
+    .addEntry('seo-pages', './src/AppBundle/Resources/public/rebrand/js/pages/seo-pages.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
     .addEntry('detected-imei', './src/AppBundle/Resources/public/rebrand/js/pages/admin/detected-imei.js')
+    .addEntry('accounts', './src/AppBundle/Resources/public/rebrand/js/pages/admin/accounts.js')
+    .addEntry('banking', './src/AppBundle/Resources/public/rebrand/js/pages/admin/banking.js')
+    .addEntry('rewards', './src/AppBundle/Resources/public/rebrand/js/pages/admin/rewards.js')
+    .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
+    .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
+
+    // Admin Extras
+    .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
+    .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
+
+    // User files
+    .addEntry('user', './src/AppBundle/Resources/public/rebrand/js/pages/user/user.js')
+    .addEntry('user-dashboard', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-dashboard.js')
+    .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
+    .addEntry('user-purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-purchase-bacs.js')
+    .addEntry('user-payment', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-payment.js')
 
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
-    // User area files
-    .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
+    // Dev
+    .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
@@ -69,7 +89,9 @@ Encore
             $: "jquery",
             jQuery: "jquery",
             Bloodhound: "corejs-typeahead/dist/bloodhound.js",
-            doT: "dot/doT.js"
+            doT: "dot/doT.js",
+            moment: "moment",
+            fitText: "fitText",
         })
     )
 ;

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
@@ -1158,46 +1159,45 @@ class UserController extends BaseController
 
             /** @var BacsService $bacsService */
             $bacsService = $this->get('app.bacs');
-            $payment = $bacsService->bacsPayment($policy, $notes, $amount, null, true, Payment::SOURCE_WEB);
-            $payment->setIdentityLog($this->getIdentityLogWeb($request));
-
-            $this->getManager()->flush();
-
-
+            $bacsService->scheduleBacsPayment(
+                $policy,
+                $amount,
+                ScheduledPayment::TYPE_USER_WEB,
+                $notes,
+                $this->getIdentityLogWeb($request)
+            );
             $this->addFlash('success', 'We will scheduled your payment within the next 3 business days');
 
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
 
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
-            $bacsFeature = false;
-        }
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
 
-        $includeJudoWebpay = false;
+        $includeCard = false;
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
-            Policy::UNPAID_JUDO_CARD_EXPIRED,
-            Policy::UNPAID_JUDO_PAYMENT_FAILED,
-            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            Policy::UNPAID_CARD_EXPIRED,
+            Policy::UNPAID_CARD_PAYMENT_FAILED,
+            Policy::UNPAID_CARD_PAYMENT_MISSING,
             Policy::UNPAID_PAYMENT_METHOD_MISSING,
         ])) {
-            $includeJudoWebpay = true;
+            $includeCard = true;
         } elseif (!$policy->canBacsPaymentBeMadeInTime() && in_array($unpaidReason, [
             Policy::UNPAID_BACS_MANDATE_INVALID,
             Policy::UNPAID_BACS_PAYMENT_FAILED,
             Policy::UNPAID_BACS_PAYMENT_MISSING,
         ])) {
-            $includeJudoWebpay = true;
+            $includeCard = true;
         }
 
-        if ($includeJudoWebpay && $amount > 0) {
+        if ($includeCard && $amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
@@ -1209,7 +1209,7 @@ class UserController extends BaseController
 
         if (in_array($unpaidReason, [
             Policy::UNPAID_BACS_UNKNOWN,
-            Policy::UNPAID_JUDO_UNKNOWN,
+            Policy::UNPAID_CARD_UNKNOWN,
             Policy::UNPAID_UNKNOWN
         ])) {
             $this->get('logger')->warning(sprintf(
@@ -1333,8 +1333,12 @@ class UserController extends BaseController
         } else {
             /** @var Policy $policy */
             $policy = $user->getLatestPolicy();
+            if (!$policy) {
+                $policy = $user->getLatestPolicy(false);
+            }
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
         // If a user has an unpaid policy, then avoid updating card details (email directing to here)
         // as its then in a very odd state - card correct, but unpaid. better ask user to take the payment immediately
@@ -1342,26 +1346,32 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
-        $lastPaymentCredit = $policy->getLastPaymentCredit();
+        // page no longer makes much sense unless associated with a policy
+        if (!$policy) {
+            return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
         $lastPaymentInProgress = false;
-        if ($this->getUser()->hasBacsPaymentMethod()) {
-            if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
-                /** @var BacsPayment $lastPaymentCredit */
-                $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+        if ($policy) {
+            $lastPaymentCredit = $policy->getLastPaymentCredit();
+            if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
+                if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                    /** @var BacsPayment $lastPaymentCredit */
+                    $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+                }
             }
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $swapFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_SWAP_FROM_BACS);
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
 
-        // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
-            $bacsFeature = false;
-        }
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
-        // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
+        // we need enough time for bacs to be billed + reverse payment to be notified + 1 day internal processing
         // or no point in swapping to bacs
         if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
             $bacsFeature = false;
@@ -1371,23 +1381,28 @@ class UserController extends BaseController
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
-        try {
-            $webpay = $this->get('app.judopay')->webRegister(
-                $user,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent'),
-                $policy
-            );
-        } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
+        if ($cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
+            try {
+                $webpay = $this->get('app.judopay')->webRegister(
+                    $user,
+                    $request->getClientIp(),
+                    $request->headers->get('User-Agent'),
+                    $policy
+                );
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
+            }
         }
         $billing = new BillingDay();
-        $billing->setPolicy($policy);
+        if ($policy) {
+            $billing->setPolicy($policy);
+        }
         /** @var FormInterface $billingForm */
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
             ->getForm();
         $bacs = new Bacs();
+        $bacs->setValidateName($user->getName());
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
@@ -1479,7 +1494,8 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
         $userEmailForm = $this->get('form.factory')
             ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
@@ -1498,17 +1514,21 @@ class UserController extends BaseController
                             'Sorry, but that email already exists in our system. Please contact us to resolve this issue.'
                         );
                         // @codingStandardsIgnoreEnd
-
-                        return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
+                    } else {
+                        $this->getManager()->flush();
+                        $this->addFlash(
+                            'success',
+                            'Your email address is updated. You should receive an email confirmation shortly.'
+                        );
                     }
 
-                    $this->getManager()->flush();
-                    $this->addFlash(
-                        'success',
-                        'Your email address is updated. You should receive an email confirmation shortly.'
-                    );
-
-                    return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
+                    if ($policy) {
+                        return $this->redirectToRoute('user_contact_details_policy', [
+                            'policyId' => $policy->getId()
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('user_contact_details');
+                    }
                 }
             }
         }
@@ -1751,6 +1771,20 @@ class UserController extends BaseController
                     'error',
                     'Sorry, there was a system error. Our engineers are investigating.'
                 );
+            }
+        }
+
+        // older unresolved davies claims are problematic. but don't give away too much info in case of fraud
+        // intentions
+        if ($claim->getNotificationDate()) {
+            $old = $this->now()->diff($claim->getNotificationDate())->days;
+            if ($old > 45) {
+                // @codingStandardsIgnoreStart
+                $this->addFlash(
+                    'warning-raw',
+                    'This appears to be an older claim that was never resolved. Please contact <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
+                );
+                // @codingStandardsIgnoreEnd
             }
         }
 

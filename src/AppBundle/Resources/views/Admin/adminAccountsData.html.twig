@@ -1,525 +1,599 @@
+{# TODO: Content area #}
 {% set indent_width = "5%" %}
 {% set text_width = "70%" %}
 {% set double_text_width = "65%" %}
+
 <h4>Premium Income Breakdown</h4>
-<table class="table table-striped">
-    <tr class="info">
-        <td colspan="3">Premium Payments</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Paid in (cards)</td>
-        <td>£{{ paymentTotals.judo.received|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Paid in (bacs)</td>
-        <td>£{{ paymentTotals.bacs.received|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Paid in (so-sure)</td>
-        <td>£{{ paymentTotals.sosure.received|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Premium received in month</strong></td>
-        {% set receivedTotal = paymentTotals.judo.received + paymentTotals.bacs.received + paymentTotals.sosure.received %}
-        {% set expectedReceived = paymentTotals.all.received - paymentTotals.chargebacks.received %}
-        {% if equal_to_two_dp(receivedTotal, expectedReceived) %}
-        <td><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
-        {% else %}
-        <td class="bg-danger" title="Expect total received £{{ expectedReceived|number_format(2, '.', ',') }}"><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
-        {% endif %}
-    </tr>
-    <tr class="info">
-        <td colspan="3">Premium Refunds</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Refunded (cards)</td>
-        <td>(£{{ (0 - paymentTotals.judo.refunded)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Chargebacks (cards)</td>
-        <td>(£{{ (0 - paymentTotals.chargebacks.total)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Refunded (bacs)</td>
-        <td>(£{{ (0 - paymentTotals.bacs.refunded)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Chargebacks (bacs)</td>
-        <td>(£{{ (0 - paymentTotals.bacsIndemnity.refunded)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Refunded (so-sure)</td>
-        <td>(£{{ (0 - paymentTotals.sosure.refunded)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
-        {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
-        {% set expectedRefunded = paymentTotals.all.refunded + paymentTotals.chargebacks.received %}
-        {% if equal_to_two_dp(refundedTotal, expectedRefunded) %}
-        <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
-        {% else %}
-        <td class="bg-danger" title="Expect total received £{{ expectedRefunded|number_format(2, '.', ',') }}"><strong>(£{{ (0 - refundedTotal)|number_format(2, '.', ',') }})</strong></td>
-        {% endif %}
-    </tr>
-    <tr>
-        <td colspan="3">&nbsp;</td>
-    </tr>
-    <tr>
-        <td colspan="2" width="{{ text_width }}">Debt Collection Fees</td>
-        <td>(£{{ (0 - paymentTotals.all.fees)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td colspan="2"><strong>Net monthly premium received</strong></td>
-        <td><strong>£{{ (paymentTotals.all.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-</table>
+<div class="table-responsive-sm mb-5">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th colspan="3">Premium Payments</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Paid in (cards)</td>
+                <td>£{{ paymentTotals.judo.received|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Paid in (bacs)</td>
+                <td>£{{ paymentTotals.bacs.received|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Paid in (so-sure)</td>
+                <td>£{{ paymentTotals.sosure.received|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Premium received in month</strong></td>
+                {% set receivedTotal = paymentTotals.judo.received + paymentTotals.bacs.received + paymentTotals.sosure.received %}
+                {% set expectedReceived = paymentTotals.all.received - paymentTotals.chargebacks.received %}
+                {% if equal_to_two_dp(receivedTotal, expectedReceived) %}
+                <td><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
+                {% else %}
+                <td class="table-danger" title="Expect total received £{{ expectedReceived|number_format(2, '.', ',') }}"><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        <thead class="thead-light">
+            <tr>
+                <th colspan="3">Premium Refunds</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Refunded (cards)</td>
+                <td>(£{{ (0 - paymentTotals.judo.refunded)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Chargebacks (cards)</td>
+                <td>(£{{ (0 - paymentTotals.chargebacks.total)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Refunded (bacs)</td>
+                <td>(£{{ (0 - paymentTotals.bacs.refunded)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Chargebacks (bacs)</td>
+                <td>(£{{ (0 - paymentTotals.bacsIndemnity.refunded)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Refunded (so-sure)</td>
+                <td>(£{{ (0 - paymentTotals.sosure.refunded)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
+                {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
+                {% set expectedRefunded = paymentTotals.all.refunded + paymentTotals.chargebacks.received %}
+                {% if equal_to_two_dp(refundedTotal, expectedRefunded) %}
+                <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
+                {% else %}
+                <td class="table-danger" title="Expect total received £{{ expectedRefunded|number_format(2, '.', ',') }}"><strong>(£{{ (0 - refundedTotal)|number_format(2, '.', ',') }})</strong></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        <tbody>
+            <tr>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2" width="{{ text_width }}">Debt Collection Fees</td>
+                <td>(£{{ (0 - paymentTotals.all.fees)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td colspan="2"><strong>Net monthly premium received</strong></td>
+                <td><strong>£{{ (paymentTotals.all.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 <h4>Reward Pot</h4>
-<table class="table table-striped">
-    <tr>
-        <td colspan="4"><strong>1. Underwriter</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Total Underwriter End of Year Reward Pot Incurred</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred</td>
-        <td>£{{ (0 - paymentTotals.potReward.refunded)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End</td>
-        <td>(£{{ paymentTotals.potReward.received|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.potReward.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Total Underwriter End of Year Reward Pot Incurred (Cashback)</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Cashback)</td>
-        <td>£{{ (0 - paymentTotals.potRewardCashback.refunded)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Cashback)</td>
-        <td>(£{{ paymentTotals.potRewardCashback.received|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred (Cashback)</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Total Underwriter End of Year Reward Pot Incurred (Renewal Discount)</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Renewal Discount)</td>
-        <td>£{{ (0 - paymentTotals.potRewardDiscount.refunded)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Renewal Discount)</td>
-        <td>(£{{ paymentTotals.potRewardDiscount.received|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred (Renewal Discount)</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.potRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr>
-        <td colspan="4"><strong>2. so-sure</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Total so-sure End of Year Reward Pot Incurred for marketing</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred</td>
-        <td>£{{ (0 - paymentTotals.sosurePotReward.refunded)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End</td>
-        <td>(£{{ paymentTotals.sosurePotReward.received|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred by so-sure for marketing</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.sosurePotReward.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Total so-sure End of Year Reward Pot Incurred for marketing (Cashback)</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Cashback)</td>
-        <td>£{{ (0 - paymentTotals.sosurePotRewardCashback.refunded)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Cashback)</td>
-        <td>(£{{ paymentTotals.sosurePotRewardCashback.received|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred by so-sure for marketing (Cashback)</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.sosurePotRewardCashback.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Total so-sure End of Year Reward Pot Incurred for marketing (Renewal Discount)</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Renewal Discount)</td>
-        <td>£{{ (0 - paymentTotals.sosurePotRewardDiscount.refunded)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Renewal Discount)</td>
-        <td>(£{{ paymentTotals.sosurePotRewardDiscount.received|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred by so-sure for marketing (Renewal Discount)</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr>
-        <td colspan="4"><strong>3. Customers</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Reward Pot Paid To Customers</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Lump Sum Cashback To Customers</td>
-        <td>£{{ paymentTotals.totalCashback|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Net Reward Pot Paid To Customers</strong></td>
-        <td><strong>£{{ paymentTotals.totalCashback|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td width="{{ indent_width }}"></td>
-        <td colspan="3">Renewal Discount Refund to Customers</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Renewal Discount Refund To Customers due to Policy Cancellation</td>
-        <td>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Net Renewal Discount Refund To Customers</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    {#
-    <tr class="info">
-        <td colspan="3">Client Account</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Opening Balance in Client Account</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Reward Pot Paid In</td>
-        <td><strong>£{{ paymentTotals.potReward.total|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Reward Pot Paid Out</td>
-        <td><strong>£</strong></td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Closing Balance in Client Account</strong></td>
-        <td></td>
-    </tr>
-    #}
-</table>
+<div class="table-responsive-sm mb-5">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th colspan="4">1. Underwriter</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Total Underwriter End of Year Reward Pot Incurred</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred</td>
+                <td>£{{ (0 - paymentTotals.potReward.refunded)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End</td>
+                <td>(£{{ paymentTotals.potReward.received|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.potReward.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Total Underwriter End of Year Reward Pot Incurred (Cashback)</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Cashback)</td>
+                <td>£{{ (0 - paymentTotals.potRewardCashback.refunded)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Cashback)</td>
+                <td>(£{{ paymentTotals.potRewardCashback.received|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred (Cashback)</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Total Underwriter End of Year Reward Pot Incurred (Renewal Discount)</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Renewal Discount)</td>
+                <td>£{{ (0 - paymentTotals.potRewardDiscount.refunded)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Renewal Discount)</td>
+                <td>(£{{ paymentTotals.potRewardDiscount.received|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred (Renewal Discount)</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.potRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+        </tbody>
+        <thead class="thead-light">
+            <tr>
+                <th colspan="4">2. so-sure</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Total so-sure End of Year Reward Pot Incurred for marketing</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred</td>
+                <td>£{{ (0 - paymentTotals.sosurePotReward.refunded)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End</td>
+                <td>(£{{ paymentTotals.sosurePotReward.received|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred by so-sure for marketing</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.sosurePotReward.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Total so-sure End of Year Reward Pot Incurred for marketing (Cashback)</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Cashback)</td>
+                <td>£{{ (0 - paymentTotals.sosurePotRewardCashback.refunded)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Cashback)</td>
+                <td>(£{{ paymentTotals.sosurePotRewardCashback.received|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred by so-sure for marketing (Cashback)</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.sosurePotRewardCashback.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Total so-sure End of Year Reward Pot Incurred for marketing (Renewal Discount)</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">End of Policy Year Reward Pot Incurred (Renewal Discount)</td>
+                <td>£{{ (0 - paymentTotals.sosurePotRewardDiscount.refunded)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End (Renewal Discount)</td>
+                <td>(£{{ paymentTotals.sosurePotRewardDiscount.received|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ double_text_width }}"><strong>Net Reward Pot Incurred by so-sure for marketing (Renewal Discount)</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+        </tbody>
+        <thead class="thead-light">
+            <tr>
+                <th colspan="4">3. Customers</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Reward Pot Paid To Customers</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Lump Sum Cashback To Customers</td>
+                <td>£{{ paymentTotals.totalCashback|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Net Reward Pot Paid To Customers</strong></td>
+                <td><strong>£{{ paymentTotals.totalCashback|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            <tr class="table-info">
+                <td width="{{ indent_width }}"></td>
+                <td colspan="3">Renewal Discount Refund to Customers</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Renewal Discount Refund To Customers due to Policy Cancellation</td>
+                <td>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Net Renewal Discount Refund To Customers</strong></td>
+                <td><strong>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            {#
+            <tr class="info">
+                <td colspan="3">Client Account</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Opening Balance in Client Account</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Reward Pot Paid In</td>
+                <td><strong>£{{ paymentTotals.potReward.total|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Reward Pot Paid Out</td>
+                <td><strong>£</strong></td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Closing Balance in Client Account</strong></td>
+                <td></td>
+            </tr>
+            #}
+        </tbody>
+    </table>
+</div>
+
 <h4>Monthly Distributions by Source</h4>
-<table class="table table-striped">
-    <tr class="info">
-        <td colspan="3">Premium</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Salva</td>
-        <td>£{{ paymentTotals.all.totalUnderwriter|number_format(2, '.', ',') }} ( {{ paymentTotals.all.totalUnderwriterPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">so-sure Coverholder Fee</td>
-        <td>£{{ paymentTotals.all.coverholderCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.all.coverholderCommissionPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">AFL Broker Fee</td>
-        <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.all.brokerCommissionPercent |number_format(1, '.', ',')}}% )</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Total premium distributions</strong></td>
-        {% set reportTotal = paymentTotals.all.totalUnderwriter + paymentTotals.all.totalCommission %}
-        {% set paymentsTotal = 0 %}
-        {% if paymentTotals.salvaPaymentFile.metadata['total'] is defined %}
-            {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
-        {% endif %}
-        {%  set expectedTotal = paymentsTotal - paymentTotals.policyDiscountRefunds.total - paymentTotals.potRewardCashback.total %}
+<div class="table-responsive-sm mb-5">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th colspan="4">Premium</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Salva</td>
+                <td>£{{ paymentTotals.all.totalUnderwriter|number_format(2, '.', ',') }} ( {{ paymentTotals.all.totalUnderwriterPercent |number_format(1, '.', ',')}}% )</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">so-sure Coverholder Fee</td>
+                <td>£{{ paymentTotals.all.coverholderCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.all.coverholderCommissionPercent |number_format(1, '.', ',')}}% )</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">AFL Broker Fee</td>
+                <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.all.brokerCommissionPercent |number_format(1, '.', ',')}}% )</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Total premium distributions</strong></td>
+                {% set reportTotal = paymentTotals.all.totalUnderwriter + paymentTotals.all.totalCommission %}
+                {% set paymentsTotal = 0 %}
+                {% if paymentTotals.salvaPaymentFile.metadata['total'] is defined %}
+                    {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
+                {% endif %}
+                {%  set expectedTotal = paymentsTotal - paymentTotals.policyDiscountRefunds.total - paymentTotals.potRewardCashback.total - paymentTotals.sosurePotRewardCashback.total %}
 
-        {% if equal_to_two_dp(reportTotal, expectedTotal) %}
-            <td title="Matches expected total from payments of £{{ paymentsTotal|number_format(2, '.', ',') }} + discount refunds of £{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }} + cashback pot rewards of £{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
-        {% else %}
-            <td class="bg-danger" title="Expect total from payments £{{ paymentsTotal|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
-        {% endif %}
-    </tr>
-</table>
+                {% if equal_to_two_dp(reportTotal, expectedTotal) %}
+                    <td title="Matches expected total from payments of £{{ paymentsTotal|number_format(2, '.', ',') }} + discount refunds of £{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }} + cashback pot rewards of £{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }} + so-sure cashback pot rewards of £{{ (0 - paymentTotals.sosurePotRewardCashback.total)|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
+                {% else %}
+                    <td class="table-danger" title="Expect total from payments £{{ expectedTotal|number_format(2, '.', ',') }}"><strong>£{{ reportTotal|number_format(2, '.', ',') }}</strong></td>
+                {% endif %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 <h4>Net Distributions of Each Party</h4>
-<table class="table table-striped">
-    <tr class="info">
-        <td colspan="3">Salva Transfer</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Premium Distribution</td>
-        <td>£{{ paymentTotals.all.totalUnderwriter|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Reward Pot Incurred (Cashback)</td>
-        <td>(£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Reward Pot Incurred by so-sure for marketing (Renewal Discount)</td>
-        <td>£{{ (0 - paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Renewal Discount Refund</td>
-        <td>(£{{ 0 - paymentTotals.policyDiscountRefunds.total|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Net transfer to Salva</strong></td>
-        <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potRewardCashback.total + (0 - paymentTotals.sosurePotRewardDiscount.total) + paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td colspan="3">so-sure Transfer</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">so-sure Coverholder fee</td>
-        <td>£{{ paymentTotals.all.coverholderCommission|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">so-sure (marketing) Premium Payments</td>
-        <td>(£{{ paymentTotals.sosure.total|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Reward Pot Incurred by so-sure for marketing (Cashback)</td>
-        <td>(£{{ (0 - paymentTotals.sosurePotRewardCashback.total)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Reward Pot Incurred by so-sure for marketing (Renewal Discount)</td>
-        <td>(£{{ (0 - paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }})</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Net transfer to so-sure</strong></td>
-        <td><strong>£{{ (paymentTotals.all.coverholderCommission - paymentTotals.sosure.total + paymentTotals.sosurePotRewardCashback.total + paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-    <tr class="info">
-        <td colspan="3">AFL Transfer</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">AFL Broker Fee</td>
-        <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Net transfer to AFL</strong></td>
-        <td><strong>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }}</strong></td>
-    </tr>
-</table>
-<h4>Details</h4>
-<table class="table table-striped">
-    <tr class="info">
-        <td colspan="3">Payments CSV</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Total payments from CSV file</td>
-        <td>£{{ paymentsTotal|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Net Renewal Discount Refund To Customers (included in payments csv but not a premium payment)</td>
-        <td>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Total Underwriter End of Year Reward Pot Incurred (Cashback) (included in payments csv but not a premium payment)</td>
-        <td>£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Expected Total premium distributions</strong></td>
-        {% if equal_to_two_dp(reportTotal, expectedTotal) %}
-            <td><strong>£{{ expectedTotal|number_format(2, '.', ',') }}</strong></td>
-        {% else %}
-            <td class="bg-danger" title="Should match premium distribution £{{ reportTotal|number_format(2, '.', ',') }}"><strong>£{{ expectedTotal|number_format(2, '.', ',') }}</strong></td>
-        {% endif %}
-    </tr>
+<div class="table-responsive-sm mb-5">
+    <table class="table table-striped">
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">Salva Transfer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Premium Distribution</td>
+                <td>£{{ paymentTotals.all.totalUnderwriter|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Reward Pot Incurred (Cashback)</td>
+                <td>(£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Reward Pot Incurred by so-sure for marketing (Renewal Discount)</td>
+                <td>£{{ (0 - paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Renewal Discount Refund</td>
+                <td>(£{{ 0 - paymentTotals.policyDiscountRefunds.total|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Net transfer to Salva</strong></td>
+                <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potRewardCashback.total + (0 - paymentTotals.sosurePotRewardDiscount.total) + paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+        </tbody>
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">so-sure Transfer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">so-sure Coverholder fee</td>
+                <td>£{{ paymentTotals.all.coverholderCommission|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">so-sure (marketing) Premium Payments</td>
+                <td>(£{{ paymentTotals.sosure.total|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Reward Pot Incurred by so-sure for marketing (Cashback)</td>
+                <td>(£{{ (0 - paymentTotals.sosurePotRewardCashback.total)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Reward Pot Incurred by so-sure for marketing (Renewal Discount)</td>
+                <td>(£{{ (0 - paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }})</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Net transfer to so-sure</strong></td>
+                <td><strong>£{{ (paymentTotals.all.coverholderCommission - paymentTotals.sosure.total + paymentTotals.sosurePotRewardCashback.total + paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+        </tbody>
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">AFL Transfer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">AFL Broker Fee</td>
+                <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Net transfer to AFL</strong></td>
+                <td><strong>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-    <tr class="info">
-        <td colspan="3">Payments Received</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Judo</td>
-        <td>{{ paymentTotals.judo.numReceived }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Bacs</td>
-        <td>{{ paymentTotals.bacs.numReceived }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">so-sure (marketing)</td>
-        <td>{{ paymentTotals.sosure.numReceived }}</td>
-    </tr>
-    <tr class="info">
-        <td colspan="3">Payments Refunded</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Judo</td>
-        <td>{{ paymentTotals.judo.numRefunded }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Bacs</td>
-        <td>{{ paymentTotals.bacs.numRefunded }}</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">so-sure (marketing)</td>
-        <td>{{ paymentTotals.sosure.numRefunded }}</td>
-    </tr>
-    <tr class="info">
-        <td colspan="3">Policy Stats</td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td>Average Payment Amount</td>
-        <td>
-            {% if paymentTotals.all.avgPayment %}£{{ paymentTotals.all.avgPayment|number_format(2, '.', ',')  }}{% else %}n/a{% endif %}
-            {% if not print and stats['accounts-avg-payments'] is defined %}
-                [£{{ stats['accounts-avg-payments'] }} cached]
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td>Number of Active Policies (as of end {{ month }} / {{ year }})</td>
-        <td>
-            {{ activePolicies }}
-            {% if not print and stats['accounts-active-policies'] is defined %}
-                [{{ stats['accounts-active-policies'] }} cached]
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td>Number of Active Policies w/Reward Pot Discount (as of end {{ month }} / {{ year }})</td>
-        <td>
-            {{ activePoliciesWithDiscount }}
-            {% if not print and stats['accounts-active-policies-with-discounts'] is defined %}
-                [{{ stats['accounts-active-policies-with-discounts'] }} cached]
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td>Reward Pot Liability <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
-        <td>
-            £{{ (rewardPotLiability - rewardPromoPotLiability)|number_format(2, '.', ',') }}
-            {% if not print and stats['accounts-reward-pot-liability-salva'] is defined %}
-                [£{{ stats['accounts-reward-pot-liability-salva'] }} cached]
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td>Reward Pot Liability for so-sure (marketing) <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
-        <td>
-            £{{ rewardPromoPotLiability|number_format(2, '.', ',') }}
-            {% if not print and stats['accounts-reward-pot-liability-sosure'] is defined %}
-                [£{{ stats['accounts-reward-pot-liability-sosure'] }} cached]
-            {% endif %}
-        </td>
-    </tr>
-    <tr>
-        <td width="{{ indent_width }}"></td>
-        <td>Annual Run Rate Premium</td>
-        <td>
-            £{{ paymentTotals.totalRunRate|number_format(0, '.', ',') }}
-            {% if not print and stats['accounts-annual-run-rate'] is defined %}
-                [£{{ stats['accounts-annual-run-rate'] }} cached]
-            {% endif %}
-        </td>
-    </tr>
-</table>
+<h4>Details</h4>
+<div class="table-responsive-sm mb-5">
+    <table class="table table-striped">
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">Payments CSV</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Total payments from CSV file</td>
+                <td>£{{ paymentsTotal|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Net Renewal Discount Refund To Customers (included in payments csv but not a premium payment)</td>
+                <td>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Total Underwriter End of Year Reward Pot Incurred (Cashback) (included in payments csv but not a premium payment)</td>
+                <td>£{{ (0 - paymentTotals.potRewardCashback.total)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Total so-sure End of Year Reward Pot Incurred for marketing (Cashback) (included in payments csv but not a premium payment)</td>
+                <td>£{{ (0 - paymentTotals.sosurePotRewardCashback.total)|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}"><strong>Expected Total premium distributions</strong></td>
+                {% if equal_to_two_dp(reportTotal, expectedTotal) %}
+                    <td><strong>£{{ expectedTotal|number_format(2, '.', ',') }}</strong></td>
+                {% else %}
+                    <td class="table-danger" title="Should match premium distribution £{{ reportTotal|number_format(2, '.', ',') }}"><strong>£{{ expectedTotal|number_format(2, '.', ',') }}</strong></td>
+                {% endif %}
+            </tr>
+        </tbody>
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">Payments Received</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Judo</td>
+                <td>{{ paymentTotals.judo.numReceived }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Bacs</td>
+                <td>{{ paymentTotals.bacs.numReceived }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">so-sure (marketing)</td>
+                <td>{{ paymentTotals.sosure.numReceived }}</td>
+            </tr>
+        </tbody>
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">Payments Refunded</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Judo</td>
+                <td>{{ paymentTotals.judo.numRefunded }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Bacs</td>
+                <td>{{ paymentTotals.bacs.numRefunded }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">so-sure (marketing)</td>
+                <td>{{ paymentTotals.sosure.numRefunded }}</td>
+            </tr>
+        </tbody>
+        <thead class="table-info">
+            <tr>
+                <th colspan="3">Policy Stats</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td>Average Payment Amount</td>
+                <td>
+                    {% if paymentTotals.all.avgPayment %}£{{ paymentTotals.all.avgPayment|number_format(2, '.', ',')  }}{% else %}n/a{% endif %}
+                    {% if not print and stats['accounts-avg-payments'] is defined %}
+                        [£{{ stats['accounts-avg-payments'] }} cached]
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td>Number of Active Policies (as of end {{ month }} / {{ year }})</td>
+                <td>
+                    {{ activePolicies }}
+                    {% if not print and stats['accounts-active-policies'] is defined %}
+                        [{{ stats['accounts-active-policies'] }} cached]
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td>Number of Active Policies w/Reward Pot Discount (as of end {{ month }} / {{ year }})</td>
+                <td>
+                    {{ activePoliciesWithDiscount }}
+                    {% if not print and stats['accounts-active-policies-with-discounts'] is defined %}
+                        [{{ stats['accounts-active-policies-with-discounts'] }} cached]
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td>Reward Pot Liability <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
+                <td>
+                    £{{ (rewardPotLiability - rewardPromoPotLiability)|number_format(2, '.', ',') }}
+                    {% if not print and stats['accounts-reward-pot-liability-salva'] is defined %}
+                        [£{{ stats['accounts-reward-pot-liability-salva'] }} cached]
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td>Reward Pot Liability for so-sure (marketing) <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
+                <td>
+                    £{{ rewardPromoPotLiability|number_format(2, '.', ',') }}
+                    {% if not print and stats['accounts-reward-pot-liability-sosure'] is defined %}
+                        [£{{ stats['accounts-reward-pot-liability-sosure'] }} cached]
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td>Annual Run Rate Premium</td>
+                <td>
+                    £{{ paymentTotals.totalRunRate|number_format(0, '.', ',') }}
+                    {% if not print and stats['accounts-annual-run-rate'] is defined %}
+                        [£{{ stats['accounts-annual-run-rate'] }} cached]
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

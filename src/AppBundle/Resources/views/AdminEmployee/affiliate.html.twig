@@ -1,83 +1,104 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/company.js'
-        '@AppBundle/Resources/public/js/Admin/confirmModal.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-affiliates' %}
+
+{% block title %}so-sure - Affiliates{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-    <div class="row">
-        <div class="col-md-8">
-            <h2>Affiliates</h2>
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Affiliates</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary btn-square"
+                       data-toggle="modal"
+                       data-target="#affiliate_form_modal"><i class="fal fa-plus fa-fw"></i> New Affiliate </a>
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>CPA</th>
+                            <th>Days</th>
+                            <th>Charge Model</th>
+                            <th>Renewal Days</th>
+                            <th>Campaign Source</th>
+                            <th>Campaign Name</th>
+                            <th>Lead Source</th>
+                            <th>Lead Source Details</th>
+                            <th>Sanctions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies %}
+                            <tr>
+                                <td>
+                                    <a href="{{ path('admin_affiliate_overview', {'id': company.id }) }}">{{ company.name }}</a>
+                                </td>
+                                <td>&pound;{{ company.cpa|number_format(2, '.', ',') }}</td>
+                                <td>{{ company.days }}</td>
+                                <td>{{ company.chargeModel }}</td>
+                                <td>{{ company.renewalDays }}</td>
+                                <td>{{ company.campaignSource }}</td>
+                                <td>{{ company.campaignName }}</td>
+                                <td>{{ company.leadSource }}</td>
+                                <td>{{ company.leadSourceDetails }}</td>
+                                <td>
+                                    <div class="sanctionData" hidden="hidden">
+                                        {% if company.sanctionsChecks|length == 0%}
+                                            No checks run
+                                        {% endif %}
+                                        {% for check in company.sanctionsChecks %}
+                                            Ran: {{ check|date }}
+                                        {% endfor %}
+                                        <br />
+                                        {% if company.sanctionsMatches|length == 0%}
+                                            No matches
+                                        {% endif %}
+                                        {% for match in company.sanctionsMatches %}
+                                        {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
+                                            {% if match.manuallyVerified %}
+                                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                                            {% else %}
+                                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                                            {% endif %}
+                                            <br>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="col-md-2">
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#affiliateForm" style="margin-top: 20px">
-                <i class="fa fa-plus"></i> New Affiliate
-            </button>
-        </div>
-    </div>
-    <div class="row" style="margin-top: 20px">
-        <div class="col-md-12">
-        <table class="table table-stripped" width="100%">
-            <tr>
-                <th>Name</th>
-                <th>CPA</th>
-                <th>Days</th>
-                <th>Charge Model</th>
-                <th>Renewal Days</th>
-                <th>Campaign Source</th>
-                <th>Campaign Name</th>
-                <th>Lead Source</th>
-                <th>Lead Source Details</th>
-                <th>Sanctions</th>
-            </tr>
-            {% for company in companies %}
-                <tr>
-                    <td width="15%">
-                        <a href="{{ path('admin_affiliate_overview', {'id': company.id }) }}">{{ company.name }}</a>
-                    </td>
-                    <td width="5%">£{{ company.cpa|number_format(2, '.', ',') }}</td>
-                    <td width="5%">{{ company.days }}</td>
-                    <td width="10%">{{ company.chargeModel }}</td>
-                    <td width="5%">{{ company.renewalDays }}</td>
-                    <td width="10%">{{ company.campaignSource }}</td>
-                    <td width="10%">{{ company.campaignName }}</td>
-                    <td width="10%">{{ company.leadSource }}</td>
-                    <td width="10%">{{ company.leadSourceDetails }}</td>
-                    <td width="30%">
-                        <div class="sanctionData" hidden="hidden">
-                            {% if company.sanctionsChecks|length == 0%}
-                                No checks run
-                            {% endif %}
-                            {% for check in company.sanctionsChecks %}
-                                Ran: {{ check|date }}
-                            {% endfor %}
-                            <br />
-                            {% if company.sanctionsMatches|length == 0%}
-                                No matches
-                            {% endif %}
-                            {% for match in company.sanctionsMatches %}
-                            {# TODO: tidy up this sanctions stuff and hide it somehow because it's not pretty #}
-                                {% if match.manuallyVerified %}
-                                Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
-                                {% else %}
-                                Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
-                                {% endif %}
-                                <br>
-                            {% endfor %}
-                        </div>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-        </div>
-    </div>
-    {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:affiliateForm', 'id': 'affiliateForm', 'title': 'Create New Affiliate'} %}
-</div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Admin/adminConfirmModalNew.html.twig' with {
+        'route': 'AppBundle:AdminEmployee:affiliateForm',
+        'id': 'affiliate_form_modal',
+        'title': 'Create New Affiliate',
+        'size': 'modal-lg'
+    } %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/confirm-modal.js') }}"></script>
 {% endblock %}

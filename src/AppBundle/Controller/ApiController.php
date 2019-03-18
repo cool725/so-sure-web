@@ -111,6 +111,7 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
             }
 
+            /** @var RateLimitService $rateLimit */
             $rateLimit = $this->get('app.ratelimit');
             // Success logins should clear the rate limit (further below)
             if (!$rateLimit->allowedByUser($user)) {
@@ -421,6 +422,7 @@ class ApiController extends BaseController
                 );
             }
 
+            /** @var RateLimitService $rateLimit */
             $rateLimit = $this->get('app.ratelimit');
             if (!$rateLimit->allowedByDevice(
                 RateLimitService::DEVICE_TYPE_RESET,
@@ -783,11 +785,11 @@ class ApiController extends BaseController
             }
 
             // Breaking change to return all the policies objects to support renewals
-            if (($platform == 'ios' && version_compare($version, '1.5.36', '<')) ||
-                ($platform == 'android' && version_compare($version, '1.5.37.0', '<')) ) {
+            if (($platform == 'ios' && version_compare($version, '1.5.56', '<')) ||
+                ($platform == 'android' && version_compare($version, '1.5.58.0', '<')) ) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_UPGRADE_APP,
-                    sprintf('%s %s must be upgraded due to renewals', $platform, $version),
+                    sprintf('%s %s must be upgraded due to multipay removal', $platform, $version),
                     422
                 );
             }

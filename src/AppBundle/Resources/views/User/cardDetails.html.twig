@@ -1,61 +1,98 @@
-<section class="user-homepage--content section--pad">
-    <div class="container">
+<h1 class="h2">Payment details</h1>
+{% if policy is defined and policy %}
+    <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</span></h6>
+{% endif %}
 
-        <h2>Payment Details</h2>
-
-        {% if bacs_feature %}
-        <div class="row">
-            <div class="col-sm-6">
-                <h4>Your current payment method:</h4>
-                <p class="lead">{% if not user.paymentMethod or user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
-                <a href="{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}"
-                   class="btn btn-blue-hollow"
-                   data-toggle="tab">
-                    {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
-                        Change to Direct Debit
-                    {% else %}
-                        Back to Direct Debit
-                    {% endif %}
-                </a>
-                {% if policy.isDifferentPayer %}
-                    <p><i class="fa fa-warning"></i> You are using multipay. Changing to direct debit will remove your multipay.</p>
-                {% endif %}
+{% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod or policy.hasCheckoutPaymentMethod %}
+    <div class="cardbox cardbox-100 mb-4 bg-lily-white">
+        <div class="cardbox__body d-lg-flex justify-content-lg-between align-items-lg-center">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo-dark.svg" alt="Direct Debit" width="140px" class="mb-2 mb-md-0">
+            <div>
+                <h5>Why not switch to Direct Debit?</h5>
+                <p>It helps avoid a lot of the problems with card payments… and only takes seconds to setup!</p>
             </div>
+            <a href="#"
+               data-tab-to="#bacs_setup_tab"
+               class="btn btn-success show-tab"
+               >Switch to Direct Debit</a>
         </div>
-        {% endif %}
-        <div class="row">
-            <div class="col-sm-6">
-                <h4>Your card:</h4>
-                <p class="lead">
-                    {% if policy.isDifferentPayer %}
-                        <i class="fa fa-warning"></i> You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
-                    {% elseif user.paymentMethod and user.paymentMethod.type == "judo" %}
-                        {{ user.paymentMethod }}
-                    {% else %}
-                        Not setup
-                    {% endif %}
-                </p>
-                {% if webpay_action and webpay_reference %}
-                <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                    <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                    <input type="submit" class="btn btn-blue-hollow" value="Update your card details">
-                </form>
-                {% endif %}
-            </div>
-        </div>
-        {% if policy.premiumPlan == 'monthly' %}
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Billing date:</h4>
-                <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
-                <button title="Change"
-                        type="button"
-                        class="btn btn-blue-hollow"
-                        data-toggle="modal"
-                        data-target="#billingModal">
-                    <i class="fa fa-edit"></i> Change</button>
-            </div>
-        </div>
-        {% endif %}
     </div>
-</section>
+{% endif %}
+
+<div class="row">
+    {% if bacs_feature %}
+        <div class="col-12 col-lg-4">
+            <div class="cardbox cardbox-100 mb-4">
+                <div class="cardbox__body">
+                    <h5 class="cardbox__title">Current payment method</h5>
+                    <div class="cardbox__text">
+                        <p>
+                            {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod %}
+                                Credit/Debit Card
+                            {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
+                                Direct Debit
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </p>
+                        <a href="#"
+                           data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
+                           class="btn {% if policy.hasCardPaymentMethod %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
+                           >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}Switch to Direct Debit{% else %}Back to Direct Debit{% endif %}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="col-12 col-lg-4">
+        <div class="cardbox cardbox-100 mb-4">
+            <div class="cardbox__body">
+                <h5 class="cardbox__title">Card details</h5>
+                <div class="cardbox__text">
+                    <p>
+                        {% if policy and policy.isDifferentPayer %}
+                            You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
+                        {% elseif policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
+                            {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
+                        {% elseif policy.hasCheckoutPaymentMethod %}
+                            {{ policy.getCheckoutPaymentMethod }}
+                        {% else %}
+                            Not setup
+                        {% endif %}
+                    </p>
+                    {% if webpay_action and webpay_reference %}
+                        <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                            <input type="submit" class="btn btn-outline-primary" value="Update your card details">
+                        </form>
+                    {% else %}
+                        <form class="payment-form" method="POST"
+                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
+                              data-value="1" data-url="{{ url('purchase_checkout_update', {'id': policy.id }) }}"
+                              data-csrf="{{ csrf_token('checkout') }}"
+                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                            <input type="button" class="btn btn-outline-primary btn-card-pay" value="Update your card details">
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if policy and policy.premiumPlan == 'monthly' and policy.hasCardPaymentMethod %}
+        <div class="col-12 col-lg-4">
+            <div class="cardbox cardbox-100 mb-4">
+                <div class="cardbox__body">
+                    <h5 class="cardbox__title">Billing date</h5>
+                    <div class="cardbox__text">
+                        <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> around <strong>{{ policy.billing|date('H','Europe/London') }}:00</strong></p>
+                        <a href="#"
+                           class="btn btn-outline-primary"
+                           data-toggle="modal"
+                           data-target="#billing_modal">Change billing date</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

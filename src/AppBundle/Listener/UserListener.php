@@ -81,9 +81,9 @@ class UserListener
         $this->mailer->sendTemplate(
             'Your email has been changed',
             $email,
-            'AppBundle:Email:emailChanged.html.twig',
+            'AppBundle:Email:user/emailChanged.html.twig',
             ['user' => $user],
-            'AppBundle:Email:emailChanged.txt.twig',
+            'AppBundle:Email:user/emailChanged.txt.twig',
             ['user' => $user]
         );
         $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);

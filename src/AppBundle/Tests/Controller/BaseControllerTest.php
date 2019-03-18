@@ -140,7 +140,7 @@ class BaseControllerTest extends WebTestCase
 
         if (!$errorMessage) {
             if ($crawler) {
-                $errorMessage = sprintf("%s %s", $errorMessage, $crawler->html());
+                $errorMessage = sprintf("%s %s", $errorMessage, $this->getCrawlerFlash($crawler));
             }
         }
 
@@ -223,7 +223,7 @@ class BaseControllerTest extends WebTestCase
         $crawler = self::$client->request('GET', $loginLocation);
         self::$client->followRedirects(false);
         if ($expectedHttpCode) {
-            self::verifyResponse($expectedHttpCode, null, null, 'Failed to start login');
+            self::verifyResponse($expectedHttpCode, null, $crawler);
             if ($expectedHttpCode > 200) {
                 return;
             }
@@ -240,7 +240,7 @@ class BaseControllerTest extends WebTestCase
         self::$client->followRedirects();
         $crawler = self::$client->submit($form);
         if ($expectedHttpCode) {
-            self::verifyResponse($expectedHttpCode, null, null, 'Failed to login');
+            self::verifyResponse($expectedHttpCode, null, $crawler);
         }
         self::$client->followRedirects(false);
         if ($expectedLocation) {
@@ -306,6 +306,25 @@ class BaseControllerTest extends WebTestCase
         }
 
         return null;
+    }
+
+    protected function getCrawlerFlash(Crawler $crawler)
+    {
+        $messages = '';
+        $classes = [
+            'alert-success',
+            'flash-success',
+            'alert-warning',
+            'flash-warning',
+            'alert-danger',
+            'flash-danger',
+        ];
+
+        foreach ($classes as $class) {
+            $messages = sprintf('%s %s', $messages, $this->getCrawlerClassHtml($crawler, $class));
+        }
+
+        return $messages;
     }
 
     protected function expectFlashSuccess(Crawler $crawler, $message)
@@ -427,6 +446,13 @@ class BaseControllerTest extends WebTestCase
         $responseTargetUrl = $this->getClientResponse()->getTargetUrl();
 
         $this->assertEquals($path, $responseTargetUrl, "Expected '$path' to match '{$responseTargetUrl}'");
+    }
+
+    protected function assertRedirectionPathPartial(string $path)
+    {
+        $responseTargetUrl = $this->getClientResponse()->getTargetUrl();
+
+        $this->assertContains($path, $responseTargetUrl, "Expected '$path' to contain '{$responseTargetUrl}'");
     }
 
     /**

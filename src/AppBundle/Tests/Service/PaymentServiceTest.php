@@ -2,7 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\BacsService;
@@ -122,8 +122,7 @@ class PaymentServiceTest extends WebTestCase
         static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
 
         $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
-        /** @var BankAccount $bankAcccount */
-        $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
+        $bankAcccount = $updatedPolicy->getPolicyOrUserBacsBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
         // should be 3 business days + 4 max holidays/weekends (except for xmas - around 14 days)
         $this->assertLessThan(15, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);
@@ -133,33 +132,55 @@ class PaymentServiceTest extends WebTestCase
 
     public function testConfirmBacsDuplicate()
     {
-        $user = static::createUser(
+        $user1 = static::createUser(
             static::$userManager,
-            static::generateEmail('testConfirmBacsDuplicate', $this),
+            static::generateEmail('testConfirmBacsDuplicate1', $this),
             'bar',
             null,
             static::$dm
         );
 
-        $policy = static::initPolicy(
-            $user,
+        $policy1 = static::initPolicy(
+            $user1,
             static::$dm,
             $this->getRandomPhone(static::$dm),
             null,
             false
         );
 
-        static::$policyService->create($policy, null, true, 12);
+        $user2 = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConfirmBacsDuplicate2', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+
+        $policy2 = static::initPolicy(
+            $user2,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            null,
+            false
+        );
+
+        static::$policyService->create($policy1, null, true, 12);
+        static::$policyService->create($policy2, null, true, 12);
 
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount(new BankAccount());
 
-        $mailer = $this->createMailer($this->exactly(2));
+        $mailer = $this->createMailer($this->exactly(4));
         static::$paymentService->setMailerMailer($mailer);
 
-        static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
+        static::$paymentService->confirmBacs($policy1, $bacs, $policy1->getStart());
+        static::$paymentService->confirmBacs($policy2, $bacs, $policy2->getStart());
 
-        $this->assertGreaterThan(0, self::$fraudService->getDuplicateBankAccountsCount($policy));
+        $this->assertGreaterThan(0, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy1)));
+        $this->assertGreaterThan(0, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy2)));
+        // if run in isolation (this test only), then would expect only 1 - manually verify that query is correct
+        //$this->assertEquals(1, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy1)));
+        //$this->assertEquals(1, count(self::$fraudService->getDuplicatePolicyBankAccounts($policy2)));
     }
 
     public function testConfirmBacsDifferentPayer()
@@ -198,7 +219,7 @@ class PaymentServiceTest extends WebTestCase
         static::$paymentService->confirmBacs($policy, $bacs);
 
         $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
-        $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
+        $bankAcccount = $updatedPolicy->getPolicyOrUserBacsBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
 
@@ -234,8 +255,7 @@ class PaymentServiceTest extends WebTestCase
         static::$paymentService->confirmBacs($policy, $bacs, $policy->getStart());
 
         $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
-        /** @var BankAccount $bankAcccount */
-        $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
+        $bankAcccount = $updatedPolicy->getPolicyOrUserBacsBankAccount();
         $this->assertNotNull($bankAcccount->getInitialNotificationDate());
         // should be 3 business days + 4 max holidays/weekends (except for xmas - around 14 days)
         $this->assertLessThan(15, $bankAcccount->getInitialNotificationDate()->diff(new \DateTime)->days);

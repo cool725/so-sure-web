@@ -169,7 +169,7 @@ class ApiControllerTest extends BaseApiControllerTest
 
         $cognitoIdentityId = $this->getUnauthIdentity();
         $user = static::createUser(self::$userManager, static::generateEmail('rate-limit-login-ok', $this), 'bar');
-        for ($i = 0; $i < 11; $i++) {
+        for ($i = 0; $i < RateLimitService::$maxRequests[RateLimitService::DEVICE_TYPE_LOGIN] + 2; $i++) {
             $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('email_user' => [
                 'email' => static::generateEmail('rate-limit-login-ok', $this),
                 'password' => 'bar'
@@ -1391,13 +1391,13 @@ class ApiControllerTest extends BaseApiControllerTest
 
     public function testVersionOkiOS()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.36');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.56');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
     public function testVersionOkAndroid()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.37.0');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.58.0');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 

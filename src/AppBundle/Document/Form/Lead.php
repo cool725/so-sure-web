@@ -4,7 +4,7 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Address;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BacsTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Policy;

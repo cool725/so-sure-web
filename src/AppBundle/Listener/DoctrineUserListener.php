@@ -3,11 +3,10 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Annotation\DataChange;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\PaymentMethod;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\CardEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
@@ -100,51 +99,6 @@ class DoctrineUserListener extends BaseDoctrineListener
             $this->triggerEvent($user, UserEvent::EVENT_NAME_UPDATED);
         }
 
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['paymentMethod'],
-            DataChange::COMPARE_BACS
-        )) {
-            /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $user->getPaymentMethod();
-
-            // prefer the old bank account data if it exists
-            /** @var BacsPaymentMethod $oldValue */
-            $oldValue = $eventArgs->getOldValue('paymentMethod');
-            if ($oldValue instanceof BacsPaymentMethod && $oldValue->getBankAccount()) {
-                /** @var BacsPaymentMethod $paymentMethod */
-                $paymentMethod = $oldValue;
-            }
-
-            $bankAccount = clone $paymentMethod->getBankAccount();
-            $event = new BacsEvent($user, $bankAccount);
-            $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
-        }
-
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['paymentMethod'],
-            DataChange::COMPARE_JUDO
-        )) {
-            $this->triggerCardEvent($user, CardEvent::EVENT_UPDATED);
-        }
-
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['paymentMethod'],
-            DataChange::COMPARE_PAYMENT_METHOD_CHANGED
-        )) {
-            /** @var PaymentMethod $oldValue */
-            $oldValue = $eventArgs->getOldValue('paymentMethod');
-
-            $event = new UserEvent($user);
-            $event->setPreviousPaymentMethod($oldValue->getType());
-            $this->dispatcher->dispatch(UserEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
-        }
-
         if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT)) {
             $this->triggerEvent($user, UserEvent::EVENT_UPDATED_HUBSPOT);
         }
@@ -195,7 +149,8 @@ class DoctrineUserListener extends BaseDoctrineListener
 
     private function triggerCardEvent(User $user, $eventType)
     {
-        $event = new CardEvent($user);
+        $event = new CardEvent();
+        $event->setUser($user);
         $this->dispatcher->dispatch($eventType, $event);
     }
 }

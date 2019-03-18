@@ -2,7 +2,7 @@
 
 namespace AppBundle\Document\Payment;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
@@ -22,6 +22,7 @@ class BacsPayment extends Payment
     const DAYS_PROCESSING = 1;
     const DAYS_CREDIT = 2;
     const DAYS_REVERSE = 5;
+    const DAYS_REPRESENTING = 30;
 
     const STATUS_PENDING = 'pending';
     const STATUS_GENERATED = 'generated';
@@ -29,6 +30,9 @@ class BacsPayment extends Payment
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILURE = 'failure';
     const STATUS_SKIPPED = 'skipped';
+
+    const ACTION_APPROVE = 'approve';
+    const ACTION_REJECT = 'reject';
 
     /**
      * A bacs payment outside the system (e.g. manually sent by the customer)
@@ -93,6 +97,20 @@ class BacsPayment extends Payment
      * @var \DateTime
      */
     protected $bacsReversedDate;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="reverses")
+     * @Gedmo\Versioned
+     * @var BacsPayment
+     */
+    protected $reversedBy;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="reversedBy")
+     * @Gedmo\Versioned
+     * @var BacsPayment
+     */
+    protected $reverses;
 
     public function isManual()
     {
@@ -164,6 +182,36 @@ class BacsPayment extends Payment
         $this->bacsReversedDate = $bacsReversedDate;
     }
 
+    public function getReversedBy()
+    {
+        return $this->reversedBy;
+    }
+
+    public function setReversedBy(BacsPayment $reversedBy)
+    {
+        $this->reversedBy = $reversedBy;
+    }
+
+    public function getReverses()
+    {
+        return $this->reverses;
+    }
+
+    public function setReverses(BacsPayment $reverses)
+    {
+        $this->reverses = $reverses;
+    }
+
+    /**
+     * Sets this payment as reversed by another payment, setting the correct properties on both.
+     * @param BacsPayment $reverse is the payment to set as reversing this one.
+     */
+    public function addReverse($reverse)
+    {
+        $this->setReversedBy($reverse);
+        $reverse->setReverses($this);
+    }
+
     public function submit(\DateTime $date = null)
     {
         if (!$date) {
@@ -199,7 +247,7 @@ class BacsPayment extends Payment
         return true;
     }
 
-    public function canAction(\DateTime $date = null)
+    public function canAction($type, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -210,6 +258,16 @@ class BacsPayment extends Payment
             return false;
         }
 
+        if ($this->inProgress() && !$this->getBacsReversedDate()) {
+            return false;
+        }
+
+        // reject can occur at any time
+        if ($type == self::ACTION_REJECT) {
+            return true;
+        }
+
+        // accept should be on or after reversal date
         $reversedDate = $this->startOfDay($this->getBacsReversedDate());
         $diff = $reversedDate->diff($this->startOfDay($date));
         if ($diff->d == 0 || (!$diff->invert && $diff->d > 0)) {
@@ -225,9 +283,9 @@ class BacsPayment extends Payment
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if (!$this->canAction($date) && !$ignoreReversedDate) {
+        if (!$this->canAction(self::ACTION_APPROVE, $date) && !$ignoreReversedDate) {
             throw new \Exception(sprintf(
-                'Attempting to action payment %s before reversal date (%s) is past',
+                'Attempting to approve payment %s before reversal date (%s) is past',
                 $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y')
             ));
@@ -242,9 +300,9 @@ class BacsPayment extends Payment
             $this->setCommission();
         }
 
-        if ($this->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+        if ($this->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {
             /** @var BacsPaymentMethod $bacsPaymentMethod */
-            $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
+            $bacsPaymentMethod = $this->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
         }
 
@@ -261,9 +319,10 @@ class BacsPayment extends Payment
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if (!$this->canAction($date)) {
+        if (!$this->canAction(self::ACTION_REJECT, $date)) {
             throw new \Exception(sprintf(
-                'Attempting to action before reversal date (%s) is past',
+                'Attempting to reject payment %s before reversal date (%s) is past',
+                $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y')
             ));
         }
@@ -285,5 +344,35 @@ class BacsPayment extends Payment
     public function isUserPayment()
     {
         return true;
+    }
+
+    /**
+     * Specific logic for whether or not a bacs payment should be shown to users.
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        if ($this->reverses) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        if ($this->amount < 0) {
+            return "Direct Debit Refund";
+        } else {
+            return "Direct Debit";
+        }
     }
 }

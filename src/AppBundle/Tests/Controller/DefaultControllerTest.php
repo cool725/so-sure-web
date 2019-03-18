@@ -30,6 +30,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/');
         self::verifyResponse(200);
+        $this->assertNotContains('<meta name="robots" content="noindex">', $crawler->html());
     }
 
     public function testTagManager()
@@ -124,62 +125,6 @@ class DefaultControllerTest extends BaseControllerTest
             sprintf("&pound;%.2f", $price->getMonthlyPremiumPrice()),
             $this->getClientResponseContent()
         );
-    }
-
-    public function testTextAppInvalidMobile()
-    {
-        $crawler = self::$client->request('GET', self::$router->generate('sms_app_link'));
-        self::verifyResponse(200);
-
-        $form = $crawler->selectButton('Text me a link')->form();
-        $form['sms_app_link[mobileNumber]'] = '123';
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
-        $this->assertContains(
-            "valid UK Mobile Number",
-            $this->getClientResponseContent()
-        );
-    }
-
-    public function testTextAppLeadPresent()
-    {
-        $lead = new Lead();
-        $lead->setMobileNumber(static::generateRandomMobile());
-        self::$dm->persist($lead);
-        self::$dm->flush();
-
-        $crawler = self::$client->request('GET', self::$router->generate('sms_app_link'));
-        self::verifyResponse(200);
-
-        $form = $crawler->selectButton('Text me a link')->form();
-        $form['sms_app_link[mobileNumber]'] = str_replace('+44', '', $lead->getMobileNumber());
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
-        $this->assertContains(
-            "already sent you a link",
-            $this->getClientResponseContent()
-        );
-    }
-    public function testPhoneSearchVSGadget()
-    {
-        $crawler = self::$client->request('GET', '/so-sure-vs-gadget-cover-phone-insurance');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
-
-    public function testPhoneSearchVSHalifax()
-    {
-        $crawler = self::$client->request('GET', '/so-sure-vs-halifax-phone-insurance');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
-
-    public function testPhoneSearchVSThree()
-    {
-        $crawler = self::$client->request('GET', '/so-sure-vs-three-phone-insurance');
-        $this->assertEquals(200, $this->getClientResponseStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function testPhoneSearchHomepage()
@@ -581,7 +526,7 @@ class DefaultControllerTest extends BaseControllerTest
 
         $claimPage = self::$router->generate('claim_login_token', ['tokenId' => 'foo']);
         $crawler = self::$client->request('GET', $claimPage);
-        
+
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect(sprintf('/claim')));
     }

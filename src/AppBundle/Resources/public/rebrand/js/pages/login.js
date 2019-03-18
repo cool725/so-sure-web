@@ -6,7 +6,7 @@ require('../../sass/pages/login.scss');
 
 // Require components
 require('jquery-validation');
-require('../../../js/Default/jqueryValidatorMethods.js');
+require('../common/validationMethods.js');
 
 // Facebook
 AccountKit_OnInteractive = () => {

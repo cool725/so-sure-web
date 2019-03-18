@@ -48,6 +48,7 @@ class Claim
     const WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER = 'claim-replacement-cost-higher';
     const WARNING_FLAG_CLAIMS_INCORRECT_EXCESS = 'claim-incorrect-excess';
     const WARNING_FLAG_CLAIMS_IMEI_MISMATCH = 'claim-imei-mismatch';
+    const WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE = 'claim-imei-unobtainable';
     const WARNING_FLAG_CLAIMS_HANDLING_TEAM = 'claim-handling-team';
     const WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO = 'claim-allow-picsure-redo';
 
@@ -165,6 +166,7 @@ class Claim
         self::WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER,
         self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS => self::WARNING_FLAG_CLAIMS_INCORRECT_EXCESS,
         self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH => self::WARNING_FLAG_CLAIMS_IMEI_MISMATCH,
+        self::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE => self::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE,
         self::WARNING_FLAG_CLAIMS_HANDLING_TEAM => self::WARNING_FLAG_CLAIMS_HANDLING_TEAM,
         self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO => self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO,
     ];
@@ -1998,6 +2000,10 @@ class Claim
     {
         /** @var PhonePolicy  $policy */
         $policy = $this->getPolicy();
+        if ($policy->hasInvalidImei()) {
+            return true;
+        }
+
         // TODO: Consider if we should be using claim FNOL pic-sure validation
         // or current policy pic-sure validation
         return $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();

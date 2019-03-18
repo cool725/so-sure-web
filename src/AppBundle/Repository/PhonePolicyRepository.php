@@ -111,13 +111,29 @@ class PhonePolicyRepository extends PolicyRepository
         }
         $policy = new PhonePolicy();
 
-        $qb = $this->createQueryBuilder()
-            ->field('status')->in([
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd(
+            $qb->expr()->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
-            ->field('end')->gt($date);
+        );
+        $qb->addAnd(
+            $qb->expr()->field('policyNumber')->equals(
+                new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()))
+            )
+        );
+        $qb->addAnd(
+            $qb->expr()->field('potValue')->gt(0)
+        );
+        $qb->addAnd(
+            $qb->expr()->field('end')->gt($date)
+        );
+
+        $qb->addAnd(
+            $qb->expr()->addOr($qb->expr()->field('potValue')->gt(0))
+                ->addOr($qb->expr()->field('promoPotValue')->gt(0))
+        );
 
         return $qb
             ->getQuery()
@@ -237,6 +253,11 @@ class PhonePolicyRepository extends PolicyRepository
 
         return $qb->getQuery()
             ->execute();
+    }
+
+    public function countAllStartedPolicies($prefix = null, \DateTime $startDate = null, \DateTime $endDate = null)
+    {
+        return count($this->findAllStartedPolicies($prefix, $startDate, $endDate));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Listener\UnpaidListener;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -54,6 +55,9 @@ class EmailDebugCommand extends ContainerAwareCommand
     /** @var MailerService */
     protected $mailerService;
 
+    /** @var UnpaidListener */
+    protected $unpaidListener;
+
     public function __construct(
         DocumentManager $dm,
         $environment,
@@ -61,7 +65,8 @@ class EmailDebugCommand extends ContainerAwareCommand
         JudopayService $judopayService,
         Client $redisMailer,
         RouterService $routerService,
-        MailerService $mailerService
+        MailerService $mailerService,
+        UnpaidListener $unpaidListener
     ) {
         parent::__construct();
         $this->dm = $dm;
@@ -71,6 +76,7 @@ class EmailDebugCommand extends ContainerAwareCommand
         $this->redisMailer = $redisMailer;
         $this->routerService = $routerService;
         $this->mailerService = $mailerService;
+        $this->unpaidListener = $unpaidListener;
     }
 
     protected function configure()
@@ -124,7 +130,10 @@ class EmailDebugCommand extends ContainerAwareCommand
             'bacs' => [
                 'bacs/notification',
                 'bacs/mandateCancelled',
+                'bacs/mandateCancelledWithClaim',
                 'bacs/mandateCancelledNameChange',
+                'bacs/bacsPaymentFailed',
+                'bacs/bacsPaymentFailedWithClaim',
             ],
             'cashback' => [
                 'cashback/approved-reduced',
@@ -145,6 +154,8 @@ class EmailDebugCommand extends ContainerAwareCommand
                 'policy/new',
                 'policy/skippedRenewal',
                 'policy/trustpilot',
+                'policy/detectedImei',
+                'policy/invalidImei',
             ],
             'card' => [
                 'card/failedPayment',
@@ -222,15 +233,52 @@ class EmailDebugCommand extends ContainerAwareCommand
         }
         $data = [];
         if (in_array($template, $templates['bacs'])) {
-            /** @var UserRepository $repo */
-            $repo = $this->dm->getRepository(User::class);
-            /** @var User $user */
-            $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
-            $data = [
-                'user' => $user,
-                'policy' => $user->getLatestPolicy(),
-                'claimed' => $variation == 'cancelledClaimed' ? true : false,
-            ];
+            $claimed = $variation == 'cancelledClaimed' || $template == 'bacs/bacsPaymentFailedWithClaim' ||
+                $template == 'bacs/mandateCancelledWithClaim';
+
+            /** @var PolicyRepository $repo */
+            $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = null;
+            $policies = $repo->findBy(['paymentMethod.type' => 'bacs']);
+            foreach ($policies as $policy) {
+                /** @var Policy $policy */
+                if ($claimed  == $policy->hasMonetaryClaimed(true, true)) {
+                    break;
+                }
+                $policy = null;
+            }
+
+            if ($policy) {
+                $data = [
+                    'user' => $policy->getUser(),
+                    'policy' => $policy,
+                    'claimed' => $claimed ? true : false,
+                ];
+            } else {
+                // TODO: Eventually remove
+                /** @var UserRepository $repo */
+                $repo = $this->dm->getRepository(User::class);
+                /** @var User $user */
+                $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
+                if (!$user) {
+                    throw new \Exception('Unknown  User');
+                }
+                /** @var Policy $policy */
+                $policy = $user->getLatestPolicy();
+                if (!$policy) {
+                    throw new \Exception('Unknown Policy');
+                }
+                $data = [
+                    'user' => $user,
+                    'policy' => $policy,
+                    'claimed' => $claimed ? true : false,
+                ];
+            }
+            if (in_array($template, ['bacs/bacsPaymentFailed', 'bacs/bacsPaymentFailedWithClaim'])) {
+                $failedPayments = $variation ?: 1;
+                return $this->unpaidListener->emailNotification($policy, $failedPayments);
+            }
         } elseif (in_array($template, $templates['cashback'])) {
             /** @var CashbackRepository $repo */
             $repo = $this->dm->getRepository(Cashback::class);
@@ -300,6 +348,10 @@ class EmailDebugCommand extends ContainerAwareCommand
                 $user->setLastName('McAndrew');
                 $policy->setUser($user);
                 return $this->mailerService->trustpilot($policy, MailerService::TRUSTPILOT_PURCHASE);
+            } elseif ($template == 'policy/detectedImei') {
+                return $this->policyService->detectedImeiEmail($policy);
+            } elseif ($template == 'policy/invalidImei') {
+                return $this->policyService->invalidImeiEmail($policy);
             } elseif ($template == 'policy/skippedRenewal') {
                 return $this->policyService->skippedRenewalEmail($policy);
             } else {
@@ -312,23 +364,26 @@ class EmailDebugCommand extends ContainerAwareCommand
             $policy = null;
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
-                if (!$policy->getUser()->hasJudoPaymentMethod()) {
+                if (!$policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
+                    $policy = null;
                     continue;
                 }
 
                 if ($template == 'card/failedPaymentWithClaim' &&
                     $policy->hasMonetaryClaimed(true, true) &&
-                    $policy->getUser()->hasValidPaymentMethod()) {
+                    $policy->hasPolicyOrUserValidPaymentMethod()) {
                     break;
                 }
 
-                if ($template == 'card/cardMissing' && !$policy->getUser()->hasValidPaymentMethod()) {
+                if ($template == 'card/cardMissing' && !$policy->hasPolicyOrPayerOrUserValidPaymentMethod()) {
                     break;
                 }
 
-                if ($template != 'card/cardMissing' && $policy->getUser()->hasValidPaymentMethod()) {
+                if ($template != 'card/cardMissing' && $policy->hasPolicyOrPayerOrUserValidPaymentMethod()) {
                     break;
                 }
+
+                $policy = null;
             }
 
             if (!$policy) {
@@ -337,7 +392,7 @@ class EmailDebugCommand extends ContainerAwareCommand
 
             if ($template != 'card/cardExpiring') {
                 $failedPayments = $variation ?: 1;
-                return $this->judopayService->failedPaymentEmail($policy, $failedPayments);
+                return $this->unpaidListener->emailNotification($policy, $failedPayments);
             } else {
                 return $this->judopayService->cardExpiringEmail($policy);
             }

@@ -1,205 +1,122 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% block title %}so-sure - Welcome back {{ app.user.firstname }}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    {% include 'AppBundle:User:userNav.html.twig' %}
-
-    <section class="user-homepage--content section--pad">
+    <section class="hero">
         <div class="container">
-
-            <div class="row">
-                <div class="col-md-6">
-                    <h1>My Policies</h1>
-                </div>
-                <div class="col-md-6">
-                    <a href="{{ path('user_data_portability') }}" target="_blank" style="margin-top: 30px;" rel="noopener noreferrer"
-                       class="btn btn-success" title="This will download your policy data in a portable csv format"><i class="fa fa-download"></i> Download my policy data</a>
-                </div>
-            </div>
-
-            {% for policyItem in user.getDisplayablePoliciesSorted %}
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>{{ policyItem.phone }} <span class="badge">{{ policyItem.status|capitalize }}</span></h4>
-                    <p>{{ policyItem.policyNumber }} ({{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }})</p>
-
-                    {% if policyItem.isPicSurePolicy %}
-                        <table class="table table-bordered table-mod text-center">
-                            <thead>
-                                <tr>
-                                    <td width="20%">
-                                        {% if policyItem.isPicSureValidated %}
-                                            pic-sure <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        {% else %}
-                                            <a href="#" data-toggle="modal" data-target="#pic-sure">pic-sure <i class="fa fa-exclamation-triangle text-blue" aria-hidden="true"></i></a>
-                                        {% endif %}
-                                    </td>
-                                    <td>Cover</td>
-                                    <td width="20%">Excess</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td rowspan="2" valign="center">
-                                        {% if policyItem.isPicSureValidated %}
-                                            <img src="{{ cdn_url }}/images/user/pic-sure_validated_stamp.svg" alt="pic-sure valid" width="80px">
-                                        {% else %}
-                                            <img src="{{ cdn_url }}/images/user/pic-sure_non_validated_stamp.svg" alt="pic-sure valid" width="80px">
-                                        {% endif %}
-                                   </td>
-                                    <td>Accidental Damage/Breakdown</td>
-                                    <td>&pound;{{ policyItem.getExcessValue('damage')|number_format(0, '.', ',') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Theft/Loss</td>
-                                    <td>&pound;{{ policyItem.getExcessValue('theft')|number_format(0, '.', ',') }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <table class="table table-bordered table-mod text-center">
-                            <thead>
-                                <tr>
-                                    <td>Cover</td>
-                                    <td width="20%">Excess</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Accidental Damage/Breakdown</td>
-                                    <td>&pound;{{ policyItem.getExcessValue('damage')|number_format(0, '.', ',') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Theft/Loss</td>
-                                    <td>&pound;{{ policyItem.getExcessValue('theft')|number_format(0, '.', ',') }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    {% endif %}
-                </div>
-                <div class="col-md-6">
-                    <ul class="nav nav-pills">
-                        {% if policyItem.getPolicyTermsFiles|length > 0 %}
-                            <li>
-                                <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}"
-                                class=""><i class="fa fa-download"></i> Policy Terms</a>
-                            </li>
-                        {% endif %}
-                        {% if policyItem.getPolicyScheduleFiles|length > 0 %}
-                            <li>
-                                <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}"
-                                class=""><i class="fa fa-download"></i> Policy Schedule</a>
-                            </li>
-                        {% endif %}
-                        {% if policyItem.displayRepurchase %}
-                            <li>
-                                <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}"
-                                class=""> Repurchase Policy</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-            {% endfor %}
-
-            {% if user.getDisplayableCashbackSorted|length > 0 %}
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2>Cashback</h2>
-                    </div>
-                </div>
-                {% for cashback in user.getDisplayableCashbackSorted %}
-                <div class="row">
-                    <div class="col-md-6">
-                      <h4>{{ cashback.policy.policyNumber }} <span class="badge">{{ cashback.getDisplayableStatus }}</span></h4>
-                      <p>£{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</p>
-                    </div>
-                    {% if cashback.status == 'missing' or cashback.status == 'failed' %}
-                    <div class="col-md-6">
-                        <a href="{{ path('user_cashback', {'id': cashback.id }) }}"
-                        class="btn btn-primary btn-xs">Add/Update Bank Details</a>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
+            <h1 class="h2">My Policies</h1>
+            {% if policy is defined and policy %}
+                <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
             {% endif %}
+
+            <div class="row">
+                {% for policyItem in user.getDisplayablePoliciesSorted %}
+                    <div class="col-12 col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {{ policyItem.phone }}
+                                    {% if policyItem.status == 'active' %}
+                                        <span class="badge badge-success ml-2">{{ policyItem.status|capitalize }}</span>
+                                    {% else %}
+                                        <span class="badge badge-primary  ml-2">{{ policyItem.status|capitalize }}</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text">{{ policyItem.policyNumber }}</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">{{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</li>
+                                {% if policyItem.isPicSurePolicy %}
+                                    <li class="list-group-item h5">
+                                        Phone validated
+                                        {% if policyItem.isPicSureValidated %}
+                                            <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i></span>
+                                        {% else %}
+                                            <span class="badge badge-pill badge-danger ml-2"><i class="far fa-times fa-fw"></i></span>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                                {% if not policyItem.isPicSureValidated %}
+                                    <li class="list-group-item">
+                                        Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.
+                                    </li>
+                                {% endif %}
+                                <li class="list-group-item">
+                                   Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getExcessValue('damage')|number_format(0, '.', ',') }}</strong>
+                                </li>
+                                <li class="list-group-item">
+                                    Excess for Theft/Loss <strong>&pound;{{ policyItem.getExcessValue('theft')|number_format(0, '.', ',') }}</strong>
+                                </li>
+                            </ul>
+
+                            {% if policyItem.getPolicyTermsFiles|length > 0 or policyItem.getPolicyScheduleFiles|length > 0 %}
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                                            <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Terms</a>
+                                        {% endif %}
+                                        {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                                            <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Schedule</a>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            {% endif %}
+                            {% if policyItem.displayRepurchase %}
+                                <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success">Repurchase Policy</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if user.getDisplayableCashbackSorted|length > 0 %}
+                    <div class="col-12 col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Cashback</h5>
+                                <ul class="list-group list-group-flush">
+                                    {% for cashback in user.getDisplayableCashbackSorted %}
+                                        <li class="list-group-item">
+                                            {{ cashback.policy.policyNumber }} <span class="badge badge-pill badge-success">{{ cashback.getDisplayableStatus }}</span><br>
+                                            <span class="h3">&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</span>
+                                        </li>
+                                    {% endfor %}
+                                    {% if cashback.status == 'missing' or cashback.status == 'failed' %}
+                                        <li class="list-group-item">
+                                            <a href="{{ path('user_cashback', {'id': cashback.id }) }}" class="btn btn-success">Add/Update Bank Details</a>
+                                        </li>
+                                     {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col">
+                     <a href="{{ path('user_data_portability') }}"
+                        target="_blank" rel="noopener noreferrer"
+                        class="btn btn-outline-primary"
+                        title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download my policy data</a>
+                </div>
+            </div>
         </div>
     </section>
 
-    <div class="modal fade"
-         id="pic-sure"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="pic-sure-modal"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h3 class="text-center">Validate phone with pic-sure</h3>
-                </div>
-                <div class="modal-body">
-                    <p>Our excess is £150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
-                    <p>And that's why, by validating your phone with pic-sure technology, which takes less than 30 seconds, you can easily take your excess down to:</p>
-                    <table class="table table-bordered table-mod text-center">
-                        <thead>
-                            <tr>
-                                <th class="text-center" width="50%"><u>Excess without pic-sure</u></th>
-                                <th class="text-center" width="50%">Excess <U>with</U> pic-sure</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td rowspan="2" align="center">
-                                    <strong>&pound;150</strong><br>
-                                    <span>Theft/Loss/Accidental Damage/Breakdown</span>
-                                </td>
-                                <td align="center">
-                                    <strong>&pound;50</strong><br>
-                                    <span>Accidental Damage/Breakdown</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td align="center">
-                                    <strong>&pound;70</strong><br>
-                                    <span>Theft/Loss</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="text-center">
-                        <h4>How to use pic-sure?</h4>
-                        <p>Download our app, validate with pic-sure, reduce your excess. <br> It's that simple!</p>
-                        <a class="ga-outbound-click"
-                           data-clicklabel="iTunes"
-                           href="{{ apple_download('my-policies-modal') }}"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
-                        </a>
-                        <a class="ga-outbound-click"
-                           data-clicklabel="PlayStore"
-                           href="{{ google_download('my-policies-modal') }}"
-                           target="_blank"
-                           rel="noopener noreferrer">
-                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {# Page Modals #}
 
+{% endblock %}
 
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
 {% endblock %}

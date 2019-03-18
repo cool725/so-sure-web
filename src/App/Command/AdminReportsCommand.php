@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Admin\Reports\KpiCached;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Service\ReportingService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -53,7 +54,7 @@ class AdminReportsCommand extends ContainerAwareCommand
         }
 
         if ($input->getOption('accounts')) {
-            $this->cacheAccountsReport();
+            $this->cacheAccountsReport($output);
         }
     }
 
@@ -73,22 +74,28 @@ class AdminReportsCommand extends ContainerAwareCommand
             list($start, $end) = ReportingService::getLastPeriod($period);
             $this->reporting->report($start, $end, false, false);
         }
-        $startDate = new \DateTime();
-        $startDate->setDate(2016, 9, 1);
-        $this->reporting->getCumulativePolicies($startDate, new \DateTime(), false);
+        $this->reporting->getCumulativePolicies(new \DateTime(SoSure::POLICY_START), new \DateTime(), false);
     }
 
     /**
      * Runs the accounts reports that need caching so that they get cached.
      */
-    private function cacheAccountsReport()
+    private function cacheAccountsReport(OutputInterface $output)
     {
         $date = new \DateTime();
         $date = $this->startOfMonth($date);
         $lastMonth = $this->startOfPreviousMonth($date);
+        $twoMonths = $this->startOfPreviousMonth($lastMonth);
+        $threeMonths = $this->startOfPreviousMonth($twoMonths);
 
         $isProd = $this->environment == 'prod';
+        $output->writeln(sprintf('Caching accounts for %s', $date->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $date, false);
+        $output->writeln(sprintf('Caching accounts for %s', $lastMonth->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $lastMonth, false);
+        $output->writeln(sprintf('Caching accounts for %s', $twoMonths->format(\DateTime::ATOM)));
+        $this->reporting->getAllPaymentTotals($isProd, $twoMonths, false);
+        $output->writeln(sprintf('Caching accounts for %s', $threeMonths->format(\DateTime::ATOM)));
+        $this->reporting->getAllPaymentTotals($isProd, $threeMonths, false);
     }
 }

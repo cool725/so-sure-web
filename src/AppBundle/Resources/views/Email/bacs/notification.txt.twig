@@ -1,36 +1,44 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
 
-**
-------------------------------------------------------------
 Your so-sure Direct Debit Confirmation And Payment Schedule
 
-Name of account holder: {{ user.paymentMethod.bankAccount.accountName }}
-Sort code: {{ user.paymentMethod.bankAccount.getDisplayableSortCode }}
-Account number: {{ user.paymentMethod.bankAccount.getDisplayableAccountNumber }}
-Bank/Building society: {{ user.paymentMethod.bankAccount.bankName }}
-{% if user.paymentMethod.bankAccount.bankAddress %}
+Name of account holder: {{ policy.getPolicyOrUserBacsBankAccount.accountName }}
+Sort code: {{ policy.getPolicyOrUserBacsBankAccount.getDisplayableSortCode }}
+Account number: {{ policy.getPolicyOrUserBacsBankAccount.getDisplayableAccountNumber }}
+Bank/Building society: {{ policy.getPolicyOrUserBacsBankAccount.bankName }}
+{% if policy.getPolicyOrUserBacsBankAccount.bankAddress %}
 Bank/Building society address:
-{{ user.paymentMethod.bankAccount.bankAddress.stringImplode("\n")|raw }}
+{{ policy.getPolicyOrUserBacsBankAccount.bankAddress.stringImplode("\n")|raw }}
 {% endif %}
-Reference number: {{ user.paymentMethod.bankAccount.reference }}
+Reference number: {{ policy.getPolicyOrUserBacsBankAccount.reference }}
 Collection frequency:
-  First Collection: {{ user.paymentMethod.bankAccount.getInitialNotificationDate|date('d F','Europe/London') }}
-  {% if user.paymentMethod.bankAccount.isAnnual %}
-  (Collected on the {{ user.paymentMethod.bankAccount.getStandardNotificationDate|date('jS M','Europe/London') }} of each year thereafter)
+  First Collection: {{ policy.getPolicyOrUserBacsBankAccount.getInitialNotificationDate|date('d F','Europe/London') }}
+  {% if policy.getPolicyOrUserBacsBankAccount.isAnnual %}
+  (Collected on the {{ policy.getPolicyOrUserBacsBankAccount.getStandardNotificationDate|date('jS M','Europe/London') }} of each year thereafter)
   {% else %}
-  (Collected on the {{ user.paymentMethod.bankAccount.getStandardNotificationDate|date('jS','Europe/London') }} of each month thereafter)
+  (Collected on the {{ policy.getPolicyOrUserBacsBankAccount.getStandardNotificationDate|date('jS','Europe/London') }} of each month thereafter)
   {% endif %}
 Payment amount: £{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}
 
-If any of the above details are incorrect please update them online.  Alternatively, you can call us on +44 330 223 4948. You have the right to cancel your Direct Debit at any time. A copy of the Direct Debit Guarantee is below.
+If any of the above details are incorrect please update them online. Alternatively, you can contact us at support@wearesosure.com. You have the right to cancel your Direct Debit at any time. A copy of the Direct Debit Guarantee is below.
 
 The Direct Debit Guarantee
 ---
 The Guarantee is offered by all banks and building societies that accept instructions to pay Direct Debits.
-If there are any changes to the amount, date or frequency of your Direct Debit the organisation will notify you (normally 10 working days) in advance of your account being debited or as otherwise agreed. If you request the organisation to collect a payment, confirmation of the amount and date will be given to you at the time of the request.
-If an error is made in the payment of your Direct Debit, by the organisation or your bank or building society, you are entitled to a full and immediate refund of the amount paid from your bank or building society.
-If you receive a refund you are not entitled to, you must pay it back when the organisation asks you to.
-You can cancel a Direct Debit at any time by simply contacting your bank or building society. Written confirmation may be required. Please also notify the organisation.
+If there are any changes to the amount, date or frequency of your Direct Debit so-sure will notify you 10 working days in advance of your account being debited or as otherwise agreed. If you request so-sure to collect a payment, confirmation of the amount and date will be given to you at the time of the request.
+If an error is made in the payment of your Direct Debit, by so-sure or your bank or building society, you are entitled to a full and immediate refund of the amount paid from your bank or building society.
+If you receive a refund you are not entitled to, you must pay it back when so-sure asks you to.
+You can cancel a Direct Debit at any time by simply contacting your bank or building society. Written confirmation may be required. Please also notify so-sure.
 
-{% endblock body %}
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

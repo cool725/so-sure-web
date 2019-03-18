@@ -50,17 +50,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
             $phoneMake = $phone->getMake();
             $makes[$phoneMake] = $phoneMake;
         }
-
-        foreach ($makes as $make) {
-            $url = $this->router->generateUrl('quote_make', [
-                'make' => $make,
-            ]);
-
-            $item = new Entry($url, null, 'weekly', 0.7);
-            $item->setDescription($make);
-            $entries[$make] = $item;
-        }
-
+        
         $phones = $repo->findActive()->getQuery()->execute();
         foreach ($phones as $phone) {
             /** @var Phone $phone */

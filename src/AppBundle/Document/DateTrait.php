@@ -40,9 +40,9 @@ trait DateTrait
         return false;
     }
 
-    public function now()
+    public function now(\DateTimeZone $timeZone = null)
     {
-        return \DateTime::createFromFormat('U', time());
+        return \DateTime::createFromFormat('U', time(), $timeZone);
     }
 
     public function startOfPreviousMonth(\DateTime $date = null)
@@ -387,6 +387,17 @@ trait DateTrait
     }
 
     /**
+     * Returns a copy of a given date which is n days behind it, taking into account negative numbers.
+     * @param \DateTime $date is the starting date.
+     * @param int       $days is the number of days to go back.
+     * @return \DateTime the new date.
+     */
+    public static function subDays($date, $days)
+    {
+        return self::addDays($date, 0 - $days);
+    }
+
+    /**
      * Creates a date interval over a given number of days and takes into account negative numbers.
      * @param int $days is the number of days to make the interval cover.
      * @return \DateInterval given number of days as an interval.
@@ -430,5 +441,32 @@ trait DateTrait
             $days *= -1;
         }
         return $days;
+    }
+
+    public function normalizeDate($date)
+    {
+        $date = trim($date);
+        $date = str_replace(" ", "/", $date);
+        $date = str_replace(".", "/", $date);
+        $date = str_replace("-", "/", $date);
+
+        return $date;
+    }
+
+    public function createValidDate($date)
+    {
+        $date = $this->normalizeDate($date);
+
+        $dt = \DateTime::createFromFormat('d/m/Y', $date);
+        if (!$dt) {
+            return $dt;
+        }
+
+        return $this->startOfDay($dt);
+    }
+
+    public function isValidDate($date)
+    {
+        return $this->createValidDate($date) !== false;
     }
 }

@@ -45,14 +45,14 @@ class S3FileRepository extends DocumentRepository
             ->execute();
     }
 
-    public function getAllFilesToDate(\DateTime $date)
+    public function getAllFilesToDate(\DateTime $date = null, string $type = null)
     {
-        $endMonth = $this->endOfMonth($date);
-
-        return $this->createQueryBuilder()
-            ->field('date')->lt($endMonth)
-            ->getQuery()
-            ->execute();
+        $endMonth = $this->endOfMonth($date ?: (new \DateTime()));
+        $qb = $this->createQueryBuilder()->field('date')->lt($endMonth);
+        if ($type) {
+            $qb->field('fileType')->equals($type);
+        }
+        return $qb->getQuery()->execute();
     }
 
     public function getYearlyFilesToDate(\DateTime $date)

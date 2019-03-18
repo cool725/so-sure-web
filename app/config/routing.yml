@@ -191,49 +191,49 @@ redirect_about_home:
     path: /about
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_are_we_regulated_within_the_uk:
     path: /about/are-we-regulated-within-the-uk
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_are_we_regulated_within_the_uk:
     path: /about/social-insurance/are-we-regulated-within-the-uk
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_how_secure_is_so_sure:
     path: /about/how-secure-is-so-sure
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_how_secure_is_so_sure:
     path: /about/social-insurance/how-secure-is-so-sure
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_the_team:
     path: /about/the-team
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_the_team:
     path: /about/social-insurance/the-team
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_how_to_contact_so_sure:
@@ -247,42 +247,42 @@ redirect_about_our_mission:
     path: /about/our-mission
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_our_mission:
     path: /about/social-insurance/our-mission
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_why_we_re_better:
     path: /about/why-we-re-better
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_why_we_re_better:
     path: /about/social-insurance/why-we-re-better
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_what_is_social_insurance:
     path: /about/what-is-social-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_about_social_what_is_social_insurance:
     path: /about/social-insurance/what-is-social-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: about_home
+        route: social_insurance
         permanent: true
 
 redirect_discount_vouchers:
@@ -315,6 +315,22 @@ redirect_change_password:
         route: user_home
         permanent: true
 
+redirect_help_centre:
+    path: /help/{file}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: faq
+        permanent: true
+    requirements:
+        file: .*
+
+redirect_help_base_centre:
+    path: /help
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: faq
+        permanent: true
+
 # https://symfony.com/doc/3.4/routing/redirect_trailing_slash.html with a 301
 remove_trailing_slash:
     path: /{url}
@@ -322,3 +338,202 @@ remove_trailing_slash:
         _controller: 'App\Controller\RedirectingController'
     requirements:
         url: .*/$
+
+redirect_iphone_insured_with_bank:
+    path: /think-your-iPhone-7-is-insured-by-your-bank
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_samsung_seven_edge_vodafone:
+    path: /samsung-s7-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_pixel_vodafone:
+    path: /google-pixel-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_se_vodafone:
+    path: /iphone-SE-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_six_vodafone:
+    path: /iphone-6-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_six_s_vodafone:
+    path: /iphone-6s-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_seven_vodafone:
+    path: /iphone-7-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_iphone_seven_s_vodafone:
+    path: /iphone-7-plus-insured-with-vodafone
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+
+redirect_sosure_vs_gadgetcover:
+    path: /so-sure-vs-gadget-cover-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_halifax:
+    path: /so-sure-vs-halifax-phone-insuranc
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_three:
+    path: /so-sure-vs-three-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_make_insurance:
+    path: /phone-insurance/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
+
+redirect_make_insure:
+    path: /insure/{make}
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+    requirements:
+        url: '[a-zA-Z]+'
+
+redirect_sosure_vs_pb:
+    path: /so-sure-vs-protect-your-bubble
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_pb_insurance:
+    path: /so-sure-vs-protect-your-bubble-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_cw_insurance:
+    path: /so-sure-vs-carphone-warehouse-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_ee_insurance:
+    path: /so-sure-vs-ee-damage-cover-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_sosure_vs_tesco_insurance:
+    path: /so-sure-vs-tesco-phone-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_text_me_the_app:
+    path: /text-me-the-app
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_download_app:
+    path: /download-app
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_about_us:
+    path: /about/social-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: social_insurance
+        permanent: true
+
+redirect_samsung_seven_mobile_network:
+    path: /samsung-s7-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_google_pixel_mobile_network:
+    path: /google-pixel-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_iphone_se_mobile_network:
+    path: /iphone-SE-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_iphone_six_mobile_network:
+    path: /iphone-6-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_iphone_sixs_mobile_network:
+    path: /iphone-6s-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_iphone_seven_mobile_network:
+    path: /iphone-7-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true
+
+redirect_iphone_seven_plus_mobile_network:
+    path: /iphone-7-plus-insured-with-your-mobile-network
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: comparison
+        permanent: true

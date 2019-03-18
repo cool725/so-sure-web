@@ -2,7 +2,10 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -29,13 +32,16 @@ class BacsMandatesType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findPendingMandates()->getQuery()->execute();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findPendingMandates()->getQuery()->execute();
         $mandates = [];
-        foreach ($users as $user) {
-            $serialNumber = $user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber();
-            $mandates[$serialNumber][$user->getName()] = $user->getId();
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            $serialNumber = $policy->getBacsBankAccount()->getMandateSerialNumber();
+            $mandates[$serialNumber][$policy->getPolicyNumber()] = $serialNumber;
         }
+
         $builder
             ->add('serialNumber', ChoiceType::class, [
                 'placeholder' => 'Select a name (will approval all name for that serial number)',

@@ -15,7 +15,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Feature;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
@@ -61,9 +61,6 @@ class JudopayServiceTest extends WebTestCase
         /** @var JudopayService $judopay */
         $judopay = self::$container->get('app.judopay');
         self::$judopay = $judopay;
-        /** @var FeatureService $feature */
-        $feature = self::$container->get('app.feature');
-        $feature->setEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM, true);
     }
 
     public function tearDown()
@@ -99,7 +96,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $paymentA = new JudoPayment();
@@ -143,7 +140,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -161,7 +158,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($policy->getId(), $payment->getReference());
         $this->assertEquals('Success', $payment->getResult());
 
-        $tokens = $user->getPaymentMethod()->getCardTokens();
+        $tokens = $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getCardTokens();
         $this->assertEquals(1, count($tokens));
         $data = json_decode($tokens['token']);
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $data->cardLastfour);
@@ -177,7 +174,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -204,7 +201,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -239,7 +236,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -277,7 +274,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
         $receiptId = self::$judopay->testPay(
             $user,
@@ -314,7 +311,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -341,7 +338,7 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
@@ -374,16 +371,16 @@ class JudopayServiceTest extends WebTestCase
         $judo = new JudoPaymentMethod();
         $judo->setCustomerToken('ctoken');
         $judo->addCardToken('token', null);
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
         static::$dm->flush();
 
         $receiptId = self::$judopay->testPay(
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4221 6900 0000 4963',
-            '12/20',
-            '125'
+            self::$JUDO_TEST_CARD_FAIL_NUM,
+            self::$JUDO_TEST_CARD_FAIL_EXP,
+            self::$JUDO_TEST_CARD_FAIL_PIN
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
     }
@@ -486,28 +483,6 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
     }
 
-    public function testJudoCommission()
-    {
-        $user = $this->createValidUser(static::generateEmail('judo-commission', $this));
-        $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
-
-        $receiptId = self::$judopay->testPay(
-            $user,
-            $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-        static::$policyService->setEnvironment('prod');
-        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
-        static::$policyService->setEnvironment('test');
-
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
-    }
-
     public function testJudoRefund()
     {
         $user = $this->createValidUser(static::generateEmail('judo-refund', $this));
@@ -518,9 +493,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD2_NUM,
+            self::$JUDO_TEST_CARD2_EXP,
+            self::$JUDO_TEST_CARD2_PIN
         );
         static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
@@ -725,6 +700,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoScheduledPaymentExpiredCard()
     {
+        /** @var User $user */
         $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentExpiredCard', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -755,14 +731,14 @@ class JudopayServiceTest extends WebTestCase
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
-        $this->assertTrue($policy->getUser()->hasValidPaymentMethod());
+        $this->assertTrue($policy->hasPolicyOrUserValidPaymentMethod());
 
-        $policy->getUser()->getPaymentMethod()->addCardToken(
+        $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->addCardToken(
             '1',
             json_encode(['cardLastfour' => '0000', 'endDate' => '0115'])
         );
         self::$dm->flush();
-        $this->assertFalse($policy->getUser()->hasValidPaymentMethod());
+        $this->assertFalse($policy->hasPolicyOrUserValidPaymentMethod());
 
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $nextMonth = \DateTime::createFromFormat('U', time());
@@ -806,11 +782,11 @@ class JudopayServiceTest extends WebTestCase
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
-        $this->assertTrue($policy->getUser()->hasValidPaymentMethod());
+        $this->assertTrue($policy->hasPolicyOrUserValidPaymentMethod());
 
-        $policy->getUser()->setPaymentMethod(null);
+        $policy->setPaymentMethod(null);
         self::$dm->flush();
-        $this->assertFalse($policy->getUser()->hasValidPaymentMethod());
+        $this->assertFalse($policy->hasPolicyOrUserValidPaymentMethod());
 
         $scheduledPayment = $policy->getScheduledPayments()[0];
         $nextMonth = \DateTime::createFromFormat('U', time());
@@ -825,7 +801,7 @@ class JudopayServiceTest extends WebTestCase
     public function testProcessTokenPayResult()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('judo-process-token', $this));
+        $user = $this->createValidUser(static::generateEmail('judo-process-token', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
         static::$dm->persist($policy);
@@ -868,13 +844,17 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertEquals(11, count($policy->getScheduledPayments()));
 
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+
         // Payment failures should be rescheduled
         $initialScheduledPayment = $policy->getNextScheduledPayment();
         for ($i = 1; $i <= 3; $i++) {
-            $scheduledPayment = $policy->getNextScheduledPayment();
+            $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+            $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
             $this->assertLessThan(
                 29,
-                $scheduledPayment->getScheduled()->diff($initialScheduledPayment->getScheduled())->days
+                $scheduledPayment->getScheduled()->diff($initialScheduledPayment->getScheduled())->days,
+                $scheduledPayment->getScheduled()->format(\DateTime::ATOM)
             );
             if ($i > 1) {
                 $this->assertGreaterThan($initialScheduledPayment->getScheduled(), $scheduledPayment->getScheduled());
@@ -917,9 +897,9 @@ class JudopayServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\SameDayPaymentException
+     * @expectedException \AppBundle\Exception\SameDayPaymentException
      */
-    public function testMultipleSameDayPayments()
+    public function testJudoMultipleSameDayPayments()
     {
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testMultipleSameDayPayments', $this));
@@ -981,7 +961,7 @@ class JudopayServiceTest extends WebTestCase
         return $mailer;
     }
 
-    public function testPaymentFirstProblem()
+    public function testJudoPaymentFirstProblem()
     {
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testPaymentFirstProblem', $this));
@@ -1034,7 +1014,7 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        $this->assertNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+        $this->assertNull($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem());
         $mock->__phpunit_verify();
 
         // 2nd failure - should trigger problem  (expected no email; total = 1)
@@ -1052,10 +1032,13 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        /*
         $this->assertEquals(
             $scheduledPayment->getScheduled(),
-            $policy->getUser()->getPaymentMethod()->getFirstProblem()
+            $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem()
         );
+        */
 
         // 3rd failure - nothing (expected no email; total = 1)
         // print '1/3rd failure' . PHP_EOL;
@@ -1072,10 +1055,12 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        /*
         $this->assertNotEquals(
             $scheduledPayment->getScheduled(),
-            $policy->getUser()->getPaymentMethod()->getFirstProblem()
+            $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem()
         );
+        */
 
         // 4th - success (expected no email; total = 1)
         // print '1/4th success' . PHP_EOL;
@@ -1105,7 +1090,7 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        $this->assertNotNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+        //$this->assertNotNull($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem());
         $mock->__phpunit_verify();
 
         /*
@@ -1127,12 +1112,12 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        $this->assertNotNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+        $this->assertNotNull($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getFirstProblem());
         $mock->__phpunit_verify();
         */
     }
 
-    public function testRemainderPaymentCancelledPolicy()
+    public function testCheckoutRemainderPaymentCancelledPolicy()
     {
         $user = $this->createValidUser(static::generateEmail('testRemainderPaymentCancelledPolicy', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -1238,10 +1223,10 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
     }
 
-    public function testCommission()
+    public function testJudoCommission()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('commission', $this));
+        $user = $this->createValidUser(static::generateEmail('testJudoCommission', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -1354,7 +1339,7 @@ class JudopayServiceTest extends WebTestCase
 
         $this->assertEquals(
             new \DateTime('2021-01-01 00:00:00', SoSure::getSoSureTimezone()),
-            $policy->getUser()->getPaymentMethod()->getCardEndDateAsDate()
+            $policy->getPolicyOrPayerOrUserJudoPaymentMethod()->getCardEndDateAsDate()
         );
         $this->assertFalse(self::$judopay->cardExpiringEmail($policy));
         $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
@@ -1446,7 +1431,7 @@ class JudopayServiceTest extends WebTestCase
         );
         // @codingStandardsIgnoreEnd
 
-        $user->setPaymentMethod(new JudoPaymentMethod());
+        $policy->setPaymentMethod(new JudoPaymentMethod());
 
         for ($i = 1; $i < 4; $i++) {
             $scheduledPayment = $policy->getNextScheduledPayment();
@@ -1497,21 +1482,23 @@ class JudopayServiceTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy1 = $repo->find($policy1->getId());
+        $updatedPolicy1 = $this->assertPolicyExists(self::$container, $policy1);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy1->getStatus());
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy1->getPolicyNumber()));
+
+        $policy2->setPaymentMethod($policy1->getPaymentMethod());
 
         static::$policyService->setEnvironment('prod');
         self::$judopay->existing($policy2, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         static::$policyService->setEnvironment('test');
 
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy2 = $repo->find($policy2->getId());
+        $updatedPolicy2 = $this->assertPolicyExists(self::$container, $policy2);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy2->getStatus());
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy2->getPolicyNumber()));
+
+        $policy3->setPaymentMethod($policy1->getPaymentMethod());
 
         static::$policyService->setEnvironment('prod');
         $invalidPremium = false;
@@ -1533,7 +1520,7 @@ class JudopayServiceTest extends WebTestCase
         self::$judopay->existing($policy3, $phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
         static::$policyService->setEnvironment('test');
 
-        $updatedPolicy3 = $repo->find($policy3->getId());
+        $updatedPolicy3 = $this->assertPolicyExists(self::$container, $policy3);
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy3->getStatus());
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy3->getPolicyNumber()));

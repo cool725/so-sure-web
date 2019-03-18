@@ -3,12 +3,15 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
+use AppBundle\Document\Form\SerialNumber;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\ValidatorTrait;
@@ -16,21 +19,26 @@ use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Form\Type\AffiliateType;
 use AppBundle\Form\Type\BacsCreditType;
+use AppBundle\Form\Type\BacsPaymentRequestType;
 use AppBundle\Form\Type\ClaimInfoType;
 use AppBundle\Form\Type\CallNoteType;
 use AppBundle\Form\Type\DetectedImeiType;
+use AppBundle\Form\Type\InvalidImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\PicSureStatusType;
+use AppBundle\Form\Type\SerialNumberType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PromotionType;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -99,11 +107,13 @@ use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\File\ScreenUploadFile;
+use AppBundle\Document\File\ManualAffiliateFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\Imei;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\AddressType;
+use AppBundle\Form\Type\ManualAffiliateFileType;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\DirectBacsReceiptType;
@@ -138,6 +148,7 @@ use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -187,6 +198,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $makes = $repo->findActiveMakes();
         $phones = $repo->createQueryBuilder();
         $phones = $phones->field('make')->notEqual('ALL');
+
+        $policyTerms = $this->getLatestPolicyTerms();
+        $excess = $policyTerms->getDefaultExcess();
+        $picsureExcess = $policyTerms->getDefaultPicSureExcess();
 
         $searchForm = $this->get('form.factory')
             ->createNamedBuilder('email_form', PhoneSearchType::class, null, ['method' => 'GET'])
@@ -336,6 +351,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         $now = \DateTime::createFromFormat('U', time());
         $oneDay = $this->addBusinessDays($now, 1);
+
+
         return [
             'phones' => $pager->getCurrentPageResults(),
             'form' => $searchForm->createView(),
@@ -345,6 +362,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'additional_phones' => $additionalPhonesForm->createView(),
             'one_day' => $oneDay,
             'policyTerms' => $this->getLatestPolicyTerms(),
+            'excess' => $excess,
+            'picsureExcess' => $picsureExcess
         ];
     }
 
@@ -819,6 +838,64 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/serial-number-form/{id}", name="serial_number_form")
+     * @Template
+     */
+    public function serialNumberFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $serialNumber = new SerialNumber();
+        $serialNumber->setPolicy($policy);
+        $serialNumberForm = $this->get('form.factory')
+            ->createNamedBuilder('serial_number_form', SerialNumberType::class, $serialNumber)
+            ->setAction($this->generateUrl(
+                'serial_number_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ("POST" === $request->getMethod()) {
+            $serialNumberForm->handleRequest($request);
+            if ($serialNumberForm->isValid()) {
+                $policy->setSerialNumber($serialNumber->getSerialNumber());
+                $msg = "Serial Number update";
+                $this->addFlash(
+                    'success',
+                    sprintf('Policy %s %s', $policy->getPolicyNumber(), $msg)
+                );
+
+                $policy->addNoteDetails(
+                    $serialNumber->getNote(),
+                    $this->getUser(),
+                    $msg
+                );
+
+                $dm->flush();
+            } else {
+                $this->addFlash(
+                    'error',
+                    'Unable to save form'
+                );
+            }
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+
+        return [
+            'form' => $serialNumberForm->createView(),
+            'policy' => $policy,
+        ];
+
+    }
+
+    /**
      * @Route("/detected-imei-form/{id}", name="detected_imei_form")
      * @Template
      */
@@ -852,18 +929,68 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
-                    $policy->setDetectedImei($imei->getImei());
+                    /** @var PolicyService $policyService */
+                    $policyService = $this->get('app.policy');
+                    $policyService->setDetectedImei($policy, $imei->getImei(), $this->getUser(), $imei->getNote());
 
-                    $policy->addNoteDetails(
-                        $imei->getNote(),
-                        $this->getUser(),
-                        'Detected IMEI Update'
-                    );
-
-                    $dm->flush();
                     $this->addFlash(
                         'success',
                         sprintf('Policy %s detected imei updated.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $imeiForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/invalid-imei-form/{id}", name="invalid_imei_form")
+     * @Template
+     */
+    public function invalidImeiFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $invalidImei = new InvalidImei();
+        $invalidImei->setPolicy($policy);
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_form', InvalidImeiType::class, $invalidImei)
+            ->setAction($this->generateUrl(
+                'invalid_imei_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('imei_form')) {
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    /** @var PolicyService $policyService */
+                    $policyService = $this->get('app.policy');
+
+                    $policyService->setInvalidImei(
+                        $policy,
+                        $invalidImei->hasInvalidImei(),
+                        $this->getUser(),
+                        $invalidImei->getNote()
+                    );
+
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s invalid imei updated.', $policy->getPolicyNumber())
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
@@ -1017,6 +1144,100 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/bacs-payment-request/{id}", name="bacs_payment_request_form")
+     * @Template
+     */
+    public function bacsPaymentRequestFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+
+        /** @var PhonePolicyRepository $repo */
+        $repo = $dm->getRepository(PhonePolicy::class);
+
+        /** @var PolicyService $policyService */
+        $policyService = $this->get('app.policy');
+
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $bacsPaymentRequestForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_payment_request_form', BacsPaymentRequestType::class)
+            ->setAction($this->generateUrl(
+                'bacs_payment_request_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('bacs_payment_request_form')) {
+                $bacsPaymentRequestForm->handleRequest($request);
+                if ($bacsPaymentRequestForm->isValid()) {
+                    $status = $policyService->sendBacsPaymentRequest($policy);
+
+                    if ($status) {
+                        $this->addFlash('success', "Successfully sent bacs payment request");
+
+                        $policy->addNoteDetails(
+                            $bacsPaymentRequestForm->get('note')->getData(),
+                            $this->getUser(),
+                            'Bacs Payment Request'
+                        );
+
+                        $dm->flush();
+                    } else {
+                        $this->addFlash('error', "Error sending bacs payment request");
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'form' => $bacsPaymentRequestForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/policy/{id}/p", name="admin_payment_redirect")
+     */
+    public function paymentRedirectAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var PaymentRepository $repo */
+        $repo = $dm->getRepository(Payment::class);
+        /** @var Payment $payment */
+        $payment = $repo->find($id);
+        if (!$payment || !$payment->getPolicy()) {
+            throw $this->createNotFoundException("Unknown payment");
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $payment->getPolicy()->getId()]);
+    }
+
+    /**
+     * @Route("/policy/{id}/sp", name="admin_scheduled_payment_redirect")
+     */
+    public function scheduledPaymentRedirectAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var ScheduledPaymentRepository $repo */
+        $repo = $dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment $scheduledPayment */
+        $scheduledPayment = $repo->find($id);
+        if (!$scheduledPayment || !$scheduledPayment->getPolicy()) {
+            throw $this->createNotFoundException("Unknown scheduled payment");
+        }
+
+        return $this->redirectToRoute('admin_policy', ['id' => $scheduledPayment->getPolicy()->getId()]);
+    }
+
+    /**
      * @Route("/policy/{id}", name="admin_policy")
      * @Template("AppBundle::Admin/claimsPolicy.html.twig")
      */
@@ -1037,6 +1258,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
+        /** @var BacsService $bacsService */
+        $bacsService = $this->get('app.bacs');
 
         $cancel = new Cancel();
         $cancel->setPolicy($policy);
@@ -1068,6 +1291,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
         $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $bacsPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
 
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
@@ -1124,6 +1350,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('monthly', SubmitType::class)
             ->add('yearly', SubmitType::class)
             ->getForm();
+        $skipPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('skip_payment_form')
+            ->add('payment_id', HiddenType::class)
+            ->add('skip', SubmitType::class)
+            ->getForm();
         $cancelDirectDebitForm = $this->get('form.factory')
             ->createNamedBuilder('cancel_direct_debit_form')
             ->add('cancel', SubmitType::class)
@@ -1140,6 +1371,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
         $bacsRefund->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $bacsRefund->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
             ->getForm();
@@ -1291,7 +1525,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     // non-manual payments should be scheduled
                     if (!$bacsPayment->isManual()) {
                         $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
-                        if (!$policy->getUser()->hasBacsPaymentMethod()) {
+                        if (!$policy->hasPolicyOrUserBacsPaymentMethod()) {
                             $this->get('logger')->warning(sprintf(
                                 'Payment (Policy %s) is scheduled, however no bacs account for user',
                                 $policy->getId()
@@ -1564,14 +1798,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     /** @var JudopayService $judopay */
                     $judopay = $this->get('app.judopay');
                     $details = $judopay->runTokenPayment(
-                        $policy->getPayerOrUser(),
+                        $policy,
                         $amount,
                         $date->getTimestamp(),
                         $policy->getId()
                     );
                     try {
                         /** @var JudoPaymentMethod $judoPaymentMethod */
-                        $judoPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+                        $judoPaymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
                         $judopay->add(
                             $policy,
                             $details['receiptId'],
@@ -1603,16 +1837,30 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('cancel_direct_debit_form')) {
                 $cancelDirectDebitForm->handleRequest($request);
                 if ($cancelDirectDebitForm->isValid()) {
-                    /** @var BacsService $bacsService */
-                    $bacsService = $this->get('app.bacs');
-                    /** @var BacsPaymentMethod $bacsPaymentMethod */
-                    $bacsPaymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
                     $bacsService->queueCancelBankAccount(
-                        $bacsPaymentMethod->getBankAccount(),
-                        $policy->getPayerOrUser()->getId()
+                        $policy->getPolicyOrUserBacsBankAccount(),
+                        $policy->hasBacsPaymentMethod() ? $policy->getId() : $policy->getPayerOrUser()->getId()
                     );
                     $this->addFlash('success', sprintf(
                         'Direct Debit Cancellation has been queued.'
+                    ));
+                }
+            } elseif ($request->request->has('skip_payment_form')) {
+                $skipPaymentForm->handleRequest($request);
+                if ($skipPaymentForm->isValid()) {
+                    $paymentId = $skipPaymentForm->getData()['payment_id'];
+                    $paymentRepo = $this->getManager()->getRepository(BacsPayment::class);
+                    /** @var BacsPayment $payment */
+                    $payment = $paymentRepo->find($paymentId);
+                    if (!$payment) {
+                        throw $this->createNotFoundException('Missing payment');
+                    }
+
+                    $payment->setStatus(BacsPayment::STATUS_SKIPPED);
+                    $payment->setScheduledPayment(null);
+                    $this->getManager()->flush();
+                    $this->addFlash('success', sprintf(
+                        'Skipped payment'
                     ));
                 }
             } elseif ($request->request->has('run_scheduled_payment_form')) {
@@ -1625,6 +1873,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $policy->addPolicyFile($paymentRequestFile);
                         $scheduledPayment->adminReschedule();
+                        if ($scheduledPayment->getPreviousAttempt()) {
+                            $scheduledPayment->setPreviousAttempt(null);
+                        }
+                        if ($scheduledPayment->getPayment()) {
+                            $scheduledPayment->setPayment(null);
+                        }
 
                         $this->getManager()->flush();
 
@@ -1641,11 +1895,16 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('bacs_refund_form')) {
                 $bacsRefundForm->handleRequest($request);
                 if ($bacsRefundForm->isValid()) {
-                    $bacsRefund->setAmount(0 - abs($bacsRefund->getAmount()));
-                    $bacsRefund->calculateSplit();
-                    $bacsRefund->setRefundTotalCommission($bacsRefund->getTotalCommission());
-                    $this->getManager()->persist($bacsRefund);
-                    $this->getManager()->flush();
+                    $bacsService->scheduleBacsPayment(
+                        $policy,
+                        0 - abs($bacsRefund->getAmount()),
+                        ScheduledPayment::TYPE_REFUND,
+                        $bacsRefund->getNotes()
+                    );
+                    $this->addFlash('success', sprintf(
+                        'Refund scheduled'
+                    ));
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('salva_update_form')) {
                 $salvaUpdateForm->handleRequest($request);
@@ -1708,6 +1967,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'bacs_refund_form' => $bacsRefundForm->createView(),
             'salva_update_form' => $salvaUpdateForm->createView(),
+            'skip_payment_form' => $skipPaymentForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'user_route' => 'admin_user',
@@ -2160,7 +2420,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
             )) {
                 $total += $scheduledPayment->getAmount();
-                if ($scheduledPayment->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+                if ($scheduledPayment->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {
                     $totalBacs += $scheduledPayment->getAmount();
                 } else {
                     $totalJudo += $scheduledPayment->getAmount();
@@ -2682,6 +2942,64 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/scheduled-payment-form/{id}/{scheduledPaymentId}", name="scheduled_payment_form")
+     * @Template
+     */
+    public function scheduledPaymentFormAction(Request $request, $id, $scheduledPaymentId)
+    {
+
+        $dm = $this->getManager();
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+        $scheduledPayment = $scheduledPaymentRepo->find($scheduledPaymentId);
+        if (!$scheduledPayment) {
+            $this->addFlash(
+                "error",
+                "Attempted to modify nonexistent scheduled payment with id '{$scheduledPaymentId}'."
+            );
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+        $scheduledPaymentForm = $this->get("form.factory")
+            ->createNamedBuilder("scheduled_payment_form")
+            ->add("notes", TextType::class, ["data" => $scheduledPayment->getNotes()])
+            ->add(
+                "scheduled",
+                DateTimeType::class,
+                [
+                    "data" => $scheduledPayment->getScheduled(),
+                    "html5" => false,
+                    "widget" => "single_text",
+                    "format" => "dd-MM-yyyy HH:mm",
+                    "attr" => ["class" => "datetimepickerfuture", "autocomplete" => "off"]
+                ]
+            )
+            ->add("submit", SubmitType::class)
+            ->setAction(
+                $this->generateUrl("scheduled_payment_form", ["id" => $id, "scheduledPaymentId" => $scheduledPaymentId])
+            )
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            // TODO: permissions
+            if ($request->request->has("scheduled_payment_form")) {
+                $scheduledPaymentForm->handleRequest($request);
+                if ($scheduledPaymentForm->isValid()) {
+                    $notes = $scheduledPaymentForm->get("notes")->getData();
+                    $scheduled = $scheduledPaymentForm->get("scheduled")->getData();
+                    if ($notes) {
+                        $scheduledPayment->setNotes($notes);
+                    }
+                    if ($scheduled) {
+                        $scheduledPayment->setScheduled($scheduled);
+                    }
+                    $dm->flush();
+                    $this->addFlash("success", "Scheduled Payment updated.");
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return ["form" => $scheduledPaymentForm->createView()];
+    }
+
+    /**
      * @Route("/company", name="admin_company")
      * @Template
      */
@@ -2954,7 +3272,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
         /** @var ReportingService $reporting */
         $reporting = $this->get('app.reporting');
-        $data = $reporting->payments($date);
+        $data = $reporting->payments($date, true);
 
         return [
             'data' => $data,
@@ -3142,6 +3460,41 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             200,
             array('Content-Type' => $mimetype)
         );
+    }
+
+    /**
+     * @Route("/optimise-csv", name="admin_optimise_csv")
+     * @Template
+     */
+    public function optimiseCsvAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $s3 = $this->get('aws.s3');
+        /** @var S3FileRepository */
+        $s3FileRepo = $dm->getRepository(S3File::class);
+        $uploadedFile = new ManualAffiliateFile();
+        $uploadForm = $this->get('form.factory')
+            ->createNamedBuilder('upload_form', ManualAffiliateFileType::class, $uploadedFile)
+            ->getForm();
+        if ($request->getMethod() === 'POST') {
+            if ($request->request->has('upload_form')) {
+                $uploadForm->handleRequest($request);
+                if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
+                    try {
+                        $affiliateService = $this->get('app.affiliate');
+                        $affiliateService->processOptimiseCsv($uploadedFile);
+                        $this->addFlash('success', 'File Processed');
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage().", file not saved.");
+                    }
+                    return new RedirectResponse($this->generateUrl('admin_optimise_csv'));
+                }
+            }
+        }
+        return [
+            'upload_form' => $uploadForm->createView(),
+            'files' => $s3FileRepo->getAllFilesToDate(null, 'manualAffiliate')
+        ];
     }
 
     /**

@@ -1,0 +1,57 @@
+{% block body %}
+
+    {{ form_start(form) }}
+    <div class="modal-body">
+        <div class="container-fluid">
+            <div class="form-row">
+                <div class="col">
+                    <p>Are you sure you want to update this policy? Common cases for this would be:</p>
+                    <div class="list-group cases">
+                        <a class="list-group-item list-group-item-action">Claims team is unable to successfully determine the IMEI after providing a voucher.</a>
+                        <a class="list-group-item list-group-item-action">User has provided sufficient proof of their IMEI (proof of purchase).</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="cases-common" required> I've read the list of common reasons above
+                    </label>
+                </div>
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" required> If it is not a common reason, I have verified the exception is allowed
+                    </label>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <label>Current Invalid IMEI</label>
+                    <p>{% if policy.hasInvalidImei %}Yes{% else %}No{% endif %}</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Invalid IMEI?</label>
+                {{ form_widget(form.invalidImei, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="form-row">
+                <label>Justification</label>
+                {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}

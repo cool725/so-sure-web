@@ -54,7 +54,7 @@
             {% endif %}
             <div class="col">
                 <small class="text-grey">Collection frequency:</small><br>
-                <span class="h6">First collection: {{ bacs.getFirstPaymentDate(policy.user)|date('d/m/y','Europe/London') }}</span><br>
+                <span class="h6">First collection: {{ bacs.getFirstPaymentDateForPolicy(policy)|date('d/m/y','Europe/London') }}</span><br>
                 {% if bacs.annual %}
                     <small>(Collected on the {{ policy.billing|date('jS M','Europe/London') }} of each year thereafter)</small><br>
                 {% else %}
@@ -65,7 +65,7 @@
     </div>
 
     <div class="form-group">
-        <small class="form-text">I confirm that the above details are correct and payment to so-sure Limited will be <u>first collected on {{ bacs.getFirstPaymentDate(policy.user)|date('d F','Europe/London') }}</u>. You will receive confirmation of this direct debit along with any future notices via <strong>email</strong>.</small>
+        <small class="form-text">I confirm that the above details are correct and payment to so-sure Limited will be <u>first collected on {{ bacs.getFirstPaymentDateForPolicy(policy)|date('d F','Europe/London') }}</u>. You will receive confirmation of this direct debit along with any future notices via <strong>email</strong>.</small>
     </div>
 
     <div class="form-group my-5">
@@ -94,8 +94,8 @@
         <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
         <small class="form-text mb-2 ml-2">
             Payments protected by the <a href="#" data-toggle="modal" data-target="#direct_debit_guarantee"><u>Direct Debit Guarantee</u></a>.
-            so-sure Ltd, Martin House, 5 Martin Lane, London EC4R 0DP<br>
-            +44 330 223 4948, <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">hello</a>
+            so-sure Ltd, Martin House, 5 Martin Lane, London EC4R 0DP <br>
+            <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>
         </small>
     </div>
 

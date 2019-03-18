@@ -31,4 +31,9 @@ gulp.task('default', function() {
     // Fancybox.css
     gulp.src(['node_modules/@fancyapps/fancybox/dist/jquery.fancybox.css'])
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+
+    // tempusdominus-bootstrap-4
+    gulp.src(['node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.css'])
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+
 });

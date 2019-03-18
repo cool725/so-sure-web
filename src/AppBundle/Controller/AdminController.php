@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
@@ -12,12 +13,15 @@ use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\CashflowsFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Document\Form\JudoRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\JudoRefundType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -43,6 +47,7 @@ use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
 use AppBundle\Service\CashflowsService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\JudopayService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
@@ -223,6 +228,80 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/judo-refund/{id}", name="judo_refund_form")
+     * @Template
+     */
+    public function judoRefundFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        /** @var Policy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $judoRefund = new JudoRefund();
+        $judoRefund->setPolicy($policy);
+        $judoRefundForm = $this->get('form.factory')
+            ->createNamedBuilder('judo_refund_form', JudoRefundType::class, $judoRefund)
+            ->setAction($this->generateUrl(
+                'judo_refund_form',
+                ['id' => $policy->getId()]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('judo_refund_form')) {
+                $judoRefundForm->handleRequest($request);
+                if ($judoRefundForm->isValid()) {
+                    /** @var JudopayService $judopayService */
+                    $judopayService = $this->get('app.judopay');
+
+                    try {
+                        $judopayService->refund(
+                            $judoRefund->getPayment(),
+                            $judoRefund->getAmount(),
+                            $judoRefund->getTotalCommission(),
+                            $judoRefund->getNotes()
+                        );
+
+                        $policy->addNoteDetails(
+                            $judoRefund->getNotes(),
+                            $this->getUser(),
+                            'Judo Refund'
+                        );
+
+                        $dm->flush();
+
+                        $this->addFlash(
+                            'success',
+                            sprintf('Successfully refunded payment of £%s', $judoRefund->getAmount())
+                        );
+                    } catch (\Exception $e) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Error processing refund: %s', $e)
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'judo_refund_form' => $judoRefundForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+
+    /**
      * @Route("/phone", name="admin_phone_add")
      * @Method({"POST"})
      */
@@ -262,7 +341,6 @@ class AdminController extends BaseController
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         /** @var Phone $phone */
@@ -277,11 +355,43 @@ class AdminController extends BaseController
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
+                $excess = $policyTerms->getDefaultExcess();
+                $picsureExcess = $policyTerms->getDefaultPicSureExcess();
+                if ($request->get('damage-excess')) {
+                    $excess->setDamage($request->get('damage-excess'));
+                }
+                if ($request->get('warranty-excess')) {
+                    $excess->setWarranty($request->get('warranty-excess'));
+                }
+                if ($request->get('extended-warranty-excess')) {
+                    $excess->setExtendedWarranty($request->get('extended-warranty-excess'));
+                }
+                if ($request->get('loss-excess')) {
+                    $excess->setLoss($request->get('loss-excess'));
+                }
+                if ($request->get('theft-excess')) {
+                    $excess->setTheft($request->get('theft-excess'));
+                }
+                if ($request->get('picsure-damage-excess')) {
+                    $picsureExcess->setDamage($request->get('picsure-damage-excess'));
+                }
+                if ($request->get('picsure-warranty-excess')) {
+                    $picsureExcess->setWarranty($request->get('picsure-warranty-excess'));
+                }
+                if ($request->get('picsure-extended-warranty-excess')) {
+                    $picsureExcess->setExtendedWarranty($request->get('picsure-extended-warranty-excess'));
+                }
+                if ($request->get('picsure-loss-excess')) {
+                    $picsureExcess->setLoss($request->get('picsure-loss-excess'));
+                }
+                if ($request->get('picsure-theft-excess')) {
+                    $picsureExcess->setTheft($request->get('picsure-theft-excess'));
+                }
                 $phone->changePrice(
                     $gwp,
                     $from,
-                    $policyTerms->getDefaultExcess(),
-                    $policyTerms->getDefaultPicSureExcess(),
+                    $excess,
+                    $picsureExcess,
                     $to,
                     $notes
                 );
@@ -540,11 +650,13 @@ class AdminController extends BaseController
         }
 
         $dm = $this->getManager();
+        /** @var S3FileRepository $s3FileRepo */
         $s3FileRepo = $dm->getRepository(S3File::class);
         /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
 
-        return [
+        // 15 - 18 seconds
+        $data = [
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
@@ -552,16 +664,26 @@ class AdminController extends BaseController
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
-            'files' => $s3FileRepo->getAllFiles($date),
-            'salvaForm' => $salvaForm->createView(),
             'stats' => $reportingService->getStats($date),
             'print' => false,
         ];
+        //throw new \Exception(print_r($data, true));
+
+        $data = array_merge($data, [
+            'files' => $s3FileRepo->getAllFiles($date),
+            'salvaForm' => $salvaForm->createView(),
+        ]);
+
+        return $data;
     }
 
     /**
      * @Route("/bacs", name="admin_bacs")
      * @Route("/bacs/{year}/{month}", name="admin_bacs_date", requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/payments/{year}/{month}", name="admin_bacs_payments",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/reports/{year}/{month}", name="admin_bacs_reports",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Template
      */
     public function bacsAction(Request $request, $year = null, $month = null)
@@ -696,13 +818,7 @@ class AdminController extends BaseController
             } elseif ($request->request->has('mandates')) {
                 $mandatesForm->handleRequest($request);
                 if ($mandatesForm->isSubmitted() && $mandatesForm->isValid()) {
-                    $userId = $mandatesForm->getData()['serialNumber'];
-                    $userRepo = $this->getManager()->getRepository(User::class);
-                    /** @var User $user */
-                    $user = $userRepo->find($userId);
-                    /** @var BacsPaymentMethod $bacsPaymentMethod */
-                    $bacsPaymentMethod = $user->getPaymentMethod();
-                    $serialNumber = $bacsPaymentMethod->getBankAccount()->getMandateSerialNumber();
+                    $serialNumber = $mandatesForm->getData()['serialNumber'];
                     if ($bacs->approveMandates($serialNumber)) {
                         $this->addFlash(
                             'success',
@@ -754,19 +870,9 @@ class AdminController extends BaseController
             }
         }
 
-        return [
+        $data = [
             'year' => $year,
             'month' => $month,
-            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
-            'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
-            'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
-            'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
-            'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
-            'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
-            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
-            'payments' => $paymentsRepo->findPayments($date),
-            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
-            'indemnity' => $paymentsIndemnityRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'uploadDebitForm' => $uploadDebitForm->createView(),
             'uploadCreditForm' => $uploadCreditForm->createView(),
@@ -775,7 +881,28 @@ class AdminController extends BaseController
             'approvePaymentsForm' => $approvePaymentsForm->createView(),
             'currentSequence' => $currentSequence,
             'outstandingMandates' => $userRepo->findPendingMandates()->getQuery()->execute()->count(),
+            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
+            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
+            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
         ];
+
+        if ($request->get('_route') == 'admin_bacs_payments') {
+            $data = array_merge($data, [
+                'indemnity' => $paymentsIndemnityRepo->findPayments($date),
+                'payments' => $paymentsRepo->findPayments($date),
+            ]);
+        } elseif ($request->get('_route') == 'admin_bacs_reports') {
+            $data = array_merge($data, [
+                'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
+                'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
+                'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
+                'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
+                'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+                'withdrawal' => $s3FileRepo->getAllFiles($date, 'bacsReportWithdrawal'),
+            ]);
+        }
+
+        return $data;
     }
 
     /**
@@ -833,16 +960,26 @@ class AdminController extends BaseController
      */
     public function bacsFileAction($serial)
     {
+        $paymentMethods = [];
+
         $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policies = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => (string) $serial]);
+        foreach ($policies as $policy) {
+            /** @var Policy $policy */
+            $bankAccount = $policy->getBacsBankAccount();
+            if ($bankAccount) {
+                $paymentMethods[] = $bankAccount->toDetailsArray();
+            }
+        }
+
         $repo = $dm->getRepository(User::class);
         $users = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => (string) $serial]);
-        $paymentMethods = [];
         foreach ($users as $user) {
             /** @var User $user */
-            /** @var BacsPaymentMethod $bacs */
-            $bacs = $user->getPaymentMethod();
-            if ($bacs->getBankAccount()) {
-                $paymentMethods[] = $bacs->getBankAccount()->toDetailsArray();
+            $bankAccount = $user->getBacsBankAccount();
+            if ($bankAccount) {
+                $paymentMethods[] = $bankAccount->toDetailsArray();
             }
         }
 
@@ -853,6 +990,7 @@ class AdminController extends BaseController
      * @Route("/bacs/file/submit/{id}", name="admin_bacs_submit")
      * @Route("/bacs/file/cancel/{id}", name="admin_bacs_cancel")
      * @Route("/bacs/file/serial/{id}", name="admin_bacs_update_serial_number")
+     * @Route("/bacs/file/meta/{id}", name="admin_bacs_update_meta")
      * @Method({"POST"})
      */
     public function bacsEditFileAction(Request $request, $id)
@@ -879,8 +1017,32 @@ class AdminController extends BaseController
                     $file->getFileName()
                 );
             } elseif ($request->get('_route') == 'admin_bacs_update_serial_number') {
-                $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
-                $message = sprintf('Bacs file %s serial number updated', $file->getFileName());
+                try {
+                    $count = $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
+                    $message = sprintf(
+                        'Bacs file %s serial number updated (%d payments updated)',
+                        $file->getFileName(),
+                        $count
+                    );
+                } catch (ValidationException $e) {
+                    $this->addFlash('error', $e->getMessage());
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs'));
+                }
+            } elseif ($request->get('_route') == 'admin_bacs_update_meta') {
+                $debit = $request->get('debit');
+                $credit = $request->get('credit');
+                if ($debit) {
+                    $metadata = $file->getMetadata();
+                    $metadata['debit-amount'] = $debit;
+                    $file->setMetadata($metadata);
+                }
+                if ($credit) {
+                    $metadata = $file->getMetadata();
+                    $metadata['credit-amount'] = $credit;
+                    $file->setMetadata($metadata);
+                }
+                $message = 'Updated metadata';
             } else {
                 throw new \Exception('Unknown route');
             }
@@ -1155,9 +1317,13 @@ class AdminController extends BaseController
     private function getYMD($year, $month, $daysInNextMonth = 3)
     {
         $ymd = [];
+        $bacs = [];
         $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $ymd[$day] = sprintf('%d%02d%02d', $year, $month, $day);
+            $date = \DateTime::createFromFormat('Ymd', $ymd[$day]);
+            $reversed = $this->subBusinessDays($date, BacsPayment::DAYS_CREDIT);
+            $bacs[$day] = $reversed->format('Ymd');
         }
 
         $nextMonth = $month + 1;
@@ -1177,6 +1343,7 @@ class AdminController extends BaseController
             'ym' => sprintf('%d%02d', $year, $month),
             'ymd' => $ymd,
             'next_ymd' => $nextMonthYMD,
+            'bacs' => $bacs,
         ];
     }
 
@@ -1250,6 +1417,11 @@ class AdminController extends BaseController
             ),
             'dailyDebitBacsTransaction' => Payment::dailyPayments(
                 $extraDebitPayments,
+                $isProd,
+                BacsPayment::class
+            ),
+            'dailyBacsTransaction' => Payment::dailyPayments(
+                $payments,
                 $isProd,
                 BacsPayment::class
             ),
@@ -1393,6 +1565,7 @@ class AdminController extends BaseController
             'dailyProcessed' => $monthlyPerDayLloydsProcessing,
             'dailyCreditBacs' => $monthlyPerDayLloydsCreditBacs,
             'dailyDebitBacs' => $monthlyPerDayLloydsDebitBacs,
+            'dailyBacs' => $monthlyPerDayLloydsBacs,
             'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
             'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
             'monthlyBacs' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsBacs, $year, $month),
@@ -1815,22 +1988,36 @@ class AdminController extends BaseController
                 throw $this->createNotFoundException(sprintf('Policy %s not found', $request->get('id')));
             }
 
-            $pattern = '*' . $policy->getId() . '*';
+            if ($request->request->has('flag-redis-policy')) {
+                $redis->sadd('policy:validation:flags', $policy->getId());
 
-            foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
-                $redis->zrem('policy:validation', $member);
+                $this->addFlash('success', sprintf(
+                    'Flagged policy %s',
+                    $policy->getPolicyNumber()
+                ));
             }
 
-            $this->addFlash('success', sprintf(
-                'Policy %s removed from redis',
-                $policy->getPolicyNumber()
-            ));
-            
+            if ($request->request->has('delete-redis-policy')) {
+                $pattern = '*' . $policy->getId() . '*';
+
+                foreach (new SortedSetKey($redis, 'policy:validation', $pattern) as $member => $rank) {
+                    $redis->zrem('policy:validation', $member);
+                }
+
+                $redis->srem('policy:validation:flags', $policy->getId());
+
+                $this->addFlash('success', sprintf(
+                    'Policy %s removed from redis',
+                    $policy->getPolicyNumber()
+                ));
+            }
+
             return $this->redirectToRoute('admin_policy_validation');
         }
 
         return [
             'validation' => $redis->zrange('policy:validation', 0, -1),
+            'flags' => $redis->smembers('policy:validation:flags'),
         ];
     }
 }

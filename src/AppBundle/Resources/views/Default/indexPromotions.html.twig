@@ -11,11 +11,16 @@
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    {% if page_type == 'vdayphonecase' %}
+        <link rel="stylesheet" href="{{ asset('css-js/homepage-vday.css') }}">
+    {% endif %}
 {% endblock %}
 
 {% block body %}
 
-    <div class="snow"></div>
+    {% if page_type == 'vdayphonecase' %}
+        <div class="snow"></div>
+    {% endif %}
 
     <section class="hero">
         <div class="container container-xtra">
@@ -23,8 +28,8 @@
                 <div class="col-lg-6">
                     <div class="hero__intro">
                         {% if page_type == 'tastecard' %}
-                            <h1 class="mb-4 text-white">soo-yummy <br><span class="sub">FREE tastecard worth &pound;79.99</span></h1>
-                            <h4 class="text-zaffre">Get a FREE tastecard this when you buy a policy and share with 5 friends</h4>
+                            <h1 class="mb-4 text-white">soo-yummy <br><span class="sub">FREE tastecard membership worth &pound;79.99</span></h1>
+                            <h4 class="text-zaffre">Get a FREE tastecard membership when you buy a policy and share with 5 friends</h4>
                             <p class="mb-4 text-white">
                                 So what are you waiting for, get your mobile protected!<br>
                                 <a href="#"
@@ -36,6 +41,17 @@
                         {% elseif page_type == 'phonecase' %}
                             <h1 class="mb-4 text-white">Double Protection <br><span class="sub">for your Mobile </span></h1>
                             <h4 class="text-zaffre">We're giving away FREE cases of your choice worth &pound;19 from our partners at <a href="https://www.layercase.co.uk/" target="_blank" rel="noopener noreferrer" class="text-zaffre h4"><u>LayerCase</u></a>. Hurry while stock lasts!</h4>
+                            <p class="mb-4 text-white">
+                                <a href="#"
+                                   class="text-white"
+                                   data-toggle="modal"
+                                   data-target="#page_terms"
+                                   role="button"><small><u>Terms &amp; Conditions</u></small>
+                                </a>
+                           </p>
+                        {% elseif page_type == 'vdayphonecase' %}
+                            <h1 class="mb-4 text-white fit">Protect the one you love <br><span class="sub">this Valentines Day </span></h1>
+                            <h4 class="text-zaffre">Love is in the air, so we're giving away FREE phone cases worth &pound;19 from our partners at <a href="https://www.layercase.co.uk/" target="_blank" rel="noopener noreferrer" class="text-zaffre h4"><u>LayerCase</u></a>. Hurry while stock lasts!</h4>
                             <p class="mb-4 text-white">
                                 <a href="#"
                                    class="text-white"
@@ -65,12 +81,20 @@
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                        {% if page_type == 'vdayphonecase' %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-vday.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
             </div>
             <div class="hero__illustration  d-block d-lg-none">
-                <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
+                {% if page_type == 'vdayphonecase' %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-vday-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                {% endif %}
             </div>
         </div>
     </section>
@@ -78,17 +102,17 @@
     <section class="cred">
         <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
             {% if page_type == 'tastecard' %}
-                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-frankie-and-bennys.png" alt="Frankie &amp; Bennys">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-zizzi.png" alt="Zizzi">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-strada.png" alt="Strada">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-giraffe.png" alt="giraffe">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-bella-italia.png" alt="Bella Italia">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-frankie-and-bennys.png" alt="Frankie &amp; Bennys" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-zizzi.png" alt="Zizzi" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-strada.png" alt="Strada" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-giraffe.png" alt="giraffe" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-bella-italia.png" alt="Bella Italia" class="lozad">
             {% else %}
-                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian">
-                <img src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian" class="lozad">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times" class="lozad">
             {% endif %}
         </div>
     </section>
@@ -98,17 +122,17 @@
             <div class="row">
                 {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
                     <h5 class="text-primary">24-72 hour replace or repair</h5>
                     <p class="mb-5">We aim to replace or repair your phone within 24-72 hours after your claim is approved</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper"width="180px">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="180px" class="lozad">
                     <h5 class="text-primary">Up to 80% money back</h5>
                     <p class="mb-5">Connect with friends and get rewarded when you and your connections don't claim</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px" class="lozad">
                     <h5 class="text-primary">Low excess from just &pound;50</h5>
                     <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess</p>
                 </div>
@@ -130,31 +154,31 @@
                     <div class="text-center text-lg-left">
                         <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
                         <p class="mb-4">We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!</p>
-                        <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
+                        <a href="{{ path('social_insurance') }}" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works"width="180px">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
                             <h5 class="cardbox__title text-dodger-blue">How it works</h5>
                             <div class="cardbox__text">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</div>
                         </div>
                     </div>
                     <div class="d-block d-lg-none text-center">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works"width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
                         <h5 class="text-primary">How it works</h5>
                         <p class="mb-5">If you and your friends take good care of your phones and don't need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</p>
                     </div>
                     <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - be careful" width="180px">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
                             <h5 class="cardbox__title text-dodger-blue">Be careful</h5>
                             <div class="cardbox__text">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</div>
                         </div>
                     </div>
                     <div class="d-block d-lg-none text-center">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
                         <h5 class="text-primary">Connect</h5>
                         <p class="mb-5">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</p>
                     </div>
@@ -162,25 +186,25 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
                             <h5 class="cardbox__title text-dodger-blue">Connect</h5>
                             <div class="cardbox__text">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</div>
                         </div>
                     </div>
                     <div class="d-block d-lg-none text-center">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - be careful" width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
                         <h5 class="text-primary">Be careful</h5>
                         <p class="mb-5">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</p>
                     </div>
                     <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
                         <div class="cardbox__body">
-                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
                             <h5 class="cardbox__title text-dodger-blue">Get rewarded</h5>
                             <div class="cardbox__text">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</div>
                         </div>
                     </div>
                     <div class="d-block d-lg-none text-center">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
                         <h5 class="text-primary">Get rewarded</h5>
                         <p class="mb-5">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</p>
                     </div>
@@ -196,7 +220,7 @@
         <div class="container py-5">
             <div class="d-lg-flex align-items-lg-center">
                 <div class="banner__image">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="so-sure - how it works"width="250px">
+                    <img data- src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="so-sure - how it works" width="250px" class="lozad">
                 </div>
                 <div class="banner__text ml-lg-4">
                     <h2 class="text-white">Home Insurance Coming 2019</h2>
@@ -231,7 +255,7 @@
         <div class="container container-xtra">
             <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
                 <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline" alt="so-sure App Icon" class="lozad">
                     <div class="banner__text text-center text-lg-left ml-lg-4">
                         <h4 class="text-white">Mobile insurance designed for you</h4>
                         <p class="lead text-white">Cover your phone in minutes </p>
@@ -285,6 +309,10 @@
                         <h5>Terms and conditions</h5>
                         <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</p>
                         <p>Promotion valid from 8th January 2019 until 31st February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
+                    {% elseif page_type == 'vdayphonecase' %}
+                        <h5>Terms and conditions</h5>
+                        <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>
+                        <p>Promotion valid from 23rd January 2019 until 15th February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
                     {% endif %}
                 </div>
             </div>
@@ -294,5 +322,8 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>å
+    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    {% if page_type == 'vdayphonecase' %}
+        <script src="{{ asset('css-js/homepage-vday.js') }}"></script>
+    {% endif %}
 {% endblock %}

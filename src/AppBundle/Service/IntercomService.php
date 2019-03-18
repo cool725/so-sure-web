@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhoneTrait;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\UserRepository;
 use GuzzleHttp\Exception\ClientException;
@@ -28,6 +30,8 @@ use Symfony\Component\Routing\RouterInterface;
 class IntercomService
 {
     use CurrencyTrait;
+    use PhoneTrait;
+    use DateTrait;
 
     const MAX_SCROLL_RECORDS = 50000;
 
@@ -100,23 +104,33 @@ class IntercomService
     protected $secure;
     protected $secureAndroid;
     protected $secureIOS;
+    protected $dpaAppAdminId;
 
     /** @var MailerService */
     protected $mailer;
 
-    /** @var RouterInterface */
+    /** @var RouterService */
     protected $router;
 
+    /** @var SanctionsService */
+    protected $sanctions;
+
+    /** @var RateLimitService */
+    protected $rateLimit;
+
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param string          $token
-     * @param Client          $redis
-     * @param string          $secure
-     * @param string          $secureAndroid
-     * @param string          $secureIOS
-     * @param MailerService   $mailer
-     * @param RouterInterface $router
+     * @param DocumentManager  $dm
+     * @param LoggerInterface  $logger
+     * @param string           $token
+     * @param Client           $redis
+     * @param string           $secure
+     * @param string           $secureAndroid
+     * @param string           $secureIOS
+     * @param MailerService    $mailer
+     * @param RouterService    $router
+     * @param string           $dpaAppAdminId
+     * @param SanctionsService $sanctions
+     * @param RateLimitService $rateLimitService
      */
     public function __construct(
         DocumentManager $dm,
@@ -127,7 +141,10 @@ class IntercomService
         $secureAndroid,
         $secureIOS,
         MailerService $mailer,
-        RouterInterface $router
+        RouterService $router,
+        $dpaAppAdminId,
+        SanctionsService $sanctions,
+        RateLimitService $rateLimitService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -138,6 +155,9 @@ class IntercomService
         $this->secureIOS = $secureIOS;
         $this->mailer = $mailer;
         $this->router = $router;
+        $this->dpaAppAdminId = $dpaAppAdminId;
+        $this->sanctions = $sanctions;
+        $this->rateLimit = $rateLimitService;
     }
 
     private function storeRateLimit()
@@ -231,6 +251,7 @@ class IntercomService
 
         try {
             $this->checkRateLimit();
+            // INTERCOM QUERY - DO NOT USE emailCanonical!
             $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
             $this->storeRateLimit();
 
@@ -257,8 +278,10 @@ class IntercomService
         try {
             $this->checkRateLimit();
             if ($useIntercomId) {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getIntercomId());
             } else {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUsers(['email' => $user->getEmailCanonical()]);
             }
             $this->storeRateLimit();
@@ -287,8 +310,10 @@ class IntercomService
         try {
             $this->checkRateLimit();
             if ($useIntercomId) {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getIntercomId());
             } else {
+                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getEmail());
             }
             $this->storeRateLimit();
@@ -305,21 +330,35 @@ class IntercomService
         }
     }
 
-    public function convertLead(User $user)
+    public function convertLead(User $user, $useIntercomId = false)
     {
         $results = [];
         if (!$user->hasEmail()) {
             return $results;
         }
         $this->checkRateLimit();
-        $resp = $this->client->leads->getLeads(['emailCanonical' => $user->getEmailCanonical()]);
+        if ($useIntercomId) {
+            $resp = $this->client->leads->getLead($user->getIntercomUserIdOrId());
+        } else {
+            // INTERCOM QUERY - DO NOT USE emailCanonical!
+            $resp = $this->client->leads->getLeads(['email' => $user->getEmailCanonical()]);
+        }
         $this->storeRateLimit();
 
         $results[] = $resp;
         foreach ($resp->contacts as $lead) {
+            if (mb_strtolower($lead->email) != $user->getEmailCanonical()) {
+                throw new \Exception(sprintf(
+                    'Lead %s/%s does not match user email %s / %s',
+                    $lead->email,
+                    $lead->id,
+                    $user->getEmail(),
+                    $user->getIntercomUserIdOrId()
+                ));
+            }
             $data = [
               "contact" => array("id" => $lead->id),
-              "user" => array("user_id" => $user->getId()),
+              "user" => array("user_id" => $user->getIntercomUserIdOrId()),
             ];
 
             $this->checkRateLimit();
@@ -329,13 +368,13 @@ class IntercomService
                 if ($e->getCode() == 404) {
                     $this->logger->debug(sprintf(
                         'Unable to convert Intercom lead (userid %s) %s (404)',
-                        $user->getId(),
+                        $user->getIntercomUserIdOrId(),
                         json_encode($resp)
                     ));
                 } else {
                     $this->logger->error(sprintf(
                         'Unable to convert Intercom lead (userid %s) %s (%s)',
-                        $user->getId(),
+                        $user->getIntercomUserIdOrId(),
                         json_encode($resp),
                         $e->getCode()
                     ));
@@ -345,16 +384,46 @@ class IntercomService
             }
             $this->storeRateLimit();
 
-            $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
+            $this->logger->debug(sprintf(
+                'Intercom convert lead (userid %s) %s',
+                $user->getIntercomUserIdOrId(),
+                json_encode($resp)
+            ));
             $results[] = $resp;
         }
 
         return $results;
     }
 
+    public function resetIntercomUserId(User $user)
+    {
+        $id = new \MongoId();
+        $user->setIntercomUserId($id->serialize());
+        $this->dm->flush();
+    }
+
+    public function resetIntercomUserIdForLead(Lead $lead)
+    {
+        $id = new \MongoId();
+        $lead->setIntercomUserId($id->serialize());
+        $this->dm->flush();
+    }
+
+    public function resetIntercomId(User $user)
+    {
+        $user->setIntercomId(null);
+        $this->dm->flush();
+    }
+
+    public function resetIntercomIdForLead(Lead $lead)
+    {
+        $lead->setIntercomId(null);
+        $this->dm->flush();
+    }
+
     public function getApiUserHash(User $user = null)
     {
-        if (!$user || !$user->getId()) {
+        if (!$user || !$user->getIntercomUserIdOrId()) {
             return null;
         }
 
@@ -377,8 +446,8 @@ class IntercomService
             throw new \Exception('Unknown secure type');
         }
 
-        if ($user && $user->getId()) {
-            return hash_hmac('sha256', $user->getId(), $secure);
+        if ($user && $user->getIntercomUserIdOrId()) {
+            return hash_hmac('sha256', $user->getIntercomUserIdOrId(), $secure);
         }
 
         return null;
@@ -394,7 +463,7 @@ class IntercomService
             'email' => $user->getEmail(),
             'name' => $user->getName(),
             'signed_up_at' => $user->getCreated()->getTimestamp(),
-            'user_id' => $user->getId(),
+            'user_id' => $user->getIntercomUserIdOrId(),
         );
         if ($user->getIntercomId()) {
             $data['id'] = $user->getIntercomId();
@@ -404,9 +473,9 @@ class IntercomService
         }
 
         $analytics = $user->getAnalytics();
-        $data['custom_attributes']['User url'] = $this->router->generate('admin_user', [
-                'id' => $user->getId()
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
+        $data['custom_attributes']['User url'] = $this->router->generateUrl('admin_user', [
+            'id' => $user->getId()
+        ]);
         $data['custom_attributes']['Premium'] = $this->toTwoDp($analytics['annualPremium']);
         $data['custom_attributes']['Displayable Premium'] = (string) sprintf('%.2f', $analytics['annualPremium']);
         $data['custom_attributes']['Monthly Premium'] = $this->toTwoDp($analytics['monthlyPremium']);
@@ -426,7 +495,6 @@ class IntercomService
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
-        $data['custom_attributes']['Payment Method'] = $analytics['paymentMethod'];
         $data['custom_attributes']['Has Outstanding pic-sure Policy'] = $analytics['hasOutstandingPicSurePolicy'];
         $data['custom_attributes']['Displayable Renewal Monthly Premium'] =
             (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumNoPot']));
@@ -434,18 +502,15 @@ class IntercomService
             $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']);
         $data['custom_attributes']['Displayable Renewal Monthly Premium With Pot'] =
             (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']));
-        $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ?
-            $user->getPaymentMethod()->__toString() :
-            null;
         $data['custom_attributes']['Policy Cancelled And Payment Owed'] = $user->hasPolicyCancelledAndPaymentOwed();
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
         }
         if ($user->getFirstPolicy() && $user->getFirstPolicy()->getPhone()) {
             $data['custom_attributes']['First Policy Learn More'] =
-                $this->router->generate('learn_more_phone', [
+                $this->router->generateUrl('learn_more_phone', [
                     'id' => $user->getFirstPolicy()->getPhone()->getId()
-                ], UrlGeneratorInterface::ABSOLUTE_URL);
+                ]);
         }
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
@@ -468,7 +533,7 @@ class IntercomService
 
         $this->logger->debug(sprintf(
             'Intercom create user (userid %s) %s',
-            $user->getId(),
+            $user->getIntercomUserIdOrId(),
             json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)
         ));
 
@@ -507,7 +572,11 @@ class IntercomService
         $resp = $this->client->leads->create($data);
         $this->storeRateLimit();
 
-        $this->logger->debug(sprintf('Intercom create lead (userid %s) %s', $lead->getId(), json_encode($resp)));
+        $this->logger->debug(sprintf(
+            'Intercom create lead (userid %s) %s',
+            $lead->getIntercomUserIdOrId(),
+            json_encode($resp)
+        ));
 
         $lead->setIntercomId($resp->id);
         $this->dm->flush();
@@ -625,7 +694,7 @@ class IntercomService
         $data['event_name'] = $event;
         $data['created_at'] = $date->getTimestamp();
         $data['id'] = $user->getIntercomId();
-        $data['user_id'] = $user->getId();
+        $data['user_id'] = $user->getIntercomUserIdOrId();
 
         $this->checkRateLimit();
         $resp = $this->client->events->create($data);
@@ -643,11 +712,11 @@ class IntercomService
         if ($user) {
             $data['from']['type'] = 'user';
             $data['from']['id'] = $user->getIntercomId();
-            $data['from']['user_id'] = $user->getId();
+            $data['from']['user_id'] = $user->getIntercomUserIdOrId();
         } elseif ($lead) {
             $data['from']['type'] = 'contact';
             $data['from']['id'] = $lead->getIntercomId();
-            $data['from']['user_id'] = $lead->getId();
+            $data['from']['user_id'] = $lead->getIntercomUserIdOrId();
         }
 
         $this->checkRateLimit();
@@ -718,7 +787,7 @@ class IntercomService
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
 
-                    $this->deleteUser($data['additional']['intercomId']);
+                    $this->deleteUser($data['additional']['intercomId'], true);
                 } elseif ($action == self::QUEUE_LEAD_DELETE) {
                     if (!isset($data['additional']) || !isset($data['additional']['intercomId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -905,22 +974,26 @@ class IntercomService
     private function findLead($email)
     {
         $repo = $this->dm->getRepository(Lead::class);
-        $lead = $repo->findOneBy(['email' => mb_strtolower($email)]);
+        $lead = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $lead;
     }
 
-    private function deleteUser($id)
+    private function deleteUser($id, $permanent = false)
     {
         try {
             $this->checkRateLimit();
-            $this->client->users->deleteUser($id);
+            if ($permanent) {
+                $this->client->users->permanentlyDeleteUser($id);
+            } else {
+                $this->client->users->deleteUser($id);
+            }
             $this->storeRateLimit();
 
             $this->logger->info(sprintf('Deleted intercom user %s', $id));
         } catch (\Exception $e) {
             $this->logger->info(
-                sprintf('Failed to deleted intercom lead %s. Already deleted?', $id),
+                sprintf('Failed to deleted intercom user %s. Already deleted?', $id),
                 ['exception' => $e]
             );
         }
@@ -1219,6 +1292,22 @@ class IntercomService
         return $output;
     }
 
+    public function destroy(User $user)
+    {
+        $intercomId = $user->getIntercomId();
+        $this->resetIntercomUserId($user);
+        $this->resetIntercomId($user);
+        $this->deleteUser($intercomId, true);
+    }
+
+    public function destroyLead(Lead $lead)
+    {
+        $intercomId = $lead->getIntercomId();
+        $this->resetIntercomUserIdForLead($lead);
+        $this->resetIntercomIdForLead($lead);
+        $this->deleteLead($intercomId);
+    }
+
     public function usersMaintenance()
     {
         /** @var UserRepository $userRepo */
@@ -1331,5 +1420,368 @@ class IntercomService
         $optout->addCategory($category);
         $optout->setEmail($email);
         $this->dm->persist($optout);
+    }
+
+    public function getDpaCard($firstName = null, $lastName = null, $dob = null, $mobile = null, $error = null)
+    {
+        // for init, all values will be null
+        $init = false;
+        $headline = null;
+        $secondaryHeadline = null;
+        $headlineError = false;
+        if ($firstName === null && $lastName === null && $dob === null && $mobile === null) {
+            $init = true;
+            // @codingStandardsIgnoreStart
+            $headline = 'For your security, we just need to confirm a few details before we can access your policy.';
+            $secondaryHeadline = 'Please check your name exactly matches your policy document.';
+            // @codingStandardsIgnoreEnd
+        } elseif (!$this->isValidName($firstName) || !$this->isValidName($lastName) ||
+            !$this->isValidDOB($dob) || !$this->isValidMobile($mobile)) {
+            $headlineError = true;
+            // @codingStandardsIgnoreStart
+            $headline = 'Oh no! Something is wrong with the information you provided… ';
+            $secondaryHeadline = 'Please review your answers and check they are in the correct format and exactly match your policy document.';
+            // @codingStandardsIgnoreEnd
+        } elseif ($error) {
+            $headlineError = true;
+            $headline = $error;
+            // @codingStandardsIgnoreStart
+            $secondaryHeadline = 'Please review your answers and check they are in the correct format and exactly match your policy document.';
+            // @codingStandardsIgnoreEnd
+        }
+
+        $response = [];
+        if ($headline) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'text',
+                'text' => $headline,
+                'style' => $headlineError ? 'error' : 'paragraph',
+            ];
+        }
+
+        if ($secondaryHeadline) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'text',
+                'text' => $secondaryHeadline,
+                'style' => $headlineError ? 'error' : 'paragraph',
+            ];
+        }
+
+        if ($headline || $secondaryHeadline) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'spacer',
+                'size' => 's',
+            ];
+        }
+
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'firstName',
+            'label' => 'First Name',
+            'value' => $firstName,
+            'save_state' => $init || (!$error && $this->isValidName($firstName)) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'lastName',
+            'label' => 'Last Name',
+            'value' => $lastName,
+            'save_state' => $init || (!$error && $this->isValidName($lastName)) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'dob',
+            'label' => 'Date of Birth (dd/mm/yyyy)',
+            'value' => $dob,
+            'save_state' => $init || (!$error && $this->isValidDOB($dob)) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'input',
+            'id' => 'mobile',
+            'label' => 'Mobile Number',
+            'value' => $mobile,
+            'save_state' => $init || (!$error && $this->isValidMobile($mobile)) ? 'unsaved' : 'failed',
+        ];
+        $response['canvas']['content']['components'][] = [
+            'type' => 'button',
+            'id' => 'verify',
+            'style' => 'primary',
+            'label' => 'Verify me',
+            'action' => ['type' => 'submit'],
+        ];
+
+        if ($error) {
+            $response['canvas']['content']['components'][] = [
+                'type' => 'button',
+                'id' => 'manual',
+                'style' => 'link',
+                'label' => 'My details above are correct, but verify me does not work',
+                'action' => ['type' => 'submit'],
+            ];
+        }
+
+        return $response;
+    }
+
+    private function getUserByMobile($mobile)
+    {
+        $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
+        $user = $repo->findOneBy(['mobileNumber' => $this->normalizeUkMobile($mobile)]);
+
+        return $user;
+    }
+
+    /**
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $dob
+     * @param string $mobile
+     * @return User|array TODO: Would be nicer to throw an exception with the array
+     * @throws \Exception
+     */
+    public function getValidatedDpaUser($firstName, $lastName, $dob, $mobile)
+    {
+        if (!$this->isValidName($firstName) || !$this->isValidName($lastName) ||
+            !$this->isValidDOB($dob) || !$this->isValidMobile($mobile)) {
+            return $this->getDpaCard($firstName, $lastName, $dob, $mobile);
+        }
+
+        $user = $this->getUserByMobile($mobile);
+        if (!$user) {
+            return $this->getDpaCard(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                'Unfortunately, we are unable to locate your details in our system…'
+            );
+        }
+
+        // To avoid minor issues with typos or misspellings, if name is very close, the accept it
+        if ($this->sanctions->getMinLevenshteinDoupleMetaphoneString($firstName, $user->getFirstName()) == 0) {
+            $firstName = $user->getFirstName();
+        }
+
+        // To avoid minor issues with typos or misspellings, if name is very close, the accept it
+        if ($this->sanctions->getMinLevenshteinDoupleMetaphoneString($lastName, $user->getLastName()) == 0) {
+            $lastName = $user->getLastName();
+        }
+
+        $validate = $user->validateDpa($firstName, $lastName, $dob, $mobile);
+
+        if ($validate == User::DPA_VALIDATION_NOT_VALID) {
+            return $this->getDpaCard($firstName, $lastName, $dob, $mobile);
+        } elseif (in_array($validate, [
+            User::DPA_VALIDATION_FAIL_MOBILE,
+            User::DPA_VALIDATION_FAIL_FIRSTNAME,
+            User::DPA_VALIDATION_FAIL_LASTNAME,
+            User::DPA_VALIDATION_FAIL_DOB,
+        ])) {
+            return $this->getDpaCard(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                'Unfortunately, we were unable to validate your details.'
+            );
+        }
+
+        // failsafe in case we add a new case and missed above
+        if ($validate != User::DPA_VALIDATION_VALID) {
+            throw new \Exception(sprintf('Validate returned %s, not expected validation', $validate));
+        }
+
+        return $user;
+    }
+
+    public function getAdminIdForConversationId($conversationId)
+    {
+        $conversation = $this->client->conversations->getConversation($conversationId);
+
+        return $this->getAdminIdForConversation($conversation);
+    }
+
+    public function getAdminIdForConversation($conversation)
+    {
+        $adminId = $conversation->assignee->id;
+        $admin = $this->client->admins->getAdmin($adminId);
+        if ($admin->type != 'admin') {
+            $adminId = null;
+        }
+
+        if (!$adminId) {
+            $adminId = $this->dpaAppAdminId;
+        }
+
+        return $adminId;
+    }
+
+    public function getUserIdForConversationId($conversationId)
+    {
+        $conversation = $this->client->conversations->getConversation($conversationId);
+
+        return $this->getUserIdForConversation($conversation);
+    }
+
+    public function getUserIdForConversation($conversation)
+    {
+        return $conversation->user->id;
+    }
+
+    private function getSearchUserUrl($firstName, $lastName, $dob, $mobile)
+    {
+        $searchUrl = $this->router->generateUrl('admin_users', [
+            'user_search[firstname]' => $firstName,
+            'user_search[lastname]' => $lastName,
+            'user_search[mobile]' => $mobile,
+            'user_search[dob]' => $dob,
+        ]);
+
+        return $searchUrl;
+    }
+
+    public function sendSearchUserNote($firstName, $lastName, $dob, $mobile, $conversationId, $prefix, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $searchUrl = $this->getSearchUserUrl($firstName, $lastName, $dob, $mobile);
+
+        $this->addNote(
+            $conversationId,
+            sprintf('%s <a href="%s">Search using provided details</a>', $prefix, $searchUrl),
+            $adminId
+        );
+
+        $this->unsnooze($conversationId, $adminId);
+    }
+
+    public function validateDpa($firstName, $lastName, $dob, $mobile, $conversationId)
+    {
+        $conversation = $this->client->conversations->getConversation($conversationId);
+        $adminId = $this->getAdminIdForConversation($conversation);
+        $userId = $this->getUserIdForConversation($conversation);
+
+        if (!$this->rateLimit->allowedByUserId($userId, RateLimitService::DEVICE_TYPE_INTERCOM_DPA)) {
+            $this->sendReply(
+                $conversationId,
+                'Sorry, we were unable to validate your DPA, but one of the team will get back to you soon.',
+                $adminId
+            );
+
+            $this->sendSearchUserNote(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                $conversationId,
+                'Too many search attempts.',
+                $adminId
+            );
+
+            return $this->canvasText(
+                'DPA Completed (unsuccessfully)'
+            );
+        }
+
+        $user = $this->getValidatedDpaUser($firstName, $lastName, $dob, $mobile);
+        if (!$user instanceof User) {
+            // user was not validated; should be a card with returned as user
+            return $user;
+        }
+
+        $userLink = $this->router->generateUrl('admin_user', ['id' => $user->getId()]);
+
+        $this->addNote(
+            $conversationId,
+            sprintf('DPA successfully confirmed for user <a href="%s">%s</a>', $userLink, $user->getName()),
+            $adminId
+        );
+
+        $this->unsnooze($conversationId, $adminId);
+
+        // @codingStandardsIgnoreStart
+        $this->sendReply(
+            $conversationId,
+            'Thanks for confirming your identity. We will look into your request as soon as possible and respond via this chat or email.',
+            $adminId
+        );
+        // @codingStandardsIgnoreEnd
+
+        return $this->canvasText('DPA Completed');
+    }
+
+    public function sendReply($conversationId, $text, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'type' => 'admin',
+            'message_type' => 'comment',
+            'admin_id' => $adminId,
+            'body' => $text,
+        ]);
+    }
+
+    public function addNote($conversationId, $text, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'type' => 'admin',
+            'message_type' => 'note',
+            'admin_id' => $adminId,
+            'body' => $text,
+        ]);
+    }
+
+    public function unsnooze($conversationId, $adminId = null)
+    {
+        if (!$adminId) {
+            $adminId = $this->getAdminIdForConversationId($conversationId);
+        }
+
+        $this->client->conversations->replyToConversation($conversationId, [
+            'message_type' => 'open',
+            'admin_id' => $adminId,
+        ]);
+    }
+
+    public function canvasText($text, $align = 'left')
+    {
+        return [
+            'canvas' => [
+                'content' => [
+                    'components' => [
+                        [
+                            'type' => 'text',
+                            'text' => $text,
+                            'align' => $align,
+                        ],
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    private function isValidName($name)
+    {
+        return mb_strlen(trim($name)) > 0;
+    }
+
+    private function isValidDOB($dob)
+    {
+        return $this->isValidDate($dob);
+    }
+
+    private function isValidMobile($mobile)
+    {
+        return $this->isValidUkMobile($mobile);
     }
 }

@@ -84,6 +84,8 @@ class PurchaseStepPaymentType extends AbstractType
                             'class' => '',
                         ],
                     ]);
+                } else {
+                    throw new \Exception("No payment amounts are allowed for this user.");
                 }
             } else {
                 $form->add('amount', TextType::class, [
@@ -93,9 +95,6 @@ class PurchaseStepPaymentType extends AbstractType
                         'placeholder' => 'Select phone above'],
                         'disabled' => true
                 ]);
-            }
-            if ($purchase->getUser()->hasValidPaymentMethod()) {
-                $form->add('existing', SubmitType::class);
             }
         });
     }

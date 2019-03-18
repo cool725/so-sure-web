@@ -1,0 +1,54 @@
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{% set body_class = 'admin-manualAffiliate' %}
+
+{% block title %}so-sure - Optimise CSV Processor{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            <h1 class="h2">Manual Affiliate Processing</h1>
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    {{ form_start(upload_form) }}
+                        {{ form_widget(upload_form.file) }}
+                        {{ form_widget(upload_form.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-primary btn-square'}}) }}
+                    {{ form_end(upload_form) }}
+                </div>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr><td>Input File</td><td>Output File</td><td>Processing Date</td></tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files|reverse %}
+                            <tr>
+                                <td>
+                                    <a href="{{ s3DownloadLink(file.bucket, file.key, file.metadata['title'])}}">
+                                        {{ file.metadata['title'] }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ s3DownloadLink(file.processed.bucket, file.processed.key, 'processed-' ~ file.metadata['title'])}}">
+                                        processed-{{ file.metadata['title'] }}
+                                    </a>
+                                </td>
+                                <td>{{ file.date|date('d-m-Y H:i') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/confirm-modal.js') }}"></script>
+{% endblock %}

@@ -4,7 +4,9 @@ namespace AppBundle\Tests\Listener;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Service\BacsService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,6 +46,8 @@ class RefundListenerTest extends WebTestCase
     protected static $judopayService;
     protected static $redis;
     protected static $logger;
+    /** @var BacsService */
+    protected static $bacsService;
 
     public static function setUpBeforeClass()
     {
@@ -65,6 +69,9 @@ class RefundListenerTest extends WebTestCase
         self::$redis = self::$container->get('snc_redis.default');
         self::$judopayService = self::$container->get('app.judopay');
         self::$logger = self::$container->get('logger');
+        /** @var BacsService $bacsService */
+        $bacsService = self::$container->get('app.bacs');
+        self::$bacsService = $bacsService;
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -85,7 +92,13 @@ class RefundListenerTest extends WebTestCase
 
         $this->assertFalse($policy->isPolicy());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
     }
 
@@ -104,7 +117,13 @@ class RefundListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
     }
 
@@ -145,7 +164,13 @@ class RefundListenerTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
         static::$dm->flush();
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -199,7 +224,13 @@ class RefundListenerTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
         static::$dm->flush();
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -252,7 +283,13 @@ class RefundListenerTest extends WebTestCase
         $policy->setEnd(\DateTime::createFromFormat('U', time()));
         static::$dm->flush();
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -298,32 +335,19 @@ class RefundListenerTest extends WebTestCase
         static::$dm->flush();
 
         $now = \DateTime::createFromFormat('U', time());
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
         $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
-        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
-
-        $total = Payment::sumPayments($policy->getPayments(), false);
-        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-
-        // bacs initial, bacs refund for cancellation
-        $this->assertEquals(2, count($policy->getPayments()));
-
-        $foundRefund = false;
-        foreach ($policy->getPayments() as $payment) {
-            if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
-                $this->assertEquals($now, $payment->getDate());
-                $this->assertTrue($payment->isManual());
-                $this->assertTrue($payment->isSuccess());
-                $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
-                $foundRefund = true;
-            }
-        }
-        $this->assertTrue($foundRefund);
+        $this->assertTrue($this->areEqualToTwoDp(0 - $scheduledPayment->getAmount(), $totalBacs['total']));
     }
 
     public function testRefundListenerBacsCancelledCooloffYearlyNonManual()
@@ -354,32 +378,19 @@ class RefundListenerTest extends WebTestCase
         static::$dm->flush();
 
         $now = \DateTime::createFromFormat('U', time());
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $scheduledPayment = $updatedPolicy->getNextScheduledPayment();
         $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
-        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
-
-        $total = Payment::sumPayments($policy->getPayments(), false);
-        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-
-        // bacs initial, bacs refund for cancellation
-        $this->assertEquals(2, count($policy->getPayments()));
-
-        $foundRefund = false;
-        foreach ($policy->getPayments() as $payment) {
-            if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
-                $this->assertEquals($now, $payment->getDate());
-                $this->assertNull($payment->isManual());
-                $this->assertTrue($payment->isSuccess());
-                $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
-                $foundRefund = true;
-            }
-        }
-        $this->assertTrue($foundRefund);
+        $this->assertTrue($this->areEqualToTwoDp(0 - $scheduledPayment->getAmount(), $totalBacs['total']));
     }
 
     public function testRefundFreeNovPromo()
@@ -400,7 +411,13 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
         $this->assertEquals(Policy::PROMO_FREE_NOV, $policy->getPromoCode());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->refundFreeMonthPromo(new PolicyEvent($policy));
     }
 
@@ -422,7 +439,13 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($policy->isValidPolicy());
         $this->assertEquals(Policy::PROMO_FREE_DEC_2016, $policy->getPromoCode());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->refundFreeMonthPromo(new PolicyEvent($policy));
     }
 
@@ -469,7 +492,13 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($renewalPolicy->isRefundAllowed());
         $this->assertTrue($renewalPolicy->hasPolicyDiscountPresent());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($renewalPolicy, new \DateTime('2017-01-01')));
 
         $this->assertNotNull($renewalPolicy->getCashback());
@@ -530,7 +559,13 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($renewalPolicy->isRefundAllowed());
         $this->assertTrue($renewalPolicy->hasPolicyDiscountPresent());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($renewalPolicy, new \DateTime('2017-01-20')));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -616,7 +651,13 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($renewalPolicy->isRefundAllowed());
         $this->assertTrue($renewalPolicy->hasPolicyDiscountPresent());
 
-        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener = new RefundListener(
+            static::$dm,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
         $listener->onPolicyCancelledEvent(new PolicyEvent($renewalPolicy, new \DateTime('2017-01-05')));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');

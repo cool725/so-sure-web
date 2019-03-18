@@ -3,7 +3,11 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Annotation\DataChange;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Event\BacsEvent;
+use AppBundle\Event\CardEvent;
+use AppBundle\Event\UserEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Policy;
@@ -25,10 +29,10 @@ class DoctrinePolicyListener extends BaseDoctrineListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        /** @var Policy $document */
-        $document = $eventArgs->getDocument();
-        if ($document instanceof Policy) {
-            if (!$document->isValidPolicy()) {
+        /** @var Policy $policy */
+        $policy = $eventArgs->getDocument();
+        if ($policy instanceof Policy) {
+            if (!$policy->isValidPolicy()) {
                 return;
             }
         }
@@ -38,7 +42,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             Policy::class,
             ['potValue', 'promoPotValue']
         )) {
-            $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_POT);
+            $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED_POT);
         }
 
         if ($this->hasDataChanged(
@@ -47,7 +51,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             ['premium'],
             DataChange::COMPARE_OBJECT_EQUALS
         )) {
-            $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_PREMIUM);
+            $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED_PREMIUM);
         }
 
         if ($this->hasDataChanged(
@@ -56,7 +60,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             ['billing'],
             DataChange::COMPARE_OBJECT_EQUALS
         )) {
-            $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_BILLING);
+            $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED_BILLING);
         }
 
         if ($this->hasDataChanged(
@@ -66,7 +70,54 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             DataChange::COMPARE_EQUAL,
             true
         )) {
-            $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_STATUS, $eventArgs->getOldValue('status'));
+            $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED_STATUS, $eventArgs->getOldValue('status'));
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            Policy::class,
+            ['paymentMethod'],
+            DataChange::COMPARE_BACS
+        )) {
+            /** @var BacsPaymentMethod $paymentMethod */
+            $paymentMethod = $policy->getPaymentMethod();
+
+            // prefer the old bank account data if it exists
+            /** @var BacsPaymentMethod $oldValue */
+            $oldValue = $eventArgs->getOldValue('paymentMethod');
+            if ($oldValue instanceof BacsPaymentMethod && $oldValue->getBankAccount()) {
+                /** @var BacsPaymentMethod $paymentMethod */
+                $paymentMethod = $oldValue;
+            }
+
+            $bankAccount = clone $paymentMethod->getBankAccount();
+            $event = new BacsEvent($bankAccount);
+            $event->setPolicy($policy);
+            $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            Policy::class,
+            ['paymentMethod'],
+            DataChange::COMPARE_JUDO
+        )) {
+            $event = new CardEvent();
+            $event->setPolicy($policy);
+            $this->dispatcher->dispatch(CardEvent::EVENT_UPDATED, $event);
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            Policy::class,
+            ['paymentMethod'],
+            DataChange::COMPARE_PAYMENT_METHOD_CHANGED
+        )) {
+            $oldValue = $eventArgs->getOldValue('paymentMethod');
+
+            $event = new PolicyEvent($policy);
+            $event->setPreviousPaymentMethod($oldValue->getType());
+            $this->dispatcher->dispatch(PolicyEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
         }
     }
 

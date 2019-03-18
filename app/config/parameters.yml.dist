@@ -34,6 +34,9 @@ parameters:
     fb_appid: changeme
     fb_secret: changeme
     fb_pixel_id:
+    fb_business_id:
+    fb_ad_account_id:
+    fb_system_user_access_token:
     fb_og_namespace: 'wearesosure-dev'
     account_kit_secret: changeme
 
@@ -74,6 +77,9 @@ parameters:
     judopay_webtoken:
     judopay_websecret:
     judopay_id:
+
+    checkout_apisecret:
+    checkout_apipublic:
 
     mongodb_db: so-sure
     mongodb_url: mongodb://root:root@localhost
@@ -140,6 +146,8 @@ parameters:
     intercom_secure: ''
     intercom_secure_android: ''
     intercom_secure_ios: ''
+    intercom_dpa_app_secret: ''
+    intercom_dpa_app_admin: ''
 
     accesspay_server: ''
     accesspay_username: ''

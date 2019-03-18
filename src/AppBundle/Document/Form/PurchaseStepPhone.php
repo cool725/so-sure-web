@@ -46,7 +46,6 @@ class PurchaseStepPhone
      * @Assert\Length(min="5", max="32",
      *  minMessage="This doesn't appear to be a valid serial number",
      *  maxMessage="This doesn't appear to be a valid serial number")
-     * @Assert\NotBlank(message="Serial Number is required.")
      */
     protected $serialNumber;
     
@@ -121,6 +120,21 @@ class PurchaseStepPhone
     public function setFileValid($fileValid)
     {
         $this->fileValid = $fileValid;
+    }
+
+    /**
+     * @Assert\IsFalse(message="Serial Number is required.")
+     */
+    public function isApplePhoneWithoutSerialNumber()
+    {
+        if (!$this->getPhone()) {
+            return true;
+        }
+        if (!$this->getPhone()->isApple()) {
+            return false;
+        }
+
+        return mb_strlen(trim($this->getSerialNumber())) == 0;
     }
 
     public function toApiArray()

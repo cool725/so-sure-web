@@ -485,7 +485,7 @@ class BankAccount
         if ($processingDate->format('j') < $this->getNotificationDay()) {
             $maxAllowedDate = $maxAllowedDate->sub(new \DateInterval('P1M'));
         }
-        
+
         $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
         $maxAllowedDate = $this->startOfDay($maxAllowedDate);
         $maxAllowedDay = $maxAllowedDate->format('j');
@@ -592,20 +592,17 @@ class BankAccount
         return $this->addBusinessDays($date, $days);
     }
 
-    public function getFirstPaymentDate(User $user, \DateTime $date = null)
+    public function getFirstPaymentDateForPolicy(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime('now', SoSure::getSoSureTimezone());
+            $date = $this->now(SoSure::getSoSureTimezone());
         }
         $useClosestPaymentDate = false;
         $nextPolicyPaymentDate = null;
-        foreach ($user->getValidPolicies(true) as $policy) {
-            /** @var Policy $policy */
-            if (!$policy->isPolicyPaidToDate($date, false, true)) {
-                $useClosestPaymentDate = true;
-            } else {
-                $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
-            }
+        if (!$policy->isPolicyPaidToDate($date, false, true)) {
+            $useClosestPaymentDate = true;
+        } else {
+            $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
         }
 
         $bacsPaymentDate = $this->getPaymentDate($date);
@@ -646,6 +643,12 @@ class BankAccount
             'bank_address' => $this->getBankAddress() ? $this->getBankAddress()->toApiArray() : null,
             'mandate' => $this->getReference(),
             'mandate_status' => $this->getMandateStatus(),
+            'initial_notification_date' => $this->getInitialNotificationDate() ?
+                $this->getInitialNotificationDate()->format(\DateTime::ATOM) :
+                null,
+            'standard_notification_day' => $this->getStandardNotificationDate() ?
+                $this->getStandardNotificationDate()->format("d") :
+                null
         ];
 
         return $data;

@@ -1,302 +1,101 @@
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        {% set inputTotal = 0 %}
-        {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
-            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-            {% if received_date|date('m') == dates.month %}
-                {% set amount = null %}
-                {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
-                    {% set amount = file.metadata['debit-accepted-value'] %}
-                {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
-                    {% set amount = 0 - file.metadata['credit-accepted-value'] %}
-                {% endif %}
-                {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
-                    {% set amount = amount + file.metadata['debit-rejected-value'] %}
-                {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
-                    {% set amount = amount - file.metadata['credit-rejected-value'] %}
-                {% endif %}
-
-                {% if amount is not null %}
-                    {% set inputTotal = inputTotal + amount %}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-
-        {% set aruddTotal = 0 %}
-        {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
-            {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-            {% if received_date|date('m') == dates.month %}
-                {% for ref,amount in file.metadata['amounts'] %}
-                    {% set amount = 0 - amount %}
-                    {% set aruddTotal = aruddTotal + amount %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-
-        {% set ddicTotal = 0 %}
-        {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-amount'] is defined %}
-            {% set received_date = day(file.metadata['refund-date']) %}
-            {% if received_date|date('m') == dates.month %}
-                {% for ref,amount in file.metadata['refund-details'] %}
-                    {% set amount = 0 - amount %}
-                    {% set ddicTotal = ddicTotal + amount %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-
-        {% set lloyds_total = 0 %}
-        {% for file in lloyds.files %}
-            {% for date,amount in file.dailyBacs %}
-                {% if date[:6] == dates.ym %}
-                    {% set lloyds_total = lloyds_total + amount %}
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-
-        <h3>Overview</h3>
-        <div class="row">
-            <div class="col-md-4">
-                <table class="table table-striped">
-                    <tr>
-                        <th colspan="2">Bacs Reporting</th>
-                    </tr>
-                    <tr>
-                        <td>Input</td>
-                        <td>{{ inputTotal|number_format(2, '.', ',') }}</td>
-                    </tr>
-                    <tr>
-                        <td>Arudd</td>
-                        <td>{{ aruddTotal|number_format(2, '.', ',') }}</td>
-                    </tr>
-                    <tr>
-                        <td>DDIC</td>
-                        <td>{{ ddicTotal|number_format(2, '.', ',') }}</td>
-                    </tr>
-                    {%  set reporting_net = inputTotal + aruddTotal + ddicTotal %}
-                    {%  set lloyds_net = lloyds_total %}
-                    {% if equal_to_two_dp(reporting_net, lloyds_net) %}
-                        {% set color = 'success' %}
-                    {% else %}
-                        {% set color = 'danger' %}
-                    {% endif %}
-                    <tr class="{{ color }}">
-                        <td>Total</td>
-                        <td>{{ reporting_net|number_format(2, '.', ',') }}</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-md-4">
-                <table class="table table-striped">
-                    <tr>
-                        <th colspan="2">Lloyds Export</th>
-                        <th>Diff</th>
-                    </tr>
-                    <tr>
-                        <td>Total</td>
-                        <td>{{ lloyds_total|number_format(2, '.', ',')  }}</td>
-                        <td>{{ (reporting_net -  lloyds_net)|number_format(2, '.', ',')  }}</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="col-md-4">
-                <table class="table table-striped">
-                    <tr>
-                        <th colspan="2">Manual Bacs Payments Expected</th>
-                    </tr>
-                    {% if not equal_to_two_dp(manualBacsPayments.total, 0) %}
-                        {% set color = 'warning' %}
-                    {% else %}
-                            {% set color = '' %}
-                    {% endif %}
-                    <tr class="{{ color }}">
-                        <td>Total</td>
-                        <td>
-                            {{ manualBacsPayments.total|number_format(2, '.', ',') }}
-                        </td>
-                    </tr>
-                </table>
-                <p><strong>Make sure to manually verify if non-zero</strong></p>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
     <div class="col-md-6">
-        <h2>Bacs Input Files</h2>
-        <table class="table">
+        <h3 class="d-flex align-items-center justify-content-between">
+            Bacs Files Summary by date
+        </h3>
+        <table class="table table-striped mb-5">
+            <thead class="thead-light">
             <tr>
-                <th>Serial Number</th>
-                <th>Amount</th>
-                <th>Processing Date</th>
-                <th>Expected Received Date</th>
-                <th>Lloyds</th>
-            </tr>
-            {% set subtotal_all = 0 %}
-            {% set subtotal_found = 0 %}
-            {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
-                {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-                {% if received_date|date('m') == dates.month %}
-                    {% set amount = null %}
-                    {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
-                        {% set amount = file.metadata['debit-accepted-value'] %}
-                    {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
-                        {% set amount = 0 - file.metadata['credit-accepted-value'] %}
-                    {% endif %}
-                    {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
-                        {% set amount = amount + file.metadata['debit-rejected-value'] %}
-                    {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
-                        {% set amount = amount - file.metadata['credit-rejected-value'] %}
-                    {% endif %}
-
-                    {% set foundFileInDate = false %}
-                    {% for lloydsFile in lloyds.files %}
-                        {% for item in lloydsFile.getBacsTransactionsByType('bacs', received_date) %}
-                            {% if equal_to_two_dp(amount, item) %}
-                                {% set foundFileInDate = true %}
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-
-                    {% set subtotal_all = subtotal_all + amount %}
-                    {% if foundFileInDate %}
-                        {% set subtotal_found = subtotal_found + amount %}
-                    {% endif %}
-                    <tr class="{% if amount is null %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
-                        <td><span title="{{ file.key }}">{{ file.metadata['serial-number'] }}</span></td>
-                        <td>{{ amount|default('-') }}</td>
-                        <td>{{ file.metadata['processing-date'] }}</td>
-                        <td>{{ received_date|date('Y-m-d') }}</td>
-                        <td>
-                            {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            {% set color = 'success' %}
-            {% if not equal_to_two_dp(inputTotal, subtotal_all) or not equal_to_two_dp(subtotal_all, subtotal_found) %}
-                {% set color = 'danger' %}
-            {% endif %}
-            <tr class="{{ color }}">
-                <td>Total</td>
-                <td>{{ subtotal_all }}</td>
+                <th>Day of Month</th>
+                <th>Input File</th>
+                <th>Arudd</th>
+                <th>DDIC</th>
                 <td></td>
+                <th>Bacs Subtotal</th>
+                <th>Bank Account</th>
                 <td></td>
-                <td>{{ subtotal_found }}</td>
+                <th>Diff</th>
+                <th>Cumulative Diff</th>
             </tr>
-
-        </table>
-    </div>
-    <div class="col-md-6">
-        <h2>Bacs Arudd Files</h2>
-        <table class="table">
-            <tr>
-                <th>Reference</th>
-                <th>Amount</th>
-                <th>Processing Date</th>
-                <th>Expected Return Date</th>
-                <th>Lloyds</th>
-            </tr>
-            {% set subtotal_all = 0 %}
-            {% set subtotal_found = 0 %}
-            {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
-                {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
-
-                {% if received_date|date('m') == dates.month %}
-                    {% for ref,amount in file.metadata['amounts'] %}
-                        {% set amount = 0 - amount %}
-                        {% set foundFileInDate = false %}
-                        {% for lloydsFile in lloyds.files %}
-                            {% for item in lloydsFile.getBacsTransactionsByType('bacs-arudd', received_date) %}
-                                {% if equal_to_two_dp(amount, item) %}
-                                    {% set foundFileInDate = true %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                        {% set subtotal_all = subtotal_all + amount %}
-                        {% if foundFileInDate %}
-                            {% set subtotal_found = subtotal_found + amount %}
+            </thead>
+            <tbody>
+            {% set cumulative = 0 %}
+            {% for day,ymd in dates.ymd %}
+                {% set input_total = 0 %}
+                {% set files = [] %}
+                {% for file in bacsInputFiles if file.metadata['serial-number'] is defined and file.metadata['processing-date']  is defined %}
+                    {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+                    {% if received_date|date('m') == dates.month and received_date|date('d') == day %}
+                        {% set amount = null %}
+                        {% if file.metadata['debit-accepted-value'] is defined and file.metadata['debit-accepted-value'] > 0 %}
+                            {% set amount = file.metadata['debit-accepted-value'] %}
+                        {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
+                            {% set amount = 0 - file.metadata['credit-accepted-value'] %}
                         {% endif %}
-                        <tr class="{% if amount is null %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
-                            <td><span title="{{ file.key }}">{{ ref }}</span></td>
-                            <td>{{ amount|default('-') }}</td>
-                            <td>{{ file.metadata['processing-date'] }}</td>
-                            <td>{{ received_date|date('Y-m-d') }}</td>
-                            <td>
-                                {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
-            {% set color = 'success' %}
-            {% if not equal_to_two_dp(aruddTotal, subtotal_all) or not equal_to_two_dp(subtotal_all, subtotal_found) %}
-                {% set color = 'danger' %}
-            {% endif %}
-            <tr class="{{ color }}">
-                <td>Total</td>
-                <td>{{ subtotal_all }}</td>
-                <td></td>
-                <td></td>
-                <td>{{ subtotal_found }}</td>
-            </tr>
-
-        </table>
-    </div>
-    <div class="col-md-6">
-        <h2>Bacs DDIC Files</h2>
-        <table class="table">
-            <tr>
-                <th>Reference</th>
-                <th>Amount</th>
-                <th>Processing Date</th>
-                <th>Expected Return Date</th>
-                <th>Lloyds</th>
-            </tr>
-            {% set subtotal_all = 0 %}
-            {% set subtotal_found = 0 %}
-            {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-details'] is defined %}
-                {% set received_date = day(file.metadata['refund-date']) %}
-                {% if received_date|date('m') == dates.month %}
-                    {% for ref,amount in file.metadata['refund-details'] %}
-
-                        {% set amount = 0 - amount %}
-                        {% set foundFileInDate = false %}
-                        {% for lloydsFile in lloyds.files %}
-                            {% for item in lloydsFile.getBacsTransactionsByType('bacs-ddic', received_date) %}
-                                {% if equal_to_two_dp(amount, item) %}
-                                    {% set foundFileInDate = true %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                        {% set subtotal_all = subtotal_all + amount %}
-                        {% if foundFileInDate %}
-                            {% set subtotal_found = subtotal_found + amount %}
+                        {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
+                            {% set amount = amount + file.metadata['debit-rejected-value'] %}
+                        {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
+                            {% set amount = amount - file.metadata['credit-rejected-value'] %}
                         {% endif %}
-                        <tr class="{% if amount is null %}hidden{% elseif foundFileInDate %}bg-success{% else %}bg-danger{% endif %}">
-                            <td><span title="{{ file.key }}">{{ ref }}</span></td>
-                            <td>{{ amount|default('-') }}</td>
-                            <td>{{ file.metadata['refund-date'] }}</td>
-                            <td>{{ received_date|date('Y-m-d') }}</td>
-                            <td>
-                                {% if foundFileInDate %}<i class="fa fa-check"></i>{% else %}-{% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
+                        {% set input_total = input_total + amount %}
+                        {% set files = files|merge([file.metadata['serial-number']]) %}
+                    {% endif %}
+                {% endfor %}
 
-            {% set color = 'success' %}
-            {% if not equal_to_two_dp(ddicTotal, subtotal_all) or not equal_to_two_dp(subtotal_all, subtotal_found) %}
-                {% set color = 'danger' %}
-            {% endif %}
-            <tr class="{{ color }}">
-                <td>Total</td>
-                <td>{{ subtotal_all }}</td>
-                <td></td>
-                <td></td>
-                <td>{{ subtotal_found }}</td>
+                {% set arudd_total = 0 %}
+                {% for file in bacsAruddFiles if file.metadata['processing-date'] is defined and file.metadata['amounts'] is defined %}
+                    {% set received_date = next_business_day_historical(file.metadata['processing-date']) %}
+
+                    {% if received_date|date('m') == dates.month and received_date|date('d') == day  %}
+                        {% for ref,amount in file.metadata['amounts'] %}
+                            {% set amount = 0 - amount %}
+                            {% set arudd_total = arudd_total + amount %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+
+                {% set ddic_total = 0 %}
+                {% for file in bacsDdicFiles if file.metadata['refund-date'] is defined and file.metadata['refund-details'] is defined %}
+                    {% set received_date = day(file.metadata['refund-date']) %}
+                    {% if received_date|date('m') == dates.month  and received_date|date('d') == day  %}
+                        {% for ref,amount in file.metadata['refund-details'] %}
+                            {% set amount = 0 - amount %}
+                            {% set ddic_total = ddic_total + amount %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+
+                {% set subtotal = input_total + arudd_total + ddic_total %}
+                {% set diff = null %}
+                {% set lloyds_day = null %}
+                {% if lloyds.dailyBacs[ymd] is defined %}
+                    {% set lloyds_day = lloyds.dailyBacs[ymd]  %}
+                    {% set diff = subtotal - lloyds.dailyBacs[ymd]  %}
+                    {% set cumulative = cumulative + diff %}
+                {% endif %}
+                {% if equal_to_two_dp(diff, 0) %}
+                    {% set color = 'table-success' %}
+                {% else %}
+                    {% set color = 'table-warning' %}
+                {% endif %}
+                <tr class="{{ color }}">
+                    <td>{{ day }}</td>
+                    <td>{{ input_total|number_format(2, '.', ',') }}</td>
+                    <td>{{ arudd_total|number_format(2, '.', ',') }}</td>
+                    <td>{{ ddic_total|number_format(2, '.', ',') }}</td>
+                    <td></td>
+                    <td>{{ subtotal|number_format(2, '.', ',') }}</td>
+                    <td>{{ lloyds_day |number_format(2, '.', ',')  }}</td>
+                    <td></td>
+                    <td><strong>{{ diff|number_format(2, '.', ',') }}</strong></td>
+                    <td>{{ cumulative|number_format(2, '.', ',')  }}</td>
+                </tr>
+            {% endfor %}
+            <tr class="table-info">
             </tr>
+            </tbody>
         </table>
     </div>
+
+
 </div>

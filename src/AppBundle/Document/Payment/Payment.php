@@ -80,6 +80,8 @@ abstract class Payment
             return 'sosurePotReward';
         } elseif ($this instanceof PolicyDiscountPayment) {
             return 'policyDiscount';
+        } elseif ($this instanceof CheckoutPayment) {
+            return 'checkout';
         } else {
             return null;
         }
@@ -152,6 +154,14 @@ abstract class Payment
     protected $reference;
 
     /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $details;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="payments")
      * @Gedmo\Versioned
      * @var Policy
@@ -175,7 +185,7 @@ abstract class Payment
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ScheduledPayment", inversedBy="payment")
-     * @var ScheduledPayment
+     * @var ScheduledPayment|null
      */
     protected $scheduledPayment;
 
@@ -213,6 +223,13 @@ abstract class Payment
      * @Gedmo\Versioned
      */
     protected $success;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $skipCommissionValidation;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\IdentityLog")
@@ -312,6 +329,16 @@ abstract class Payment
         return $this->ipt;
     }
 
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    public function setDetails($details)
+    {
+        $this->details = $details;
+    }
+
     public function setNotes($notes)
     {
         $this->notes = $notes;
@@ -369,6 +396,31 @@ abstract class Payment
     public function isDiscount()
     {
         return false;
+    }
+
+    public function toString()
+    {
+        return $this->__toString();
+    }
+
+    public function getSkipCommissionValidation()
+    {
+        return $this->skipCommissionValidation;
+    }
+
+    public function setSkipCommissionValidation($skipCommissionValidation)
+    {
+        $this->skipCommissionValidation = $skipCommissionValidation;
+    }
+
+    public function __toString()
+    {
+        return sprintf(
+            '£%0.2f on %s (%s)',
+            $this->getAmount(),
+            $this->getDate()->format('d/m/Y H:i:s'),
+            $this->getType()
+        );
     }
 
     public function calculateSplit()
@@ -438,12 +490,12 @@ abstract class Payment
     {
         $this->reference = $reference;
     }
-    
+
     public function getReference()
     {
         return $this->reference;
     }
-    
+
     public function setPolicy($policy)
     {
         $this->policy = $policy;
@@ -478,7 +530,7 @@ abstract class Payment
     }
 
     /**
-     * @return ScheduledPayment
+     * @return ScheduledPayment|null
      */
     public function getScheduledPayment()
     {
@@ -486,10 +538,10 @@ abstract class Payment
     }
 
     /**
-     * @param ScheduledPayment $scheduledPayment
+     * @param ScheduledPayment|null $scheduledPayment
      *
      */
-    public function setScheduledPayment(ScheduledPayment $scheduledPayment)
+    public function setScheduledPayment(ScheduledPayment $scheduledPayment = null)
     {
         $this->scheduledPayment = $scheduledPayment;
     }
@@ -528,6 +580,25 @@ abstract class Payment
         }
     }
 
+    /**
+     * Tells if a payment should be visible to users.
+     * @return boolean true if the user should see it, otherwise false.
+     */
+    public function isVisibleUserPayment()
+    {
+        return false;
+    }
+
+    /**
+     * Gives a public description of the payment to be viewed externally by users or something.
+     * Just defaults to payment, and is meant to be extended by subclasses.
+     * @return string containing the name.
+     */
+    public function getUserPaymentDisplay()
+    {
+        return $this->userPaymentName();
+    }
+
     public function toApiArray()
     {
         return [
@@ -558,6 +629,9 @@ abstract class Payment
             'totalUnderwriterPercent' => 0,
             'avgPayment' => null,
         ];
+        if (!$payments) {
+            return $data;
+        }
         foreach ($payments as $payment) {
             /** @var Payment $payment */
             // For prod, skip invalid policies
@@ -666,5 +740,14 @@ abstract class Payment
         } else {
             return null;
         }
+    }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @return string containing the name.
+     */
+    protected function userPaymentName()
+    {
+        return "Other";
     }
 }

@@ -4,7 +4,10 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\NoOp;
 use AppBundle\Document\Address;
+use AppBundle\Document\Attribution;
 use AppBundle\Document\DateTrait;
+use AppBundle\Service\IntercomService;
+use AppBundle\Service\RequestService;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -308,9 +311,18 @@ class ApiExternalController extends BaseController
         $user = new User();
         $user->setEnabled(true);
 
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        $attribution = $requestService->getAttribution();
+        $attribution->setGoCompareQuote(
+            $alphaValidator->conform($this->getRequestString($request, 'quote_id'))
+        );
+        $user->setAttribution($attribution);
+
         $user->setFirstName($alphaValidator->conform($this->getRequestString($request, 'first_name')));
         $user->setLastName($alphaValidator->conform($this->getRequestString($request, 'surname')));
         $user->setEmail($email);
+
 
         $dob = $this->getRequestString($request, 'dob');
         $birthday = null;
@@ -373,5 +385,87 @@ class ApiExternalController extends BaseController
         );
 
         return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
+    }
+
+    /**
+     * @Route("/intercom/messenger/init", name="api_external_intercom_messenger_init")
+     * @Method({"POST"})
+     */
+    public function intercomMessengerInitAction(Request $request)
+    {
+        $this->validateIntercomSignature($request);
+
+        /** @var IntercomService $intercom */
+        $intercom = $this->get('app.intercom');
+        return new JsonResponse($intercom->getDpaCard());
+    }
+
+    /**
+     * @Route("/intercom/messenger/config", name="api_external_intercom_messenger_config")
+     * @Method({"POST"})
+     */
+    public function intercomMessengerConfigAction(Request $request)
+    {
+        $this->validateIntercomSignature($request);
+
+        return new JsonResponse([
+            'results' => [
+                'name' => ''
+            ]
+        ]);
+    }
+
+    /**
+     * @Route("/intercom/messenger/submit", name="api_external_intercom_messenger_submit")
+     * @Method({"POST"})
+     */
+    public function intercomMessengerSubmitAction(Request $request)
+    {
+        $this->validateIntercomSignature($request);
+
+        $data = json_decode($request->getContent(), true);
+        $firstName = $data['input_values']['firstName'];
+        $lastName = $data['input_values']['lastName'];
+        $dob = $data['input_values']['dob'];
+        $mobile = $data['input_values']['mobile'];
+        $conversationId = $data['context']['conversation_id'];
+        $button = $data['component_id'];
+
+        /*
+        print_r($data);
+        print_r($name);
+        print_r($dob);
+        print_r($mobile);
+        print_r($conversationId);
+        */
+
+        /** @var IntercomService $intercom */
+        $intercom = $this->get('app.intercom');
+        if ($button == 'manual') {
+            $intercom->sendSearchUserNote(
+                $firstName,
+                $lastName,
+                $dob,
+                $mobile,
+                $conversationId,
+                'Manual validation requested.'
+            );
+
+            $intercom->sendReply($conversationId, 'One of the team will get back to you soon.');
+
+            return new JsonResponse($intercom->canvasText('DPA Completed (unsuccessfully)'));
+        }
+
+        return new JsonResponse($intercom->validateDpa($firstName, $lastName, $dob, $mobile, $conversationId));
+    }
+
+    private function validateIntercomSignature(Request $request)
+    {
+        $intercomDpaAppSecret = $this->getParameter('intercom_dpa_app_secret');
+        $signature = $request->headers->get('X-Body-Signature');
+
+        if (hash_hmac('sha256', $request->getContent(), $intercomDpaAppSecret) != $signature) {
+            throw new \Exception(sprintf('Invalid intercom signature %s', $signature));
+        }
     }
 }

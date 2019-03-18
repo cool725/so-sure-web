@@ -83,39 +83,23 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $force = null;
-        $trafficFraction = '0.0000001';
-        if ($request->get('_route') == 'replacement_24_landing') {
-            $force = 'next-working-day';
-            $trafficFraction = 1;
-        } elseif ($request->get('_route') == 'replacement_72_landing') {
-            $force = 'twentyfour-seventy-two';
-            $trafficFraction = 1;
-        }
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
-        $pageType = 'xmas-homepage';
+        $template = 'AppBundle:Default:index.html.twig';
 
-        // Blackfriday Promo
-        // Start: Friday 23rd November Mighnight
-        // End: Monday 26th November Mighnight
-        $now   = \DateTime::createFromFormat('U', time());
-        $start = new \DateTime('2018-11-23 00:00:00', SoSure::getSoSureTimezone());
-        $end   = new \DateTime('2018-11-26 23:59:59', SoSure::getSoSureTimezone());
-
-        if ($now >= $start && $now <= $end) {
-            $pageType = 'blackfriday';
-        }
+        // A/B Homepage USPS test
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_USPS,
+            ['homepage', 'homepage-usps']
+        );
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'page_type' => $pageType,
+            'exp'       => $exp,
         );
-
-        $template = 'AppBundle:Default:index.html.twig';
 
         return $this->render($template, $data);
     }
@@ -158,26 +142,23 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/money", name="money")
+     * @Route("/valentines-day-free-phone-case", name="valentines_day_free_phone_case")
      */
-    public function moneyLanding()
+    public function valentinesDayCase()
     {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'money']);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'valentinesdayfreephonecase'
+        ]);
 
-        return $this->render('AppBundle:Default:indexMoney.html.twig');
-    }
+        $pageType = 'vdayphonecase';
 
-    /**
-     * @Route("/starling-bank", name="starling_bank")
-     * @Template
-     */
-    public function starlingLanding(Request $request)
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'starling']);
+        $data = array(
+            'page_type' => $pageType,
+        );
 
-        $this->starlingOAuthSession($request);
+        $template = 'AppBundle:Default:indexPromotions.html.twig';
 
-        return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
+        return $this->render($template, $data);
     }
 
     /**
@@ -195,114 +176,199 @@ class DefaultController extends BaseController
      * @Route("/quidco", name="quidco")
      * @Route("/ivip", name="ivip")
      * @Route("/reward-gateway", name="reward_gateway")
+     * @Route("/money", name="money")
+     * @Route("/money-free-phone-case", name="money_free_phone_case")
+     * @Route("/starling-bank", name="starling_bank")
+     * @Route("/comparison", name="comparison")
+     * @Route("/vendi-app", name="vendi_app")
+     * @Route("/so-sure-compared", name="so_sure_compared")
      */
     public function affiliateLanding(Request $request)
     {
-        $page = null;
-        $affiliate = null;
+        $competitor = [
+            'PYB' => [
+                'name' => 'Protect Your Bubble',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 4
+            ],
+            'GC' => [
+                'name' => 'Gadget<br>Cover',
+                'days' => '<strong>5 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'SS' => [
+                'name' => 'Simplesurance',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'CC' => [
+                'name' => 'CloudCover',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 3,
+            ],
+            'END' => [
+                'name' => 'Endsleigh',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-check',
+                'oldphones' => 'fa-check',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'LICI' => [
+                'name' => 'Loveit<br>coverIt.co.uk',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ]
+        ];
+
+        $data = [
+            'competitor' => $competitor,
+        ];
+
+        $template = 'AppBundle:Default:indexAffiliate.html.twig';
 
         if ($request->get('_route') == 'topcashback') {
-            $page = 'topcashback';
-            $affiliate = 'TopCashback';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'topcashback',
+                'affiliate_company' => 'TopCashback',
+                'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'SS',
+            ];
         } elseif ($request->get('_route') == 'vouchercodes') {
-            $page = 'vouchercodes';
-            $affiliate = 'VoucherCodes';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'vouchercodes',
+                'affiliate_company' => 'VoucherCodes',
+                'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'END',
+            ];
         } elseif ($request->get('_route') == 'quidco') {
-            $page = 'quidco';
-            $affiliate = 'Quidco';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'quidco',
+                'affiliate_company' => 'Quidco',
+                'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'CC',
+            ];
         } elseif ($request->get('_route') == 'ivip') {
-            $page = 'ivip';
-            $affiliate = 'iVIP';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'ivip',
+                'affiliate_company' => 'iVIP',
+                'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
         } elseif ($request->get('_route') == 'reward_gateway') {
-            $page = 'reward-gateway';
-            $affiliate = 'Reward Gateway';
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'reward-gateway',
+                'affiliate_company' => 'Reward Gateway',
+                'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'END',
+                'competitor3' => 'SS',
+            ];
+        } elseif ($request->get('_route') == 'money') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'money',
+                'affiliate_company' => 'money',
+                'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'money_free_phone_case') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'money-free-phone-case',
+                'affiliate_company' => 'money',
+                'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'starling_bank') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'starling-bank',
+                // 'affiliate_company' => 'Starling Bank',
+                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+            $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            $this->starlingOAuthSession($request);
+        } elseif ($request->get('_route') == 'comparison') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'comparison',
+                'titleH1' => 'Mobile Insurance beyond compare',
+                'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'vendi_app') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'vendi-app',
+                'affiliate_company' => 'Vendi',
+                'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'so_sure_compared') {
+            $data = [
+                'competitor' => $competitor,
+                'affiliate_page' => 'so-sure-compared',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => $page
-        ]);
+            'page' => $data['affiliate_page']]);
 
-        $data = [
-            'affiliate_company' => $affiliate,
-            'affiliate_page' => $page,
-        ];
-
-        return $this->render('AppBundle:Default:indexAffiliate.html.twig', $data);
-    }
-
-    /**
-     * @Route("/eb", name="eb")
-     * @Template
-     */
-    public function ebLanding(Request $request)
-    {
-        $exp = $this->sixpackSimple(SixpackService::EXPERIMENT_EBAY_LANDING, $request);
-
-        if ($exp === 'ebay-landing') {
-            return $this->render('AppBundle:Default:indexEbay.html.twig');
-        }
-
-        return $this->redirectToRoute('homepage');
-    }
-
-    /**
-     * @Route("/eb1", name="eb1")
-     * @Template
-     */
-    public function eb1Landing(Request $request)
-    {
-        $data = [
-            'main_title' => 'Honest Insurance for Honest People',
-            'hero_class' => 'ebay__hero_1',
-        ];
-
-        $exp = $this->sixpackSimple(SixpackService::EXPERIMENT_EBAY_LANDING_1, $request);
-
-        if ($exp === 'ebay-landing') {
-            return $this->render('AppBundle:Default:indexEbay.html.twig', $data);
-        }
-
-        return $this->redirectToRoute('homepage');
-    }
-
-    /**
-     * @Route("/eb2", name="eb2")
-     * @Template
-     */
-    public function eb2Landing(Request $request)
-    {
-
-        $data = [
-            'main_title' => 'Insurance You Deserve',
-            'hero_class' => 'ebay__hero_2',
-        ];
-
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EBAY_LANDING_2,
-            ['homepage', 'ebay-landing-2']
-        );
-
-        if ($exp == 'ebay-landing') {
-            return $this->render('AppBundle:Default:indexEbay.html.twig', $data);
-        } else {
-            return $this->redirectToRoute('homepage');
-        }
-    }
-
-    /**
-     * @Route("/comparison", name="comparison")
-     * @Template
-     */
-    public function soSureCompetitors()
-    {
-        $data = [
-            'headline'     => 'Mobile Insurance Beyond Compare',
-            'sub_heading'  => 'But if you do want to compare…',
-            'sub_heading2' => 'here’s how we stack up against the competition',
-        ];
-
-        return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
+        return $this->render($template, $data);
     }
 
     /**
@@ -774,68 +840,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/download-app", name="download_app", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
-     * @Template
-     */
-    public function downloadAppAction()
-    {
-        return [];
-    }
-
-    /**
-     * @Route("/text-me-the-app", name="sms_app_link", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
-     * @Template
-     */
-    public function smsAppLinkAction(Request $request)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Lead::class);
-        $form = $this->createForm(SmsAppLinkType::class);
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $mobileNumber = $form->get('mobileNumber')->getData();
-            $ukMobileNumber = $this->normalizeUkMobile($mobileNumber, true);
-            $lead = $repo->findOneBy(['mobileNumber' => $ukMobileNumber]);
-            if ($lead) {
-                $this->addFlash(
-                    'error',
-                    "Oops, looks like we already sent you a link."
-                );
-            } elseif (!$this->isValidUkMobile($ukMobileNumber)) {
-                $this->addFlash('error', sprintf(
-                    'Sorry, that number does not appear to be a valid UK Mobile Number'
-                ));
-            } else {
-                $sms = $this->get('app.sms');
-                $message = $this->get('templating')->render(
-                    'AppBundle:Sms:text-me.txt.twig',
-                    ['branch_pot_url' => $this->getParameter('branch_pot_url')]
-                );
-                if ($sms->send($ukMobileNumber, $message)) {
-                    $lead = new Lead();
-                    $lead->setMobileNumber($ukMobileNumber);
-                    $lead->setSource(Lead::SOURCE_TEXT_ME);
-                    $dm->persist($lead);
-                    $dm->flush();
-                    $this->addFlash(
-                        'success',
-                        'You should receive a download link shortly'
-                    );
-                } else {
-                    $this->addFlash(
-                        'error',
-                        'Sorry, we had a problem sending you a sms. Please download the so-sure app from your app store.'
-                    );
-                }
-            }
-        }
-
-        return array(
-            'form' => $form->createView(),
-        );
-    }
-
-    /**
      * @Route("/price/{id}", name="price_item")
      */
     public function priceItemAction($id)
@@ -851,339 +855,6 @@ class DefaultController extends BaseController
             'price' => $phone->getCurrentPhonePrice(),
         ]);
     }
-
-    /**
-     * @Route("/think-your-iPhone-7-is-insured-by-your-bank", name="think_your_iPhone-7_is_insured_by_your_bank")
-     * @Template
-     */
-    public function thinkYourIPhone7IsInsuredByYourBank()
-    {
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-gadget-cover-phone-insurance", name="so-sure-vs-gadget_cover_phone_insurance")
-     * @Template
-     */
-    public function soSureVsGadgetCover()
-    {
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => 'Gadget Cover',
-        ]);
-
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-halifax-phone-insurance", name="so-sure-vs-halifax_phone_insurance")
-     * @Template
-     */
-    public function soSureVsHalifaxCover()
-    {
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => 'Halifax',
-        ]);
-
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-three-phone-insurance", name="so-sure-vs-three_phone_insurance")
-     * @Template
-     */
-    public function soSureVsThree()
-    {
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => 'Three',
-        ]);
-
-        return array();
-    }
-
-    /**
-     * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
-     * @Route("/so-sure-vs-protect-your-bubble-phone-insurance", name="so_sure_vs_protect_your_bubble_phone_insurance")
-     * @Route("/so-sure-vs-carphone-warehouse-phone-insurance", name="so_sure_vs_carphone_warehouse_phone_insurance")
-     * @Route("/so-sure-vs-ee-damage-cover-insurance", name="so_sure_vs_ee_damage_cover_insurance")
-     * @Route("/so-sure-vs-tesco-phone-insurance", name="so_sure_vs_tesco_phone_insurance")
-     * @Template
-     */
-    public function soSureVsCompetitor(Request $request)
-    {
-        /*
-        $exp = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_PYG_HOME,
-            ['pyg', 'home'],
-            SixpackService::LOG_MIXPANEL_NONE
-        );
-        */
-        //if ($exp == 'home') {
-        return new RedirectResponse($this->generateUrl('homepage'));
-        //}
-
-        $data = null;
-        if ($request->get('_route') == "so_sure_vs_protect_your_bubble_phone_insurance" ||
-            $request->get('_route') == "so_sure_vs_protect_your_bubble") {
-            $data = [
-                'c_name' => 'Protect Your Bubble',
-                's_theft' => 'Yes',
-                's_theft_bg' => 'tick-background',
-                's_loss' => 'As standard',
-                's_loss_bg' => 'tick-background',
-                's_theft_replacement' => '24-72 hours once claim approved',
-                's_damage_replacement' => '24-72 hours once claim approved',
-                's_used_phones' => 'Yes',
-                's_used_phones_bg' => 'tick-background',
-                's_cashback' => 'Yes',
-                's_cashback_bg' => 'tick-background',
-                'c_theft' => 'Yes',
-                'c_theft_bg' => 'tick-background',
-                'c_loss' => 'Extra £1.50 per month',
-                'c_loss_bg' => 'cross-background',
-                'c_theft_replacement' => '2 working days',
-                'c_damage_replacement' => '3-5 working days',
-                'c_used_phones' => 'Only up to 12 months old',
-                'c_used_phones_bg' => 'cross-background',
-                'c_cashback' => 'No',
-                'c_cashback_bg' => 'cross-background',
-            ];
-        } elseif ($request->get('_route') == "so_sure_vs_carphone_warehouse_phone_insurance") {
-            $data = [
-                'c_name' => 'Carphone Warehouse',
-                's_theft' => 'Yes',
-                's_theft_bg' => 'tick-background',
-                's_loss' => 'Yes',
-                's_loss_bg' => 'tick-background',
-                's_theft_replacement' => '24-72 hours once claim approved',
-                's_damage_replacement' => '24-72 hours once claim approved',
-                's_used_phones' => 'Yes',
-                's_used_phones_bg' => 'tick-background',
-                's_cashback' => 'Yes',
-                's_cashback_bg' => 'tick-background',
-                'c_theft' => 'Yes',
-                'c_theft_bg' => 'tick-background',
-                'c_loss' => 'Yes',
-                'c_loss_bg' => 'tick-background',
-                'c_theft_replacement' => 'Next working day',
-                'c_damage_replacement' => 'Next working day',
-                'c_used_phones' => 'No',
-                'c_used_phones_bg' => 'cross-background',
-                'c_cashback' => 'No',
-                'c_cashback_bg' => 'cross-background',
-            ];
-        } elseif ($request->get('_route') == "so_sure_vs_ee_damage_cover_insurance") {
-            $data = [
-                'c_name' => 'EE Damage Cover',
-                's_theft' => 'Yes',
-                's_theft_bg' => 'tick-background',
-                's_loss' => 'Yes',
-                's_loss_bg' => 'tick-background',
-                's_theft_replacement' => '24-72 hours once claim approved',
-                's_damage_replacement' => '24-72 hours once claim approved',
-                's_used_phones' => 'Yes',
-                's_used_phones_bg' => 'tick-background',
-                's_cashback' => 'Yes',
-                's_cashback_bg' => 'tick-background',
-                'c_theft' => 'Yes',
-                'c_theft_bg' => 'tick-background',
-                'c_loss' => 'No',
-                'c_loss_bg' => 'cross-background',
-                'c_theft_replacement' => 'Theft: Next working day Loss: N/A',
-                'c_damage_replacement' => 'Next working day',
-                'c_used_phones' => 'Only new phones bought from EE',
-                'c_used_phones_bg' => 'cross-background',
-                'c_cashback' => 'No',
-                'c_cashback_bg' => 'cross-background',
-            ];
-        } elseif ($request->get('_route') == "so_sure_vs_tesco_phone_insurance") {
-            $data = [
-                'c_name' => 'Tesco Phone',
-                's_theft' => 'Yes',
-                's_theft_bg' => 'tick-background',
-                's_loss' => 'Yes',
-                's_loss_bg' => 'tick-background',
-                's_theft_replacement' => '24-72 hours once claim approved',
-                's_damage_replacement' => '24-72 hours once claim approved',
-                's_used_phones' => 'Yes',
-                's_used_phones_bg' => 'tick-background',
-                's_cashback' => 'Yes',
-                's_cashback_bg' => 'tick-background',
-                'c_theft' => 'Yes',
-                'c_theft_bg' => 'tick-background',
-                'c_loss' => 'Yes',
-                'c_loss_bg' => 'tick-background',
-                'c_theft_replacement' => '7-10 working days',
-                'c_damage_replacement' => '7-10 working days',
-                'c_used_phones' => 'Only new phones bought from Tesco',
-                'c_used_phones_bg' => 'cross-background',
-                'c_cashback' => 'No',
-                'c_cashback_bg' => 'cross-background',
-            ];
-        }
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
-            'Competitor' => $data['c_name'],
-        ]);
-
-        return array('data' => $data);
-    }
-
-    /**
-     * @Route("/samsung-s7-insured-with-vodafone", name="samsung_s7_insured_with_vodafone")
-     * @Route("/google-pixel-insured-with-vodafone", name="google_pixel_insured_with_vodafone")
-     * @Route("/iphone-SE-insured-with-vodafone", name="iphone_SE_insured_with_vodafone")
-     * @Route("/iphone-6-insured-with-vodafone", name="iphone_6_insured_with_vodafone")
-     * @Route("/iphone-6s-insured-with-vodafone", name="iphone_6s_insured_with_vodafone")
-     * @Route("/iphone-7-insured-with-vodafone", name="iphone_7_insured_with_vodafone")
-     * @Route("/iphone-7-plus-insured-with-vodafone", name="iphone_7_plus_insured_with_vodafone")
-     * @Template
-     */
-    public function insuredWithVodafone(Request $request)
-    {
-        $phoneName = null;
-        $phonePrice = null;
-        $quoteRoute = null;
-        if ($request->get('_route') == "samsung_s7_insured_with_vodafone") {
-            $phoneName = "Samsung S7";
-            $phonePrice = "7.99";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'samsung',
-                'model' => 'galaxy+s7',
-                'memory' => '32'
-            ]);
-        } elseif ($request->get('_route') == "google_pixel_insured_with_vodafone") {
-            $phoneName = "Google Pixel";
-            $phonePrice = "8.49";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'google',
-                'model' => 'pixel',
-                'memory' => '32'
-            ]);
-        } elseif ($request->get('_route') == "iphone_SE_insured_with_vodafone") {
-            $phoneName = "iPhone SE";
-            $phonePrice = "6.99";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'apple',
-                'model' => 'iphone+se',
-                'memory' => '16'
-            ]);
-        } elseif ($request->get('_route') == "iphone_7_plus_insured_with_vodafone") {
-            $phoneName = "iPhone 7 Plus";
-            $phonePrice = "9.99";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'apple',
-                'model' => 'iphone+7+plus',
-                'memory' => '32'
-            ]);
-        } elseif ($request->get('_route') == "iphone_7_insured_with_vodafone") {
-            $phoneName = "iPhone 7";
-            $phonePrice = "7.99";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'apple',
-                'model' => 'iphone+7',
-                'memory' => '32'
-            ]);
-        } elseif ($request->get('_route') == "iphone_6s_insured_with_vodafone") {
-            $phoneName = "iPhone 6S";
-            $phonePrice = "7.99";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'apple',
-                'model' => 'iphone+6s',
-                'memory' => '32'
-            ]);
-        } elseif ($request->get('_route') == "iphone_6_insured_with_vodafone") {
-            $phoneName = "iPhone 6";
-            $phonePrice = "7.99";
-            $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'apple',
-                'model' => 'iphone+6',
-                'memory' => '16'
-            ]);
-        }
-        return array('phone_name' => $phoneName, 'phone_price' => $phonePrice, 'quote_route' => $quoteRoute);
-    }
-
-    /**
-     * @Route("/samsung-s7-insured-with-your-mobile-network", name="samsung_s7_insured_with_your_mobile_network")
-     * @Route("/google-pixel-insured-with-your-mobile-network", name="google_pixel_insured_with_your_mobile_network")
-     * @Route("/iphone-SE-insured-with-your-mobile-network", name="iphone_SE_insured_with_your_mobile_network")
-     * @Route("/iphone-6-insured-with-your-mobile-network", name="iphone_6_insured_with_your_mobile_network")
-     * @Route("/iphone-6s-insured-with-your-mobile-network", name="iphone_6s_insured_with_your_mobile_network")
-     * @Route("/iphone-7-insured-with-your-mobile-network", name="iphone_7_insured_with_your_mobile_network")
-     * @Route("/iphone-7-plus-insured-with-your-mobile-network", name="iphone_7_plus_insured_with_your_mobile_network")
-     * @Template
-     */
-    public function insuredWithMobileNetwork(Request $request)
-    {
-        $phone = null;
-        $phoneName = null;
-        $repo = $this->getManager()->getRepository(Phone::class);
-        if ($request->get('_route') == "samsung_s7_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Samsung',
-                'model' => 'Galaxy S7',
-                'memory' => (int) 32
-            ]);
-            $phoneName = "Samsung S7";
-        } elseif ($request->get('_route') == "google_pixel_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Google',
-                'model' => 'Pixel',
-                'memory' => (int) 32
-            ]);
-            $phoneName = "Google Pixel";
-        } elseif ($request->get('_route') == "iphone_SE_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone SE',
-                'memory' => (int) 16
-            ]);
-            $phoneName = "iPhone SE";
-        } elseif ($request->get('_route') == "iphone_7_plus_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone 7 Plus',
-                'memory' => (int) 32
-            ]);
-            $phoneName = "iPhone 7 Plus";
-        } elseif ($request->get('_route') == "iphone_7_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone 7',
-                'memory' => (int) 32
-            ]);
-            $phoneName = "iPhone 7";
-        } elseif ($request->get('_route') == "iphone_6s_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone 6S',
-                'memory' => (int) 32
-            ]);
-            $phoneName = "iPhone 6S";
-        } elseif ($request->get('_route') == "iphone_6_insured_with_your_mobile_network") {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone 6',
-                'memory' => (int) 16
-            ]);
-            $phoneName = "iPhone 6";
-        }
-        return array(
-            'phone' => $phone,
-            'phone_name' => $phoneName,
-        );
-    }
-
 
     /**
      * @Route("/phone/{make}/{model}", name="phone_make_model")
@@ -1269,9 +940,9 @@ class DefaultController extends BaseController
             $mailer->sendTemplate(
                 'Update your communication preferences',
                 $email,
-                'AppBundle:Email:optOutLink.html.twig',
+                'AppBundle:Email:user/optOutLink.html.twig',
                 ['hash' => $hash],
-                'AppBundle:Email:optOutLink.txt.twig',
+                'AppBundle:Email:user/optOutLink.txt.twig',
                 ['hash' => $hash]
             );
 

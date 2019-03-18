@@ -4,9 +4,12 @@ require('../../../sass/pages/admin.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/tooltip');
+require('bootstrap/js/dist/dropdown');
+require('bootstrap/js/dist/tab');
+require('bootstrap/js/dist/collapse');
 
 // Require components
-// e.g. require('../components/banner.js');
+// require('tempusdominus-bootstrap-4');
 
 $(function(){
 

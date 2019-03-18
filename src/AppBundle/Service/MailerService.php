@@ -51,6 +51,9 @@ class MailerService
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var bool */
+    protected $uploadEmail;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -61,15 +64,34 @@ class MailerService
      * @var array
      */
     public static $analyticsCampaigns = [
+        'bacs/bacsPaymentFailed-1',
+        'bacs/bacsPaymentFailed-2',
+        'bacs/bacsPaymentFailed-3',
+        'bacs/bacsPaymentFailed-4',
+        'bacs/bacsPaymentFailedMandateCancelled-1',
+        'bacs/bacsPaymentFailedMandateCancelled-2',
+        'bacs/bacsPaymentFailedMandateCancelled-3',
+        'bacs/bacsPaymentFailedMandateCancelled-4',
+        'bacs/bacsPaymentFailedWithClaim-1',
+        'bacs/bacsPaymentFailedWithClaim-2',
+        'bacs/bacsPaymentFailedWithClaim-3',
+        'bacs/bacsPaymentFailedWithClaim-4',
+        'bacs/bacsPaymentFailedWithClaimMandateCancelled-3',
+        'bacs/bacsPaymentFailedWithClaimMandateCancelled-4',
         'card/cardExpiring',
+        'card/cardMissing-1',
+        'card/cardMissing-2',
+        'card/cardMissing-3',
+        'card/cardMissing-4',
+        'card/cardMissingWithClaim-4',
         'card/failedPayment-1',
         'card/failedPayment-2',
         'card/failedPayment-3',
         'card/failedPayment-4',
-        'policy/failedPaymentWithClaim-1',
-        'policy/failedPaymentWithClaim-2',
-        'policy/failedPaymentWithClaim-3',
-        'policy/failedPaymentWithClaim-4',
+        'card/failedPaymentWithClaim-1',
+        'card/failedPaymentWithClaim-2',
+        'card/failedPaymentWithClaim-3',
+        'card/failedPaymentWithClaim-4',
     ];
 
     /**
@@ -83,6 +105,7 @@ class MailerService
      * @param S3Client         $s3Client
      * @param string           $environment
      * @param DocumentManager  $dm
+     * @param boolean          $uploadEmail
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -94,7 +117,8 @@ class MailerService
         MixpanelService $mixpanelService,
         S3Client $s3Client,
         $environment,
-        DocumentManager $dm
+        DocumentManager $dm,
+        $uploadEmail
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
@@ -106,6 +130,7 @@ class MailerService
         $this->s3 = $s3Client;
         $this->environment = $environment;
         $this->dm = $dm;
+        $this->uploadEmail = $uploadEmail;
     }
 
     public function sendTemplateToUser(
@@ -245,7 +270,7 @@ class MailerService
 
         $mailer->send($message);
 
-        if ($user) {
+        if ($this->uploadEmail && $user) {
             $this->uploadS3($user, $to, $subject, $message->toString());
         }
 
@@ -259,7 +284,7 @@ class MailerService
     public function trustpilot(Policy $policy, $template)
     {
         $body = $this->templating->render(
-            'AppBundle:Email:trustpilot.html.twig',
+            'AppBundle:Email:system/trustpilot.html.twig',
             ['policy' => $policy, 'template_id' => $template]
         );
 

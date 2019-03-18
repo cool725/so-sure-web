@@ -59,9 +59,14 @@ services:
         arguments:
             - "@logger"
             - "@router"
+            - "@doctrine_mongodb.odm.default_document_manager"
             - "%fb_appid%"
             - "%fb_secret%"
             - "%account_kit_secret%"
+            - "%fb_business_id%"
+            - "%fb_ad_account_id%"
+            - "%fb_system_user_access_token%"
+            - "%kernel.environment%"
 
     app.facebook:
         alias: AppBundle\Service\FacebookService
@@ -117,6 +122,24 @@ services:
             - "@app.sms"
             - "@app.feature"
 
+    app.checkout:
+        alias: AppBundle\Service\CheckoutService
+        public: true
+
+    AppBundle\Service\CheckoutService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.policy"
+            - "@app.mailer"
+            - "%checkout_apisecret%"
+            - "%checkout_apipublic%"
+            - "%kernel.environment%"
+            - "@statsd"
+            - "@event_dispatcher"
+            - "@app.sms"
+            - "@app.feature"
+
     app.payment:
         alias: AppBundle\Service\PaymentService
         public: true
@@ -124,6 +147,7 @@ services:
     AppBundle\Service\PaymentService:
         arguments:
             - "@app.judopay"
+            - "@app.checkout"
             - "@app.router"
             - "@logger"
             - "@doctrine_mongodb.odm.default_document_manager"
@@ -210,6 +234,8 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "@app.policy"
+            - "@aws.s3"
+            - "%kernel.environment%"
 
     app.promotion:
         class: AppBundle\Service\PromotionService
@@ -302,7 +328,10 @@ services:
             - "%intercom_secure_android%"
             - "%intercom_secure_ios%"
             - "@app.mailer"
-            - "@router"
+            - "@app.router"
+            - '%intercom_dpa_app_admin%'
+            - "@app.sanctions"
+            - "@app.ratelimit"
 
     app.address:
         alias: AppBundle\Service\PCAService
@@ -422,7 +451,7 @@ services:
             - "@security.token_storage"
             - "%sosure_employee_cookie_value%"
             - "%kernel.environment%"
-            - "%sosure_ips%"
+            - "%analytics_ips%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension
@@ -475,6 +504,14 @@ services:
             - "@request_stack"
             - "@logger"
             - "@router"
+        public: false
+        tags:
+            - { name: twig.extension }
+
+    app.twig.policy:
+        class: AppBundle\Service\PolicyTwigExtension
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
         public: false
         tags:
             - { name: twig.extension }
@@ -720,6 +757,7 @@ services:
             - "@aws.s3"
             - "%kernel.environment%"
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "%online%"
 
     app.router:
         alias: AppBundle\Service\RouterService
@@ -1111,6 +1149,15 @@ services:
         tags:
         -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
+    app.listener.gocompare:
+        class:   AppBundle\Listener\GoCompareListener
+        arguments:
+        - "@logger"
+        - "%kernel.environment%"
+        tags:
+        -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+        -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
     app.listener.intercom:
         class:   AppBundle\Listener\IntercomListener
         arguments:
@@ -1165,6 +1212,7 @@ services:
         class:   AppBundle\Listener\MixpanelListener
         arguments:
             - "@app.mixpanel"
+            - "%kernel.environment%"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
@@ -1175,7 +1223,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.updated-status, method: onPolicyStatusEvent }
             -  { name: kernel.event_listener, event: event.card.updated, method: onCardUpdatedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
-            -  { name: kernel.event_listener, event: event.user.payment-method.changed, method: onUserPaymentMethodChangedEvent }
+            -  { name: kernel.event_listener, event: event.policy.payment-method.changed, method: onPolicyPaymentMethodChangedEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener
@@ -1208,6 +1256,7 @@ services:
             - "@app.judopay"
             - "@logger"
             - "%kernel.environment%"
+            - "@app.bacs"
         tags:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeMonthPromo }
@@ -1269,6 +1318,16 @@ services:
         tags:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }
+
+    app.listener.unpaid:
+        class: AppBundle\Listener\UnpaidListener
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.mailer"
+            - "@app.sms"
+            - "@app.feature"
+        tags:
+            -  { name: kernel.event_listener, event: event.scheduledPayment.failed, method: onUnpaidEvent }
 
     app.form.type.registration:
         class: AppBundle\Form\Type\RegistrationFormType

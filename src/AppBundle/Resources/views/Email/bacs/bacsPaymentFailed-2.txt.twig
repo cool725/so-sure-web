@@ -1,0 +1,30 @@
+
+Direct Debit failed for a 2nd time!
+
+Oh no! We tried to take your monthly Direct Debit payment of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice }}, but it failed again!
+
+We will attempt to take payment again from your account {{ policy.getPolicyOrUserBacsBankAccount.getDisplayableSortCode }} {{ policy.getPolicyOrUserBacsBankAccount.getDisplayableAccountNumber }}{% if nextScheduledPayment %} on or around {{ nextScheduledPayment.scheduled|date('M jS','Europe/London') }}{% endif %}.
+
+Here's what you need to do to keep your {{ policy.phone }} insured against loss, damage and theft…
+
+💰💰💰
+Make sure there are sufficient funds in your account.
+
+✅
+Check your payment details are up-to-date.
+
+Check payment details: {{ branch_payment_details_url }}
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+Our mailing address is:
+so-sure, Martin House, 5 Martin Lane, London EC4R 0DP, United Kingdom

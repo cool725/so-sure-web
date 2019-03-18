@@ -1,12 +1,13 @@
 <?php
 namespace AppBundle\Service;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
@@ -26,6 +27,9 @@ class PaymentService
 {
     /** @var JudopayService $judopay */
     protected $judopay;
+
+    /** @var CheckoutService $checkout */
+    protected $checkout;
 
     /** @var RouterService */
     protected $routerService;
@@ -62,6 +66,7 @@ class PaymentService
     /**
      * PaymentService constructor.
      * @param JudopayService           $judopay
+     * @param CheckoutService          $checkout
      * @param RouterService            $routerService
      * @param LoggerInterface          $logger
      * @param DocumentManager          $dm
@@ -74,6 +79,7 @@ class PaymentService
      */
     public function __construct(
         JudopayService $judopay,
+        CheckoutService $checkout,
         RouterService $routerService,
         LoggerInterface $logger,
         DocumentManager $dm,
@@ -85,6 +91,7 @@ class PaymentService
         EventDispatcherInterface $dispatcher
     ) {
         $this->judopay = $judopay;
+        $this->checkout = $checkout;
         $this->routerService = $routerService;
         $this->logger = $logger;
         $this->dm = $dm;
@@ -101,8 +108,12 @@ class PaymentService
         $this->mailer->setMailer($mailer);
     }
 
-    public function getAllValidScheduledPaymentsForType($prefix, $type, \DateTime $scheduledDate = null)
-    {
+    public function getAllValidScheduledPaymentsForType(
+        $prefix,
+        $type,
+        \DateTime $scheduledDate = null,
+        $validateBillable = true
+    ) {
         $results = [];
 
         /** @var ScheduledPaymentRepository $repo */
@@ -110,26 +121,19 @@ class PaymentService
         $scheduledPayments = $repo->findScheduled($scheduledDate);
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
-            if (!$scheduledPayment->isBillable()) {
+            if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
                 continue;
             }
-            if (!$scheduledPayment->getPolicy()->getPayerOrUser()) {
-                $this->logger->warning(sprintf(
-                    'Policy %s/%s does not have a user (payer)',
-                    $scheduledPayment->getPolicy()->getPolicyNumber(),
-                    $scheduledPayment->getPolicy()->getId()
-                ));
+            if (!$scheduledPayment->getPolicy()->getPolicyOrPayerOrUserPaymentMethod() instanceof $type) {
                 continue;
             }
-            if (!$scheduledPayment->getPolicy()->getPayerOrUser()->getPaymentMethod() instanceof $type) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->getPayerOrUser()->hasValidPaymentMethod()) {
+            if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
                 $this->logger->info(sprintf(
-                    'User %s does not have a valid payment method',
+                    'Policy %s or User %s does not have a valid payment method',
+                    $scheduledPayment->getPolicy()->getId(),
                     $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
                 ));
             }
@@ -149,7 +153,7 @@ class PaymentService
         $scheduledPayment->validateRunable($prefix, $date);
 
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+        $paymentMethod = $policy->getPaymentMethod();
         if ($paymentMethod && $paymentMethod instanceof JudoPaymentMethod) {
             return $this->judopay->scheduledPayment(
                 $scheduledPayment,
@@ -157,6 +161,13 @@ class PaymentService
                 $date,
                 $abortOnMultipleSameDayPayment
             );
+        } elseif ($paymentMethod && $paymentMethod instanceof CheckoutPaymentMethod) {
+                return $this->checkout->scheduledPayment(
+                    $scheduledPayment,
+                    $prefix,
+                    $date,
+                    $abortOnMultipleSameDayPayment
+                );
         } else {
             throw new \Exception(sprintf(
                 'Payment method not valid for scheduled payment %s',
@@ -166,19 +177,19 @@ class PaymentService
     }
 
     /**
-     * @param Bacs $bacs
-     * @param User $user
+     * @param BankAccount $bankAccount
+     * @param User        $user
      * @return string
      * @throws \Exception
      */
-    public function generateBacsReference(Bacs $bacs, User $user)
+    public function generateBacsReference(BankAccount $bankAccount, User $user)
     {
         if ($this->environment == 'prod') {
             $seq = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE);
         } else {
             $seq = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE_INVALID);
         }
-        $ref = $bacs->generateReference($user, $seq);
+        $ref = $bankAccount->generateReference($user, $seq);
 
         return $ref;
     }
@@ -189,9 +200,9 @@ class PaymentService
      */
     public function confirmBacs(Policy $policy, BacsPaymentMethod $bacsPaymentMethod, \DateTime $date = null)
     {
-        $policy->getUser()->setPaymentMethod($bacsPaymentMethod);
+        $policy->setPaymentMethod($bacsPaymentMethod);
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
-            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser(), $date)
+            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDateForPolicy($policy, $date)
         );
         $bacsPaymentMethod->getBankAccount()->setFirstPayment(true);
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
@@ -218,7 +229,7 @@ class PaymentService
             'bcc-ddnotifications@so-sure.com'
         );
 
-        if ($this->fraudService->getDuplicateBankAccountsCount($policy) > 0) {
+        if (count($this->fraudService->getDuplicatePolicyBankAccounts($policy)) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
                 'tech@so-sure.com',

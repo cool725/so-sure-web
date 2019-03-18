@@ -1,8 +1,8 @@
 
 Did you know your card is due to expire?
 
-{% if policy.user.paymentMethod.cardType is defined %}
-    Your card ending {{ policy.user.paymentMethod.cardLastFour }} will expire on {{ policy.user.paymentMethod.getCardEndDateAsDate | date('m/y', 'Europe/London') }}.
+{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardType is defined %}
+    Your card ending {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }} will expire on {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.getCardEndDateAsDate | date('m/y', 'Europe/London') }}.
 {% endif %}
 
 Please update your payment details by clicking the link below.

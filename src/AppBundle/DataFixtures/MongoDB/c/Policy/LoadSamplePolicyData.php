@@ -2,7 +2,7 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
-use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
@@ -30,7 +30,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Invitation\EmailInvitation;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -525,6 +525,18 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $user->setBillingAddress($address);
+
+        if (random_int(0, 1) == 0) {
+            $charge = new Charge();
+            $charge->setType(Charge::TYPE_ADDRESS);
+            $user->addCharge($charge);
+        }
+
+        return $user;
+    }
+
+    private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs)
+    {
         $bacs = false;
         if ($isPaymentMethodBacs === null) {
             $bacs = random_int(0, 1) == 0;
@@ -538,7 +550,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $bankAccount->setReference($reference);
             $bankAccount->setSortCode('000099');
             $bankAccount->setAccountNumber('87654321');
-            $bankAccount->setAccountName($user->getName());
+            if ($policy->getUser()) {
+                $bankAccount->setAccountName($policy->getUser()->getName());
+            }
             $bankAccount->setMandateSerialNumber(0);
             $status = rand(0, 4);
             if ($status == 0) {
@@ -562,15 +576,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $paymentMethod = new JudoPaymentMethod();
         }
 
-        $user->setPaymentMethod($paymentMethod);
-
-        if (random_int(0, 1) == 0) {
-            $charge = new Charge();
-            $charge->setType(Charge::TYPE_ADDRESS);
-            $user->addCharge($charge);
-        }
-
-        return $user;
+        return $paymentMethod;
     }
 
     private function getIPhoneUI($manager)
@@ -618,6 +624,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * @param float|null    $policyDiscount
      * @param integer|null  $paidMonths
      * @param string        $picSure
+     * @param boolean       $isPaymentMethodBacs
      * @return SalvaPhonePolicy
      * @throws \AppBundle\Exception\InvalidPremiumException
      */
@@ -634,7 +641,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $days = null,
         $policyDiscount = null,
         $paidMonths = null,
-        $picSure = self::PICSURE_RANDOM
+        $picSure = self::PICSURE_RANDOM,
+        $isPaymentMethodBacs = null
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -665,6 +673,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
+        $policy->setPaymentMethod($this->getPaymentMethod($policy, $isPaymentMethodBacs));
         $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
@@ -709,14 +718,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
-        $bacs = $user->hasBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
+        $bacs = $policy->hasPolicyOrUserBacsPaymentMethod() && count($user->getValidPolicies(true)) < 1;
 
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && random_int(0, 1) == 0)) {
             if ($bacs) {
                 $payment = $this->newBacsPayment(
                     $manager,
-                    $user,
+                    $policy,
                     $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate),
                     Salva::YEARLY_TOTAL_COMMISSION,
                     clone $paymentDate);
@@ -728,7 +737,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 if (rand(0, 9) == 0) {
                     $refund = $this->newBacsPayment(
                         $manager,
-                        $user,
+                        $policy,
                         $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate)*-1,
                         Salva::YEARLY_TOTAL_COMMISSION,
                         clone $paymentDate);
@@ -762,7 +771,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 if ($bacs) {
                     $payment = $this->newBacsPayment(
                         $manager,
-                        $user,
+                        $policy,
                         $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate),
                         $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
                         clone $paymentDate);
@@ -774,7 +783,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     if (rand(0, 4) == 0 && $i == $months) {
                         $refund = $this->newBacsPayment(
                             $manager,
-                            $user,
+                            $policy,
                             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate)*-1,
                             $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
                             clone $paymentDate);
@@ -876,8 +885,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $policy;
     }
 
-    private function newBacsPayment(ObjectManager $manager, User $user, $amount, $totalComission, $paymentDate)
+    private function newBacsPayment(ObjectManager $manager, Policy $policy, $amount, $totalComission, $paymentDate)
     {
+        $user = $policy->getUser();
         $serialNumber = $paymentDate->format("ymd");
         $submissionFile = null;
         $inputFile = null;
@@ -906,7 +916,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
         $payment->setSuccess(true);
         /** @var BacsPaymentMethod $bacsPaymentMethod */
-        $bacsPaymentMethod = $user->getPaymentMethod();
+        $bacsPaymentMethod = $policy->getBacsPaymentMethod();
         $bankAccount = $bacsPaymentMethod->getBankAccount();
         $bankAccount->setMandateSerialNumber($serialNumber);
         $manager->persist($bankAccount);

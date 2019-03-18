@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "13c9f3d0311e6d3ae41336a39172df1e",
+    "content-hash": "f89e31915564bde093f3aa65995d9d53",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -193,6 +193,111 @@
                 "transliterator"
             ],
             "time": "2015-09-28T16:26:35+00:00"
+        },
+        {
+            "name": "checkout/checkout-php-api",
+            "version": "1.2.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/checkout/checkout-php-library.git",
+                "reference": "cd70a25391eac2f0fdb52e70c9442a16e9d40d29"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/checkout/checkout-php-library/zipball/cd70a25391eac2f0fdb52e70c9442a16e9d40d29",
+                "reference": "cd70a25391eac2f0fdb52e70c9442a16e9d40d29",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "com\\checkout\\": "com/checkout"
+                },
+                "psr-0": {
+                    "CheckoutApi_": "com/checkout/packages"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dhiraj Gangoosirdar",
+                    "email": "integration@checkout.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Checkout PHP API Library",
+            "homepage": "https://github.com/checkout/checkout-php-library",
+            "keywords": [
+                "CKO",
+                "GW3",
+                "checkout.com",
+                "checkoutcom",
+                "gateway",
+                "online payment",
+                "payment"
+            ],
+            "time": "2018-09-03T10:40:03+00:00"
+        },
+        {
+            "name": "checkout/checkout-sdk-php",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/checkout/checkout-sdk-php.git",
+                "reference": "2260afb51d32e3625522d9d1f27d0c2e654a82a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/checkout/checkout-sdk-php/zipball/2260afb51d32e3625522d9d1f27d0c2e654a82a9",
+                "reference": "2260afb51d32e3625522d9d1f27d0c2e654a82a9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Checkout\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Checkout.com",
+                    "email": "platforms@checkout.com",
+                    "homepage": "https://github.com/checkout/checkout-sdk-php/graphs/contributors"
+                }
+            ],
+            "description": "Checkout.com SDK for PHP",
+            "homepage": "https://github.com/checkout/checkout-sdk-php",
+            "keywords": [
+                "CKO",
+                "GW3",
+                "Reboot",
+                "api",
+                "checkout",
+                "checkout.com",
+                "checkoutcom",
+                "gateway",
+                "library",
+                "payment",
+                "php",
+                "sdk"
+            ],
+            "time": "2019-03-05T15:45:30+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -1590,16 +1695,16 @@
         },
         {
             "name": "facebook/graph-sdk",
-            "version": "5.6.3",
+            "version": "5.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/php-graph-sdk.git",
-                "reference": "90e92bd1816fe718e55184ab85910dfcf488432c"
+                "reference": "2d8250638b33d73e7a87add65f47fabf91f8ad9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-graph-sdk/zipball/90e92bd1816fe718e55184ab85910dfcf488432c",
-                "reference": "90e92bd1816fe718e55184ab85910dfcf488432c",
+                "url": "https://api.github.com/repos/facebook/php-graph-sdk/zipball/2d8250638b33d73e7a87add65f47fabf91f8ad9b",
+                "reference": "2d8250638b33d73e7a87add65f47fabf91f8ad9b",
                 "shasum": ""
             },
             "require": {
@@ -1644,7 +1749,44 @@
                 "facebook",
                 "sdk"
             ],
-            "time": "2018-07-03T02:25:00+00:00"
+            "time": "2018-12-11T22:56:31+00:00"
+        },
+        {
+            "name": "facebook/php-business-sdk",
+            "version": "3.2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/facebook/facebook-php-business-sdk.git",
+                "reference": "0064bac15f069c89d5b9dcca8ec477379eb21a51"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/0064bac15f069c89d5b9dcca8ec477379eb21a51",
+                "reference": "0064bac15f069c89d5b9dcca8ec477379eb21a51",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.6",
+                "symfony/finder": "~2.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FacebookAds\\": "src/FacebookAds/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "PHP SDK for Facebook Business",
+            "homepage": "https://developers.facebook.com/",
+            "keywords": [
+                "ads",
+                "business",
+                "facebook",
+                "instagram",
+                "page",
+                "sdk"
+            ],
+            "time": "2019-01-15T23:19:09+00:00"
         },
         {
             "name": "fig/link-util",
@@ -3124,16 +3266,16 @@
         },
         {
             "name": "judopay/judopay-sdk",
-            "version": "2.0.1.5",
+            "version": "2.0.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/Judo-PHP.git",
-                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9"
+                "reference": "bb3b311fb6df32e275a8daa1669e0e47db4b3df1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/040344788e721476ad7dff1e4eb579e222c3dec9",
-                "reference": "040344788e721476ad7dff1e4eb579e222c3dec9",
+                "url": "https://api.github.com/repos/so-sure/Judo-PHP/zipball/bb3b311fb6df32e275a8daa1669e0e47db4b3df1",
+                "reference": "bb3b311fb6df32e275a8daa1669e0e47db4b3df1",
                 "shasum": ""
             },
             "require": {
@@ -3183,9 +3325,9 @@
                 "payment"
             ],
             "support": {
-                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.5"
+                "source": "https://github.com/so-sure/Judo-PHP/tree/2.0.1.8"
             },
-            "time": "2018-12-12T17:22:28+00:00"
+            "time": "2019-01-14T09:30:57+00:00"
         },
         {
             "name": "knplabs/knp-snappy",
@@ -9261,6 +9403,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-01-06T05:45:45+00:00"
         },
         {

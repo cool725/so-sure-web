@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Service\BaseImeiService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
@@ -98,6 +99,7 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
         $policy = new PhonePolicy();
+        $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
         static::$dm->persist($policy);
@@ -121,6 +123,7 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
         $policy = new PhonePolicy();
+        $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
         static::$dm->persist($policy);
@@ -140,6 +143,7 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
         $policy = new PhonePolicy();
+        $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
         static::$dm->persist($policy);
@@ -160,6 +164,7 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
         $policy = new PhonePolicy();
+        $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
         static::$dm->persist($policy);
@@ -171,6 +176,41 @@ class BaseImeiServiceTest extends WebTestCase
         $policy->setCancelledReason(PhonePolicy::CANCELLED_DISPOSSESSION);
         static::$dm->flush();
         $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
+    }
+
+    /**
+     * Tests if an IMEI can be disregarded as a duplicate if the policy owning the duplicate is in fact the same policy
+     * as the one we are meant to be testing.
+     */
+    public function testIsDuplicatePolicyImeiSamePolicy()
+    {
+        $imeiNumber = rand(1, 999999);
+        // Test case where the imei is not yet used.
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+        // Create policiies with various imeis.
+        $a = new PhonePolicy();
+        $a->setPremium(new PhonePremium());
+        $a->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $a->setImei($imeiNumber);
+        static::$dm->persist($a);
+        $b = new PhonePolicy();
+        $b->setPremium(new PhonePremium());
+        $b->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $b->setImei(rand(1, 999999));
+        static::$dm->persist($b);
+        static::$dm->flush();
+        $c = new PhonePolicy();
+        $c->setPremium(new PhonePremium());
+        $c->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $c->setImei($imeiNumber);
+        // Test normal case with just imei which should report a duplicate.
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
+        // Test case where the policy owning the IMEI is provided so it should not be considered duplicate.
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber, $a));
+        // Test case where policy with wrong imei is provided which should find a duplicate since there is one.
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber, $b));
+        // Test case where other policy with same imei is used which should find a duplicate.
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber, $c));
     }
 
     public function testOcrAndroid()

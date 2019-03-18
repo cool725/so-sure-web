@@ -13,6 +13,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Lead;
@@ -46,6 +47,8 @@ class PhonePolicyTest extends WebTestCase
     protected static $invitationService;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var BacsService */
+    protected static $bacsService;
 
     public static function setUpBeforeClass()
     {
@@ -69,6 +72,10 @@ class PhonePolicyTest extends WebTestCase
         self::$invitationService = $invitationService;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
+
+        /** @var BacsService $bacsService */
+        $bacsService = self::$container->get('app.bacs');
+        self::$bacsService = $bacsService;
     }
 
     public function setUp()
@@ -454,6 +461,31 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(
             SalvaPhonePolicy::RISK_CONNECTED_SELF_CLAIM,
             $policyA->getRiskReason(new \DateTime("2016-01-10"))
+        );
+    }
+
+    public function testRenewedNoPreviousClaim()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testRenewedNoPreviousClaim', $this));
+        $policyRenewed = static::createUserPolicy(true);
+        $policyRenewed->setUser($policy->getUser());
+        $policy->link($policyRenewed);
+        static::$dm->persist($policyRenewed->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($policyRenewed);
+        static::$dm->flush();
+        $this->assertNotNull($policyRenewed->getId());
+
+        $claimA = new Claim();
+        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        $policyRenewed->addClaim($claimA);
+        $this->assertTrue($policyRenewed->hasMonetaryClaimed());
+        $this->assertEquals(
+            SalvaPhonePolicy::RISK_RENEWED_NO_PREVIOUS_CLAIM,
+            $policyRenewed->getRiskReason(new \DateTime("2016-01-10"))
         );
     }
 
@@ -942,6 +974,28 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy1->getRiskReason());
         $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy2->getRiskReason());
+    }
+
+    public function testUseForAttribution()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUseForAttribution', $this),
+            'bar'
+        );
+        $policy1 = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy2 = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy1, new \DateTime('2018-01-02'));
+        static::$policyService->create($policy2, new \DateTime('2018-01-01'));
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy1->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertTrue($policy2->useForAttribution());
+        $this->assertFalse($policy1->useForAttribution());
     }
 
     /**
@@ -2077,6 +2131,7 @@ class PhonePolicyTest extends WebTestCase
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setPolicy($policy);
             $policy->addScheduledPayment($scheduledPayment->reschedule());
         }
 
@@ -3487,7 +3542,7 @@ class PhonePolicyTest extends WebTestCase
             12,
             $date
         );
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_APPROVAL);
 
         $this->assertEquals(new \DateTime('2018-10-31'), $policy->getPolicyExpirationDate(new \DateTime('2018-09-01')));
         $this->assertTrue($policy->canBacsPaymentBeMadeInTime(new \DateTime('2018-10-21')));
@@ -3842,6 +3897,18 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
     }
 
+    public function testCanCreatePendingRenewalInvalidImei()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCanCreatePendingRenewalInvalidImei', $this));
+
+        // 21 day renewal
+        $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2017-01-01 00:01")));
+
+        $policy->setInvalidImei(true);
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+    }
+
     public function testCanRenew()
     {
         $policy = $this->getPolicy(static::generateEmail('testCanRenew', $this));
@@ -3862,6 +3929,17 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
+    }
+
+    public function testCanRenewInvalidImei()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCanRenewInvalidImei', $this));
+
+        $this->getRenewalPolicy($policy);
+        $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
+
+        $policy->setInvalidImei(true);
+        $this->assertFalse($policy->canRenew(new \DateTime("2016-12-10")));
     }
 
     public function testIsRenewed()
@@ -5392,16 +5470,16 @@ class PhonePolicyTest extends WebTestCase
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setPaymentMethod($policy->getUser(), '0116');
+        self::setPaymentMethodForPolicy($policy, '0116');
         $this->assertEquals(
-            Policy::UNPAID_JUDO_CARD_EXPIRED,
+            Policy::UNPAID_CARD_EXPIRED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setPaymentMethod($policy->getUser(), '0120');
+        self::setPaymentMethodForPolicy($policy, '0120');
         //\Doctrine\Common\Util\Debug::dump($policy->getLastPaymentCredit(), 3);
         $this->assertEquals(
-            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            Policy::UNPAID_CARD_PAYMENT_MISSING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
@@ -5415,7 +5493,7 @@ class PhonePolicyTest extends WebTestCase
             JudoPayment::RESULT_DECLINED
         );
         $this->assertEquals(
-            Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            Policy::UNPAID_CARD_PAYMENT_FAILED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
     }
@@ -5438,37 +5516,49 @@ class PhonePolicyTest extends WebTestCase
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_INIT);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_INIT);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_PENDING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_PENDING_APPROVAL);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_PENDING_APPROVAL);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_PENDING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_CANCELLED);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_CANCELLED);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_INVALID,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_FAILURE);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_FAILURE);
         $this->assertEquals(
             Policy::UNPAID_BACS_MANDATE_INVALID,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
-        self::setBacsPaymentMethod($policy->getUser(), BankAccount::MANDATE_SUCCESS);
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
 
         $this->assertEquals(
             Policy::UNPAID_BACS_PAYMENT_MISSING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
+        $scheduledPayment = self::$bacsService->scheduleBacsPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            ScheduledPayment::TYPE_USER_WEB,
+            ''
+        );
+        $this->assertEquals(
+            Policy::UNPAID_BACS_PAYMENT_PENDING,
+            $policy->getUnpaidReason(new \DateTime('2016-03-01'))
+        );
+
         // add an ontime payment
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
         $payment = self::addBacsPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
@@ -5611,7 +5701,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->init($user, self::getLatestPolicyTerms(static::$dm));
         $policy->setPhone(self::$phone);
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->create(rand(1, 999999), 'Mob', null, rand(1, 9999));
         $policy->setImei(rand(1, 999999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(rand(1, 999999));
@@ -5652,13 +5742,8 @@ class PhonePolicyTest extends WebTestCase
         $diff = $expiration->diff($policy->getEnd());
 
         // print_r($diff);
-        // Normally 0, but 1 for 29th
-        $expectedDaysDiff = 0;
-        $now = $this->now();
-        if ($now->format('d') > 28) {
-            $expectedDaysDiff = $now->format('d') - 28;
-        }
-        $this->assertTrue(in_array($diff->days, [$expectedDaysDiff, $expectedDaysDiff - 1]), json_encode($diff));
+        // normally 0, but if current date is 29th, then 1 (likewise, 30th => 2, 31st => 3)
+        $this->assertTrue(in_array($diff->days, [0, 1, 2, 3]));
         $this->assertTrue($expiration < $policy->getEnd());
     }
 

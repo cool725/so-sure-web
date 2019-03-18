@@ -1,0 +1,31 @@
+{% set logo_image = 'unhappy' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Payment required - payments are behind for {{ policy.policyNumber }}{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: center;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+			Dear {{ policy.user.firstName }},
+			<br><br>
+		    We hope this email finds you well.
+			<br><br>
+			Our Finance department has flagged your account is behind on payments.
+			<br><br>
+		    You can view your balance on your <a href="{{ url('user_payment_details_policy', {'policyId': policy.id}) }}">payment details page</a>.
+			<br><br>
+		    To make sure your device remains covered by us, kindly reply to this email and authorize us to bill you for your current outstanding balance.
+			<br><br>
+			We look forward to hearing from you.
+			<br><br>
+			Kind regards,
+			<br><br>
+			The so-sure team
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

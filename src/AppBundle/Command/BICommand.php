@@ -288,7 +288,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllStartedPolicies($prefix);
+        $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',
@@ -332,6 +332,8 @@ class BICommand extends ContainerAwareCommand
             '"Payment Method"',
             '"Expected Unpaid Cancellation Date"',
             '"Bacs Mandate Status"',
+            '"First time policy"',
+            '"Has Successful User Payment Credit"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -383,10 +385,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'H:i')),
                 sprintf('"%0.2f"', $policy->getBadDebtAmount()),
                 sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
-                sprintf(
-                    '"%s"',
-                    $policy->getUser()->hasPaymentMethod() ? $policy->getUser()->getPaymentMethod()->getType() : null
-                ),
+                sprintf('"%s"', $policy->getUsedPaymentType()),
                 sprintf(
                     '"%s"',
                     $policy->getStatus() == Policy::STATUS_UNPAID ?
@@ -395,10 +394,12 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf(
                     '"%s"',
-                    $policy->getUser()->hasBacsPaymentMethod() ?
-                        $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+                    $policy->getPolicyOrUserBacsBankAccount() ?
+                        $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
                         null
                 ),
+                sprintf('"%s"', $policy->useForAttribution($prefix) ? 'yes' : 'no'),
+                sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no')
             ]);
         }
         if (!$skipS3) {

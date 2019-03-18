@@ -18,6 +18,9 @@ class JudoPayment extends Payment
     const RESULT_SKIPPED = "Skipped";
     const RESULT_ERROR = "Error";
 
+    const TYPE_PAYMENT = 'Payment';
+    const TYPE_REFUND = 'Refund';
+
     /**
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")
@@ -143,5 +146,31 @@ class JudoPayment extends Payment
     public function isUserPayment()
     {
         return true;
+    }
+
+    /**
+     * Judopay specific logic for whether to show a payment to users.
+     * @inheritDoc
+     */
+    public function isVisibleUserPayment()
+    {
+        if ($this->areEqualToTwoDp(0, $this->amount)) {
+            return false;
+        }
+
+        return $this->success;
+    }
+
+    /**
+     * Gives the name that this payment should be called by to users when there is not an overriding circumstance.
+     * @inheritDoc
+     */
+    protected function userPaymentName()
+    {
+        if ($this->amount < 0) {
+            return "Card Refund";
+        } else {
+            return "Card Payment";
+        }
     }
 }

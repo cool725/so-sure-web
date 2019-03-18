@@ -51,6 +51,13 @@ class Rollbar
             return true;
         }
 
+        // security scanner: Invalid csrf token
+        // Verify: GET -UsEd https://wearesosure.com/app.php/resetting/send-email
+        if ($source instanceof \InvalidArgumentException &&
+            mb_stripos($exception->getMessage(), "Invalid csrf token") !== false) {
+            return true;
+        }
+
         return false;
     }
 }

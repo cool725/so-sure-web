@@ -15,7 +15,7 @@ use Judopay;
 
 use AppBundle\Classes\Salva;
 
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Phone;
@@ -29,6 +29,7 @@ use AppBundle\Document\MultiPay;
 use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Event\PaymentEvent;
+use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Event\PolicyEvent;
 
 use AppBundle\Exception\InvalidPremiumException;
@@ -141,6 +142,7 @@ class JudopayService
            'apiSecret' => $apiSecret,
            'judoId' => $judoId,
            'useProduction' => $environment == 'prod',
+           'apiVersion' => '5.6'
            // endpointUrl is overwriten in Judopay Configuration Constructor
            // 'endpointUrl' => ''
         );
@@ -185,7 +187,7 @@ class JudopayService
                 ['exception' => $e]
             );
         }
-    
+
         return null;
     }
 
@@ -240,7 +242,7 @@ class JudopayService
             // allow a few (5) minutes before warning if missing receipt
             if ($diff < 300) {
                 $data['skipped-too-soon']++;
-            } elseif (in_array($receipt['type'], ['Payment', 'Refund']) &&
+            } elseif (in_array($receipt['type'], [JudoPayment::TYPE_PAYMENT, JudoPayment::TYPE_REFUND]) &&
                 $receipt['result'] == JudoPayment::RESULT_SUCCESS) {
                 if (!$payment) {
                     if ($logMissing) {
@@ -269,7 +271,7 @@ class JudopayService
                 } else {
                     $data['validated']++;
                 }
-            } elseif (in_array($receipt['type'], ['Payment', 'Refund']) &&
+            } elseif (in_array($receipt['type'], [JudoPayment::TYPE_PAYMENT, JudoPayment::TYPE_REFUND]) &&
                 $receipt['result'] != JudoPayment::RESULT_SUCCESS) {
                 // can ignore failed missing payments
                 // however if our db thinks it successful and judo says its not, that's problematic
@@ -408,7 +410,7 @@ class JudopayService
         if ($deviceDna) {
             $judo->setDeviceDna($deviceDna);
         }
-        $user->setPaymentMethod($judo);
+        $policy->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
 
@@ -439,7 +441,7 @@ class JudopayService
         }
     }
 
-    private function triggerPolicyEvent($policy, $event)
+    private function triggerPolicyEvent($policy, $event, \DateTime $date = null)
     {
         if (!$policy) {
             return;
@@ -448,7 +450,7 @@ class JudopayService
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             $this->logger->debug(sprintf('Event %s', $event));
-            $this->dispatcher->dispatch($event, new PolicyEvent($policy));
+            $this->dispatcher->dispatch($event, new PolicyEvent($policy, $date));
         } else {
             $this->logger->warning('Dispatcher is disabled for Judo Service');
         }
@@ -611,10 +613,20 @@ class JudopayService
             $payment->setMessage($transactionDetails["message"]);
         }
 
-        $judo = $user->getPaymentMethod();
+        // TODO: This should update on all policies
+        $judo = null;
+        if ($policy && $policy->getJudoPaymentMethod()) {
+            $judo = $policy->getJudoPaymentMethod();
+        }
         if (!$judo || !$judo instanceof JudoPaymentMethod) {
             $judo = new JudoPaymentMethod();
-            $user->setPaymentMethod($judo);
+            if ($policy) {
+                $policy->setPaymentMethod($judo);
+            } else {
+                foreach ($user->getValidPolicies(true) as $userPolicy) {
+                    $userPolicy->setPaymentMethod($judo);
+                }
+            }
         }
         $judo->setCustomerToken($consumerToken);
         if ($cardToken) {
@@ -710,7 +722,7 @@ class JudopayService
         }
 
         /** @var JudoPaymentMethod $judoPaymentMethod */
-        $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
+        $judoPaymentMethod = $policy->getPolicyOrUserPaymentMethod();
         if ($cardToken) {
             $tokens = $judoPaymentMethod->getCardTokens();
             if (!isset($tokens[$cardToken]) || !$tokens[$cardToken]) {
@@ -721,6 +733,10 @@ class JudopayService
                     $payment->setCardLastFour($transactionDetails['cardDetails']['cardLastFour']);
                 }
             }
+        }
+
+        if ($judoPaymentMethod && !$payment->getDetails()) {
+            $payment->setDetails($judoPaymentMethod->__toString());
         }
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -820,7 +836,7 @@ class JudopayService
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
+        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
         try {
             if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
                 throw new \Exception(sprintf(
@@ -853,6 +869,9 @@ class JudopayService
             $payment = new JudoPayment();
             $payment->setAmount(0);
             $payment->setResult(JudoPayment::RESULT_SKIPPED);
+            if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+                $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+            }
             $policy->addPayment($payment);
         }
         $this->processScheduledPaymentResult($scheduledPayment, $payment);
@@ -915,67 +934,11 @@ class JudopayService
             // and used by expire process to cancel policy if unpaid after 30 days
             $policy->setStatus(PhonePolicy::STATUS_UNPAID);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
-
-            /** @var ScheduledPaymentRepository $repo */
-            $repo = $this->dm->getRepository(ScheduledPayment::class);
-
-            // Only allow up to 4 failed payment attempts
-            $failedPayments = $repo->countUnpaidScheduledPayments($policy);
-
-            $finalAttempt = $failedPayments == 4;
-            $next = null;
-            if ($failedPayments <= 3) {
-                // create another scheduled payment for 7 days later
-                $rescheduled = $scheduledPayment->reschedule($date);
-                $policy->addScheduledPayment($rescheduled);
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                $next = $rescheduled->getScheduled();
-            }
-
-            // Due to a limitation in intercom, messages are only sent to a user once
-            // So, we want to use Intercom but only if its the first time that's been used
-            $paymentMethod = $policy->getUser()->getPaymentMethod();
-            $withinFirstProblemTimeframe = false;
-            if ($paymentMethod && $firstProblem = $paymentMethod->getFirstProblem()) {
-                //print_r($date);
-                //print_r($firstProblem);
-                $diff = $date->diff($firstProblem);
-                //print_r($diff);
-                $days = $diff->days;
-                // 28 (feb) - 7 = 21 days - firstProblem is recorded 7 days into problem (failedPayments >= 2)
-                // must be less than or will catch first next month
-                $withinFirstProblemTimeframe = $days < 21;
-                //print $days . PHP_EOL;
-                //print $failedPayments . PHP_EOL;
-            }
-            if ($paymentMethod && $this->featureService->isEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM)) {
-                // We need the user to only enter the campaign on the 2nd failure as otherwise
-                // the timing will be completely off
-                if ($failedPayments == 2 && !$firstProblem) {
-                    $paymentMethod->setFirstProblem($date);
-                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                    if ($this->dispatcher) {
-                        $this->logger->debug('Event Payment First Problem');
-                        $this->dispatcher->dispatch(PaymentEvent::EVENT_FIRST_PROBLEM, new PaymentEvent($payment));
-                    } else {
-                        $this->logger->warning('Dispatcher is disabled for Judo Service');
-                    }
-                } elseif ($failedPayments >= 2 && $withinFirstProblemTimeframe) {
-                    // intercom campaign should be handling addition if its the same payment problem
-                    \AppBundle\Classes\NoOp::ignore([]);
-                } else {
-                    $this->failedPaymentEmail($policy, $failedPayments, $next);
-                }
-            } else {
-                $this->failedPaymentEmail($policy, $failedPayments, $next);
-            }
-
-            // Sms is quite invasive and occasionlly a failed payment will just work the next time
-            // so allow 1 failed payment before sending sms
-            if ($failedPayments > 1) {
-                $this->failedPaymentSms($policy, $failedPayments, $next);
-            }
+            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID, $date);
+            $this->dispatcher->dispatch(
+                ScheduledPaymentEvent::EVENT_FAILED,
+                new ScheduledPaymentEvent($scheduledPayment, $date)
+            );
         }
     }
 
@@ -995,7 +958,9 @@ class JudopayService
             $nextMonth = clone $date;
         }
         $nextMonth->add(new \DateInterval('P1M'));
-        if (!$policy->getPayerOrUser()->getPaymentMethod()->isCardExpired($nextMonth)) {
+
+        if (!$policy->hasPolicyOrPayerOrUserJudoPaymentMethod() ||
+            !$policy->getPolicyOrPayerOrUserJudoPaymentMethod()->isCardExpired($nextMonth)) {
             return false;
         }
 
@@ -1034,7 +999,7 @@ class JudopayService
         $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
         if ($policy->hasMonetaryClaimed(true, true)) {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
-        } elseif (!$policy->getUser()->hasValidPaymentMethod()) {
+        } elseif (!$policy->hasPolicyOrUserValidPaymentMethod()) {
             $baseTemplate = sprintf('AppBundle:Email:card/cardMissing');
         } else {
             $baseTemplate = sprintf('AppBundle:Email:card/failedPayment');
@@ -1077,15 +1042,19 @@ class JudopayService
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
-    public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)
+    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $customerRef = null)
     {
         /** @var JudoPaymentMethod $paymentMethod */
-        $paymentMethod = $user->getPaymentMethod();
+        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
         if (!$paymentMethod) {
-            throw new \Exception(sprintf('Unknown payment method for user %s', $user->getId()));
+            throw new \Exception(sprintf(
+                'Unknown payment method for policy %s user %s',
+                $policy->getId(),
+                $policy->getPayerOrUser()->getId()
+            ));
         }
         if (!$customerRef) {
-            $customerRef = $user->getId();
+            $customerRef = $policy->getPayerOrUser()->getId();
         }
 
         // add payment
@@ -1102,9 +1071,12 @@ class JudopayService
                 'amount' => $this->toTwoDp($amount),
                 'currency' => 'GBP',
                 'cardToken' => $paymentMethod->getCardToken(),
-                'emailAddress' => $user->getEmail(),
-                'mobileNumber' => $user->getMobileNumber(),
+                'emailAddress' => $policy->getUser()->getEmail(),
+                'mobileNumber' => $policy->getUser()->getMobileNumber(),
         );
+        if ($this->featureService->isEnabled(Feature::FEATURE_JUDO_RECURRING)) {
+            $data['recurringPayment'] = true;
+        }
         // For webpayments, we won't have the customer token, but its optoinal anyway
         if ($paymentMethod->getCustomerToken()) {
             $data['consumerToken'] = $paymentMethod->getCustomerToken();
@@ -1117,7 +1089,7 @@ class JudopayService
             \AppBundle\Classes\NoOp::ignore([]);
         } else {
             // May not have for older customers
-            $this->logger->info(sprintf('Missing JudoPay DeviceDna for user %s', $user->getId()));
+            $this->logger->info(sprintf('Missing JudoPay DeviceDna for policy %s', $policy->getId()));
         }
 
         // populate the required data fields.
@@ -1187,12 +1159,15 @@ class JudopayService
         $payment->setNotes($notes);
         $payment->setUser($policy->getUser());
         $payment->setSource(Payment::SOURCE_TOKEN);
+        if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+            $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+        }
         $policy->addPayment($payment);
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        if ($user->hasValidPaymentMethod()) {
-            $tokenPaymentDetails = $this->runTokenPayment($user, $amount, $payment->getId(), $policy->getId());
+        if ($policy->hasPolicyOrUserValidPaymentMethod()) {
+            $tokenPaymentDetails = $this->runTokenPayment($policy, $amount, $payment->getId(), $policy->getId());
 
             $payment->setReference($tokenPaymentDetails["yourPaymentReference"]);
             $payment->setReceipt($tokenPaymentDetails["receiptId"]);
@@ -1215,7 +1190,7 @@ class JudopayService
 
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
-        
+
         // TODO: Validate receipt does not set commission on failed payments, but token does
         // make consistent
         $this->setCommission($payment);
@@ -1286,7 +1261,7 @@ class JudopayService
         return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
     }
 
-    public function webRegister(User $user, $ipAddress, $userAgent, $policy = null)
+    public function webRegister(User $user, $ipAddress, $userAgent, Policy $policy = null)
     {
         $payment = new JudoPayment();
         $payment->setAmount(0);
@@ -1349,13 +1324,17 @@ class JudopayService
         if (!$totalCommision) {
             $totalCommision = $payment->getTotalCommission();
         }
+        $policy = $payment->getPolicy();
 
         // Refund is a negative payment
         $refund = new JudoPayment();
         $refund->setAmount(0 - $amount);
         $refund->setNotes($notes);
         $refund->setSource($source);
-        $payment->getPolicy()->addPayment($refund);
+        if ($policy->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+            $payment->setDetails($policy->getPolicyOrPayerOrUserJudoPaymentMethod()->__toString());
+        }
+        $policy->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -1478,7 +1457,7 @@ class JudopayService
                             $line['ReceiptId']
                         );
                         // @codingStandardsIgnoreEnd
-                        
+
                         $this->mailer->send(
                             sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
                             'developersupport@judopayments.com',
@@ -1578,10 +1557,6 @@ class JudopayService
     public function existing(Policy $policy, $amount, \DateTime $date = null)
     {
         $this->statsd->startTiming("judopay.existing");
-
-        if ($policy->getStatus() != null) {
-            throw new ProcessedException();
-        }
 
         $premium = $policy->getPremium();
         if ($amount < $premium->getMonthlyPremiumPrice() &&

@@ -8,48 +8,147 @@
                      data-ride="carousel"
                      data-interval="false">
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <div class="reviews__item text-center text-lg-left">
-                                <span class="mt-2">
+                        <div class="carousel-item {% if app.request.get('_route') != 'social_insurance' %}active{% endif %}">
+                            <div class="reviews__item text-center text-lg-left"
+                                 vocab="https://schema.org/"
+                                 typeof="Review">
+                                <span property="itemReviewed"
+                                      typeof="Thing">
+                                    <meta property="name" content="so-sure insurance">
+                                </span>
+                                <span class="mt-2" property="reviewRating" typeof="Rating">
+                                    <meta property="ratingValue" content="5">
+                                    <meta property="bestRating" content="5">
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                 </span>
-                                <p class="lead py-4">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
-                                <div class="reviews__footer mb-4">
-                                    <span class="h5 text-zaffre mr-2">Nick B</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                <p class="lead py-4" property="description">"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
+                                <div class="reviews__footer mb-4"
+                                     property="author" typeof="Person">
+                                    <span class="h5 text-zaffre mr-2" property="name">Nick B</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="reviews__item text-center text-lg-left">
-                                <span class="mt-2">
+                            <div class="reviews__item text-center text-lg-left"
+                                 vocab="https://schema.org/"
+                                 typeof="Review">
+                                <span property="itemReviewed"
+                                      typeof="Thing">
+                                    <meta property="name" content="so-sure insurance">
+                                </span>
+                                <span class="mt-2" property="reviewRating" typeof="Rating">
+                                    <meta property="ratingValue" content="5">
+                                    <meta property="bestRating" content="5">
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                 </span>
-                                <p class="lead py-4">"Very happy with these guys, my phone was badly cracked after a fall, they picked it up, repaired it good as new in 2 days!  Claims team very nice, would highly recommend"</p>
-                                <div class="reviews__footer mb-4">
-                                    <span class="h5 text-zaffre mr-2">Tommy P</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                <p class="lead py-4" property="description">"Very happy with these guys, my phone was badly cracked after a fall, they picked it up, repaired it good as new in 2 days!  Claims team very nice, would highly recommend"</p>
+                                <div class="reviews__footer mb-4"
+                                     property="author" typeof="Person">
+                                    <span class="h5 text-zaffre mr-2" property="name">Tommy P</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
                                 </div>
                             </div>
                         </div>
                         <div class="carousel-item">
-                            <div class="reviews__item text-center text-lg-left">
-                                <span class="mt-2">
+                            <div class="reviews__item text-center text-lg-left"
+                                 vocab="https://schema.org/"
+                                 typeof="Review">
+                                <span property="itemReviewed"
+                                      typeof="Thing">
+                                    <meta property="name" content="so-sure insurance">
+                                </span>
+                                <span class="mt-2" property="reviewRating" typeof="Rating">
+                                    <meta property="ratingValue" content="5">
+                                    <meta property="bestRating" content="5">
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                     <i class="fas fa-star fa-lg text-primary"></i>
                                 </span>
-                                <p class="lead py-4">"Only paid 50 quid excess for my iphone X which is fab, app is really easy to use and a lady called kitti was very helpful in the claim and getting me my new phone"</p>
-                                <div class="reviews__footer mb-4">
-                                    <span class="h5 text-zaffre mr-2">Paulo R</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                <p class="lead py-4" property="description">"Only paid 50 quid excess for my iphone X which is fab, app is really easy to use and a lady called kitti was very helpful in the claim and getting me my new phone"</p>
+                                <div class="reviews__footer mb-4"
+                                     property="author" typeof="Person">
+                                    <span class="h5 text-zaffre mr-2" property="name">Paulo R</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item {% if app.request.get('_route') == 'social_insurance' %}active{% endif %}">
+                            <div class="reviews__item text-center text-lg-left"
+                                 vocab="https://schema.org/"
+                                 typeof="Review">
+                                <span property="itemReviewed"
+                                      typeof="Thing">
+                                    <meta property="name" content="so-sure insurance">
+                                </span>
+                                <span class="mt-2" property="reviewRating" typeof="Rating">
+                                    <meta property="ratingValue" content="5">
+                                    <meta property="bestRating" content="5">
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                </span>
+                                <p class="lead py-4" property="description">"I got &pound;80 quid back at the end of the year! I used it to reduce my monthly payments to almost nothing!"</p>
+                                <div class="reviews__footer mb-4"
+                                     property="author" typeof="Person">
+                                    <span class="h5 text-zaffre mr-2" property="name">Mark</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="reviews__item text-center text-lg-left"
+                                 vocab="https://schema.org/"
+                                 typeof="Review">
+                                <span property="itemReviewed"
+                                      typeof="Thing">
+                                    <meta property="name" content="so-sure insurance">
+                                </span>
+                                <span class="mt-2" property="reviewRating" typeof="Rating">
+                                    <meta property="ratingValue" content="5">
+                                    <meta property="bestRating" content="5">
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                </span>
+                                <p class="lead py-4" property="description">"Thanks so sure, me and my husband didnt claim and we both got &pound;40 back, we totally forgot about it so it was a really nice surprise"</p>
+                                <div class="reviews__footer mb-4"
+                                     property="author" typeof="Person">
+                                    <span class="h5 text-zaffre mr-2" property="name">Fiona</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="reviews__item text-center text-lg-left"
+                                 vocab="https://schema.org/"
+                                 typeof="Review">
+                                <span property="itemReviewed"
+                                      typeof="Thing">
+                                    <meta property="name" content="so-sure insurance">
+                                </span>
+                                <span class="mt-2" property="reviewRating" typeof="Rating">
+                                    <meta property="ratingValue" content="5">
+                                    <meta property="bestRating" content="5">
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                    <i class="fas fa-star fa-lg text-primary"></i>
+                                </span>
+                                <p class="lead py-4" property="description">"Great to get some money back, nice one - highly recommend"</p>
+                                <div class="reviews__footer mb-4"
+                                     property="author" typeof="Person">
+                                    <span class="h5 text-zaffre mr-2" property="name">Roddy</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
                                 </div>
                             </div>
                         </div>

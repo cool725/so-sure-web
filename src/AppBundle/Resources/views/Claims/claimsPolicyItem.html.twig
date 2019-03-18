@@ -313,6 +313,10 @@
                         </div>
                     {% endif %}
 
+
+
+                    {% if is_granted('ROLE_EMPLOYEE') %}
+
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Files</h3>
@@ -336,6 +340,14 @@
                             </table>
                         </div>
                     </div>
+
+                    {% endif %}
+
+
+
+
+
+
                 </div>
                 <div class="col-md-6">
                     <div class="panel panel-default">
@@ -451,36 +463,35 @@
                                         </td>
                                     </tr>
                                 {% endif %}
-                                {% if policy.isPolicy and policy.payerOrUser.paymentMethod and
-                                    policy.payerOrUser.paymentMethod.getType == "judo" %}
+                                {% if policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                                     <tr>
-                                        <td>Card</td>
-                                        <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">
-                                            {{ policy.payerOrUser.paymentMethod }}
+                                        <td>Card {% if policy.hasJudoPaymentMethod %}on policy{% else %}on user{% endif %}</td>
+                                        <td class="{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.isCardExpired %}danger{% endif %}">
+                                            {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
                                             <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank" rel="noopener noreferrer">
                                                 <i class="fa fa-external-link"></i>
                                             </a>
                                         </td>
 
                                     </tr>
-                                {% elseif policy.isPolicy and policy.payerOrUser.paymentMethod and
-                                    policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                                {% endif %}
+                                {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                                     <tr>
-                                        <td>Bacs</td>
+                                        <td>Bacs {% if policy.hasBacsPaymentMethod %}on policy{% else %}on user{% endif %}</td>
                                         <td class="">
-                                            {% if policy.payerOrUser.paymentMethod.bankAccount.isMandateInvalid %}
-                                                <s>{{ policy.payerOrUser.paymentMethod }}</s>
+                                            {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
+                                                <s>{{ policy.getPolicyOrUserBacsPaymentMethod }}</s>
                                             {% else %}
-                                                {{ policy.payerOrUser.paymentMethod }}
+                                                {{ policy.getPolicyOrUserBacsPaymentMethod }}
                                             {% endif %}
                                             <br>
-                                            Reference: {{ policy.payerOrUser.paymentMethod.bankAccount.reference }}
+                                            Reference: {{ policy.getPolicyOrUserBacsBankAccount.reference }}
                                             <br>
-                                            Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }}
+                                            Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
                                             <br>
-                                            Initial date: {{  policy.payerOrUser.paymentMethod.bankAccount.initialNotificationDate| date('d M Y')   }}
+                                            Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
                                             <br>
-                                            and then on the {{  policy.payerOrUser.paymentMethod.bankAccount.standardNotificationDate|date('jS')  }}
+                                            and then on the {{  policy.getPolicyOrUserBacsBankAccount.standardNotificationDate|date('jS')  }}
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -554,7 +565,7 @@
                                         <td>
                                             <strong>{{ policy.company.policies|length }}</strong>&nbsp;:&nbsp;
                                             {% for companyPolicy in policy.company.policies %}
-                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a>;
+                                                <a href="{{ path(policy_route, {'id': companyPolicy.id }) }}">{{ companyPolicy.policyNumber }}</a> ({{ companyPolicy.status }});
                                             {% endfor %}
                                         </td>
                                     </tr>
@@ -594,12 +605,12 @@
                                     <td>{% if fraud.duplicate_postcode %}{{ fraud.duplicate_postcode }}{% else %}N/A{% endif %}</td>
                                 </tr>
                                 <tr>
-                                    <td>Other Users w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
+                                    <td>Other Users/Policies w/possibly same account details (for card: same last 4, type, exp date, for bacs: same details)</td>
                                     <td>
                                         <strong>{{ fraud.duplicate_bank_accounts_count }}</strong>
-                                        {% for user in fraud.duplicate_bank_accounts %}
-                                            <a href="{{ path(user_route, {'id': user.id }) }}">
-                                                {{ user.name }}
+                                        {% for policy in fraud.duplicate_bank_policy_accounts %}
+                                            <a href="{{ path(policy_route, {'id': policy.id }) }}">
+                                                {{ policy.policyNumber }}
                                             </a>;
                                         {% endfor %}
                                     </td>
@@ -861,6 +872,10 @@
                     <td>Latest Attribution</td>
                     <td>{{ policy.user.latestAttribution }}</td>
                 </tr>
+                <tr>
+                    <td>Chase Payment<br> (Policy Cancelled w/Successful Claim)</td>
+                    <td>{% if policy.user.hasPolicyCancelledAndPaymentOwed %}Yes{% else %}No{% endif %}</td>
+                </tr>
             </table>
             {% if policy.namedUser %}
             <h2>Additional Named User</h2>
@@ -883,6 +898,10 @@
                 </tr>
             </table>
             {% endif %}
+
+            {% if is_granted('ROLE_EMPLOYEE') %}
+
+
             <h2>User Files</h2>
             <table class="table table-striped">
                 {% for file in policy.user.userFiles %}
@@ -905,6 +924,10 @@
                     </tr>
                 {% endfor %}
             </table>
+
+            {% endif %}
+
+
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
             {% if is_granted('ROLE_EMPLOYEE') %}
@@ -1025,7 +1048,7 @@
                         {{ form_start(resend_email_form, {'attr': {'class': 'form-inline'}}) }}
                         {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to resend the Policy Welcome Email?'}}) }}
                         {{ form_end(resend_email_form) }}
-                      </td>
+                    </td>
                 </tr>
                 <tr>
                     <td>Taste Card</td>
@@ -1158,6 +1181,15 @@
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
                 <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Request Bacs Payment</td>
+                    <td>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#bacsPaymentRequestForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Request
+                        </button>
+                    </td>
+                </tr>
+                <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Debt Collection</td>
                     <td>
                         {% if policy.debtCollector %}
@@ -1199,13 +1231,12 @@
                     </td>
                 </tr>
                 {% endif %}
-                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
-                    <td><i class="fa fa-shield" title="Customer Service only"></i> Pay Policy</td>
+                    <td>Pay Policy</td>
                     <td>
-                        {% if not policy.payerOrUser.paymentMethod %}
+                        {% if not policy.getPolicyOrPayerOrUserPaymentMethod %}
                             Missing payment method
-                        {% elseif policy.payerOrUser.paymentMethod.type != 'judo' %}
+                        {% elseif not policy.getPolicyOrPayerOrUserJudoPaymentMethod %}
                             Non-Judo payment method
                         {% elseif not policy.user.hasValidDetails %}
                             Invalid user details (missing mobile number, address, or birthday)
@@ -1219,11 +1250,8 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% endif %}
                 {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                    {% if policy.isPolicy
-                        and policy.payerOrUser.paymentMethod
-                        and policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                    {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                         <tr>
                             <td><i class="fa fa-shield" title="Customer Service only"></i> Cancel Direct Debit</td>
                             <td>
@@ -1235,14 +1263,24 @@
                     {% endif %}
                 {% endif %}
                 {% if is_granted('ROLE_ADMIN') %}
-                    {% if policy.isPolicy
-                        and policy.payerOrUser.paymentMethod
-                        and policy.payerOrUser.paymentMethod.getType == "bacs" %}
+                    {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
                         <tr>
                             <td><i class="fa fa-lock" title="Admin only"></i> Refund Bacs</td>
                             <td>
-                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#bacsRefundModal"
-                                >Refund</button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#bacsRefundModal">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
+                            </td>
+                        </tr>
+                    {% elseif policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Refund Judo</td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#judoRefundForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
                             </td>
                         </tr>
                     {% endif %}
@@ -1287,13 +1325,29 @@
                 <tr>
                     <td><i class="fa fa-shield" title="Customer Service only"></i> Phone</td>
                     <td>
-                        <div class="form-group">
-                            {{ policy.phone }}
-                        </div>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
-                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            Update
-                        </button>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {{ policy.phone }}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#imeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Serial Number</td>
+                    <td>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {{ policy.serialNumber }}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#serialNumberForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 <tr>
@@ -1304,6 +1358,22 @@
                                 {{ policy.detectedImei }}
                             </div>
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#detectedImeiForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-shield" title="Customer Service only"></i> Invalid Imei</td>
+                    <td>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                {% if policy.invalidImei %}IMEI has been flagged as invalid. User needs to provide proof of purchase.
+                                {% else %}IMEI is valid
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#invalidImeiForm">
                                 <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                 Update
                             </button>
@@ -1410,6 +1480,8 @@
                         <td>
                             {% if payment.type == 'judo' %}
                                 <i class="fa fa-credit-card" title="JudoPay"></i>
+                            {% elseif payment.type == 'checkout' %}
+                                <i class="fa fa-credit-card" title="Checkout"></i>
                             {% elseif payment.type == 'sosure' %}
                                 <i class="fa fa-smile-o" title="so-sure Credit/Debit"></i>
                             {% elseif payment.type == 'bacs' %}
@@ -1475,6 +1547,12 @@
                             {%  if payment.status is defined and payment.status %}
                                 ({{  payment.status }})
                             {% endif %}
+                            {% if is_granted('ROLE_ADMIN') and payment.status is defined and payment.status == 'pending' %}
+                                <button title="Skip" type="button" class="btn btn-warning" data-payment-id="{{ payment.id }}"
+                                        data-toggle="modal" data-target="#skipPaymentModal"
+                                ><i class="fa fa-trash"></i> Skip</button>
+                            {% endif %}
+
                         </td>
                     </tr>
                   {% endfor %}
@@ -1484,11 +1562,12 @@
             <table class="table table-striped">
               <tbody>
                   <tr>
-                      <th>Type</th>
+                      <th style="width: 5%">Type</th>
                       <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
                       <th>Payment Status</th>
+                      <th>Notes</th>
                       <th>Actions</th>
                   </tr>
                   {% set totalScheduled = 0 %}
@@ -1525,16 +1604,22 @@
                             {% endif %}
                         </td>
                         <td>
+                            {{ scheduledPayment.notes }}
+                        </td>
+                        <td>
+                            {# edit button #}
+                            {% if is_granted('ROLE_EMPLOYEE') and scheduledPayment.status == 'scheduled' %}
+                                <button title="Edit Scheduled Payment" type="button" class="btn btn-danger" data-toggle="modal" data-target="#scheduledPaymentForm{{scheduledPayment.id}}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
+                            {% endif %}
+                            {# run button #}
                             {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                                 {% if policy.nextScheduledPayment and policy.nextScheduledPayment.id == scheduledPayment.id %}
                                     <button title="Run Scheduled Payment" type="button" class="btn btn-warning"
                                             data-toggle="modal" data-target="#runScheduledPaymentModal"
                                             ><i class="fa fa-play"></i> Run</button>
-                                {% else %}
-                                    -
                                 {% endif %}
-                            {% else %}
-                                -
                             {% endif %}
                         </td>
                     </tr>
@@ -1544,6 +1629,11 @@
                         <td>
                             £{{ totalScheduled | number_format(2, '.', ',') }}
                         </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
               </tbody>
             </table>
@@ -1634,6 +1724,31 @@
                         {{ form_widget(run_scheduled_payment_form.upload, {'label': 'Reschedule', 'attr': {'class': 'btn btn-success'}}) }}
                     </div>
                     {{ form_end(run_scheduled_payment_form )}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="modal fade" id="skipPaymentModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document" style="width: 60%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Skip payment</h4>
+                    </div>
+                    {{ form_start(skip_payment_form)}}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Change status from pending to skipped</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {{ form_widget(skip_payment_form.skip, {'label': 'Skip', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(skip_payment_form )}}
                 </div>
             </div>
         </div>
@@ -1835,17 +1950,28 @@
 
     {% if is_granted('ROLE_EMPLOYEE') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:serialNumberForm', 'policy': policy, 'id': 'serialNumberForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:bacsPaymentRequestForm', 'policy': policy, 'id': 'bacsPaymentRequestForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
+        {% for scheduledPayment in policy.scheduledPayments if scheduledPayment.status == 'scheduled' %}
+            {%
+                include 'AppBundle::Admin/adminConfirmModal.html.twig' with
+                {'route': 'AppBundle:AdminEmployee:scheduledPaymentForm', 'params': {'id': policy.id, 'scheduledPaymentId': scheduledPayment.id}, 'id': 'scheduledPaymentForm' ~ scheduledPayment.id, 'title': 'Edit Scheduled Payment'}
+            %}
+        {% endfor %}
+
     {% endif %}
     {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:invalidImeiForm', 'params': {'id': policy.id }, 'id': 'invalidImeiForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_ADMIN') %}

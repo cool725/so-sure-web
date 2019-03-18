@@ -86,10 +86,11 @@ class BaseImeiService
      * Check if imei is already assigned to another policy
      *
      * @param string $imei
+     * @param Policy $original is a policy to consider as the "original", but it can be null and ignored.
      *
      * @return boolean
      */
-    public function isDuplicatePolicyImei($imei)
+    public function isDuplicatePolicyImei($imei, Policy $original = null)
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -97,6 +98,12 @@ class BaseImeiService
 
         foreach ($policies as $policy) {
             /** @var Policy $policy */
+
+            // Partial policies can be ignored
+            if (!$policy->isPolicy()) {
+                continue;
+            }
+
             // Expired policies can be paid for again
             if ($policy->isExpired()) {
                 continue;
@@ -110,6 +117,14 @@ class BaseImeiService
             // Cancelled policies that are not policy declined can be paid for again
             if ($policy->isCancelled() && !$policy->isCancelledWithPolicyDeclined()) {
                 continue;
+            }
+
+            // Extra checks if we are checking with a specific policy in mind.
+            if ($original) {
+                $ancestor = $original->getPreviousPolicy();
+                if ($original->getId() === $policy->getId() || ($ancestor && $ancestor->getId() === $policy->getId())) {
+                    continue;
+                }
             }
 
             // TODO: may want to allow a new policy if within 1 month of expiration and same user

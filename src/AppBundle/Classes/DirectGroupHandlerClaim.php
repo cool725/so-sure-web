@@ -72,20 +72,24 @@ class DirectGroupHandlerClaim extends HandlerClaim
     const DETAIL_STATUS_REJECTED_UNCLEAR = 'Unclear Circumstances'; // REJECT - 28
     const DETAIL_STATUS_REJECTED_COSMETIC = 'Wear and Tear/Cosmetic damages'; // REJECT - 29
 
+    const SUPPLIER_MASTERCARD = 'Mastercard';
+
     public $replacementSupplier;
     public $repairSupplier;
     public $supplierStatus;
 
     public static $breakdownEmailAddresses = [
-        'SoSure@directgroup.co.uk',
+        'Robert.Hodson@directgroup.co.uk',
         'Tracey.McManus@directgroup.co.uk',
     ];
 
     public static $errorEmailAddresses = [
-        'SoSure@directgroup.co.uk',
+        'Robert.Hodson@directgroup.co.uk',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
         'Sally.Hancock@directgroup.co.uk',
+        'Sharon.Nolan@directgroup.co.uk',
+        'kitti@so-sure.com'
     ];
 
     public static $sheetNames = [
@@ -360,6 +364,21 @@ class DirectGroupHandlerClaim extends HandlerClaim
         return mb_strlen($this->repairSupplier) > 0 || $this->status == self::STATUS_CLOSED_REPAIRED;
     }
 
+    public function isPhoneReplacementCostCorrect()
+    {
+        if (parent::isPhoneReplacementCostCorrect()) {
+            return true;
+        }
+
+        return $this->isMastercardPhoneReplacement();
+    }
+
+    protected function isMastercardPhoneReplacement()
+    {
+        // odd case for dg where mastercard appears under the accessories instead of phone replacement
+        return $this->accessories > 0 &&
+            mb_strtolower($this->replacementSupplier) == mb_strtolower(self::SUPPLIER_MASTERCARD);
+    }
 
     protected function isSuspicious($field)
     {

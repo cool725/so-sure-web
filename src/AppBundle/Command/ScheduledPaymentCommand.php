@@ -2,8 +2,9 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Document\BacsPaymentMethod;
-use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\PaymentService;
@@ -20,6 +21,7 @@ use AppBundle\Document\Policy;
 
 class ScheduledPaymentCommand extends ContainerAwareCommand
 {
+    use DateTrait;
     /** @var DocumentManager  */
     protected $dm;
 
@@ -70,7 +72,13 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Pretent its this date'
+                'Pretend its this date'
+            )
+            ->addOption(
+                'end-of-day',
+                null,
+                InputOption::VALUE_NONE,
+                'Last processing of the day (get all payemnt up to end of day)'
             )
             ->addArgument(
                 'prefix',
@@ -94,11 +102,14 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $policyNumber = $input->getOption('policyNumber');
         $date = $input->getOption('date');
         $show = true === $input->getOption('show');
+        $endOfDay = true === $input->getOption('end-of-day');
         $prefix = $input->getArgument('prefix');
         $allowMultipleSameDayPayment = true === $input->getOption('allow-multiple-same-day-payment');
         $scheduledDate = null;
         if ($date) {
             $scheduledDate = new \DateTime($date);
+        } elseif ($endOfDay) {
+            $scheduledDate = $this->endOfDay($this->now());
         }
 
         /** @var ScheduledPaymentRepository $repo */
@@ -129,13 +140,18 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         } else {
             $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
                 $prefix,
-                JudoPaymentMethod::class
+                JudoPaymentMethod::class,
+                $scheduledDate
             );
             foreach ($scheduledPayments as $scheduledPayment) {
                 /** @var ScheduledPayment $scheduledPayment */
                 try {
                     if (!$show) {
-                        $scheduledPayment = $this->paymentService->scheduledPayment($scheduledPayment, $prefix);
+                        $scheduledPayment = $this->paymentService->scheduledPayment(
+                            $scheduledPayment,
+                            $prefix,
+                            $scheduledDate
+                        );
                     }
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 } catch (\Exception $e) {

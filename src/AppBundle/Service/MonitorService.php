@@ -8,6 +8,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\DaviesFile;
 use AppBundle\Document\File\DirectGroupFile;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -30,6 +31,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\MongoDB\LoggableCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -61,6 +63,13 @@ class MonitorService
 
     /** @var JudopayService */
     protected $judopay;
+
+    protected $jsonEncodeOptions = 0;
+
+    public function setJsonEncodeOptions($options)
+    {
+        $this->jsonEncodeOptions = $options;
+    }
 
     /**
      * @param DocumentManager $dm
@@ -295,8 +304,8 @@ class MonitorService
                 /** @var mixed $intercomUser */
                 /** @var mixed $attributes */
                 $attributes = $intercomUser->{'custom_attributes'};
+                //print_r($intercomUser);
                 //print_r($attributes);
-                // only active/unpaid policies and definitely not cancelled
                 if (!isset($attributes->Premium)) {
                     // Missing attribute indicates that potentially this is a lead rather than user
                     if ($intercomUser = $this->intercom->getIntercomUser($policy->getUser(), false)) {
@@ -309,14 +318,22 @@ class MonitorService
                             ));
                             $this->dm->flush();
                             $this->intercom->queue($policy->getUser());
-
-                            continue;
                         }
+                    } else {
+                        $this->intercom->resetIntercomId($policy->getUser());
+                        $this->logger->warning(sprintf(
+                            'Reset intercom id  user for policy %s & requeuing update',
+                            $policy->getId()
+                        ));
                     }
 
                     $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s is missing a premium attribute. Requeued.',
+                        $policy->getUser()->getEmail()
+                    );
+                    $errors[] = sprintf(
+                        'Intercom out of sync: %s is missing a premium attribute.',
                         $policy->getUser()->getEmail()
                     );
                 } elseif ($policy->isActive(true) && $attributes->Premium <= 0) {
@@ -538,6 +555,22 @@ class MonitorService
         }
     }
 
+    public function bacsInputFileNotImported()
+    {
+        $now = $this->now();
+        $startOfToday = $this->startOfDay($now);
+        $endOfToday = $this->endOfDay($now);
+
+        /** @var S3FileRepository $repo */
+        $repo = $this->dm->getRepository(BacsReportInputFile::class);
+        $imported = $repo->findBy(['date' => ['$gte' => $startOfToday, '$lt' => $endOfToday]]);
+        if (count($imported) == 0) {
+            throw new MonitorException(sprintf(
+                'Bacs input report has not been uploaded for today'
+            ));
+        }
+    }
+
     public function bankHolidays(\DateTime $date = null)
     {
         if (!$date) {
@@ -572,7 +605,7 @@ class MonitorService
         }
     }
 
-    public function bacsPayments($details = false)
+    public function bacsPayments()
     {
         $errors = [];
         $twoDays = \DateTime::createFromFormat('U', time());
@@ -593,17 +626,17 @@ class MonitorService
                 continue;
             }
 
-            if ($payment->canAction(\DateTime::createFromFormat('U', time()))) {
-                $msg = sprintf('There are bacs payments waiting actioning: %s', $payment->getId());
-                $errors[] = $msg;
-                if (!$details) {
-                    throw new MonitorException($msg);
-                }
+            if ($payment->canAction(BacsPayment::ACTION_APPROVE, \DateTime::createFromFormat('U', time()))) {
+                $errors[] = $payment->getId();
             }
         }
 
         if (count($errors) > 0) {
-            throw new MonitorException($this->quoteSafeArrayToString($errors));
+            throw new MonitorException(sprintf(
+                "Found %d bacs payments. Ids: %s",
+                count($errors),
+                $this->quoteSafeArrayToString($errors)
+            ));
         }
     }
 
@@ -634,6 +667,21 @@ class MonitorService
         foreach ($unpaid as $payment) {
             /** @var BacsPayment $payment */
             throw new MonitorException('There are generated bacs payments waiting: ' . $payment->getId());
+        }
+    }
+
+    public function bacsSubmittedPayments()
+    {
+        /** @var BacsPaymentRepository $paymentsRepo */
+        $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
+
+        /** @var BacsPayment[] $unpaid */
+        $submitted = $paymentsRepo->findSubmittedPayments();
+
+        /** @noinspection LoopWhichDoesNotLoopInspection */
+        foreach ($submitted as $payment) {
+            /** @var BacsPayment $payment */
+            throw new MonitorException('There are submitted unactioned bacs payments waiting: ' . $payment->getId());
         }
     }
 
@@ -671,17 +719,6 @@ class MonitorService
 
     public function missingPaymentCommissions()
     {
-        // a few payments were missing, but had a later payment to adjust the missing commission figure
-        $commissionValidationPaymentExclusions = [
-            new \MongoId('5a8a7f55c084c74d28413471'),
-            new \MongoId('5aa6dec854e50f46ab3e8874'),
-            new \MongoId('5ac61e7a7c62216654636bea'),
-            new \MongoId('5ad5e80e75435e73e152874f'),
-            new \MongoId('5bd0381fedc29544427b31ab'),
-            new \MongoId('5bd03821edc29544427b31af'),
-            new \MongoId('5c2bb9f6d6c8c6148f38aed4'),
-        ];
-
         $commissionValidationPolicyExclusions = [];
         foreach (Salva::$commissionValidationExclusions as $item) {
             $commissionValidationPolicyExclusions[] = new \MongoId($item);
@@ -692,11 +729,11 @@ class MonitorService
         $payments = $repo->findBy([
             'success' => true,
             'totalCommission' => null,
-            'type' => ['$nin' => ['potReward', 'sosurePotReward', 'policyDiscount']],
+            'type' => ['$nin' => ['potReward', 'sosurePotReward', 'policyDiscount', 'policyDiscountRefund']],
             'amount' => ['$gt' => 2], // we may need to take small offsets; if so, there would not be a commission
             'policy.$id' => ['$nin' => $commissionValidationPolicyExclusions],
-            '_id' => ['$nin' => $commissionValidationPaymentExclusions],
             'date' => ['$gt' => new \DateTime('2017-11-01')],
+            'skipCommissionValidation' => ['neq' => true],
         ]);
 
         /** @noinspection LoopWhichDoesNotLoopInspection */
@@ -1028,12 +1065,16 @@ class MonitorService
             ->getQuery()
             ->execute();
 
+        $items = [];
         foreach ($results as $result) {
+            $items[] = $result->getId();
+        }
+
+        if (count($items) > 0) {
             throw new MonitorException(sprintf(
-                "Bacs payment (%s) under policy number %s is pending and in the past (%s)",
-                $result->getId(),
-                $result->getPolicy()->getPolicyNumber(),
-                $result->getDate()->format('Y-M-d H:m')
+                "Found %d bacs payments. Ids: %s",
+                count($items),
+                $this->quoteSafeArrayToString($items)
             ));
         }
     }
@@ -1069,17 +1110,17 @@ class MonitorService
     public function blockedScheduledPayments()
     {
         $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $twoDays = $this->subBusinessDays($this->now(), 2);
+        $twoDays = $this->startOfDay($this->subBusinessDays($this->now(), 2));
         $blocked = $repo->findBy(['status' => ScheduledPayment::STATUS_SCHEDULED, 'scheduled' => ['$lt' => $twoDays]]);
 
         $blockedItems = [];
         foreach ($blocked as $block) {
             /** @var ScheduledPayment $block */
-            if (!$block->getPolicy()->isValidPolicy()) {
+            if (!$block->getPolicy()->isActive() || !$block->getPolicy()->isValidPolicy()) {
                 continue;
             }
 
-            $bacs = $block->getPolicy()->getUser()->getBacsPaymentMethod();
+            $bacs = $block->getPolicy()->getPolicyOrUserBacsPaymentMethod();
             if ($bacs) {
                 // ignore initial first payments if we haven't reached the initial notification date
                 if ($bacs->getBankAccount()->isFirstPayment() &&
@@ -1093,15 +1134,15 @@ class MonitorService
 
         if (count($blockedItems) > 0) {
             throw new MonitorException(sprintf(
-                "Found %d blocked scheduled payments. First id: %s",
+                "Found %d blocked scheduled payments. Ids: %s",
                 count($blockedItems),
                 $this->quoteSafeArrayToString($blockedItems)
             ));
         }
     }
 
-    private function quoteSafeArrayToString($data, $options = JSON_PRETTY_PRINT)
+    public function quoteSafeArrayToString($data)
     {
-        return str_replace("\"", "'", json_encode($data, $options));
+        return str_replace("\"", "", json_encode($data, $this->jsonEncodeOptions));
     }
 }

@@ -1,50 +1,41 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
+{# Set vars #}
+{% set body_class = 'seo-theft' %}
+
+{% block title %}so-sure - Phone Insurance Theft{% endblock %}
 {% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
     <link rel="canonical" href="{{ url('phone_insurance_theft') }}" />
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/about.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-    {% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/seo-pages.css') }}">
 {% endblock %}
 
 {% block body %}
-<section class="about-section section--pad">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="section-title">Theft</h1>
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5 class="text-zaffre mb-0">Phone Insurance</h5>
+                    <h1 class="text-primary mb-4">Theft</h1>
+                    <p>Nearly 300,000 mobile phones are stolen every year. That kind of number makes us sad (what kind of person steals a phone!?) - phones are an essential part of all of our lives as we depend on them to do just about everything. Taking a phone away from somebody robs them of the ability to contact their close family and friends while also making it harder for them to do everyday things such as paying bills, getting the bus or finding their way around town. </p>
+                    <p class="mb-4">Thankfully, when bad stuff like this happens you can be sure that we’ve got you covered. so-sure covers your phone for theft at home and abroad (up to 90 days coverage).</p>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote sosure-track"
+                       data-event="seo-pages-theft">
+                       Get a Quote</a>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <p>Nearly 300,000 mobile phones are stolen every year. That kind of number makes us sad (what kind of person steals a phone!?) - phones are an essential part of all of our lives as we depend on them to do just about everything. Taking a phone away from somebody robs them of the ability to contact their close family and friends while also making it harder for them to do everyday things such as paying bills, getting the bus or finding their way around town. </p>
-                <p>Thankfully, when bad stuff like this happens you can be sure that we’ve got you covered. so-sure covers your phone for theft at home and abroad (up to 90 days coverage).</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
+    {# Page Modals #}
 
-{% include 'AppBundle::Default/footerCta.html.twig' %}
+{% endblock %}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}
+{% block javascriptsPage %}
 
 {% endblock %}

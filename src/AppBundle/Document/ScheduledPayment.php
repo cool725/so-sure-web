@@ -2,11 +2,13 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Classes\SoSure;
 
 /**
@@ -23,10 +25,15 @@ class ScheduledPayment
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_REVERTED = 'reverted';
 
     const TYPE_SCHEDULED = 'scheduled';
     const TYPE_RESCHEDULED = 'rescheduled';
+    // Refund cancellations should always occur regardless of policy status
+    const TYPE_REFUND = 'refund';
     const TYPE_ADMIN = 'admin';
+    const TYPE_USER_WEB = 'user-web';
+    const TYPE_USER_MOBILE = 'user-mobile';
 
     /**
      * @MongoDB\Id
@@ -41,14 +48,14 @@ class ScheduledPayment
     protected $created;
 
     /**
-     * @Assert\Choice({"scheduled", "success", "failed", "cancelled", "pending"}, strict=true)
+     * @Assert\Choice({"scheduled", "success", "failed", "cancelled", "pending", "reverted"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
     protected $status;
 
     /**
-     * @Assert\Choice({"scheduled", "rescheduled", "admin"}, strict=true)
+     * @Assert\Choice({"scheduled", "rescheduled", "admin", "user-web", "user-mobile", "refund"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -63,7 +70,7 @@ class ScheduledPayment
     protected $scheduled;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=-200,max=200)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
@@ -91,6 +98,21 @@ class ScheduledPayment
      */
     protected $notes;
 
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     * @Gedmo\Versioned
+     */
+    protected $identityLog;
+
+    /**
+     * If this scheduled payment is a rescheduling of an older scheduled payment, then this field will contain the
+     * old one.
+     * @MongoDB\ReferenceOne(targetDocument="ScheduledPayment")
+     * @Gedmo\Versioned
+     * @var ScheduledPayment|null
+     */
+    protected $previousAttempt;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -106,7 +128,7 @@ class ScheduledPayment
     {
         $this->amount = $amount;
     }
-    
+
     public function getAmount()
     {
         return $this->amount;
@@ -132,6 +154,21 @@ class ScheduledPayment
         return $this->type;
     }
 
+    public function getPaymentSource()
+    {
+        if ($this->getType() == self::TYPE_USER_WEB) {
+            return Payment::SOURCE_WEB;
+        } elseif ($this->getType() == self::TYPE_USER_MOBILE) {
+            return Payment::SOURCE_MOBILE;
+        } elseif ($this->getType() == self::TYPE_ADMIN) {
+            return Payment::SOURCE_ADMIN;
+        } elseif ($this->getType() == self::TYPE_REFUND) {
+            return Payment::SOURCE_SYSTEM;
+        } else {
+            return Payment::SOURCE_TOKEN;
+        }
+    }
+
     public function setScheduled($scheduled)
     {
         $this->scheduled = $scheduled;
@@ -154,9 +191,16 @@ class ScheduledPayment
         return $this->getScheduled() ? $this->getScheduled()->format('j') : null;
     }
 
-    public function setPayment(Payment $payment)
+    public function setPayment(Payment $payment = null)
     {
-        $payment->setScheduledPayment($this);
+        if (!$payment && $this->payment) {
+            $this->payment->setScheduledPayment(null);
+        }
+
+        if ($payment) {
+            $payment->setScheduledPayment($this);
+        }
+
         $this->payment = $payment;
     }
 
@@ -185,17 +229,51 @@ class ScheduledPayment
         return $this->notes;
     }
 
+    public function getIdentityLog()
+    {
+        return $this->identityLog;
+    }
+
+    public function setIdentityLog($identityLog)
+    {
+        $this->identityLog = $identityLog;
+    }
+
+    public function setPreviousAttempt(ScheduledPayment $previousAttempt = null)
+    {
+        $this->previousAttempt = $previousAttempt;
+    }
+
+    public function getPreviousAttempt()
+    {
+        return $this->previousAttempt;
+    }
+
     public function cancel()
     {
         $this->setStatus(self::STATUS_CANCELLED);
     }
 
-    public function reschedule($date = null, $days = 7)
+    public function reschedule($date = null, $days = null)
     {
+        if (!$this->getPolicy()) {
+            throw new \Exception(sprintf('Missing policy for scheduled payment %s', $this->getId()));
+        }
+
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         } else {
             $date = clone $date;
+        }
+
+        if ($days === null) {
+            if ($this->getPolicy()->getPolicyOrUserBacsPaymentMethod()) {
+                $days = 6;
+            } elseif ($this->getPolicy()->getPolicyOrPayerOrUserJudoPaymentMethod()) {
+                $days = 7;
+            } else {
+                $days = 7;
+            }
         }
         $date->add(new \DateInterval(sprintf('P%dD', $days)));
 
@@ -205,7 +283,7 @@ class ScheduledPayment
         $rescheduled->setAmount($this->getAmount());
         $rescheduled->setStatus(self::STATUS_SCHEDULED);
         $rescheduled->setScheduled($date);
-
+        $rescheduled->setPreviousAttempt($this);
         return $rescheduled;
     }
 
@@ -304,12 +382,40 @@ class ScheduledPayment
         return false;
     }
 
+    /**
+     * Tells you if a scheduled payment is a rescheduled one and if it is close enough to it's original payment that it
+     * is ok to let it go ahead. If this is not a rescheduled payment then it will always fail.
+     * @return boolean|null true if we can go ahead and false if not, and null if the scheduled payment is not even bacs
+     *                      or rescheduled.
+     */
+    public function rescheduledInTime()
+    {
+        $paymentType = $this->getPolicy()->getPolicyOrUserPaymentMethod()->getType();
+        if ($paymentType !== PaymentMethod::TYPE_BACS || $this->type !== self::TYPE_RESCHEDULED) {
+            return null;
+        }
+        $origin = $this;
+        $limiter = 0;
+        while ($origin->getPreviousAttempt() && $limiter < 100) {
+            $origin = $origin->getPreviousAttempt();
+            $limiter++;
+        }
+        if ($origin == $this || $limiter == 100) {
+            return false;
+        }
+        $date = $origin->getScheduled();
+        return $date < $this->getScheduled() &&
+            $date >= $this->subDays($this->getScheduled(), BacsPayment::DAYS_REPRESENTING);
+    }
+
     public function toApiArray()
     {
         return [
             'date' => $this->getScheduled() ? $this->getScheduled()->format(\DateTime::ATOM) : null,
             'amount' => $this->getAmount() ? $this->toTwoDp($this->getAmount()) : null,
-            'type' => 'judo', // TODO: scheduled payments are only judo for now, but this isn't great
+            'type' => $this->getPolicy() && $this->getPolicy()->getPaymentMethod() ?
+                $this->getPolicy()->getPaymentMethod()->getType() :
+                null
         ];
     }
 

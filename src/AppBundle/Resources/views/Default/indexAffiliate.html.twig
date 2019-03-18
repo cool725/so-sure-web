@@ -3,9 +3,12 @@
 {# Set vars #}
 {% set body_class = 'landing' %}
 
-{% block title %}so-sure - Welcome to Social Insurance with {{ affiliate_company }}{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %}{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    {% if affiliate_page == 'so-sure-compared' %}
+        <link rel="canonical" href="{{ url('homepage') }}" />
+    {% endif %}
 {% endblock %}
 
 {% block cssPage %}
@@ -17,24 +20,26 @@
     <section class="hero">
         <div class="container container-xtra">
             <div class="hero__intro">
-                <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
-                {% if affiliate_page == 'topcashback' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_topcashback_logo.svg" alt="TopCashback" width="220px" class="d-block mb-4 mx-auto">
-                {% elseif affiliate_page == 'vouchercodes' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_vouchercodes_logo.svg" alt="iVIP" width="280px" class="d-block mb-4 mx-auto">
-                {% elseif affiliate_page == 'quidco' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_quidco_logo.svg" alt="Quidco" width="160px" class="d-block mb-4 mx-auto">
-                {% elseif affiliate_page == 'ivip' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ivip_logo.svg" alt="iVIP" width="200px" class="d-block mt-4 mb-5 mx-auto">
-                {% elseif affiliate_page == 'reward-gateway' %}
-                    <img src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_reward_gateway_logo.svg" alt="Reward Gateway" width="300px" class="d-block mt-4 mb-5 mx-auto">
+                {% if affiliate_page == 'comparison' %}
+                    <h1 class="mb-2 text-white h2">{{ titleH1 }}</h1>
+                    <h4 class="text-zaffre mb-4">{{ leadP|raw }}</h4>
+                {% elseif affiliate_page == 'so-sure-compared' %}
+                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
+                    <h4 class="text-zaffre">Simple terms, pain-free claims, premium cover</h4>
+                    <p class="mb-4 lead text-white">We're a new type of insurer that you can rely on. <br class="d-none d-lg-inline"> We protect you when you need to claim and reward you when you don't.</p>
+                {% else %}
+                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
+                    <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto lozad">
                 {% endif %}
             </div>
             <div class="hero__controls mb-5">
-                <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
+                <a href="#" class="btn btn-success btn-block-xs get-a-quote">
+                    {% if affiliate_page == 'so-sure-compared' %}Get a Quote{% else %}Get Insured {% endif %}
+                    <i class="far fa-arrow-right fa-sm ml-2"></i>
+                </a>
             </div>
-            {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'table_content': affiliate_page } %}
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'affiliate_page': affiliate_page } %}
             <p class="updated-text mt-2"><em class="text-center"><small>Information checked on  November 18 2018</small></em>
         </div>
         <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -59,19 +64,19 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="why__container">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px" class="lozad">
                         <h4 class="text-dodger-blue">24-72 hour replace or repair</h4>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="why__container">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back"width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back" width="180px" class="lozad">
                         <h4 class="text-dodger-blue">Up to 80% money back</h4>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="why__container">
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px" class="lozad">
                         <h4 class="text-dodger-blue">Low excess from just &pound;50</h4>
                     </div>
                 </div>
@@ -93,6 +98,30 @@
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+    <div class="modal fade"
+         id="page_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Free phone case
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Terms and conditions</h5>
+                    <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>
+                    <p>Promotion is valid from 23rd January 2019 until 15th February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

@@ -14,6 +14,7 @@ use AppBundle\Service\RouterService;
 use Aws\S3\S3Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
+use Predis\Collection\Iterator\SortedSetKey;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -197,7 +198,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $this->resyncPicsureMetadata();
         } elseif ($flushPolicyRedis) {
             $this->redis->del(['policy:validation']);
+            $this->redis->del(['policy:validation:flags']);
         } else {
+            $this->redis->del(['policy:validation']);
+
             /** @var PolicyRepository $policyRepo */
             $policyRepo = $this->dm->getRepository(Policy::class);
 
@@ -246,9 +250,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '';
                 $lines[] = '-------------';
                 $lines[] = '';
-
-                // for now, delete as we're refreshing
-                $this->redis->del(['policy:validation']);
 
                 foreach ($policies as $policy) {
                     if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
@@ -426,10 +427,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $policy->getPolicyNumber()
                         );
                     }
-                } elseif ($policy->getUser()->hasBacsPaymentMethod() &&
-                    $policy->getUser()->getBacsPaymentMethod() &&
-                    $policy->getUser()->getBacsPaymentMethod()->getBankAccount() &&
-                    $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->isMandateInvalid()) {
+                } elseif ($policy->hasPolicyOrUserBacsPaymentMethod() &&
+                    $policy->getPolicyOrUserBacsBankAccount() &&
+                    $policy->getPolicyOrUserBacsBankAccount()->isMandateInvalid()) {
                     // If the mandate is invalid, we can just ignore - user will be prompted to resolve the issue
                     /*
                     $lines[] = sprintf(
@@ -492,8 +492,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $policy->getPolicyNumber()
                 );
             }
-            $refund = $policy->getRefundAmount();
-            $refundCommission = $policy->getRefundCommissionAmount();
+            $refund = $policy->getRefundAmount(false, true);
+            $refundCommission = $policy->getRefundCommissionAmount(false, true);
             $pendingBacsTotal = abs($policy->getPendingBacsPaymentsTotal(true));
             $pendingBacsTotalCommission = abs($policy->getPendingBacsPaymentsTotalCommission(true));
             $refundMismatch =  $this->greaterThanZero($refund) && $refund > $pendingBacsTotal &&
@@ -514,24 +514,28 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             // bacs checks are only necessary on active policies
-            if ($policy->getUser()->hasBacsPaymentMethod() && $policy->isActive(true)) {
-                $bacsPayments = count($policy->getPaymentsByType(BacsPayment::class));
-                $bacsPaymentMethod = $policy->getUser()->getBacsPaymentMethod();
-                $bankAccount = null;
-                if ($bacsPaymentMethod) {
-                    $bankAccount = $bacsPaymentMethod->getBankAccount();
-                }
+            if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive(true)) {
+                $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
+                    $bacsPayments = $policy->getPaymentsByType(BacsPayment::class);
+                    $bacsPaymentCount = 0;
+                    $initialDay = $this->startOfDay($bankAccount->getInitialNotificationDate());
+                    foreach ($bacsPayments as $bacsPayment) {
+                        /** @var BacsPayment $bacsPayment */
+                        if ($bacsPayment->getDate() >= $initialDay) {
+                            $bacsPaymentCount++;
+                        }
+                    }
+
                     $isFirstPayment = $bankAccount->isFirstPayment();
-                    if ($bacsPayments >= 1 && $isFirstPayment) {
+                    if ($bacsPaymentCount >= 1 && $isFirstPayment) {
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
-                    } elseif ($bacsPayments == 0 && !$isFirstPayment) {
+                    } elseif ($bacsPaymentCount == 0 && !$isFirstPayment) {
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
-                    $now = \DateTime::createFromFormat('U', time());
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
-                        if ($bacsPayments == 0) {
+                        if ($bacsPaymentCount == 0) {
                             $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
@@ -568,9 +572,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy->getStatus()
         );
 
-        if ($policy->getUser()->hasBacsPaymentMethod()) {
-            $bacsStatus = $policy->getUser()->getBacsPaymentMethod() ?
-                $policy->getUser()->getBacsPaymentMethod()->getBankAccount()->getMandateStatus() :
+        if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
+            $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
+            $bacsStatus = $bankAccount ?
+                $bankAccount->getMandateStatus() :
                 'unknown';
             $message = sprintf('%s (Bacs Mandate Status: %s)', $message, $bacsStatus);
         }

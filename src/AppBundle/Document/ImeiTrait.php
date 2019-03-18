@@ -23,19 +23,18 @@ trait ImeiTrait
 
     public static function generateRandomImei()
     {
-        $imei = [];
-        for ($i = 0; $i < 14; $i++) {
-            $imei[$i] = random_int(0, 9);
+        // First two digits are 0, which means the IMEI isn't registered by any real organisation.
+        $imei = [0, 0];
+        $time = (int) (floor(microtime(true)) * 1000) + random_int(0, 1000);
+        for ($i = 0; $i < 12; $i++) {
+            $imei[] = $time % 10;
+            $time /= 10;
         }
-
-        $result = self::luhnGenerate(implode($imei));
-
-        // strange bug - only sometimes will return 14 digits
-        // TODO - fix this
-        if (mb_strlen($result) != 15) {
-            return self::generateRandomImei();
+        $result = ''.self::luhnGenerate(implode($imei));
+        while (mb_strlen($result) < 15) {
+            // luhnGenerate returns int so leading 0s have to be replaced.
+            $result = '0'.$result;
         }
-
         return $result;
     }
 

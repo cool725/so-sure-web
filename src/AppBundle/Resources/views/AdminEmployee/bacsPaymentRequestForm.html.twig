@@ -1,0 +1,25 @@
+{% block body %}
+
+    {{ form_start(form) }}
+    <div class="modal-body">
+        <div class="form-row">
+            <div class="col">
+                <p>Are you sure you want to request a bacs payment from this user?</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="form-row">
+            <label>Justification</label>
+            {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(form.submit, {'attr': {'class': 'btn btn-danger'}}) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+
+{% endblock %}

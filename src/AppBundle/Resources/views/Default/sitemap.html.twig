@@ -1,43 +1,78 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'sitemap' %}
+{% set prev_path = '' %}
 
-{% block title %}so-sure Sitemap
+{% block title %}so-sure - Sitemap{% endblock %}
+{% block meta %}
+
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'
-    '@AppBundle/Resources/public/sass/page/corporate.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
 {% endblock %}
-
-{# {% block nav %}{% endblock %} #}
 
 {% block body %}
-    {% set prev_path = '' %}
-    <div class="container">
-        <div class="col-md-12">
-            <h1>Sitemap</h1>
-            <ul class="list-unstyled">
-                {% for entity in entities %}
-                    {% set path = path_info(entity.url)['dirname'] %}
-                    {% if path != prev_path %}
+
+    <section class="faq">
+        <div class="d-lg-flex">
+
+            {# Main Content #}
+            <div class="faq__main__container">
+                <div class="faq__main px-4 px-lg-5">
+                    <div class="mb-5">
+                        <h1 class="mb-4 text-primary">Sitemap</h1>
+                        <ul class="list-unstyled">
+                            {% for entity in entities %}
+                                {% set path = path_info(entity.url)['dirname'] %}
+                                {% if path != prev_path %}
+                                    </ul>
+                                    {% if path != "http:" and path != "https:" %}
+                                        <h4 class="mb-2">{{ path|translateSitemapUrl() }}</h4>
+                                    {% endif %}
+                                <ul class="list-unstyled mb-4">
+                                {% endif %}
+                                {% set prev_path = path %}
+                                <li class="mb-2"><i class="fal fa-link fa-fw"></i> <a href="{{ entity.url }}">{{ entity.description ?? entity.url|translateSitemapUrl() }}</a></li>
+                            {% endfor %}
                         </ul>
-                        {% if path != "http:" and path != "https:" %}
-                            <h2>{{ path|translateSitemapUrl() }}</h2>
-                        {% endif %}
-                    <ul class="list-unstyled">
-                    {% endif %}
-                    {% set prev_path = path %}
-                    <li><a href="{{ entity.url }}">{{ entity.description ?? entity.url|translateSitemapUrl() }}</a></li>
-                {% endfor %}
-            </ul>
+                    </div>
+                </div>
+            </div>
+
+            {# Sub Content #}
+            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
+                {# Curve Desktop #}
+                <div class="faq__curve">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
+                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="faq__sub text-center">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
+                    <h2 class="text-dodger-blue mb-5">Sitemap 🗺️</h2>
+                    <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </section>
+
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/faq.js') }}"></script>
 {% endblock %}
 

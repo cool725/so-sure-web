@@ -125,6 +125,14 @@ class PhonePolicy extends Policy
     protected $detectedImei;
 
     /**
+     * We know the imei is not correct and needs to be validated
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $invalidImei;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -231,7 +239,7 @@ class PhonePolicy extends Policy
     public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
     {
         $this->phone = $phone;
-        if (!$phone->getCurrentPhonePrice()) {
+        if (!$phone->getCurrentPhonePrice($date)) {
             throw new \Exception('Phone must have a price');
         }
 
@@ -305,6 +313,16 @@ class PhonePolicy extends Policy
     public function setImei($imei)
     {
         $this->imei = $imei;
+    }
+
+    public function hasInvalidImei()
+    {
+        return $this->invalidImei;
+    }
+
+    public function setInvalidImei($invalidImei)
+    {
+        $this->invalidImei = $invalidImei;
     }
 
     public function adjustImei($imei, $setReplacementDate = true)
@@ -906,6 +924,32 @@ class PhonePolicy extends Policy
         } else {
             return $phonePremium->getExcess();
         }
+    }
+
+    /**
+     * Can renew is for this specific policy
+     * This is different than if a user is allowed to purchase an additional policy
+     * although lines get blurred if a policy expires and then user wants to re-purchase
+     */
+    public function canRenew(\DateTime $date = null, $checkTimeframe = true)
+    {
+        if ($this->hasInvalidImei()) {
+            return false;
+        }
+
+        return parent::canRenew($date, $checkTimeframe);
+    }
+
+    /**
+     * Pending renewal policy is required in order to renew
+     */
+    public function canCreatePendingRenewal(\DateTime $date = null)
+    {
+        if ($this->hasInvalidImei()) {
+            return false;
+        }
+
+        return parent::canCreatePendingRenewal($date);
     }
 
     public function toApiArray()

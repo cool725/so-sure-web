@@ -2,6 +2,11 @@
 
 .dropdown {
 
+  &-toggle {
+        &:after {
+            display: none;
+        }
+    }
 
     &-menu {
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
@@ -30,6 +35,12 @@
             &:last-of-type {
                 @include border-bottom-radius(5px);
             }
+        }
+    }
+
+    &-toggle {
+        &:after {
+            margin-left: .7rem;
         }
     }
 }
