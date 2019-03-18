@@ -1188,6 +1188,7 @@ services:
         class:   AppBundle\Listener\MixpanelListener
         arguments:
             - "@app.mixpanel"
+            - "%kernel.environment%"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }

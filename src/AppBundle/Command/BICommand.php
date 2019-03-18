@@ -398,7 +398,7 @@ class BICommand extends ContainerAwareCommand
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
                         null
                 ),
-                sprintf('"%s"', $policy->useForAttribution() ? 'yes' : 'no'),
+                sprintf('"%s"', $policy->useForAttribution($prefix) ? 'yes' : 'no'),
                 sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no')
             ]);
         }

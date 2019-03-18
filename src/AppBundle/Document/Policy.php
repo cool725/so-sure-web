@@ -5931,13 +5931,13 @@ abstract class Policy
         return $isConnected;
     }
 
-    public function useForAttribution()
+    public function useForAttribution($prefix = null)
     {
         if (!$this->isPolicy()) {
             return null;
         }
 
-        $attributionPolicy = $this->getUser()->getAttributionPolicy();
+        $attributionPolicy = $this->getUser()->getAttributionPolicy($prefix);
         if (!$attributionPolicy) {
             return null;
         }

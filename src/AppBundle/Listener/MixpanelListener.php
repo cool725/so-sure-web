@@ -18,13 +18,16 @@ class MixpanelListener
 {
     /** @var MixpanelService */
     protected $mixpanel;
+    protected $env;
 
     /**
      * @param MixpanelService $mixpanel
+     * @param string          $env
      */
-    public function __construct(MixpanelService $mixpanel)
+    public function __construct(MixpanelService $mixpanel, $env)
     {
         $this->mixpanel = $mixpanel;
+        $this->env = $env;
     }
 
     public function onPaymentSuccessEvent(PaymentEvent $event)
@@ -50,7 +53,7 @@ class MixpanelListener
             'Policy Id' => $policy->getId(),
             'Payment Source' => $source,
             'Payment Type' => $type,
-            'Use For Attribution' => $policy->useForAttribution() ? 'Yes' : 'No',
+            'Use For Attribution' => $policy->useForAttribution($policy->getPolicyPrefix($this->env)) ? 'Yes' : 'No'
         ]);
     }
 
