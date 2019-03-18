@@ -1,11 +1,12 @@
-// homepage.js
+// landing-snapchat.js
 
-require('../../sass/pages/homepage.scss');
+require('../../sass/pages/landing-snapchat.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/carousel');
 
 // Require components
+require('../components/table.js');
 require('../components/banner.js');
 let textFit = require('textfit');
 
@@ -18,8 +19,9 @@ observer.observe();
 
 
 $(function() {
-
-    textFit($('.fit')[0], {detectMultiLine: false});
-
+    textFit($('.fit')[0], {
+        minFontSize: 40,
+        maxFontSize: 60
+    });
 });
 
