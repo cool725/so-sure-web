@@ -113,6 +113,7 @@ class PhonePolicy extends Policy
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $imei;
 
@@ -144,6 +145,7 @@ class PhonePolicy extends Policy
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $serialNumber;
 
@@ -778,7 +780,7 @@ class PhonePolicy extends Policy
 
         return $status;
     }
-    
+
     public function getPicSureStatusWithClaims()
     {
         $status = $this->getPicSureStatus();

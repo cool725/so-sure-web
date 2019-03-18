@@ -61,7 +61,7 @@ class HubspotCommand extends ContainerAwareCommand
         $this->setDescription("Sync data with HubSpot")
             ->addArgument(
                 "action",
-                InputArgument::OPTIONAL,
+                InputArgument::REQUIRED,
                 "sync-all|sync-user|queue-count|queue-show|queue-clear|test|process"
             )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")

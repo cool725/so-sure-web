@@ -248,6 +248,7 @@ abstract class Policy
      *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $status;
 
@@ -385,6 +386,7 @@ abstract class Policy
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false, sparse=true)
+     * @DataChange(categories="hubspot")
      */
     protected $start;
 
@@ -400,6 +402,7 @@ abstract class Policy
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false, sparse=true)
+     * @DataChange(categories="hubspot")
      */
     protected $end;
 

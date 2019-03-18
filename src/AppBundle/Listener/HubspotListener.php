@@ -45,6 +45,15 @@ class HubspotListener
     }
 
     /**
+     * Hubspot actions for when a policy changes status.
+     * @param PolicyEvent $event represents the policy that is changing status.
+     */
+    public function onPolicyUpdatedStatusEvent(PolicyEvent $event)
+    {
+        $this->hubspotService->queueUpdateDeal($event->getPolicy());
+    }
+
+    /**
      * Hubspot actions for when a policy is cancelled.
      * @param PolicyEvent $event is the event object representing the cancellation.
      */
