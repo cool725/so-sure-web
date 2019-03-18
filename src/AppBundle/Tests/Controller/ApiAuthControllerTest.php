@@ -2771,7 +2771,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             $this->assertEquals(10, $highConnectionValue);
         }
         $this->assertEquals(2, $lowConnectionValue);
-        $this->assertEquals(1, count($policyData['premium_payments']['paid']));
+        $this->assertEquals(
+            1,
+            count($policyData['premium_payments']['paid']),
+            json_encode($policyData['premium_payments'])
+        );
         $this->assertEquals('checkout', $policyData['premium_payments']['paid'][0]['type']);
     }
 

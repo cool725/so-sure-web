@@ -301,9 +301,7 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        $this->updatePaymentMethod($policy, $token, $amount);
-
-        $charge = $this->runTokenPayment($policy, $amount, rand(1, 999999), $policy->getId());
+        $charge = $this->capturePaymentMethod($policy, $token, $amount);
 
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
@@ -655,6 +653,79 @@ class CheckoutService
      * @param Policy $policy
      * @param string $token
      */
+    public function capturePaymentMethod(
+        Policy $policy,
+        $token,
+        $amount = null
+    ) {
+        $user = $policy->getUser();
+        $details = null;
+        $payment = null;
+        try {
+            $service = $this->client->chargeService();
+
+            $charge = new CardTokenChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setCurrency('GBP');
+            $charge->setMetadata(['policy_id' => $policy->getId()]);
+            $charge->setCardToken($token);
+            if ($amount) {
+                $charge->setValue($this->convertToPennies($amount));
+            }
+
+            $details = $service->chargeWithCardToken($charge);
+            $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+
+            if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
+                throw new PaymentDeclinedException($details->getResponseMessage());
+            }
+
+            if ($details) {
+                $card = $details->getCard();
+                if ($card) {
+                    $this->setCardToken($policy, $card);
+                }
+            }
+
+            if ($amount) {
+                $capture = new ChargeCapture();
+                $capture->setChargeId($details->getId());
+                $details = $service->CaptureCardCharge($capture);
+                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+
+                if ($details) {
+                    $card = $details->getCard();
+                    if ($card) {
+                        $this->setCardToken($policy, $card);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+
+            throw $e;
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy && $policy->isDifferentPayer()) {
+            // don't use $user as not validated that policy belongs to user
+            $policy->setPayer($policy->getUser());
+        }
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $details;
+    }
+
+    /**
+     * @param Policy $policy
+     * @param string $token
+     */
     public function updatePaymentMethod(
         Policy $policy,
         $token,
@@ -713,8 +784,15 @@ class CheckoutService
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             }
 
-            if (!$details || $details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
+            if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
                 throw new PaymentDeclinedException($details->getResponseMessage());
+            }
+
+            if ($details) {
+                $card = $details->getCard();
+                if ($card) {
+                    $this->setCardToken($policy, $card);
+                }
             }
 
             if ($amount) {
