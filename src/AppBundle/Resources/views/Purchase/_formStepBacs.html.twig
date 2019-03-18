@@ -9,29 +9,29 @@
 </h4>
 
 {% if to_card_form is defined %}
-    <p class="mb-4">
-    <form class="payment-form" method="POST"
-          data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
-          data-value="{{ convert_to_pennies(amount) }}" data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
-          data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
-    </form>
-    </p>
+    <div class="d-flex mb-4">
+        <form class="payment-form"
+              method="POST"
+              data-public-key="{{ checkout_public_key }}"
+              data-customer-email="{{ app.user.email }}"
+              data-value="{{ convert_to_pennies(amount) }}"
+              data-currency="GBP"
+              data-payment-mode="cards"
+              data-card-form-mode="cardTokenisation"
+              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+        </form>
+        <span class="mx-2">💳 Prefer to pay by card?</span>
+        {% block to_card_form %}
+            {{ form_start(to_card_form, {'attr':{'class':'form-inline'}}) }}
+            {% set card_classes = "btn-simple-link" %}
+            {% if card_provider == "checkout" %}
+                {% set card_classes = "btn-simple-link btn-card-pay" %}
+            {% endif %}
 
-    <p class="mb-4">
-        <small class="text-zaffre">
-            💳 Prefer to pay by card?
-            {% block to_card_form %}
-                {{ form_start(to_card_form) }}
-                {% set card_classes = "btn-simple-link" %}
-                {% if card_provider == "checkout" %}
-                    {% set card_classes = "btn-simple-link btn-card-pay" %}
-                {% endif %}
-
-                {{ form_widget(to_card_form.submit, {'label': 'Click here', 'attr': {'class': card_classes}}) }}
-                {{ form_end(to_card_form) }}
-            {% endblock to_card_form %}
-        </small>
-    </p>
+            {{ form_widget(to_card_form.submit, {'label': 'Click here', 'attr': {'class': card_classes}}) }}
+            {{ form_end(to_card_form) }}
+        {% endblock to_card_form %}
+    </div>
 {% endif %}
 
 {{ form_start(bacs_form, {'attr': {
@@ -52,21 +52,50 @@
         {% endif %}
     </div>
 
-    <div class="form-row">
-        <div class="col">
-            <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
-                {{ form_label(bacs_form.sortCode, 'Sort code') }}
-                {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'e.g. 02-02-02', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
-                <div class="with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
-                {{ form_label(bacs_form.sortCode, 'Account number') }}
-                {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'e.g. 83748596', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
-                <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
-            </div>
-        </div>
+    <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
+        {{ form_label(bacs_form.sortCode, 'Sort code') }}
+        {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'e.g. 02-02-02', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
+        <div class="with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
+    </div>
+
+    <div class="form-group {% if form_errors(bacs_form.validateSortCode) %}has-error{% endif %}">
+        {{ form_label(bacs_form.validateSortCode, 'Confirm sort code', { 'label_attr': {'class': 'sr-only'} }) }}
+        <label for="bacs_form[sortCode]" class="text-grey">
+            Confirm sort code
+            <span class="ml-2 text-dodger-blue">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#bank_details_modal"
+                   role="button">
+                    <i class="fal fa-info-circle"></i>
+                </a>
+            </span>
+        </label>
+        {{ form_widget(bacs_form.validateSortCode, {'attr': {'placeholder': '👆', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
+        <div class="with-errors">{{ form_errors(bacs_form.validateSortCode) }}</div>
+    </div>
+
+    <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
+        {{ form_label(bacs_form.sortCode, 'Account number') }}
+        {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'e.g. 83748596', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
+        <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
+    </div>
+
+    <div class="form-group {% if form_errors(bacs_form.validateAccountNumber) %}has-error{% endif %}">
+        {{ form_label(bacs_form.validateAccountNumber, 'Confirm account number', { 'label_attr': {'class': 'sr-only'} }) }}
+        <label for="bacs_form[accountNumber]" class="text-secondary">
+            Confirm account number
+            <span class="ml-2 text-dodger-blue">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#bank_details_modal"
+                   role="button">
+                    <i class="fal fa-info-circle"></i>
+                </a>
+            </span>
+        </label>
+        {{ form_widget(bacs_form.validateAccountNumber, {'attr': {'placeholder': '👆', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
+        <div class="with-errors">{{ form_errors(bacs_form.validateAccountNumber) }}</div>
     </div>
 
     <div class="form-group">

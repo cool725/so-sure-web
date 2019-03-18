@@ -153,10 +153,14 @@ class CheckoutPayment extends Payment
         $this->webType = $webType;
     }
 
-    public function isSuccess()
+    public function isSuccess($includeAuthorized = false)
     {
         if ($this->success !== null) {
             return $this->success;
+        }
+
+        if ($includeAuthorized && $this->result == self::RESULT_AUTHORIZED) {
+            return true;
         }
 
         return in_array($this->result, [self::RESULT_CAPTURED, self::RESULT_REFUNDED, self::RESULT_CARD_VERIFIED]);
@@ -203,11 +207,11 @@ class CheckoutPayment extends Payment
         }
     }
 
-    public static function isSuccessfulResult($status)
+    public static function isSuccessfulResult($status, $includeAuthorized = false)
     {
         $checkout = new CheckoutPayment();
         $checkout->setResult($status);
 
-        return $checkout->isSuccess();
+        return $checkout->isSuccess($includeAuthorized);
     }
 }

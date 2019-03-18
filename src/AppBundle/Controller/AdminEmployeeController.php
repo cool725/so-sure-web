@@ -38,6 +38,7 @@ use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -106,11 +107,13 @@ use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\File\ScreenUploadFile;
+use AppBundle\Document\File\ManualAffiliateFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\Imei;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\AddressType;
+use AppBundle\Form\Type\ManualAffiliateFileType;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\DirectBacsReceiptType;
@@ -3457,6 +3460,41 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             200,
             array('Content-Type' => $mimetype)
         );
+    }
+
+    /**
+     * @Route("/optimise-csv", name="admin_optimise_csv")
+     * @Template
+     */
+    public function optimiseCsvAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $s3 = $this->get('aws.s3');
+        /** @var S3FileRepository */
+        $s3FileRepo = $dm->getRepository(S3File::class);
+        $uploadedFile = new ManualAffiliateFile();
+        $uploadForm = $this->get('form.factory')
+            ->createNamedBuilder('upload_form', ManualAffiliateFileType::class, $uploadedFile)
+            ->getForm();
+        if ($request->getMethod() === 'POST') {
+            if ($request->request->has('upload_form')) {
+                $uploadForm->handleRequest($request);
+                if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
+                    try {
+                        $affiliateService = $this->get('app.affiliate');
+                        $affiliateService->processOptimiseCsv($uploadedFile);
+                        $this->addFlash('success', 'File Processed');
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage().", file not saved.");
+                    }
+                    return new RedirectResponse($this->generateUrl('admin_optimise_csv'));
+                }
+            }
+        }
+        return [
+            'upload_form' => $uploadForm->createView(),
+            'files' => $s3FileRepo->getAllFilesToDate(null, 'manualAffiliate')
+        ];
     }
 
     /**

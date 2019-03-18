@@ -8,16 +8,15 @@ use AppBundle\Repository\ChargeRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
-use AppBundle\Repository\File\S3FileRepository;
+use AppBundle\Document\File\ManualAffiliateFile;
+use AppBundle\Document\File\ManualAffiliateProcessedFile;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\UserRepository;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Predis\Client;
-use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -45,6 +44,11 @@ use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Exception\PromotionInactiveException;
 use AppBundle\Exception\AlreadyParticipatingException;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Predis\Client;
+use Psr\Log\LoggerInterface;
+use Aws\S3\S3Client;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -57,21 +61,29 @@ class AffiliateService
     protected $policyService;
     protected $chargeRepository;
     protected $affiliateRepository;
+    protected $s3;
+    protected $environment;
 
     /**
      * Builds the affiliate service and sends in it's dependencies as arguments.
      * @param DocumentManager $dm            is the document manager.
      * @param LoggerInterface $logger        is the logger.
      * @param PolicyService   $policyService is the policy service.
+     * @param S3Client        $s3            is the s3 service for backing up files.
+     * @param string          $environment   is the name of the current environment.
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        PolicyService $policyService
+        PolicyService $policyService,
+        S3Client $s3,
+        string $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->policyService = $policyService;
+        $this->s3 = $s3;
+        $this->environment = $environment;
         /** @var ChargeRepository $chargeRepository */
         $this->chargeRepository = $dm->getRepository(Charge::class);
         /** @var affiliateRepository $affiliateRepository */
@@ -267,6 +279,71 @@ class AffiliateService
             return static::daysFrom($chargeDate, $now) + $dayDifference;
         }
         return 0;
+    }
+
+    /**
+     * Takes a CSV file containing Optimize affiliate stuff and processes it and puts both files on s3.
+     * @param ManualAffiliateFile $input is the raw input file.
+     * @throws \Exception  if the file is malformed.
+     * @throws IOException if there is a problem opening one of the files.
+     */
+    public function processOptimiseCsv($input)
+    {
+        $outputFile = tmpfile();
+        $outputFilename = stream_get_meta_data($outputFile)["uri"];
+        /** @var PolicyRepository */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $header = [];
+        if (($handle = fopen($input->getFile(), "r")) === false) {
+            throw new \Exception("Provided file could not be opened.");
+        }
+        // Processing the data.
+        while (($row = fgetcsv($handle, 1000)) !== false) {
+            if (!$header) {
+                for ($i = 0; $i < count($row); $i++) {
+                    $header[$row[$i]] = $i;
+                }
+            } else {
+                /** @var Policy */
+                $policy = $policyRepo->find($row[$header["ConversionReference"]]);
+                if (!$policy) {
+                    $row[$header["ConversionStatus"]] = "rejected";
+                    $row[$header["RejectionReason"]] = "policy does not exist";
+                } elseif ($this->addDays($policy->getStart(), 30) <= $policy->getEnd()) {
+                    $row[$header["ConversionStatus"]] = "approved";
+                    $row[$header["ConversionValue"]] = 10;
+                } elseif ($policy->getEnd()) {
+                    $row[$header["ConversionStatus"]] = "rejected";
+                    $row[$header["RejectionReason"]] = "cancelled";
+                }
+            }
+            fputcsv($outputFile, $row);
+        }
+        // persisting the files to s3.
+        $date = new \DateTime();
+        $key = $this->environment."/optimise/".$date->format("U")."-proc.csv";
+        /** @var UploadedFile */
+        $inputFile = $input->getFile();
+        $input->setBucket(SoSure::S3_BUCKET_ADMIN);
+        $input->addMetadata('title', $inputFile->getClientOriginalName());
+        $input->setKeyFormat($this->environment."/%s");
+        $input->setDate($date);
+        $output = new ManualAffiliateProcessedFile();
+        $output->setBucket(SoSure::S3_BUCKET_ADMIN);
+        $output->addMetadata('title', $inputFile->getClientOriginalName());
+        $output->setKey($key);
+        $output->setDate($date);
+        $output->setSource($input);
+        $input->setProcessed($output);
+        $this->dm->persist($input);
+        $this->dm->persist($output);
+        $this->s3->putObject([
+            "Bucket" => SoSure::S3_BUCKET_ADMIN,
+            "Key" => $key,
+            "SourceFile" => $outputFilename
+        ]);
+        $this->dm->flush();
+        fclose($outputFile);
     }
 
     /**
