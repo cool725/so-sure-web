@@ -15,6 +15,11 @@ trait CurrencyTrait
 
     public function getCurrentIptRate(\DateTime $date = null)
     {
+        return self::staticGetCurrentIptRate($date);
+    }
+
+    public function staticGetCurrentIptRate(\DateTime $date = null)
+    {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
@@ -46,6 +51,23 @@ trait CurrencyTrait
         return ceil($float * $multiplier) / $multiplier;
     }
 
+    public function convertToPennies($float)
+    {
+        $pennies = $this->toTwoDp($float) * 100;
+
+        return $this->toZeroDp($pennies);
+    }
+
+    public function convertFromPennies($float)
+    {
+        return $this->toTwoDp($float / 100);
+    }
+
+    public function toZeroDp($float)
+    {
+        return number_format(round($float, 0), 0, ".", "");
+    }
+
     public function toTwoDp($float)
     {
         return number_format(round($float, 2), 2, ".", "");
@@ -62,6 +84,11 @@ trait CurrencyTrait
     }
 
     public function areEqualToTwoDp($float1, $float2)
+    {
+        return abs($float1 - $float2) < 0.001;
+    }
+
+    public static function staticAreEqualToTwoDp($float1, $float2)
     {
         return abs($float1 - $float2) < 0.001;
     }

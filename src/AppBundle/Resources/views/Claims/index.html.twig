@@ -1,18 +1,48 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-claims-home' %}
+
+{% block title %}so-sure - claims home{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-    {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
-<div class="container" style="margin-bottom: 50px; margin-top: 70px;"  >
-    <div class="row">
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('claims_policies') }}"><i class="fa fa-file-pdf-o fa-large"></i> Policies</a>
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Claims Home</h1>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="mb-4">General</h3>
+                    <div class="list-group admin-list-group mb-4">
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('claims_policies') }}">
+                            <i class="fal fa-file-pdf fa-fw mr-3"></i> Policies
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('claims_users') }}">
+                            <i class="fal fa-users fa-fw mr-3"></i> Users
+                        </a>
+                        <a class="list-group-item list-group-item-action"
+                           href="{{ path('claims_claims') }}">
+                            <i class="fal fa-exchange fa-fw mr-3"></i> Claims
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('claims_users') }}"><i class="fa fa-users fa-large"></i> Users</a>
-        </div>
-        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('claims_claims') }}"><i class="fa fa-exchange fa-large"></i> Claims</a>
-        </div>
-    </div>
-</div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}

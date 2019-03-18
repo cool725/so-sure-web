@@ -45,4 +45,14 @@
             left: 0; top: 5px;
         }
     }
+
+    li.h5 {
+        padding-left: 40px;
+
+        > .far,
+        > .fal,
+        > .fab {
+            top: 2px;
+        }
+    }
 }

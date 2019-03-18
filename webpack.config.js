@@ -30,6 +30,7 @@ Encore
     .addEntry('purchase-pledge', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge.js')
     .addEntry('purchase-payment', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment.js')
     .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
+    .addEntry('purchase-remainder', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-remainder.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
     .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
     .addEntry('onboarding', './src/AppBundle/Resources/public/rebrand/js/pages/onboarding.js')
@@ -46,10 +47,11 @@ Encore
     .addEntry('banking', './src/AppBundle/Resources/public/rebrand/js/pages/admin/banking.js')
     .addEntry('rewards', './src/AppBundle/Resources/public/rebrand/js/pages/admin/rewards.js')
     .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
-    .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
+    .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
+    .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
 
     // User files
     .addEntry('user', './src/AppBundle/Resources/public/rebrand/js/pages/user/user.js')

@@ -147,6 +147,14 @@ class UnpaidListener
             } else {
                 return "card/failedPayment";
             }
+        } elseif ($policy->getCheckoutPaymentMethod()) {
+            if ($policy->hasMonetaryClaimed(true, true)) {
+                return "card/failedPaymentWithClaim";
+            } elseif (!$policy->getCheckoutPaymentMethod()->isValid()) {
+                return "card/cardMissing";
+            } else {
+                return "card/failedPayment";
+            }
         } else {
             return null;
         }

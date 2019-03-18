@@ -5472,14 +5472,14 @@ class PhonePolicyTest extends WebTestCase
 
         self::setPaymentMethodForPolicy($policy, '0116');
         $this->assertEquals(
-            Policy::UNPAID_JUDO_CARD_EXPIRED,
+            Policy::UNPAID_CARD_EXPIRED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
         self::setPaymentMethodForPolicy($policy, '0120');
         //\Doctrine\Common\Util\Debug::dump($policy->getLastPaymentCredit(), 3);
         $this->assertEquals(
-            Policy::UNPAID_JUDO_PAYMENT_MISSING,
+            Policy::UNPAID_CARD_PAYMENT_MISSING,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
 
@@ -5493,7 +5493,7 @@ class PhonePolicyTest extends WebTestCase
             JudoPayment::RESULT_DECLINED
         );
         $this->assertEquals(
-            Policy::UNPAID_JUDO_PAYMENT_FAILED,
+            Policy::UNPAID_CARD_PAYMENT_FAILED,
             $policy->getUnpaidReason(new \DateTime('2016-03-01'))
         );
     }
@@ -5742,13 +5742,8 @@ class PhonePolicyTest extends WebTestCase
         $diff = $expiration->diff($policy->getEnd());
 
         // print_r($diff);
-        // Normally 0, but 1 for 29th
-        $expectedDaysDiff = 0;
-        $now = $this->now();
-        if ($now->format('d') > 28) {
-            $expectedDaysDiff = $now->format('d') - 28;
-        }
-        $this->assertTrue(in_array($diff->days, [$expectedDaysDiff, $expectedDaysDiff - 1]), json_encode($diff));
+        // normally 0, but if current date is 29th, then 1 (likewise, 30th => 2, 31st => 3)
+        $this->assertTrue(in_array($diff->days, [0, 1, 2, 3]));
         $this->assertTrue($expiration < $policy->getEnd());
     }
 

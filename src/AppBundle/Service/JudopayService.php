@@ -242,7 +242,7 @@ class JudopayService
             // allow a few (5) minutes before warning if missing receipt
             if ($diff < 300) {
                 $data['skipped-too-soon']++;
-            } elseif (in_array($receipt['type'], ['Payment', 'Refund']) &&
+            } elseif (in_array($receipt['type'], [JudoPayment::TYPE_PAYMENT, JudoPayment::TYPE_REFUND]) &&
                 $receipt['result'] == JudoPayment::RESULT_SUCCESS) {
                 if (!$payment) {
                     if ($logMissing) {
@@ -271,7 +271,7 @@ class JudopayService
                 } else {
                     $data['validated']++;
                 }
-            } elseif (in_array($receipt['type'], ['Payment', 'Refund']) &&
+            } elseif (in_array($receipt['type'], [JudoPayment::TYPE_PAYMENT, JudoPayment::TYPE_REFUND]) &&
                 $receipt['result'] != JudoPayment::RESULT_SUCCESS) {
                 // can ignore failed missing payments
                 // however if our db thinks it successful and judo says its not, that's problematic

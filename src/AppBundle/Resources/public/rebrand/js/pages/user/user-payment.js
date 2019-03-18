@@ -6,9 +6,9 @@ require('../../../sass/pages/user/user-payment.scss');
 require('bootstrap/js/dist/tooltip');
 
 // Require components
+require('../../common/checkout.js');
+
 
 $(function() {
-
     $('[data-toggle="tooltip"]').tooltip();
-
 });

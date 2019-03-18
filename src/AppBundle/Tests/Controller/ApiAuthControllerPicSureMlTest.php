@@ -63,7 +63,7 @@ class ApiAuthControllerPicSureMlTest extends BaseApiControllerTest
         sleep(1);
 
         /** @var PhonePolicy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policyData['id']);
 
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
         $files = $updatedPolicy->getPolicyPicSureFiles();

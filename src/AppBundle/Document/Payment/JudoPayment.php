@@ -18,6 +18,9 @@ class JudoPayment extends Payment
     const RESULT_SKIPPED = "Skipped";
     const RESULT_ERROR = "Error";
 
+    const TYPE_PAYMENT = 'Payment';
+    const TYPE_REFUND = 'Refund';
+
     /**
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")
