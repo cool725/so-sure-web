@@ -23,14 +23,16 @@ class S3TwigExtension extends \Twig_Extension
         );
     }
 
-    public function s3DownloadLink($bucket, $key)
+    public function s3DownloadLink($bucket, $key, $filename = null)
     {
         if (!$key || mb_strlen(trim($key)) == 0) {
             return null;
         }
 
         $keyItems = explode('/', $key);
-        $filename = $keyItems[count($keyItems) - 1];
+        if (!$filename) {
+            $filename = $keyItems[count($keyItems) - 1];
+        }
         $command = $this->s3->getCommand('GetObject', array(
             'Bucket' => $bucket,
             'Key'    => $key,

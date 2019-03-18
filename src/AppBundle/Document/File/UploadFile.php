@@ -84,7 +84,7 @@ abstract class UploadFile extends S3File
     {
         $this->keyFormat = $keyFormat;
     }
-    
+
     /**
      * @return string
      */
