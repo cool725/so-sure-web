@@ -84,6 +84,14 @@ $dark:          $haiti;
     @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 }
 
+@mixin blue-gradient-0 {
+    @include linear-gradient(0deg, $crayon-blue, $deep-sky-blue-b);
+}
+
+@mixin blue-gradient-180 {
+    @include linear-gradient(0deg, $deep-sky-blue-b, $crayon-blue);
+}
+
 .blue-gradient {
     @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 }

@@ -6,6 +6,7 @@ require('../../sass/pages/landing-snapchat.scss');
 require('bootstrap/js/dist/carousel');
 
 // Require components
+require('../components/table.js');
 require('../components/banner.js');
 let textFit = require('textfit');
 

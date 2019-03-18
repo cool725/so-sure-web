@@ -3,7 +3,7 @@
 {# Set vars #}
 {% set body_class = 'landing-snapchat' %}
 
-{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block title %}so-sure - Snapchat{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
@@ -39,18 +39,15 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="hero__controls pb-3">
+                    <div class="hero__controls mb-5">
                         <a href="#" class="btn btn-bright-yellow btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
                     </div>
                 </div>
-                <div class="col-lg-6 d-none d-lg-block">
+                <div class="col-lg-6">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/snapchat/so-sure_hero-illustration_snapchat.png" alt="so-sure - snapchat" class="img-fluid lozad animated bounceInUp">
                     </div>
                 </div>
-            </div>
-            <div class="hero__illustration  d-block d-lg-none">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
             </div>
         </div>
     </section>
@@ -63,17 +60,17 @@
             <div class="row">
                 {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile_snapchat.png" alt="so-sure - Simple Terms &amp; Conditions" width="160px" class="lozad">
                     <h5 class="text-zaffre">24-72 hour replace or repair</h5>
                     <p class="mb-5 text-white">We aim to replace or repair your phone within <span class="text-nowrap">24-72</span> hours after your claim is approved</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="180px" class="lozad">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback_snapchat.png" alt="so-sure - Up to 40% cheaper" width="160px" class="lozad">
                     <h5 class="text-zaffre">Up to 80% money back</h5>
                     <p class="mb-5 text-white">Connect with friends and get rewarded when you and your connections don't claim</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px" class="lozad">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr_snapchat.png" alt="so-sure - super quick cover" width="160px" class="lozad">
                     <h5 class="text-zaffre">Low excess from just &pound;50</h5>
                     <p class="mb-5 text-white">Download the so-sure app and validate your phone to reduce your excess</p>
                 </div>
@@ -82,115 +79,177 @@
         </div>
     </section>
 
+    <section class="comparison-table">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-3 text-primary text-center">What makes so-sure better than the rest?</h2>
+            <p class="mb-4 text-center">Our customers love us – that's why thousands of customers have joined the so-sure family.</p>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
+        </div>
+    </section>
+
     {# Cover #}
-    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
+    <section class="cover py-lg-5">
+        <div class="container container-xtra pt-5">
+            <h2 class="h3 mb-3 text-primary text-center">Relax, we’ve got you covered</h2>
+            <p class="mb-4 text-center">We replace and repair hundreds of customer phones every month, here's a look at what's covered</p>
+            <div class="cover__illustration__mobile text-center d-block d-lg-none">
+                <img data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_cover-illustration-mobile.png" alt="Cracked phone screen" width="220px" class="lozad">
+            </div>
+            <div class="cover__desktop d-none d-lg-block">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <ul class="list-unstyled text-right cover__list">
+                            <li class="media">
+                                <div class="media-body mb-5">
+                                    <h5>International travel</h5>
+                                    90 days of globe trotting, from backpacking to business you're covered
+                                </div>
+                                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="50px" class="ml-3 lozad">
+                            </li>
+                            <li class="media">
+                                <div class="media-body mb-5">
+                                    <h5>Out-of-warranty breakdowns</h5>
+                                    Phone breaks out of warranty, no worries you're covered
+                                </div>
+                                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="50px" class="ml-3 lozad">
+                            </li>
+                            <li class="media">
+                                <div class="media-body mb-5">
+                                    <h5>Phones up to three years old</h5>
+                                    We're one of the only insurers that covers phones up to 3 years old
+                                </div>
+                                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_old-phones-icn.svg" alt="so-sure - Phone up to three years old" width="50px" class="ml-3 lozad">
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <img data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_cover-illustration-desktop.png " alt="so-sure - social insurance" class="img-fluid lozad">
+                    </div>
+                    <div class="col-lg-4">
+                        <ul class="list-unstyled cover__list">
+                            <li class="media">
+                                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="50px" class="mr-3 lozad">
+                                <div class="media-body mb-5">
+                                    <h5>Accidental damage</h5>
+                                    Don't worry we can usually repair this device so its a good as new
+                                </div>
+                            </li>
+                            <li class="media">
+                                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="50px" class="mr-3 lozad">
+                                <div class="media-body mb-5">
+                                    <h5>Theft or loss</h5>
+                                    Phones been snatched, don't stress we've got your back
+                                </div>
+                            </li>
+                            <li class="media">
+                                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="50px" class="mr-3 lozad">
+                                <div class="media-body">
+                                    <h5>Accessories</h5>
+                                    No tunes, no problem. You're covered up to the value of &pound;100 inc. VAT
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g transform="translate(0.000000, -72.000000)" fill="#fbd231">
+                    <g transform="translate(-4700.000000, -8443.000000)">
+                        <path d="M4700,8515 C4824,8551 4948.66667,8569 5074,8569 C5199.33333,8569 5324.66667,8551 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    <section class="cover__mobile d-block d-lg-none">
+        <div class="container container-xtra py-5">
+            <ul class="list-unstyled">
+                <li class="media">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="50px" class="mr-3 lozad">
+                    <div class="media-body mb-5">
+                        <h5>International travel</h5>
+                        90 days of globe trotting covered
+                    </div>
+                </li>
+                <li class="media">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="50px" class="mr-3 lozad">
+                    <div class="media-body mb-5">
+                        <h5>Out-of-warranty breakdowns</h5>
+                        Phone breaks out of warranty, no worries you're covered
+                    </div>
+                </li>
+                <li class="media">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_old-phones-icn.svg" alt="so-sure - Phones up to three years old" width="50px" class="mr-3 lozad">
+                    <div class="media-body mb-5">
+                        <h5>Phones up to three years old</h5>
+                        We're one of the only insurers that covers phones up to 3 years old
+                    </div>
+                </li>
+                <li class="media">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="50px" class="mr-3 lozad">
+                    <div class="media-body mb-5">
+                        <h5>Accidental damage</h5>
+                        Don't worry we can usually repair this device so it’s as good as new
+                    </div>
+                </li>
+                <li class="media">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="50px" class="mr-3 lozad">
+                    <div class="media-body mb-5">
+                        <h5>Theft or loss</h5>
+                        Phones been snatched, don't stress we've got your back
+                    </div>
+                </li>
+                <li class="media">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="50px" class="mr-3 lozad">
+                    <div class="media-body">
+                        <h5>Accessories</h5>
+                        No tunes, no problem. You're covered up to the value of &pound;100 inc. VAT
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
 
     {# We do things differently #}
     {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
 
-    <section class="reward py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_why-illustration.png ">
-        <div class="container container-xtra py-5">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="text-center text-lg-left">
-                        <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
-                        <p class="mb-4">We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!</p>
-                        <a href="{{ path('social_insurance') }}" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
-                            <h5 class="cardbox__title text-dodger-blue">How it works</h5>
-                            <div class="cardbox__text">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
-                        <h5 class="text-primary">How it works</h5>
-                        <p class="mb-5">If you and your friends take good care of your phones and don't need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</p>
-                    </div>
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
-                            <h5 class="cardbox__title text-dodger-blue">Be careful</h5>
-                            <div class="cardbox__text">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
-                        <h5 class="text-primary">Connect</h5>
-                        <p class="mb-5">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
-                            <h5 class="cardbox__title text-dodger-blue">Connect</h5>
-                            <div class="cardbox__text">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
-                        <h5 class="text-primary">Be careful</h5>
-                        <p class="mb-5">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</p>
-                    </div>
-                    <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
-                            <h5 class="cardbox__title text-dodger-blue">Get rewarded</h5>
-                            <div class="cardbox__text">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
-                        <h5 class="text-primary">Get rewarded</h5>
-                        <p class="mb-5">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     {# Claims Process #}
-    {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %}
-
-    <section class="banner banner-dismissible">
-        <div class="container py-5">
-            <div class="d-lg-flex align-items-lg-center">
-                <div class="banner__image">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="Home insurance" width="250px" class="lozad">
+    <section class="claims py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-3 text-bright-yellow">Our hassle-free claims process</h2>
+            <p class="mb-4 text-white">Need to claim, here's what happens</p>
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-zaffre">1</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px" class="lozad">
+                    </div>
+                    <h5>Launch your claim online</h5>
+                    <p class="mb-5 text-white">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Get started using our online claims portal below</p>
                 </div>
-                <div class="banner__text ml-lg-4">
-                    <h2 class="text-white">Home Insurance Coming 2019</h2>
-                    <p class="text-columbia-blue-e lead mb-0">Take our survey to be in for a chance to <strong>win a phone cover</strong></p>
-                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2018, 1 per customer.</small></p>
-                    <a href="https://sosure.typeform.com/to/CdsghS"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="btn btn-white sosure-track"
-                       data-event="take-survey-banner-clicked"
-                       data-event-url="https://sosure.typeform.com/to/CdsghS"
-                       data-event-blank="true">
-                        Take Survey
-                        <i class="far fa-long-arrow-right fa-lg ml-2"></i>
-                    </a>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-zaffre">2</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px" class="lozad">
+                    </div>
+                    <h5>Review Claim</h5>
+                    <p class="mb-5 text-white">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-zaffre">3</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px" class="lozad">
+                    </div>
+                    <h5>Approve Claim</h5>
+                    <p class="mb-5 text-white">Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours</p>
                 </div>
             </div>
+            <a href="{{ path('claim') }}" class="btn btn-bright-yellow btn-block-xs mt-3">Open the claims portal</a>
         </div>
-        <button type="button"
-                class="banner__close close text-white"
-                data-dismiss="banner"
-                data-event="take-survey-banner-closed"
-                aria-label="Close">
-            <i class="fal fa-times fa-lg"></i>
-        </button>
     </section>
-
-    {# Reviews #}
-    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
 
     <section class="banner py-5">
         <div class="container container-xtra">
