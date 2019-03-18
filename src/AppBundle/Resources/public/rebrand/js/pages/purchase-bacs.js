@@ -39,7 +39,7 @@ sosure.purchaseStepBacs = (function() {
 
     self.addValidation = () => {
         self.form.validate({
-            debug: false,
+            debug: true,
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
