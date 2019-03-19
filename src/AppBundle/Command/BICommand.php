@@ -394,7 +394,7 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf(
                     '"%s"',
-                    $policy->getPolicyOrUserBacsBankAccount() ?
+                    ($policy->getPolicyOrUserBacsBankAccount() && $policy->isActive(true)) ?
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
                         null
                 ),
