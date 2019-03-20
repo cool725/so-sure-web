@@ -17,7 +17,8 @@
                 {% if amount > 0 %}
                     <p>Click below to pay for the remainder <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> of your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong>.</p>
 
-                    {%  if webpay_action and webpay_reference %}
+                    {% if card_provider == 'judo' %}
+                      {% if webpay_action and webpay_reference %}
                         <form action="{{ webpay_action }}"
                               method="post"
                               id="webpay-form"
@@ -38,6 +39,7 @@
                                 </div>
                             {% endif %}
                         </form>
+                      {% endif %}
                     {% else %}
                         <form class="payment-form" method="POST"
                               data-public-key="{{ checkout_public_key }}"

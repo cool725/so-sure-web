@@ -16,9 +16,12 @@
               data-customer-email="{{ app.user.email }}"
               data-value="{{ convert_to_pennies(amount) }}"
               data-currency="GBP"
+              data-csrf="{{ csrf_token('checkout') }}"
               data-payment-mode="cards"
               data-card-form-mode="cardTokenisation"
               data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+              data-url="{{ url('purchase_checkout', {'id': policy.id }) }}"
+              data-redirect-url="{{ path('user_welcome', {id: policy.id}) }}"
               data-title="Pay now"
               data-subtitle="Please enter your card details">
         </form>

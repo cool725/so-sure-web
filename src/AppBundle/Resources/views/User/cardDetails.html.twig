@@ -60,11 +60,13 @@
                             Not setup
                         {% endif %}
                     </p>
-                    {% if webpay_action and webpay_reference %}
+                    {% if card_provider == 'judo' %}
+                        {% if webpay_action and webpay_reference %}
                         <form action="{{ webpay_action }}" method="post" id="webpay-form">
                             <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
                             <input type="submit" class="btn btn-outline-primary" value="Update your card details">
                         </form>
+                        {% endif %}
                     {% else %}
                         <form class="payment-form" method="POST"
                               data-public-key="{{ checkout_public_key }}"

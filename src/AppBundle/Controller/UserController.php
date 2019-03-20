@@ -1228,6 +1228,7 @@ class UserController extends BaseController
             'bacs_feature' => $bacsFeature,
             'unpaid_reason' => $unpaidReason,
             'form' => $form->createView(),
+            'card_provider' => $cardProvider,
         ];
 
         return $data;
@@ -1393,6 +1394,7 @@ class UserController extends BaseController
                 $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
             }
         }
+
         $billing = new BillingDay();
         if ($policy) {
             $billing->setPolicy($policy);
@@ -1473,6 +1475,7 @@ class UserController extends BaseController
             'bacs_feature' => $bacsFeature,
             'bacs' => $bacs,
             'bacs_last_payment_in_progress' => $lastPaymentInProgress,
+            'card_provider' => $cardProvider,
         ];
 
         return $data;

@@ -231,7 +231,8 @@
                 {% endif %}
                 {# END - IF CAN SETUP BACS #}
                 {% if show_card and amount > 0 %}
-                    {% if webpay_action and webpay_reference %}
+                    {% if card_provider == 'judo' %}
+                      {% if webpay_action and webpay_reference %}
                         <form action="{{ webpay_action }}" method="post" id="webpay-form">
                             <div class="form-group">
                                 <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
@@ -241,6 +242,7 @@
                                 <input type="submit" class="{% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}btn-simple-link{% else %}btn btn-success{% endif %}" value="{{ judo_btn_text }}">
                             </div>
                         </form>
+                      {% endif %}
                     {% else %}
                         <form class="payment-form" method="POST"
                               data-public-key="{{ checkout_public_key }}"
