@@ -51,11 +51,13 @@
 }
 
 // Pages we have the same gradient for the 'hero' add here
+// TODO: Move to a single classname i.e. .nav-with-hero
 .home,
 .landing,
 .social-insurance,
 .error-page,
-.landing-snapchat {
+.landing-snapchat,
+.landing-twitter {
     .navbar-so-sure {
         background-image: none;
     }
