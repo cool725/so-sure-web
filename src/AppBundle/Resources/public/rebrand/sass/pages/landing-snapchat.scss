@@ -47,7 +47,7 @@
         height: 200px;
 
         @include media-breakpoint-up(lg) {
-            right: 100px;
+            // right: 100px;
         }
     }
 }

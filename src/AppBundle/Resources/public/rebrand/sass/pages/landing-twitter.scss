@@ -11,6 +11,7 @@
     position: relative;
     padding-top: 8rem;
     padding-bottom: 4rem;
+    overflow: hidden;
 
     @include twitter-gradient;
 
@@ -44,10 +45,33 @@
     }
 
     &__illustration {
-        height: 200px;
+        position: relative;
+        z-index: 4;
 
         @include media-breakpoint-up(lg) {
-            right: 100px;
+            width: 740px;
+            position: absolute;
+            top: 150px; right: 0;
+        }
+
+        @include media-breakpoint-up(fl) {
+            top: 200px;
+        }
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/twitter/so-sure_twitter-hero-background-offset-mobile.svg');
+        background-size: cover;
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/twitter/so-sure_twitter-hero-background-offset.svg ');
         }
     }
 }

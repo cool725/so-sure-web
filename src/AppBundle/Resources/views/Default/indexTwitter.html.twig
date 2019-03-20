@@ -20,8 +20,8 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
-                        <h1 class="mb-4 text-ultramarine fit">Insure your Mobile <br> with so-sure</h1>
-                        <ul class="list-unstyled icn-fa-list mb-5">
+                        <h1 class="mb-4 text-ultramarine fit text-center text-lg-left">Insure your Mobile <br class="d-none d-lg-inline"> with <span class="text-nowrap">so-sure</span></h1>
+                        <ul class="list-unstyled icn-fa-list mb-5 d-none d-lg-block">
                             <li class="mb-3 h5 text-ultramarine">
                                 <i class="far fa-check fa-lg fa-fw text-white"></i>
                                 24-72 hour replace or repair
@@ -40,16 +40,18 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="hero__controls mb-5">
+                    <div class="hero__controls d-none d-lg-block mb-5">
                         <a href="#" class="btn btn-ultramarine btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="hero__illustration">
-                        {# <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/snapchat/so-sure_hero-illustration_snapchat.png" alt="so-sure - snapchat" class="img-fluid lozad animated bounceInUp"> #}
-                    </div>
-                </div>
             </div>
+        </div>
+        <div class="hero__illustration">
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/twitter/so-sure_twitter-hero-tweets--desktop.png" alt="so-sure - social insurance" class="img-fluid lozad d-none d-lg-block animated slideInRight">
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/twitter/so-sure_twitter-hero-tweets--mobile.png" alt="so-sure - social insurance" class="img-fluid lozad d-lg-none">
+        </div>
+        <div class="container container-extra d-lg-none my-4">
+            <a href="#" class="btn btn-ultramarine btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
         </div>
     </section>
 
