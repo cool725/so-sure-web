@@ -628,7 +628,7 @@ class BacsService
             }
 
             $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-            $bacsPaymentMethod->getBankAccount()->setMandateCancelledReason('addacs:'.$reason);
+            $bacs->getBankAccount()->setMandateCancelledReason('addacs:'.$reason);
             $this->dm->flush();
 
             $referenceId = null;
