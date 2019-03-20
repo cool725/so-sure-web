@@ -3,10 +3,12 @@
 namespace AppBundle\Tests;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
@@ -505,6 +507,30 @@ trait UserClassTrait
         return $payment;
     }
 
+    public static function addCheckoutPayment(
+        Policy $policy,
+        $amount,
+        $commission,
+        $receiptId = null,
+        $date = null,
+        $result = CheckoutPayment::RESULT_CAPTURED
+    ) {
+        if (!$receiptId) {
+            $receiptId = rand(1, 999999);
+        }
+        $payment = new CheckoutPayment();
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($commission);
+        $payment->setResult($result);
+        $payment->setReceipt($receiptId);
+        if ($date) {
+            $payment->setDate($date);
+        }
+        $policy->addPayment($payment);
+
+        return $payment;
+    }
+
     public static function setPaymentMethodForPolicy(Policy $policy, $endDate = '1220')
     {
         $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
@@ -513,6 +539,16 @@ trait UserClassTrait
         $policy->setPaymentMethod($judo);
 
         return $judo;
+    }
+
+    public static function setCheckoutPaymentMethodForPolicy(Policy $policy, $endDate = '1220')
+    {
+        $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
+        $checkout = new CheckoutPaymentMethod();
+        $checkout->addCardTokenArray(random_int(1, 999999), $account);
+        $policy->setPaymentMethod($checkout);
+
+        return $checkout;
     }
 
     public static function addBacsPayment(

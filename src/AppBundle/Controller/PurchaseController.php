@@ -1453,6 +1453,7 @@ class PurchaseController extends BaseController
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,
             'policy' => $policy,
+            'card_provider' => $cardProvider,
         ];
 
         return $data;
@@ -1518,21 +1519,27 @@ class PurchaseController extends BaseController
             $logger->info(sprintf('Token: %s / Pennies; %s', $token, $pennies));
             /** @var CheckoutService $checkout */
             $checkout = $this->get('app.checkout');
-            $checkout->updatePaymentMethod(
-                $policy,
-                $token,
-                $amount
-            );
 
-            /*
-            if ($amount > 0) {
-                $checkout->pay($policy, $charge->getId(), $amount, Payment::SOURCE_WEB);
+            if ($request->get('_route') == 'purchase_checkout') {
+                $checkout->pay(
+                    $policy,
+                    $token,
+                    $amount,
+                    Payment::SOURCE_WEB,
+                    null,
+                    $this->getIdentityLogWeb($request)
+                );
+            } else {
+                $checkout->updatePaymentMethod(
+                    $policy,
+                    $token,
+                    $amount
+                );
             }
-            */
 
             $this->addFlash('success', $successMessage);
 
-            return $this->getSuccessJsonResponse("Updated payment token.");
+            return $this->getSuccessJsonResponse($successMessage);
         } catch (PaymentDeclinedException $e) {
             $this->addFlash('error', $errorMessage);
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');

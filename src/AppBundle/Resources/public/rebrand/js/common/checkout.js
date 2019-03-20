@@ -28,7 +28,12 @@ $(function() {
             $.post(url, {'csrf': csrf, 'token': event.data.cardToken, 'pennies': pennies}, function(resp) {
                 console.log(resp);
             }).always(function() {
-                window.location.reload(false);
+                let redirect = $('.payment-form').data('redirect-url');
+                if (redirect) {
+                    window.location.href = redirect;
+                } else {
+                    window.location.reload(false);
+                }
             });
         }
     });

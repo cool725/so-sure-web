@@ -1030,6 +1030,9 @@ abstract class Policy
                 } elseif ($payment instanceof BacsPayment) {
                     /** @var BacsPayment $payment */
                     return $payment->getStatus() !== null;
+                } elseif ($payment instanceof CheckoutPayment) {
+                    /** @var CheckoutPayment $payment */
+                    return $payment->getResult() !== null;
                 }
             });
         }
