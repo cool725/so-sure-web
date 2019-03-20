@@ -39,7 +39,7 @@
         }
 
         @include media-breakpoint-up(xl) {
-            padding-top: 6rem;
+            // padding-top: 4rem;
         }
 
     }
@@ -113,7 +113,7 @@
     }
 
     &__mobile {
-        background-color: $bright-yellow;
+        background-color: $pattens-blue;
     }
 
     &__list {
