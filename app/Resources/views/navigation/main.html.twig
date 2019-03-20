@@ -24,12 +24,14 @@
         {% include '::navigation/onboarding.html.twig' %}
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
+            {% if hide_login is not defined %}
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 <a href="{{ path('claim') }}"
                    class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
                     Make a Claim
                 </a>
             </li>
+            {% endif %}
             <li class="nav-item d-none d-xl-block pr-xl-5">
                 <a href="{{ path('social_insurance') }}"
                    class="nav-link {{ app.request.get('_route') == 'social_insurance' ? 'nav-active' }}">
