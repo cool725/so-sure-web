@@ -40,12 +40,17 @@
                         </form>
                     {% else %}
                         <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
-                              data-value="{{ convert_to_pennies(amount) }}" data-url="{{ url('purchase_checkout_remainder', {'id': policy.id }) }}"
+                              data-public-key="{{ checkout_public_key }}"
+                              data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}"
+                              data-url="{{ url('purchase_checkout_remainder', {'id': policy.id }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
-                              data-title="so-sure" data-subtitle="Pay remainder of premium for {{ policy.policyNumber }}"
-                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                              data-currency="GBP"
+                              data-payment-mode="cards"
+                              data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                              data-title="Pay now"
+                              data-subtitle="Please enter your card details now">
                             {% if policy.displayRepurchase %}
                                 <div class="form-row">
                                     <div class="col">

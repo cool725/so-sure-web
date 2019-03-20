@@ -243,12 +243,17 @@
                         </form>
                     {% else %}
                         <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
-                              data-value="{{ convert_to_pennies(amount) }}" data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id }) }}"
+                              data-public-key="{{ checkout_public_key }}"
+                              data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}"
+                              data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
-                              data-title="so-sure" data-subtitle="Bring your Policy {{ policy.policyNumber }} up to date"
-                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                              data-currency="GBP"
+                              data-payment-mode="cards"
+                              data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                              data-title="Pay outstanding balance"
+                              data-subtitle="Please enter your card details now">
                             <div class="form-group">
                                 <input type="submit" class="btn btn-success btn-card-pay" value="Pay now">
                             </div>

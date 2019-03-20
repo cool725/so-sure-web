@@ -67,11 +67,17 @@
                         </form>
                     {% else %}
                         <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
-                              data-value="1" data-url="{{ url('purchase_checkout_update', {'id': policy.id }) }}"
+                              data-public-key="{{ checkout_public_key }}"
+                              data-customer-email="{{ app.user.email }}"
+                              data-value="1"
+                              data-url="{{ url('purchase_checkout_update', {'id': policy.id }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
-                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                              data-currency="GBP"
+                              data-payment-mode="cards"
+                              data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                              data-title="Update card details"
+                              data-subtitle="Please enter your new card details">
                             <input type="button" class="btn btn-outline-primary btn-card-pay" value="Update your card details">
                         </form>
                     {% endif %}

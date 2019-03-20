@@ -18,7 +18,9 @@
               data-currency="GBP"
               data-payment-mode="cards"
               data-card-form-mode="cardTokenisation"
-              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+              data-title="Pay now"
+              data-subtitle="Please enter your card details">
         </form>
         <span class="mx-2">💳 Prefer to pay by card?</span>
         {% block to_card_form %}

@@ -1467,17 +1467,21 @@ class PurchaseController extends BaseController
      */
     public function checkoutAction(Request $request, $id)
     {
-        $successMessage = 'Payment is successful.';
-        $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+        $successMessage = 'Success! Your payment has been successfully completed';
+        $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+        details are correct and try again or get in touch if you continue to have issues';
         if ($request->get('_route') == 'purchase_checkout_update') {
-            $successMessage = 'Your card is now updated.';
-            $errorMessage = 'Sorry, we are unable to update your card. Please try again.';
+            $successMessage = 'Success! Your card details have been successfully updated';
+            $errorMessage = 'Sorry, we were unable to update your card details. Please try again or
+            get in touch if you continue to have issues.';
         } elseif ($request->get('_route') == 'purchase_checkout_remainder') {
-            $successMessage = 'The remainder of policy is now paid.';
-            $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+            $successMessage = 'Success! Your payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
         } elseif ($request->get('_route') == 'purchase_checkout_unpaid') {
-            $successMessage = 'Payment is successful.';
-            $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+            $successMessage = 'Success! Your payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
         }
 
         try {
