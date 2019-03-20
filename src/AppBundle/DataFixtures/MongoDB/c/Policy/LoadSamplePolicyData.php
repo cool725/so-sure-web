@@ -557,6 +557,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $status = rand(0, 4);
             if ($status == 0) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+                $bankAccount->setMandateCancelledReason("test:reasonCode");
             } elseif ($status == 1) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
             } elseif ($status == 2) {

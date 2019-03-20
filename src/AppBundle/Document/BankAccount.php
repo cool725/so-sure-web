@@ -26,6 +26,8 @@ class BankAccount
     const MANDATE_FAILURE = 'failure';
     const MANDATE_CANCELLED = 'cancelled';
 
+    const CANCELLED_ALTERED_DETAILS = 'altered-details';
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @AppAssert\BankAccountName()
@@ -80,6 +82,13 @@ class BankAccount
      * @var string
      */
     protected $mandateStatus;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $mandateCancelledReason;
 
     /**
      * @AppAssert\Token()
@@ -296,6 +305,16 @@ class BankAccount
         $this->mandateStatus = $mandateStatus;
     }
 
+    public function getMandateCancelledReason()
+    {
+        return $this->mandateCancelledReason;
+    }
+
+    public function setMandateCancelledReason($mandateCancelledReason)
+    {
+        $this->mandateCancelledReason = $mandateCancelledReason;
+    }
+
     public function getMandateSerialNumber()
     {
         return $this->mandateSerialNumber;
@@ -491,6 +510,15 @@ class BankAccount
         $maxAllowedDay = $maxAllowedDate->format('j');
 
         return $maxAllowedDay;
+    }
+
+    public function getMandateCancelledReasonIfCancelled()
+    {
+        $status = $this->getMandateStatus();
+        if ($status == self::MANDATE_CANCELLED || $status == self::MANDATE_FAILURE) {
+            return $this->getMandateCancelledReason();
+        }
+        return "N/A";
     }
 
     public function getNotificationDay()
