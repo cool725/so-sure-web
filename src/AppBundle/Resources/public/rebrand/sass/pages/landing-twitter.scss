@@ -12,7 +12,7 @@
     padding-top: 8rem;
     padding-bottom: 4rem;
 
-    @include blue-gradient-0;
+    @include twitter-gradient;
 
     .container {
         position: relative;
@@ -72,7 +72,7 @@
 
 .intro {
     text-align: center;
-    @include blue-gradient-180;
+    @include twitter-gradient;
 }
 
 .comparison-table {

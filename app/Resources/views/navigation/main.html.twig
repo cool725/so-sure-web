@@ -61,20 +61,22 @@
                     {% endif %}
                 </li>
             {% else %}
-                <li class="nav-item d-none-xxs pr-xl-5">
+                <li class="nav-item d-none-xxs {% if hide_login is not defined %}pr-xl-5{% endif %}">
                     <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote btn-shadow">Get a Quote</a>
                 </li>
             {% endif %}
             <li class="nav-item d-none d-xl-block pr-xl-5">
-                {% if app.user is not null and app.user %}
-                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
+                {% if hide_login is not defined %}
+                    {% if app.user is not null and app.user %}
+                        {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
+                        {% else %}
+                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
+                        {% endif %}
                     {% else %}
-                        <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
+                        <a href="{{ path('fos_user_security_login') }}"
+                           class="btn btn-outline-columbia-blue-f btn-sm">Customer log in <i class="far fa-arrow-right fa-fw ml-2"></i></a>
                     {% endif %}
-                {% else %}
-                    <a href="{{ path('fos_user_security_login') }}"
-                       class="btn btn-outline-columbia-blue-f btn-sm">Customer log in <i class="far fa-arrow-right fa-fw ml-2"></i></a>
                 {% endif %}
             </li>
             <li class="nav-item d-xl-none">
