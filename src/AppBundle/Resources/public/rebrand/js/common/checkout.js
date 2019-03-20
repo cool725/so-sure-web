@@ -17,7 +17,8 @@ $(function() {
         cardFormMode: $('.payment-form').data('card-form-mode'),
         title: $('.payment-form').data('title'),
         subtitle: $('.payment-form').data('subtitle'),
-        logoUrl: 'https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-white-light.svg',
+        logoUrl: 'https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo_checkout.svg',
+        themeColor: '#2593f3',
         cardTokenised: function(event) {
             console.log(event.data.cardToken);
             var url = $('.payment-form').data('url');
