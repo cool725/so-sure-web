@@ -67,6 +67,7 @@ class BacsService
     const BACS_COMMAND_CANCEL_MANDATE = '0C';
     const BACS_COMMAND_FIRST_DIRECT_DEBIT = '01';
     const BACS_COMMAND_DIRECT_DEBIT = '17';
+    const BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION = '18';
     const BACS_COMMAND_DIRECT_CREDIT = '99';
 
     const ADDACS_REASON_BANK = 0;
@@ -471,7 +472,14 @@ class BacsService
                 continue;
             }
             $lineData = str_getcsv($line, ",", '"');
-            if (in_array($lineData[2], [self::BACS_COMMAND_FIRST_DIRECT_DEBIT, self::BACS_COMMAND_DIRECT_DEBIT])) {
+            if (in_array(
+                $lineData[2],
+                [
+                    self::BACS_COMMAND_FIRST_DIRECT_DEBIT,
+                    self::BACS_COMMAND_DIRECT_DEBIT,
+                    self::BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION
+                ]
+            )) {
                 $metadata['debits']++;
                 $metadata['debit-amount'] += $lineData[6];
             } elseif ($lineData[2] == self::BACS_COMMAND_CANCEL_MANDATE) {
@@ -852,7 +860,7 @@ class BacsService
                     if ($scheduledPayment) {
                         $this->dispatcher->dispatch(
                             ScheduledPaymentEvent::EVENT_FAILED,
-                            new ScheduledPaymentEvent($scheduledPayment)
+                            new ScheduledPaymentEvent($scheduledPayment, null, $returnCode == 0)
                         );
                     }
                     $results['failed-payments']++;
@@ -2280,17 +2288,21 @@ class BacsService
                 ));
                 continue;
             }
-            
+
             if ($processingDate < $date) {
                 $processingDate = $date;
             }
+
+            $retry = $payment->getScheduledPayment()->getType() == ScheduledPayment::TYPE_RESCHEDULED;
 
             $lines[] = implode(',', [
                 sprintf('"%s"', $processingDate->format('d/m/y')),
                 '"Scheduled Payment"',
                 $bankAccount->isFirstPayment() ?
                     sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
-                    sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
+                    $retry ?
+                        sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION) :
+                        sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),
