@@ -634,7 +634,7 @@ class BankAccount
                     $description = 'mandate reinstated';
                     break;
             }
-            return "{$this->madateCancelledReason}: {$description}.";
+            return "{$this->mandateCancelledReason}: {$description}.";
         }
     }
 
