@@ -562,56 +562,80 @@ class BankAccount
         } elseif ($this->mandateCanceller == self::CANCELLER_SOSURE) {
             return $this->mandateCancelledReason;
         } else {
+            $desciption = "";
             switch ($this->mandateCancelledReason) {
                 case 0:
-                    return 'cancelled by bank, refer to user';
+                    $description = 'cancelled by bank, refer to user';
+                    break;
                 case 1:
-                    return 'instruction cancelled by user';
+                    $description = 'instruction cancelled by user';
+                    break;
                 case 2:
-                    return 'user deceased';
+                    $description = 'user deceased';
+                    break;
                 case 3:
-                    return 'account transferred to new bank';
+                    $description = 'account transferred to new bank';
+                    break;
                 case 5:
-                    return 'no account';
+                    $description = 'no account';
+                    break;
                 case 6:
-                    return 'no mandate';
+                    $description = 'no mandate';
+                    break;
                 case 7:
-                    return 'ddi amount not zero';
+                    $description = 'ddi amount not zero';
+                    break;
                 case 'B':
-                    return 'account closed';
+                    $description = 'account closed';
+                    break;
                 case 'C':
-                    return 'account transferred to new branch of bank';
+                    $description = 'account transferred to new branch of bank';
+                    break;
                 case 'D':
-                    return 'advance notice of mandate disputed';
+                    $description = 'advance notice of mandate disputed';
+                    break;
                 case 'E':
-                    return 'mandate amended';
+                    $description = 'mandate amended';
+                    break;
                 case 'F':
-                    return 'invalid account type';
+                    $description = 'invalid account type';
+                    break;
                 case 'G':
-                    return 'bank will not accept direct debits on this account';
+                    $description = 'bank will not accept direct debits on this account';
+                    break;
                 case 'H':
-                    return 'mandate has expired';
+                    $description = 'mandate has expired';
+                    break;
                 case 'I':
-                    return 'payer reference is not unique';
+                    $description = 'payer reference is not unique';
+                    break;
                 case 'K':
-                    return 'mandate cancelled by paying bank';
+                    $description = 'mandate cancelled by paying bank';
+                    break;
                 case 'L':
-                    return 'incorrect user\'s account details';
+                    $description = 'incorrect user\'s account details';
+                    break;
                 case 'M':
-                    return 'transaction Code / user status incompatible';
+                    $description = 'transaction Code / user status incompatible';
+                    break;
                 case 'N':
-                    return 'Transaction Disallowed at user\'s branch';
+                    $description = 'Transaction Disallowed at user\'s branch';
+                    break;
                 case 'O':
-                    return 'invalid reference';
+                    $description = 'invalid reference';
+                    break;
                 case 'P':
-                    return 'user\'s name not present';
+                    $description = 'user\'s name not present';
+                    break;
                 case 'Q':
-                    return 'services user\'s name is blank';
+                    $description = 'services user\'s name is blank';
+                    break;
                 case 'R':
-                    return 'mandate reinstated';
+                    $description = 'mandate reinstated';
+                    break;
             }
+            return "{$this->madateCanclledReason}: {$description}.";
         }
-        return $this->mandateCancelledReason;
     }
 
     public function getNotificationDay()
