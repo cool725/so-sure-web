@@ -72,7 +72,7 @@
                               data-public-key="{{ checkout_public_key }}"
                               data-customer-email="{{ app.user.email }}"
                               data-value="1"
-                              data-url="{{ url('purchase_checkout_update', {'id': policy.id }) }}"
+                              data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
                               data-currency="GBP"
                               data-payment-mode="cards"

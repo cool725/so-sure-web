@@ -1471,18 +1471,26 @@ class PurchaseController extends BaseController
         $successMessage = 'Success! Your payment has been successfully completed';
         $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
         details are correct and try again or get in touch if you continue to have issues';
+        $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $id]);
+        $redirectFailure = $this->generateUrl('purchase_step_payment_id', ['id' => $id]);
         if ($request->get('_route') == 'purchase_checkout_update') {
             $successMessage = 'Success! Your card details have been successfully updated';
             $errorMessage = 'Sorry, we were unable to update your card details. Please try again or
             get in touch if you continue to have issues.';
+            $redirectSuccess = $this->generateUrl('user_payment_details_policy', ['policyId' => $id]);
+            $redirectFailure = $this->generateUrl('user_payment_details_policy', ['policyId' => $id]);
         } elseif ($request->get('_route') == 'purchase_checkout_remainder') {
             $successMessage = 'Success! Your payment has been successfully completed';
             $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
             details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('purchase_remainder_policy', ['id' => $id]);
+            $redirectFailure = $this->generateUrl('purchase_remainder_policy', ['id' => $id]);
         } elseif ($request->get('_route') == 'purchase_checkout_unpaid') {
             $successMessage = 'Success! Your payment has been successfully completed';
             $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
             details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('user_unpaid_policy');
+            $redirectFailure = $this->generateUrl('user_unpaid_policy');
         }
 
         try {
@@ -1497,16 +1505,31 @@ class PurchaseController extends BaseController
 
             //$this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+            $type = null;
             $token = $request->get("token");
-            if (!$token) {
-                $logger->info(sprintf('Missing token'));
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Token parameter missing.");
-            } elseif (!$this->isCsrfTokenValid("checkout", $request->request->get('csrf'))) {
-                $logger->info(sprintf('Failed csrf'));
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
+            $pennies = $request->get("pennies");
+            $csrf = $request->get("csrf");
+            $publicKey = $request->get("cko-public-key");
+            $cardToken = $request->get("cko-card-token");
+
+            if ($token && $pennies && $csrf) {
+                $type = 'modal';
+            } elseif ($publicKey && $cardToken) {
+                $type = 'redirect';
+                $token = $cardToken;
             }
 
-            $pennies = $request->get("pennies");
+            if (!$type) {
+                $logger->info(sprintf('Missing params'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Token parameter missing.");
+            } elseif ($csrf && !$this->isCsrfTokenValid("checkout", $csrf)) {
+                $logger->info(sprintf('Failed csrf'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
+            } elseif ($type == 'redirect' && $publicKey != $this->getParameter('checkout_apipublic')) {
+                $logger->info(sprintf('Failed public key'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid public key.");
+            }
+
             $amount = null;
             if (mb_strlen($pennies) > 0) {
                 $amount = $this->convertFromPennies($pennies);
@@ -1539,16 +1562,32 @@ class PurchaseController extends BaseController
 
             $this->addFlash('success', $successMessage);
 
-            return $this->getSuccessJsonResponse($successMessage);
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectSuccess);
+            } else {
+                return $this->getSuccessJsonResponse($successMessage);
+            }
         } catch (PaymentDeclinedException $e) {
             $this->addFlash('error', $errorMessage);
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectFailure);
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
+            }
         } catch (AccessDeniedException $e) {
             $this->addFlash('error', $errorMessage);
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectFailure);
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+            }
         } catch (\Exception $e) {
             $this->addFlash('error', $errorMessage);
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown error');
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectFailure);
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown error');
+            }
         }
     }
 }
