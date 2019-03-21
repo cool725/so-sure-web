@@ -26,7 +26,22 @@ class BankAccount
     const MANDATE_FAILURE = 'failure';
     const MANDATE_CANCELLED = 'cancelled';
 
+    const CANCELLER_AUDDIS = 'auddis';
+    const CANCELLER_ADDACS = 'addacs';
+    const CANCELLER_DDICS = 'ddics';
+    const CANCELLER_SOSURE = 'sosure';
+
     const CANCELLED_ALTERED_DETAILS = 'altered-details';
+    const CANCELLED_USER = 'cancelled-by-user';
+    const CANCELLED_BANK = 'cancelled-by-bank';
+    const CANCELLED_TRANSFER = 'account-transferred';
+    const CANCELLED_CANCELLED = 'account-cancelled';
+    const CANCELLED_DECEASED = 'user-deceased';
+    const CANCELLED_DISPUTED = 'advance-notice-disputed';
+    const CANCELLED_AMENDED = 'mandate-amended';
+    const CANCELLED_REINSTATED = 'mandate-reinstated';
+    const CANCELLED_INDEMNITY = 'indemnity-claim';
+
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -82,6 +97,15 @@ class BankAccount
      * @var string
      */
     protected $mandateStatus;
+
+    /**
+     * Denotes where the cause for the mandate cancellation originated from.
+     * @Assert\Choice({"addacs", "auddis", "sosure"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $mandateCanceller;
 
     /**
      * @MongoDB\Field(type="string")
@@ -303,6 +327,19 @@ class BankAccount
     public function setMandateStatus($mandateStatus)
     {
         $this->mandateStatus = $mandateStatus;
+        // Blank cancel reasons whenever we update status.
+        $this->setMandateCanceller(null);
+        $this->setMandateCancelledReason(null);
+    }
+
+    public function getMandateCanceller()
+    {
+        return $this->mandateCanceller;
+    }
+
+    public function setMandateCanceller($mandateCanceller)
+    {
+        $this->mandateCanceller = $mandateCanceller;
     }
 
     public function getMandateCancelledReason()
@@ -448,6 +485,19 @@ class BankAccount
         return $expectedNotificationDate < $date;
     }
 
+    /**
+     * Sets the bank account's mandate to cancelled, saves the name of the origin of the cancellation, and the reason
+     * code given.
+     * @param string $canceller is the name of the cancelling event. This is either arudd, auddis, or sosure.
+     * @param string $reason    is the reason code given by the bacs system, or information given by sosure.
+     */
+    public function cancelMandate($canceller, $reason)
+    {
+        $this->setMandateStatus(self::MANDATE_CANCELLED);
+        $this->setMandateCanceller($canceller);
+        $this->setMandateCancelledReason($reason);
+    }
+
     public function isMandateInvalid()
     {
         return in_array($this->getMandateStatus(), [
@@ -512,13 +562,62 @@ class BankAccount
         return $maxAllowedDay;
     }
 
-    public function getMandateCancelledReasonIfCancelled()
+    /**
+     * Gives you a text string explaining the mandate cancellation reason code.
+     * @return string containing the explanation. If the mandate is not cancelled then it will be null.
+     */
+    public function getSimplifiedMandateCancelledReason()
     {
-        $status = $this->getMandateStatus();
-        if ($status == self::MANDATE_CANCELLED || $status == self::MANDATE_FAILURE) {
-            return $this->getMandateCancelledReason();
+        if (!$this->mandateCanceller) {
+            return null;
         }
-        return "N/A";
+        switch ($this->mandateCanceller)
+        {
+            case self::CANCELLER_ADDACS:
+                break;
+            case self::CANCELLER_AUDDIS:
+                break;
+            case self::CANCELLER_DDICS:
+                break;
+            case self::CANCELLER_SOSURE:
+                return $this->mandateCancelledReason;
+        }
+    }
+
+    private function getAddacsReason($reasonCode)
+    {
+        switch ($reasonCode)
+        {
+            case 0:
+                return "bingo";
+            case 1:
+                return "bongo";
+        }
+        return "addacs-invalid-reason";
+    }
+
+    private function getAuddisReason($reasonCode)
+    {
+        switch ($reasonCode)
+        {
+            case 0:
+                return "bingo";
+            case 1:
+                return "bongo";
+        }
+        return "auddis-invalid-reason";
+    }
+
+    private function getddicsReason($reasonCode)
+    {
+        switch ($reasonCode)
+        {
+            case 0:
+                return "bingo";
+            case 1:
+                return "bongo";
+        }
+        return "ddics-invalid-reason";
     }
 
     public function getNotificationDay()

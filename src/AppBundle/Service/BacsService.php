@@ -627,8 +627,7 @@ class BacsService
                 continue;
             }
 
-            $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-            $bacs->getBankAccount()->setMandateCancelledReason('addacs:'.$reason);
+            $bacs->getBankAccount()->cancelMandate(BankAccount::CANCELLER_ADDACS, $reason);
             $this->dm->flush();
 
             $referenceId = null;
@@ -1039,8 +1038,7 @@ class BacsService
                 $referencePolicy = $referenceUser->getLatestPolicy();
             }
 
-            $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-            $bacsPaymentMethod->getBankAccount()->setMandateCancelledReason('ddics:'.$reasonCode);
+            $bacsPaymentMethod->getBankAccount()->cancelMandate(BankAccount::CANCELLER_DDICS, $reasonCode);
             $this->logger->warning(sprintf(
                 'Cancelled bacs mandate [User %s / Policy %s] due to DDIC. Review as cancellation may not be needed.',
                 $referenceUser ? $referenceUser->getId() : null,
@@ -1340,8 +1338,7 @@ class BacsService
                     self::AUDDIS_REASON_MISSING_SERVICE_NAME,
                     self::AUDDIS_REASON_INCORRECT_DETAILS,
                 ])) {
-                    $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-                    $bacsPaymentMethod->getBankAccount()->setMandateCancelledReason('auddis:'.$reason);
+                    $bacsPaymentMethod->getBankAccount()->cancelMandate(BankAccount::CANCELLER_AUDDIS, $reason);
                     if ($referencePolicy) {
                         $referencePolicy->setPolicyStatusUnpaidIfActive();
                     } elseif ($referenceUser) {

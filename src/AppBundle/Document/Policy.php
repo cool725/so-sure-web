@@ -5260,7 +5260,7 @@ abstract class Policy
             if ($bankAccount && $bankAccount->isMandateInProgress()) {
                 return self::UNPAID_BACS_MANDATE_PENDING;
             } elseif ($bankAccount && $bankAccount->isMandateInvalid()) {
-                return self::UNPAID_BACS_MANDATE_INVALID.'_'.$bankAccount->getMandateCancelledReason();
+                return self::UNPAID_BACS_MANDATE_INVALID;
             } elseif ($lastPaymentInProgress) {
                 return self::UNPAID_BACS_PAYMENT_PENDING;
             } elseif ($lastPaymentFailure) {
