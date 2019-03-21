@@ -564,29 +564,52 @@ class BankAccount
         } else {
             switch ($this->mandateCancelledReason)
             {
-                case 0: return 'cancelled by bank, refer to user';
-                case 1: return 'instruction cancelled by user';
-                case 2: return 'user deceased';
-                case 3: return 'account transferred to new bank';
-                case 5: return 'no account';
-                case 6: return 'no mandate';
-                case 7: return 'ddi amount not zero';
-                case 'B': return 'account closed';
-                case 'C': return 'account transferred to new branch of bank';
-                case 'D': return 'advance notice of mandate disputed';
-                case 'E': return 'mandate amended';
-                case 'F': return 'invalid account type';
-                case 'G': return 'bank will not accept direct debits on this account';
-                case 'H': return 'mandate has expired';
-                case 'I': return 'payer reference is not unique';
-                case 'K': return 'mandate cancelled by paying bank';
-                case 'L': return 'incorrect user\'s account details';
-                case 'M': return 'transaction Code / user status incompatible';
-                case 'N': return 'Transaction Disallowed at user\'s branch';
-                case 'O': return 'invalid reference';
-                case 'P': return 'user\'s name not present';
-                case 'Q': return 'services user\'s name is blank';
-                case 'R': return 'mandate reinstated';
+                case 0:
+                    return 'cancelled by bank, refer to user';
+                case 1:
+                    return 'instruction cancelled by user';
+                case 2:
+                    return 'user deceased';
+                case 3:
+                    return 'account transferred to new bank';
+                case 5:
+                    return 'no account';
+                case 6:
+                    return 'no mandate';
+                case 7:
+                    return 'ddi amount not zero';
+                case 'B':
+                    return 'account closed';
+                case 'C':
+                    return 'account transferred to new branch of bank';
+                case 'D':
+                    return 'advance notice of mandate disputed';
+                case 'E':
+                    return 'mandate amended';
+                case 'F':
+                    return 'invalid account type';
+                case 'G':
+                    return 'bank will not accept direct debits on this account';
+                case 'H':
+                    return 'mandate has expired';
+                case 'I':
+                    return 'payer reference is not unique';
+                case 'K':
+                    return 'mandate cancelled by paying bank';
+                case 'L':
+                    return 'incorrect user\'s account details';
+                case 'M':
+                    return 'transaction Code / user status incompatible';
+                case 'N':
+                    return 'Transaction Disallowed at user\'s branch';
+                case 'O':
+                    return 'invalid reference';
+                case 'P':
+                    return 'user\'s name not present';
+                case 'Q':
+                    return 'services user\'s name is blank';
+                case 'R':
+                    return 'mandate reinstated';
             }
         }
         return $this->mandateCancelledReason;
