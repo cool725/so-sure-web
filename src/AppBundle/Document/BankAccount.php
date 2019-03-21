@@ -31,17 +31,6 @@ class BankAccount
     const CANCELLER_DDICS = 'ddics';
     const CANCELLER_SOSURE = 'sosure';
 
-    const CANCELLED_ALTERED_DETAILS = 'altered-details';
-    const CANCELLED_USER = 'cancelled-by-user';
-    const CANCELLED_BANK = 'cancelled-by-bank';
-    const CANCELLED_TRANSFER = 'account-transferred';
-    const CANCELLED_CANCELLED = 'account-cancelled';
-    const CANCELLED_DECEASED = 'user-deceased';
-    const CANCELLED_DISPUTED = 'advance-notice-disputed';
-    const CANCELLED_AMENDED = 'mandate-amended';
-    const CANCELLED_REINSTATED = 'mandate-reinstated';
-    const CANCELLED_INDEMNITY = 'indemnity-claim';
-
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -570,54 +559,37 @@ class BankAccount
     {
         if (!$this->mandateCanceller) {
             return null;
+        } elseif ($this->mandateCanceller == self::CANCELLER_SOSURE) {
+            return $this->mandateCancelledReason;
+        } else {
+            switch ($this->mandateCancelledReason)
+            {
+                case 0: return 'cancelled by bank, refer to user';
+                case 1: return 'instruction cancelled by user';
+                case 2: return 'user deceased';
+                case 3: return 'account transferred to new bank';
+                case 5: return 'no account';
+                case 6: return 'no mandate';
+                case 7: return 'ddi amount not zero';
+                case 'B': return 'account closed';
+                case 'C': return 'account transferred to new branch of bank';
+                case 'D': return 'advance notice of mandate disputed';
+                case 'E': return 'mandate amended';
+                case 'F': return 'invalid account type';
+                case 'G': return 'bank will not accept direct debits on this account';
+                case 'H': return 'mandate has expired';
+                case 'I': return 'payer reference is not unique';
+                case 'K': return 'mandate cancelled by paying bank';
+                case 'L': return 'incorrect user\'s account details';
+                case 'M': return 'transaction Code / user status incompatible';
+                case 'N': return 'Transaction Disallowed at user\'s branch';
+                case 'O': return 'invalid reference';
+                case 'P': return 'user\'s name not present';
+                case 'Q': return 'services user\'s name is blank';
+                case 'R': return 'mandate reinstated';
+            }
         }
-        switch ($this->mandateCanceller)
-        {
-            case self::CANCELLER_ADDACS:
-                break;
-            case self::CANCELLER_AUDDIS:
-                break;
-            case self::CANCELLER_DDICS:
-                break;
-            case self::CANCELLER_SOSURE:
-                return $this->mandateCancelledReason;
-        }
-    }
-
-    private function getAddacsReason($reasonCode)
-    {
-        switch ($reasonCode)
-        {
-            case 0:
-                return "bingo";
-            case 1:
-                return "bongo";
-        }
-        return "addacs-invalid-reason";
-    }
-
-    private function getAuddisReason($reasonCode)
-    {
-        switch ($reasonCode)
-        {
-            case 0:
-                return "bingo";
-            case 1:
-                return "bongo";
-        }
-        return "auddis-invalid-reason";
-    }
-
-    private function getddicsReason($reasonCode)
-    {
-        switch ($reasonCode)
-        {
-            case 0:
-                return "bingo";
-            case 1:
-                return "bongo";
-        }
-        return "ddics-invalid-reason";
+        return $this->mandateCancelledReason;
     }
 
     public function getNotificationDay()
