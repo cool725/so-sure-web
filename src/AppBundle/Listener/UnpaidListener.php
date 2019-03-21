@@ -58,7 +58,7 @@ class UnpaidListener
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $failedPayments = $scheduledPaymentRepo->countUnpaidScheduledPayments($policy);
         $nextScheduledPayment = null;
-        if ($failedPayments <= 3 && $scheduledPayment->getCanRetry()) {
+        if ($failedPayments <= 3 && $event->getCanRetry()) {
             /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayment = $scheduledPaymentRepo->mostRecentWithStatuses(
                 $policy,
