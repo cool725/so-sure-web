@@ -562,7 +562,7 @@ class BankAccount
         } elseif ($this->mandateCanceller == self::CANCELLER_SOSURE) {
             return $this->mandateCancelledReason;
         } else {
-            $desciption = "";
+            $description = "";
             switch ($this->mandateCancelledReason) {
                 case 0:
                     $description = 'cancelled by bank, refer to user';
@@ -634,7 +634,7 @@ class BankAccount
                     $description = 'mandate reinstated';
                     break;
             }
-            return "{$this->madateCanclledReason}: {$description}.";
+            return "{$this->madateCancelledReason}: {$description}.";
         }
     }
 
