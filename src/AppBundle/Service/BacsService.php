@@ -32,6 +32,7 @@ use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
