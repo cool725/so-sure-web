@@ -114,6 +114,15 @@ class PaymentService
         \DateTime $scheduledDate = null,
         $validateBillable = true
     ) {
+        return $this->getAllValidScheduledPaymentsForTypes($prefix, [$type], $scheduledDate, $validateBillable);
+    }
+
+    public function getAllValidScheduledPaymentsForTypes(
+        $prefix,
+        $types,
+        \DateTime $scheduledDate = null,
+        $validateBillable = true
+    ) {
         $results = [];
 
         /** @var ScheduledPaymentRepository $repo */
@@ -121,13 +130,21 @@ class PaymentService
         $scheduledPayments = $repo->findScheduled($scheduledDate);
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
+
+            $foundType = false;
+            foreach ($types as $type) {
+                if ($scheduledPayment->getPolicy()->getPaymentMethod() instanceof $type) {
+                    $foundType = true;
+                }
+            }
+            if (!$foundType) {
+                continue;
+            }
+
             if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->getPolicyOrPayerOrUserPaymentMethod() instanceof $type) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {

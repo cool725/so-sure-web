@@ -44,7 +44,7 @@
 
     .hamburger {
         position: absolute;
-        top: 0; right: 1rem;
+        top: 0.5rem; right: 1rem;
 
         @include media-breakpoint-up(lg) {
             right: 3rem;

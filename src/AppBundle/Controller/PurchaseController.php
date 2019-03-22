@@ -1453,6 +1453,7 @@ class PurchaseController extends BaseController
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,
             'policy' => $policy,
+            'card_provider' => $cardProvider,
         ];
 
         return $data;
@@ -1467,17 +1468,29 @@ class PurchaseController extends BaseController
      */
     public function checkoutAction(Request $request, $id)
     {
-        $successMessage = 'Payment is successful.';
-        $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+        $successMessage = 'Success! Your payment has been successfully completed';
+        $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+        details are correct and try again or get in touch if you continue to have issues';
+        $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $id]);
+        $redirectFailure = $this->generateUrl('purchase_step_payment_id', ['id' => $id]);
         if ($request->get('_route') == 'purchase_checkout_update') {
-            $successMessage = 'Your card is now updated.';
-            $errorMessage = 'Sorry, we are unable to update your card. Please try again.';
+            $successMessage = 'Success! Your card details have been successfully updated';
+            $errorMessage = 'Sorry, we were unable to update your card details. Please try again or
+            get in touch if you continue to have issues.';
+            $redirectSuccess = $this->generateUrl('user_payment_details_policy', ['policyId' => $id]);
+            $redirectFailure = $this->generateUrl('user_payment_details_policy', ['policyId' => $id]);
         } elseif ($request->get('_route') == 'purchase_checkout_remainder') {
-            $successMessage = 'The remainder of policy is now paid.';
-            $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+            $successMessage = 'Success! Your payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('purchase_remainder_policy', ['id' => $id]);
+            $redirectFailure = $this->generateUrl('purchase_remainder_policy', ['id' => $id]);
         } elseif ($request->get('_route') == 'purchase_checkout_unpaid') {
-            $successMessage = 'Payment is successful.';
-            $errorMessage = 'Sorry, we are unable to take payment. Please try again.';
+            $successMessage = 'Success! Your payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('user_unpaid_policy');
+            $redirectFailure = $this->generateUrl('user_unpaid_policy');
         }
 
         try {
@@ -1492,16 +1505,31 @@ class PurchaseController extends BaseController
 
             //$this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+            $type = null;
             $token = $request->get("token");
-            if (!$token) {
-                $logger->info(sprintf('Missing token'));
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Token parameter missing.");
-            } elseif (!$this->isCsrfTokenValid("checkout", $request->request->get('csrf'))) {
-                $logger->info(sprintf('Failed csrf'));
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
+            $pennies = $request->get("pennies");
+            $csrf = $request->get("csrf");
+            $publicKey = $request->get("cko-public-key");
+            $cardToken = $request->get("cko-card-token");
+
+            if ($token && $pennies && $csrf) {
+                $type = 'modal';
+            } elseif ($publicKey && $cardToken) {
+                $type = 'redirect';
+                $token = $cardToken;
             }
 
-            $pennies = $request->get("pennies");
+            if (!$type) {
+                $logger->info(sprintf('Missing params'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Token parameter missing.");
+            } elseif ($csrf && !$this->isCsrfTokenValid("checkout", $csrf)) {
+                $logger->info(sprintf('Failed csrf'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
+            } elseif ($type == 'redirect' && $publicKey != $this->getParameter('checkout_apipublic')) {
+                $logger->info(sprintf('Failed public key'));
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid public key.");
+            }
+
             $amount = null;
             if (mb_strlen($pennies) > 0) {
                 $amount = $this->convertFromPennies($pennies);
@@ -1514,30 +1542,52 @@ class PurchaseController extends BaseController
             $logger->info(sprintf('Token: %s / Pennies; %s', $token, $pennies));
             /** @var CheckoutService $checkout */
             $checkout = $this->get('app.checkout');
-            $checkout->updatePaymentMethod(
-                $policy,
-                $token,
-                $amount
-            );
 
-            /*
-            if ($amount > 0) {
-                $checkout->pay($policy, $charge->getId(), $amount, Payment::SOURCE_WEB);
+            if ($request->get('_route') == 'purchase_checkout') {
+                $checkout->pay(
+                    $policy,
+                    $token,
+                    $amount,
+                    Payment::SOURCE_WEB,
+                    null,
+                    $this->getIdentityLogWeb($request)
+                );
+            } else {
+                $checkout->updatePaymentMethod(
+                    $policy,
+                    $token,
+                    $amount
+                );
             }
-            */
 
             $this->addFlash('success', $successMessage);
 
-            return $this->getSuccessJsonResponse("Updated payment token.");
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectSuccess);
+            } else {
+                return $this->getSuccessJsonResponse($successMessage);
+            }
         } catch (PaymentDeclinedException $e) {
             $this->addFlash('error', $errorMessage);
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectFailure);
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
+            }
         } catch (AccessDeniedException $e) {
             $this->addFlash('error', $errorMessage);
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectFailure);
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+            }
         } catch (\Exception $e) {
             $this->addFlash('error', $errorMessage);
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown error');
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectFailure);
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown error');
+            }
         }
     }
 }

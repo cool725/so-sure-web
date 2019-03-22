@@ -51,10 +51,13 @@
 }
 
 // Pages we have the same gradient for the 'hero' add here
+// TODO: Move to a single classname i.e. .nav-with-hero
 .home,
 .landing,
 .social-insurance,
-.error-page {
+.error-page,
+.landing-snapchat,
+.landing-twitter {
     .navbar-so-sure {
         background-image: none;
     }
@@ -74,6 +77,12 @@
 .navbar-scrolled:not(.devbar) {
     @include blue-gradient;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
+}
+
+.landing-twitter {
+    .navbar-scrolled:not(.devbar) {
+        @include twitter-gradient;
+    }
 }
 
 .navbar-scrolled-quote {
