@@ -912,6 +912,25 @@ class BacsService
             /** @var BacsPayment $payment */
             try {
                 $payment->approve();
+                // if the policy is no longer active then we have to refund it again.
+                $policy = $payment->getPolicy();
+                if ($policy->isCancelled()) {
+                    $this->dm->flush();
+                    $refund = $payment->getPolicy()->getRefundAmount();
+                    if ($refund > 0) {
+                        /** @var ScheduledPaymentRepository */
+                        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+                        $scheduledRefunds = $scheduledPaymentRepo->getScheduledRefundAmount($policy);
+                        if ($scheduledRefunds < $refund) {
+                            $this->scheduleBacsPayment(
+                                $policy,
+                                $scheduledRefunds - $refund,
+                                ScheduledPayment::TYPE_REFUND,
+                                'refund for bacs payment after cancellation'
+                            );
+                        }
+                    }
+                }
             } catch (\Exception $e) {
                 $this->logger->error(
                     sprintf('Skipping payment %s approval', $payment->getId()),
@@ -2280,7 +2299,7 @@ class BacsService
                 ));
                 continue;
             }
-            
+
             if ($processingDate < $date) {
                 $processingDate = $date;
             }

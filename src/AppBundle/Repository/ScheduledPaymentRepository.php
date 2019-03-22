@@ -103,4 +103,24 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->execute(['cursor' => true])
             ->toArray();
     }
+
+    /**
+     * Gets the amount that a given policy is scheduled to receive in refunds currently.
+     * @param Policy $policy is the policy that we are inspecting.
+     * @return float with the scheduled refund amount.
+     */
+    public function getScheduledRefundAmount($policy)
+    {
+        $scheduledPayments = $this->createQueryBuilder()
+            ->field('policy')->references($policy)
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field('amount')->lt(0)
+            ->getQuery()
+            ->execute();
+        $total = 0;
+        foreach ($scheduledPayments as $scheduledPayment) {
+            $total -= $scheduledPayment->getAmount();
+        }
+
+    }
 }
