@@ -2164,6 +2164,14 @@ class BacsService
 
         // credits require much less validation
         if ($scheduledPayment->getAmount() < 0) {
+            // cancel if it is a refund of more than they deserve.
+            /** @var ScheduledPaymentRepository */
+            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+            $refunds = $scheduledPaymentRepo->getScheduledRefundAmount($scheduledPayment->getPolicy());
+            if ($refunds > $scheduledPayment->getPolicy()->getRefundAmount()) {
+                $this->warnings[] = "Cancelling (scheduled) payment {$id} as it is refunding too much";
+                return self::VALIDATE_CANCEL;
+            }
             return self::VALIDATE_OK;
         }
 
