@@ -535,7 +535,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     }
 
                     if ($bankAccount->isAfterInitialNotificationDate()) {
-                        if ($bacsPaymentCount == 0) {
+                        if ($bacsPaymentCount == 0 && count($policy->getScheduledPayments()) == 0) {
                             $lines[] = 'Warning!! There are no bacs payments, yet past the initial notification date';
                         }
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
