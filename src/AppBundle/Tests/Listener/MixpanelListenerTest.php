@@ -132,7 +132,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $listener->onPaymentSuccessEvent(new PaymentEvent($payment));
         static::$requestService->setEnvironment('test');
@@ -164,7 +164,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
         static::$requestService->setEnvironment('test');
@@ -196,7 +196,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $listener->onPolicyCashbackEvent(new PolicyEvent($policy));
         static::$requestService->setEnvironment('test');
@@ -228,7 +228,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $listener->onPolicyRenewedEvent(new PolicyEvent($policy));
         static::$requestService->setEnvironment('test');
@@ -260,7 +260,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $listener->onPolicyDeclineRenewedEvent(new PolicyEvent($policy));
         static::$requestService->setEnvironment('test');
@@ -293,7 +293,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $event = new PolicyEvent($policy);
         $event->setPreviousStatus(Policy::STATUS_UNPAID);
@@ -328,7 +328,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $event = new CardEvent();
         $event->setUser($user);
@@ -363,7 +363,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $event = new CardEvent();
         $event->setPolicy($policy);
@@ -398,7 +398,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $event = new BacsEvent(new BankAccount());
         $event->setUser($user);
@@ -433,7 +433,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $event = new BacsEvent(new BankAccount());
         $event->setPolicy($policy);
@@ -468,7 +468,7 @@ class MixpanelListenerTest extends WebTestCase
         static::$redis->del(MixpanelService::KEY_MIXPANEL_QUEUE);
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
-        $listener = new MixpanelListener(static::$mixpanelService);
+        $listener = new MixpanelListener(static::$mixpanelService, 'test');
         static::$requestService->setEnvironment('prod');
         $event = new PolicyEvent($policy);
         $event->setPreviousPaymentMethod('judo');

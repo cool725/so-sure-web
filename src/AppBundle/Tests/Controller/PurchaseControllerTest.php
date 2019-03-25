@@ -6,9 +6,12 @@ use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\RouterService;
+use AppBundle\Tests\Service\CheckoutServiceTest;
+use function GuzzleHttp\Psr7\build_query;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -48,6 +51,9 @@ class PurchaseControllerTest extends BaseControllerTest
     /** @var FeatureService */
     protected static $featureService;
 
+    /** @var CheckoutService */
+    protected static $checkoutService;
+
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
@@ -55,6 +61,10 @@ class PurchaseControllerTest extends BaseControllerTest
         /** @var FeatureService $featureService */
         self::$featureService = self::$container->get('app.feature');
         self::$featureService->setEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS, true);
+
+        /** @var  CheckoutService $checkoutService */
+        $checkoutService = self::$container->get('app.checkout');
+        self::$checkoutService = $checkoutService;
     }
 
     public function tearDown()
@@ -62,6 +72,12 @@ class PurchaseControllerTest extends BaseControllerTest
         //self::$client->request('GET', '/logout');
         //self::$client->followRedirect();
         self::$client->getCookieJar()->clear();
+    }
+
+    public function setUp()
+    {
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, false);
+        $this->assertFalse(self::$featureService->isEnabled(Feature::FEATURE_CHECKOUT));
     }
 
     public function testPurchaseOkNew()
@@ -279,9 +295,20 @@ class PurchaseControllerTest extends BaseControllerTest
             'foo',
             $phone
         );
-        $policy1 = self::initPolicy($user, self::$dm, $phone);
-        sleep(1);
-        $policy2 = self::initPolicy($user, self::$dm, $phone);
+        $imei1 = self::generateRandomImei();
+        $policy1 = self::initPolicy($user, self::$dm, $phone, null, false, false, true, $imei1);
+        $infiniteLoopCount = 0;
+        $imei2 = self::generateRandomImei();
+        while ($imei1 == $imei2) {
+            usleep(100);
+            $imei2 = self::generateRandomImei();
+            $infiniteLoopCount++;
+            if ($infiniteLoopCount > 100) {
+                break;
+            }
+        }
+        $this->assertNotEquals($imei1, $imei2);
+        $policy2 = self::initPolicy($user, self::$dm, $phone, null, false, false, true, $imei1);
 
         $this->login($user->getEmail(), 'foo', 'user/invalid');
 
@@ -289,7 +316,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect(
             sprintf('/purchase/step-pledge/%s', $policy1->getId())
-        ));
+        ), $crawler->html());
     }
 
     public function testStarlingLead()
@@ -369,7 +396,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $this->assertTrue($cardButton->count() == 0);
 
         // test with the judo flag
@@ -379,12 +406,174 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPayment($crawler, $phone);
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $this->assertTrue($cardButton->count() == 1);
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
+    }
+
+    public function testPurchasePhoneCheckout()
+    {
+        $phone = $this->getRandomPhoneAndSetSession();
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhoneCheckout', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+        $this->assertTrue($this->isClientResponseRedirect());
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPhone($phone);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+        $url = self::$client->getHistory()->current()->getUri();
+        $this->assertContains('/purchase/step-pledge', $url);
+        $policyId = mb_substr(
+            $url,
+            mb_stripos($url, '/step-pledge/') + mb_strlen('/step-pledge/')
+        );
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        // test with the card option & checkout flag
+        self::$featureService->setEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS, true);
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+        $crawler = $this->setPayment($crawler, $phone);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
+        $this->assertTrue($cardButton->count() == 1);
+        $cardNode = $cardButton->getNode(0);
+        $this->assertNotNull($cardNode);
+        if ($cardNode) {
+            $this->assertContains('btn-card-pay', $cardNode->getAttribute('class'));
+        }
+
+        $csrf = null;
+        $url = null;
+        $paymentNode = $crawler->filter('.payment-form')->getNode(0);
+        $this->assertNotNull($paymentNode);
+        if ($paymentNode) {
+            $csrf = $paymentNode->getAttribute('data-csrf');
+            $url = $paymentNode->getAttribute('data-url');
+        }
+
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $this->convertToPennies($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user');
+        self::verifyResponse(200);
+    }
+
+    public function testPurchasePhoneCheckoutFailed()
+    {
+        $phone = $this->getRandomPhoneAndSetSession();
+
+        $crawler = $this->createPurchase(
+            self::generateEmail('testPurchasePhoneCheckoutFailed', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+        self::verifyResponse(302);
+        $this->assertTrue($this->isClientResponseRedirect());
+        self::$client->followRedirect();
+        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
+
+        $crawler = $this->setPhone($phone);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
+        $url = self::$client->getHistory()->current()->getUri();
+        $this->assertContains('/purchase/step-pledge', $url);
+        $policyId = mb_substr(
+            $url,
+            mb_stripos($url, '/step-pledge/') + mb_strlen('/step-pledge/')
+        );
+
+        //print $crawler->html();
+        $crawler = $this->agreePledge($crawler);
+        //print $crawler->html();
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
+
+        // test with the card option & checkout flag
+        self::$featureService->setEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS, true);
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+        $crawler = $this->setPayment($crawler, $phone);
+        self::verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
+        $this->assertTrue($cardButton->count() == 1);
+        $cardNode = $cardButton->getNode(0);
+        $this->assertNotNull($cardNode);
+        if ($cardNode) {
+            $this->assertContains('btn-card-pay', $cardNode->getAttribute('class'));
+        }
+
+        $csrf = null;
+        $url = null;
+        $paymentNode = $crawler->filter('.payment-form')->getNode(0);
+        $this->assertNotNull($paymentNode);
+        if ($paymentNode) {
+            $csrf = $paymentNode->getAttribute('data-csrf');
+            $url = $paymentNode->getAttribute('data-url');
+        }
+
+        // need to adjust pennies on the querystring. This is only because we're adjusting the amount to fail
+        // the payment (as required by checkout)
+        $query = parse_url($url, PHP_URL_QUERY);
+        parse_str($query, $queryData);
+        $queryData['pennies'] = $this->convertToPennies(CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_AMOUNT);
+        $port = parse_url($url, PHP_URL_PORT);
+        $url = sprintf(
+            '%s://%s%s%s?%s',
+            parse_url($url, PHP_URL_SCHEME),
+            parse_url($url, PHP_URL_HOST),
+            mb_strlen($port) > 0 ? ':' . $port : null,
+            parse_url($url, PHP_URL_PATH),
+            build_query($queryData)
+        );
+
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_PIN
+        );
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $this->convertToPennies(CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_AMOUNT),
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
+
+        $crawler = self::$client->request('GET', '/user');
+        self::verifyResponse(302);
+        $this->assertRedirectionPathPartial('/purchase/step-phone');
     }
 
     public function testPurchasePhoneBacs()
@@ -679,7 +868,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
@@ -717,7 +906,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
@@ -766,11 +955,21 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
         $this->assertContains($phone->getModel(), $crawler->html());
 
+        $infiniteLoopCount = 0;
         $phone2 = $this->getRandomPhone(static::$dm);
+        while ($phone->getId() == $phone2->getId()) {
+            usleep(100);
+            $phone2 = $this->getRandomPhone(static::$dm);
+            $infiniteLoopCount++;
+            if ($infiniteLoopCount > 100) {
+                break;
+            }
+        }
+        $this->assertNotEquals($phone2->getId(), $phone->getId());
+
         $crawler = $this->changePhone($phone2);
         self::verifyResponse(200);
         $this->assertContains($phone2->getModel(), $crawler->html());
-        $this->assertNotEquals($phone2->getId(), $phone->getId());
     }
 
     public function testRePurchase()
@@ -844,7 +1043,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
@@ -882,7 +1081,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
@@ -920,7 +1119,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
 
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
@@ -944,30 +1143,30 @@ class PurchaseControllerTest extends BaseControllerTest
             new \DateTime('1980-01-01')
         );
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, 'create Purchase');
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
 
         $crawler = $this->setPhone($phone);
 
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, sprintf('Set Phone %s', $phone->__toString()));
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
         //print $crawler->html();
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, 'pledge');
         $crawler = self::$client->followRedirect();
         $this->assertContains('/purchase/step-payment', self::$client->getHistory()->current()->getUri());
 
         $crawler = $this->setPayment($crawler, $phone);
-        self::verifyResponse(302);
+        self::verifyResponse(302, null, $crawler, 'payment');
         $crawler = self::$client->followRedirect();
 
-        $cardButton = $crawler->selectButton('to_judo_form[submit]');
+        $cardButton = $crawler->selectButton('to_card_form[submit]');
         $form = $cardButton->form();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, $crawler, 'card');
         $this->verifyPurchaseReady($crawler);
     }
 

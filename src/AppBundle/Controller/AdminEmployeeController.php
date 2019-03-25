@@ -38,6 +38,7 @@ use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\FraudService;
@@ -106,11 +107,13 @@ use AppBundle\Document\File\BarclaysFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\File\ScreenUploadFile;
+use AppBundle\Document\File\ManualAffiliateFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\Imei;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\AddressType;
+use AppBundle\Form\Type\ManualAffiliateFileType;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\DirectBacsReceiptType;
@@ -145,6 +148,7 @@ use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -2933,6 +2937,64 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/scheduled-payment-form/{id}/{scheduledPaymentId}", name="scheduled_payment_form")
+     * @Template
+     */
+    public function scheduledPaymentFormAction(Request $request, $id, $scheduledPaymentId)
+    {
+
+        $dm = $this->getManager();
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+        $scheduledPayment = $scheduledPaymentRepo->find($scheduledPaymentId);
+        if (!$scheduledPayment) {
+            $this->addFlash(
+                "error",
+                "Attempted to modify nonexistent scheduled payment with id '{$scheduledPaymentId}'."
+            );
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+        $scheduledPaymentForm = $this->get("form.factory")
+            ->createNamedBuilder("scheduled_payment_form")
+            ->add("notes", TextType::class, ["data" => $scheduledPayment->getNotes()])
+            ->add(
+                "scheduled",
+                DateTimeType::class,
+                [
+                    "data" => $scheduledPayment->getScheduled(),
+                    "html5" => false,
+                    "widget" => "single_text",
+                    "format" => "dd-MM-yyyy HH:mm",
+                    "attr" => ["class" => "datetimepickerfuture", "autocomplete" => "off"]
+                ]
+            )
+            ->add("submit", SubmitType::class)
+            ->setAction(
+                $this->generateUrl("scheduled_payment_form", ["id" => $id, "scheduledPaymentId" => $scheduledPaymentId])
+            )
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            // TODO: permissions
+            if ($request->request->has("scheduled_payment_form")) {
+                $scheduledPaymentForm->handleRequest($request);
+                if ($scheduledPaymentForm->isValid()) {
+                    $notes = $scheduledPaymentForm->get("notes")->getData();
+                    $scheduled = $scheduledPaymentForm->get("scheduled")->getData();
+                    if ($notes) {
+                        $scheduledPayment->setNotes($notes);
+                    }
+                    if ($scheduled) {
+                        $scheduledPayment->setScheduled($scheduled);
+                    }
+                    $dm->flush();
+                    $this->addFlash("success", "Scheduled Payment updated.");
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return ["form" => $scheduledPaymentForm->createView()];
+    }
+
+    /**
      * @Route("/company", name="admin_company")
      * @Template
      */
@@ -3393,6 +3455,41 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             200,
             array('Content-Type' => $mimetype)
         );
+    }
+
+    /**
+     * @Route("/optimise-csv", name="admin_optimise_csv")
+     * @Template
+     */
+    public function optimiseCsvAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $s3 = $this->get('aws.s3');
+        /** @var S3FileRepository */
+        $s3FileRepo = $dm->getRepository(S3File::class);
+        $uploadedFile = new ManualAffiliateFile();
+        $uploadForm = $this->get('form.factory')
+            ->createNamedBuilder('upload_form', ManualAffiliateFileType::class, $uploadedFile)
+            ->getForm();
+        if ($request->getMethod() === 'POST') {
+            if ($request->request->has('upload_form')) {
+                $uploadForm->handleRequest($request);
+                if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
+                    try {
+                        $affiliateService = $this->get('app.affiliate');
+                        $affiliateService->processOptimiseCsv($uploadedFile);
+                        $this->addFlash('success', 'File Processed');
+                    } catch (\Exception $e) {
+                        $this->addFlash('error', $e->getMessage().", file not saved.");
+                    }
+                    return new RedirectResponse($this->generateUrl('admin_optimise_csv'));
+                }
+            }
+        }
+        return [
+            'upload_form' => $uploadForm->createView(),
+            'files' => $s3FileRepo->getAllFilesToDate(null, 'manualAffiliate')
+        ];
     }
 
     /**

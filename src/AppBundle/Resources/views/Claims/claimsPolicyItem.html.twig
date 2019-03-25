@@ -1480,6 +1480,8 @@
                         <td>
                             {% if payment.type == 'judo' %}
                                 <i class="fa fa-credit-card" title="JudoPay"></i>
+                            {% elseif payment.type == 'checkout' %}
+                                <i class="fa fa-credit-card" title="Checkout"></i>
                             {% elseif payment.type == 'sosure' %}
                                 <i class="fa fa-smile-o" title="so-sure Credit/Debit"></i>
                             {% elseif payment.type == 'bacs' %}
@@ -1560,11 +1562,12 @@
             <table class="table table-striped">
               <tbody>
                   <tr>
-                      <th>Type</th>
+                      <th style="width: 5%">Type</th>
                       <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
                       <th>Payment Status</th>
+                      <th>Notes</th>
                       <th>Actions</th>
                   </tr>
                   {% set totalScheduled = 0 %}
@@ -1601,16 +1604,22 @@
                             {% endif %}
                         </td>
                         <td>
+                            {{ scheduledPayment.notes }}
+                        </td>
+                        <td>
+                            {# edit button #}
+                            {% if is_granted('ROLE_EMPLOYEE') and scheduledPayment.status == 'scheduled' %}
+                                <button title="Edit Scheduled Payment" type="button" class="btn btn-danger" data-toggle="modal" data-target="#scheduledPaymentForm{{scheduledPayment.id}}">
+                                    <i class="fa fa-edit"></i> Edit
+                                </button>
+                            {% endif %}
+                            {# run button #}
                             {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                                 {% if policy.nextScheduledPayment and policy.nextScheduledPayment.id == scheduledPayment.id %}
                                     <button title="Run Scheduled Payment" type="button" class="btn btn-warning"
                                             data-toggle="modal" data-target="#runScheduledPaymentModal"
                                             ><i class="fa fa-play"></i> Run</button>
-                                {% else %}
-                                    -
                                 {% endif %}
-                            {% else %}
-                                -
                             {% endif %}
                         </td>
                     </tr>
@@ -1620,6 +1629,11 @@
                         <td>
                             £{{ totalScheduled | number_format(2, '.', ',') }}
                         </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
               </tbody>
             </table>
@@ -1941,6 +1955,13 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:bacsPaymentRequestForm', 'policy': policy, 'id': 'bacsPaymentRequestForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
+        {% for scheduledPayment in policy.scheduledPayments if scheduledPayment.status == 'scheduled' %}
+            {%
+                include 'AppBundle::Admin/adminConfirmModal.html.twig' with
+                {'route': 'AppBundle:AdminEmployee:scheduledPaymentForm', 'params': {'id': policy.id, 'scheduledPaymentId': scheduledPayment.id}, 'id': 'scheduledPaymentForm' ~ scheduledPayment.id, 'title': 'Edit Scheduled Payment'}
+            %}
+        {% endfor %}
+
     {% endif %}
     {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}

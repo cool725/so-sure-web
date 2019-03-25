@@ -147,11 +147,21 @@
         </div>
     {% endif %}
 
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
+
+    {# Page Modals #}
     {% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 
 {% block javascriptsPage %}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
     <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-payment.js') }}"></script>
     <script src="{{ asset('css-js/user-purchase-bacs.js') }}"></script>

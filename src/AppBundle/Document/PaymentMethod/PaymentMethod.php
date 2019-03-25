@@ -13,13 +13,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @MongoDB\DiscriminatorField("type")
  * make sure to update getType() if adding
  * @MongoDB\DiscriminatorMap({"judo"="JudoPaymentMethod",
- *      "bacs"="BacsPaymentMethod"})
+ *      "bacs"="BacsPaymentMethod", "checkout"="CheckoutPaymentMethod"})
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class PaymentMethod
 {
     const TYPE_JUDO = 'judo';
     const TYPE_BACS = 'bacs';
+    const TYPE_CHECKOUT = 'checkout';
     abstract public function isValid();
     abstract public function __toString();
 
@@ -46,6 +47,8 @@ abstract class PaymentMethod
             return self::TYPE_JUDO;
         } elseif ($this instanceof BacsPaymentMethod) {
             return self::TYPE_BACS;
+        } elseif ($this instanceof CheckoutPaymentMethod) {
+            return self::TYPE_CHECKOUT;
         } else {
             return null;
         }

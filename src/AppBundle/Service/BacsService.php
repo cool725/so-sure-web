@@ -825,7 +825,14 @@ class BacsService
 
                     // refund requires commission to be set, but probably isn't at this point in time
                     if (!$submittedPayment->getTotalCommission()) {
-                        $submittedPayment->setCommission();
+                        try {
+                            $submittedPayment->setCommission();
+                        } catch (\Exception $e) {
+                            $this->logger->error(sprintf(
+                                'Unable to set refund commission for policy %s',
+                                $policy->getId()
+                            ), ['exception' => $e]);
+                        }
                     }
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();

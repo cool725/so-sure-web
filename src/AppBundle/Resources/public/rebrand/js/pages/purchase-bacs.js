@@ -9,6 +9,7 @@ require('bootstrap/js/dist/dropdown');
 require('jquery-validation');
 require('jquery-mask-plugin');
 require('../common/validationMethods.js');
+require('../common/checkout.js');
 
 const sosure = sosure || {};
 
@@ -60,8 +61,16 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: true,
                 },
+                "bacs_form[validateSortCode]": {
+                    required: true,
+                    equalTo: '#bacs_form_sortCode',
+                },
                 "bacs_form[accountNumber]": {
                     required: true,
+                },
+                "bacs_form[validateAccountNumber]": {
+                    required: true,
+                    equalTo: '#bacs_form_accountNumber',
                 }
             },
             messages: {
@@ -73,8 +82,16 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: 'Please enter your sort code',
                 },
+                "bacs_form[validateSortCode]": {
+                    required: 'Please confirm your sort code',
+                    equalTo: 'Your sort code doesn\'t match, please double check',
+                },
                 "bacs_form[accountNumber]": {
                     required: 'Please enter your account number',
+                },
+                "bacs_form[validateAccountNumber]": {
+                    required: 'Please confirm your account number',
+                    equalTo: 'Your account number doesn\'t match, please double check',
                 },
                 "bacs_form[soleSignature]": {
                     required: ''
@@ -100,4 +117,24 @@ $(function() {
         sosure.purchaseStepBacs.loader.show();
         webpay.submit();
     }
+
+    $('.btn-card-pay').on('click', function(e) {
+        //console.log('click');
+        e.preventDefault();
+        Checkout.open();
+    });
+
+    Checkout.configure({
+        publicKey: $('.payment-form').data('public-key'),
+        customerEmail: $('.payment-form').data('customer-email'),
+        value: $('.payment-form').data('value'),
+        currency: $('.payment-form').data('currency'),
+        debugMode: $('.payment-form').data('debug-mode'),
+        paymentMode: $('.payment-form').data('payment-mode'),
+        cardFormMode: $('.payment-form').data('card-form-mode'),
+        cardTokenised: function(event) {
+            console.log(event.data.cardToken);
+        }
+    });
+
 });

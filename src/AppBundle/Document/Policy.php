@@ -11,8 +11,10 @@ use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Service\InvitationService;
@@ -123,10 +125,10 @@ abstract class Policy
     const UNPAID_BACS_PAYMENT_FAILED = 'unpaid_bacs_payment_failed';
     const UNPAID_BACS_PAYMENT_MISSING = 'unpaid_bacs_payment_missing';
     const UNPAID_BACS_UNKNOWN = 'unpaid_bacs_unknown';
-    const UNPAID_JUDO_CARD_EXPIRED = 'unpaid_judo_card_expired';
-    const UNPAID_JUDO_PAYMENT_FAILED = 'unpaid_judo_payment_failed';
-    const UNPAID_JUDO_PAYMENT_MISSING = 'unpaid_judo_payment_missing';
-    const UNPAID_JUDO_UNKNOWN = 'unpaid_judo_unknown';
+    const UNPAID_CARD_EXPIRED = 'unpaid_card_expired';
+    const UNPAID_CARD_PAYMENT_FAILED = 'unpaid_card_payment_failed';
+    const UNPAID_CARD_PAYMENT_MISSING = 'unpaid_card_payment_missing';
+    const UNPAID_CARD_UNKNOWN = 'unpaid_card_unknown';
     const UNPAID_PAYMENT_METHOD_MISSING = 'unpaid_payment_method_missing';
     const UNPAID_UNKNOWN = 'unpaid_unknown';
     const UNPAID_PAID = 'unpaid_paid';
@@ -137,9 +139,9 @@ abstract class Policy
         self::UNPAID_BACS_PAYMENT_PENDING,
         self::UNPAID_BACS_PAYMENT_FAILED,
         self::UNPAID_BACS_PAYMENT_MISSING,
-        self::UNPAID_JUDO_CARD_EXPIRED,
-        self::UNPAID_JUDO_PAYMENT_FAILED,
-        self::UNPAID_JUDO_PAYMENT_MISSING,
+        self::UNPAID_CARD_EXPIRED,
+        self::UNPAID_CARD_PAYMENT_FAILED,
+        self::UNPAID_CARD_PAYMENT_MISSING,
         self::UNPAID_PAID,
     ];
 
@@ -1028,6 +1030,9 @@ abstract class Policy
                 } elseif ($payment instanceof BacsPayment) {
                     /** @var BacsPayment $payment */
                     return $payment->getStatus() !== null;
+                } elseif ($payment instanceof CheckoutPayment) {
+                    /** @var CheckoutPayment $payment */
+                    return $payment->getResult() !== null;
                 }
             });
         }
@@ -2493,6 +2498,36 @@ abstract class Policy
         }
 
         return null;
+    }
+
+    public function hasCheckoutPaymentMethod()
+    {
+        return $this->getPaymentMethod() instanceof CheckoutPaymentMethod;
+    }
+
+    /**
+     * @return CheckoutPaymentMethod|null
+     */
+    public function getCheckoutPaymentMethod()
+    {
+        if ($this->hasCheckoutPaymentMethod()) {
+            /** @var CheckoutPaymentMethod $paymentMethod */
+            $paymentMethod = $this->getPaymentMethod();
+
+            return $paymentMethod;
+        }
+
+        return null;
+    }
+
+    public function hasCardPaymentMethod()
+    {
+        return $this->hasCheckoutPaymentMethod() || $this->hasPolicyOrPayerOrUserJudoPaymentMethod();
+    }
+
+    public function getCardPaymentMethod()
+    {
+        return $this->getCheckoutPaymentMethod() ?: $this->getPolicyOrPayerOrUserJudoPaymentMethod();
     }
 
     public function hasPolicyOrPayerOrUserJudoPaymentMethod()
@@ -5241,23 +5276,41 @@ abstract class Policy
 
             return self::UNPAID_BACS_UNKNOWN;
         } elseif ($this->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
-            if ($lastPaymentCredit && $lastPaymentCredit instanceof JudoPayment) {
-                /** @var JudoPayment $lastPaymentCredit */
+            if ($lastPaymentCredit &&
+                ($lastPaymentCredit instanceof JudoPayment || $lastPaymentCredit instanceof CheckoutPayment)) {
                 $lastPaymentFailure = !$lastPaymentCredit->isSuccess();
             }
 
             $judoPaymentMethod = $this->getPolicyOrPayerOrUserJudoPaymentMethod();
             if ($judoPaymentMethod && $judoPaymentMethod->isCardExpired($date)) {
-                return self::UNPAID_JUDO_CARD_EXPIRED;
+                return self::UNPAID_CARD_EXPIRED;
             } elseif ($lastPaymentFailure) {
-                return self::UNPAID_JUDO_PAYMENT_FAILED;
+                return self::UNPAID_CARD_PAYMENT_FAILED;
             } elseif ($outstandingPremium > 0) {
                 // we're unpaid with some premium due - the card is not expired and the last judo payment
                 // was either not present, or was successful
-                return self::UNPAID_JUDO_PAYMENT_MISSING;
+                return self::UNPAID_CARD_PAYMENT_MISSING;
             }
 
-            return self::UNPAID_JUDO_UNKNOWN;
+            return self::UNPAID_CARD_UNKNOWN;
+        } elseif ($this->hasCheckoutPaymentMethod()) {
+            if ($lastPaymentCredit &&
+                ($lastPaymentCredit instanceof JudoPayment || $lastPaymentCredit instanceof CheckoutPayment)) {
+                $lastPaymentFailure = !$lastPaymentCredit->isSuccess();
+            }
+
+            $checkoutPaymentMethod = $this->getCheckoutPaymentMethod();
+            if ($checkoutPaymentMethod && $checkoutPaymentMethod->isCardExpired($date)) {
+                return self::UNPAID_CARD_EXPIRED;
+            } elseif ($lastPaymentFailure) {
+                return self::UNPAID_CARD_PAYMENT_FAILED;
+            } elseif ($outstandingPremium > 0) {
+                // we're unpaid with some premium due - the card is not expired and the last judo payment
+                // was either not present, or was successful
+                return self::UNPAID_CARD_PAYMENT_MISSING;
+            }
+
+            return self::UNPAID_CARD_UNKNOWN;
         } elseif (!$this->getPolicyOrUserPaymentMethod()) {
             return self::UNPAID_PAYMENT_METHOD_MISSING;
         }
@@ -5881,13 +5934,13 @@ abstract class Policy
         return $isConnected;
     }
 
-    public function useForAttribution()
+    public function useForAttribution($prefix = null)
     {
         if (!$this->isPolicy()) {
             return null;
         }
 
-        $attributionPolicy = $this->getUser()->getAttributionPolicy();
+        $attributionPolicy = $this->getUser()->getAttributionPolicy($prefix);
         if (!$attributionPolicy) {
             return null;
         }
@@ -5907,6 +5960,14 @@ abstract class Policy
             self::STATUS_RENEWAL,
         ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
+        }
+
+
+        $cardDetails = JudoPaymentMethod::emptyApiArray();
+        if ($this->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
+            $cardDetails = $this->getPolicyOrPayerOrUserJudoPaymentMethod()->toApiArray();
+        } elseif ($this->getCheckoutPaymentMethod()) {
+            $cardDetails = $this->getCheckoutPaymentMethod()->toApiArray();
         }
 
         $data = [
@@ -5955,9 +6016,7 @@ abstract class Policy
                 $this->getBacsBankAccount()->toApiArray() :
                 null,
             'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
-            'card_details' => $this->hasPolicyOrPayerOrUserJudoPaymentMethod() ?
-                $this->getPolicyOrPayerOrUserJudoPaymentMethod()->toApiArray() :
-                JudoPaymentMethod::emptyApiArray(),
+            'card_details' => $cardDetails,
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

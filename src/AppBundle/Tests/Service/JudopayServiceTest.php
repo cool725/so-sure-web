@@ -378,9 +378,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4221 6900 0000 4963',
-            '12/20',
-            '125'
+            self::$JUDO_TEST_CARD_FAIL_NUM,
+            self::$JUDO_TEST_CARD_FAIL_EXP,
+            self::$JUDO_TEST_CARD_FAIL_PIN
         );
         $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
     }
@@ -483,28 +483,6 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
     }
 
-    public function testJudoCommission()
-    {
-        $user = $this->createValidUser(static::generateEmail('judo-commission', $this));
-        $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
-
-        $receiptId = self::$judopay->testPay(
-            $user,
-            $policy->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-        static::$policyService->setEnvironment('prod');
-        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
-        static::$policyService->setEnvironment('test');
-
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
-    }
-
     public function testJudoRefund()
     {
         $user = $this->createValidUser(static::generateEmail('judo-refund', $this));
@@ -515,9 +493,9 @@ class JudopayServiceTest extends WebTestCase
             $user,
             $policy->getId(),
             $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            '4976 0000 0000 3436',
-            '12/20',
-            '452'
+            self::$JUDO_TEST_CARD2_NUM,
+            self::$JUDO_TEST_CARD2_EXP,
+            self::$JUDO_TEST_CARD2_PIN
         );
         static::$policyService->setEnvironment('prod');
         self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
@@ -919,9 +897,9 @@ class JudopayServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\SameDayPaymentException
+     * @expectedException \AppBundle\Exception\SameDayPaymentException
      */
-    public function testMultipleSameDayPayments()
+    public function testJudoMultipleSameDayPayments()
     {
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testMultipleSameDayPayments', $this));
@@ -983,7 +961,7 @@ class JudopayServiceTest extends WebTestCase
         return $mailer;
     }
 
-    public function testPaymentFirstProblem()
+    public function testJudoPaymentFirstProblem()
     {
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testPaymentFirstProblem', $this));
@@ -1139,7 +1117,7 @@ class JudopayServiceTest extends WebTestCase
         */
     }
 
-    public function testRemainderPaymentCancelledPolicy()
+    public function testCheckoutRemainderPaymentCancelledPolicy()
     {
         $user = $this->createValidUser(static::generateEmail('testRemainderPaymentCancelledPolicy', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -1245,10 +1223,10 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
     }
 
-    public function testCommission()
+    public function testJudoCommission()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('commission', $this));
+        $user = $this->createValidUser(static::generateEmail('testJudoCommission', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 

@@ -9,3 +9,5 @@ parameters:
                 - '#Argument of an invalid type PHPExcel_Worksheet_CellIterator supplied for foreach, only iterables are supported.#'
                 - '#Call to function is_object\(\) will always evaluate to false#'
                 - '#Call to an undefined method Symfony\\Component\\Serializer\\SerializerInterface::normalize()#'
+        universalObjectCratesClasses:
+                - Checkout\Models\Tokens\Card

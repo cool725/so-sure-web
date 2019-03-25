@@ -45,7 +45,9 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "proofOfLoss"="ProofOfLossFile",
  *      "damagePicture"="DamagePictureFile",
  *      "otherClaim"="OtherClaimFile",
- *      "email"="EmailFile"
+ *      "email"="EmailFile",
+ *      "manualAffiliate"="ManualAffiliateFile",
+ *      "manualAffiliateProcessed"="ManualAffiliateProcessedFile"
  * })
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */

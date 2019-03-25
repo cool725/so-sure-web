@@ -6,10 +6,12 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Tests\UserClassTrait;
+use Checkout\CheckoutApi;
 use FacebookAds\Api;
 use PhpParser\Node\Expr\AssignOp\Mul;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -2709,6 +2711,74 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('judo', $policyData['premium_payments']['paid'][0]['type']);
     }
 
+    public function testNewPolicyCheckoutOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyCheckoutOk', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+
+        /** @var CheckoutService $checkout */
+        $checkout = $this->getContainer(true)->get('app.checkout');
+        $token = $checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => $token->getId(),
+            'amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+        $promoCode = null;
+        $now = \DateTime::createFromFormat('U', time());
+        if ($now->format('Y-m') == '2016-11') {
+            $promoCode = Policy::PROMO_FREE_NOV;
+        } elseif ($now->format('Y-m') == '2016-12') {
+            $promoCode = Policy::PROMO_FREE_DEC_2016;
+        }
+
+        $this->assertEquals($promoCode, $policyData['promo_code']);
+        $this->assertEquals(7, $policyData['pot']['max_connections'], json_encode($policyData));
+        // $this->assertEquals(83.88, $policyData['pot']['max_value']);
+        // 6.38 gwp * 1.1 = 7.018 * 12 = 84.24 * .8 = 67.39
+        $this->assertEquals(68.64, $policyData['pot']['max_value']);
+        $this->assertEquals(7.15, $policyData['premium']);
+        $this->assertEquals(6.38, $policyData['premium_gwp']);
+        $highConnectionValue = 0;
+        $lowConnectionValue = null;
+        foreach ($policyData['pot']['connection_values'] as $connectionValue) {
+            if ($connectionValue['value'] > $highConnectionValue) {
+                $highConnectionValue = $connectionValue['value'];
+            }
+            if (!$lowConnectionValue || $connectionValue['value'] < $lowConnectionValue) {
+                $lowConnectionValue = $connectionValue['value'];
+            }
+        }
+        if ($promoCode == 'launch') {
+            $this->assertEquals(15, $highConnectionValue);
+        } else {
+            $this->assertEquals(10, $highConnectionValue);
+        }
+        $this->assertEquals(2, $lowConnectionValue);
+        $this->assertEquals(
+            1,
+            count($policyData['premium_payments']['paid']),
+            json_encode($policyData['premium_payments'])
+        );
+        $this->assertEquals('checkout', $policyData['premium_payments']['paid'][0]['type']);
+    }
+
     public function testNewPolicyWithPremiumValidation()
     {
         $dm = $this->getDocumentManager(true);
@@ -3406,6 +3476,89 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(self::$JUDO_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
     }
 
+    public function testUpdatePolicyPaymentCheckoutOk()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdatePolicyPaymentCheckoutOk', $this),
+            'foo'
+        );
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        static::addAddress($user);
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+
+        /** @var CheckoutService $checkout */
+        $checkout = $this->getContainer(true)->get('app.checkout');
+        $token = $checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => $token->getId(),
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_NAME, $data['payment_details']);
+        $this->assertEquals('checkout', $data['payment_method']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
+
+        $token = $checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD2_NUM,
+            self::$CHECKOUT_TEST_CARD2_EXP,
+            self::$CHECKOUT_TEST_CARD2_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => $token->getId(),
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD2_NAME, $data['payment_details']);
+        $this->assertEquals('checkout', $data['payment_method']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD2_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD2_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
+
+        $token = $checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => $token->getId(),
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_NAME, $data['payment_details']);
+        $this->assertEquals('checkout', $data['payment_method']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
+    }
+
     public function testUpdatePolicyPaymentBacsOk()
     {
         $user = self::createUser(
@@ -3705,6 +3858,28 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
+    public function testUpdatePolicyPaymentCheckoutNoData()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdatePolicyPaymentCheckoutNoData', $this),
+            'foo'
+        );
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+
+        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+        ]]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
     public function testUpdatePolicyPaymentJudopayDiffUser()
     {
         $userA = self::createUser(
@@ -3746,6 +3921,43 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
     }
 
+    public function testUpdatePolicyPaymentCheckoutDiffUser()
+    {
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdatePolicyPaymentCheckoutDiffUser-A', $this),
+            'foo'
+        );
+        $userB = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdatePolicyPaymentCheckoutDiffUser-B', $this),
+            'foo'
+        );
+        $userA->setFirstName('foo');
+        $userA->setLastName('bar');
+        static::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($userA);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $userA);
+        $data = $this->verifyResponse(200);
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
+
+        /** @var CheckoutService $checkout */
+        $checkout = $this->getContainer(true)->get('app.checkout');
+        $token = $checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+
+        $cognitoIdentityId = $this->getAuthUser($userB);
+        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => $token->getId(),
+        ]]);
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
+    }
+
     public function testUpdatePolicyPaymentJudopayUnknownPolicy()
     {
         $user = self::createUser(
@@ -3760,6 +3972,22 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'consumer_token' => 'foo',
             'card_token' => 'foo',
             'receipt_id' => 'foo',
+        ]]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+    }
+
+    public function testUpdatePolicyPaymentCheckoutUnknownPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUpdatePolicyPaymentCheckoutUnknownPolicy', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf("/api/v1/auth/policy/%s/payment", 'foo');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => 'foo',
         ]]);
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
@@ -4677,11 +4905,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     /**
      *
      */
-    public function testPicsureWithValidS3File()
+    public function testPicsureWithValidS3FileApi()
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testPicsureWithValidS3File', $this),
+            self::generateEmail('testPicsureWithValidS3FileApi', $this),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
@@ -4698,7 +4926,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         /** @var PhonePolicy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$client->getContainer(), $policyData['id']);
 
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
     }

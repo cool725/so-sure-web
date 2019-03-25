@@ -31,11 +31,12 @@ input[type="submit"][class*="btn-outline-"], {
 }
 
 // Modify white btns to match design
-.btn-white {
-    color: $dodger-blue;
+.btn-white,
+.btn-bright-yellow {
+    color: $zaffre;
 
     &:hover {
-        color: darken($dodger-blue, 5%);
+        color: darken($zaffre, 5%);
     }
 }
 

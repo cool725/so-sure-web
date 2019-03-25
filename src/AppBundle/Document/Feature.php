@@ -34,6 +34,7 @@ class Feature
     const FEATURE_PAYMENTS_BCC = 'bcc-payments';
     const FEATURE_JUDO_RECURRING = 'judo-recurring';
     const FEATURE_USER_PAYMENT_HISTORY = 'user-payment-history';
+    const FEATURE_CHECKOUT = 'checkout';
 
     // All Features should be here
     public static $features = [
@@ -55,6 +56,7 @@ class Feature
         self::FEATURE_JUDO_RECURRING,
         self::FEATURE_CARD_SWAP_FROM_BACS,
         self::FEATURE_USER_PAYMENT_HISTORY,
+        self::FEATURE_CHECKOUT,
     ];
 
     // @codingStandardsIgnoreStart
@@ -77,6 +79,7 @@ class Feature
         self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',
         self::FEATURE_JUDO_RECURRING => 'Perform Judopay token payments with the \'recurring\' flag set.',
         self::FEATURE_USER_PAYMENT_HISTORY => 'Allow users to view their payment history',
+        self::FEATURE_CHECKOUT => 'Use Checkout instead of Judo for payments',
     ];
     // @codingStandardsIgnoreEnd
 

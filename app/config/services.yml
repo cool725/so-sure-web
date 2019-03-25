@@ -122,6 +122,24 @@ services:
             - "@app.sms"
             - "@app.feature"
 
+    app.checkout:
+        alias: AppBundle\Service\CheckoutService
+        public: true
+
+    AppBundle\Service\CheckoutService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.policy"
+            - "@app.mailer"
+            - "%checkout_apisecret%"
+            - "%checkout_apipublic%"
+            - "%kernel.environment%"
+            - "@statsd"
+            - "@event_dispatcher"
+            - "@app.sms"
+            - "@app.feature"
+
     app.payment:
         alias: AppBundle\Service\PaymentService
         public: true
@@ -129,6 +147,7 @@ services:
     AppBundle\Service\PaymentService:
         arguments:
             - "@app.judopay"
+            - "@app.checkout"
             - "@app.router"
             - "@logger"
             - "@doctrine_mongodb.odm.default_document_manager"
@@ -215,6 +234,8 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "@app.policy"
+            - "@aws.s3"
+            - "%kernel.environment%"
 
     app.promotion:
         class: AppBundle\Service\PromotionService
@@ -1169,6 +1190,7 @@ services:
         class:   AppBundle\Listener\MixpanelListener
         arguments:
             - "@app.mixpanel"
+            - "%kernel.environment%"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }

@@ -98,6 +98,7 @@ twig:
         web_base_url: "%web_base_url%"
         cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
         rollbar_client_access_token: "%rollbar_client_access_token%"
+        checkout_public_key: "%checkout_apipublic%"
 
 doctrine_mongodb:
     connections:
@@ -444,6 +445,7 @@ nelmio_security:
                 - wss://*.hotjar.com # necessary?
                 - https://*.hotjar.com
                 - https://app.getsentry.com # necessary?
+                - https://secure.checkout.com
                 - https://player.vimeo.com
                 - https://*.facebook.com
                 - http://*.facebook.com
@@ -478,6 +480,10 @@ nelmio_security:
                 - https://api.intercom.io
                 - https://api-iam.intercom.io
                 - https://api-ping.intercom.io
+                - https://api.checkout.com
+                - https://api2.checkout.com
+                - https://secure.checkout.com
+                - https://sandbox.checkout.com
                 - https://nexus-websocket-a.intercom.io
                 - https://nexus-websocket-b.intercom.io
                 - https://nexus-long-poller-a.intercom.io
@@ -720,6 +726,7 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://*.gstatic.com
                 - https://js.intercomcdn.com
+                - https://cdn.checkout.com
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
                 - https://fonts.googleapis.com
@@ -735,6 +742,7 @@ nelmio_security:
                 - http://*.facebook.com
                 - https://tr.snapchat.com
                 - https://vimeo.com
+                - https://secure.checkout.com
                 - https://*.vimeo.com
                 - https://*.hotjar.com
                 - https://*.doubleclick.net
@@ -779,6 +787,7 @@ nelmio_security:
                 - https://app.intercom.io
                 - https://widget.intercom.io
                 - https://js.intercomcdn.com
+                - https://cdn.checkout.com
                 - https://*.hotjar.com
                 - http://*.hotjar.com
                 - https://js.hs-scripts.com
@@ -1023,6 +1032,7 @@ nelmio_security:
                 - https://maxcdn.bootstrapcdn.com
                 - https://app.prodpad.com
                 - https://cdn.digits.com
+                - https://cdn.checkout.com
                 - https://*.twitter.com
                 - http://*.twitter.com
                 - https://*.fastly.net
@@ -1043,6 +1053,7 @@ nelmio_security:
                 - https://*.wp.com
                 - https://cdn.mxpnl.com
                 - http://cdn.mxpnl.com
+                - https://cdn.checkout.com
                 - https://www.google-analytics.com
                 - http://www.google-analytics.com
                 - https://stats.g.doubleclick.net
@@ -1072,6 +1083,7 @@ nelmio_security:
                 - https://chart.googleapis.com
                 - https://bat.bing.com
                 - https://www.googletagmanager.com
+                - https://www.googleadservices.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com

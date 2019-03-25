@@ -2,6 +2,9 @@
 {% form_theme purchase_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 {# Set vars #}
 {% set quote_mode = true %}
+{% if phone %}
+    {% set body_class = 'purchase' %}
+{% endif %}
 
 {% block title %}
     {% if phone %}
@@ -21,15 +24,11 @@
 
     <section class="qpw">
         <div class="d-lg-flex">
-
             {% if phone %}
-
-                {% set body_class = 'purchase' %}
-
                 {# Main Content #}
                 <div class="qpw__main__container">
                     <div class="qpw__main px-4 px-lg-5">
-                        <h5 class="text-white mb-4 text-center text-lg-left">Here’s your quote details, Insure your:</h5>
+                        <div class="qpw__h5 h5 text-center text-lg-left text-white mb-4">Almost there, enter your payment details:</div>
                         <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
                             <h1 class="qpw__h1 text-columbia-blue-e">
                                 <span class="sub">
@@ -141,16 +140,17 @@
                     </div>
                 </div>
 
-            <div id="qpw-info-mobile" class="qpw__info__container__mobile  d-block d-lg-none">
-                <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g id="Artboard" fill="#FFFFFF">
-                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                {# Mobile Info #}
+                <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="Artboard" fill="#FFFFFF">
+                                <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) "></path>
+                            </g>
                         </g>
-                    </g>
-                </svg>
-                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
-            </div>
+                    </svg>
+                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                </div>
             {% else %}
                 <div class="purchase__details__container">
                     <div class="purchase__details p-4 p-lg-5 mt-5">

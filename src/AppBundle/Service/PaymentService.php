@@ -5,6 +5,7 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
@@ -26,6 +27,9 @@ class PaymentService
 {
     /** @var JudopayService $judopay */
     protected $judopay;
+
+    /** @var CheckoutService $checkout */
+    protected $checkout;
 
     /** @var RouterService */
     protected $routerService;
@@ -62,6 +66,7 @@ class PaymentService
     /**
      * PaymentService constructor.
      * @param JudopayService           $judopay
+     * @param CheckoutService          $checkout
      * @param RouterService            $routerService
      * @param LoggerInterface          $logger
      * @param DocumentManager          $dm
@@ -74,6 +79,7 @@ class PaymentService
      */
     public function __construct(
         JudopayService $judopay,
+        CheckoutService $checkout,
         RouterService $routerService,
         LoggerInterface $logger,
         DocumentManager $dm,
@@ -85,6 +91,7 @@ class PaymentService
         EventDispatcherInterface $dispatcher
     ) {
         $this->judopay = $judopay;
+        $this->checkout = $checkout;
         $this->routerService = $routerService;
         $this->logger = $logger;
         $this->dm = $dm;
@@ -107,6 +114,15 @@ class PaymentService
         \DateTime $scheduledDate = null,
         $validateBillable = true
     ) {
+        return $this->getAllValidScheduledPaymentsForTypes($prefix, [$type], $scheduledDate, $validateBillable);
+    }
+
+    public function getAllValidScheduledPaymentsForTypes(
+        $prefix,
+        $types,
+        \DateTime $scheduledDate = null,
+        $validateBillable = true
+    ) {
         $results = [];
 
         /** @var ScheduledPaymentRepository $repo */
@@ -114,13 +130,21 @@ class PaymentService
         $scheduledPayments = $repo->findScheduled($scheduledDate);
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
+
+            $foundType = false;
+            foreach ($types as $type) {
+                if ($scheduledPayment->getPolicy()->getPaymentMethod() instanceof $type) {
+                    $foundType = true;
+                }
+            }
+            if (!$foundType) {
+                continue;
+            }
+
             if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->getPolicyOrPayerOrUserPaymentMethod() instanceof $type) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
@@ -146,7 +170,7 @@ class PaymentService
         $scheduledPayment->validateRunable($prefix, $date);
 
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
+        $paymentMethod = $policy->getPaymentMethod();
         if ($paymentMethod && $paymentMethod instanceof JudoPaymentMethod) {
             return $this->judopay->scheduledPayment(
                 $scheduledPayment,
@@ -154,6 +178,13 @@ class PaymentService
                 $date,
                 $abortOnMultipleSameDayPayment
             );
+        } elseif ($paymentMethod && $paymentMethod instanceof CheckoutPaymentMethod) {
+                return $this->checkout->scheduledPayment(
+                    $scheduledPayment,
+                    $prefix,
+                    $date,
+                    $abortOnMultipleSameDayPayment
+                );
         } else {
             throw new \Exception(sprintf(
                 'Payment method not valid for scheduled payment %s',

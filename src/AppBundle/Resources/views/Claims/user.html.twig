@@ -1,614 +1,714 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% if reset_form is defined %}
+    {% form_theme reset_form with ['AppBundle:Form:submit.html.twig'] %}
+{% endif %}
+{% if user_permission_form is defined %}
+    {% form_theme user_permission_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
+{% endif %}
+{% if user_high_risk_form is defined %}
+    {% form_theme user_high_risk_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
+{% endif %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Claims/user.js'
-    %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-user' %}
+
+{% block title %}so-sure - User: {{ user.name }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-8">
-            <h2>User - {{ user.name }}</h2>
-        </div>
-    </div>
-            <table class="table table-striped">
-                <tr>
-                    <td>Id</td>
-                    <td>
-                        {{ user.id }}
-                        {% if is_granted('ROLE_EMPLOYEE') and user.intercomId %}
-                            <a target="_blank" rel="noopener noreferrer" title="Intercom" href="https://app.intercom.io/a/apps/bjo63djg/users/{{ user.intercomId }}/all-conversations"><i class="fa fa-external-link"></i></a>
-                        {% endif %}
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td>{{ user.email }} </td>
-                    <td>
-                        {% if reset_form is defined %}
-                        {{ form_start(reset_form) }}
-                        {{ form_widget(reset_form.reset, {'label': 'Send reset email', 'attr': {'class': 'btn btn-danger'}}) }}
-                        {{ form_end(reset_form) }}
 
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userEmailModal"
-                            ><i class="fa fa-edit"></i> Change Email Address</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% if user.hasEmployeeRole or user.hasClaimsRole %}
-                <tr>
-                    <td>Password expiry</td>
-                    <td>
-                        {% if user.isPasswordChangeRequired %}
-                            Expired
-                        {% else %}
-                            Not Expired ( {{ user.daysLeftUntilPasswordChangeRequired }} days left )
-                        {% endif %}
-                    </td>
-                    <td>
-                        Last changed: {{ user.lastPasswordChange|date }}
-                    </td>
-                </tr>
-                {% endif %}
-                {% if user.confirmationToken is not empty and is_granted('ROLE_EMPLOYEE') %}
-                    <tr>
-                        <td>Confirmation Link</td>
-                        <td>
-                            <p>{{ url('fos_user_resetting_reset', {'token': user.confirmationToken}) }}</p>
-                            <p>Requested at {{ user.passwordRequestedAt|date("H:i d/m/Y") }}</p>
-                        </td>
-                        <td></td>
-                    </tr>
-                {% endif %}
-                <tr>
-                    <td>Name</td>
-                    <td>{{ user.name }}
-                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
-                            <a href="{{ path('user_home', {'id': user.id, '_impersonate': user.username}) }}">Login as user</a>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if user_detail_form is defined %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
-                            ><i class="fa fa-edit"></i> Edit User Details</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Gender</td>
-                    <td>{{ user.gender }}</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Birthday</td>
-                    <td>{% if user.birthday %}{{ user.birthday|date('d M Y', 'Europe/London') }}{% else %}Not set{% endif %}
-                    </td>
-                    <td>
-                        {% if user_detail_form is defined %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
-                            ><i class="fa fa-edit"></i> Edit User Details</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Mobile</td>
-                    <td>{{ user.mobileNumber }}</td>
-                    <td>
-                        {% if user_detail_form is defined %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
-                            ><i class="fa fa-edit"></i> Edit User Details</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Billing Address</td>
-                    <td>{{ user.billingAddress }}
-                        {% if user.billingAddress%}
-                        [<a target="blank" href="http://maps.google.com/?q={{ user.billingAddress.postcode }}">{{ user.billingAddress.postcode }}</a>]
-                        {% endif %}
-                    {% if postcode is defined and postcode and postcode.location %}
-                        [<a target="blank" href="http://maps.google.com/?ll={{ postcode.location.coordinates[1]}},{{ postcode.location.coordinates[0]}}">
-                            Postcode match
-                        </a>]
-                    {% endif %}
-                    {% if census is defined and census %}
-                        [<a target="blank" href="http://maps.google.com/?ll={{ census.location.coordinates[1]}},{{ census.location.coordinates[0]}}">
-                            Census match
-                        </a>]
-                        <br>
-                        {{ census.getSuperGroup }} / {{ census.getGroup }} / {{ census.getSubGroup }}
-                    {% endif %}
-                    {% if income is defined and income %}
-                        <br>
-                        £{{ income.total.income|number_format(0, '.', ',') }} weekly income
-                    {% endif %}
-                    </td>
-                    <td>
-                        {% if user_address_form is defined %}
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userAddressModal"
-                        ><i class="fa fa-edit"></i> Edit User Address</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>User Status</td>
-                    <td>
-                        {% if user.locked and not user.enabled %}locked / disabled
-                        {% elseif user.locked %}locked
-                        {% elseif not user.enabled %}disabled
-                        {% else %}enabled
-                        {%endif %}
-                    </td>
-                    <td>
-                        {% if user_permission_form is defined %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userPermissionModal"
-                            ><i class="fa fa-edit"></i> Edit User Permissions</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>User High Risk</td>
-                    <td>
-                        {% if user.highRisk %}
-                            <strong>Yes (additional £500 premium / yearly only)</strong>
-                        {% else %}
-                            No
-                        {%endif %}
-                    </td>
-                    <td>
-                        {% if user_high_risk_form is defined %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userHighRiskModal"
-                            ><i class="fa fa-edit"></i> Edit User High Risk</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Policies</td>
-                    <td>
-                        {% for policy in user.allPolicies %}
-                            {% if policy.policyNumber|length > 0 %}
-                                <a href="{{ path(policy_route, {'id': policy.id }) }}">
-                                    {{ policy.policyNumber }}
-                                </a> ({{ policy.status }})
-                            {% elseif policy.status == 'pending-renewal' %}
-                                <a href="{{ path(policy_route, {'id': policy.id }) }}">{{ policy.id }}</a> (Pending Renwal)
-                            {% else %}
-                                <a href="{{ path(policy_route, {'id': policy.id }) }}">{{ policy.id }} (In progress)</a>
-                            {% endif %}
-                            <br />
-                        {% endfor %}
-                        {% if user.allPolicies|length == 0 %}
-                            No policies
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if policy_form is defined %}
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newPolicyModal"
-                                ><i class="fa fa-plus"></i> Add partial policy</button>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% if makemodel_form is defined %}
-                    {{ form_start(makemodel_form)}}
-                <tr>
-                    <td>
-                        Recipero Make/Model Check
-                    </td>
-                    <td>
-                        <span class="text-danger">
-                        {{ form_errors(makemodel_form) }}
-                        {{ form_errors(makemodel_form.imei) }}
-                        {{ form_errors(makemodel_form.serialNumber) }}
-                        </span>
-                        {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI'}})}}
-                        <br>-- or --<br>
-                        {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number'}})}}
-                    </td>
-                    <td>
-                        {{ form_widget(makemodel_form.check, {'label': 'Run Check', 'attr': {'class': 'btn btn-info'}})}}
-                        <br>
-                        £0.05 to run check
-                    </td>
-                    {{ form_end(makemodel_form)}}
-                </tr>
-                {% endif %}
-                {% if is_granted('ROLE_EMPLOYEE') %}
-                <tr>
-                    <td>Sanctions</td>
-                    <td>
-                        {% if user.sanctionsChecks|length == 0%}
-                            No checks run
-                        {% endif %}
-                        {% for check in user.sanctionsChecks %}
-                            Ran: {{ check|date }}<br>
-                        {% endfor %}
-                        {% if user.sanctionsMatches|length == 0%}
-                            No matches
-                        {% endif %}
-                        {% for match in user.sanctionsMatches %}
-                            {% if match.manuallyVerified %}
-                                Confirmed not match: <del>{{ match.sanctions.name }}</del>
-                            {% else %}
-                                Possible match: <b>{{ match.sanctions.name }}</b>
-                            {% endif %}
-                            / Dob:
-                            {% if match.sanctions.birthday %}
-                                {% if match.sanctions.birthday|date('d M Y') == user.birthday|date('d M Y') %}
-                                    <b style="color: red">{{ match.sanctions.birthday|date('d M Y') }}</b>
-                                {% else %}
-                                    <b>{{ match.sanctions.birthday|date('d M Y') }}</b>
-                                {% endif %}
-                            {% else %}
-                                Unknown
-                            {% endif %}
-                            (L dist: {% if match.distance == 0 %}<b>0</b>{% else %}{{ match.distance }}{% endif %})
-                            <br>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% if sanctions_form is defined %}
-                        {{ form_start(sanctions_form)}}
-                        {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-info'}})}}
-                        {{ form_end(sanctions_form)}}
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="1">Roles</td>
-                    <td>
-                        {% for ur in user.roles %}
-                            {{ ur }}<br>
-                        {% endfor %}
-                    </td>
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <td>
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newRoleModal"><i class="fa fa-plus"></i> Edit Roles</button>
-                        </td>
-                    {% endif %}
-                </tr>
-                 {% if user.hasClaimsRole %}
-                    <tr>
-                        <td colspan="1">Claims Handling Team</td>
-                        <td>{% if user.handlingTeam %}{{ user.handlingTeam }}{% else %}Not set{% endif %}</td>
-                        {% if is_granted('ROLE_ADMIN') %}
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">User - {{ user.name }}</h1>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>ID</strong></td>
                             <td>
-                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#handlingTeamModal">Edit Handling Team</button>
+                                {{ user.id }}
+                                {% if is_granted('ROLE_EMPLOYEE') and user.intercomId %}
+                                    <a target="_blank" rel="noopener noreferrer" title="Intercom" href="https://app.intercom.io/a/apps/bjo63djg/users/{{ user.intercomId }}/all-conversations"><i class="fa fa-external-link"></i></a>
+                                {% endif %}
                             </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email</strong></td>
+                            <td>{{ user.email }} </td>
+                            <td>
+                                {% if reset_form is defined %}
+                                {{ form_start(reset_form, {'attr': {'class': 'form-inline d-inline'}}) }}
+                                    {{ form_widget(reset_form.reset, {
+                                        'label': 'Send reset email',
+                                        'fa': 'fal fa-paper-plane fa-fw',
+                                        'left': true,
+                                        'attr': {
+                                            'class': 'btn btn-danger btn-square btn-sm mb-1 mr-md-2'
+                                    }}) }}
+                                {{ form_end(reset_form) }}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2" data-toggle="modal"
+                                            data-target="#user_email_modal"
+                                    ><i class="fal fa-edit fa-fw"></i> Edit email</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if user.hasEmployeeRole or user.hasClaimsRole %}
+                            <tr>
+                                <td><strong>Password expiry</strong></td>
+                                <td>
+                                    {% if user.isPasswordChangeRequired %}
+                                        Expired
+                                    {% else %}
+                                        Not Expired ( {{ user.daysLeftUntilPasswordChangeRequired }} days left )
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    Last changed: {{ user.lastPasswordChange|date }}
+                                </td>
+                            </tr>
                         {% endif %}
-                    </tr>
-                  {% endif %}
-                <tr>
-                    <td colspan="1">Delete</td>
-                    <td>
-                    </td>
-                    <td>
-                        {% if not user.canDelete %}
-                            Unable to delete user due to data rentention rules (policy was created)
-                        {% elseif is_granted('ROLE_ADMIN') %}
-                                {{ form_start(delete_form) }}
-                                {{ form_widget(delete_form.delete, {'label': 'Delete User', 'attr': {'class': 'btn btn-danger confirm-delete-user'}}) }}
-                                {{ form_end(delete_form) }}
-                        {% else %}
-                            Insufficient permission to delete
+                        {% if user.confirmationToken is not empty and is_granted('ROLE_EMPLOYEE') %}
+                            <tr>
+                                <td><strong>Confirmation Link</strong></td>
+                                <td>
+                                    <p>{{ url('fos_user_resetting_reset', {'token': user.confirmationToken}) }}</p>
+                                    <p>Requested at {{ user.passwordRequestedAt|date("H:i d/m/Y") }}</p>
+                                </td>
+                                <td></td>
+                            </tr>
                         {% endif %}
-                        </td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td>Attribution</td>
-                    <td>{{ user.attribution }}</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Latest Attribution</td>
-                    <td>{{ user.latestAttribution }}</td>
-                    <td></td>
-                </tr>
-            </table>
-</div>
-{% if policy_form is defined %}
-    <div class="modal fade" id="newPolicyModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            {{ form_start(policy_form) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Add Partial Policy</h4>
-            <p>For cases where IMEI detection is failing</p>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(policy_form.phone, 'Phone') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(policy_form.phone) }}
-                    {{ form_widget(policy_form.phone) }}
-                </div>
+                        <tr>
+                            <td><strong>Name</strong></td>
+                            <td>
+                                {{ user.name }}
+                                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                                    <a href="{{ path('user_home', {'id': user.id, '_impersonate': user.username}) }}" class="ml-2"><i class="fas fa-user fa-fw"></i> Login as user</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user_detail_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#user_detail_modal">
+                                            <i class="fal fa-edit fa-fw"></i> Edit user details</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gender</strong></td>
+                            <td>
+                                {% if user.gender %}
+                                    {{ user.gender }}
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Birthday</strong></td>
+                            <td>
+                                {% if user.birthday %}
+                                    {{ user.birthday|date('jS M Y', 'Europe/London') }}
+                                {% else %}
+                                    Not set
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user_detail_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#user_detail_modal">
+                                            <i class="fal fa-edit fa-fw"></i> Edit user details</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mobile</strong></td>
+                            <td><a href="tel:{{ user.mobileNumber }}">{{ user.mobileNumber }}</a></td>
+                            <td>
+                                {% if user_detail_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#user_detail_modal">
+                                            <i class="fal fa-edit fa-fw"></i> Edit user details</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Billing Address</strong></td>
+                            <td>
+                                {{ user.billingAddress }}
+                                {% if user.billingAddress%}
+                                    [<a target="blank" href="http://maps.google.com/?q={{ user.billingAddress.postcode }}">{{ user.billingAddress.postcode }}</a>]
+                                {% endif %}
+                                {% if postcode is defined and postcode and postcode.location %}
+                                    [<a target="blank" href="http://maps.google.com/?ll={{ postcode.location.coordinates[1]}},{{ postcode.location.coordinates[0]}}">
+                                        Postcode match
+                                    </a>]
+                                {% endif %}
+                                {% if census is defined and census %}
+                                    [<a target="blank" href="http://maps.google.com/?ll={{ census.location.coordinates[1]}},{{ census.location.coordinates[0]}}">
+                                        Census match
+                                    </a>]
+                                    <br>
+                                    {{ census.getSuperGroup }} / {{ census.getGroup }} / {{ census.getSubGroup }}
+                                {% endif %}
+                                {% if income is defined and income %}
+                                    <br>
+                                    &pound;{{ income.total.income|number_format(0, '.', ',') }} weekly income
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user_address_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#user_address_modal">
+                                            <i class="fal fa-edit fa-fw"></i> Edit user address</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>User Status</strong></td>
+                            <td>
+                                {% if user.locked and not user.enabled %}locked / disabled
+                                {% elseif user.locked %}locked
+                                {% elseif not user.enabled %}disabled
+                                {% else %}enabled
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user_permission_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#user_permission_modal">
+                                            <i class="fal fa-edit fa-fw"></i> Edit user permissions</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>User High Risk</strong></td>
+                            <td>
+                                {% if user.highRisk %}
+                                    <strong>Yes (additional &pound;500 premium / yearly only)</strong>
+                                {% else %}
+                                    No
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user_high_risk_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#user_high_risk_modal">
+                                            <i class="fal fa-edit fa-fw"></i> Edit users risk</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Policies</strong></td>
+                            <td>
+                                {% for policy in user.allPolicies %}
+                                    {% if policy.policyNumber|length > 0 %}
+                                        <a href="{{ path(policy_route, {'id': policy.id }) }}">
+                                            {{ policy.policyNumber }}
+                                        </a> ({{ policy.status }})
+                                    {% elseif policy.status == 'pending-renewal' %}
+                                        <a href="{{ path(policy_route, {'id': policy.id }) }}">{{ policy.id }}</a> (Pending Renwal)
+                                    {% else %}
+                                        <a href="{{ path(policy_route, {'id': policy.id }) }}">{{ policy.id }} (In progress)</a>
+                                    {% endif %}
+                                    <br />
+                                {% endfor %}
+                                {% if user.allPolicies|length == 0 %}
+                                    No policies
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if policy_form is defined %}
+                                    <button type="button"
+                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            data-toggle="modal"
+                                            data-target="#new_policy_modal">
+                                            <i class="fal fa-plus fa-fw"></i> Add partial policy</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if makemodel_form is defined %}
+                            <tr>
+                                <td>
+                                    <strong>Recipero Make/Model check</strong>
+                                    <br>&pound;0.05 to run check
+                                </td>
+                                <td colspan="2">
+                                    {{ form_start(makemodel_form, {'attr': {'class':'form-inline'}})}}
+                                        <div class="form-group">
+                                            {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI', 'class': 'form-control form-control-sm'}})}}
+                                            <div class="with-errors">{{ form_errors(makemodel_form.imei) }}</div>
+                                        </div>
+                                        <div class="form-group">
+                                            -- or --
+                                        </div>
+                                        <div class="form-group">
+                                             {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number', 'class': 'form-control form-control-sm'}})}}
+                                             <div class="with-errors">{{ form_errors(makemodel_form.serialNumber) }}</div>
+                                        </div>
+                                        <div class="form-group">
+                                            {{ form_widget(makemodel_form.check, {'label': 'Run Check', 'attr': {'class': 'btn btn-primary btn-square btn-sm mb-1 mx-md-2'}})}}
+                                            <div class="with-errors">{{ form_errors(makemodel_form) }}</div>
+                                        </div>
+                                    {{ form_end(makemodel_form)}}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if is_granted('ROLE_EMPLOYEE') %}
+                            <tr>
+                                <td><strong>Sanctions</strong></td>
+                                <td>
+                                    {% if user.sanctionsChecks|length == 0%}
+                                        No checks run
+                                    {% endif %}
+                                    {% for check in user.sanctionsChecks %}
+                                        Ran: {{ check|date }}<br>
+                                    {% endfor %}
+                                    {% if user.sanctionsMatches|length == 0%}
+                                        No matches
+                                    {% endif %}
+                                    {% for match in user.sanctionsMatches %}
+                                        {% if match.manuallyVerified %}
+                                            Confirmed not match: <del>{{ match.sanctions.name }}</del>
+                                        {% else %}
+                                            Possible match: <b>{{ match.sanctions.name }}</b>
+                                        {% endif %}
+                                        / Dob:
+                                        {% if match.sanctions.birthday %}
+                                            {% if match.sanctions.birthday|date('d M Y') == user.birthday|date('d M Y') %}
+                                                <b style="color: red">{{ match.sanctions.birthday|date('d M Y') }}</b>
+                                            {% else %}
+                                                <b>{{ match.sanctions.birthday|date('d M Y') }}</b>
+                                            {% endif %}
+                                        {% else %}
+                                            Unknown
+                                        {% endif %}
+                                        (L dist: {% if match.distance == 0 %}<b>0</b>{% else %}{{ match.distance }}{% endif %})
+                                        <br>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% if sanctions_form is defined %}
+                                        {{ form_start(sanctions_form)}}
+                                            {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-warning btn-square btn-sm mb-1 mr-md-2'}})}}
+                                        {{ form_end(sanctions_form)}}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Roles</strong></td>
+                                <td>
+                                    {% for ur in user.roles %}
+                                        {{ ur }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <button type="button"
+                                                class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                                data-toggle="modal"
+                                                data-target="#new_role_modal">
+                                                <i class="fal fa-edit fa-fw"></i> Edit roles</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if user.hasClaimsRole %}
+                                <tr>
+                                    <td><strong>Claims Handling Team</strong></td>
+                                    <td>
+                                        {% if user.handlingTeam %}
+                                            {{ user.handlingTeam }}
+                                        {% else %}
+                                            Not set
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if is_granted('ROLE_ADMIN') %}
+                                            <button type="button"
+                                                    class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                                    data-toggle="modal"
+                                                    data-target="#handling_team_modal">
+                                                    <i class="fal fa-edit fa-fw"></i> Edit handling team</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td><strong>Delete</strong></td>
+                                <td></td>
+                                <td>
+                                    {% if not user.canDelete %}
+                                        Unable to delete user due to data rentention rules (policy was created)
+                                    {% elseif is_granted('ROLE_ADMIN') %}
+                                            {{ form_start(delete_form) }}
+                                            {{ form_widget(delete_form.delete, {
+                                                'label': 'Delete User',
+                                                'fa': 'fal fa-trash-alt fa-fw',
+                                                'left': true,
+                                                'attr': {
+                                                    'class': 'btn btn-danger btn-square btn-sm mb-1 confirm-delete-user'
+                                                }}) }}
+                                            {{ form_end(delete_form) }}
+                                    {% else %}
+                                        Insufficient permission to delete
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(policy_form.imei, 'IMEI') }}
+
+           {#  {% if users.count > 0 %}
+                <div class="d-flex justify-content-center mb-5">
+                    {{ pagerfanta(pager, 'twitter_bootstrap4') }}
                 </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(policy_form.imei) }}
-                    {{ form_widget(policy_form.imei) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(policy_form.serialNumber, 'Serial Number') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(policy_form.serialNumber) }}
-                    {{ form_widget(policy_form.serialNumber) }}
-                    <br /><span class="text-danger">* Required for Apple Phones</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
-                    {{ form_widget(policy_form.add, {'label': 'Create Partial Policy', 'attr': {'class': 'btn btn-warning'}}) }}
-                </div>
-            </div>
-          </div>
-            {{ form_end(policy_form) }}
+            {% endif %} #}
+
         </div>
-      </div>
-    </div>
-{% endif %}
-{% if user_detail_form is defined %}
-    <div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-            {{ form_start(user_detail_form )}}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Edit User Details</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_detail_form.firstName) }}
-                        {{ form_errors(user_detail_form.firstName) }}
-                        {{ form_widget(user_detail_form.firstName) }}
-                        <strong>WARNING! Changing this field will trigger a salva policy update!</strong>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(user_detail_form.lastName) }}
-                        {{ form_errors(user_detail_form.lastName) }}
-                        {{ form_widget(user_detail_form.lastName) }}
-                        <strong>WARNING! Changing this field will trigger a salva policy update!</strong>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(user_detail_form.birthday) }}
-                        {{ form_errors(user_detail_form.birthday) }}
-                        {{ form_widget(user_detail_form.birthday) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(user_detail_form.mobileNumber) }}
-                        {{ form_errors(user_detail_form.mobileNumber) }}
-                        {{ form_widget(user_detail_form.mobileNumber) }}
-                        <strong>WARNING! Mobile is required for most of users!</strong>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-                {{ form_widget(user_detail_form.update, {'label': 'Update User', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-            {{ form_end(user_detail_form )}}
-        </div>
-      </div>
-    </div>
-{% endif %}
-{% if user_email_form is defined %}
-    <div class="modal fade" id="userEmailModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-            {{ form_start(user_email_form )}}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Change User Email</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_email_form.email) }}
-                        {{ form_errors(user_email_form.email) }}
-                        {{ form_widget(user_email_form.email) }}
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-                {{ form_widget(user_email_form.update, {'label': 'Change User Email Address', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-          {{ form_end(user_email_form )}}
-        </div>
-      </div>
-    </div>
-{% endif %}
-{% if user_address_form is defined %}
-    <div class="modal fade" id="userAddressModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-            {{ form_start(user_address_form )}}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Change User Address</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_address_form.line1) }}
-                        {{ form_errors(user_address_form.line1) }}
-                        {{ form_widget(user_address_form.line1) }}
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_address_form.line2) }}
-                        {{ form_errors(user_address_form.line2) }}
-                        {{ form_widget(user_address_form.line2) }}
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_address_form.line3) }}
-                        {{ form_errors(user_address_form.line3) }}
-                        {{ form_widget(user_address_form.line3) }}
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_address_form.city) }}
-                        {{ form_errors(user_address_form.city) }}
-                        {{ form_widget(user_address_form.city) }}
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_address_form.postcode) }}
-                        {{ form_errors(user_address_form.postcode) }}
-                        {{ form_widget(user_address_form.postcode) }}
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-                {{ form_widget(user_address_form.next, {'label': 'Change User Address', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-          {{ form_end(user_address_form )}}
-        </div>
-      </div>
-    </div>
-{% endif %}
-{% if user_permission_form is defined %}
-    <div class="modal fade" id="userPermissionModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-            {{ form_start(user_permission_form )}}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Change User Permissions</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_permission_form.enabled) }}
-                        {{ form_errors(user_permission_form.enabled) }}
-                        {{ form_widget(user_permission_form.enabled) }}
-                        <strong>Admin enable/disable - Will disable user logging in</strong>
-                    </div>
-                    <div class="form-group">
-                        {{ form_label(user_permission_form.locked) }}
-                        {{ form_errors(user_permission_form.locked) }}
-                        {{ form_widget(user_permission_form.locked) }}
-                        <strong>Too many login attempts - Will disable user from logging in until password reset</strong>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-                {{ form_widget(user_permission_form.update, {'label': 'Update User Permissions', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-          {{ form_end(user_permission_form )}}
-        </div>
-      </div>
-    </div>
-{% endif %}
-{% if user_high_risk_form is defined %}
-    <div class="modal fade" id="userHighRiskModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-            {{ form_start(user_high_risk_form )}}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Change User High Risk</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        {{ form_label(user_high_risk_form.highRisk) }}
-                        {{ form_errors(user_high_risk_form.highRisk) }}
-                        {{ form_widget(user_high_risk_form.highRisk) }}
-                        <strong>Will add £500 to premium & yearly only purchase</strong>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-                {{ form_widget(user_high_risk_form.update, {'label': 'Update User High Risk', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-          {{ form_end(user_high_risk_form )}}
-        </div>
-      </div>
-    </div>
-{% endif %}
-{% if role_form is defined %}
-    <div class="modal fade" id="newRoleModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            {{ form_start(role_form) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Edit User Roles</h4>
-          </div>
-            <div class="modal-body">
-                <span class="text-danger">
-                    {{ form_errors(role_form) }}
-                </span>
-                {{ form_widget(role_form.roles)}}
-            </div>
-          <div class="modal-footer">
-                {{ form_widget(role_form.save, {'label': 'Update Roles', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-            {{ form_end(role_form) }}
-        </div>
-      </div>
-    </div>
-{% endif %}
-    {% if handling_team_form is defined %}
-        <div class="modal fade" id="handlingTeamModal" tabindex="-1" role="dialog">
+    </section>
+
+    {# Page Modals #}
+    {% if policy_form is defined %}
+        <div class="modal fade"
+             id="new_policy_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="new_policy_modal"
+             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    {{ form_start(handling_team_form) }}
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Edit Handling Team</h4>
+                        <h5 class="modal-title">Add partial policy</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
                     </div>
                     <div class="modal-body">
-                <span class="text-danger">
-                    {{ form_errors(handling_team_form) }}
-                </span>
-                        {{ form_widget(handling_team_form.handlingTeam)}}
+                        <p>For cases where IMEI detection is failing</p>
+                        {{ form_start(policy_form) }}
+                            <div class="form-group">
+                                {{ form_label(policy_form.phone, 'Phone') }}
+                                {{ form_widget(policy_form.phone, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(policy_form.phone) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(policy_form.imei, 'IMEI') }}
+                                {{ form_widget(policy_form.imei, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(policy_form.imei) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(policy_form.serialNumber, 'Serial Number') }}
+                                {{ form_widget(policy_form.serialNumber, {'attr': {'class':'form-control'}}) }}
+                                <small class="form-text">* Required for all Apple phones</small>
+                                <div class="with-errors">{{ form_errors(policy_form.serialNumber) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(policy_form.add, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(policy_form) }}
                     </div>
-                    <div class="modal-footer">
-                        {{ form_widget(handling_team_form.save, {'label': 'Update Handling Team', 'attr': {'class': 'btn btn-success'}}) }}
-                    </div>
-                    {{ form_end(handling_team_form) }}
                 </div>
             </div>
         </div>
     {% endif %}
 
+    {% if user_detail_form is defined %}
+        <div class="modal fade"
+             id="user_detail_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="user_detail_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit user details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(user_detail_form )}}
+                            <div class="form-group">
+                                {{ form_label(user_detail_form.firstName) }}
+                                {{ form_widget(user_detail_form.firstName, {'attr': {'class':'form-control'}}) }}
+                                <small class="form-text">WARNING! Changing this field will trigger a salva policy update!</small>
+                                <div class="with-errors">{{ form_errors(user_detail_form.firstName) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_detail_form.lastName) }}
+                                {{ form_widget(user_detail_form.lastName, {'attr': {'class':'form-control'}}) }}
+                                <small class="form-text">WARNING! Changing this field will trigger a salva policy update!</small>
+                                <div class="with-errors">{{ form_errors(user_detail_form.lastName) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_detail_form.birthday) }}
+                                {{ form_widget(user_detail_form.birthday, {'attr': {'class':'form-control dob'}}) }}
+                                <div class="with-errors">{{ form_errors(user_detail_form.birthday) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_detail_form.mobileNumber) }}
+                                {{ form_widget(user_detail_form.mobileNumber, {'attr': {'class':'form-control'}}) }}
+                                <small class="form-text">WARNING! Mobile is required for most of users!</small>
+                                <div class="with-errors">{{ form_errors(user_detail_form.mobileNumber) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(user_detail_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(user_detail_form )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if user_email_form is defined %}
+        <div class="modal fade"
+             id="user_email_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="user_email_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change user email</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(user_email_form )}}
+                            <div class="form-group">
+                                {{ form_label(user_email_form.email) }}
+                                {{ form_widget(user_email_form.email, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(user_email_form.email) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(user_email_form.update, {'label': 'Change', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(user_email_form )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if user_address_form is defined %}
+        <div class="modal fade"
+             id="user_address_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="user_address_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change user address</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(user_address_form )}}
+                            <div class="form-group">
+                                {{ form_label(user_address_form.line1) }}
+                                {{ form_widget(user_address_form.line1, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(user_address_form.line1) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_address_form.line2) }}
+                                {{ form_widget(user_address_form.line2, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(user_address_form.line2) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_address_form.line3) }}
+                                {{ form_widget(user_address_form.line3, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(user_address_form.line3) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_address_form.city) }}
+                                {{ form_widget(user_address_form.city, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(user_address_form.city) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_address_form.postcode) }}
+                                {{ form_widget(user_address_form.postcode, {'attr': {'class':'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(user_address_form.postcode) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(user_address_form.next, {'label': 'Change', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(user_address_form )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if user_permission_form is defined %}
+        <div class="modal fade"
+             id="user_permission_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="user_permission_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change user permissions</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(user_permission_form )}}
+                            <div class="form-group">
+                                {{ form_label(user_permission_form.enabled) }}
+                                {{ form_widget(user_permission_form.enabled) }}
+                                <small class="form-text">Admin enable/disable - Will disable user logging in</small>
+                                <div class="with-errors">{{ form_errors(user_permission_form.enabled) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(user_permission_form.locked) }}
+                                {{ form_widget(user_permission_form.locked) }}
+                                <small class="form-text">Too many login attempts - Will disable user from logging in until password reset</small>
+                                <div class="with-errors">{{ form_errors(user_permission_form.locked) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(user_permission_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(user_permission_form )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if user_high_risk_form is defined %}
+        <div class="modal fade"
+             id="user_high_risk_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="user_high_risk_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Change user high risk</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(user_high_risk_form)}}
+                            <div class="form-group">
+                                {{ form_label(user_high_risk_form.highRisk) }}
+                                {{ form_widget(user_high_risk_form.highRisk) }}
+                                <small class="form-text">Will add &pound;500 to premium &amp; yearly only purchase</small>
+                                <div class="with-errors">{{ form_errors(user_high_risk_form.highRisk) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(user_high_risk_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(user_high_risk_form )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if role_form is defined %}
+        <div class="modal fade"
+             id="new_role_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="new_role_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit user role</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(role_form) }}
+                            <div class="form-group">
+                                {{ form_widget(role_form.roles, {'attr': {'class': 'form-control'}})}}
+                                <div class="with-erros">{{ form_errors(role_form) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(role_form.save, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(role_form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if handling_team_form is defined %}
+        <div class="modal fade"
+             id="handling_team_modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="handling_team_modal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit handling team</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_errors(handling_team_form) }}
+                            <div class="form-group">
+                                {{ form_widget(handling_team_form.handlingTeam)}}
+                                <div class="with-errors">{{ form_errors(handling_team_form) }}</div>
+                            </div>
+                            <div class="form-group">
+                                 {{ form_widget(handling_team_form.save, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            </div>
+                        {{ form_end(handling_team_form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/admin-users.js') }}"></script>
 {% endblock %}

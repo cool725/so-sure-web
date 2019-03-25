@@ -1,0 +1,1668 @@
+<?php
+namespace AppBundle\Service;
+
+use AppBundle\Classes\NoOp;
+use AppBundle\Classes\SoSure;
+use AppBundle\Document\Charge;
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\File\JudoFile;
+use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Repository\CheckoutPaymentRepository;
+use AppBundle\Repository\JudoPaymentRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
+use Checkout\CheckoutApi;
+use com\checkout\ApiClient;
+use com\checkout\ApiServices\Cards\RequestModels\BaseCardCreate;
+use com\checkout\ApiServices\Cards\RequestModels\CardCreate;
+use com\checkout\ApiServices\Cards\ResponseModels\Card;
+use com\checkout\ApiServices\Charges\RequestModels\CardChargeCreate;
+use com\checkout\ApiServices\Charges\RequestModels\CardIdChargeCreate;
+use com\checkout\ApiServices\Charges\RequestModels\CardTokenChargeCreate;
+use com\checkout\ApiServices\Charges\RequestModels\ChargeCapture;
+use com\checkout\ApiServices\Charges\RequestModels\ChargeRefund;
+use com\checkout\ApiServices\Customers\RequestModels\CustomerCreate;
+use com\checkout\ApiServices\Reporting\RequestModels\TransactionFilter;
+use com\checkout\ApiServices\SharedModels\Address;
+use com\checkout\ApiServices\SharedModels\Transaction;
+use com\checkout\ApiServices\Tokens\RequestModels\PaymentTokenCreate;
+use Psr\Log\LoggerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
+
+use Judopay;
+
+use AppBundle\Classes\Salva;
+
+use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Phone;
+use AppBundle\Document\User;
+use AppBundle\Document\Feature;
+use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\Policy;
+use AppBundle\Document\MultiPay;
+use AppBundle\Document\CurrencyTrait;
+
+use AppBundle\Event\PaymentEvent;
+use AppBundle\Event\ScheduledPaymentEvent;
+use AppBundle\Event\PolicyEvent;
+
+use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\PaymentDeclinedException;
+use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\SameDayPaymentException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+class CheckoutService
+{
+    use CurrencyTrait;
+    use DateTrait;
+
+    const MAX_HOUR_DELAY_FOR_RECEIPTS = 2;
+
+    /** Standard payment (monthly/yearly; initial payment */
+    const WEB_TYPE_STANDARD = 'standard';
+
+    /** No payment, just updating the card details */
+    const WEB_TYPE_CARD_DETAILS = 'card-details';
+
+    /** Remainder of policy payment (typically cancelled policy w/claim) */
+    const WEB_TYPE_REMAINDER = 'remainder';
+
+    /** Payment after card fails */
+    const WEB_TYPE_UNPAID = 'unpaid';
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var DocumentManager */
+    protected $dm;
+
+    /** @var PolicyService */
+    protected $policyService;
+
+    /** @var MailerService */
+    protected $mailer;
+
+    /** @var \Domnikl\Statsd\Client */
+    protected $statsd;
+
+    /** @var string */
+    protected $environment;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    /** @var SmsService */
+    protected $sms;
+
+    /** @var FeatureService */
+    protected $featureService;
+
+    /** @var ApiClient */
+    protected $client;
+
+    /** @var CheckoutApi */
+    protected $api;
+
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param DocumentManager          $dm
+     * @param LoggerInterface          $logger
+     * @param PolicyService            $policyService
+     * @param MailerService            $mailer
+     * @param string                   $apiSecret
+     * @param string                   $apiPublic
+     * @param string                   $environment
+     * @param \Domnikl\Statsd\Client   $statsd
+     * @param EventDispatcherInterface $dispatcher
+     * @param SmsService               $sms
+     * @param FeatureService           $featureService
+     */
+    public function __construct(
+        DocumentManager $dm,
+        LoggerInterface $logger,
+        PolicyService $policyService,
+        MailerService $mailer,
+        $apiSecret,
+        $apiPublic,
+        $environment,
+        \Domnikl\Statsd\Client $statsd,
+        EventDispatcherInterface $dispatcher,
+        SmsService $sms,
+        FeatureService $featureService
+    ) {
+        $this->dm = $dm;
+        $this->logger = $logger;
+        $this->policyService = $policyService;
+        $this->mailer = $mailer;
+        $this->dispatcher = $dispatcher;
+        $this->sms = $sms;
+        $this->statsd = $statsd;
+        $this->environment = $environment;
+        $this->featureService = $featureService;
+
+        $isProd = $environment == 'prod';
+        $this->client = new ApiClient($apiSecret, $isProd ? 'live' : 'sandbox', !$isProd);
+        $this->api = new CheckoutApi($apiSecret, -1, $apiPublic);
+    }
+
+    /**
+     * @param string $chargeId
+     * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge
+     */
+    public function getTransaction($chargeId)
+    {
+        $charge = $this->client->chargeService();
+        /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
+        $details = $charge->getCharge($chargeId);
+
+        return $details;
+    }
+
+    public function getTransactionWebType($chargeId)
+    {
+        try {
+            $data = $this->getTransaction($chargeId);
+            if ($data->getMetadata() && isset($data->getMetadata()['web_type'])) {
+                return $data->getMetadata()['web_type'];
+            }
+        } catch (\Exception $e) {
+            $this->logger->warning(
+                sprintf('Unable to find transaction charge %s', $chargeId),
+                ['exception' => $e]
+            );
+        }
+
+        return null;
+    }
+
+    public function getTransactions($pageSize, $logMissing = true)
+    {
+        NoOp::ignore([$pageSize]);
+
+        $policies = [];
+        $repo = $this->dm->getRepository(CheckoutPayment::class);
+
+        $filter = new TransactionFilter();
+        $filter->setPageSize($pageSize);
+        //$filter->setSearch()
+
+        $transactions = $this->client->reportingService()->queryTransaction($filter);
+        $data = [
+            'validated' => 0,
+            'missing' => [],
+            'invalid' => [],
+            'non-payment' => 0,
+            'skipped-too-soon' => 0,
+            'additional-payments' => []
+        ];
+        foreach ($transactions->getData() as $transaction) {
+            /** @var Transaction $transaction */
+            $policyId = null;
+            $result = $transaction->getStatus();
+            $details = $this->getTransaction($transaction->getId());
+            if ($result == CheckoutPayment::RESULT_CAPTURED &&
+                $details->getMetadata() && isset($details->getMetadata()['policy_id'])) {
+                // Non-token payments (eg. user) may be tried several times in a row
+                // Ideally would seperate out the user/token payments, but for now
+                // use success as a proxy for that
+                $policyId = $details->getMetadata()['policy_id'];
+                if (!isset($policies[$policyId])) {
+                    $policies[$policyId] = true;
+                } else {
+                    if (!isset($data['additional-payments'][$policyId])) {
+                        $data['additional-payments'][$policyId] = 0;
+                    }
+                    //$data['additional-payments'][$policyId]++;
+                    $data['additional-payments'][$policyId] = json_encode($transaction->getObject());
+                }
+            }
+
+            $chargeId = $transaction->getId();
+            /** @var JudoPayment $payment */
+            $payment = $repo->findOneBy(['receipt' => $chargeId]);
+
+            $created = null;
+            if ($transaction->getDate()) {
+                $created = \DateTime::createFromFormat('Y-m-d\TH:i:s.uP', $transaction->getDate());
+            }
+
+            if (!$created) {
+                $created = $this->now();
+            }
+            $now = \DateTime::createFromFormat('U', time());
+            $diff = $now->getTimestamp() - $created->getTimestamp();
+
+            $success = CheckoutPayment::isSuccessfulResult($transaction->getStatus());
+
+            // allow a few (5) minutes before warning if missing receipt
+            if ($diff < 300) {
+                $data['skipped-too-soon']++;
+            } elseif ($success) {
+                if (!$payment) {
+                    if ($logMissing) {
+                        $this->logger->error(sprintf(
+                            'INVESTIGATE!! Missing db checkout payment for received payment. id %s on %s [%s]',
+                            $chargeId,
+                            $transaction->getDate(),
+                            json_encode($transaction->getObject())
+                        ));
+                    }
+                    $data['missing'][$chargeId] = $transaction->getTrackId();
+                } elseif (!$payment->isSuccess()) {
+                    if ($logMissing) {
+                        $this->logger->error(sprintf(
+                            'INVESTIGATE!! Checkout payment status in db does not match checkout id %s on %s [%s]',
+                            $chargeId,
+                            $transaction->getDate(),
+                            json_encode($transaction->getObject())
+                        ));
+                    }
+                    $data['invalid'][$chargeId] = $transaction->getTrackId();
+                } else {
+                    $data['validated']++;
+                }
+            } elseif (!$success) {
+                // can ignore failed missing payments
+                // however if our db thinks it successful and judo says its not, that's problematic
+                if ($payment && $payment->isSuccess()) {
+                    if ($logMissing) {
+                        $this->logger->error(sprintf(
+                            'INVESTIGATE!! Checkout payment status in db does not match checkout. id %s on %s [%s]',
+                            $chargeId,
+                            $transaction->getDate(),
+                            json_encode($transaction->getObject())
+                        ));
+                    }
+                    $data['invalid'][$chargeId] = $transaction->getTrackId();
+                }
+            } else {
+                $data['non-payment']++;
+            }
+        }
+
+        return $data;
+    }
+
+    public function pay(
+        Policy $policy,
+        $token,
+        $amount,
+        $source,
+        \DateTime $date = null,
+        IdentityLog $identityLog = null
+    ) {
+        $charge = $this->capturePaymentMethod($policy, $token, $amount);
+
+        return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
+    }
+
+    /**
+     * @param Policy      $policy
+     * @param string      $chargeId
+     * @param string      $source      Source of the payment
+     * @param \DateTime   $date
+     * @param IdentityLog $identityLog
+     */
+    public function add(
+        Policy $policy,
+        $chargeId,
+        $source,
+        \DateTime $date = null,
+        IdentityLog $identityLog = null
+    ) {
+        $this->statsd->startTiming("judopay.add");
+        // doesn't make sense to add payments for expired policies
+        if (in_array($policy->getStatus(), [
+            PhonePolicy::STATUS_EXPIRED,
+            PhonePolicy::STATUS_EXPIRED_CLAIMABLE,
+            PhonePolicy::STATUS_EXPIRED_WAIT_CLAIM,
+        ])) {
+            throw new \Exception('Unable to apply payment to cancelled/expired policy');
+        } elseif ($policy->getStatus() == PhonePolicy::STATUS_CANCELLED) {
+            // a bit unusual, but for remainder payments w/claim it could occur
+            $this->logger->warning(sprintf(
+                'Payment is being applied to a cancelled policy %s',
+                $policy->getId()
+            ));
+        } elseif ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
+            // shouldn't really happen as policy should be in unpaid status
+            // but seems to occur on occasion - make sure we credit that policy anyway
+            $this->logger->info(sprintf(
+                'Non-token payment is being applied to active policy %s',
+                $policy->getId()
+            ));
+        }
+
+        if (!$policy->getStatus() ||
+            in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
+            // New policy
+
+            // Mark policy as pending for monitoring purposes
+            $policy->setStatus(PhonePolicy::STATUS_PENDING);
+            $this->dm->flush();
+
+            $payment = $this->createPayment(
+                $policy,
+                $chargeId,
+                $source,
+                $date
+            );
+
+            $this->policyService->create($policy, $date, true, null, $identityLog);
+            $this->dm->flush();
+        } else {
+            // Existing policy - add payment + prevent duplicate billing
+            $payment = $this->createPayment(
+                $policy,
+                $chargeId,
+                $source,
+                $date
+            );
+            if (!$this->policyService->adjustScheduledPayments($policy, true)) {
+                // Reload object from db
+                /** @var Policy $policy */
+                $policy = $this->dm->merge($policy);
+            }
+
+            $this->validatePolicyStatus($policy, $date);
+            $this->dm->flush();
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy->isDifferentPayer()) {
+            $policy->setPayer($policy->getUser());
+            $this->dm->flush();
+        }
+
+        $this->statsd->endTiming("judopay.add");
+
+        return true;
+    }
+
+    protected function createPayment(
+        Policy $policy,
+        $chargeId,
+        $source,
+        \DateTime $date = null
+    ) {
+        $user = $policy->getUser();
+
+        $payment = $this->validateCharge($policy, $chargeId, $source, $date);
+
+        $this->triggerPaymentEvent($payment);
+
+        $this->validateUser($user);
+
+        return $payment;
+    }
+
+    private function triggerPaymentEvent($payment)
+    {
+        if (!$payment) {
+            return;
+        }
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            if ($payment->isSuccess()) {
+                $this->logger->debug('Event Payment Success');
+                $this->dispatcher->dispatch(PaymentEvent::EVENT_SUCCESS, new PaymentEvent($payment));
+            } else {
+                $this->logger->debug('Event Payment Failed');
+                $this->dispatcher->dispatch(PaymentEvent::EVENT_FAILED, new PaymentEvent($payment));
+            }
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Judo Service');
+        }
+    }
+
+    private function triggerPolicyEvent($policy, $event, \DateTime $date = null)
+    {
+        if (!$policy) {
+            return;
+        }
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->logger->debug(sprintf('Event %s', $event));
+            $this->dispatcher->dispatch($event, new PolicyEvent($policy, $date));
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Judo Service');
+        }
+    }
+
+    public function testPay(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
+    {
+        $charge = $this->testPayDetails($policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId);
+        if (!$charge) {
+            return null;
+        }
+
+        return $charge->getId();
+    }
+
+    private function getCheckoutAddress(User $user)
+    {
+        $address = new Address();
+        if ($user->getBillingAddress()) {
+            $address->setAddressLine1($user->getBillingAddress()->getLine1());
+            $address->setAddressLine2($user->getBillingAddress()->getLine2());
+            $address->setCity($user->getBillingAddress()->getCity());
+            $address->setPostcode($user->getBillingAddress()->getPostcode());
+        }
+        $address->setCountry('GB');
+
+        $phone = new \com\checkout\ApiServices\SharedModels\Phone();
+        $phone->setNumber(str_replace('+44', '', $user->getMobileNumber()));
+        $phone->setCountryCode('44');
+        $address->setPhone($phone);
+
+        return $address;
+    }
+
+    /**
+     * @param Policy      $policy
+     * @param string      $ref
+     * @param string      $amount
+     * @param string      $cardNumber
+     * @param string      $expiryDate
+     * @param string      $cv2
+     * @param string|null $policyId
+     * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge|null
+     * @throws \Exception
+     */
+    public function testPayDetails(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
+    {
+        $user = $policy->getUser();
+        $details = null;
+        try {
+            $exp = explode('/', $expiryDate);
+
+
+            $cardCreate = new BaseCardCreate();
+            $cardCreate->setNumber(str_replace(' ', '', $cardNumber));
+            $cardCreate->setExpiryMonth($exp[0]);
+            $cardCreate->setExpiryYear($exp[1]);
+            $cardCreate->setCvv($cv2);
+
+            $cardCreate->setBillingDetails($this->getCheckoutAddress($user));
+
+            /*
+            $cardCreate = new CardCreate();
+            $cardCreate->setBaseCardCreate($card);
+            $cardCreate->setCustomerId($user->getId());
+
+            $cardService = $this->client->cardService();
+            $card = $cardService->createCard($cardCreate);
+
+            $customerCreate = new CustomerCreate();
+            $customerCreate->setBaseCardCreate($cardCreate);
+            $customerCreate->setEmail($user->getEmail());
+
+            $customerService = $this->client->customerService();
+            $customerResponse = $customerService->createCustomer($customerCreate);
+
+            $this->setCardToken($policy, $customerResponse->getDefaultCard());
+
+            $details = $this->runTokenPayment($policy, $amount, $ref, $policyId);
+            */
+            $pennies = $this->convertToPennies($amount);
+            $charge = new CardChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setValue($pennies);
+            $charge->setCurrency('GBP');
+            $charge->setTrackId($ref);
+            // Don't use for testing - ids will be changing constantly
+            //$charge->setCustomerId($user->getId());
+            $charge->setMetadata(['policy_id' => $policyId]);
+            $charge->setBaseCardCreate($cardCreate);
+
+            $service = $this->client->chargeService();
+            $details = $service->chargeWithCard($charge);
+            if ($details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
+                return $details;
+            }
+
+            $capture = new ChargeCapture();
+            $capture->setChargeId($details->getId());
+            $capture->setValue($this->convertToPennies($amount));
+
+            $service = $this->client->chargeService();
+            $details = $service->CaptureCardCharge($capture);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+        }
+
+        return $details;
+    }
+
+    public function createCardToken($cardNumber, $expiryDate, $cv2)
+    {
+        $token = null;
+        try {
+            $exp = explode('/', $expiryDate);
+
+            $cardNumber = str_replace(' ', '', $cardNumber);
+
+            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
+            //NoOp::ignore([$cv2]);
+            $card->cvv = $cv2;
+            $service = $this->api->tokens();
+            $token = $service->request($card);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed creating card token. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+        }
+
+        return $token;
+    }
+
+    public function getCharge($chargeId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
+    {
+        $service = $this->client->chargeService();
+
+        try {
+            /**  @var \com\checkout\ApiServices\Charges\ResponseModels\ChargeHistory  $transactionDetails **/
+            $transactionDetails = $service->getChargeHistory($chargeId);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf(
+                'Error retrieving charge %s. Ex: %s',
+                $chargeId,
+                $e
+            ));
+
+            throw $e;
+        }
+
+        $hasRefund = false;
+        $refundedAmount = 0;
+        $amount = 0;
+        foreach ($transactionDetails->getCharges() as $charge) {
+            /** @var \com\checkout\ApiServices\SharedModels\Charge $charge */
+            if ($charge->getStatus() == CheckoutPayment::RESULT_REFUNDED) {
+                $hasRefund = true;
+                $refundedAmount += $charge->getValue();
+            } elseif ($charge->getStatus() == CheckoutPayment::RESULT_CAPTURED) {
+                $amount += $charge->getValue();
+            }
+        }
+
+
+        if ($hasRefund) {
+            $msg = sprintf(
+                'Checkout receipt %s has a refund applied (refunded %s of %s).',
+                $chargeId,
+                $this->convertFromPennies($refundedAmount),
+                $this->convertFromPennies($amount)
+            );
+            if ($enforceFullAmount) {
+                $this->logger->error($msg);
+
+                throw new \Exception($msg);
+            } else {
+                $this->logger->warning($msg);
+            }
+        }
+
+
+        /**  @var \com\checkout\ApiServices\Charges\ResponseModels\Charge  $transactionDetails **/
+        $transactionDetails = $service->verifyCharge($chargeId);
+        $created = \DateTime::createFromFormat(\DateTime::ATOM, $transactionDetails->getCreated());
+
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $diff = $date->diff($created);
+        if ($diff->days > 0 || $diff->h >= self::MAX_HOUR_DELAY_FOR_RECEIPTS) {
+            $msg = sprintf(
+                'Checkout chage %s is older than expected (%d:%d hours).',
+                $chargeId,
+                $diff->days,
+                $diff->h
+            );
+            if ($enforceDate) {
+                $this->logger->error($msg);
+
+                throw new \Exception($msg);
+            } else {
+                $this->logger->warning($msg);
+            }
+        }
+
+        return $transactionDetails;
+    }
+
+    /**
+     * @param Policy $policy
+     * @param string $token
+     */
+    public function capturePaymentMethod(
+        Policy $policy,
+        $token,
+        $amount = null
+    ) {
+        $user = $policy->getUser();
+        $details = null;
+        $payment = null;
+        try {
+            $service = $this->client->chargeService();
+
+            $charge = new CardTokenChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setCurrency('GBP');
+            $charge->setMetadata(['policy_id' => $policy->getId()]);
+            $charge->setCardToken($token);
+            if ($amount) {
+                $charge->setValue($this->convertToPennies($amount));
+            }
+
+            $details = $service->chargeWithCardToken($charge);
+            $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+
+            if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
+                throw new PaymentDeclinedException($details->getResponseMessage());
+            }
+
+            if ($details) {
+                $card = $details->getCard();
+                if ($card) {
+                    $this->setCardToken($policy, $card);
+                }
+            }
+
+            if ($amount) {
+                $capture = new ChargeCapture();
+                $capture->setChargeId($details->getId());
+                $details = $service->CaptureCardCharge($capture);
+                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+
+                if ($details) {
+                    $card = $details->getCard();
+                    if ($card) {
+                        $this->setCardToken($policy, $card);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+
+            throw $e;
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy && $policy->isDifferentPayer()) {
+            // don't use $user as not validated that policy belongs to user
+            $policy->setPayer($policy->getUser());
+        }
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $details;
+    }
+
+    /**
+     * @param Policy $policy
+     * @param string $token
+     */
+    public function updatePaymentMethod(
+        Policy $policy,
+        $token,
+        $amount = null
+    ) {
+        $user = $policy->getUser();
+        $details = null;
+        $payment = null;
+        try {
+            if ($amount) {
+                $payment = new CheckoutPayment();
+                $payment->setAmount($amount);
+                $payment->setUser($policy->getUser());
+                $payment->setSource(Payment::SOURCE_WEB);
+                $policy->addPayment($payment);
+                $this->dm->persist($payment);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
+
+            $service = $this->client->chargeService();
+
+            $charge = new CardTokenChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setCurrency('GBP');
+            $charge->setMetadata(['policy_id' => $policy->getId()]);
+            $charge->setCardToken($token);
+            if ($amount) {
+                $charge->setValue($this->convertToPennies($amount));
+            }
+            if ($payment) {
+                $charge->setTrackId($payment->getId());
+            }
+
+            /*
+            $charge = new CardIdChargeCreate();
+            $charge->setEmail($user->getEmail());
+            $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
+            $charge->setCurrency('GBP');
+            $charge->setMetadata(['policy_id' => $policy->getId()]);
+            $charge->setCardId($token);
+            $details = $service->chargeWithCardId($charge);
+            */
+
+            $details = $service->chargeWithCardToken($charge);
+            $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+
+            if ($details && $payment) {
+                $payment->setReceipt($details->getId());
+                $payment->setAmount($this->convertFromPennies($details->getValue()));
+                $payment->setResult($details->getStatus());
+                $payment->setMessage($details->getResponseMessage());
+                $payment->setRiskScore($details->getRiskCheck());
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            }
+
+            if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
+                throw new PaymentDeclinedException($details->getResponseMessage());
+            }
+
+            if ($details) {
+                $card = $details->getCard();
+                if ($card) {
+                    $this->setCardToken($policy, $card);
+                }
+            }
+
+            if ($amount) {
+                $capture = new ChargeCapture();
+                $capture->setChargeId($details->getId());
+                $details = $service->CaptureCardCharge($capture);
+                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+
+                if ($details && $payment) {
+                    $payment->setReceipt($details->getId());
+                    $payment->setAmount($this->convertFromPennies($details->getValue()));
+                    $payment->setResult($details->getStatus());
+                    $payment->setMessage($details->getResponseMessage());
+                    $payment->setRiskScore($details->getRiskCheck());
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+
+            throw $e;
+        }
+
+        if ($details) {
+            $card = $details->getCard();
+            if ($card) {
+                $this->setCardToken($policy, $card);
+            }
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy && $policy->isDifferentPayer()) {
+            // don't use $user as not validated that policy belongs to user
+            $policy->setPayer($policy->getUser());
+        }
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $details;
+    }
+
+    private function setCardToken(Policy $policy, Card $card)
+    {
+        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
+        $checkoutPaymentMethod = $policy->getCheckoutPaymentMethod();
+        if (!$checkoutPaymentMethod) {
+            $checkoutPaymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($checkoutPaymentMethod);
+        }
+
+        if (!$checkoutPaymentMethod->getCustomerId()) {
+            $checkoutPaymentMethod->setCustomerId($card->getCustomerId());
+        }
+
+        $tokens = $checkoutPaymentMethod->getCardTokens();
+        if (!isset($tokens[$card->getId()])) {
+            $cardDetails = [
+                'cardLastFour' => $card->getLast4(),
+                'endDate' => sprintf('%s%s', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
+                'cardType' => $card->getPaymentMethod(),
+                'fingerprint' => $card->getFingerprint(),
+                'authCode' => $card->getAuthCode(),
+                'cvvCheck' => $card->getCvvCheck(),
+                'avsCheck' => $card->getAvsCheck(),
+            ];
+            $checkoutPaymentMethod->addCardToken($card->getId(), json_encode($cardDetails));
+        } else {
+            $checkoutPaymentMethod->setCardToken($card->getId());
+        }
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param string    $chargeId
+     * @param string    $source
+     * @param \DateTime $date
+     */
+    public function validateCharge(Policy $policy, $chargeId, $source, \DateTime $date = null)
+    {
+        $transactionDetails = $this->getCharge($chargeId);
+        $repo = $this->dm->getRepository(CheckoutPayment::class);
+        $exists = $repo->findOneBy(['receipt' => $transactionDetails->getId()]);
+        if ($exists) {
+            throw new ProcessedException(sprintf(
+                "Charge %s has already been used to pay for a policy",
+                $transactionDetails->getId()
+            ));
+        }
+
+        // webpayment will already have a payment record
+
+        // Try to find payment via policy object, so that there isn't any inconsistencies
+        // Uncertain if this is doing anything productive or not, but there was an error
+        // that seems like it could only be causes by loading an unflush db record - ch4972
+        /** @var CheckoutPayment $payment */
+        $payment = null;
+        foreach ($policy->getPayments() as $payment) {
+            if ($payment->getId() == $transactionDetails->getTrackId()) {
+                break;
+            }
+
+            /** @var CheckoutPayment $payment */
+            $payment = null;
+        }
+        // Fallback to db query if unable to find
+        if (!$payment) {
+            /** @var CheckoutPayment $payment */
+            $payment = $repo->find($transactionDetails->getTrackId());
+        }
+
+        $transactionAmount = $this->convertFromPennies($transactionDetails->getValue());
+        if (!$payment) {
+            $payment = new CheckoutPayment();
+            $payment->setReference($transactionDetails->getTrackId());
+            $payment->setAmount($transactionAmount);
+            $payment->setUser($policy->getUser());
+            $policy->addPayment($payment);
+            $this->dm->persist($payment);
+            //\Doctrine\Common\Util\Debug::dump($payment);
+        } else {
+            if (!$this->areEqualToTwoDp($payment->getAmount(), $transactionAmount)) {
+                $this->logger->error(sprintf(
+                    'Payment %s Expected Matching Payment Amount %f',
+                    $payment->getId(),
+                    $transactionAmount
+                ));
+            }
+        }
+
+        $payment->setReceipt($transactionDetails->getId());
+        $payment->setResult($transactionDetails->getStatus());
+        $payment->setMessage($transactionDetails->getResponseMessage());
+        $payment->setRiskScore($transactionDetails->getRiskCheck());
+        $payment->setSource($source);
+
+        if ($date) {
+            $payment->setDate($date);
+        }
+
+        /** @var Card $card */
+        $card = $transactionDetails->getCard();
+
+        if ($card) {
+            $this->setCardToken($policy, $card);
+            $payment->setCardLastFour($card->getLast4());
+        }
+
+        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
+        $checkoutPaymentMethod = $policy->getCheckoutPaymentMethod();
+        if ($checkoutPaymentMethod && !$payment->getDetails()) {
+            $payment->setDetails($checkoutPaymentMethod->__toString());
+        }
+        //\Doctrine\Common\Util\Debug::dump($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        $metadata = $transactionDetails->getMetadata();
+        if (!$metadata || !isset($metadata["policy_id"])) {
+            $this->logger->warning(sprintf('Unable to find policy id metadata for payment id %s', $payment->getId()));
+        } elseif ($metadata["policy_id"] != $policy->getId()) {
+            $this->logger->error(sprintf(
+                'Payment id %s metadata [%s] does not match policy id %s',
+                $payment->getId(),
+                json_encode($metadata),
+                $policy->getId()
+            ));
+        }
+
+        // Ensure the correct amount is paid
+        $this->validatePaymentAmount($payment);
+
+        if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED) {
+            // We've recorded the payment - can return error now
+            throw new PaymentDeclinedException();
+        }
+
+        $this->setCommission($payment);
+
+        return $payment;
+    }
+
+    protected function validatePaymentAmount(CheckoutPayment $payment)
+    {
+        // TODO: Should we issue a refund in this case??
+        $premium = $payment->getPolicy()->getPremium();
+        if (!$premium->isEvenlyDivisible($payment->getAmount()) &&
+            !$premium->isEvenlyDivisible($payment->getAmount(), true) &&
+            !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getOutstandingPremium())) {
+            $errMsg = sprintf(
+                'ADJUSTMENT NEEDED!! Expected %f or %f (or maybe %f), not %f for payment id: %s',
+                $premium->getMonthlyPremiumPrice(),
+                $premium->getYearlyPremiumPrice(),
+                $payment->getPolicy()->getOutstandingPremium(),
+                $payment->getAmount(),
+                $payment->getId()
+            );
+            $this->logger->error($errMsg);
+        }
+
+        /* TODO: May want to validate this data??
+        if ($tokenPaymentDetails["type"] != 'Payment') {
+            $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
+            $this->logger->error($errMsg);
+            // save up to this point
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+        }
+        if ($payment->getId() != $tokenPaymentDetails["yourPaymentReference"]) {
+            $errMsg = sprintf(
+                'Payment ref mismatch. %s != %s',
+                $payment->getId(),
+                $tokenPaymentDetails["yourPaymentReference"]
+            );
+            $this->logger->error($errMsg);
+            // save up to this point
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            throw new \Exception($errMsg);
+        }
+        */
+    }
+
+    protected function validateUser($user)
+    {
+        if (!$user->hasValidDetails()) {
+            throw new \InvalidArgumentException(sprintf(
+                'User is missing details such as name or email address (User: %s)',
+                $user->getId()
+            ));
+        }
+
+        if (!$user->hasValidBillingDetails()) {
+            throw new \InvalidArgumentException(sprintf(
+                'User is missing details such as billing address (User: %s)',
+                $user->getId()
+            ));
+        }
+    }
+
+    /**
+     * Run via scheduledPaymentService
+     */
+    public function scheduledPayment(
+        ScheduledPayment $scheduledPayment,
+        $prefix = null,
+        \DateTime $date = null,
+        $abortOnMultipleSameDayPayment = true
+    ) {
+        $scheduledPayment->validateRunable($prefix, $date);
+
+        $payment = null;
+        $policy = $scheduledPayment->getPolicy();
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
+        try {
+            if (!$paymentMethod || !$paymentMethod instanceof CheckoutPaymentMethod) {
+                throw new \Exception(sprintf(
+                    'Payment method not valid for scheduled payment %s',
+                    $scheduledPayment->getId()
+                ));
+            }
+
+            $payment = $this->tokenPay(
+                $policy,
+                $scheduledPayment->getAmount(),
+                $scheduledPayment->getNotes() ?: $scheduledPayment->getType(),
+                $abortOnMultipleSameDayPayment,
+                $date
+            );
+        } catch (SameDayPaymentException $e) {
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+            throw $e;
+        } catch (\Exception $e) {
+            // TODO: Nicer handling if Checkout has an issue
+            $this->logger->error(sprintf(
+                'Error running scheduled payment %s. Ex: %s',
+                $scheduledPayment->getId(),
+                $e->getMessage()
+            ));
+        }
+
+        if (!$payment) {
+            $payment = new CheckoutPayment();
+            $payment->setAmount(0);
+            $payment->setResult(CheckoutPayment::RESULT_SKIPPED);
+            if ($policy->getCheckoutPaymentMethod()) {
+                $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
+            }
+            $policy->addPayment($payment);
+        }
+        $this->processScheduledPaymentResult($scheduledPayment, $payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $scheduledPayment;
+    }
+
+    public function validatePolicyStatus(Policy $policy, \DateTime $date = null)
+    {
+        // if payment fails at exactly same second as payment is due, technically policy is still paid to date
+        // this is problematic if setting the policy state to unpaid prior to calling this method
+        $isPaidToDate = $policy->isPolicyPaidToDate($date);
+        // print sprintf('%s paid: %s', $policy->getStatus(), $isPaidToDate ? 'yes' : 'no') . PHP_EOL;
+        // update status if it makes sense to
+        if ($isPaidToDate &&
+            in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
+        ) {
+            $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_REACTIVATED);
+            // print 'status -> active' . PHP_EOL;
+            // \Doctrine\Common\Util\Debug::dump($policy);
+        } elseif (!$isPaidToDate) {
+            $this->logger->error(sprintf('Policy %s is not paid to date', $policy->getPolicyNumber()));
+
+            if (in_array($policy->getStatus(), [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_PENDING])) {
+                $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
+            }
+        }
+    }
+
+    public function getMailer()
+    {
+        return $this->mailer;
+    }
+
+    public function processScheduledPaymentResult(
+        ScheduledPayment $scheduledPayment,
+        CheckoutPayment $payment = null,
+        \DateTime $date = null
+    ) {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+
+        $policy = $scheduledPayment->getPolicy();
+        if ($payment) {
+            $scheduledPayment->setPayment($payment);
+        }
+        if ($payment && $payment->isSuccess()) {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+
+            // will only be sent if card is expiring
+            $this->cardExpiringEmail($policy, $date);
+
+            $this->validatePolicyStatus($policy, $date);
+        } else {
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
+            // Very important to update status to unpaid as used by the app to update payment
+            // and used by expire process to cancel policy if unpaid after 30 days
+            $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID, $date);
+            $this->dispatcher->dispatch(
+                ScheduledPaymentEvent::EVENT_FAILED,
+                new ScheduledPaymentEvent($scheduledPayment, $date)
+            );
+        }
+    }
+
+    /**
+     * Should only be called if payment is successful (e.g. card is not already expired)
+     *
+     * @param Policy    $policy
+     * @param \DateTime $date
+     *
+     * @return boolean true if email sent, false if card is not expiring next month
+     */
+    public function cardExpiringEmail(Policy $policy, \DateTime $date = null)
+    {
+        if (!$date) {
+            $nextMonth = \DateTime::createFromFormat('U', time());
+        } else {
+            $nextMonth = clone $date;
+        }
+        $nextMonth->add(new \DateInterval('P1M'));
+
+        if (!$policy->getCheckoutPaymentMethod() ||
+            !$policy->getCheckoutPaymentMethod()->isCardExpired($nextMonth)) {
+            return false;
+        }
+
+        $baseTemplate = sprintf('AppBundle:Email:card/cardExpiring');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplateToUser(
+            sprintf('Your card is expiring next month'),
+            $policy->getPayerOrUser(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy],
+            null,
+            $this->featureService->isEnabled(Feature::FEATURE_PAYMENTS_BCC) ? 'bcc@so-sure.com' : null
+        );
+
+        return true;
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param int       $failedPayments
+     * @param \DateTime $next
+     *
+     * @return bool|string false if $failedPayments does not fall in range of 1-4. $baseTemplate if successfully sent
+     */
+    public function failedPaymentEmail(Policy $policy, $failedPayments, \DateTime $next = null)
+    {
+        // email only supported for 1, 2, 3, & 4
+        if ($failedPayments < 1 || $failedPayments > 4) {
+            return false;
+        }
+
+        $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
+        if ($policy->hasMonetaryClaimed(true, true)) {
+            $baseTemplate = sprintf('AppBundle:Email:card/failedPaymentWithClaim');
+        } elseif (!$policy->hasPolicyOrUserValidPaymentMethod()) {
+            $baseTemplate = sprintf('AppBundle:Email:card/cardMissing');
+        } else {
+            $baseTemplate = sprintf('AppBundle:Email:card/failedPayment');
+        }
+
+        $htmlTemplate = sprintf("%s-%d.html.twig", $baseTemplate, $failedPayments);
+        $textTemplate = sprintf("%s-%d.txt.twig", $baseTemplate, $failedPayments);
+
+        $this->mailer->sendTemplateToUser(
+            $subject,
+            $policy->getUser(),
+            $htmlTemplate,
+            ['policy' => $policy, 'next' => $next],
+            $textTemplate,
+            ['policy' => $policy, 'next' => $next],
+            null,
+            $this->featureService->isEnabled(Feature::FEATURE_PAYMENTS_BCC) ? 'bcc@so-sure.com' : null
+        );
+
+        return $baseTemplate;
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param int       $failedPayments
+     * @param \DateTime $next
+     */
+    private function failedPaymentSms(Policy $policy, $failedPayments, \DateTime $next = null)
+    {
+        if ($this->environment != 'prod') {
+            return;
+        }
+
+        // sms only supported for 2, 3, & 4
+        if ($failedPayments < 2 || $failedPayments > 4) {
+            return;
+        }
+
+        $smsTemplate = sprintf('AppBundle:Sms:card/failedPayment-%d.txt.twig', $failedPayments);
+        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
+    }
+
+    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId)
+    {
+        /** @var CheckoutPaymentMethod $paymentMethod */
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
+        if (!$paymentMethod) {
+            throw new \Exception(sprintf(
+                'Unknown payment method for policy %s user %s',
+                $policy->getId(),
+                $policy->getPayerOrUser()->getId()
+            ));
+        }
+
+        try {
+            $user = $policy->getUser();
+
+            $chargeService = $this->client->chargeService();
+            $chargeCreate = new CardIdChargeCreate();
+            $chargeCreate->setBillingDetails($this->getCheckoutAddress($user));
+
+            // Can only use 1
+            if ($paymentMethod->getCustomerId()) {
+                $chargeCreate->setCustomerId($paymentMethod->getCustomerId());
+            } else {
+                $chargeCreate->setEmail($user->getEmail());
+            }
+            $chargeCreate->setAutoCapTime(0);
+            $chargeCreate->setAutoCapture('N');
+            $chargeCreate->setValue($this->convertToPennies($amount));
+            $chargeCreate->setCurrency('GBP');
+            $chargeCreate->setTrackId($paymentRef);
+            $chargeCreate->setMetadata(['policy_id' => $policyId]);
+            $chargeCreate->setCardId($paymentMethod->getCardToken());
+
+            $chargeResponse = $chargeService->chargeWithCardId($chargeCreate);
+
+            $capture = new ChargeCapture();
+            $capture->setChargeId($chargeResponse->getId());
+            $capture->setValue($this->convertToPennies($amount));
+
+            /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
+            $chargeResponse = $chargeService->CaptureCardCharge($capture);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $paymentRef, $e));
+
+            throw $e;
+        }
+
+        return $chargeResponse;
+    }
+
+    protected function tokenPay(
+        Policy $policy,
+        $amount = null,
+        $notes = null,
+        $abortOnMultipleSameDayPayment = true,
+        \DateTime $date = null
+    ) {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        foreach ($policy->getAllPayments() as $payment) {
+            $diff = $date->diff($payment->getDate());
+            if ($payment instanceof CheckoutPayment && $payment->getAmount() > 0 &&
+                $diff->days == 0 && $payment->getSource() == Payment::SOURCE_TOKEN) {
+                $msg = sprintf(
+                    'Attempting to run addition payment for policy %s on the same day. %s',
+                    $policy->getId(),
+                    $abortOnMultipleSameDayPayment ? 'Aborting' : 'Please verify.'
+                );
+                if ($abortOnMultipleSameDayPayment) {
+                    throw new SameDayPaymentException($msg);
+                } else {
+                    // to avoid constantly warning, only warn if minutes are < 15 - we run every 10 minutes
+                    // so this should grab one trigger per hour (better than 6/hour)
+                    if ($diff->i < 15) {
+                        $this->logger->warning($msg);
+                    } else {
+                        $this->logger->info($msg);
+                    }
+                }
+            }
+        }
+
+        if (!$amount) {
+            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        }
+        $user = $policy->getPayerOrUser();
+
+        $payment = new CheckoutPayment();
+        $payment->setAmount($amount);
+        $payment->setNotes($notes);
+        $payment->setUser($policy->getUser());
+        $payment->setSource(Payment::SOURCE_TOKEN);
+        if ($policy->getCheckoutPaymentMethod()) {
+            $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
+        }
+        $policy->addPayment($payment);
+        $this->dm->persist($payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        if ($policy->hasPolicyOrUserValidPaymentMethod()) {
+            $tokenPaymentDetails = $this->runTokenPayment($policy, $amount, $payment->getId(), $policy->getId());
+
+            $payment->setReceipt($tokenPaymentDetails->getId());
+            $payment->setAmount($this->convertFromPennies($tokenPaymentDetails->getValue()));
+            $payment->setResult($tokenPaymentDetails->getStatus());
+            $payment->setMessage($tokenPaymentDetails->getResponseMessage());
+            $payment->setRiskScore($tokenPaymentDetails->getRiskCheck());
+        } else {
+            $this->logger->info(sprintf(
+                'User %s does not have a valid payment method (Policy %s)',
+                $user->getId(),
+                $policy->getId()
+            ));
+            $payment->setResult(CheckoutPayment::RESULT_SKIPPED);
+        }
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        // Ensure the correct amount is paid
+        $this->validatePaymentAmount($payment);
+
+        // TODO: Validate receipt does not set commission on failed payments, but token does
+        // make consistent
+        $this->setCommission($payment);
+
+        $this->triggerPaymentEvent($payment);
+
+        return $payment;
+    }
+
+    public function setCommission($payment)
+    {
+        try {
+            $payment->setCommission();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
+    }
+
+    /**
+     * Refund a payment
+     *
+     * @param CheckoutPayment $payment
+     * @param float           $amount         Amount to refund (or null for entire initial amount)
+     * @param float           $totalCommision Total commission amount to refund (or null for entire amount from payment)
+     * @param string          $notes
+     * @param string          $source
+     *
+     * @return CheckoutPayment
+     */
+    public function refund(
+        CheckoutPayment $payment,
+        $amount = null,
+        $totalCommision = null,
+        $notes = null,
+        $source = null
+    ) {
+        if (!$amount) {
+            $amount = $payment->getAmount();
+        }
+        if (!$totalCommision) {
+            $totalCommision = $payment->getTotalCommission();
+        }
+        $policy = $payment->getPolicy();
+
+        // Refund is a negative payment
+        $refund = new CheckoutPayment();
+        $refund->setAmount(0 - $amount);
+        $refund->setNotes($notes);
+        $refund->setSource($source);
+        if ($policy->getCheckoutPaymentMethod()) {
+            $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
+        }
+        $policy->addPayment($refund);
+        $this->dm->persist($refund);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        $chargeService = $this->client->chargeService();
+        $chargeRefund = new ChargeRefund();
+        $chargeRefund->setChargeId($payment->getReceipt());
+        $chargeRefund->setValue($this->convertToPennies($amount));
+        try {
+            $refundDetails = $chargeService->refundCardChargeRequest($chargeRefund);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf(
+                'Error running refund %s (%0.2f >? %0.2f)',
+                $refund->getId(),
+                $this->toTwoDp(abs($refund->getAmount())),
+                $payment->getAmount()
+            ), ['exception' => $e]);
+
+            throw $e;
+        }
+
+        $receiptId = $refundDetails->getId();
+        $repo = $this->dm->getRepository(Payment::class);
+        $payment = $repo->findOneBy(['receiptId' => $receiptId]);
+        if ($payment) {
+            $receiptId = sprintf('R-%s', $receiptId);
+        }
+
+        $refund->setReceipt($receiptId);
+        $refund->setResult($refundDetails->getStatus());
+        $refund->setMessage($refundDetails->getResponseMessage());
+        $refund->setRiskScore($refundDetails->getRiskCheck());
+
+        $refundAmount = $this->convertFromPennies($refundDetails->getValue());
+        $refund->setAmount(0 - $refundAmount);
+        //$refund->setReference($refundModelDetails["yourPaymentReference"]);
+
+        $refund->setRefundTotalCommission($totalCommision);
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $refund;
+    }
+
+    public function processCsv(JudoFile $judoFile)
+    {
+        $filename = $judoFile->getFile();
+        $header = null;
+        $lines = array();
+        $dailyTransaction = array();
+
+        $payments = 0;
+        $numPayments = 0;
+        $refunds = 0;
+        $numRefunds = 0;
+        $declined = 0;
+        $numDeclined = 0;
+        $failed = 0;
+        $numFailed = 0;
+        $total = 0;
+        $maxDate = null;
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000)) !== false) {
+                if (!$header) {
+                    $header = $row;
+                } else {
+                    $line = array_combine($header, $row);
+                    $lines[] = $line;
+                    $transactionDate = \DateTime::createFromFormat(
+                        'd F Y H:i',
+                        $line['Date'],
+                        SoSure::getSoSureTimezone()
+                    );
+                    if (!$transactionDate) {
+                        throw new \Exception(sprintf('Unable to parse date %s', $line['Date']));
+                    }
+                    $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone('UTC'));
+
+                    if (!isset($dailyTransaction[$transactionDate->format('Ymd')])) {
+                        $dailyTransaction[$transactionDate->format('Ymd')] = 0;
+                    }
+
+                    if ($line['TransactionResult'] == "Transaction Successful") {
+                        if ($line['TransactionType'] == "Payment") {
+                            $total += $line['Net'];
+                            $payments += $line['Net'];
+                            $numPayments++;
+                            $dailyTransaction[$transactionDate->format('Ymd')] += $line['Net'];
+                        } elseif ($line['TransactionType'] == "Refund") {
+                            $total -= $line['Net'];
+                            $refunds += $line['Net'];
+                            $numRefunds++;
+                            $dailyTransaction[$transactionDate->format('Ymd')] -= $line['Net'];
+                        }
+                    } elseif ($line['TransactionResult'] == "Card Declined") {
+                        $declined += $line['Net'];
+                        $numDeclined++;
+                    } elseif ($line['TransactionResult'] == "Failed") {
+                        $failed += $line['Net'];
+                        $numFailed++;
+                    } elseif (mb_strlen(trim($line['TransactionResult'])) == 0) {
+                        $failed += $line['Net'];
+                        $numFailed++;
+
+                        // @codingStandardsIgnoreStart
+                        $body = sprintf(
+                            'Our csv export for last month included a blank transaction result for receipt %s. Please confirm the transaction was, in fact, a failure.',
+                            $line['ReceiptId']
+                        );
+                        // @codingStandardsIgnoreEnd
+
+                        $this->mailer->send(
+                            sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
+                            'developersupport@judopayments.com',
+                            $body,
+                            null,
+                            null,
+                            'tech@so-sure.com',
+                            'tech@so-sure.com'
+                        );
+                    } else {
+                        throw new \Exception(sprintf('Unknown Transaction Result: %s', $line['TransactionResult']));
+                    }
+
+                    $date = new \DateTime($line['Date']);
+                    if ($maxDate && $maxDate->format('m') != $date->format('m')) {
+                        throw new \Exception('Export should only be for the same calendar month');
+                    }
+
+                    if (!$maxDate || $maxDate > $date) {
+                        $maxDate = $date;
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
+        $data = [
+            'total' => $this->toTwoDp($total),
+            'payments' => $this->toTwoDp($payments),
+            'numPayments' => $numPayments,
+            'refunds' => $this->toTwoDp($refunds),
+            'numRefunds' => $numRefunds,
+            'date' => $maxDate,
+            'declined' => $this->toTwoDp($declined),
+            'numDeclined' => $numDeclined,
+            'failed' => $this->toTwoDp($failed),
+            'numFailed' => $numFailed,
+            'dailyTransaction' => $dailyTransaction,
+            'data' => $lines,
+        ];
+
+        $judoFile->addMetadata('total', $data['total']);
+        $judoFile->addMetadata('payments', $data['payments']);
+        $judoFile->addMetadata('numPayments', $data['numPayments']);
+        $judoFile->addMetadata('refunds', $data['refunds']);
+        $judoFile->addMetadata('numRefunds', $data['numRefunds']);
+        $judoFile->addMetadata('declined', $data['declined']);
+        $judoFile->addMetadata('numDeclined', $data['numDeclined']);
+        $judoFile->addMetadata('failed', $data['failed']);
+        $judoFile->addMetadata('numFailed', $data['numFailed']);
+        $judoFile->setDailyTransaction($data['dailyTransaction']);
+        $judoFile->setDate($data['date']);
+
+        return $data;
+    }
+
+    /**
+     * @param MultiPay  $multiPay
+     * @param float     $amount
+     * @param \DateTime $date
+     */
+    public function multiPay(MultiPay $multiPay, $amount, \DateTime $date = null)
+    {
+        $this->statsd->startTiming("judopay.multipay");
+
+        $policy = $multiPay->getPolicy();
+        if ($policy->getStatus() != PhonePolicy::STATUS_MULTIPAY_REQUESTED) {
+            throw new ProcessedException();
+        }
+
+        // Policy should NOT change to pending as will affect client
+        // Monitoring should be set on any policies with STATUS_MULTIPAY_REQUESTED
+        // that also have a multi pay set to aceepted
+        // $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $multiPay->getPayer()->addPayerPolicy($policy);
+        $this->dm->flush();
+
+        $payment = $this->tokenPay($policy, $amount, null, false);
+        if (!$payment->isSuccess()) {
+            return false;
+        }
+
+        $this->policyService->create($policy, $date, true);
+        $this->dm->flush();
+
+        $this->statsd->endTiming("judopay.multipay");
+
+        return true;
+    }
+
+    /**
+     *
+     * @param Policy    $policy
+     * @param double    $amount
+     * @param \DateTime $date
+     */
+    public function existing(Policy $policy, $amount, \DateTime $date = null)
+    {
+        $this->statsd->startTiming("judopay.existing");
+
+        $premium = $policy->getPremium();
+        if ($amount < $premium->getMonthlyPremiumPrice() &&
+            !$this->areEqualToTwoDp($amount, $premium->getMonthlyPremiumPrice())) {
+            throw new InvalidPremiumException();
+        } elseif ($amount > $premium->getYearlyPremiumPrice() &&
+            !$this->areEqualToTwoDp($amount, $premium->getYearlyPremiumPrice())) {
+            throw new InvalidPremiumException();
+        }
+
+        if (!$policy->getPayer()) {
+            $policy->setPayer($policy->getUser());
+        }
+
+        $payment = $this->tokenPay($policy, $amount, null, false);
+        if (!$payment->isSuccess()) {
+            return false;
+        }
+
+        $this->policyService->create($policy, $date, true);
+        $this->dm->flush();
+
+        $this->statsd->endTiming("judopay.existing");
+
+        return true;
+    }
+}

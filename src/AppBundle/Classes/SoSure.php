@@ -20,6 +20,10 @@ class SoSure
     const S3_BUCKET_POLICY = 'policy.so-sure.com';
     const S3_BUCKET_OPS = 'ops.so-sure.com';
 
+    const PAYMENT_PROVIDER_BACS = 'bacs';
+    const PAYMENT_PROVIDER_JUDO = 'judo';
+    const PAYMENT_PROVIDER_CHECKOUT = 'checkout';
+
     public static function getSoSureTimezone()
     {
         return new \DateTimeZone(self::TIMEZONE);

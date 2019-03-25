@@ -78,6 +78,7 @@ class DaviesHandlerClaim extends HandlerClaim
         'Thomas.Gibbs@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
+        'kitti@so-sure.com'
     ];
 
     public static $sheetNames = [
