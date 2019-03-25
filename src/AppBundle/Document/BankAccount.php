@@ -37,6 +37,8 @@ class BankAccount
         self::CANCELLER_SOSURE
     ];
 
+    const CANCEL_REASON_PERSONAL_DETAILS = 'cancel-personal-details';
+
 
     /**
      * @AppAssert\AlphanumericSpaceDot()

@@ -68,7 +68,10 @@ class BacsListener
                     $bankAccount->getAccountName(),
                     $user
                 )) {
-                    $bankAccount->cancelMandate(BankAccount::CANCELLER_SOSURE, 'personal-details-updated');
+                    $bankAccount->cancelMandate(
+                        BankAccount::CANCELLER_SOSURE,
+                        BankAccount::CANCEL_REASON_PERSONAL_DETAILS
+                    );
                     $this->bacsService->notifyMandateCancelledByNameChange($user);
                 }
             }
