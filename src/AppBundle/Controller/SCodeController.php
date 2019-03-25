@@ -84,7 +84,7 @@ class SCodeController extends BaseController
         $landingText = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_SCODE_LANDING_TEXT,
-            ['scode-landing-text-a', 'scode-landing-text-b']
+            ['scode-landing-text', 'scode-landing-text-b']
         );
 
         return array(
