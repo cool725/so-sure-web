@@ -612,6 +612,91 @@ class UserControllerTest extends BaseControllerTest
         $this->assertContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
     }
 
+    public function testUserPaymentDetailsCheckoutOtherUser()
+    {
+        $email = self::generateEmail('testUserPaymentDetailsCheckoutOtherUser', $this);
+        $email2 = self::generateEmail('testUserPaymentDetailsCheckoutOtherUser-2', $this);
+        $password = 'fooBar123!';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        self::$client = self::createClient();
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $this->login($email, $password, 'user');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/payment-details');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+
+        $cardDetails = $crawler->filter('#payment_card');
+        $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
+
+        $paymentForm = $crawler->filter('.payment-form')->getNode(0);
+        $this->assertNotNull($paymentForm);
+        $csrf = null;
+        $pennies = null;
+        if ($paymentForm) {
+            $csrf = $paymentForm->getAttribute('data-csrf');
+            $pennies = $paymentForm->getAttribute('data-value');
+        }
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user/payment-details');
+        $this->expectFlashSuccess($crawler, 'successfully updated');
+        $cardDetails = $crawler->filter('#payment_card');
+        $this->assertContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
+
+        $this->logout();
+        $this->login($email2, $password);
+
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(422);
+    }
+
     private function validateInviteAllowed($crawler, $allowed)
     {
         $count = 0;
