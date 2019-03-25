@@ -30,6 +30,12 @@ class BankAccount
     const CANCELLER_ADDACS = 'addacs';
     const CANCELLER_DDICS = 'ddics';
     const CANCELLER_SOSURE = 'sosure';
+    const CANCELLERS = [
+        self::CANCELLER_AUDDIS,
+        self::CANCELLER_ADDACS,
+        self::CANCELLER_DDICS,
+        self::CANCELLER_SOSURE
+    ];
 
 
     /**
@@ -555,7 +561,7 @@ class BankAccount
      * Gives you a text string explaining the mandate cancellation reason code.
      * @return string|null containing the explanation. If the mandate is not cancelled then it will be null.
      */
-    public function getSimplifiedMandateCancelledReason()
+    public function getMandateCancelledExplanation()
     {
         if (!$this->mandateCanceller) {
             return null;
