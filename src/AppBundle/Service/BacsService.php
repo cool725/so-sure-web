@@ -2293,16 +2293,19 @@ class BacsService
                 $processingDate = $date;
             }
 
-            $retry = $payment->getScheduledPayment()->getType() == ScheduledPayment::TYPE_RESCHEDULED;
-
+            // Find which submission code the debit should be sent with.
+            $bacsCode = null;
+            if ($bankAccount->isFirstPayment()) {
+                $bacsCode = self::BACS_COMMAND_FIRST_DIRECT_DEBIT;
+            } elseif ($payment->getScheduledPayment()->getType() == ScheduledPayment::TYPE_RESCHEDULED) {
+                $bacsCode = self::BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION;
+            } else {
+                $bacsCode = self::BACS_COMMAND_DIRECT_DEBIT;
+            }
             $lines[] = implode(',', [
                 sprintf('"%s"', $processingDate->format('d/m/y')),
                 '"Scheduled Payment"',
-                $bankAccount->isFirstPayment() ?
-                    sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
-                    $retry ?
-                        sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION) :
-                        sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
+                sprintf('"%s"', $bacsCode),
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),
