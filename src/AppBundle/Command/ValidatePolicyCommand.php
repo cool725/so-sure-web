@@ -11,6 +11,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
+use AppBundle\Service\BacsService;
 use Aws\S3\S3Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
@@ -167,6 +168,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // If bacs has not yet gone through today then we stop the whole thing and can do it later.
+        if (!$this->redis->get(BacsService::KEY_BACS_PROCESSED)) {
+            $output->writeln("bacs has not processed today. Aborting.");
+            return;
+        }
+
+        // Normal functionality.
         $lines = [];
         $csvData = [];
         $policies = [];

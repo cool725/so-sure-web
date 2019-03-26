@@ -57,6 +57,7 @@ class BacsService
     const SUN = '176198';
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
+    const KEY_BACS_PROCESSED = 'bacs:processed';
 
     // special key to use to adjust file date instead of storing in metadata
     const SPECIAL_METADATA_FILE_DATE = 'file-date';
@@ -307,6 +308,14 @@ class BacsService
                 $results['autoApprove'] = $this->autoApprovePaymentsAndMandates($date);
             }
         }
+
+        // State that bacs has been processed for the rest of the day.
+        $time = new \DateTime(SoSure::TIMEZONE);
+        $this->redis->setex(
+            self::KEY_BACS_PROCESSED,
+            $this->endOfDay($time)->getTimestamp() - $time->getTimestamp(),
+            $time->format("d-m-Y H:i")
+        );
 
         return $results;
     }
