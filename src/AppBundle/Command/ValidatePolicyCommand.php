@@ -170,7 +170,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     {
         // If bacs has not yet gone through today then we stop the whole thing and can do it later.
         if (!$this->redis->get(BacsService::KEY_BACS_PROCESSED)) {
-            $output->writeln("bacs has not processed today. Aborting.");
+            $output->writeln("bacs has not been processed today. Aborting.");
             return;
         }
 
