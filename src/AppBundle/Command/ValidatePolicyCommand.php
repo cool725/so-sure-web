@@ -549,8 +549,18 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     } elseif ($bankAccount->isAfterInitialNotificationDate() === null) {
                         $lines[] = 'Warning!! Missing initial notification date';
                     }
+
+                    // if the mandate standard date and the policy billing date do not match.
+                    if ($bankAccount->getStandardNotificationDate() != $policy->getBilling()) {
+                        $lines[] = sprintf(
+                            'Warning!! Policy %s\'s billing date and mandate standard notification date don\'t match.',
+                            $policy->getPolicyNumber()
+                        );
+                    }
                 }
             }
+
+
         } catch (\Exception $e) {
             $lines[] = sprintf('Exception!! Msg; %s', $e->getMessage());
         }
