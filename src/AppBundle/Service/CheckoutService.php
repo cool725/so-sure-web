@@ -862,6 +862,8 @@ class CheckoutService
                 'avsCheck' => $card->getAvsCheck(),
             ];
             $checkoutPaymentMethod->addCardToken($card->getId(), json_encode($cardDetails));
+        } else {
+            $checkoutPaymentMethod->setCardToken($card->getId());
         }
     }
 

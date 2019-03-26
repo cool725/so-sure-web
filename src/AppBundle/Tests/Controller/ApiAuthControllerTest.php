@@ -3537,6 +3537,26 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(self::$CHECKOUT_TEST_CARD2_EXP_DATE, $data['card_details']['end_date']);
         $this->assertEquals(self::$CHECKOUT_TEST_CARD2_TYPE, $data['card_details']['type']);
         $this->assertEquals(self::$CHECKOUT_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
+
+        $token = $checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => $token->getId(),
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $updatedPolicy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_NAME, $data['payment_details']);
+        $this->assertEquals('checkout', $data['payment_method']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_EXP_DATE, $data['card_details']['end_date']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_TYPE, $data['card_details']['type']);
+        $this->assertEquals(self::$CHECKOUT_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
     }
 
     public function testUpdatePolicyPaymentBacsOk()

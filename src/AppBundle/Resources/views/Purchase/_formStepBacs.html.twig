@@ -20,7 +20,7 @@
               data-payment-mode="cards"
               data-card-form-mode="cardTokenisation"
               data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-              data-url="{{ url('purchase_checkout', {'id': policy.id }) }}"
+              data-url="{{ url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
               data-redirect-url="{{ path('user_welcome', {id: policy.id}) }}"
               data-title="Pay now"
               data-subtitle="Please enter your card details">
@@ -144,7 +144,7 @@
 
 
 <div id="so-sure-loader" class="loader">
-    <div class="loader__inner d-flex align-items-center flex-column justify-content-center">
+    <div class="loader__inner d-flex">
         <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_loader.svg" alt="loading...">
         <small class="text-grey">Payments powered by</small><br>
         <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px">

@@ -333,7 +333,7 @@ class BICommand extends ContainerAwareCommand
             '"Expected Unpaid Cancellation Date"',
             '"Bacs Mandate Status"',
             '"First time policy"',
-            '"Has Successful User Payment Credit"'
+            '"Successful Payment"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */

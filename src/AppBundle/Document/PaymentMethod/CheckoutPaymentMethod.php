@@ -56,6 +56,11 @@ class CheckoutPaymentMethod extends PaymentMethod
         return $this->customerId;
     }
 
+    public function setCardToken($cardToken)
+    {
+        $this->cardToken = $cardToken;
+    }
+
     public function addCardToken($key, $json)
     {
         $this->cardToken = $key;

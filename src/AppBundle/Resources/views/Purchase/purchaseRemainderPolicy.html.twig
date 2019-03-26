@@ -45,7 +45,7 @@
                               data-public-key="{{ checkout_public_key }}"
                               data-customer-email="{{ app.user.email }}"
                               data-value="{{ convert_to_pennies(amount) }}"
-                              data-url="{{ url('purchase_checkout_remainder', {'id': policy.id }) }}"
+                              data-url="{{ url('purchase_checkout_remainder', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
                               data-currency="GBP"
                               data-payment-mode="cards"
@@ -75,6 +75,9 @@
             </div>
         </div>
     </section>
+
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
 
     {# Page Modals #}
 

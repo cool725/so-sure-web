@@ -9,9 +9,11 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\CurrencyTrait;
 
 class PolicyRepository extends BaseDocumentRepository
 {
+    use CurrencyTrait;
     use DateTrait;
 
     public function isPromoLaunch($policyPrefix)
@@ -276,5 +278,34 @@ class PolicyRepository extends BaseDocumentRepository
         return $qb
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * Finds a list of all expired policies which have been renewed and do not have either a cashback or a discout on
+     * the renewal policy despite having pot value.
+     * @return array containing all such policies.
+     */
+    public function findBlockedDiscountPolicies()
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('nextPolicy')->notEqual(null)
+            ->field('potValue')->gt(0)
+            ->field('cashback')->exists(false);
+        return array_filter($qb->getQuery()->execute()->toArray(), function ($policy) {
+            $next = $policy->getNextPolicy();
+            if ($next->getPremium()->getAnnualDiscount() > 0) {
+                return false;
+            }
+            if ($policy->hasOpenClaim() || $policy->hasOpenNetworkClaim()) {
+                return false;
+            }
+            if (!$policy->getConnections()) {
+                return false;
+            }
+            if ($policy->hasMonetaryClaimed() || count($policy->getNetworkClaims(true, true)) > 0) {
+                return false;
+            }
+            return true;
+        });
     }
 }
