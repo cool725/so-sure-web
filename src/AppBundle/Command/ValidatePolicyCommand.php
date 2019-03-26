@@ -559,8 +559,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     }
                 }
             }
-
-
         } catch (\Exception $e) {
             $lines[] = sprintf('Exception!! Msg; %s', $e->getMessage());
         }
