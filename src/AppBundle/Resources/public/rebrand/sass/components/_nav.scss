@@ -86,6 +86,12 @@
     }
 }
 
+.landing-facebook {
+    .navbar-scrolled:not(.devbar) {
+        @include facebook-gradient;
+    }
+}
+
 .navbar-scrolled-quote {
     visibility: hidden;
 }

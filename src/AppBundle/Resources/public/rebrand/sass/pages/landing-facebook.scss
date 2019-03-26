@@ -13,7 +13,7 @@
     padding-bottom: 4rem;
     overflow: hidden;
 
-    @include twitter-gradient;
+    @include facebook-gradient;
 
     .container {
         position: relative;
@@ -35,7 +35,7 @@
         }
 
         @include media-breakpoint-up(lg) {
-            padding-top: 4rem;
+            // padding-top: 4rem;
         }
 
         @include media-breakpoint-up(xl) {
@@ -48,15 +48,15 @@
         position: relative;
         z-index: 4;
 
-        @include media-breakpoint-up(lg) {
-            width: 740px;
-            position: absolute;
-            top: 150px; right: 0;
-        }
+        // @include media-breakpoint-up(lg) {
+        //     width: 740px;
+        //     position: absolute;
+        //     top: 150px; right: 0;
+        // }
 
-        @include media-breakpoint-up(fl) {
-            top: 200px;
-        }
+        // @include media-breakpoint-up(fl) {
+        //     top: 200px;
+        // }
     }
 
     &:before {
@@ -65,38 +65,52 @@
         top: 0; left: 0; right: 0; bottom: 0;
         content: '';
         z-index: 1;
-        background-image: url('#{$cdn_url}/images/rebrand/twitter/so-sure_twitter-hero-background-offset-mobile.svg');
+        background-image: url('#{$cdn_url}/images/rebrand/facebook/so-facebook-hero-background-offset-mobile.svg');
         background-size: cover;
     }
 
     @include media-breakpoint-up(lg) {
         &:before {
-            background-image: url('#{$cdn_url}/images/rebrand/twitter/so-sure_twitter-hero-background-offset.svg ');
+            background-image: url('#{$cdn_url}/images/rebrand/facebook/so-sure_facebook-hero-background-offset.svg');
         }
     }
 }
 
+// .cred {
+//     text-align: center;
+//     background-color: $ultramarine;
+//     position: relative;
+//     z-index: 5;
+
+//     img {
+//         width: 100px;
+//         margin: 0.5rem;
+//         // opacity: 0.3;
+
+//         @include media-breakpoint-up(lg) {
+//             width: 120px;
+//             margin: 0;
+//         }
+//     }
+// }
+
 .cred {
     text-align: center;
-    background-color: $ultramarine;
-    position: relative;
-    z-index: 5;
+    background-color: darken($pattens-blue, 5%);
 
     img {
         width: 100px;
-        margin: 0.5rem;
-        // opacity: 0.3;
+        opacity: 0.6;
 
         @include media-breakpoint-up(lg) {
             width: 120px;
-            margin: 0;
         }
     }
 }
 
 .intro {
     text-align: center;
-    @include twitter-gradient;
+    @include facebook-gradient;
 }
 
 .comparison-table {
@@ -152,7 +166,7 @@
 }
 
 .claims {
-    @include twitter-gradient;
+    @include facebook-gradient;
     text-align: center;
 
     &__step {
@@ -171,7 +185,7 @@
 
     &__number {
         width: 55px; height: 55px;
-        background-color: $dodger-blue;
+        background-color: $white;
         margin: 0 auto 1.2rem;
 
         @include border-radius(50%);
