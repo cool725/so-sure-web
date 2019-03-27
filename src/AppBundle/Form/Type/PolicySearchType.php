@@ -75,6 +75,7 @@ class PolicySearchType extends BaseType
                 'placeholder' => 'Any',
                 'choices' => [
                     'Judo' => 'judo',
+                    'Checkout' => 'checkout',
                     'Bacs' => 'bacs',
                 ]
             ])
