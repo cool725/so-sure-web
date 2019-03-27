@@ -465,7 +465,7 @@
                                 {% endif %}
                                 {% if policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                                     <tr>
-                                        <td>Card {% if policy.hasJudoPaymentMethod %}on policy{% else %}on user{% endif %}</td>
+                                        <td>Card (Judo) {% if policy.hasJudoPaymentMethod %}on policy{% else %}on user{% endif %}</td>
                                         <td class="{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.isCardExpired %}danger{% endif %}">
                                             {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
                                             <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank" rel="noopener noreferrer">
@@ -473,6 +473,14 @@
                                             </a>
                                         </td>
 
+                                    </tr>
+                                {% endif %}
+                                {% if policy.isPolicy and policy.hasCheckoutPaymentMethod %}
+                                    <tr>
+                                        <td>Card (Checkout) on policy</td>
+                                        <td class="{% if policy.getCheckoutPaymentMethod.isCardExpired %}danger{% endif %}">
+                                            {{ policy.getCheckoutPaymentMethod }}
+                                        </td>
                                     </tr>
                                 {% endif %}
                                 {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
@@ -1283,6 +1291,16 @@
                                 </button>
                             </td>
                         </tr>
+                    {% elseif policy.isPolicy and policy.hasCheckoutPaymentMethod %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Refund Checkout</td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#checkoutRefundForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
+                            </td>
+                        </tr>
                     {% endif %}
                 {% endif %}
             </table>
@@ -1967,6 +1985,7 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}

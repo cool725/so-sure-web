@@ -2,7 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
-use AppBundle\Document\Form\JudoRefund;
+use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Repository\PaymentRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class JudoRefundType extends AbstractType
+class CardRefundType extends AbstractType
 {
     use ValidatorTrait;
 
@@ -30,7 +30,7 @@ class JudoRefundType extends AbstractType
             ->add('add', SubmitType::class);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            /** @var JudoRefund $judoRefund */
+            /** @var CardRefund $judoRefund */
             $judoRefund = $event->getData();
             $form = $event->getForm();
 
@@ -57,7 +57,7 @@ class JudoRefundType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Form\JudoRefund',
+            'data_class' => 'AppBundle\Document\Form\CardRefund',
         ));
     }
 }
