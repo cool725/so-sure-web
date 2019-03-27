@@ -2040,7 +2040,7 @@ abstract class Policy
                 $total -= $payment->getAmount();
             }
         }
-        return $amount;
+        return $total;
     }
 
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)

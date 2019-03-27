@@ -323,7 +323,6 @@ class BacsPayment extends Payment
                 $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
                 $policy->addScheduledPayment($scheduledPayment);
-                $this->dm->flush();
             }
         }
 
