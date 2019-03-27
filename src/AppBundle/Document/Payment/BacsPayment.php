@@ -288,7 +288,7 @@ class BacsPayment extends Payment
                 'Attempting to approve payment %s before reversal date (%s) is past. policy: %s',
                 $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y'),
-                $this->getPolicy()
+                $this->getPolicy()->getPolicyNumber()
             ));
         }
 
@@ -325,7 +325,7 @@ class BacsPayment extends Payment
                 'Attempting to reject payment %s before reversal date (%s) is past. policy: %s',
                 $this->getId(),
                 $this->getBacsReversedDate()->format('d m Y'),
-                $this->getPolicy()
+                $this->getPolicy()->getPolicyNumber()
             ));
         }
 
