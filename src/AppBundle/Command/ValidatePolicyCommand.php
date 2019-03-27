@@ -163,16 +163,18 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Set the picsure status from the policy on the s3file metadata'
             )
+            ->addOption(
+                'force',
+                null,
+                InputOption::VALUE_NONE,
+                'Run regardless of bacs flags'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // If bacs has not yet gone through today then we stop the whole thing and can do it later.
-        if (!$this->redis->get(BacsService::KEY_BACS_PROCESSED)) {
-            $output->writeln("bacs has not been processed today. Aborting.");
-            return;
-        }
+
 
         // Normal functionality.
         $lines = [];
@@ -190,6 +192,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $skipCancelled = true === $input->getOption('skip-cancelled');
         $flushPolicyRedis = true === $input->getOption('flush-policy-redis');
         $unpaid = $input->getOption('unpaid');
+        $force = $input->getOption('force');
         if (!in_array($unpaid, [null, 'all', 'expiry', 'none'])) {
             throw new \Exception(sprintf('Unknown option for unpaid: %s', $unpaid));
         }
@@ -198,6 +201,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $validateDate = null;
         if ($date) {
             $validateDate = new \DateTime($date);
+        }
+
+        // If this key is not set it means either bacs has not processed today or we have already run this command.
+        if (!$this->redis->get(BacsService::KEY_BACS_PROCESSED) && !$force) {
+            $output->writeln("Skipping validation as bacs processed flag is not set.");
+            return;
         }
 
         if ($resyncPicsure) {
@@ -342,6 +351,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             $output->writeln(implode(PHP_EOL, $lines));
             $output->writeln('Finished');
+
+            // get rid of the bacs processed flag so we do not run this command twice in a row.
+            if (!$force) {
+                $this->redis->del(BacsService::KEY_BACS_PROCESSED);
+            }
         }
     }
 
