@@ -354,7 +354,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             // get rid of the bacs processed flag so we do not run this command twice in a row.
             if (!$force) {
-                $this->redis->del(BacsService::KEY_BACS_PROCESSED);
+                $this->redis->del([BacsService::KEY_BACS_PROCESSED]);
             }
         }
     }
