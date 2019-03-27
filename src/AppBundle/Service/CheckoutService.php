@@ -854,7 +854,7 @@ class CheckoutService
         if (!isset($tokens[$card->getId()])) {
             $cardDetails = [
                 'cardLastFour' => $card->getLast4(),
-                'endDate' => sprintf('%s%s', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
+                'endDate' => sprintf('%02d%02d', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
                 'cardType' => $card->getPaymentMethod(),
                 'fingerprint' => $card->getFingerprint(),
                 'authCode' => $card->getAuthCode(),
