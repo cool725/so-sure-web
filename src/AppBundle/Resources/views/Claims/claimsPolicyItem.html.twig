@@ -1291,6 +1291,16 @@
                                 </button>
                             </td>
                         </tr>
+                    {% elseif policy.isPolicy and policy.hasCheckoutPaymentMethod %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Refund Checkout</td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#checkoutRefundForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
+                            </td>
+                        </tr>
                     {% endif %}
                 {% endif %}
             </table>
@@ -1975,6 +1985,7 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}

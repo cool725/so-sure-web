@@ -13,7 +13,7 @@ use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\CashflowsFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
-use AppBundle\Document\Form\JudoRefund;
+use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
@@ -21,7 +21,7 @@ use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
-use AppBundle\Form\Type\JudoRefundType;
+use AppBundle\Form\Type\CardRefundType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -46,6 +46,7 @@ use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
 use AppBundle\Service\CashflowsService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\ClaimsService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\LloydsService;
@@ -245,10 +246,10 @@ class AdminController extends BaseController
             throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
         }
 
-        $judoRefund = new JudoRefund();
+        $judoRefund = new CardRefund();
         $judoRefund->setPolicy($policy);
         $judoRefundForm = $this->get('form.factory')
-            ->createNamedBuilder('judo_refund_form', JudoRefundType::class, $judoRefund)
+            ->createNamedBuilder('judo_refund_form', CardRefundType::class, $judoRefund)
             ->setAction($this->generateUrl(
                 'judo_refund_form',
                 ['id' => $policy->getId()]
@@ -300,6 +301,78 @@ class AdminController extends BaseController
         ];
     }
 
+    /**
+     * @Route("/checkout-refund/{id}", name="checkout_refund_form")
+     * @Template
+     */
+    public function checkoutRefundFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        /** @var Policy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $checkoutRefund = new CardRefund();
+        $checkoutRefund->setPolicy($policy);
+        $checkoutRefundForm = $this->get('form.factory')
+            ->createNamedBuilder('checkout_refund_form', CardRefundType::class, $checkoutRefund)
+            ->setAction($this->generateUrl(
+                'checkout_refund_form',
+                ['id' => $policy->getId()]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('checkout_refund_form')) {
+                $checkoutRefundForm->handleRequest($request);
+                if ($checkoutRefundForm->isValid()) {
+                    /** @var CheckoutService $checkoutService */
+                    $checkoutService = $this->get('app.checkout');
+
+                    try {
+                        $checkoutService->refund(
+                            $checkoutRefund->getPayment(),
+                            $checkoutRefund->getAmount(),
+                            $checkoutRefund->getTotalCommission(),
+                            $checkoutRefund->getNotes()
+                        );
+
+                        $policy->addNoteDetails(
+                            $checkoutRefund->getNotes(),
+                            $this->getUser(),
+                            'Checkout Refund'
+                        );
+
+                        $dm->flush();
+
+                        $this->addFlash(
+                            'success',
+                            sprintf('Successfully refunded payment of £%s', $checkoutRefund->getAmount())
+                        );
+                    } catch (\Exception $e) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Error processing refund: %s', $e)
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'checkout_refund_form' => $checkoutRefundForm->createView(),
+            'policy' => $policy,
+        ];
+    }
 
     /**
      * @Route("/phone", name="admin_phone_add")
