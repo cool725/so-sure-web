@@ -5834,6 +5834,29 @@ class PhonePolicyTest extends WebTestCase
      */
     public function testGetScheduledPaymentRefunds()
     {
+        // not refunds.
+        for ($i = 0; $i < 5; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+            $scheduledPayment->setAmount(1.1);
+            $scheduledPayment->setScheduled(clone $date);
+            $policy->addScheduledPayment($scheduledPayment);
+        }
+        // refunds.
+        $refunds = [];
+        for ($i = 0; $i < 5; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
+            $scheduledPayment->setAmount(0.82);
+            $scheduledPayment->setScheduled(clone $date);
+            $policy->addScheduledPayment($scheduledPayment);
+            $refunds[] = $scheduledPayment;
+        }
+        // now see
+
+
 
     }
 
