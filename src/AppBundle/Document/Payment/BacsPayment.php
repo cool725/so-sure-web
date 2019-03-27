@@ -310,6 +310,23 @@ class BacsPayment extends Payment
             $this->getScheduledPayment()->setStatus(ScheduledPayment::STATUS_SUCCESS);
         }
 
+        // if the policy is owning this payment no longer active then we have to refund.
+        $policy = $this->getPolicy();
+        if ($policy && $policy->isCancelled()) {
+            $refund = $policy->getRefundAmount(false, false, true);
+            if ($refund > 0) {
+                $scheduledPayment = new ScheduledPayment();
+                $scheduledPayment->setAmount(0 - $refund);
+                $scheduledPayment->setPolicy($policy);
+                $scheduledPayment->setNotes('refund for bacs payment after cancellation');
+                $scheduledPayment->setScheduled(new \DateTime());
+                $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                $policy->addScheduledPayment($scheduledPayment);
+                $this->dm->flush();
+            }
+        }
+
         $this->setPolicyStatusActiveIfUnpaid();
     }
 

@@ -1375,7 +1375,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPotValue(120);
     }
-    
+
     public function testSetPolicyLaunchValueOk()
     {
         $user = new User();
@@ -2403,7 +2403,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
         $policy->setPremiumInstallments(12);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        
+
         $renewal = new SalvaPhonePolicy();
         $renewal->setPhone(static::$phone);
         $renewal->init($user, static::getLatestPolicyTerms(self::$dm));
@@ -2412,7 +2412,7 @@ class PhonePolicyTest extends WebTestCase
         $renewal->setStatus(Policy::STATUS_ACTIVE);
 
         $policy->link($renewal);
-        
+
         $this->assertEquals(
             new \DateTime('2017-01-01 00:00'),
             $renewal->getNextBillingDate(new \DateTime('2017-01-01'))
@@ -2698,7 +2698,7 @@ class PhonePolicyTest extends WebTestCase
             $this->assertTrue(in_array($scode->getCode(), [$scodeB->getCode(), $scodeC->getCode()]));
         }
     }
-    
+
 
     public function testPolicyActualFraudNoRefund()
     {
@@ -3487,7 +3487,7 @@ class PhonePolicyTest extends WebTestCase
             new \DateTime('2016-03-31', $timezone),
             $policy->getPolicyExpirationDate()
         );
-    
+
         // add a late payment
         self::addPayment(
             $policy,
@@ -4237,7 +4237,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithClaim', $this));
 
         $this->assertFalse($policy->isRenewed());
-        
+
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
@@ -5827,5 +5827,21 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate($now, true, false, true));
         $policy->setPolicyStatusUnpaidIfActive(true);
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+    }
+
+    /**
+     * Tests if the get scheduled payment refunds method works correctly.
+     */
+    public function testGetScheduledPaymentRefunds()
+    {
+
+    }
+
+    /**
+     * Tests if the get scheduled payment refunds method works correctly.
+     */
+    public function testGetScheduledPaymentRefundAmount()
+    {
+
     }
 }
