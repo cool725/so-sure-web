@@ -208,6 +208,25 @@ class DefaultController extends BaseController
         return $this->render('AppBundle:Default:indexTwitter.html.twig', $data);
     }
 
+    /**
+     * @Route("/facebook", name="facebook")
+     */
+    public function facebookLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'facebook'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexFacebook.html.twig', $data);
+    }
+
     private function competitorsData()
     {
         $competitor = [
