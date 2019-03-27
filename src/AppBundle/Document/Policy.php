@@ -1539,7 +1539,6 @@ abstract class Policy
                 $connections[] = $connection;
             }
         }
-
         return $connections;
     }
 
