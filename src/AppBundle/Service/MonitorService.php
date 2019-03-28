@@ -291,7 +291,7 @@ class MonitorService
                 continue;
             }
             */
-            
+
             /** @var mixed $intercomUser */
             $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
             if (is_object($intercomUser)) {
@@ -1123,6 +1123,27 @@ class MonitorService
                 "Found %d blocked scheduled payments. Ids: %s",
                 count($blockedItems),
                 $this->quoteSafeArrayToString($blockedItems)
+            ));
+        }
+    }
+
+    /**
+     * Checks for reward pot payouts that were blocked by open claims which can now be paid.
+     */
+    public function blockedRewardPot()
+    {
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findBlockedDiscountPolicies();
+        if ($policies) {
+            $items = [];
+            foreach ($policies as $policy) {
+                $items[] = $policy->getId()." -> ".$policy->getNextPolicy()->getId();
+            }
+            throw new MonitorException(sprintf(
+                "%d policies have unpaid reward pot discount due to previously open claims: %s",
+                count($items),
+                $this->quoteSafeArrayToString($items)
             ));
         }
     }

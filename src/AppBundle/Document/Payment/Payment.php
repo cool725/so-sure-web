@@ -24,6 +24,7 @@ use AppBundle\Document\ScheduledPayment;
  * @MongoDB\DiscriminatorMap({
  *      "judo"="JudoPayment",
  *      "sosure"="SoSurePayment",
+ *      "checkout"="CheckoutPayment",
  *      "bacs"="BacsPayment",
  *      "bacsIndemnity"="BacsIndemnityPayment",
  *      "chargeback"="ChargebackPayment",
