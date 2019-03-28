@@ -190,6 +190,25 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/snapchat-b", name="snapchat-b")
+     */
+    public function snapchatbLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'snapchat-b'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexSnapchatB.html.twig', $data);
+    }
+
+    /**
      * @Route("/twitter", name="twitter")
      */
     public function twitterLanding()

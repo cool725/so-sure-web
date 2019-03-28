@@ -58,7 +58,8 @@
 .error-page,
 .landing-snapchat,
 .landing-twitter,
-.landing-facebook, {
+.landing-facebook,
+.landing-snapchat-b {
     .navbar-so-sure {
         background-image: none;
     }
@@ -71,6 +72,18 @@
         width: 120px; height: 30px;
         background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-light.svg') no-repeat center center;
         background-size: 120px;
+    }
+}
+
+.landing-snapchat-b {
+    // Logo bits
+    .navbar-brand {
+
+        &__logo {
+            width: 120px; height: 28px;
+            background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-yellow.svg') no-repeat center center;
+            background-size: 118px;
+        }
     }
 }
 
@@ -92,6 +105,12 @@
     }
 }
 
+.landing-snapchat-b {
+    .navbar-scrolled:not(.devbar) {
+        @include snapchat-gradient-90;
+    }
+}
+
 .navbar-scrolled-quote {
     visibility: hidden;
 }
@@ -105,29 +124,29 @@
         outline: 0;
     }
 
-    &.is-active {
+    // &.is-active {
 
-        .hamburger-inner {
-            &,
-            &::before,
-            &::after {
-                background-color: $white;
-            }
-        }
-    }
+    //     .hamburger-inner {
+    //         &,
+    //         &::before,
+    //         &::after {
+    //             background-color: $white;
+    //         }
+    //     }
+    // }
 }
 
-.navbar-light {
-    .hamburger {
-        .hamburger-inner {
-            &,
-            &::before,
-            &::after {
-                background-color: $white;
-            }
-        }
-    }
-}
+// .navbar-light {
+//     .hamburger {
+//         .hamburger-inner {
+//             &,
+//             &::before,
+//             &::after {
+//                 background-color: $white;
+//             }
+//         }
+//     }
+// }
 
 
 // Page specific
