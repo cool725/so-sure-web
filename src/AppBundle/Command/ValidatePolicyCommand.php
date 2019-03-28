@@ -565,7 +565,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     }
 
                     // if the mandate standard date and the policy billing date do not match.
-                    if ($bankAccount->getStandardNotificationDate() != $policy->getBilling()) {
+                    if (!$this->isSameDay($bankAccount->getStandardNotificationDate(), $policy->getBilling())) {
                         $lines[] = sprintf(
                             'Warning!! Policy %s\'s billing date and mandate standard notification date don\'t match.',
                             $policy->getPolicyNumber()
