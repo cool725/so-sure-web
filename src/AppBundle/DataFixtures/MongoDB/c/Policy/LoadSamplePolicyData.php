@@ -1097,7 +1097,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $status = rand(0, 4);
         if ($status == 0) {
             $canceller = array_rand(BankAccount::CANCELLERS);
-            if (array_has_key($canceller, BankAccount::CANCEL_REASONS)) {
+            if (array_key_exists($canceller, BankAccount::CANCEL_REASONS)) {
                 $bankAccount->cancelMandate($canceller, array_rand(BankAccount::CANCELLERS[$canceller]));
             } elseif ($canceller == BankAccount::CANCELLER_SOSURE) {
                 $bankAccount->cancelMandate($canceller, BankAccount::CANCEL_REASON_PERSONAL_DETAILS);
