@@ -126,7 +126,7 @@ Vagrant.configure("2") do |config|
     dev1804_nonfs_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
     dev1804_nonfs_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
     dev1804_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
-    dev1804_nonfs_config.vm.synced_folder ".", "/vagrant"
+    dev1804_nonfs_config.vm.synced_folder ".", "/vagrant" , mount_options: ["dmode=777,fmode=777"]
     dev1804_nonfs_config.ssh.forward_agent = true
 
     dev1804_nonfs_config.vm.provision "shell",
