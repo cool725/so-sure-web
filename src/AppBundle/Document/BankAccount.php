@@ -40,30 +40,30 @@ class BankAccount
 
     const CANCEL_REASONS = [
         self::CANCELLER_AUDDIS => [
-            BacsService::AUDDIS_REASON_USER => 'yeet',
-            BacsService::AUDDIS_REASON_DECEASED => 'yeet',
-            BacsService::AUDDIS_REASON_TRANSFER => 'yeet',
-            BacsService::AUDDIS_REASON_NO_ACCOUNT => 'yeet',
-            BacsService::AUDDIS_REASON_NO_INSTRUCTION => 'yeet',
-            BacsService::AUDDIS_REASON_NON_ZERO => 'yeet',
-            BacsService::AUDDIS_REASON_CLOSED => 'yeet',
-            BacsService::AUDDIS_REASON_TRANSFER_BRANCH => 'yeet',
-            BacsService::AUDDIS_REASON_INVALID_ACCOUNT_TYPE => 'yeet',
-            BacsService::AUDDIS_REASON_DD_NOT_ALLOWED => 'yeet',
-            BacsService::AUDDIS_REASON_EXPIRED => 'yeet',
-            BacsService::AUDDIS_REASON_DUPLICATE_REFERENCE => 'yeet',
-            BacsService::AUDDIS_REASON_INCORRECT_DETAILS => 'yeet',
-            BacsService::AUDDIS_REASON_CODE_INCOMPATIBLE => 'yeet',
-            BacsService::AUDDIS_REASON_NOT_ALLOWED => 'yeet',
-            BacsService::AUDDIS_REASON_INVALID_REFERENCE => 'yeet',
-            BacsService::AUDDIS_REASON_MISSING_PAYER_NAME => 'yeet',
-            BacsService::AUDDIS_REASON_MISSING_SERVICE_NAME => 'yeet'
+            BacsService::AUDDIS_REASON_USER => 'Instruction cancelled by user',
+            BacsService::AUDDIS_REASON_DECEASED => 'Payer deceased',
+            BacsService::AUDDIS_REASON_TRANSFER => 'Account transferred',
+            BacsService::AUDDIS_REASON_NO_ACCOUNT => 'No account',
+            BacsService::AUDDIS_REASON_NO_INSTRUCTION => 'No instruction',
+            BacsService::AUDDIS_REASON_NON_ZERO => 'DDI amount not zero',
+            BacsService::AUDDIS_REASON_CLOSED => 'Account closed',
+            BacsService::AUDDIS_REASON_TRANSFER_BRANCH => 'Account transferred to different branch',
+            BacsService::AUDDIS_REASON_INVALID_ACCOUNT_TYPE => 'Invalid account type',
+            BacsService::AUDDIS_REASON_DD_NOT_ALLOWED => 'Bank will not accept direct debits',
+            BacsService::AUDDIS_REASON_EXPIRED => 'Instruction has expired',
+            BacsService::AUDDIS_REASON_DUPLICATE_REFERENCE => 'Payer reference is not unique',
+            BacsService::AUDDIS_REASON_INCORRECT_DETAILS => 'Account details incorrect',
+            BacsService::AUDDIS_REASON_CODE_INCOMPATIBLE => 'Incorrect transaction code sent',
+            BacsService::AUDDIS_REASON_NOT_ALLOWED => 'Transaction disallowed at branch',
+            BacsService::AUDDIS_REASON_INVALID_REFERENCE => 'Invalid Reference',
+            BacsService::AUDDIS_REASON_MISSING_PAYER_NAME => 'Payer name missing',
+            BacsService::AUDDIS_REASON_MISSING_SERVICE_NAME => 'Service User Name missing'
         ],
         self::CANCELLER_ADDACS => [
-            BacsService::ADDACS_REASON_BANK => 'yet',
-            BacsService::ADDACS_REASON_USER => 'yeet',
-            BacsService::ADDACS_REASON_DECEASED => 'f',
-            BacsService::ADDACS_REASON_TRANSFER => 'd'
+            BacsService::ADDACS_REASON_BANK => 'Instruction cancelled, refer to payer',
+            BacsService::ADDACS_REASON_USER => 'Instruction cancelled by payer',
+            BacsService::ADDACS_REASON_DECEASED => 'Payer deceased',
+            BacsService::ADDACS_REASON_TRANSFER => 'Account transferred'
         ]
     ];
 
