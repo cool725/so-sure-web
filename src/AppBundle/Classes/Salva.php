@@ -31,6 +31,7 @@ class Salva
         '58341bfc1d255d3f0a6641c9', // should not have been upgrade
         '59d47a1496a9626f3c3b8650', // dispossion, but was cancelled much later than should have been
         '5b808f2bb1e212103e4a6e3f', // Manual verified this is ok
+        '5ae7a1271eae627ff4735599', // kitti requested full payment
     ];
 
     public static $commissionValidationExclusions = [
@@ -72,6 +73,7 @@ class Salva
         '59ef69bb7a3db40bfd2a7a67', // not fully paid policy; logic is slightly off, but ignore policy for now
         '5a5770754ea92e22451bbef7', // not fully paid policy; logic is slightly off, but ignore policy for now
         '5bc30ac971f06f50e106e225', // full refund as duplicate policies purchased
+        '5ae7a1271eae627ff4735599', // kitti requested full payment
     ];
 
     public function sumBrokerFee($months, $includeFinalCommission)

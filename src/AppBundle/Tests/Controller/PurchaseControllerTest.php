@@ -11,6 +11,7 @@ use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\RouterService;
 use AppBundle\Tests\Service\CheckoutServiceTest;
+use function GuzzleHttp\Psr7\build_query;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -542,6 +543,21 @@ class PurchaseControllerTest extends BaseControllerTest
             $csrf = $paymentNode->getAttribute('data-csrf');
             $url = $paymentNode->getAttribute('data-url');
         }
+
+        // need to adjust pennies on the querystring. This is only because we're adjusting the amount to fail
+        // the payment (as required by checkout)
+        $query = parse_url($url, PHP_URL_QUERY);
+        parse_str($query, $queryData);
+        $queryData['pennies'] = $this->convertToPennies(CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_AMOUNT);
+        $port = parse_url($url, PHP_URL_PORT);
+        $url = sprintf(
+            '%s://%s%s%s?%s',
+            parse_url($url, PHP_URL_SCHEME),
+            parse_url($url, PHP_URL_HOST),
+            mb_strlen($port) > 0 ? ':' . $port : null,
+            parse_url($url, PHP_URL_PATH),
+            build_query($queryData)
+        );
 
         $token = self::$checkoutService->createCardToken(
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_NUM,

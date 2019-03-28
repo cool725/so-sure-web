@@ -1468,6 +1468,7 @@ class PurchaseController extends BaseController
      */
     public function checkoutAction(Request $request, $id)
     {
+        $type = null;
         $successMessage = 'Success! Your payment has been successfully completed';
         $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
         details are correct and try again or get in touch if you continue to have issues';
@@ -1503,9 +1504,6 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
             }
 
-            //$this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-
-            $type = null;
             $token = $request->get("token");
             $pennies = $request->get("pennies");
             $csrf = $request->get("csrf");
@@ -1518,6 +1516,8 @@ class PurchaseController extends BaseController
                 $type = 'redirect';
                 $token = $cardToken;
             }
+
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
             if (!$type) {
                 $logger->info(sprintf('Missing params'));

@@ -3,6 +3,8 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Claim;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
@@ -25,7 +27,6 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use FOS\UserBundle\Model\UserManager;
 use Pimple\Container;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use AppBundle\Document\Claim;
 use Symfony\Component\Validator\Constraints\Date;
 
 /**
@@ -595,6 +596,49 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->bacsInputFileNotImported();
         // if there are no exceptions then the test passed.
         $this->assertTrue(true);
+    }
+
+    /**
+     * Tests if the blocked reward pot monitor will report when policies are blocked from getting their deserved
+     * discount.
+     */
+    public function testBlockedRewardPot()
+    {
+        // make sure it does not go off unwantedly.
+        self::$monitor->blockedRewardPot();
+        // Create the circumstances that would have caused the blocking to occur.
+        $parent = $this->createUserPolicy(true, null, false, "parent@testblocked.com");
+        $child = $this->createUserPolicy(true, null, false, "child@testblocked.com");
+        $fiend = $this->createUserPolicy(true, null, false, "fiend@testblocked.com");
+        $connection = new StandardConnection();
+        $connection->setDate(new \DateTime());
+        $parent->link($child);
+        $connection->setLinkedPolicy($fiend);
+        $connection->setSourcePolicy($parent);
+        $parent->addConnection($connection);
+        $fiend->addConnection($connection);
+        $irrelevantClaim = $this->claim(self::$container, $fiend, null, Claim::STATUS_DECLINED);
+        $claim = $this->claim(self::$container, $fiend, null, Claim::STATUS_INREVIEW);
+        self::$dm->persist($parent);
+        self::$dm->persist($parent->getUser());
+        self::$dm->persist($child);
+        self::$dm->persist($child->getUser());
+        self::$dm->persist($fiend);
+        self::$dm->persist($fiend->getUser());
+        self::$dm->persist($claim);
+        self::$dm->flush();
+        $parent->setPotValue(32.11);
+        self::$dm->flush();
+        self::$monitor->blockedRewardPot();
+        // Now close the claim so that the user can get reported for needing a reward.
+        $claim->setStatus(Claim::STATUS_WITHDRAWN);
+        self::$dm->flush();
+        $this->expectException(MonitorException::class);
+        self::$monitor->blockedRewardPot();
+        // If there is a valid claim then all this becomes irrelevant.
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        self::$dm->flush();
+        self::$monitor->blockedRewardPot();
     }
 
     public function testQuoteSafeArrayToString()
