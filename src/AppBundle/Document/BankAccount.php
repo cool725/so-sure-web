@@ -4,6 +4,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Service\BacsService;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -35,6 +36,35 @@ class BankAccount
         self::CANCELLER_ADDACS,
         self::CANCELLER_DDICS,
         self::CANCELLER_SOSURE
+    ];
+
+    const CANCEL_REASONS = [
+        self::CANCELLER_AUDDIS => [
+            BacsService::AUDDIS_REASON_USER => 'yeet',
+            BacsService::AUDDIS_REASON_DECEASED => 'yeet',
+            BacsService::AUDDIS_REASON_TRANSFER => 'yeet',
+            BacsService::AUDDIS_REASON_NO_ACCOUNT => 'yeet',
+            BacsService::AUDDIS_REASON_NO_INSTRUCTION => 'yeet',
+            BacsService::AUDDIS_REASON_NON_ZERO => 'yeet',
+            BacsService::AUDDIS_REASON_CLOSED => 'yeet',
+            BacsService::AUDDIS_REASON_TRANSFER_BRANCH => 'yeet',
+            BacsService::AUDDIS_REASON_INVALID_ACCOUNT_TYPE => 'yeet',
+            BacsService::AUDDIS_REASON_DD_NOT_ALLOWED => 'yeet',
+            BacsService::AUDDIS_REASON_EXPIRED => 'yeet',
+            BacsService::AUDDIS_REASON_DUPLICATE_REFERENCE => 'yeet',
+            BacsService::AUDDIS_REASON_INCORRECT_DETAILS => 'yeet',
+            BacsService::AUDDIS_REASON_CODE_INCOMPATIBLE => 'yeet',
+            BacsService::AUDDIS_REASON_NOT_ALLOWED => 'yeet',
+            BacsService::AUDDIS_REASON_INVALID_REFERENCE => 'yeet',
+            BacsService::AUDDIS_REASON_MISSING_PAYER_NAME => 'yeet',
+            BacsService::AUDDIS_REASON_MISSING_SERVICE_NAME => 'yeet'
+        ],
+        self::CANCELLER_ADDACS => [
+            BacsService::ADDACS_REASON_BANK => 'yet',
+            BacsService::ADDACS_REASON_USER => 'yeet',
+            BacsService::ADDACS_REASON_DECEASED => 'f',
+            BacsService::ADDACS_REASON_TRANSFER => 'd'
+        ]
     ];
 
     const CANCEL_REASON_PERSONAL_DETAILS = 'cancel-personal-details';
@@ -567,83 +597,18 @@ class BankAccount
     {
         if (!$this->mandateCanceller) {
             return null;
-        } elseif ($this->mandateCanceller == self::CANCELLER_SOSURE) {
-            return $this->mandateCancelledReason;
-        } else {
-            $description = "";
-            switch ($this->mandateCancelledReason) {
-                case 0:
-                    $description = 'cancelled by bank, refer to user';
-                    break;
-                case 1:
-                    $description = 'instruction cancelled by user';
-                    break;
-                case 2:
-                    $description = 'user deceased';
-                    break;
-                case 3:
-                    $description = 'account transferred to new bank';
-                    break;
-                case 5:
-                    $description = 'no account';
-                    break;
-                case 6:
-                    $description = 'no mandate';
-                    break;
-                case 7:
-                    $description = 'ddi amount not zero';
-                    break;
-                case 'B':
-                    $description = 'account closed';
-                    break;
-                case 'C':
-                    $description = 'account transferred to new branch of bank';
-                    break;
-                case 'D':
-                    $description = 'advance notice of mandate disputed';
-                    break;
-                case 'E':
-                    $description = 'mandate amended';
-                    break;
-                case 'F':
-                    $description = 'invalid account type';
-                    break;
-                case 'G':
-                    $description = 'bank will not accept direct debits on this account';
-                    break;
-                case 'H':
-                    $description = 'mandate has expired';
-                    break;
-                case 'I':
-                    $description = 'payer reference is not unique';
-                    break;
-                case 'K':
-                    $description = 'mandate cancelled by paying bank';
-                    break;
-                case 'L':
-                    $description = 'incorrect user\'s account details';
-                    break;
-                case 'M':
-                    $description = 'transaction Code / user status incompatible';
-                    break;
-                case 'N':
-                    $description = 'Transaction Disallowed at user\'s branch';
-                    break;
-                case 'O':
-                    $description = 'invalid reference';
-                    break;
-                case 'P':
-                    $description = 'user\'s name not present';
-                    break;
-                case 'Q':
-                    $description = 'services user\'s name is blank';
-                    break;
-                case 'R':
-                    $description = 'mandate reinstated';
-                    break;
-            }
-            return "{$this->mandateCancelledReason}: {$description}.";
         }
+        if (array_key_exists($this->mandateCanceller, self::CANCEL_REASONS)) {
+            $category = self::CANCEL_REASONS[$this->mandateCanceller];
+            if (array_key_exists($this->mandateCancelledReason, $category)) {
+                $description = $category[$this->mandateCancelledReason];
+            } else {
+                $description = $this->mandateCancelledReason;
+            }
+        } else {
+            $description = $this->mandateCancelledReason;
+        }
+        return "{$this->mandateCanceller}: {$description}.";
     }
 
     public function getNotificationDay()
