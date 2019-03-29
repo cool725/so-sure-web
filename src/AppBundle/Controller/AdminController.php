@@ -11,6 +11,7 @@ use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportDdicFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\CashflowsFile;
+use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Form\CardRefund;
@@ -22,6 +23,7 @@ use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\CardRefundType;
+use AppBundle\Form\Type\CheckoutFileType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -36,6 +38,7 @@ use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\CashflowsFileRepository;
+use AppBundle\Repository\File\CheckoutFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
 use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
@@ -1229,6 +1232,10 @@ class AdminController extends BaseController
         $judoForm = $this->get('form.factory')
             ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
             ->getForm();
+        $checkoutFile = new CheckoutFile();
+        $checkoutForm = $this->get('form.factory')
+            ->createNamedBuilder('checkout', CheckoutFileType::class, $checkoutFile)
+            ->getForm();
         $barclaysFile = new BarclaysFile();
         $barclaysForm = $this->get('form.factory')
             ->createNamedBuilder('barclays', BarclaysFileType::class, $barclaysFile)
@@ -1263,6 +1270,24 @@ class AdminController extends BaseController
                     $data = $judoService->processCsv($judoFile);
 
                     $dm->persist($judoFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('n'),
+                    ]);
+                }
+            } elseif ($request->request->has('checkout')) {
+                $checkoutForm->handleRequest($request);
+                if ($checkoutForm->isSubmitted() && $checkoutForm->isValid()) {
+                    $dm = $this->getManager();
+                    $checkoutFile->setBucket(SoSure::S3_BUCKET_ADMIN);
+                    $checkoutFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $checkoutService = $this->get('app.checkout');
+                    $data = $checkoutService->processCsv($checkoutFile);
+
+                    $dm->persist($checkoutFile);
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
@@ -1366,6 +1391,7 @@ class AdminController extends BaseController
 
         return [
             'judoForm' => $judoForm->createView(),
+            'checkoutForm' => $checkoutForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
             'barclaysStatementForm' => $barclaysStatementForm->createView(),
             'lloydsForm' => $lloydsForm->createView(),
@@ -1378,6 +1404,7 @@ class AdminController extends BaseController
             'reconciliation' => $this->getReconcilationBanking($date),
             'salva' => $this->getSalvaBanking($date, $year, $month),
             'judo' => $this->getJudoBanking($date, $year, $month),
+            'checkout' => $this->getCheckoutBanking($date, $year, $month),
             'cashflows' => $this->getCashflowsBanking($date, $year, $month),
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
             'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
@@ -1551,6 +1578,33 @@ class AdminController extends BaseController
         ];
 
         return $judo;
+    }
+
+    private function getCheckoutBanking(\DateTime $date, $year, $month)
+    {
+        $dm = $this->getManager();
+
+        /** @var CheckoutFileRepository $checkoutFileRepo */
+        $checkoutFileRepo = $dm->getRepository(CheckoutFile::class);
+
+        $monthlyCheckoutFiles = $checkoutFileRepo->getMonthlyFiles($date);
+        $monthlyPerDayCheckoutTransaction = CheckoutFile::combineDailyTransactions($monthlyCheckoutFiles);
+
+        $yearlyCheckoutFiles = $checkoutFileRepo->getYearlyFilesToDate($date);
+        $yearlyPerDayCheckoutTransaction = CheckoutFile::combineDailyTransactions($yearlyCheckoutFiles);
+
+        $allCheckoutFiles = $checkoutFileRepo->getAllFilesToDate($date);
+        $allCheckoutTransaction = CheckoutFile::combineDailyTransactions($allCheckoutFiles);
+
+        $checkout = [
+            'dailyTransaction' => $monthlyPerDayCheckoutTransaction,
+            'monthlyTransaction' => CheckoutFile::totalCombinedFiles($monthlyPerDayCheckoutTransaction, $year, $month),
+            'yearlyTransaction' => CheckoutFile::totalCombinedFiles($yearlyPerDayCheckoutTransaction),
+            'allTransaction' => CheckoutFile::totalCombinedFiles($allCheckoutTransaction),
+            'files' => $monthlyCheckoutFiles,
+        ];
+
+        return $checkout;
     }
 
     private function getSalvaBanking(\DateTime $date, $year, $month)

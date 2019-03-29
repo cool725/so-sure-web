@@ -5,6 +5,7 @@ use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -572,6 +573,57 @@ class CheckoutService
         }
 
         return $token;
+    }
+
+    public function tokenMigration($filename)
+    {
+        $skipped = 0;
+        $migrated = 0;
+        $header = null;
+        $repo = $this->dm->getRepository(Policy::class);
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000)) !== false) {
+                if (!$header) {
+                    $header = $row;
+                } else {
+                    $line = array_combine($header, $row);
+                    $policies = $repo->findBy(['paymentMethod.cardToken' => $line['old_card_id']]);
+                    if (count($policies) == 0) {
+                        $this->logger->info(sprintf('Unable to find token %s', $line['old_card_id']));
+                        $skipped++;
+                        continue;
+                    }
+                    foreach ($policies as $policy) {
+                        /** @var Policy $policy */
+                        /** @var \AppBundle\Document\PaymentMethod\JudoPaymentMethod $judo */
+                        $judo = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
+                        if (!$judo) {
+                            $this->logger->info(sprintf('Unable to find judo payment method %s', $line['old_card_id']));
+                            $skipped++;
+                            continue;
+                        }
+
+                        $cardDetails = [
+                            'cardLastFour' => $judo->getCardLastFour(),
+                            'endDate' => $judo->getCardEndDate(),
+                            'cardType' => $judo->getCardType(),
+                        ];
+
+                        $checkout = new CheckoutPaymentMethod();
+                        $checkout->setCustomerId($line['cko_customer_id']);
+                        $checkout->addCardTokenArray($line['cko_cards_id'], $cardDetails);
+                        $checkout->setNotes(sprintf('Was Judo Token: %s', $line['old_card_id']));
+                        $policy->setPaymentMethod($checkout);
+
+                        $migrated++;
+                    }
+                }
+            }
+        }
+
+        $this->dm->flush();
+
+        return ['migrated' => $migrated, 'skipped' => $skipped];
     }
 
     public function getCharge($chargeId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
@@ -1473,9 +1525,9 @@ class CheckoutService
         return $refund;
     }
 
-    public function processCsv(JudoFile $judoFile)
+    public function processCsv(CheckoutFile $checkoutFile)
     {
-        $filename = $judoFile->getFile();
+        $filename = $checkoutFile->getFile();
         $header = null;
         $lines = array();
         $dailyTransaction = array();
@@ -1486,24 +1538,29 @@ class CheckoutService
         $numRefunds = 0;
         $declined = 0;
         $numDeclined = 0;
-        $failed = 0;
-        $numFailed = 0;
         $total = 0;
         $maxDate = null;
         if (($handle = fopen($filename, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000)) !== false) {
-                if (!$header) {
+                // appears to be quite a few unused additional columns. Go to row BA (Card Wallet Type)
+                $row = array_slice($row, 0, 53);
+                if (count($row) == 0) {
+                    continue;
+                } elseif (!$header) {
                     $header = $row;
                 } else {
+                    if (count($header) != count($row)) {
+                        throw new \Exception(sprintf('%s != %s', json_encode($header), json_encode($row)));
+                    }
                     $line = array_combine($header, $row);
                     $lines[] = $line;
                     $transactionDate = \DateTime::createFromFormat(
-                        'd F Y H:i',
-                        $line['Date'],
+                        'Y-m-d H:i:s',
+                        $line['Action Date'],
                         SoSure::getSoSureTimezone()
                     );
                     if (!$transactionDate) {
-                        throw new \Exception(sprintf('Unable to parse date %s', $line['Date']));
+                        throw new \Exception(sprintf('Unable to parse date %s', $line['Action Date']));
                     }
                     $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone('UTC'));
 
@@ -1511,55 +1568,33 @@ class CheckoutService
                         $dailyTransaction[$transactionDate->format('Ymd')] = 0;
                     }
 
-                    if ($line['TransactionResult'] == "Transaction Successful") {
-                        if ($line['TransactionType'] == "Payment") {
-                            $total += $line['Net'];
-                            $payments += $line['Net'];
+
+                    if ($line['Response Code'] == CheckoutPayment::RESPONSE_CODE_SUCCESS) {
+                        // "Capture" and not CheckoutPayment::RESULT_CAPTURED :(
+                        if ($line['Action Type'] == "Capture") {
+                            $total += $line['Amount'];
+                            $payments += $line['Amount'];
                             $numPayments++;
-                            $dailyTransaction[$transactionDate->format('Ymd')] += $line['Net'];
-                        } elseif ($line['TransactionType'] == "Refund") {
-                            $total -= $line['Net'];
-                            $refunds += $line['Net'];
+                            $dailyTransaction[$transactionDate->format('Ymd')] += $line['Amount'];
+                        } elseif ($line['Action Type'] == "Refund") {
+                            $total -= $line['Amount'];
+                            $refunds += $line['Amount'];
                             $numRefunds++;
-                            $dailyTransaction[$transactionDate->format('Ymd')] -= $line['Net'];
+                            $dailyTransaction[$transactionDate->format('Ymd')] -= $line['Amount'];
                         }
-                    } elseif ($line['TransactionResult'] == "Card Declined") {
-                        $declined += $line['Net'];
+                    } elseif ($line['Response Code'] != CheckoutPayment::RESPONSE_CODE_SUCCESS) {
+                        $declined += $line['Amount'];
                         $numDeclined++;
-                    } elseif ($line['TransactionResult'] == "Failed") {
-                        $failed += $line['Net'];
-                        $numFailed++;
-                    } elseif (mb_strlen(trim($line['TransactionResult'])) == 0) {
-                        $failed += $line['Net'];
-                        $numFailed++;
-
-                        // @codingStandardsIgnoreStart
-                        $body = sprintf(
-                            'Our csv export for last month included a blank transaction result for receipt %s. Please confirm the transaction was, in fact, a failure.',
-                            $line['ReceiptId']
-                        );
-                        // @codingStandardsIgnoreEnd
-
-                        $this->mailer->send(
-                            sprintf('Missing Transaction Result for Receipt %s', $line['ReceiptId']),
-                            'developersupport@judopayments.com',
-                            $body,
-                            null,
-                            null,
-                            'tech@so-sure.com',
-                            'tech@so-sure.com'
-                        );
                     } else {
-                        throw new \Exception(sprintf('Unknown Transaction Result: %s', $line['TransactionResult']));
+                        throw new \Exception(sprintf('Unknown Response Result: %s', $line['Response Code']));
                     }
 
-                    $date = new \DateTime($line['Date']);
-                    if ($maxDate && $maxDate->format('m') != $date->format('m')) {
+                    if ($maxDate && $maxDate->format('m') != $transactionDate->format('m')) {
                         throw new \Exception('Export should only be for the same calendar month');
                     }
 
-                    if (!$maxDate || $maxDate > $date) {
-                        $maxDate = $date;
+                    if (!$maxDate || $maxDate > $transactionDate) {
+                        $maxDate = clone $transactionDate;
                     }
                 }
             }
@@ -1575,23 +1610,19 @@ class CheckoutService
             'date' => $maxDate,
             'declined' => $this->toTwoDp($declined),
             'numDeclined' => $numDeclined,
-            'failed' => $this->toTwoDp($failed),
-            'numFailed' => $numFailed,
             'dailyTransaction' => $dailyTransaction,
             'data' => $lines,
         ];
 
-        $judoFile->addMetadata('total', $data['total']);
-        $judoFile->addMetadata('payments', $data['payments']);
-        $judoFile->addMetadata('numPayments', $data['numPayments']);
-        $judoFile->addMetadata('refunds', $data['refunds']);
-        $judoFile->addMetadata('numRefunds', $data['numRefunds']);
-        $judoFile->addMetadata('declined', $data['declined']);
-        $judoFile->addMetadata('numDeclined', $data['numDeclined']);
-        $judoFile->addMetadata('failed', $data['failed']);
-        $judoFile->addMetadata('numFailed', $data['numFailed']);
-        $judoFile->setDailyTransaction($data['dailyTransaction']);
-        $judoFile->setDate($data['date']);
+        $checkoutFile->addMetadata('total', $data['total']);
+        $checkoutFile->addMetadata('payments', $data['payments']);
+        $checkoutFile->addMetadata('numPayments', $data['numPayments']);
+        $checkoutFile->addMetadata('refunds', $data['refunds']);
+        $checkoutFile->addMetadata('numRefunds', $data['numRefunds']);
+        $checkoutFile->addMetadata('declined', $data['declined']);
+        $checkoutFile->addMetadata('numDeclined', $data['numDeclined']);
+        $checkoutFile->setDailyTransaction($data['dailyTransaction']);
+        $checkoutFile->setDate($data['date']);
 
         return $data;
     }

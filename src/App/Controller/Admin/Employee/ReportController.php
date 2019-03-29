@@ -40,16 +40,7 @@ class ReportController extends AbstractController
         $period = $request->get("period");
         $period = isset($period) ? $period : ReportingService::REPORT_PERIODS_DEFAULT;
         $report = ["period" => $period];
-        // Setting up the period options.
-        $report["periods"] = [];
-        foreach (ReportingService::REPORT_PERIODS as $key => $periodChoice) {
-            if (array_key_exists("month", $periodChoice)) {
-                $start = (new \DateTime($periodChoice["start"]))->format("F Y");
-                $report["periods"][$start] = $key;
-            } else {
-                $report["periods"][$key] = $key;
-            }
-        }
+        $report["periods"] = ReportingService::getPeriodList();
         // Get the start and end dates for the given period.
         try {
             list($start, $end, $month) = ReportingService::getLastPeriod($period);

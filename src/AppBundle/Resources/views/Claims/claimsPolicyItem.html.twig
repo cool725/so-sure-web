@@ -480,6 +480,17 @@
                                         <td>Card (Checkout) on policy</td>
                                         <td class="{% if policy.getCheckoutPaymentMethod.isCardExpired %}danger{% endif %}">
                                             {{ policy.getCheckoutPaymentMethod }}
+                                            {% if policy.getCheckoutPaymentMethod.customerId %}
+                                                {% if environment == 'prod' %}
+                                                    <a title="Checkout" href="https://hub.checkout.com/v2/customers/details/{{ policy.getCheckoutPaymentMethod.customerId }}" target="_blank" rel="noopener noreferrer">
+                                                        <i class="fa fa-external-link"></i>
+                                                    </a>
+                                                {% else %}
+                                                    <a title="Checkout" href="https://sandbox.checkout.com/v2/customers/details/{{ policy.getCheckoutPaymentMethod.customerId }}" target="_blank" rel="noopener noreferrer">
+                                                        <i class="fa fa-external-link"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -522,7 +533,7 @@
                                     <div class="col-sm-8">
                                         <b>{{ note.date|date }} by {{ note.userName }}</b>
                                     </div>
-                                    {% if note.action is not null %}
+                                    {% if note.action is defined and note.action is not null %}
                                         <div class="col-sm-4">
                                             Action: {{ note.action }}
                                         </div>

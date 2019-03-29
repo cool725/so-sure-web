@@ -65,6 +65,10 @@
                                     <a class="dropdown-item"
                                        href="#"
                                        data-toggle="modal"
+                                       data-target="#checkout_modal">Checkout</a>
+                                    <a class="dropdown-item"
+                                       href="#"
+                                       data-toggle="modal"
                                        data-target="#barclays_modal">Barclays</a>
                                     <a class="dropdown-item"
                                        href="#"
@@ -117,6 +121,15 @@
                        role="tab"
                        aria-controls="judo_content"
                        aria-selected="false">Judo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="checkout_tab"
+                       data-toggle="tab"
+                       href="#checkout_content"
+                       role="tab"
+                       aria-controls="checkout_content"
+                       aria-selected="false">Checkout</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -177,6 +190,12 @@
                      role="tabpanel"
                      aria-labelledby="judo_tab">
                     {% include 'AppBundle::Admin/adminBanking/judo.html.twig' %}
+                </div>
+                <div class="tab-pane fade"
+                     id="checkout_content"
+                     role="tabpanel"
+                     aria-labelledby="checkout_tab">
+                    {% include 'AppBundle::Admin/adminBanking/checkout.html.twig' %}
                 </div>
                 <div class="tab-pane fade"
                      id="barclays_content"
@@ -262,6 +281,67 @@
                                     <td>
                                         <button class="delete-file btn btn-danger btn-square"
                                                 data-delete-url="{{ path('admin_file_delete', {'id': judoFile.id }) }}">
+                                            <i class="fal fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="checkout_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="checkout_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Checkout Upload</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(checkoutForm) }}
+                    <div class="form-group">
+                        {{ form_label(checkoutForm.file, 'File') }}
+                        {{ form_widget(checkoutForm.file) }}
+                        <div class="with-errors">{{ form_errors(checkoutForm.file) }}</div>
+                    </div>
+                    <div class="form-group mb-0">
+                        {{ form_widget(checkoutForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                    </div>
+                    {{ form_end(checkoutForm) }}
+                    <hr>
+                    <h2>Files</h2>
+                    {% if checkout.files|length == 0 %}
+                        <p>No Files</p>
+                    {% else %}
+                        <table class="table table-striped">
+                            {% for checkoutFile in checkout.files %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ s3DownloadLink(checkoutFile.bucket, checkoutFile.key) }}">{{ checkoutFile.fileName }}</a>
+                                    </td>
+                                    <td>
+                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
+                                        {{ checkoutFile.created|date() }}
+                                        <br>
+                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ checkoutFile.date|date() }}
+                                    </td>
+                                    <td>
+                                        {# TODO: Move into tab??? #}
+                                        {{ checkoutFile.metadata|json_encode }}
+                                    </td>
+                                    <td>
+                                        <button class="delete-file btn btn-danger btn-square"
+                                                data-delete-url="{{ path('admin_file_delete', {'id': checkoutFile.id }) }}">
                                             <i class="fal fa-trash-alt"></i>
                                         </button>
                                     </td>

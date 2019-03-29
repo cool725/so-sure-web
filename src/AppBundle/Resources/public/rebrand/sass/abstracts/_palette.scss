@@ -31,6 +31,7 @@ $ultramarine:          #081B9A;
 $bright-yellow:        #fbd231;
 $bay-of-many:          #28487d;
 $waikawa-gray:         #6274a4;
+$salomie:              #fde589;
 
 // Brands
 $facebook: #3B5998;
@@ -70,6 +71,7 @@ $theme-colors: (
     "ultramarine":          $ultramarine,
     "bay-of-many":          $bay-of-many,
     "waikawa-gray":         $waikawa-gray,
+    "salomie":              $salomie,
 );
 
 // Bootstrap overides
@@ -111,6 +113,18 @@ $dark:          $haiti;
 
 @mixin facebook-gradient {
     @include linear-gradient(45deg, $bay-of-many, $waikawa-gray);
+}
+
+@mixin snapchat-gradient {
+    @include linear-gradient(0deg, $salomie, $bright-yellow);
+}
+
+@mixin snapchat-gradient-90 {
+    @include linear-gradient(90deg, $bright-yellow, $salomie);
+}
+
+@mixin snapchat-gradient-180 {
+    @include linear-gradient(180deg, $salomie, $bright-yellow);
 }
 
 // Box shadow
