@@ -575,6 +575,57 @@ class CheckoutService
         return $token;
     }
 
+    public function tokenMigration($filename)
+    {
+        $skipped = 0;
+        $migrated = 0;
+        $header = null;
+        $repo = $this->dm->getRepository(Policy::class);
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000)) !== false) {
+                if (!$header) {
+                    $header = $row;
+                } else {
+                    $line = array_combine($header, $row);
+                    $policies = $repo->findBy(['paymentMethod.cardToken' => $line['old_card_id']]);
+                    if (count($policies) == 0) {
+                        $this->logger->info(sprintf('Unable to find token %s', $line['old_card_id']));
+                        $skipped++;
+                        continue;
+                    }
+                    foreach ($policies as $policy) {
+                        /** @var Policy $policy */
+                        /** @var \AppBundle\Document\PaymentMethod\JudoPaymentMethod $judo */
+                        $judo = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
+                        if (!$judo) {
+                            $this->logger->info(sprintf('Unable to find judo payment method %s', $line['old_card_id']));
+                            $skipped++;
+                            continue;
+                        }
+
+                        $cardDetails = [
+                            'cardLastFour' => $judo->getCardLastFour(),
+                            'endDate' => $judo->getCardEndDate(),
+                            'cardType' => $judo->getCardType(),
+                        ];
+
+                        $checkout = new CheckoutPaymentMethod();
+                        $checkout->setCustomerId($line['cko_customer_id']);
+                        $checkout->addCardTokenArray($line['cko_cards_id'], $cardDetails);
+                        $checkout->setNotes(sprintf('Was Judo Token: %s', $line['old_card_id']));
+                        $policy->setPaymentMethod($checkout);
+
+                        $migrated++;
+                    }
+                }
+            }
+        }
+
+        $this->dm->flush();
+
+        return ['migrated' => $migrated, 'skipped' => $skipped];
+    }
+
     public function getCharge($chargeId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
     {
         $service = $this->client->chargeService();
