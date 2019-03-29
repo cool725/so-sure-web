@@ -530,7 +530,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPaymentCount >= 1 && $isFirstPayment) {
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
-                    } elseif ($bacsPaymentCount == 0 && !$isFirstPayment) {
+                    } elseif ($bacsPaymentCount == 0 && !$isFirstPayment && !$policy->getNextScheduledPayment()) {
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
 
