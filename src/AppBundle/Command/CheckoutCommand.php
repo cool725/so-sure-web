@@ -39,6 +39,13 @@ class CheckoutCommand extends ContainerAwareCommand
                 'Number of records to check',
                 10
             )
+            ->addOption(
+                'judo-token-migration-file',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'CSV File to perform token migrations from judo to checkout',
+                null
+            )
         ;
     }
 
@@ -46,9 +53,13 @@ class CheckoutCommand extends ContainerAwareCommand
     {
         $chargeId = $input->getOption('chargeId');
         $pageSize = $input->getOption('pageSize');
+        $judoTokenMigrationFile = $input->getOption('judo-token-migration-file');
         if ($chargeId) {
             $details = $this->checkoutService->getCharge($chargeId, false, false);
             $output->writeln(json_encode($details, JSON_PRETTY_PRINT));
+        } elseif ($judoTokenMigrationFile) {
+            $results = $this->checkoutService->tokenMigration($judoTokenMigrationFile);
+            $output->writeln(sprintf('%s', json_encode($results, JSON_PRETTY_PRINT)));
         } else {
             $results = $this->checkoutService->getTransactions($pageSize);
             $output->writeln(sprintf('%d Entries %s', $pageSize, json_encode($results, JSON_PRETTY_PRINT)));
