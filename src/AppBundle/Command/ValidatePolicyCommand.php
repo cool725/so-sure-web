@@ -519,18 +519,21 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $bacsPayments = $policy->getPaymentsByType(BacsPayment::class);
                     $bacsPaymentCount = 0;
+                    $futurePaymentCount = 0;
                     $initialDay = $this->startOfDay($bankAccount->getInitialNotificationDate());
                     foreach ($bacsPayments as $bacsPayment) {
                         /** @var BacsPayment $bacsPayment */
                         if ($bacsPayment->getDate() >= $initialDay) {
                             $bacsPaymentCount++;
+                        } else {
+                            $futurePaymentCount++;
                         }
                     }
 
                     $isFirstPayment = $bankAccount->isFirstPayment();
                     if ($bacsPaymentCount >= 1 && $isFirstPayment) {
                         $lines[] = 'Warning!! 1 or more bacs payments, yet bank has first payment flag set';
-                    } elseif ($bacsPaymentCount == 0 && !$isFirstPayment && !$policy->getNextScheduledPayment()) {
+                    } elseif ($bacsPaymentCount + $futurePaymentCount == 0 && !$isFirstPayment) {
                         $lines[] = 'Warning!! No bacs payments, yet bank does not have first payment flag set';
                     }
 
