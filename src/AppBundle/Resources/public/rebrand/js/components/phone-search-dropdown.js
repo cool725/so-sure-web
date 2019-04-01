@@ -1,4 +1,4 @@
-// phoneSearchDropdown.js
+// phone-search-dropdown.js
 
 $(function() {
 
@@ -8,7 +8,7 @@ $(function() {
         let phones = $('.phone-search-dropdown').data('phones'),
             make   = $('.phone-search-dropdown__make'),
             model  = $('.phone-search-dropdown__model'),
-            memory = $('.phone-search-dropdown__memory');
+            memory = $('.phone-search-dropdown__memory'),
             button = $('.phone-search-dropdown__button'),
             arule  = $('#a-rule');
 

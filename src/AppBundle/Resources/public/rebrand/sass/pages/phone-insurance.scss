@@ -1,0 +1,290 @@
+// phone-insurance.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+
+.hero {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+    overflow: hidden;
+
+    @include blue-gradient;
+
+    .container {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__intro {
+
+        .h1m {
+            line-height: 1.5;
+            display: inline;
+            font-size: 2rem;
+        }
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 2.7rem;
+        }
+    }
+
+    &__illustration {
+
+    }
+
+    .hero__illustration-iphone-x {
+        height: 250px;
+
+        @include media-breakpoint-up(lg) {
+            height: 100%;
+            max-width: 340px;
+            position: absolute;
+            z-index: 2;
+            left: 170px; bottom: 0;
+        }
+    }
+
+    .hero__illustration-generic,
+    .hero__illustration-iphone-xr,
+    .hero__illustration-iphone-xs,
+    .hero__illustration-iphone-7,
+    .hero__illustration-iphone-8,
+    .hero__illustration-galaxy-s8,
+    .hero__illustration-galaxy-s9,
+    .hero__illustration-galaxy-note-9,
+    .hero__illustration-pixel
+    .hero__illustration-pixel-3-xl,     {
+        height: 250px;
+
+        @include media-breakpoint-up(lg) {
+            height: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+        }
+    }
+
+    .hero__illustration-iphone-7 {
+        @include media-breakpoint-up(lg) {
+            max-width: 260px;
+        }
+    }
+
+    // TODO: Make better;
+    .hero-generic {
+        max-width: 300px;
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+        }
+    }
+
+}
+
+.cred {
+    text-align: center;
+    background-color: $ultramarine;
+    position: relative;
+    z-index: 5;
+
+    img {
+        width: 100px;
+        margin: 0.5rem;
+        // opacity: 0.3;
+
+        @include media-breakpoint-up(lg) {
+            width: 120px;
+            margin: 0;
+        }
+    }
+}
+
+.intro {
+    text-align: center;
+    background-color: $pattens-blue;
+    position: relative;
+    z-index: 5;
+
+    p {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+}
+
+.why-insure {
+    text-align: center;
+    overflow: hidden;
+
+    .container {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__illustration-desktop {
+        width: 655px;
+        position: absolute;
+        z-index: 2;
+        bottom: 0; right: -200px;
+
+        @include media-breakpoint-up(fl) {
+            right: -200px;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+    }
+}
+
+.cover {
+    position: relative;
+
+    @include media-breakpoint-up(lg) {
+        background-color: $pattens-blue;
+    }
+
+    &__illustration__mobile {
+        height: 240px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    &__mobile {
+        background-color: $pattens-blue;
+    }
+
+    &__list {
+        margin-top: 7rem;
+    }
+
+    svg {
+        position: absolute;
+        bottom: -1px; left: 0; right: 0;
+    }
+}
+
+.why-insure-continued {
+    text-align: center;
+
+    @include media-breakpoint-up(lg) {
+        padding-bottom: inherit;
+        margin-bottom: 0;
+        background: $white url('#{$cdn_url}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png') no-repeat -100px 70px;
+        background-size: 600px;
+        text-align: left;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: -100px 70px;
+        background-size: 700px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: -100px 70px;
+    }
+}
+
+.our-reviews {
+    background-color: $pattens-blue;
+    text-align: center;
+    position: relative;
+
+    .reviews {
+        position: relative;
+        z-index: 4;
+    }
+
+    svg {
+        position: absolute;
+        bottom: 100%; left: 0;
+    }
+}
+
+.comparison {
+    background-color: $pattens-blue;
+
+    .table-list {
+        position: relative;
+
+        &__header {
+            background-color: $zaffre;
+        }
+
+        &__insurers {
+            tr {
+                td {
+                    background-color: $dodger-blue;
+                    border-bottom-color: rgba(255, 255, 255, 0.1);
+                }
+
+                td.border-fix {
+                    @include  border-bottom-radius(15px);
+                }
+            }
+        }
+
+        &__icn-dark {
+            background-image: url('#{$cdn_url}/images/rebrand/icns/so-sure_unhappy-dark-icn.svg');
+        }
+
+        @include media-breakpoint-up(xl) {
+
+            &__insurers {
+                z-index: 10;
+            }
+
+            &__so-sure {
+                transform: translateX(-25px);
+                z-index: 11;
+            }
+        }
+    }
+}
+
+.other-phones {
+    text-align: center;
+
+    a img {
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+    }
+}
+
+.mini-faq {
+    background-color: $pattens-blue;
+}
+
+.banner {
+    position: relative;
+    text-align: center;
+
+    @include blue-gradient;
+
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+    }
+}
