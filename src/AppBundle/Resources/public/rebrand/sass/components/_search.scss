@@ -44,11 +44,15 @@
             }
         }
 
+        option {
+            color: $dark
+        }
+
         @include media-breakpoint-up(ss) {
-            background-position:  right 20px;
+            background-position:  right 22px;
 
             &.valid-select {
-                background-position:  right 20px;
+                background-position:  right 22px;
             }
         }
     }
