@@ -8,11 +8,14 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Feature;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\BacsPaymentRepository;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
+use AppBundle\Tests\Service\CheckoutServiceTest;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -37,10 +40,31 @@ class UserControllerTest extends BaseControllerTest
     use CurrencyTrait;
     use DateTrait;
 
+    /** @var FeatureService */
+    protected static $featureService;
+
+    /** @var CheckoutService */
+    protected static $checkoutService;
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        /** @var FeatureService $featureService */
+        $featureService = self::$container->get('app.feature');
+        self::$featureService = $featureService;
+
+        /** @var  CheckoutService $checkoutService */
+        $checkoutService = self::$container->get('app.checkout');
+        self::$checkoutService = $checkoutService;
+    }
+
     public function setUp()
     {
         parent::setUp();
         self::$redis->flushdb();
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, false);
+        $this->assertFalse(self::$featureService->isEnabled(Feature::FEATURE_CHECKOUT));
     }
 
     public function tearDown()
@@ -497,6 +521,182 @@ class UserControllerTest extends BaseControllerTest
         //print_r($crawler->html());
     }
 
+    public function testUserPaymentDetails()
+    {
+        $email = self::generateEmail('testUserPaymentDetails', $this);
+        $password = 'fooBar123!';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        self::$client = self::createClient();
+
+        $this->login($email, $password, 'user');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/payment-details');
+
+        $this->validateCheckoutForm($crawler, false);
+        $this->validateJudoForm($crawler, true);
+    }
+
+    public function testUserPaymentDetailsCheckout()
+    {
+        $email = self::generateEmail('testUserPaymentDetailsCheckout', $this);
+        $password = 'fooBar123!';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        self::$client = self::createClient();
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $this->login($email, $password, 'user');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/payment-details');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+
+        $cardDetails = $crawler->filter('#payment_card');
+        $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
+
+        $paymentForm = $crawler->filter('.payment-form')->getNode(0);
+        $this->assertNotNull($paymentForm);
+        $csrf = null;
+        $pennies = null;
+        if ($paymentForm) {
+            $csrf = $paymentForm->getAttribute('data-csrf');
+            $pennies = $paymentForm->getAttribute('data-value');
+        }
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user/payment-details');
+        $this->expectFlashSuccess($crawler, 'successfully updated');
+        $cardDetails = $crawler->filter('#payment_card');
+        $this->assertContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
+    }
+
+    public function testUserPaymentDetailsCheckoutOtherUser()
+    {
+        $email = self::generateEmail('testUserPaymentDetailsCheckoutOtherUser', $this);
+        $email2 = self::generateEmail('testUserPaymentDetailsCheckoutOtherUser-2', $this);
+        $password = 'fooBar123!';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        self::$client = self::createClient();
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $this->login($email, $password, 'user');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/payment-details');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+
+        $cardDetails = $crawler->filter('#payment_card');
+        $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
+
+        $paymentForm = $crawler->filter('.payment-form')->getNode(0);
+        $this->assertNotNull($paymentForm);
+        $csrf = null;
+        $pennies = null;
+        if ($paymentForm) {
+            $csrf = $paymentForm->getAttribute('data-csrf');
+            $pennies = $paymentForm->getAttribute('data-value');
+        }
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user/payment-details');
+        $this->expectFlashSuccess($crawler, 'successfully updated');
+        $cardDetails = $crawler->filter('#payment_card');
+        $this->assertContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
+
+        $this->logout();
+        $this->login($email2, $password);
+
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(422);
+    }
+
     private function validateInviteAllowed($crawler, $allowed)
     {
         $count = 0;
@@ -537,9 +737,14 @@ class UserControllerTest extends BaseControllerTest
         $this->validateXPathCount($crawler, '//a[@id="user-homepage--nav-renew"]', $exists);
     }
 
-    private function validateUnpaidJudoForm($crawler, $exists)
+    private function validateJudoForm($crawler, $exists)
     {
         $this->validateXPathCount($crawler, '//form[@id="webpay-form"]', $exists);
+    }
+
+    private function validateCheckoutForm($crawler, $exists)
+    {
+        $this->validateXPathCount($crawler, '//form[@class="payment-form"]', $exists);
     }
 
     private function validateUnpaidRescheduleBacsForm($crawler, $exists)
@@ -589,7 +794,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -627,7 +832,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -668,7 +873,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -683,7 +888,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -718,7 +923,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -758,7 +963,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -777,7 +982,7 @@ class UserControllerTest extends BaseControllerTest
         $this->logout();
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -835,7 +1040,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -859,7 +1064,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -912,7 +1117,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -936,7 +1141,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, false);
+        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -996,11 +1201,69 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Unpaid Policy', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyCheckoutPaymentMissingNoBacsLink()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyCheckoutPaymentMissingNoBacsLink', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
+        self::setPaymentMethodForPolicy($policy);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_MISSING, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+
+        $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
+        $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/unpaid', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+         ]);
+         $data = self::verifyResponse(200);
+
+         $crawler = self::$client->request('GET', '/user/unpaid');
+         $this->expectFlashSuccess($crawler, 'successfully completed');
+         $this->assertContains('paid up to date', $crawler->html());
     }
 
     public function testUserUnpaidPolicyJudoPaymentMissingBacsLink()
@@ -1036,7 +1299,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, true);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1081,11 +1344,78 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Unpaid Policy', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyCheckoutPaymentFailedNoBacsLink()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyCheckoutPaymentFailedNoBacsLink', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
+        self::setCheckoutPaymentMethodForPolicy($policy);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        static::addCheckoutPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonthAgo,
+            CheckoutPayment::RESULT_DECLINED
+        );
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+
+        $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
+        $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/unpaid', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user/unpaid');
+        $this->expectFlashSuccess($crawler, 'successfully completed');
+        $this->assertContains('paid up to date', $crawler->html());
     }
 
     public function testUserUnpaidPolicyJudoPaymentFailedBacsLink()
@@ -1131,7 +1461,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, true);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1169,11 +1499,71 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Card Expired', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyCheckoutCardExpiredNoBacsLink()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyCheckoutCardExpiredNoBacsLink', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
+
+        self::setCheckoutPaymentMethodForPolicy($policy, '0101');
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_CARD_EXPIRED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, false);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Card Expired', $crawler->html());
+
+        $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
+        $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/unpaid', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user/unpaid');
+        $this->expectFlashSuccess($crawler, 'successfully completed');
+        $this->assertContains('paid up to date', $crawler->html());
     }
 
     public function testUserUnpaidPolicyJudoCardExpiredBacsLink()
@@ -1216,11 +1606,73 @@ class UserControllerTest extends BaseControllerTest
         print $policy->getTotalSuccessfulPayments() . PHP_EOL;
         */
 
-        $this->validateUnpaidJudoForm($crawler, true);
+        $this->validateJudoForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, true);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Card Expired', $crawler->html());
+    }
+
+    public function testUserUnpaidPolicyCheckoutCardExpiredBacsLink()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyCheckoutCardExpiredBacsLink', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
+        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
+        self::setCheckoutPaymentMethodForPolicy($policy, '0101');
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+
+        $this->assertEquals(Policy::UNPAID_CARD_EXPIRED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+
+        // bacs feature flag conditions
+        $this->assertFalse(count($policy->getUser()->getValidPolicies(true)) > 1);
+        $this->assertTrue($policy->getPremiumPlan() == Policy::PLAN_MONTHLY);
+        /** @var FeatureService $featureService */
+        $featureService = $this->getContainer(true)->get('app.feature');
+        $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
+
+        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
+
+        $featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $crawler = $this->login($email, $password, 'user/unpaid');
+
+        $this->validateCheckoutForm($crawler, true);
+        $this->validateJudoForm($crawler, false);
+        $this->validateUnpaidRescheduleBacsForm($crawler, false);
+        $this->validateUnpaidBacsSetupLink($crawler, true);
+        $this->validateUnpaidBacsUpdateLink($crawler, false);
+        $this->assertContains('Card Expired', $crawler->html());
+
+        $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
+        $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/unpaid', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/user/unpaid');
+        $this->expectFlashSuccess($crawler, 'successfully completed');
+        $this->assertContains('paid up to date', $crawler->html());
     }
 
     public function testUserUnpaidPolicyPaymentDetails()
@@ -1292,7 +1744,59 @@ class UserControllerTest extends BaseControllerTest
         self::$dm->flush();
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->isCancelledAndPaymentOwed());
-        $this->login($email, $password, sprintf('purchase/remainder/%s', $policy->getId()));
+        $crawler = $this->login($email, $password, sprintf('purchase/remainder/%s', $policy->getId()));
+        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, false);
+    }
+
+    public function testUserPolicyCancelledAndPaymentOwedCheckout()
+    {
+        $email = self::generateEmail('testUserPolicyCancelledAndPaymentOwedCheckout', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setCancelledReason(Policy::CANCELLED_UNPAID);
+        self::$dm->flush();
+        //print_r($policy->getClaimsWarnings());
+        $this->assertTrue($policy->isCancelledAndPaymentOwed());
+
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+
+        $remainderPath = sprintf('purchase/remainder/%s', $policy->getId());
+        $crawler = $this->login($email, $password, $remainderPath);
+
+        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, true);
+        $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
+        $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
+
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/remainder', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', '/' . $remainderPath);
+        $this->expectFlashSuccess($crawler, 'successfully completed');
+        $this->assertContains('fully paid', $crawler->html());
     }
 
     public function testUserAccessDenied()

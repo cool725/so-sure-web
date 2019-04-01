@@ -465,7 +465,7 @@
                                 {% endif %}
                                 {% if policy.isPolicy and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
                                     <tr>
-                                        <td>Card {% if policy.hasJudoPaymentMethod %}on policy{% else %}on user{% endif %}</td>
+                                        <td>Card (Judo) {% if policy.hasJudoPaymentMethod %}on policy{% else %}on user{% endif %}</td>
                                         <td class="{% if policy.getPolicyOrPayerOrUserJudoPaymentMethod.isCardExpired %}danger{% endif %}">
                                             {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
                                             <a title="Judopay" href="https://portal.judopay.com/payments/history?SearchQuery={{ policy.payerOrUser.id }}&SearchQueryType=0&AppName=&DeviceId=&From=&To=&AppId=0" target="_blank" rel="noopener noreferrer">
@@ -473,6 +473,25 @@
                                             </a>
                                         </td>
 
+                                    </tr>
+                                {% endif %}
+                                {% if policy.isPolicy and policy.hasCheckoutPaymentMethod %}
+                                    <tr>
+                                        <td>Card (Checkout) on policy</td>
+                                        <td class="{% if policy.getCheckoutPaymentMethod.isCardExpired %}danger{% endif %}">
+                                            {{ policy.getCheckoutPaymentMethod }}
+                                            {% if policy.getCheckoutPaymentMethod.customerId %}
+                                                {% if environment == 'prod' %}
+                                                    <a title="Checkout" href="https://hub.checkout.com/v2/customers/details/{{ policy.getCheckoutPaymentMethod.customerId }}" target="_blank" rel="noopener noreferrer">
+                                                        <i class="fa fa-external-link"></i>
+                                                    </a>
+                                                {% else %}
+                                                    <a title="Checkout" href="https://sandbox.checkout.com/v2/customers/details/{{ policy.getCheckoutPaymentMethod.customerId }}" target="_blank" rel="noopener noreferrer">
+                                                        <i class="fa fa-external-link"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                 {% endif %}
                                 {% if policy.isPolicy and policy.hasPolicyOrUserBacsPaymentMethod %}
@@ -488,6 +507,9 @@
                                             Reference: {{ policy.getPolicyOrUserBacsBankAccount.reference }}
                                             <br>
                                             Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
+                                            {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
+                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.simplifiedMandateCancelledReason }}
+                                            {% endif %}
                                             <br>
                                             Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
                                             <br>
@@ -514,7 +536,7 @@
                                     <div class="col-sm-8">
                                         <b>{{ note.date|date }} by {{ note.userName }}</b>
                                     </div>
-                                    {% if note.action is not null %}
+                                    {% if note.action is defined and note.action is not null %}
                                         <div class="col-sm-4">
                                             Action: {{ note.action }}
                                         </div>
@@ -1283,6 +1305,16 @@
                                 </button>
                             </td>
                         </tr>
+                    {% elseif policy.isPolicy and policy.hasCheckoutPaymentMethod %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Refund Checkout</td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#checkoutRefundForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Refund
+                                </button>
+                            </td>
+                        </tr>
                     {% endif %}
                 {% endif %}
             </table>
@@ -1967,6 +1999,7 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}

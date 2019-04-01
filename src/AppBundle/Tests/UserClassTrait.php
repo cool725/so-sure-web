@@ -3,10 +3,13 @@
 namespace AppBundle\Tests;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Claim;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
@@ -505,6 +508,30 @@ trait UserClassTrait
         return $payment;
     }
 
+    public static function addCheckoutPayment(
+        Policy $policy,
+        $amount,
+        $commission,
+        $receiptId = null,
+        $date = null,
+        $result = CheckoutPayment::RESULT_CAPTURED
+    ) {
+        if (!$receiptId) {
+            $receiptId = rand(1, 999999);
+        }
+        $payment = new CheckoutPayment();
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($commission);
+        $payment->setResult($result);
+        $payment->setReceipt($receiptId);
+        if ($date) {
+            $payment->setDate($date);
+        }
+        $policy->addPayment($payment);
+
+        return $payment;
+    }
+
     public static function setPaymentMethodForPolicy(Policy $policy, $endDate = '1220')
     {
         $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
@@ -513,6 +540,16 @@ trait UserClassTrait
         $policy->setPaymentMethod($judo);
 
         return $judo;
+    }
+
+    public static function setCheckoutPaymentMethodForPolicy(Policy $policy, $endDate = '1220')
+    {
+        $account = ['type' => '1', 'lastfour' => '1234', 'endDate' => $endDate];
+        $checkout = new CheckoutPaymentMethod();
+        $checkout->addCardTokenArray(random_int(1, 999999), $account);
+        $policy->setPaymentMethod($checkout);
+
+        return $checkout;
     }
 
     public static function addBacsPayment(
@@ -595,6 +632,33 @@ trait UserClassTrait
     {
         $invitation = $invitationService->inviteByEmail($policyA, $policyB->getUser()->getEmail());
         $invitationService->accept($invitation, $policyB, $date);
+    }
+
+    /**
+     * Adds a claim to the given policy.
+     * @param Container $container is the container thingy which is used to get the claims service.
+     * @param Policy    $policy    is the policy we  are adding the claim to.
+     * @param \DateTime $date      is the date that the claim should be set at, or null for right now.
+     * @param string    $status    is the status that the claim should have.
+     * @param string    $type      is the type of claim that it is.
+     * @return Claim which was just created.
+     */
+    private function claim(
+        $container,
+        $policy,
+        $date = null,
+        $status = Claim::STATUS_APPROVED,
+        $type = Claim::TYPE_THEFT
+    ) {
+        $claim = new Claim();
+        $claim->setStatus($status);
+        $claim->setType($type);
+        $claim->setNumber(uniqid());
+        $claim->setSubmissionDate($date ? clone $date : new \DateTime());
+        /** @var ClaimsService $claimsService */
+        $claimsService =  $container->get('app.claims');
+        $claimsService->addClaim($policy, $claim);
+        return $claim;
     }
 
     /**

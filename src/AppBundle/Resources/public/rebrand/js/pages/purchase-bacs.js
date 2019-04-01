@@ -61,8 +61,16 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: true,
                 },
+                "bacs_form[validateSortCode]": {
+                    required: true,
+                    equalTo: '#bacs_form_sortCode',
+                },
                 "bacs_form[accountNumber]": {
                     required: true,
+                },
+                "bacs_form[validateAccountNumber]": {
+                    required: true,
+                    equalTo: '#bacs_form_accountNumber',
                 }
             },
             messages: {
@@ -74,8 +82,16 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: 'Please enter your sort code',
                 },
+                "bacs_form[validateSortCode]": {
+                    required: 'Please confirm your sort code',
+                    equalTo: 'Your sort code doesn\'t match, please double check',
+                },
                 "bacs_form[accountNumber]": {
                     required: 'Please enter your account number',
+                },
+                "bacs_form[validateAccountNumber]": {
+                    required: 'Please confirm your account number',
+                    equalTo: 'Your account number doesn\'t match, please double check',
                 },
                 "bacs_form[soleSignature]": {
                     required: ''

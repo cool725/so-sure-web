@@ -35,6 +35,10 @@ class CheckoutPayment extends Payment
     // TODO
     const TYPE_REFUND = 'Refund';
 
+    const RESPONSE_CODE_SUCCESS = 10000;
+    const RESPONSE_CODE_DECLINED = 20005;
+    const RESPONSE_CODE_NO_FUNDS = 20051;
+
     /**
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")

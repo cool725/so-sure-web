@@ -51,10 +51,18 @@
 }
 
 // Pages we have the same gradient for the 'hero' add here
+// TODO: Move to a single classname i.e. .nav-with-hero
 .home,
 .landing,
 .social-insurance,
-.error-page {
+.error-page,
+.phone-insurance,
+.phone-insurance-model,
+.phone-insurance-make-model,
+.landing-snapchat,
+.landing-twitter,
+.landing-facebook,
+.landing-snapchat-b {
     .navbar-so-sure {
         background-image: none;
     }
@@ -70,10 +78,40 @@
     }
 }
 
+.landing-snapchat-b {
+    // Logo bits
+    .navbar-brand {
+
+        &__logo {
+            width: 120px; height: 28px;
+            background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-yellow.svg') no-repeat center center;
+            background-size: 118px;
+        }
+    }
+}
+
 // Scroll effects
 .navbar-scrolled:not(.devbar) {
     @include blue-gradient;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
+}
+
+.landing-twitter {
+    .navbar-scrolled:not(.devbar) {
+        @include twitter-gradient;
+    }
+}
+
+.landing-facebook {
+    .navbar-scrolled:not(.devbar) {
+        @include facebook-gradient;
+    }
+}
+
+.landing-snapchat-b {
+    .navbar-scrolled:not(.devbar) {
+        @include snapchat-gradient-90;
+    }
 }
 
 .navbar-scrolled-quote {
@@ -89,29 +127,29 @@
         outline: 0;
     }
 
-    &.is-active {
+    // &.is-active {
 
-        .hamburger-inner {
-            &,
-            &::before,
-            &::after {
-                background-color: $white;
-            }
-        }
-    }
+    //     .hamburger-inner {
+    //         &,
+    //         &::before,
+    //         &::after {
+    //             background-color: $white;
+    //         }
+    //     }
+    // }
 }
 
-.navbar-light {
-    .hamburger {
-        .hamburger-inner {
-            &,
-            &::before,
-            &::after {
-                background-color: $white;
-            }
-        }
-    }
-}
+// .navbar-light {
+//     .hamburger {
+//         .hamburger-inner {
+//             &,
+//             &::before,
+//             &::after {
+//                 background-color: $white;
+//             }
+//         }
+//     }
+// }
 
 
 // Page specific

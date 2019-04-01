@@ -86,6 +86,23 @@ trait DateTrait
         return $startMonth;
     }
 
+    /**
+     * Gets the precise moment of the start of the week that a given date falls within, or a number of weeks before and
+     * after the current one.
+     * @param \DateTime $date   is the date that the week is being found for, defaulting to now.
+     * @param int       $offset is the number of weeks to shift before or after this one.
+     * @return \DateTime of the start of the week.
+     */
+    public function startOfWeek(\DateTime $date = null, $offset = 0)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $newDate = new \DateTime(null, new \DateTimeZone(SoSure::TIMEZONE));
+        $newDate->setISODate($date->format("Y"), $date->format("W") + $offset)->setTime(0, 0);
+        return $newDate;
+    }
+
     public function startOfYear(\DateTime $date = null)
     {
         if (!$date) {
@@ -468,5 +485,22 @@ trait DateTrait
     public function isValidDate($date)
     {
         return $this->createValidDate($date) !== false;
+    }
+
+    /**
+     * Takes a DateTime or date string and finds which month is falls in and gives the name and year of that month as
+     * a string.
+     * @param \DateTime|string $date is the date that we are going to find the month of. If left null it will default
+     *                               to right now.
+     * @return string containing the year and name of the month for the date given.
+     */
+    public function monthName($date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        } elseif (is_string($date)) {
+            $date = new \DateTime($date);
+        }
+        return $date->format("F Y");
     }
 }

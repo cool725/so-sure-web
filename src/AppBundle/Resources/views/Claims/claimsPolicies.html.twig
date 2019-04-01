@@ -137,8 +137,14 @@
         </div>
         <div class="col-sm-6" class="pull-right" style="margin-top: 20px">
             {% if is_granted('ROLE_EMPLOYEE') and (status == 'call' or status == 'called') %}
-                <a href="{{ path('admin_policies_called_list') }}" title="Download last week" target="_blank" rel="noopener noreferrer"><i class="fa fa-2x fa-download"></i> </a>
-                <a href="{{ path('admin_policies_called_list', {'week': 'now'}) }}" title="Download this week" target="_blank" rel="noopener noreferrer"><i class="fa fa-2x fa-clock-o"></i> </a>
+                <form class="form-row" method='GET' action="{{ path('admin_policies_called_list') }}">
+                    <div class="col-sm-9">
+                        <select name="period">
+                            {% for key, period in periods %}<option value="{{ period }}">{{ key }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-3"><button class="btn btn-primary">Unpaid Calls Report</button></div>
+                </form>
             {% endif %}
         </div>
     </div>

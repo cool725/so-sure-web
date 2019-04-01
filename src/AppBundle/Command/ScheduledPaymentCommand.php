@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
@@ -138,9 +139,9 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {
-            $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForTypes(
                 $prefix,
-                JudoPaymentMethod::class,
+                [JudoPaymentMethod::class, CheckoutPaymentMethod::class],
                 $scheduledDate
             );
             foreach ($scheduledPayments as $scheduledPayment) {

@@ -1,0 +1,40 @@
+{{ form_start(form_phone, { 'attr': {
+    'class': 'form-inline memory-search-dropdown h1 h1m',
+    'data-phones': phones|json_encode|raw,
+    'autocomplete': 'off'
+}}) }}
+    {{ form_widget(form_phone.make, {
+      'attr': {
+        'class': 'd-none mb-2 mr-2 phone-search-dropdown__select memory-search-dropdown__make sub'
+    }}) }}
+    {{ form_widget(form_phone.model, {
+      'attr': {
+        'class': 'd-none mb-2 mr-2 phone-search-dropdown__select memory-search-dropdown__model sub',
+        'data-model': phone.model
+    }}) }}
+    <br class="d-none d-lg-inline">
+    {{ form_widget(form_phone.memory, {
+        'attr': {
+            'class': 'mr-2 phone-search-dropdown__select memory-search-dropdown__memory sub',
+    }}) }}
+
+    <span id="size_rule" class="sub text-white">for exact price</span>
+
+    <div class="form-group my-5 mt-lg-5 my-lg-0">
+        {{ form_widget(form_phone.next, {
+          'label': 'Get Insured',
+          'attr': {
+            'class': 'btn btn-white btn-block-xs mr-sm-2 memory-search-dropdown__button',
+            'disabled': 'disabled'
+        }}) }}
+        <a href="#"
+           class="btn btn-outline-white watch-video btn-block-xs"
+           data-event="watch-video-index-hero"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+            Watch our Video
+        </a>
+    </div>
+{{ form_end(form_phone) }}
