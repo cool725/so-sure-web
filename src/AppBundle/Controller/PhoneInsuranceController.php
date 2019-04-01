@@ -99,18 +99,9 @@ class PhoneInsuranceController extends BaseController
         return array();
     }
 
-    /**
-     * @Route("/mobile-insurance/{make}-{model}", name="mobile_insurance",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     */
-    public function mobileInsuranceAction()
-    {
-        return array();
-    }
 
     /**
-     * @Route("/phone-insurance", name="phone_insurance"),
-     * requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"
+     * @Route("/phone-insurance", name="phone_insurance")
      */
     public function phoneInsuranceAction()
     {
