@@ -147,7 +147,12 @@
         </div>
     {% endif %}
 
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
+
+    {# Page Modals #}
     {% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

@@ -1043,6 +1043,9 @@ abstract class Policy
                 } elseif ($payment instanceof BacsPayment) {
                     /** @var BacsPayment $payment */
                     return $payment->getStatus() !== null;
+                } elseif ($payment instanceof CheckoutPayment) {
+                    /** @var CheckoutPayment $payment */
+                    return $payment->getResult() !== null;
                 }
             });
         }
@@ -1559,7 +1562,6 @@ abstract class Policy
                 $connections[] = $connection;
             }
         }
-
         return $connections;
     }
 
@@ -4942,6 +4944,15 @@ abstract class Policy
         }
 
         $bankAccount = $this->getPolicyOrUserBacsBankAccount();
+        // Judo policies get a pass on days with scheduled payments.
+        if (!$bankAccount) {
+            $scheduledPayments = $this->getScheduledPayments();
+            foreach ($scheduledPayments as $scheduledPayment) {
+                if ($this->isSameDay($scheduledPayment->getScheduled(), $date)) {
+                    return true;
+                }
+            }
+        }
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
         } elseif ($this->isPolicyPaidToDate($date, true, false, true)) {

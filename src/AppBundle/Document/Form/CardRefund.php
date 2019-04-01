@@ -11,7 +11,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\File\ImeiUploadFile;
 
-class JudoRefund
+class CardRefund
 {
     /** @var Policy */
     protected $policy;

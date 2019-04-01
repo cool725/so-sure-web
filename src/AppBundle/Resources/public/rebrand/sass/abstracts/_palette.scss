@@ -27,6 +27,11 @@ $haiti-80:             rgba(23, 11, 56, 0.8);    // < $dark 80%
 $columbia-blue-e:      #99e3ff; // < $blue-1
 $columbia-blue-f:      #8fe0ff; // + new
 $pale-cornflower-blue: #a8d1f7; // < $blue-x
+$ultramarine:          #081B9A;
+$bright-yellow:        #fbd231;
+$bay-of-many:          #28487d;
+$waikawa-gray:         #6274a4;
+$salomie:              #fde589;
 
 // Brands
 $facebook: #3B5998;
@@ -62,6 +67,11 @@ $theme-colors: (
     "google":               $google,
     "starling":             $starling,
     "twitter":              $twitter,
+    "bright-yellow":        $bright-yellow,
+    "ultramarine":          $ultramarine,
+    "bay-of-many":          $bay-of-many,
+    "waikawa-gray":         $waikawa-gray,
+    "salomie":              $salomie,
 );
 
 // Bootstrap overides
@@ -69,7 +79,7 @@ $primary:       $dodger-blue;
 $secondary:     $lynch;
 $success:       $ufo-green;
 $info:          $columbia-blue-e;
-// $warning:       $tangerine;
+$warning:       $bright-yellow;
 $danger:        $lust;
 $light:         $lynch-30;
 $dark:          $haiti;
@@ -81,12 +91,40 @@ $dark:          $haiti;
     @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 }
 
+@mixin blue-gradient-0 {
+    @include linear-gradient(0deg, $crayon-blue, $deep-sky-blue-b);
+}
+
+@mixin blue-gradient-180 {
+    @include linear-gradient(0deg, $deep-sky-blue-b, $crayon-blue);
+}
+
 .blue-gradient {
     @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
 }
 
+@mixin twitter-gradient {
+    @include linear-gradient(45deg, $deep-sky-blue-b, $deep-sky-blue-d);
+}
+
 @mixin dark-blue-gradient {
     @include linear-gradient(90deg, $zaffre, $haiti);
+}
+
+@mixin facebook-gradient {
+    @include linear-gradient(45deg, $bay-of-many, $waikawa-gray);
+}
+
+@mixin snapchat-gradient {
+    @include linear-gradient(0deg, $salomie, $bright-yellow);
+}
+
+@mixin snapchat-gradient-90 {
+    @include linear-gradient(90deg, $bright-yellow, $salomie);
+}
+
+@mixin snapchat-gradient-180 {
+    @include linear-gradient(180deg, $salomie, $bright-yellow);
 }
 
 // Box shadow

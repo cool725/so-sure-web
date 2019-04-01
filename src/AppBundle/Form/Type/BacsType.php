@@ -51,7 +51,9 @@ class BacsType extends AbstractType
             ->add('accountName', TextType::class, ['required' => $this->required])
             ->add('validateName', HiddenType::class)
             ->add('sortCode', TextType::class, ['required' => $this->required, 'attr' => ['maxlength' => 8]])
+            ->add('validateSortCode', TextType::class, ['required' => $this->required])
             ->add('accountNumber', TextType::class, ['required' => $this->required])
+            ->add('validateAccountNumber', TextType::class, ['required' => $this->required])
             ->add('soleSignature', CheckboxType::class, [
                 'label' => 'I am the sole signature on the account',
                 'required' => $this->required

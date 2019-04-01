@@ -17,7 +17,8 @@
                 {% if amount > 0 %}
                     <p>Click below to pay for the remainder <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong> of your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong>.</p>
 
-                    {%  if webpay_action and webpay_reference %}
+                    {% if card_provider == 'judo' %}
+                      {% if webpay_action and webpay_reference %}
                         <form action="{{ webpay_action }}"
                               method="post"
                               id="webpay-form"
@@ -38,14 +39,20 @@
                                 </div>
                             {% endif %}
                         </form>
+                      {% endif %}
                     {% else %}
                         <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
-                              data-value="{{ convert_to_pennies(amount) }}" data-url="{{ url('purchase_checkout_remainder', {'id': policy.id }) }}"
+                              data-public-key="{{ checkout_public_key }}"
+                              data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}"
+                              data-url="{{ url('purchase_checkout_remainder', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
-                              data-title="so-sure" data-subtitle="Pay remainder of premium for {{ policy.policyNumber }}"
-                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                              data-currency="GBP"
+                              data-payment-mode="cards"
+                              data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                              data-title="Pay now"
+                              data-subtitle="Please enter your card details now">
                             {% if policy.displayRepurchase %}
                                 <div class="form-row">
                                     <div class="col">
@@ -68,6 +75,9 @@
             </div>
         </div>
     </section>
+
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
 
     {# Page Modals #}
 

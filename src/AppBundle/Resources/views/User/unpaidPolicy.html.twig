@@ -231,7 +231,8 @@
                 {% endif %}
                 {# END - IF CAN SETUP BACS #}
                 {% if show_card and amount > 0 %}
-                    {% if webpay_action and webpay_reference %}
+                    {% if card_provider == 'judo' %}
+                      {% if webpay_action and webpay_reference %}
                         <form action="{{ webpay_action }}" method="post" id="webpay-form">
                             <div class="form-group">
                                 <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
@@ -241,14 +242,20 @@
                                 <input type="submit" class="{% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}btn-simple-link{% else %}btn btn-success{% endif %}" value="{{ judo_btn_text }}">
                             </div>
                         </form>
+                      {% endif %}
                     {% else %}
                         <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}" data-customer-email="{{ app.user.email }}"
-                              data-value="{{ convert_to_pennies(amount) }}" data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id }) }}"
+                              data-public-key="{{ checkout_public_key }}"
+                              data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}"
+                              data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
-                              data-title="so-sure" data-subtitle="Bring your Policy {{ policy.policyNumber }} up to date"
-                              data-currency="GBP" data-payment-mode="cards" data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}">
+                              data-currency="GBP"
+                              data-payment-mode="cards"
+                              data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                              data-title="Pay outstanding balance"
+                              data-subtitle="Please enter your card details now">
                             <div class="form-group">
                                 <input type="submit" class="btn btn-success btn-card-pay" value="Pay now">
                             </div>
@@ -258,6 +265,9 @@
             </div>
         </div>
     </section>
+
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
 
     {# Page Modals #}
 

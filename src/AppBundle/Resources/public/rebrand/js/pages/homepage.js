@@ -18,6 +18,8 @@ observer.observe();
 
 
 $(function() {
+
     textFit($('.fit')[0], {detectMultiLine: false});
+
 });
 

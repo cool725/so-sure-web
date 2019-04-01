@@ -171,19 +171,82 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/topcashback", name="topcashback")
-     * @Route("/vouchercodes", name="vouchercodes")
-     * @Route("/quidco", name="quidco")
-     * @Route("/ivip", name="ivip")
-     * @Route("/reward-gateway", name="reward_gateway")
-     * @Route("/money", name="money")
-     * @Route("/money-free-phone-case", name="money_free_phone_case")
-     * @Route("/starling-bank", name="starling_bank")
-     * @Route("/comparison", name="comparison")
-     * @Route("/vendi-app", name="vendi_app")
-     * @Route("/so-sure-compared", name="so_sure_compared")
+     * @Route("/snapchat", name="snapchat")
      */
-    public function affiliateLanding(Request $request)
+    public function snapchatLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'snapchat'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexSnapchat.html.twig', $data);
+    }
+
+    /**
+     * @Route("/snapchat-b", name="snapchat-b")
+     */
+    public function snapchatbLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'snapchat-b'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexSnapchatB.html.twig', $data);
+    }
+
+    /**
+     * @Route("/twitter", name="twitter")
+     */
+    public function twitterLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'twitter'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexTwitter.html.twig', $data);
+    }
+
+    /**
+     * @Route("/facebook", name="facebook")
+     */
+    public function facebookLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'facebook'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexFacebook.html.twig', $data);
+    }
+
+    private function competitorsData()
     {
         $competitor = [
             'PYB' => [
@@ -248,15 +311,33 @@ class DefaultController extends BaseController
             ]
         ];
 
+        return $competitor;
+    }
+
+    /**
+     * @Route("/topcashback", name="topcashback")
+     * @Route("/vouchercodes", name="vouchercodes")
+     * @Route("/quidco", name="quidco")
+     * @Route("/ivip", name="ivip")
+     * @Route("/reward-gateway", name="reward_gateway")
+     * @Route("/money", name="money")
+     * @Route("/money-free-phone-case", name="money_free_phone_case")
+     * @Route("/starling-bank", name="starling_bank")
+     * @Route("/comparison", name="comparison")
+     * @Route("/vendi-app", name="vendi_app")
+     * @Route("/so-sure-compared", name="so_sure_compared")
+     */
+    public function affiliateLanding(Request $request)
+    {
         $data = [
-            'competitor' => $competitor,
+            'competitor' => $this->competitorsData(),
         ];
 
         $template = 'AppBundle:Default:indexAffiliate.html.twig';
 
         if ($request->get('_route') == 'topcashback') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'topcashback',
                 'affiliate_company' => 'TopCashback',
                 'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
@@ -266,7 +347,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'vouchercodes') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'vouchercodes',
                 'affiliate_company' => 'VoucherCodes',
                 'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
@@ -275,7 +356,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'quidco') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'quidco',
                 'affiliate_company' => 'Quidco',
                 'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
@@ -285,7 +366,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'ivip') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'ivip',
                 'affiliate_company' => 'iVIP',
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
@@ -295,7 +376,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'reward-gateway',
                 'affiliate_company' => 'Reward Gateway',
                 'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
@@ -305,7 +386,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'money') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
@@ -315,7 +396,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'money-free-phone-case',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
@@ -325,7 +406,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'starling_bank') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'starling-bank',
                 // 'affiliate_company' => 'Starling Bank',
                 // 'affiliate_company_logo' => 'so-sure_money_logo.png',
@@ -337,7 +418,7 @@ class DefaultController extends BaseController
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'comparison') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'comparison',
                 'titleH1' => 'Mobile Insurance beyond compare',
                 'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
@@ -347,7 +428,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'vendi_app') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'vendi-app',
                 'affiliate_company' => 'Vendi',
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
@@ -357,7 +438,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == 'so_sure_compared') {
             $data = [
-                'competitor' => $competitor,
+                'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'so-sure-compared',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',

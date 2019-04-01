@@ -46,6 +46,14 @@ class CheckoutPaymentMethod extends PaymentMethod
      */
     protected $cardTokenHash;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $notes;
+
     public function setCustomerId($customerId)
     {
         $this->customerId = $customerId;
@@ -54,6 +62,11 @@ class CheckoutPaymentMethod extends PaymentMethod
     public function getCustomerId()
     {
         return $this->customerId;
+    }
+
+    public function setCardToken($cardToken)
+    {
+        $this->cardToken = $cardToken;
     }
 
     public function addCardToken($key, $json)
@@ -158,6 +171,16 @@ class CheckoutPaymentMethod extends PaymentMethod
         }
 
         return $date >= $end;
+    }
+
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 
     public function __toString()

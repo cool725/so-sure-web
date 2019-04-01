@@ -333,7 +333,8 @@ class BICommand extends ContainerAwareCommand
             '"Expected Unpaid Cancellation Date"',
             '"Bacs Mandate Status"',
             '"First time policy"',
-            '"Has Successful User Payment Credit"'
+            '"Successful Payment"',
+            '"Bacs Mandate Cancelled Reason"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -394,12 +395,13 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf(
                     '"%s"',
-                    $policy->getPolicyOrUserBacsBankAccount() ?
+                    ($policy->getPolicyOrUserBacsBankAccount() && $policy->isActive(true)) ?
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
                         null
                 ),
                 sprintf('"%s"', $policy->useForAttribution($prefix) ? 'yes' : 'no'),
-                sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no')
+                sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
+                sprintf('"%s"', $policy->getMandateCancelledExplanation())
             ]);
         }
         if (!$skipS3) {
