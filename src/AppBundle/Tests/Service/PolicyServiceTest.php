@@ -1907,6 +1907,62 @@ class PolicyServiceTest extends WebTestCase
         $this->assertGreaterThan(0, count($policies));
     }
 
+    public function testActivateRenewalCopyBacs()
+    {
+        $policies = static::$policyService->activateRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testActivateRenewalCopyBacs', $this, true),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        self::setBacsPaymentMethodForPolicy($policy, BankAccount::MANDATE_SUCCESS);
+        $oneMonthAgo = \DateTime::createFromFormat('U', time());
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
+
+        $payment = static::addBacsPayPayment($policy, $oneMonthAgo, true);
+        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $policy->expire(new \DateTime(date('Y-m-d h:i:s')));
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+
+        $policies = static::$policyService->activateRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertEquals($policy->getBacsBankAccount(), $renewalPolicy->getBacsBankAccount());
+    }
+
     public function testFullyExpireExpiredClaimablePolicies()
     {
         $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(

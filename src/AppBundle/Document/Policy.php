@@ -4281,6 +4281,16 @@ abstract class Policy
 
         $this->setStatus(Policy::STATUS_ACTIVE);
 
+        /**
+         * Before we begin updating the connections and the pot we really need to make sure that we have
+         * the correct payment details on the renewal policy.
+         * In the case of BACs this should be the same account as the existing policy
+         * and so we can just copy them over.
+         */
+        if ($this->getPreviousPolicy() && $this->getPreviousPolicy()->getPaymentMethod()) {
+            $this->setPaymentMethod($this->getPreviousPolicy()->getPaymentMethod());
+        }
+
         foreach ($this->getRenewalConnections() as $connection) {
             if ($connection->getRenew()) {
                 // There needs to be an inversed connection
