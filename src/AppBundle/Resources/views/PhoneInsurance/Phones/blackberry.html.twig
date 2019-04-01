@@ -1,0 +1,28 @@
+{% extends 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig' %}
+
+{% block phone_hero_text %}
+    <p class="mb-4">Insuring your <strong>Blackberry phone</strong> is affordable and easy with so-sure: we cover a whole range of situations, so you can be confident that you're prepared for any unwanted surprises like accidental damage or smartphone theft/loss. It only takes minutes to get it insured.</p>
+{% endblock %}
+
+{% block phone_why_insure_text %}
+    <p>so-sure's insurance covers these Blackberry handsets for now: <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'DEKT50', 'memory': 16}) }}">BlackBerry DTEK50</a>, <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'DEKT60', 'memory': 32}) }}">BlackBerry DTEK60</a>, <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'KEYone', 'memory': 32}) }}">BlackBerry KEYone</a>, Blackberry KEY2 and <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'Priv', 'memory': 32}) }}">BlackBerry Priv</a>. Whilst some models are more popular than others, they all come with neat features and stylish designs.</p>
+    <p>One of the best selling-points for BlackBerry has always been the security, both in terms of OS and rest of the software standpoints; in fact DTEK50 and Priv both encrypt data by default whilst DTEK50 and DTEK60 are claimed to be the &quot;World's most secure Android smartphones&quot; by the maker. That's bold but warranted, as it turns out.</p>
+    <p>If you're big on security, then a solid approach should always be to consider a similarly advanced <a href="{{ path('phone_insurance') }}">mobile phone insurance</a>. And this is so-sure.</p>
+{% endblock %}
+
+{% block extra_content_one %}
+    <h2 class="h3 mb-4 text-primary">BlackBerry phones are big on security, we're big on insurance</h2>
+    <p>With their sleek, work-focused designs and physical keyboard, BlackBerry devices stand out from a distance as high-end business hardware focused on security and privacy. We understand the need for these. But we also know that buying a BlackBerry phone for the sophisticated security it offers and not investing in a comprehensive, low excess insurance policy is not the best approach for the privacy minded individual.</p>
+    <p>Our mobile device insurance makes it easy to keep your BlackBerry handset covered while you're out shopping, running errands, going about your workday, enjoying a night out with friends or logging into your online accounts.</p>
+    <p>You'll be fully covered for theft and loss as a standard, so you can use your mobile device with total confidence. We also provide coverage for any accidental damage to your phone, meaning there's no need to worry about drops, water damage and other common issues.</p>
+{% endblock %}
+
+{% block extra_content_two %}
+    <h2 class="h3 mb-4 text-primary">Learn more about our BlackBerry phone insurance</h2>
+    <p>Our BlackBerry insurance is designed to let you use your mobile device the way it was intended, all without any headaches. Just like the handset manufacturer, we focus on your peace of mind so you have one thing less a worry about.</p>
+    <p>so-sure's comprehensive insurance has your device fully covered for theft, loss and accidental damage, among other things. We also see that your favourite accessories with a value of up to &pound;100 including VAT are covered.</p>
+    <p>Need to travel outside the UK? No problem. Our mobile device insurance includes up to 90 days of worldwide cover, meaning you'll be covered while you're traveling. Someone uses your phone while it's lost or stolen? No worries. You're covered for up to &pound;1,000 in unauthorised network charges.</p>
+    <p>If your phone is lost, stolen or damaged, we'll aim to provide a replacement or repair in 24-72 hours after approving your claim. We complete 74% of all insurance claims within 24 hours to provide the fastest, most convenient service possible.</p>
+    <p>Finally, if you and your connections don't make any claims, you could receive up to 80% of your premiums as cash back at the end of the policy year, making it even more cost-effective to keep your BlackBerry device fully covered.</p>
+    <p>so-sure's insurance covers these Blackberry models for now: <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'DEKT50', 'memory': 16}) }}">BlackBerry DTEK50</a>, <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'DEKT60', 'memory': 32}) }}">BlackBerry DTEK60</a>, <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'KEYone', 'memory': 32}) }}">BlackBerry KEYone</a>, Blackberry KEY2 and <a href="{{ path('quote_make_model_memory', {'make': 'blackberry', 'model': 'Priv', 'memory': 32}) }}">BlackBerry Priv</a>.</p>
+{% endblock %}

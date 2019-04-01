@@ -1,4 +1,4 @@
-// getQuote.js
+// get-quote.js
 
 $(function() {
 
@@ -16,7 +16,7 @@ $(function() {
         }
 
         // Fix for resizing select if phone in session
-        if ($('body').is('.quote, .purchase')) {
+        if ($('body').is('.quote, .purchase, .phone-insurance-make-model')) {
             $('.phone-search-dropdown__make, .phone-search-dropdown__model').resizeselect();
         }
 
