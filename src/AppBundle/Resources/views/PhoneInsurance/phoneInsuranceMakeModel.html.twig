@@ -10,7 +10,7 @@
 
 {% block meta %}
     <meta name="description" content="Mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Insure your {{ phone.make }} {{ phone.model }} from just £{{ phone_price.monthlyPremiumPrice }} per month."/>
-    {# <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" /> #}
+    <link rel="canonical" href="{{ url('mobile_insurance', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
 {% endblock %}
 
 {% block cssPage %}
