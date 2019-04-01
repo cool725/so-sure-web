@@ -10,6 +10,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")

@@ -67,7 +67,7 @@ class HubspotService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
-        $this->client = new HubspotFactory(["key" => $hubspotKey], null, ['http_errors' => false], false);
+        $this->client = new HubspotFactory(["key" => $hubspotKey], null, [], true);
         $this->redis = $redis;
         $this->searchService = $searchService;
         $this->queueKey = 'queue:hubspot';
@@ -104,6 +104,77 @@ class HubspotService
     }
 
     /**
+     * Gives you the email of every user contact on hubspot.
+     * @return Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
+     */
+    public function getAllUserEmails()
+    {
+        $condition = $customer ? ["customer" => true] : [];
+        $offset = 0;
+        while (true) {
+            $response = $this->client->contacts()->all([
+                "count" => 100,
+                "property" => ["email"],
+                "vid-offset" => $offset
+            ]);
+            $offset += 100;
+            foreach ($response->contacts as $contact) {
+                yield $contact;
+            }
+            if (!$response->{'has-more'}) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Gives you the policy number stored in each customer deal on hubspot.
+     * @return Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
+     */
+    public function getAllPolicyNumbers()
+    {
+        $offset = 0;
+        while (true) {
+            $response = $this->client->deals()->getAll([
+                "count" => 100,
+                "property" => ["policyNumber"],
+                "vid-offset" => $offset
+            ]);
+            $offset += 100;
+            foreach ($response->deals as $deal) {
+                yield $deal;
+            }
+            if (!$response->{'has-more'}) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Gets the id code of a desired deal stage. This information has to be downloaded from hubspot but can then be
+     * cached, so this just downloads and caches it when necessary.
+     * @param string $name is the name of the desired stage.
+     * @return string the id code of the desired deal stage so long as it's a valid deal stage.
+     * @throws \Exception if you try to get a deal stage that does not exist.
+     */
+    public function getDealStageId($name)
+    {
+        $value = $this->redis->hget(self::DEAL_STAGE_CACHE_KEY, $name);
+        if ($value) {
+            return $value;
+        }
+        $response = $this->client->dealPipelines()->getPipeline($this->dealPipelineKey);
+        foreach ($response["stages"] as $stage) {
+            $this->redis->hset(self::DEAL_STAGE_CACHE_KEY, $stage["label"], $stage["stageId"]);
+        }
+        $value = $this->redis->hget(self::DEAL_STAGE_CACHE_KEY, $name);
+        if ($value) {
+            return $value;
+        }
+        throw new \Exception("{$name} is not a deal stage in the sosure deal pipeline");
+    }
+
+    /**
      * If the given user already exists as a contact then update them, otherwise create them.
      * @param User $user the user the update will be based off of.
      * @return string containing the hubspot id of the contact.
@@ -112,7 +183,6 @@ class HubspotService
     {
         $hubspotUserArray = $this->buildHubspotUserData($user);
         $response = $this->client->contacts()->createOrUpdate($user->getEmail(), $hubspotUserArray);
-        $response = $this->validateResponse($response, [200, 204]);
         if ($user->getHubspotId() !== $response["vid"]) {
             $user->setHubspotId($response["vid"]);
             $this->dm->flush();
@@ -133,7 +203,6 @@ class HubspotService
         $hubspotPolicyArray = $this->buildHubspotPolicyData($policy);
         if (!$policy->getHubspotId()) {
             $response = $this->client->deals()->create($hubspotPolicyArray);
-            $response = $this->validateResponse($response, [200, 404]);
             if ($response["responseCode"] != 404) {
                 $policy->setHubspotId($response["dealId"]);
                 $this->dm->flush();
@@ -141,7 +210,6 @@ class HubspotService
             }
         }
         $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
-        $response = $this->validateResponse($response, 200);
         return $policy->getHubspotId();
     }
 
@@ -149,20 +217,36 @@ class HubspotService
      * Deletes a contact off hubspot which represented the given user.
      * @param User $user is the user represented by the hubspot contact you want to delete.
      */
-    public function deleteContact($user)
+    public function deleteUser($user)
     {
-        $response = $this->client->contacts()->delete($user->getHubspotId());
-        $this->validateResponse($response, 204);
+        $this->deleteContact($user->getHubspotId());
     }
 
     /**
      * Deletes a deal off hubspot which represented the given policy.
      * @param Policy $policy is the policy represented by the hubspot deal you want to delete.
      */
-    public function deleteDeal($policy)
+    public function deletePolicy($policy)
     {
-        $response = $this->client->deals()->delete($policy->getHubspotId());
-        $this->validateResponse($response, 204);
+        $this->deleteDeal($policy->getHubspotId());
+    }
+
+    /**
+     * Deletes a given contact from hubspot by their hubspot id.
+     * @param string $hubspotId is the id of the hubspot contact to delete.
+     */
+    public function deleteContact($hubspotId)
+    {
+        $response = $this->client->contacts()->delete($hubspotId);
+    }
+
+    /**
+     * Deletes a given deal from hubspot by their hubspot id.
+     * @param string $hubspotId is the id of the hubspot deal to delete.
+     */
+    public function deleteDeal($hubspotId)
+    {
+        $response = $this->client->deals()->delete($hubspotId);
     }
 
     /**
@@ -343,58 +427,5 @@ class HubspotService
     private function buildProperty($name, $value, $deal = false)
     {
         return [($deal ? "name" : "property") => $name, "value" => $value];
-    }
-
-    /**
-     * Check if a response has the correct status code, and if it does not then it throws an exception. If the status
-     * code returned denotes rate limiting then it will tell you of this.
-     * @param Response  $response is the response that you are checking.
-     * @param array|int $desired  is the response code or list containing that you want the response to have.
-     * @return array the response body converted into an array from json.
-     * @throws \Exception when $response's status code is not $desired.
-     */
-    private function validateResponse($response, $desired)
-    {
-        $code = $response->getStatusCode();
-        if (!is_array($desired)) {
-            $desired = [$desired];
-        }
-        if (in_array($code, $desired)) {
-            $data = json_decode($response->getBody()->getContents(), true);
-            $data["responseCode"] = $code;
-            return $data;
-        } elseif ($code === 429) {
-            // TODO: next time I merge master there is an exception I made for this and use catch it up in the process
-            //       function like it does in mixpanel service to requeue unconditionally.
-            //       Must also put that in the queue trait.
-            throw new \Exception("Hubspot rate limited.");
-        } else {
-            throw new \Exception("Hubspot request returned status {$code}. ".$response->getBody());
-        }
-    }
-
-    /**
-     * Gets the id code of a desired deal stage. This information has to be downloaded from hubspot but can then be
-     * cached, so this just downloads and caches it when necessary.
-     * @param string $name is the name of the desired stage.
-     * @return string the id code of the desired deal stage so long as it's a valid deal stage.
-     * @throws \Exception if you try to get a deal stage that does not exist.
-     */
-    private function getDealStageId($name)
-    {
-        $value = $this->redis->hget(self::DEAL_STAGE_CACHE_KEY, $name);
-        if ($value) {
-            return $value;
-        }
-        $response = $this->client->dealPipelines()->getPipeline($this->dealPipelineKey);
-        $response = $this->validateResponse($response, 200);
-        foreach ($response["stages"] as $stage) {
-            $this->redis->hset(self::DEAL_STAGE_CACHE_KEY, $stage["label"], $stage["stageId"]);
-        }
-        $value = $this->redis->hget(self::DEAL_STAGE_CACHE_KEY, $name);
-        if ($value) {
-            return $value;
-        }
-        throw new \Exception("{$name} is not a deal stage in the sosure deal pipeline");
     }
 }

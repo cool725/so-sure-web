@@ -39,6 +39,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Exception\ClaimException;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")

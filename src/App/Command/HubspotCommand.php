@@ -62,7 +62,7 @@ class HubspotCommand extends ContainerAwareCommand
             ->addArgument(
                 "action",
                 InputArgument::REQUIRED,
-                "sync-all|sync-user|queue-count|queue-show|queue-clear|test|process"
+                "sync-all|sync-user|drop|queue-count|queue-show|queue-clear|test|process"
             )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
             ->addOption(
@@ -99,6 +99,9 @@ class HubspotCommand extends ContainerAwareCommand
                     } else {
                         $output->writeln("<info>{$email}</info> does not belong to a user.");
                     }
+                    break;
+                case "drop":
+                    $this->drop($input, $output);
                     break;
                 case "queue-count":
                     $this->queueCount($output);
@@ -176,12 +179,38 @@ class HubspotCommand extends ContainerAwareCommand
     }
 
     /**
+     * Deletes all customers and associated deals on hubspot.
+     * @param InputInterface  $input  is used to take user confirmation.
+     * @param OutputInterface $output is used for reporting some output.
+     */
+    private function drop($input, $output)
+    {
+        $dealCount = 0;
+        $contactCount = 0;
+        // Delete policies
+        foreach ($this->hubspot->getAllPolicyNumbers() as $deal) {
+            print_r($deal);
+            $this->hubspot->deleteDeal($deal->dealId);
+            $output->writeln($deal->properties->policyNumber);
+            $dealCount++;
+        }
+        // Delete users.
+        foreach ($this->hubspot->getAllUserEmails() as $contact) {
+            $this->hubspot->deleteContact($contact->vid);
+            $output->writeln($contact->properties->email);
+            $contactCount++;
+        }
+        $output->writeln("Dropped <info>{$dealCount}</info> deals.");
+        $output->writeln("Dropped <info>{$contactCount}</info> contacts.");
+    }
+
+    /**
      * Temporary or testing functionality.
      * @param OutputInterface $output allows output to the commandline.
      */
     private function test($output)
     {
-        $output->writeln("test.");
+        $output->writeln("testing...");
     }
 
     /**
