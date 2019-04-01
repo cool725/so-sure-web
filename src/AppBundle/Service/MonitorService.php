@@ -826,7 +826,8 @@ class MonitorService
                 null,
                 SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
                 SalvaPhonePolicy::SALVA_STATUS_CANCELLED]
-            ]
+            ],
+            'statusUpdated' => ['$lt' => (new \DateTime())->sub(new \DateInterval("PT10M"))]
         ]);
 
         if (count($policies) > 0) {
@@ -846,7 +847,8 @@ class MonitorService
             '$or' => [
                 ['policyFiles' => null],
                 ['policyFiles' => ['$size' => 0]]
-            ]
+            ],
+            'statusUpdated' => ['$lt' => (new \DateTime())->sub(new \DateInterval("PT10M"))]
         ]);
 
         if (count($policyFiles) > 0) {
