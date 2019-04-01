@@ -4,6 +4,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Service\BacsService;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -25,6 +26,49 @@ class BankAccount
     const MANDATE_SUCCESS = 'success';
     const MANDATE_FAILURE = 'failure';
     const MANDATE_CANCELLED = 'cancelled';
+
+    const CANCELLER_AUDDIS = 'auddis';
+    const CANCELLER_ADDACS = 'addacs';
+    const CANCELLER_DDICS = 'ddics';
+    const CANCELLER_SOSURE = 'sosure';
+    const CANCELLERS = [
+        self::CANCELLER_AUDDIS,
+        self::CANCELLER_ADDACS,
+        self::CANCELLER_DDICS,
+        self::CANCELLER_SOSURE
+    ];
+
+    const CANCEL_REASONS = [
+        self::CANCELLER_AUDDIS => [
+            BacsService::AUDDIS_REASON_USER => 'Instruction cancelled by user',
+            BacsService::AUDDIS_REASON_DECEASED => 'Payer deceased',
+            BacsService::AUDDIS_REASON_TRANSFER => 'Account transferred',
+            BacsService::AUDDIS_REASON_NO_ACCOUNT => 'No account',
+            BacsService::AUDDIS_REASON_NO_INSTRUCTION => 'No instruction',
+            BacsService::AUDDIS_REASON_NON_ZERO => 'DDI amount not zero',
+            BacsService::AUDDIS_REASON_CLOSED => 'Account closed',
+            BacsService::AUDDIS_REASON_TRANSFER_BRANCH => 'Account transferred to different branch',
+            BacsService::AUDDIS_REASON_INVALID_ACCOUNT_TYPE => 'Invalid account type',
+            BacsService::AUDDIS_REASON_DD_NOT_ALLOWED => 'Bank will not accept direct debits',
+            BacsService::AUDDIS_REASON_EXPIRED => 'Instruction has expired',
+            BacsService::AUDDIS_REASON_DUPLICATE_REFERENCE => 'Payer reference is not unique',
+            BacsService::AUDDIS_REASON_INCORRECT_DETAILS => 'Account details incorrect',
+            BacsService::AUDDIS_REASON_CODE_INCOMPATIBLE => 'Incorrect transaction code sent',
+            BacsService::AUDDIS_REASON_NOT_ALLOWED => 'Transaction disallowed at branch',
+            BacsService::AUDDIS_REASON_INVALID_REFERENCE => 'Invalid Reference',
+            BacsService::AUDDIS_REASON_MISSING_PAYER_NAME => 'Payer name missing',
+            BacsService::AUDDIS_REASON_MISSING_SERVICE_NAME => 'Service User Name missing'
+        ],
+        self::CANCELLER_ADDACS => [
+            BacsService::ADDACS_REASON_BANK => 'Instruction cancelled, refer to payer',
+            BacsService::ADDACS_REASON_USER => 'Instruction cancelled by payer',
+            BacsService::ADDACS_REASON_DECEASED => 'Payer deceased',
+            BacsService::ADDACS_REASON_TRANSFER => 'Account transferred'
+        ]
+    ];
+
+    const CANCEL_REASON_PERSONAL_DETAILS = 'cancel-personal-details';
+
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -80,6 +124,22 @@ class BankAccount
      * @var string
      */
     protected $mandateStatus;
+
+    /**
+     * Denotes where the cause for the mandate cancellation originated from.
+     * @Assert\Choice({"addacs", "auddis", "sosure"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $mandateCanceller;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $mandateCancelledReason;
 
     /**
      * @AppAssert\Token()
@@ -294,6 +354,29 @@ class BankAccount
     public function setMandateStatus($mandateStatus)
     {
         $this->mandateStatus = $mandateStatus;
+        // Blank cancel reasons whenever we update status.
+        $this->setMandateCanceller(null);
+        $this->setMandateCancelledReason(null);
+    }
+
+    public function getMandateCanceller()
+    {
+        return $this->mandateCanceller;
+    }
+
+    public function setMandateCanceller($mandateCanceller)
+    {
+        $this->mandateCanceller = $mandateCanceller;
+    }
+
+    public function getMandateCancelledReason()
+    {
+        return $this->mandateCancelledReason;
+    }
+
+    public function setMandateCancelledReason($mandateCancelledReason)
+    {
+        $this->mandateCancelledReason = $mandateCancelledReason;
     }
 
     public function getMandateSerialNumber()
@@ -429,6 +512,19 @@ class BankAccount
         return $expectedNotificationDate < $date;
     }
 
+    /**
+     * Sets the bank account's mandate to cancelled, saves the name of the origin of the cancellation, and the reason
+     * code given.
+     * @param string $canceller is the name of the cancelling event. This is either arudd, auddis, or sosure.
+     * @param string $reason    is the reason code given by the bacs system, or information given by sosure.
+     */
+    public function cancelMandate($canceller, $reason)
+    {
+        $this->setMandateStatus(self::MANDATE_CANCELLED);
+        $this->setMandateCanceller($canceller);
+        $this->setMandateCancelledReason($reason);
+    }
+
     public function isMandateInvalid()
     {
         return in_array($this->getMandateStatus(), [
@@ -491,6 +587,28 @@ class BankAccount
         $maxAllowedDay = $maxAllowedDate->format('j');
 
         return $maxAllowedDay;
+    }
+
+    /**
+     * Gives you a text string explaining the mandate cancellation reason code.
+     * @return string|null containing the explanation. If the mandate is not cancelled then it will be null.
+     */
+    public function getMandateCancelledExplanation()
+    {
+        if (!$this->mandateCanceller) {
+            return null;
+        }
+        if (array_key_exists($this->mandateCanceller, self::CANCEL_REASONS)) {
+            $category = self::CANCEL_REASONS[$this->mandateCanceller];
+            if (array_key_exists($this->mandateCancelledReason, $category)) {
+                $description = $category[$this->mandateCancelledReason];
+            } else {
+                $description = $this->mandateCancelledReason;
+            }
+        } else {
+            $description = $this->mandateCancelledReason;
+        }
+        return "{$this->mandateCanceller}: {$description}.";
     }
 
     public function getNotificationDay()
