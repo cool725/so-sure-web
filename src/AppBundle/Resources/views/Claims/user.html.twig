@@ -692,7 +692,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        {{ form_errors(handling_team_form) }}
+                        {{ form_start(handling_team_form) }}
                             <div class="form-group">
                                 {{ form_widget(handling_team_form.handlingTeam)}}
                                 <div class="with-errors">{{ form_errors(handling_team_form) }}</div>
