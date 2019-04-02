@@ -757,11 +757,15 @@ class MonitorService
         }
 
         if (count($tooOldSubmittedClaims) > 0) {
-            $sampleClaim = current($tooOldSubmittedClaims);
-            $claimId = $sampleClaim->getId();
-            throw new MonitorException(
-                "At least one Claim (eg: {$claimId}) is still marked as 'Submitted' after 2 business days"
-            );
+            $ids = [];
+            foreach ($tooOldSubmittedClaims as $claim) {
+                $ids[] = $claim->getId();
+            }
+            throw new MonitorException(sprintf(
+                "Found %d claims still marked as 'submitted' after 2 business days. Ids: %s",
+                count($ids),
+                $this->quoteSafeArrayToString($ids)
+            ));
         }
     }
 
@@ -822,7 +826,8 @@ class MonitorService
                 null,
                 SalvaPhonePolicy::SALVA_STATUS_ACTIVE,
                 SalvaPhonePolicy::SALVA_STATUS_CANCELLED]
-            ]
+            ],
+            'statusUpdated' => ['$lt' => (new \DateTime())->sub(new \DateInterval("PT10M"))]
         ]);
 
         if (count($policies) > 0) {
@@ -842,7 +847,8 @@ class MonitorService
             '$or' => [
                 ['policyFiles' => null],
                 ['policyFiles' => ['$size' => 0]]
-            ]
+            ],
+            'statusUpdated' => ['$lt' => (new \DateTime())->sub(new \DateInterval("PT10M"))]
         ]);
 
         if (count($policyFiles) > 0) {

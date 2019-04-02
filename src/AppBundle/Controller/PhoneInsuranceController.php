@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\LeadEmailType;
@@ -98,6 +99,16 @@ class PhoneInsuranceController extends BaseController
         return array();
     }
 
+
+    /**
+     * @Route("/phone-insurance", name="phone_insurance")
+     */
+    public function phoneInsuranceAction()
+    {
+
+        return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig');
+    }
+
     /**
      * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
@@ -167,7 +178,6 @@ class PhoneInsuranceController extends BaseController
                     'memory' => $memory,
                 ]);
             }
-
             return $this->redirectToRoute('homepage');
         }
 
@@ -451,14 +461,120 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USPS);
         }
 
+        // Hyphenate Model for images/template
+        $modelHyph = str_replace('+', '-', $model);
+
+        // List all available hero images otherwise switch to genric
+        $availableImages = [
+            'iphone-x',
+            'iphone-xr',
+            'iphone-xs',
+            'iphone-7',
+            'iphone-8',
+            'galaxy-s8',
+            'galaxy-s9',
+            'galaxy-note-9',
+            'pixel',
+            'pixel-3-xl',
+        ];
+
+        // BlackBerry Generic
+        $blackberry = [
+            'dekt50'
+        ];
+
+        // HTC One Generic
+        $htcOne = [
+            'one-a9',
+            'one-m8s',
+            'one-m9',
+            'one-x9',
+        ];
+
+        $huaweiP9 = [
+            'p9',
+            'p9-plus',
+            'p9-lite'
+        ];
+
+        $motorolaMoto = [
+            'moto-g4-play',
+            'moto-g',
+            'moto-g5s-plus',
+            'moto-e4-plus',
+            'moto-g5',
+            'moto-g5s',
+            'moto-g6',
+            'moto-e3',
+            'moto-g-(3rd-gen)'
+        ];
+
+        $galaxyS5 = [
+            'galaxy-s5-neo',
+            'galaxy-s5-mini'
+        ];
+
+        $sonyXperia = [
+            'xperia-e4g',
+            'xperia-e4',
+            'xperia-xz1',
+            'xperia-e5',
+            'xperia-zx',
+            'xperia-z5-premium',
+            'xperia-z5-compact',
+            'xperia-z5',
+            'xperia-m4-aqua',
+            'xperia-xz3',
+            'xperia-xz2-compact',
+            'xperia-xz2',
+            'xperia-z3-plus',
+            'xperia-xz-premium',
+            'xperia-xa2-ultra',
+            'xperia-xa2',
+            'xperia-xa1-ultra',
+            'xperia-xa1',
+            'xperia-xa-ultra',
+            'xperia-xa',
+            'xperia-x',
+            'xperia-m5',
+        ];
+
+        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+
+        // SEO pages
+        // TODO: Add check if file exists or redirect to 404
+
+        if ($request->get('_route') == 'quote_make_model') {
+            // Model template
+            $templateModel = $modelHyph.'.html.twig';
+            $template = 'AppBundle:PhoneInsurance/Phones:'.$templateModel;
+
+            // If certain models share the same template - check
+            if (in_array($modelHyph, $blackberry)) {
+                $template = 'AppBundle:PhoneInsurance/Phones:blackberry.html.twig';
+            } elseif (in_array($modelHyph, $htcOne)) {
+                $template = 'AppBundle:PhoneInsurance/Phones:htc-one.html.twig';
+            } elseif (in_array($modelHyph, $huaweiP9)) {
+                $template = 'AppBundle:PhoneInsurance/Phones:huawei-p9.html.twig';
+            } elseif (in_array($modelHyph, $motorolaMoto)) {
+                $template = 'AppBundle:PhoneInsurance/Phones:motorola-moto.html.twig';
+            } elseif (in_array($modelHyph, $galaxyS5)) {
+                $template = 'AppBundle:PhoneInsurance/Phones:galaxy-s5.html.twig';
+            } elseif (in_array($modelHyph, $sonyXperia)) {
+                $template = 'AppBundle:PhoneInsurance/Phones:sony-xperia.html.twig';
+            }
+
+            // Check if template exists
+            if (!$this->get('templating')->exists($template)) {
+                throw new NotFoundHttpException();
+            }
+        }
+
         $data = array(
             'phone'                 => $phone,
             'phone_price'           => $phone->getCurrentPhonePrice(),
             'policy_key'            => $this->getParameter('policy_key'),
             'connection_value'      => PhonePolicy::STANDARD_VALUE,
-            'annual_premium'        => $annualPremium,
-            'max_connections'       => $maxConnections,
-            'max_pot'               => $maxPot,
             'lead_form'             => $leadForm->createView(),
             'buy_form'              => $buyForm->createView(),
             'buy_form_banner'       => $buyBannerForm->createView(),
@@ -473,15 +589,15 @@ class PhoneInsuranceController extends BaseController
                 ],
                 ['memory' => 'asc']
             ),
-            'comparision'     => $phone->getComparisions(),
-            'comparision_max' => $maxComparision,
-            'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
-            'web_base_url'    => $this->getParameter('web_base_url'),
-            // 'slider_test'     => 'slide-me',
-            // 'replacement'     => $replacement,
+            'comparision'      => $phone->getComparisions(),
+            'comparision_max'  => $maxComparision,
+            'coming_soon'      => $phone->getCurrentPhonePrice() ? false : true,
+            'web_base_url'     => $this->getParameter('web_base_url'),
+            'img_url'          => $modelHyph,
+            'available_images' => $availableImages,
         );
 
-        return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+        return $this->render($template, $data);
     }
 
     /**

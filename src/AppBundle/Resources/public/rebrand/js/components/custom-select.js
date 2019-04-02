@@ -1,4 +1,4 @@
-// customSelect.js
+// custom-select.js
 
 (function($, window){
 
