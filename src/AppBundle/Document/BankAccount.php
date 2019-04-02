@@ -127,7 +127,7 @@ class BankAccount
 
     /**
      * Denotes where the cause for the mandate cancellation originated from.
-     * @Assert\Choice({"addacs", "auddis", "ddics", "sosure"}, strict=true)
+     * @Assert\Choice(choices=BankAccount::CANCELLERS, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      * @var string

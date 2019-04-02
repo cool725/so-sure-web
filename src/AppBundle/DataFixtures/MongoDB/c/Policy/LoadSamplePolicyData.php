@@ -1092,13 +1092,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * Sets the bank account's madate status and potentially cancellation reasons and cancellers.
      * @param BankAccount $bankAccount is the bank account that we are operating on.
      */
-    protected function giveRandomMandateStatus($bankAccount)
+    private function giveRandomMandateStatus($bankAccount)
     {
         $status = rand(0, 4);
         if ($status == 0) {
-            $canceller = array_rand(BankAccount::CANCELLERS);
+            $canceller = BankAccount::CANCELLERS[array_rand(BankAccount::CANCELLERS)];
             if (array_key_exists($canceller, BankAccount::CANCEL_REASONS)) {
-                $bankAccount->cancelMandate($canceller, array_rand(BankAccount::CANCELLERS[$canceller]));
+                $bankAccount->cancelMandate($canceller, array_rand(BankAccount::CANCEL_REASONS[$canceller]));
             } elseif ($canceller == BankAccount::CANCELLER_SOSURE) {
                 $bankAccount->cancelMandate($canceller, BankAccount::CANCEL_REASON_PERSONAL_DETAILS);
             } else {
