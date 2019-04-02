@@ -2203,12 +2203,12 @@ class BacsService
         if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
             if (!$ignoreNotEnoughTime) {
                 $msg = sprintf(
-                    'Skipping (scheduled) payment %s as payment date is after expiration date',
+                    'Cancelling (scheduled) payment %s as payment date is after expiration date',
                     $id
                 );
                 $this->warnings[] = $msg;
 
-                return self::VALIDATE_SKIP;
+                return self::VALIDATE_CANCEL;
             }
 
             // @codingStandardsIgnoreStart
