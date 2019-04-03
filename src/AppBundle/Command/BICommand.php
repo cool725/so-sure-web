@@ -401,7 +401,12 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf('"%s"', $policy->useForAttribution($prefix) ? 'yes' : 'no'),
                 sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
-                sprintf('"%s"', $policy->getMandateCancelledExplanation())
+                sprintf(
+                    '"%s"',
+                    $policy->getPolicyOrUserBacsBankAccount() ?
+                        $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledReason() :
+                        null
+                )
             ]);
         }
         if (!$skipS3) {
