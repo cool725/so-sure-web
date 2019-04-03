@@ -15,7 +15,7 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Paid in (cards)</td>
-                <td>£{{ paymentTotals.judo.received|number_format(2, '.', ',') }}</td>
+                <td>£{{ (paymentTotals.judo.received + paymentTotals.checkout.received)|number_format(2, '.', ',') }}</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
@@ -30,7 +30,7 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}"><strong>Premium received in month</strong></td>
-                {% set receivedTotal = paymentTotals.judo.received + paymentTotals.bacs.received + paymentTotals.sosure.received %}
+                {% set receivedTotal = paymentTotals.judo.received + paymentTotals.checkout.received + paymentTotals.bacs.received + paymentTotals.sosure.received %}
                 {% set expectedReceived = paymentTotals.all.received - paymentTotals.chargebacks.received %}
                 {% if equal_to_two_dp(receivedTotal, expectedReceived) %}
                 <td><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
@@ -48,7 +48,7 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Refunded (cards)</td>
-                <td>(£{{ (0 - paymentTotals.judo.refunded)|number_format(2, '.', ',') }})</td>
+                <td>(£{{ (0 - (paymentTotals.judo.refunded + paymentTotals.checkout.refunded))|number_format(2, '.', ',') }})</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
@@ -73,7 +73,7 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
-                {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
+                {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.checkout.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
                 {% set expectedRefunded = paymentTotals.all.refunded + paymentTotals.chargebacks.received %}
                 {% if equal_to_two_dp(refundedTotal, expectedRefunded) %}
                 <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
@@ -497,6 +497,11 @@
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Checkout</td>
+                <td>{{ paymentTotals.checkout.numReceived }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Bacs</td>
                 <td>{{ paymentTotals.bacs.numReceived }}</td>
             </tr>
@@ -516,6 +521,11 @@
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Judo</td>
                 <td>{{ paymentTotals.judo.numRefunded }}</td>
+            </tr>
+            <tr>
+                <td width="{{ indent_width }}"></td>
+                <td width="{{ text_width }}">Checkout</td>
+                <td>{{ paymentTotals.checkout.numRefunded }}</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
