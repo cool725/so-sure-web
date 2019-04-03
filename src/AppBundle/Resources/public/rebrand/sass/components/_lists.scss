@@ -56,3 +56,15 @@
         }
     }
 }
+
+// Use .list-unstyled
+.simple-list {
+
+    &-item {
+        border-bottom: 2px solid $selago;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
