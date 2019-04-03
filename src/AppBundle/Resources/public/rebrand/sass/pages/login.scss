@@ -106,7 +106,7 @@
         position: absolute;
         bottom: -200px; right: -106px;
 
-        background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-phone-smile.png') no-repeat;
+        background: transparent url('#{$cdn_url}/images/onexone.png') no-repeat;
         background-size: 352px;
 
         @include media-breakpoint-up(lg) {
@@ -120,7 +120,7 @@
             position: absolute;
             left: 55%; top: 50%;
 
-            background: transparent url('#{$cdn_url}/images/rebrand/login/so-sure_login-money.png') no-repeat;
+            background: transparent url('#{$cdn_url}/images/onexone.png') no-repeat;
             background-size: 367px;
         }
     }
