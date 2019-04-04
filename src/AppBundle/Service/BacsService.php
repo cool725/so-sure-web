@@ -1415,6 +1415,7 @@ class BacsService
         ]);
 
         if (!$file) {
+            $this->logger->error("Serial number {$serialNumber} is not found on pending accesspay file.");
             return false;
         }
 
