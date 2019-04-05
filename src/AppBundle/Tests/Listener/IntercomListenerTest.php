@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Listener;
 use AppBundle\Document\Charge;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Event\PicsureEvent;
+use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -170,7 +171,7 @@ class IntercomListenerTest extends WebTestCase
         static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
         $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
 
-        static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicy, new MailerService(), new \DateTime('2017-01-01'));
 
         // Expect a policy start event + policy created event + user update
         $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));

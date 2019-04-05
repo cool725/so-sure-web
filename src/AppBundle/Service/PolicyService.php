@@ -65,6 +65,7 @@ use AppBundle\Exception\AlreadyParticipatingException;
 
 use Gedmo\Loggable\Document\LogEntry;
 use Symfony\Component\Templating\EngineInterface;
+use thiagoalessio\TesseractOCR\Command;
 
 class PolicyService
 {
@@ -1631,7 +1632,7 @@ class PolicyService
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this-> activate($policy, $date, $this->mailer);
+                    $this-> activate($policy, $this->mailer, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error activating Policy %s / %s',
@@ -1974,13 +1975,13 @@ class PolicyService
 
     /**
      * @param Policy             $policy
-     * @param \DateTime|null     $date
      * @param MailerService|null $mailer
+     * @param \DateTime|null     $date
      * @throws \Exception
      */
-    public function activate(Policy $policy, \DateTime $date = null, MailerService $mailer = null)
+    public function activate(Policy $policy, MailerService $mailer, \DateTime $date = null)
     {
-        $policy->activate($date, $mailer);
+        $policy->activate($mailer, $date);
         $this->dm->flush();
 
         $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));

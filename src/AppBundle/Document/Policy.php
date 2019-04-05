@@ -4250,11 +4250,11 @@ abstract class Policy
     }
 
     /**
-     * @param \DateTime|null     $date
      * @param MailerService|null $mailer
+     * @param \DateTime|null     $date
      * @throws \Exception
      */
-    public function activate(\DateTime $date = null, MailerService $mailer = null)
+    public function activate(MailerService $mailer, \DateTime $date = null)
     {
         if ($date == null) {
             $date = \DateTime::createFromFormat('U', time());
@@ -4300,7 +4300,6 @@ abstract class Policy
             $previousPremium = $this->getPreviousPolicy()->getPremiumInstallmentPrice(false, false);
             $renewalPremium = $this->getPremiumInstallmentPrice(false, false);
             if ($renewalPremium !== $previousPremium) {
-                $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
                 $mailer->sendTemplateToUser(
                     sprintf('Your Direct Debit Confirmation'),
                     $this->getUser(),
