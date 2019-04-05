@@ -1975,7 +1975,7 @@ class PolicyService
 
     /**
      * @param Policy             $policy
-     * @param MailerService|null $mailer
+     * @param MailerService      $mailer
      * @param \DateTime|null     $date
      * @throws \Exception
      */

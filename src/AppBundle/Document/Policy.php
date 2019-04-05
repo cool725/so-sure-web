@@ -4250,7 +4250,7 @@ abstract class Policy
     }
 
     /**
-     * @param MailerService|null $mailer
+     * @param MailerService      $mailer
      * @param \DateTime|null     $date
      * @throws \Exception
      */
