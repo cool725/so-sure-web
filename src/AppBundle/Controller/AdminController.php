@@ -1192,6 +1192,9 @@ class AdminController extends BaseController
     /**
      * @Route("/banking", name="admin_banking")
      * @Route("/banking/{year}/{month}", name="admin_banking_date")
+     * @Route("/banking/card/{year}/{month}", name="admin_banking_card_date")
+     * @Route("/banking/merchant/{year}/{month}", name="admin_banking_merchant_date")
+     * @Route("/banking/bacs/{year}/{month}", name="admin_banking_bacs_date")
      * @Template
      */
     public function adminBankingAction(Request $request, $year = null, $month = null)
@@ -1215,7 +1218,7 @@ class AdminController extends BaseController
         $inputRepo = $dm->getRepository(BacsReportInputFile::class);
         /** @var BacsReportAruddFileRepository $aruddRepo */
         $aruddRepo = $dm->getRepository(BacsReportAruddFile::class);
-        /** @var BacsReportDdicFileRepository $aruddRepo */
+        /** @var BacsReportDdicFileRepository $ddicRepo */
         $ddicRepo = $dm->getRepository(BacsReportDdicFile::class);
         /** @var BacsPaymentRepository $bacsPaymentRepo */
         $bacsPaymentRepo = $dm->getRepository(BacsPayment::class);
@@ -1389,7 +1392,7 @@ class AdminController extends BaseController
             }
         }
 
-        return [
+        $data = [
             'judoForm' => $judoForm->createView(),
             'checkoutForm' => $checkoutForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
@@ -1398,20 +1401,30 @@ class AdminController extends BaseController
             'reconciliationForm' => $reconciliationForm->createView(),
             'cashflowsForm' => $cashflowsForm->createView(),
             'dates' => $this->getYMD($year, $month),
-            'lloyds' => $this->getLloydsBanking($date, $year, $month),
-            'barclays' => $this->getBarclaysBanking($date, $year, $month),
+            'salva' => $this->getSalvaBanking($date, $year, $month),
             'sosure' => $sosure,
             'reconciliation' => $this->getReconcilationBanking($date),
-            'salva' => $this->getSalvaBanking($date, $year, $month),
-            'judo' => $this->getJudoBanking($date, $year, $month),
-            'checkout' => $this->getCheckoutBanking($date, $year, $month),
-            'cashflows' => $this->getCashflowsBanking($date, $year, $month),
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
-            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
-            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
-            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
-            'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false),
+            'year' => $date->format('Y'),
+            'month' => $date->format('n'),
         ];
+
+        if ($request->get('_route') == 'admin_banking_card_date') {
+            $data['judo'] = $this->getJudoBanking($date, $year, $month);
+            $data['checkout'] = $this->getCheckoutBanking($date, $year, $month);
+        } elseif ($request->get('_route') == 'admin_banking_merchant_date') {
+            $data['cashflows'] = $this->getCashflowsBanking($date, $year, $month);
+            $data['barclays'] = $this->getBarclaysBanking($date, $year, $month);
+            $data['lloyds'] = $this->getLloydsBanking($date, $year, $month);
+        } elseif ($request->get('_route') == 'admin_banking_bacs_date') {
+            $data['lloyds'] = $this->getLloydsBanking($date, $year, $month);
+            $data['bacsInputFiles'] = $inputRepo->getMonthlyFiles($date);
+            $data['bacsAruddFiles'] = $aruddRepo->getMonthlyFiles($date);
+            $data['bacsDdicFiles'] = $ddicRepo->getMonthlyFiles($date);
+            $data['manualBacsPayments'] = Payment::sumPayments($manualBacsPayments, false);
+        }
+
+        return $data;
     }
 
     private function getYMD($year, $month, $daysInNextMonth = 3)

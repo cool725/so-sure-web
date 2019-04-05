@@ -1,4 +1,4 @@
-// landing-snapchat-b.scss
+// landing-youtube.scss
 
 @import "../vendor/bs4/functions";
 @import "../vendor/bs4/variables";
@@ -13,7 +13,7 @@
     padding-bottom: 4rem;
     overflow: hidden;
 
-    @include snapchat-gradient;
+    @include blue-gradient;
 
     .container {
         position: relative;
@@ -35,20 +35,43 @@
         }
 
         @include media-breakpoint-up(lg) {
-            padding-top: 4rem;
+            padding-top: 2rem;
         }
 
         @include media-breakpoint-up(xl) {
-            padding-top: 6rem;
+            // padding-top: 4rem;
         }
 
     }
 
     &__illustration {
-        height: 200px;
+        position: relative;
+        z-index: 4;
 
-        @include media-breakpoint-up(lg) {
-            // right: 100px;
+        // @include media-breakpoint-up(lg) {
+        //     width: 740px;
+        //     position: absolute;
+        //     top: 150px; right: 0;
+        // }
+
+        // @include media-breakpoint-up(fl) {
+        //     top: 200px;
+        // }
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/youtube/so-sure_youtube-hero-background-offset-mobile.svg');
+        background-size: cover;
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/youtube/so-sure_youtube-hero-background-offset.svg');
         }
     }
 }
@@ -73,7 +96,7 @@
 
 .intro {
     text-align: center;
-    @include snapchat-gradient-180;
+    @include blue-gradient;
 }
 
 .comparison-table {
@@ -90,7 +113,7 @@
     }
 
     &__mobile {
-        background-color: $bright-yellow;
+        background-color: $pattens-blue;
     }
 
     &__list {
@@ -129,7 +152,7 @@
 }
 
 .claims {
-    @include blue-gradient-180;
+    @include blue-gradient-0;
     text-align: center;
 
     &__step {
@@ -148,7 +171,7 @@
 
     &__number {
         width: 55px; height: 55px;
-        background-color: $bright-yellow;
+        background-color: $white;
         margin: 0 auto 1.2rem;
 
         @include border-radius(50%);
@@ -161,43 +184,6 @@
         }
     }
 }
-
-// .comparison {
-//     position: relative;
-//     background-color: $pattens-blue;
-
-//     // .table-list {
-//     //     position: relative;
-
-//     //     @include media-breakpoint-up(md) {
-//     //         width: 520px;
-//     //     }
-
-//     //     @include media-breakpoint-up(lg) {
-
-//     //         &__insurers {
-//     //             transform: translateX(25px);
-//     //             z-index: 10;
-//     //         }
-
-//     //         &__so-sure {
-//     //             transform: translateX(-25px);
-//     //             z-index: 11;
-//     //         }
-//     //     }
-//     // }
-
-//     .table-comparison  {
-//         position: relative;
-//         z-index: 4;
-//     }
-
-//     svg {
-//         position: absolute;
-//         top: -20%; left: 0;
-//         z-index: 1;
-//     }
-// }
 
 .banner {
     position: relative;
