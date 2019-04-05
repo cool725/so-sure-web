@@ -1974,9 +1974,9 @@ class PolicyService
 
 
     /**
-     * @param Policy             $policy
-     * @param MailerService      $mailer
-     * @param \DateTime|null     $date
+     * @param Policy         $policy
+     * @param MailerService  $mailer
+     * @param \DateTime|null $date
      * @throws \Exception
      */
     public function activate(Policy $policy, MailerService $mailer, \DateTime $date = null)

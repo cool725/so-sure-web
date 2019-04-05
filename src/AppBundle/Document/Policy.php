@@ -4250,8 +4250,8 @@ abstract class Policy
     }
 
     /**
-     * @param MailerService      $mailer
-     * @param \DateTime|null     $date
+     * @param MailerService  $mailer
+     * @param \DateTime|null $date
      * @throws \Exception
      */
     public function activate(MailerService $mailer, \DateTime $date = null)
