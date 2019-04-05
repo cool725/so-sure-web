@@ -1,0 +1,44 @@
+<ul class="nav navbar-nav flex-row align-items-center">
+    <li class="nav-item d-none d-xl-block pr-xl-5">
+        <a href="{{ path('phone_insurance') }}"
+           class="nav-link">
+           {# TODO: This changes in totally pages to Mobile Phone Insurane is this needed? #}
+            Mobile Insurance
+        </a>
+    </li>
+    <li class="nav-item d-none d-xl-block pr-xl-5">
+        <a href="{{ path('quote_make_model_memory', {'make': 'apple', 'model': 'iphone x', 'memory': 64}) }}"
+           class="nav-link">
+           {# TODO: Default to iphone top??? #}
+            iPhone X Insurance
+        </a>
+    </li>
+    <li class="nav-item d-none d-xl-block pr-xl-5">
+        <a href="{{ path('faq') }}"
+           class="nav-link {{ app.request.get('_route') == 'faq' ? 'nav-active' }}">
+           FAQs
+        </a>
+    </li>
+    <li class="nav-item d-none d-xl-block pr-xl-5">
+        <a href="https://blog.wearesosure.com"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="nav-link">Blog</a>
+    </li>
+    <li class="nav-item d-none-xxs pr-xl-5">
+        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote btn-shadow">
+            {% if app.request.get('_route') == 'mobile_insurance_make_model' %}
+                Insure your phone
+            {% else %}
+                Get a Quote
+            {% endif %}
+        </a>
+    </li>
+    <li class="nav-item d-xl-none">
+        <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse" type="button">
+            <span class="hamburger-box">
+                <span class="hamburger-inner"></span>
+            </span>
+        </button>
+    </li>
+</ul>

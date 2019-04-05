@@ -1042,6 +1042,8 @@ nelmio_security:
                 - https://*.vimeocdn.com
                 - https://use.fontawesome.com
                 - https://pro.fontawesome.com
+                - https://tagmanager.google.com
+                - https://fonts.googleapis.com
             img-src:
                 - 'self'
                 - https://wearesosure.com

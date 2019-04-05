@@ -1,0 +1,96 @@
+<section class="mini-faq py-lg-5">
+    <div class="container container-xtra py-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="text-center text-lg-left">
+                    <h2 class="h3 mb-3 text-primary">{% if phone is defined and phone %}{{ phone.model }}{% else %}Mobile{% endif %} Insurance <br><span class="sub">FAQs</span></h2>
+                    <p class="mb-4">Here's the top questions we get asked.</p>
+                    <a href="{{ path('faq') }}" class="d-none d-md-inline btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                    <div class="expanding-cardbox__body">
+                        <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                            Why should I use you? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        </h5>
+                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                            <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="#social-insurance-and-reward-pot">money back</a>.</p>
+                            <ul class="mb-0">
+                                <li class="mb-2">Instant cover from purchase</li>
+                                <li class="mb-2">We aim for 24-72 hour replacement or repair once your claim is approved</li>
+                                <li class="mb-2">Hassle-Free Claims</li>
+                                <li class="mb-2">Low excess from just &pound;50 when validated with our anti-fraud technology. If not validated then excess is &pound;150</li>
+                                <li class="mb-2">Insure mobiles up to 3 years old</li>
+                                <li class="mb-2">No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
+                                <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                    <div class="expanding-cardbox__body">
+                        <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                            I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        </h5>
+                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                            Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.
+                        </div>
+                    </div>
+                </div>
+                <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                    <div class="expanding-cardbox__body">
+                        <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                            Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        </h5>
+                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                            <p>Yes, you can take out insurance on a second hand phone.</p>
+                            <p class="mb-0">The phone bought needs to have originally been sold into the UK or European Union market prior your purchase (e.g. we don't insure models sold in China).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                    <div class="expanding-cardbox__body">
+                        <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                            How much is excess? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        </h5>
+                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                            <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology</p>
+                            <p class="mb-0"><mark>If you don't validate your phone with pic-sure using our app, the excess is &pound;150.</mark></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                    <div class="expanding-cardbox__body">
+                        <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                            Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        </h5>
+                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                            The phone you want to insure must be <mark>less than 3 years old</mark> from when your policy begins.
+                        </div>
+                    </div>
+                </div>
+                <div class="expanding-cardbox expanding-cardbox-white mb-4">
+                    <div class="expanding-cardbox__body">
+                        <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                            What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        </h5>
+                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                            <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
+                            <h6 class="text-zaffre">For iOS (Apple) users:</h6>
+                            <p>Unfortunately, as we need your serial number on iOS you can’t just dial a number (although dialing the same number as above will reveal your IMEI number).</p>
+                            <p>As such you can find both numbers by going to <mark>Settings &gt; General &gt; About</mark>.</p>
+                            <p>If you’re using our app (or if requested by support), you can take a screenshot by pressing the <mark>Sleep/Wake</mark> and <mark>Home</mark> buttons at the same time until you see the screen flash quickly.</p>
+                            <h6 class="text-zaffre">For Android users:</h6>
+                            <p>The easiest way to find your phone’s IMEI number if you’re on an Android device is to simply dial <mark>*#06#</mark>.</p>
+                            <p>If you’re still having trouble, then you should be able to find it in <mark>Settings &gt; About phone &gt; Status &gt; IMEI information</mark>.</p>
+                            <p>Your serial number will be on the Status screen.</p>
+                            <p class="mb-0">If requested by support, you can take a screenshot on most Android phones by holding the volume down and the power buttons for 1-2 seconds. The screen should flash and the photo can be found in your photos app.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ path('faq') }}" class="d-md-none btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
+            </div>
+        </div>
+    </div>
+</section>

@@ -97,6 +97,25 @@
                                     <i class="far fa-clock fa-fw"></i>
                                 {% endif %}</button>
                         </div>
+                        <div class="form-group">
+                            <div class="dropdown mr-2">
+                                <a class="btn btn-primary btn-square dropdown-toggle"
+                                   href="#" role="button"
+                                   id="tabs_dropdown"
+                                   data-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="false"> Tabs</a>
+                                <div class="dropdown-menu"
+                                     aria-labelledby="tabs_dropdown">
+                                        <a class="dropdown-item" href="{{ path('admin_banking_card_date', {'year': year, 'month': month}) }}"
+                                        >Card Details</a>
+                                        <a class="dropdown-item" href="{{ path('admin_banking_merchant_date', {'year': year, 'month': month}) }}"
+                                        >Merchant Details</a>
+                                        <a class="dropdown-item" href="{{ path('admin_banking_bacs_date', {'year': year, 'month': month}) }}"
+                                        >Bacs Details</a>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -111,16 +130,16 @@
                        href="#salva_content"
                        role="tab"
                        aria-controls="home_content"
-                       aria-selected="true">Salva</a>
+                       aria-selected="true">Salva <i class="fa fa-check"></i> </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item {% if judo is defined %}active{% endif %}">
                     <a class="nav-link"
                        id="judo_tab"
                        data-toggle="tab"
                        href="#judo_content"
                        role="tab"
                        aria-controls="judo_content"
-                       aria-selected="false">Judo</a>
+                       aria-selected="false">Judo {% if judo is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -129,16 +148,16 @@
                        href="#checkout_content"
                        role="tab"
                        aria-controls="checkout_content"
-                       aria-selected="false">Checkout</a>
+                       aria-selected="false">Checkout {% if checkout is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item {% if barclays is defined %}active{% endif %}">
                     <a class="nav-link"
                        id="barclays_tab"
                        data-toggle="tab"
                        href="#barclays_content"
                        role="tab"
                        aria-controls="barclays_content"
-                       aria-selected="false">Barclays</a>
+                       aria-selected="false">Barclays {% if barclays is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -147,16 +166,16 @@
                        href="#cashflows_content"
                        role="tab"
                        aria-controls="cashflows_content"
-                       aria-selected="true">Cashflows</a>
+                       aria-selected="true">Cashflows {% if cashflow is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item {% if bacsInputFiles is defined %}active{% endif %}">
                     <a class="nav-link"
                        id="bacs_tab"
                        data-toggle="tab"
                        href="#bacs_content"
                        role="tab"
                        aria-controls="bacs_content"
-                       aria-selected="false">Bacs</a>
+                       aria-selected="false">Bacs {% if bacsInputFiles is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -165,7 +184,7 @@
                        href="#bacs_files_content"
                        role="tab"
                        aria-controls="bacs_files_content"
-                       aria-selected="false">Bacs Files</a>
+                       aria-selected="false">Bacs Files {% if bacsInputFiles is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -174,7 +193,7 @@
                        href="#lloyds_content"
                        role="tab"
                        aria-controls="lloyds_content"
-                       aria-selected="false">Lloyds</a>
+                       aria-selected="false">Lloyds {% if lloyds is defined and barclays is defined%}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
             </ul>
 
@@ -258,35 +277,37 @@
                         </div>
                     {{ form_end(judoForm) }}
                     <hr>
-                    <h2>Files</h2>
-                    {% if judo.files|length == 0 %}
-                        <p>No Files</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            {% for judoFile in judo.files %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a>
-                                    </td>
-                                    <td>
-                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                        {{ judoFile.created|date() }}
-                                        <br>
-                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ judoFile.date|date() }}
-                                    </td>
-                                    <td>
-                                        {# TODO: Move into tab??? #}
-                                        {{ judoFile.metadata|json_encode }}
-                                    </td>
-                                    <td>
-                                        <button class="delete-file btn btn-danger btn-square"
-                                                data-delete-url="{{ path('admin_file_delete', {'id': judoFile.id }) }}">
-                                            <i class="fal fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
+                    {% if judo is defined %}
+                        <h2>Files</h2>
+                        {% if judo.files|length == 0 %}
+                            <p>No Files</p>
+                        {% else %}
+                            <table class="table table-striped">
+                                {% for judoFile in judo.files %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a>
+                                        </td>
+                                        <td>
+                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
+                                            {{ judoFile.created|date() }}
+                                            <br>
+                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ judoFile.date|date() }}
+                                        </td>
+                                        <td>
+                                            {# TODO: Move into tab??? #}
+                                            {{ judoFile.metadata|json_encode }}
+                                        </td>
+                                        <td>
+                                            <button class="delete-file btn btn-danger btn-square"
+                                                    data-delete-url="{{ path('admin_file_delete', {'id': judoFile.id }) }}">
+                                                <i class="fal fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -319,35 +340,37 @@
                     </div>
                     {{ form_end(checkoutForm) }}
                     <hr>
-                    <h2>Files</h2>
-                    {% if checkout.files|length == 0 %}
-                        <p>No Files</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            {% for checkoutFile in checkout.files %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ s3DownloadLink(checkoutFile.bucket, checkoutFile.key) }}">{{ checkoutFile.fileName }}</a>
-                                    </td>
-                                    <td>
-                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                        {{ checkoutFile.created|date() }}
-                                        <br>
-                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ checkoutFile.date|date() }}
-                                    </td>
-                                    <td>
-                                        {# TODO: Move into tab??? #}
-                                        {{ checkoutFile.metadata|json_encode }}
-                                    </td>
-                                    <td>
-                                        <button class="delete-file btn btn-danger btn-square"
-                                                data-delete-url="{{ path('admin_file_delete', {'id': checkoutFile.id }) }}">
-                                            <i class="fal fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
+                    {% if checkout is defined %}
+                        <h2>Files</h2>
+                        {% if checkout.files|length == 0 %}
+                            <p>No Files</p>
+                        {% else %}
+                            <table class="table table-striped">
+                                {% for checkoutFile in checkout.files %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ s3DownloadLink(checkoutFile.bucket, checkoutFile.key) }}">{{ checkoutFile.fileName }}</a>
+                                        </td>
+                                        <td>
+                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
+                                            {{ checkoutFile.created|date() }}
+                                            <br>
+                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ checkoutFile.date|date() }}
+                                        </td>
+                                        <td>
+                                            {# TODO: Move into tab??? #}
+                                            {{ checkoutFile.metadata|json_encode }}
+                                        </td>
+                                        <td>
+                                            <button class="delete-file btn btn-danger btn-square"
+                                                    data-delete-url="{{ path('admin_file_delete', {'id': checkoutFile.id }) }}">
+                                                <i class="fal fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -380,35 +403,37 @@
                         </div>
                     {{ form_end(barclaysForm) }}
                     <hr>
-                    <h2>Files</h2>
-                    {% if barclays.files|length == 0 %}
-                        <p>No Files</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            {% for barclaysFile in barclays.files %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a>
-                                    </td>
-                                    <td>
-                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                        {{ barclaysFile.created|date() }}
-                                        <br>
-                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ barclaysFile.date|date() }}
-                                    </td>
-                                    <td>
-                                        {# TODO: Move into tab??? #}
-                                        {{ barclaysFile.metadata|json_encode }}
-                                    </td>
-                                    <td>
-                                        <button class="delete-file btn btn-danger btn-square"
-                                                data-delete-url="{{ path('admin_file_delete', {'id': barclaysFile.id }) }}">
-                                            <i class="fal fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
+                    {% if barclays is defined %}
+                        <h2>Files</h2>
+                        {% if barclays.files|length == 0 %}
+                            <p>No Files</p>
+                        {% else %}
+                            <table class="table table-striped">
+                                {% for barclaysFile in barclays.files %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a>
+                                        </td>
+                                        <td>
+                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
+                                            {{ barclaysFile.created|date() }}
+                                            <br>
+                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ barclaysFile.date|date() }}
+                                        </td>
+                                        <td>
+                                            {# TODO: Move into tab??? #}
+                                            {{ barclaysFile.metadata|json_encode }}
+                                        </td>
+                                        <td>
+                                            <button class="delete-file btn btn-danger btn-square"
+                                                    data-delete-url="{{ path('admin_file_delete', {'id': barclaysFile.id }) }}">
+                                                <i class="fal fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -502,35 +527,37 @@
                         </div>
                     {{ form_end(cashflowsForm) }}
                     <hr>
-                    <h2>Files</h2>
-                    {% if cashflows.files|length == 0 %}
-                        <p>No Files</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            {% for cashflowsFile in cashflows.files %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ s3DownloadLink(cashflowsFile.bucket, cashflowsFile.key) }}">{{ cashflowsFile.fileName }}</a>
-                                    </td>
-                                    <td>
-                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                        {{ cashflowsFile.created|date() }}
-                                        <br>
-                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ cashflowsFile.date|date() }}
-                                    </td>
-                                    <td>
-                                        {# TODO: Move into tab??? #}
-                                        {{ cashflowsFile.metadata|json_encode }}
-                                    </td>
-                                    <td>
-                                        <button class="delete-file btn btn-danger btn-square"
-                                                data-delete-url="{{ path('admin_file_delete', {'id': cashflowsFile.id }) }}">
-                                            <i class="fal fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
+                    {% if cashflows is defined %}
+                        <h2>Files</h2>
+                        {% if cashflows.files|length == 0 %}
+                            <p>No Files</p>
+                        {% else %}
+                            <table class="table table-striped">
+                                {% for cashflowsFile in cashflows.files %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ s3DownloadLink(cashflowsFile.bucket, cashflowsFile.key) }}">{{ cashflowsFile.fileName }}</a>
+                                        </td>
+                                        <td>
+                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
+                                            {{ cashflowsFile.created|date() }}
+                                            <br>
+                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ cashflowsFile.date|date() }}
+                                        </td>
+                                        <td>
+                                            {# TODO: Move into tab??? #}
+                                            {{ cashflowsFile.metadata|json_encode }}
+                                        </td>
+                                        <td>
+                                            <button class="delete-file btn btn-danger btn-square"
+                                                    data-delete-url="{{ path('admin_file_delete', {'id': cashflowsFile.id }) }}">
+                                                <i class="fal fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -563,35 +590,37 @@
                         </div>
                     {{ form_end(lloydsForm) }}
                     <hr>
-                    <h2>Files</h2>
-                    {% if lloyds.files|length == 0 %}
-                        <p>No Files</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            {% for lloydsFile in lloyds.files %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ s3DownloadLink(lloydsFile.bucket, lloydsFile.key) }}">{{ lloydsFile.fileName }}</a>
-                                    </td>
-                                    <td>
-                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                        {{ lloydsFile.created|date() }}
-                                        <br>
-                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ lloydsFile.date|date() }}
-                                    </td>
-                                    <td>
-                                        {# TODO: Move into tab??? #}
-                                        {{ lloydsFile.metadata|json_encode }}
-                                    </td>
-                                    <td>
-                                        <button class="delete-file btn btn-danger btn-square"
-                                                data-delete-url="{{ path('admin_file_delete', {'id': lloydsFile.id }) }}">
-                                            <i class="fal fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
+                    {% if lloyds is defined %}
+                        <h2>Files</h2>
+                        {% if lloyds.files|length == 0 %}
+                            <p>No Files</p>
+                        {% else %}
+                            <table class="table table-striped">
+                                {% for lloydsFile in lloyds.files %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ s3DownloadLink(lloydsFile.bucket, lloydsFile.key) }}">{{ lloydsFile.fileName }}</a>
+                                        </td>
+                                        <td>
+                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
+                                            {{ lloydsFile.created|date() }}
+                                            <br>
+                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ lloydsFile.date|date() }}
+                                        </td>
+                                        <td>
+                                            {# TODO: Move into tab??? #}
+                                            {{ lloydsFile.metadata|json_encode }}
+                                        </td>
+                                        <td>
+                                            <button class="delete-file btn btn-danger btn-square"
+                                                    data-delete-url="{{ path('admin_file_delete', {'id': lloydsFile.id }) }}">
+                                                <i class="fal fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
