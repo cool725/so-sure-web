@@ -16,6 +16,7 @@ use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\ValidationException;
@@ -1518,9 +1519,14 @@ class AdminController extends BaseController
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd),
             'dailyShiftedTransaction' => Payment::dailyPayments($payments, $isProd, null, $tz),
             'dailyJudoTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
+            'dailyCheckoutTransaction' => Payment::dailyPayments($payments, $isProd, CheckoutPayment::class),
             'monthlyJudoTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'monthlyCheckoutTransaction' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
             'dailyJudoShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
+            'dailyCheckoutShiftedTransaction' =>
+                Payment::dailyPayments($payments, $isProd, CheckoutPayment::class, $tz),
             'monthlyJudoShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'monthlyCheckoutShiftedTransaction' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
             'dailyCreditBacsTransaction' => Payment::dailyPayments(
                 $extraCreditPayments,
                 $isProd,

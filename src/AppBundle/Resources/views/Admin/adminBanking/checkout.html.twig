@@ -5,8 +5,8 @@
         {% set sosureTotal = 0 %}
         {% set checkoutTotal = 0 %}
         {% for day,ymd in dates.ymd %}
-            {% if sosure['dailyJudoTransaction'][day] is defined %}
-                {% set sosureTotal = sosureTotal + sosure['dailyJudoTransaction'][day] %}
+            {% if sosure['dailyCheckoutTransaction'][day] is defined %}
+                {% set sosureTotal = sosureTotal + sosure['dailyCheckoutTransaction'][day] %}
             {% endif %}
             {% if checkout['dailyTransaction'][ymd] is defined %}
                 {% set checkoutTotal = checkoutTotal + checkout['dailyTransaction'][ymd] %}
@@ -25,13 +25,13 @@
                 <tr>
                     <td>Month</td>
                     {% set color = '' %}
-                    {% if equal_to_two_dp(sosure['monthlyJudoTransaction'].total, sosureTotal) %}
+                    {% if equal_to_two_dp(sosure['monthlyCheckoutTransaction'].total, sosureTotal) %}
                         {% set color = 'table-success' %}
                     {% else %}
                         {% set color = 'table-danger' %}
                     {% endif %}
                     <td class="{{ color }}">
-                        &pound;{{ sosure['monthlyJudoTransaction'].total|number_format(2, '.', ',') }}
+                        &pound;{{ sosure['monthlyCheckoutTransaction'].total|number_format(2, '.', ',') }}
                     </td>
                     {% if equal_to_two_dp(checkout['monthlyTransaction'], checkoutTotal) %}
                         {% set color = 'table-success' %}
@@ -42,7 +42,7 @@
                         &pound;{{ checkout['monthlyTransaction']|number_format(2, '.', ',') }}
                     </td>
                     <td>
-                        &pound;{{ (sosure['monthlyJudoTransaction'].total - checkout['monthlyTransaction'])|number_format(2, '.', ',') }}
+                        &pound;{{ (sosure['monthlyCheckoutTransaction'].total - checkout['monthlyTransaction'])|number_format(2, '.', ',') }}
                     </td>
                 </tr>
             </tbody>
@@ -65,8 +65,8 @@
             {% set cumulative = 0 %}
             {% for day,ymd in dates.ymd %}
                 {% set color = '' %}
-                {% if sosure['dailyJudoTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
-                    {% if equal_to_two_dp(sosure['dailyJudoTransaction'][day], judo['dailyTransaction'][ymd]) %}
+                {% if sosure['dailyCheckoutTransaction'][day] is defined and checkout['dailyTransaction'][ymd] is defined  %}
+                    {% if equal_to_two_dp(sosure['dailyCheckoutTransaction'][day], checkout['dailyTransaction'][ymd]) %}
                         {% set color = 'table-success' %}
                     {% else %}
                         {% set color = 'table-danger' %}
@@ -74,8 +74,8 @@
                 {% endif %}
                 <tr class='{{ color }}'>
                     <td>{{ day }}</td>
-                    <td>{% if sosure['dailyJudoTransaction'][day] is defined %}
-                            &pound;{{ sosure['dailyJudoTransaction'][day]|number_format(2, '.', ',') }}
+                    <td>{% if sosure['dailyCheckoutTransaction'][day] is defined %}
+                            &pound;{{ sosure['dailyCheckoutTransaction'][day]|number_format(2, '.', ',') }}
                         {% else %}
                             -
                         {% endif %}
@@ -86,15 +86,15 @@
                             -
                         {% endif %}
                     </td>
-                    <td>{% if sosure['dailyJudoTransaction'][day] is defined and checkout['dailyTransaction'][ymd] is defined %}
-                            {% set diff = sosure['dailyJudoTransaction'][day] - checkout['dailyTransaction'][ymd] %}
+                    <td>{% if sosure['dailyCheckoutTransaction'][day] is defined and checkout['dailyTransaction'][ymd] is defined %}
+                            {% set diff = sosure['dailyCheckoutTransaction'][day] - checkout['dailyTransaction'][ymd] %}
                             {% set cumulative = cumulative + diff %}
                             &pound;{{ diff|number_format(2, '.', ',') }}
                         {% else %}
                             -
                         {% endif %}
                     </td>
-                    <td>{% if sosure['dailyJudoTransaction'][day] is defined and checkout['dailyTransaction'][ymd] is defined %}
+                    <td>{% if sosure['dailyCheckoutTransaction'][day] is defined and checkout['dailyTransaction'][ymd] is defined %}
                             &pound;{{ cumulative|number_format(2, '.', ',') }}
                         {% else %}
                             -
@@ -133,7 +133,7 @@
                     <td>Month</td>
                     <td>&pound;{{ reconciliation['monthlyTransaction']|number_format(2, '.', ',') }}</td>
                     <td>&pound;{{ checkout['monthlyTransaction']|number_format(2, '.', ',') }}</td>
-                    <td>&pound;{{ (sosure['monthlyJudoTransaction'].total - checkout['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
+                    <td>&pound;{{ (sosure['monthlyCheckoutTransaction'].total - checkout['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
                 </tr>
                 <tr>
                     <td>Year</td>
