@@ -1960,7 +1960,6 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-01-02')
         );
-        var_dump($renewalPolicy->getStatus());
         $this->assertEquals($policy->getBacsBankAccount(), $renewalPolicy->getBacsBankAccount());
     }
 
