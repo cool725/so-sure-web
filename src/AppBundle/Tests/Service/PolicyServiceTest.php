@@ -38,7 +38,7 @@ use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 use Gedmo\Loggable\Document\LogEntry;
-use AppBundle\Service\MailerService
+use AppBundle\Service\MailerService;
 
 /**
  * @group functional-nonet
