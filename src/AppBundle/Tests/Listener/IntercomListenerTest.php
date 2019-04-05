@@ -198,7 +198,7 @@ class IntercomListenerTest extends WebTestCase
             $dm,
             false
         );
-        static::$policyService->activate($renewalPolicy, $mailer, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
 
         // Expect a policy start event + policy created event + user update
         $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
