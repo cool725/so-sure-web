@@ -336,7 +336,8 @@ class BICommand extends ContainerAwareCommand
             '"Bacs Mandate Status"',
             '"First time policy"',
             '"Successful Payment"',
-            '"Bacs Mandate Cancelled Reason"'
+            '"Bacs Mandate Cancelled Reason"',
+            '"Premium Installments"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -408,7 +409,8 @@ class BICommand extends ContainerAwareCommand
                     $policy->getPolicyOrUserBacsBankAccount() ?
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() :
                         null
-                )
+                ),
+                sprintf('"%s"', $policy->getPremiumInstallments())
             ]);
         }
         if (!$skipS3) {
