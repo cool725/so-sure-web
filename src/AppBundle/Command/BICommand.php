@@ -404,7 +404,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf(
                     '"%s"',
                     $policy->getPolicyOrUserBacsBankAccount() ?
-                        $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledReason() :
+                        $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() :
                         null
                 )
             ]);

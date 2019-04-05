@@ -246,6 +246,25 @@ class DefaultController extends BaseController
         return $this->render('AppBundle:Default:indexFacebook.html.twig', $data);
     }
 
+    /**
+     * @Route("/youtube", name="youtube")
+     */
+    public function youtubeLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'youtube'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexYoutube.html.twig', $data);
+    }
+
     private function competitorsData()
     {
         $competitor = [

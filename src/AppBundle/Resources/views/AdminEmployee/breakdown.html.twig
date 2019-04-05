@@ -1,26 +1,42 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-policy-breakdown' %}
+
+{% block title %}so-sure - Policy Breakdown{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>Policy Breakdown</h1>
-    </div>
-    <div class='col-md-4' style="margin-top: 15px">
-        <a href="{{ path('admin_policy_breakdown_print') }}"><i class="fa fa-print fa-large"></i></a>
-    </div>
-</div>
-    <div class="row">
-        <div class="col-md-11">
-            <div class="table-responsive">
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Policy Breakdown</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a class="btn btn-info btn-square mr-md-2"
+                       target="_blank"
+                       href="{{ path('admin_policy_breakdown_print') }}"
+                       rel="noopener noreferrer">
+                        <i class="fa fa-print fa-fw"></i></a>
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
                 <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Make</th>
-                        <th>Total</th>
-                        <th>%</th>
-                    </tr>
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Make</th>
+                            <th>Total</th>
+                            <th>%</th>
+                        </tr>
                     </thead>
                     <tbody>
                     {% for item, value in data.makes %}
@@ -33,18 +49,14 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-11">
-            <div class="table-responsive">
+            <div class="table-responsive-sm mb-5">
                 <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Total</th>
-                        <th>%</th>
-                    </tr>
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Phone</th>
+                            <th>Total</th>
+                            <th>%</th>
+                        </tr>
                     </thead>
                     <tbody>
                     {% for item in data.phones %}
@@ -58,6 +70,12 @@
                 </table>
             </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
