@@ -1,10 +1,153 @@
 // reviews.scss
 
 .review {
+    // min-height: 330px;
+    background-color: $white;
+    text-align: center;
+    opacity: 0.6;
+    // Push down so we see reviewer image
+    margin-top: 40px;
+    position: relative;
 
-    &__review {}
+    display: flex;
+    flex-direction: column;
 
-    &__footer {}
+    @include border-radius(12px);
 
-    &__controls {}
+    &__body {
+        position: relative;
+        padding: 1.7rem 1.5rem;
+        padding-top: 55px;
+
+        flex: 2;
+        align-self: stretch;
+
+        @include media-breakpoint-up(lg) {
+            display: flex;
+            align-items: center;
+            padding-top: inherit;
+        }
+    }
+
+    &__img {
+        position: absolute;
+        margin: auto;
+        left: 50%; top: -35px;
+        transform: translate(-50%, 0);
+
+        @include media-breakpoint-up(lg) {
+            position: static;
+            transform: translate(0);
+        }
+    }
+
+    &__footer {
+        display: flex;
+        flex: 1;
+        align-self: stretch;
+        align-items: center;
+        justify-content: space-between;
+        background-color: lighten($selago, 4%);
+        @include border-bottom-radius(12px);
+    }
+
+    &__rating {
+
+    }
+
+    &__controls {
+        display: none;
+        // width: 96px; height: 48px;
+        position: absolute;
+        top: 0; right: 0;
+        z-index: 2000;
+
+        &-prev,
+        &-next {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px; height: 48px;
+            cursor: pointer;
+        }
+
+        &-next {
+            background-color: $ultramarine;
+            color: $white;
+
+            @include border-top-right-radius(12px);
+            @include border-bottom-left-radius(12px);
+
+            &:hover {
+                background-color: darken($ultramarine, 8%);
+            }
+
+            @include media-breakpoint-up(lg) {
+                background-color: $dodger-blue;
+
+                @include border-bottom-right-radius(6px);
+                @include border-top-right-radius(6px);
+                @include border-bottom-left-radius(0);
+
+                &:hover {
+                    background-color: darken($dodger-blue, 8%);
+                }
+            }
+        }
+
+        &-prev {
+            display: none;
+            background-color: $ultramarine;
+            color: $white;
+            @include border-bottom-left-radius(6px);
+
+            &:hover {
+                background-color: darken($ultramarine, 8%);
+            }
+
+            @include media-breakpoint-up(lg) {
+                display: flex;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+            right: -48px;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        // min-height: none;
+        height: 275px;
+        text-align: left;
+        // Remove Push down
+        margin-top: 0;
+    }
+}
+
+.rewiew-slide {
+    width: 80%; height: 400px;
+    margin-right: 1rem;
+
+    @include media-breakpoint-up(lg) {
+        width: 40%; height: 300px;
+        margin-right: 70px;
+    }
+
+    &.is-selected {
+
+        .review {
+            opacity: 1;
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                        0 5px 15px 0 rgba(8,27,154,0.08);
+
+            .review__rating .fas {
+                color: $dodger-blue;
+            }
+        }
+
+        .review__controls {
+            display: flex;
+            align-items: center;
+        }
+    }
 }

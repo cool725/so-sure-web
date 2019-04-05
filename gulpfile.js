@@ -36,4 +36,8 @@ gulp.task('default', function() {
     gulp.src(['node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.css'])
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
+    // Fancybox.css
+    gulp.src(['node_modules/flickity/css/flickity.css'])
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+
 });

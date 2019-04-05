@@ -50,6 +50,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "manualAffiliate"="ManualAffiliateFile",
  *      "manualAffiliateProcessed"="ManualAffiliateProcessedFile"
  * })
+ * @MongoDB\Index(keys={"fileType"="asc"}, sparse="true")
+ * @MongoDB\Index(keys={"fileType"="asc","date"="asc"}, sparse="true")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class S3File

@@ -20,13 +20,15 @@ class PartialPolicyType extends AbstractType
                     'placeholder' => 'Select your device',
                     'class' => 'AppBundle:Phone',
                     'query_builder' => function (PhoneRepository $dr) {
-                        return $dr->findActive();
+                        return $dr->findActiveInactive();
+                    },
+                    'choice_label' => function ($phone) {
+                        return sprintf('%s%s', $phone->getActive() ? '' : '(OLD) ', $phone);
                     }
             ])
             ->add('imei', TextType::class)
             ->add('serialNumber', TextType::class, ['required' => false])
-            ->add('add', SubmitType::class)
-        ;
+            ->add('add', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)
