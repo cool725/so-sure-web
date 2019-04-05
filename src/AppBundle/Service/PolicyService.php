@@ -1631,7 +1631,7 @@ class PolicyService
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->activate($policy, $date);
+                    $this-> activate($policy, $date, $this->mailer);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error activating Policy %s / %s',
@@ -1971,12 +1971,16 @@ class PolicyService
         $this->dispatchEvent(PolicyEvent::EVENT_CASHBACK, new PolicyEvent($policy));
     }
 
+
     /**
-     * @param Policy $policy
+     * @param Policy             $policy
+     * @param \DateTime|null     $date
+     * @param MailerService|null $mailer
+     * @throws \Exception
      */
-    public function activate(Policy $policy, \DateTime $date = null)
+    public function activate(Policy $policy, \DateTime $date = null, MailerService $mailer = null)
     {
-        $policy->activate($date);
+        $policy->activate($date, $mailer);
         $this->dm->flush();
 
         $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));

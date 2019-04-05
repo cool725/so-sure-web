@@ -18,9 +18,11 @@ use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Service\InvitationService;
+use AppBundle\Service\MailerService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
+use FOS\UserBundle\Mailer\Mailer;
 use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -4247,7 +4249,12 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_UNRENEWED);
     }
 
-    public function activate(\DateTime $date = null)
+    /**
+     * @param \DateTime|null     $date
+     * @param MailerService|null $mailer
+     * @throws \Exception
+     */
+    public function activate(\DateTime $date = null, MailerService $mailer = null)
     {
         if ($date == null) {
             $date = \DateTime::createFromFormat('U', time());
@@ -4293,7 +4300,8 @@ abstract class Policy
             $previousPremium = $this->getPreviousPolicy()->getPremiumInstallmentPrice(false, false);
             $renewalPremium = $this->getPremiumInstallmentPrice(false, false);
             if ($renewalPremium !== $previousPremium) {
-                $this->mailer->sendTemplateToUser(
+                $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
+                $mailer->sendTemplateToUser(
                     sprintf('Your Direct Debit Confirmation'),
                     $this->getUser(),
                     'AppBundle:Email:bacs/notification.html.twig',
