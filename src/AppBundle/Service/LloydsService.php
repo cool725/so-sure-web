@@ -143,10 +143,7 @@ class LloydsService
                         // Incoming faster payments
                         // 28/04/2017,FPI,'30-65-41,36346160,XXX...XXX ,,425.53,2733.96
                         $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
-                        $identifier = sprintf('BCARD%s', BarclaysService::MID);
-                        if (mb_stripos($line['Transaction Description'], $identifier) !== false) {
-                            $paymentType = self::PAYMENT_TYPE_BARCLAYS_FPI;
-                        }
+                        $paymentType = self::PAYMENT_TYPE_BARCLAYS_FPI;
                     } elseif (in_array($line['Transaction Type'], ['BGC', 'DD'])) {
                         // Standard incoming from barclays
                         // 13/04/2017,BGC,'30-65-41,36346160,MDIR  8008566APR11 8008566 ,,32.37,1219.18
