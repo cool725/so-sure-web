@@ -9,11 +9,8 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
 use AppBundle\Exception\DuplicateImeiException;
-use AppBundle\Service\MixpanelService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
-use AppBundle\Service\RouterService;
-use Aws\S3\S3Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -41,8 +38,6 @@ use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 use Gedmo\Loggable\Document\LogEntry;
-use AppBundle\Service\MailerService;
-use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @group functional-nonet
@@ -63,8 +58,6 @@ class PolicyServiceTest extends WebTestCase
 
     /** @var PaymentService */
     protected static $paymentService;
-
-    protected static $mailer;
 
     public static function setUpBeforeClass()
     {
@@ -95,15 +88,6 @@ class PolicyServiceTest extends WebTestCase
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
-        $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher());
-        /** @var EngineInterface $templating */
-        $templating = self::$container->get('templating');
-        /** @var RouterService $router */
-        $router = self::$container->get('app.router');
-        /** @var MixpanelService $mixpanelService */
-        $mixpanelService = self::$container->get('app.mixpanel');
-        /** @var S3Client $s3Client */
-        $s3Client = self::$container->get('aws.s3');
     }
 
     public function setUp()

@@ -5,10 +5,6 @@ namespace AppBundle\Tests\Listener;
 use AppBundle\Document\Charge;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Event\PicsureEvent;
-use AppBundle\Service\MailerService;
-use AppBundle\Service\MixpanelService;
-use AppBundle\Service\RouterService;
-use Aws\S3\S3Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +33,6 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Connection\StandardConnection;
 
 use AppBundle\Service\IntercomService;
-use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @group functional-net
@@ -175,29 +170,6 @@ class IntercomListenerTest extends WebTestCase
         static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
         $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
 
-        $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher());
-        /** @var EngineInterface $templating */
-        $templating = self::$container->get('templating');
-        /** @var RouterService $router */
-        $router = self::$container->get('app.router');
-        /** @var MixpanelService $mixpanelService */
-        $mixpanelService = self::$container->get('app.mixpanel');
-        /** @var S3Client $s3Client */
-        $s3Client = self::$container->get('aws.s3');
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $mailer = new MailerService(
-            new \Swift_Mailer($transport),
-            $transport,
-            $templating,
-            $router,
-            'foo@foo.com',
-            'bar',
-            $mixpanelService,
-            $s3Client,
-            self::$container->getParameter('kernel.environment'),
-            $dm,
-            false
-        );
         static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
 
         // Expect a policy start event + policy created event + user update
