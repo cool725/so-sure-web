@@ -137,16 +137,16 @@ class HubspotService
         while (true) {
             $response = $this->client->deals()->getAll([
                 "count" => 100,
-                "property" => ["policyNumber"],
-                "vid-offset" => $offset
+                "properties" => ["dealname"],
+                "offset" => $offset
             ]);
-            $offset += 100;
             foreach ($response->deals as $deal) {
                 yield $deal;
             }
-            if (!$response->{'has-more'}) {
+            if (!property_exists($response->data, "hasMore") || !$response->data->hasMore) {
                 return;
             }
+            $offset = $response->data->offset;
         }
     }
 

@@ -189,9 +189,8 @@ class HubspotCommand extends ContainerAwareCommand
         $contactCount = 0;
         // Delete policies
         foreach ($this->hubspot->getAllPolicyNumbers() as $deal) {
-            print_r($deal);
             $this->hubspot->deleteDeal($deal->dealId);
-            $output->writeln($deal->properties->policyNumber);
+            $output->writeln("{$deal->properties->dealname->value} removed from hubspot.");
             $dealCount++;
         }
         // Delete users.
