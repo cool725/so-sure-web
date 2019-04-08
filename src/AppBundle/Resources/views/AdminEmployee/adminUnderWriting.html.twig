@@ -1,43 +1,136 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/month.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-underwriting-report' %}
+
+{% block title %}so-sure - Underwriting Report{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
-    {% block body %}
-    <div class="container">
-<div class="row">
-    <div class="col-md-8">
-        <h1>Underwriting Report for {{ data.start|date('M Y', 'Europe/London') }}</h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-4">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_underwriting_date') }}">
-                <input name="pl" type='text' class="form-control" value="{{data.month}}-{{data.year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Underwriting Report for {{ data.start|date('M Y', 'Europe/London') }}</h1>
             </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="GET"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_underwriting_date') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{data.month}}-{{data.year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+
+                    </form>
                 </div>
             </div>
+            {# TODO: Content area #}
+            <h2 class="h3 mb-3">Web only data</h2>
+            <p>Policies: {{ data.policies }}</p>
+            <hr>
+            <h4 class="mb-3">Underwriting for {{ data.start|date('M Y', 'Europe/London') }}</h4>
+            {% if not data.allowed %}
+                <h4 class="text-danger mb-3">PRELIMINARY RESULTS - Monthly period must be over 1 year ago</h4>
+            {% endif %}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Premium</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Premium Recieved</td>
+                            <td align="right">&pound;{{ data.premiumReceived|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Premium Outstanding</td>
+                            <td align="right">&pound;{{ data.premiumOutstanding|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Premium</strong></td>
+                            <td align="right"><strong>&pound;{{ data.premiumTotal|number_format(2, '.', ',') }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Claims</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cost of Claims</td>
+                            <td align="right">&pound;{{ data.claimsCost|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Claims Reserves</td>
+                            <td align="right">&pound;{{ data.claimsReserves|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Claims Total</strong></td>
+                            <td align="right"><strong>&pound;{{ data.claimsTotal|number_format(2, '.', ',') }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Ratios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Overall Loss Ratio</td>
+                            <td align="right">{{ data.lossRatioOverall|number_format(1, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Earned Loss Ration</td>
+                            <td align="right">{{ data.lossRatioEarned|number_format(1, '.', ',') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    </form>
-</div>
+    </section>
 
-<div class="container">
-    <h4>Web only data</h4>
-    <p>Policies: {{ data.policies }}</p>
-    <hr />
-    {% include 'AppBundle:AdminEmployee:adminUnderWritingData.html.twig' %}
-</div>
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}
