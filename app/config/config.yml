@@ -520,6 +520,7 @@ nelmio_security:
                 - https://syndication.twitter.com
                 - https://www.linkedin.com
                 - https://angel.co
+                - https://www.bing.com
                 - fbrpc://call
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
