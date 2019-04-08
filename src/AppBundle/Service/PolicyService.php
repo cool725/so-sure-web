@@ -1979,7 +1979,7 @@ class PolicyService
      */
     public function activate(Policy $policy, \DateTime $date = null)
     {
-        $policy->activate($this->mailer, $date);
+        $policy->activate($date);
         $this->dm->flush();
 
         $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));
