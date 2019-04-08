@@ -4250,11 +4250,10 @@ abstract class Policy
     }
 
     /**
-     * @param MailerService  $mailer
      * @param \DateTime|null $date
      * @throws \Exception
      */
-    public function activate(MailerService $mailer, \DateTime $date = null)
+    public function activate(\DateTime $date = null)
     {
         if ($date == null) {
             $date = \DateTime::createFromFormat('U', time());
@@ -4293,24 +4292,10 @@ abstract class Policy
          * the correct payment details on the renewal policy.
          * In the case of BACs this should be the same account as the existing policy
          * and so we can just copy them over.
-         * However if we the amount has changed, we will need to notify the account holder.
+         * However if the amount has changed, we will need to notify the account holder.
          */
         if ($this->getPreviousPolicy() && $this->getPreviousPolicy()->getPaymentMethod()) {
             $this->setPaymentMethod($this->getPreviousPolicy()->getPaymentMethod());
-            $previousPremium = $this->getPreviousPolicy()->getPremiumInstallmentPrice(false, false);
-            $renewalPremium = $this->getPremiumInstallmentPrice(false, false);
-            if ($renewalPremium !== $previousPremium) {
-                $mailer->sendTemplateToUser(
-                    sprintf('Your Direct Debit Confirmation'),
-                    $this->getUser(),
-                    'AppBundle:Email:bacs/notification.html.twig',
-                    ['user' => $this->getUser(), 'policy' => $this],
-                    'AppBundle:Email:bacs/notification.txt.twig',
-                    ['user' => $this->getUser(), 'policy' => $this],
-                    null,
-                    'bcc-ddnotifications@so-sure.com'
-                );
-            }
         }
 
         foreach ($this->getRenewalConnections() as $connection) {
