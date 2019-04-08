@@ -216,6 +216,7 @@ class BICommand extends ContainerAwareCommand
             '"Total cost of claim"',
             '"Claim Closed Date"',
             "'Risk Rating'",
+            "'Network'"
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -275,6 +276,7 @@ class BICommand extends ContainerAwareCommand
                     '"%s"',
                     $claim->getFnolRisk() ? $claim->getFnolRisk() : null
                 ),
+                sprintf('"%s"', $claim->getNetwork())
             ]);
         }
         if (!$skipS3) {
