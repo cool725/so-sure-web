@@ -55,8 +55,7 @@ sosure.purchaseStepBacs = (function() {
                             return true;
                         }
                     },
-                    fullName: true,
-                    equalToIgnoreCase: '#bacs_form_validateName'
+                    LastName: '#bacs_form_validateName'
                 },
                 "bacs_form[sortCode]": {
                     required: true,
@@ -76,8 +75,6 @@ sosure.purchaseStepBacs = (function() {
             messages: {
                 "bacs_form[accountName]": {
                     required: 'Please enter the name on the account',
-                    fullName: 'Please enter your first and last name',
-                    equalToIgnoreCase: 'The name on the account must match the policy holder'
                 },
                 "bacs_form[sortCode]": {
                     required: 'Please enter your sort code',
