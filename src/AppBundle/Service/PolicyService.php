@@ -1971,8 +1971,11 @@ class PolicyService
         $this->dispatchEvent(PolicyEvent::EVENT_CASHBACK, new PolicyEvent($policy));
     }
 
+
     /**
-     * @param Policy $policy
+     * @param Policy         $policy
+     * @param \DateTime|null $date
+     * @throws \Exception
      */
     public function activate(Policy $policy, \DateTime $date = null)
     {
