@@ -55,6 +55,6 @@ class InvitationControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $url);
         $data = self::$client->getResponse();
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 }

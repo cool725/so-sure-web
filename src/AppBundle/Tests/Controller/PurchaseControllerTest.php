@@ -1581,7 +1581,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         return $crawler;
     }
-    
+
     private function setBacs(Crawler $crawler, Policy $policy, $accountNumber = PCAService::TEST_ACCOUNT_NUMBER_OK)
     {
         //print $crawler->html();
@@ -1686,7 +1686,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/purchase/');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     /**
