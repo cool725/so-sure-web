@@ -107,23 +107,22 @@ class HubspotService
      * Gives you the email of every user contact on hubspot.
      * @return Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
      */
-    public function getAllUserEmails()
+    public function getAllContacts()
     {
-        $condition = $customer ? ["customer" => true] : [];
+        //$condition = $customer ? ["customer" => true] : [];
         $offset = 0;
         while (true) {
             $response = $this->client->contacts()->all([
                 "count" => 100,
-                "property" => ["email"],
-                "vid-offset" => $offset
+                "offset" => $offset
             ]);
-            $offset += 100;
             foreach ($response->contacts as $contact) {
-                yield $contact;
+                yield $contact->vid;
             }
-            if (!$response->{'has-more'}) {
+            if (!property_exists($response->data, "has-more") || !$response->data->{"has-more"}) {
                 return;
             }
+            $offset = $response->data->{"vid-offset"};
         }
     }
 
@@ -131,17 +130,16 @@ class HubspotService
      * Gives you the policy number stored in each customer deal on hubspot.
      * @return Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
      */
-    public function getAllPolicyNumbers()
+    public function getAllDeals()
     {
         $offset = 0;
         while (true) {
             $response = $this->client->deals()->getAll([
                 "count" => 100,
-                "properties" => ["dealname"],
                 "offset" => $offset
             ]);
             foreach ($response->deals as $deal) {
-                yield $deal;
+                yield $deal->dealId;
             }
             if (!property_exists($response->data, "hasMore") || !$response->data->hasMore) {
                 return;
@@ -203,13 +201,11 @@ class HubspotService
         $hubspotPolicyArray = $this->buildHubspotPolicyData($policy);
         if (!$policy->getHubspotId()) {
             $response = $this->client->deals()->create($hubspotPolicyArray);
-            if ($response["responseCode"] != 404) {
-                $policy->setHubspotId($response["dealId"]);
-                $this->dm->flush();
-                return $response["dealId"];
-            }
+            $policy->setHubspotId($response["dealId"]);
+            $this->dm->flush();
+            return $response["dealId"];
         }
-        $response = $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
+        $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
         return $policy->getHubspotId();
     }
 

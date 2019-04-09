@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use Symfony\Component\Console\Helper\ProgressBar;
 use AppBundle\Exception\Queue\QueueException;
 use AppBundle\Exception\Queue\UnknownMessageException;
 use Psr\Log\LoggerInterface;
@@ -30,13 +31,19 @@ trait QueueTrait
 
     /**
      * Processes queued messages.
-     * @param int $max is the maximum number of messages to process.
+     * @param int             $max    is the maximum number of messages to process.
+     * @param OutputInterface $output can be used to output to the commandline if you want but if it is not given then
+     *                                it is just not used.
      * @return array containing "processed", "requeued", and "dropped" counts.
      */
-    public function process($max)
+    public function process($max, $output = null)
     {
         if (!isset($this->queueKey)) {
             throw new QueueException("Trying to use queue without defining \$queueKey.");
+        }
+        $progressBar = null;
+        if ($output) {
+            $progressBar = new ProgressBar($output);
         }
         $requeued = 0;
         $processed = 0;
@@ -54,9 +61,15 @@ trait QueueTrait
                     throw new UnknownMessageException($message);
                 }
                 if (!$this->messageReady($data)) {
-                    $requeued++;
-                    $this->queue($data);
+                    if ($this->queue($data)) {
+                        $requeued++;
+                    } else {
+                        $dropped++;
+                    }
                     continue;
+                }
+                if ($progressBar) {
+                    $progressBar->advance();
                 }
                 $this->action($data);
                 $processed++;
@@ -70,6 +83,10 @@ trait QueueTrait
                     $requeued++;
                 }
             }
+        }
+        if ($progressBar) {
+            $progressBar->finish();
+            $output->writeln("");
         }
         return ["processed" => $processed, "requeued" => $requeued, "dropped" => $dropped];
     }

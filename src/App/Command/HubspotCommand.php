@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use SevenShores\Hubspot\Exceptions\BadRequest;
@@ -188,17 +189,25 @@ class HubspotCommand extends ContainerAwareCommand
         $dealCount = 0;
         $contactCount = 0;
         // Delete policies
-        foreach ($this->hubspot->getAllPolicyNumbers() as $deal) {
-            $this->hubspot->deleteDeal($deal->dealId);
-            $output->writeln("{$deal->properties->dealname->value} removed from hubspot.");
+        $output->writeln("Deleting Deals:");
+        $progressBar = new ProgressBar($output);
+        foreach ($this->hubspot->getAllDeals() as $deal) {
+            $this->hubspot->deleteDeal($deal);
+            $progressBar->advance();
             $dealCount++;
         }
+        $progressBar->finish();
+        $output->writeln("");
         // Delete users.
-        foreach ($this->hubspot->getAllUserEmails() as $contact) {
-            $this->hubspot->deleteContact($contact->vid);
-            $output->writeln($contact->properties->email);
+        $output->writeln("Deleting Contacts:");
+        $progressBar = new ProgressBar($output);
+        foreach ($this->hubspot->getAllContacts() as $contact) {
+            $this->hubspot->deleteContact($contact);
+            $progressBar->advance();
             $contactCount++;
         }
+        $progressBar->finish();
+        $output->writeln("");
         $output->writeln("Dropped <info>{$dealCount}</info> deals.");
         $output->writeln("Dropped <info>{$contactCount}</info> contacts.");
     }
@@ -219,7 +228,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     public function process(OutputInterface $output, $max)
     {
-        $counts = $this->hubspot->process($max);
+        $counts = $this->hubspot->process($max, $output);
         $output->writeln(sprintf(
             'Sent %s updates, %s requeued, %s dropped',
             $counts["processed"],
