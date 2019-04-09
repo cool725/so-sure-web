@@ -577,7 +577,7 @@ class PurchaseController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
         $amount = null;
         $bacs = new Bacs();
-        $bacs->setValidateName($user->getName());
+        $bacs->setValidateName($user->getLastName());
         $bacsConfirm = new Bacs();
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
