@@ -48,6 +48,7 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
             $output->writeln("Updating $id as it is missing paymentMethod");
             $previousId = $next->getPreviousPolicy()->getId();
             /** @var SalvaPhonePolicy $oldPaymethod */
+            $oldPayMethod = null;
             try {
                 $oldPayMethod = $this->getPreviousPayMethod($previousId);
             } catch (MongoDBException $e) {
@@ -102,7 +103,7 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
      * find the paymentMethod from their previous policy.
      *
      * @param string $id
-     * @return PaymentMethod
+     * @return PaymentMethod|null
      * @throws MongoDBException
      */
     private function getPreviousPayMethod($id)
