@@ -1,50 +1,204 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/month.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-Quarterly-p-l' %}
+
+{% block title %}so-sure - Quarterly PL{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
-    {% block body %}
-    <div class="container">
-<div class="row">
-    <div class="col-md-8">
-        <h1>so-sure Quarterly PL [{{ data.start|date('M Y', 'Europe/London') }} - {{ data.end|date('M Y', 'Europe/London') }}]</h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-4">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_quarterly_pl_date') }}">
-                <input name="pl" type='text' class="form-control" value="{{data.month}}-{{data.year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Quarterly PL {{ data.start|date('M Y', 'Europe/London') }} - {{ data.end|date('M Y', 'Europe/London') }}</h1>
             </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="GET"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_underwriting_date') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{data.month}}-{{data.year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+
+                    </form>
                 </div>
             </div>
-            <div class="input-group" style="margin-left: 10px;">
-                <div class="input-group-btn">
-                    <a class="btn btn-info" target="_blank" rel="noopener noreferrer" href="{{ path('admin_quarterly_pl_print', {'year': data.year, 'month': data.month}) }}">
-                        &nbsp;<i class="fa fa-print"></i>&nbsp;
-                    </a>
-                </div>
+            {# TODO: Content area #}
+            <h2 class="h3 mb-3">Web only data</h2>
+            <p>Policies: {{ data.policies }}</p>
+            <hr>
+            <h4 class="mb-3">so-sure Scheme P&amp;L for {{ data.start|date('M Y', 'Europe/London') }} - {{ data.end|date('M Y', 'Europe/London') }}</h4>
+            {% if not data.allowed %}
+                <h4 class="text-danger mb-3">PRELIMINARY RESULTS - Monthly period must be over 1 year ago</h4>
+            {% endif %}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Income</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Gross Written Premium</td>
+                            <td align="right">&pound;{{ data.gwp|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Coverholder Commission</td>
+                            <td align="right">&pound;{{ data.coverholderCommission|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>AFL Brokerage Fee</td>
+                            <td align="right">&pound;{{ data.brokerCommission|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Net Premium</strong></td>
+                            <td align="right"><strong>&pound;{{ data.net|number_format(2, '.', ',') }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Outgoings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reward Pot</td>
+                            {# Value is reward pot paid to customer - the ipt rebate #}
+                            <td align="right">&pound;{{ data.rewardPotExcludingIptRebate|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Net Cost of Claims</td>
+                            <td align="right">&pound;{{ data.claimsCost|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Claims Reserves</td>
+                            <td align="right">&pound;{{ data.claimsReserves|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Deficit</td>
+                            {# TODO: Store historical data and include #}
+                            <td align="right">-</td>
+                        </tr>
+                        <tr>
+                            <td>Underwriter's Return</td>
+                            <td align="right">&pound;{{ data.underwriterReturn|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Profit Share</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>For Salva</td>
+                            <td align="right">{{ data.profitSalva|number_format(1, '.', ',') }} <br><small>40% of Policy profit</small></td>
+                        </tr>
+                        <tr>
+                            <td>For so-sure</td>
+                            <td align="right">{{ data.profitSoSure|number_format(1, '.', ',') }} <br><small>60% of Policy profit</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Profit to Share</strong></td>
+                            <td align="right"><strong>&pound;{{ data.profit|number_format(2, '.', ',') }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Net Writen Premium</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Gross Written Premium</td>
+                            <td align="right">&pound;{{ data.gwp|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Coverholder commission</td>
+                            <td align="right">&pound;{{ data.coverholderCommission|number_format(2, '.', ',') }} <br><small>&pound;10 per policy sold</small></td>
+                        </tr>
+                        <tr>
+                            <td>Reward Pot including IPT Rebate</td>
+                            <td align="right">&pound;{{ data.rewardPot|number_format(2, '.', ',') }} <br><small>No claims bonus premium rebate (incl IPT rebate)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Net Written Premium</strong></td>
+                            <td align="right"><strong>&pound;{{ data.netWrittenPremium|number_format(2, '.', ',') }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th colspan="2">Underwriter's Return</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Underwriter preferred return</td>
+                            <td align="right">&pound;{{ data.underwriterPreferredReturn|number_format(2, '.', ',') }} <br><small>8% Net Written Premium</small></td>
+                        </tr>
+                        <tr>
+                            <td>AFL Brokerage Fee</td>
+                            <td align="right">&pound;{{ data.brokerCommission|number_format(2, '.', ',') }} <br><small>72p per policy</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Underwriter's Return</strong></td>
+                            <td align="right"><strong>&pound;{{ data.underwriterReturn|number_format(2, '.', ',') }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
-    </form>
-</div>
+    </section>
 
-<div class="container">
-    <h4>Web only data</h4>
-    <p>Policies: {{ data.policies }}</p>
-    <hr />
-    {% include 'AppBundle:AdminEmployee:adminQuarterlyPLData.html.twig' %}
-</div>
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}
