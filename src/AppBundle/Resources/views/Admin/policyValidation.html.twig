@@ -11,11 +11,11 @@
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
                 <h1 class="h2">Policy Validation</h1>
             </div>
-
-            <div class="table-responsive-sm mb-12">
+            <div class="table-responsive-sm">
                 <table class="table table-striped">
                     <thead class="thead-light">
                     <tr>
+                        <th></th>
                         <th>Policy</th>
                         <th>Current Status</th>
                         <th>Validation</th>
@@ -24,56 +24,51 @@
                     </thead>
                     <tbody>
                     {% for item in validation %}
-                    {% set validate = unserialise(item) %}
-                    <tr>
-                        <td>
-                            {% if validate.id in flags %}
-                                <i class="fas fa-flag"></i>
-                            {% endif %}
-
-                            <a class="mr-auto align-self-center"
-                               href="{{ path('admin_policy', {'id': validate.id}) }}">
-                                {{ validate.policyNumber }}
-                            </a>
-                        </td>
-                        <td>
-                            {{ get_policy(validate.id).status }}
-                        </td>
-                        <td>
-                            <ul>
-                            {% for issue in validate.issues %}
-                                <li>{{ issue|trim }}</li>
-                            {% endfor %}
-                            </ul>
-                        </td>
-                        <td>
-                            <form method="POST">
-                                <button name="delete-redis-policy"
-                                        type="submit"
-                                        class="btn btn-success delete-redis-policy form-control mb-2">
-                                    Remove from list
-                                </button>
-
-                                <button name="flag-redis-policy"
-                                        type="submit"
-                                        class="btn btn-secondary flag-redis-policy form-control">
-                                    {% if validate.id in flags %}
-                                        Remove Flag
-                                    {% else %}
-                                        Flag
-                                    {% endif %}
-                                </button>
-
-                                <input type="hidden" name="id" value="{{ validate.id }}"/>
-                                <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                        {% set validate = unserialise(item) %}
+                            <tr>
+                                <td>
+                                    {% if validate.id in flags %}<i class="fas fa-flag text-danger"></i>{% endif %}
+                                </td>
+                                <td>
+                                    <a class="mr-auto align-self-center"
+                                       href="{{ path('admin_policy', {'id': validate.id}) }}">
+                                        {{ validate.policyNumber }}
+                                    </a>
+                                </td>
+                                <td>
+                                    {{ get_policy(validate.id).status }}
+                                </td>
+                                <td>
+                                    <ul>
+                                    {% for issue in validate.issues %}
+                                        <li>{{ issue|trim }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                </td>
+                                <td>
+                                    <form method="POST">
+                                        <button name="delete-redis-policy"
+                                                type="submit"
+                                                class="btn btn-success btn-square btn-sm delete-redis-policy mb-1 mr-md-2">
+                                            Remove from list</button>
+                                        <button name="flag-redis-policy"
+                                                type="submit"
+                                                class="btn btn-secondary btn-square btn-sm flag-redis-policy mb-1 mr-md-2">
+                                            {% if validate.id in flags %}
+                                                Remove Flag
+                                            {% else %}
+                                                Flag
+                                            {% endif %}
+                                        </button>
+                                        <input type="hidden" name="id" value="{{ validate.id }}"/>
+                                        <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
-
         </div>
     </section>
 {% endblock %}
