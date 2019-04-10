@@ -54,6 +54,6 @@ class PolicyUpdatePaymentCommandTest extends BaseControllerTest
      */
     public function testUpdatePaymentDetailsWhereTheyDontExist()
     {
-        $this->callCommand('', '');
+        $this->callCommand('');
     }
 }

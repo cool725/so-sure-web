@@ -2,22 +2,19 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use Doctrine\MongoDB\EagerCursor;
 use Doctrine\ODM\MongoDB\Cursor;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\MongoDBException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use AppBundle\Document\CurrencyTrait;
-use AppBundle\Document\DateTrait;
 
 class PolicyUpdatePaymentCommand extends ContainerAwareCommand
 {
-    use DateTrait;
-    use CurrencyTrait;
-
     /** @var DocumentManager */
     protected $dm;
 
@@ -55,13 +52,13 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
      * This will only work for policies that have a previousPolicy i.e. a renewal.
      *
      * @return mixed
-     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     * @throws MongoDBException
      */
     private function getOutstanding()
     {
         $qb = $this->dm->createQueryBuilder(Policy::class);
         return $qb->field('status')->equals('active')
-            ->field('previousPolicy')->exists('true')
+            ->field('previousPolicy')->exists(true)
             ->addOr($qb->expr()->field('paymentMethod')->equals(''))
             ->addOr($qb->expr()->field('paymentMethod')->exists(false))
             ->addOr($qb->expr()->field('paymentMethod.bankAccount')->equals(''))
@@ -74,9 +71,9 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
      * Using the previousPolicy _id on the policies that are missing payment data,
      * find the paymentMethond from their previous policy.
      *
-     * @param $id
-     * @return \AppBundle\Document\PaymentMethod\PaymentMethod
-     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     * @param $id string
+     * @return PaymentMethod
+     * @throws MongoDBException
      */
     private function getPreviousPayMethod($id)
     {
@@ -94,10 +91,10 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
     /**
      * Set the old policy's payment method onto the current active policy.
      *
-     * @param $id
-     * @param $oldPayMethod
+     * @param $id string
+     * @param $oldPayMethod PaymentMethod
      * @return mixed
-     * @throws \Doctrine\ODM\MongoDB\MongoDBException
+     * @throws MongoDBException
      */
     private function updateNewPayMethodWithOld($id, $oldPayMethod)
     {
