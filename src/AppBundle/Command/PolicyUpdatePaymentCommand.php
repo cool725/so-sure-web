@@ -53,7 +53,7 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
             } catch (MongoDBException $e) {
                 $output->writeln("Could not find previous policy for $id, error occurred: {$e->getMessage()}");
             }
-            if ($oldPayMethod === null){
+            if ($oldPayMethod === null) {
                 $output->writeln("Policy $id has no paymentMethod and the previous policy does not have one either.");
             } else {
                 try {
