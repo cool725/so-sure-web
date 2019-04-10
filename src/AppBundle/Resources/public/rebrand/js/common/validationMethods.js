@@ -21,7 +21,7 @@ const removeAccents = (text) => {
 $(function(){
     // Extend Validation Rules
 
-    // Full name
+    // Fullname
     jQuery.validator.addMethod('fullName', function(value, element) {
 
         value = removeAccents(value);
@@ -29,6 +29,18 @@ $(function(){
         return this.optional(element) || value.match(/^[-'a-zA-Z]+\s[-'a-zA-Z]+\s?$/);
 
     }, 'Please enter your full name');
+
+    // LastName
+    jQuery.validator.addMethod('LastName', function(value, element, param) {
+
+        lastName = value.split(' ').pop();
+        policyName = $(param).val().split(' ').pop();
+
+        // console.log('Param: ' + policyName, ' Word: ' + lastName);
+
+        return this.optional(element) || (lastName.toLowerCase() == policyName.toLowerCase());
+
+    }, 'Check name is correct on bank account');
 
     jQuery.validator.addMethod('emaildomain', function(value, element) {
         return this.optional(element) || value.match(/^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/);

@@ -392,7 +392,7 @@
                                                     <br>
                                                     {% if policy.isPolicy and policy.start %}
                                                         {% if policy.end < now %}
-                                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy (disregarding cancellation or claims)
                                                         {% else %}
                                                             Premium of £{{ policy.getProratedPremium() | number_format(2, '.', ',') }} due (daily calc)
                                                         {% endif %}
@@ -507,6 +507,9 @@
                                             Reference: {{ policy.getPolicyOrUserBacsBankAccount.reference }}
                                             <br>
                                             Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
+                                            {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
+                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.simplifiedMandateCancelledReason }}
+                                            {% endif %}
                                             <br>
                                             Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
                                             <br>

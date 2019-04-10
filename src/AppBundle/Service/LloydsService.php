@@ -143,15 +143,12 @@ class LloydsService
                         // Incoming faster payments
                         // 28/04/2017,FPI,'30-65-41,36346160,XXX...XXX ,,425.53,2733.96
                         $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
-                        $identifier = sprintf('BCARD%s', BarclaysService::MID);
-                        if (mb_stripos($line['Transaction Description'], $identifier) !== false) {
-                            $paymentType = self::PAYMENT_TYPE_BARCLAYS_FPI;
-                        }
+                        $paymentType = self::PAYMENT_TYPE_BARCLAYS_FPI;
                     } elseif (in_array($line['Transaction Type'], ['BGC', 'DD'])) {
                         // Standard incoming from barclays
-                        // 13/04/2017,BGC,'30-65-41,36346160,MDIR  8008566APR11 8008566 ,,32.37,1219.18
+                        // 13/04/2017,BGC,'30-65-41,36346160,BARCLAYCARD STL08008566300319 ,,32.37,1219.18
                         $processedDates = explode(BarclaysService::MID, $line['Transaction Description']);
-                        if (mb_stripos($line['Transaction Description'], 'MDIR') !== false) {
+                        if (mb_stripos($line['Transaction Description'], 'BARCLAYCARD') !== false) {
                             if (count($processedDates) < 2) {
                                 $this->logger->warning(sprintf(
                                     'Skipping line as unable to parse barclays description. %s',
@@ -159,7 +156,7 @@ class LloydsService
                                 ));
                                 continue;
                             }
-                            $processedDate = new \DateTime($processedDates[1]);
+                            $processedDate = \DateTime::createFromFormat("dmy", trim($processedDates[1]));
                             $paymentType = self::PAYMENT_TYPE_BARCLAYS_STANDARD;
                         } elseif (trim($line['Transaction Description']) == 'BACS') {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);

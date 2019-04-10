@@ -1,0 +1,102 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'phone-insurance' %}
+{% set seo_mode = true %}
+
+{% block title %}so-sure - phone insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim."/>
+    <link rel="canonical" href="{{ path('phone_insurance') }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container container-xtra">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <a class="text-deep-sky-blue-d" href="{{ path('homepage') }}">Home</a>
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-white"></i>
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    Mobile Insurance
+                                </li>
+                            </ul>
+                        </div>
+                        <h1 class="text-white fit">Mobile phone insurance <br><span class="sub text-columbia-blue-e">Done properly</span></h1>
+                        <p class="my-4 text-white">Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re here protecting customers when they claim and rewarding them when they don’t.</p>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-white btn-block-xs mr-sm-2 get-a-quote">Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch our Video
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                   <div class="hero__illustration hero__illustration-generic text-center">
+                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png" alt="so-sure - social insurance" class="img-fluid lozad animated bounceInUp">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_cred.html.twig' %}
+
+    {# Intro #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_intro.html.twig' %}
+
+    {# Why Insure #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_whyInsure.html.twig' %}
+
+    {# Cover #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_coverSEO.html.twig' %}
+
+    {# Why Insure Continued #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_whyInsureContinued.html.twig' %}
+
+    {# Reviews #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviews.html.twig' %}
+
+    {# Articles #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_articles.html.twig' %}
+
+    {# Comparison #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
+
+    {# Other phones #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_otherPhones.html.twig' %}
+
+    {# Mini FAQ #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_miniFaq.html.twig' %}
+
+    {# Banner #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_banner.html.twig' %}
+
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/phone-insurance.js') }}"></script>
+{% endblock %}
