@@ -71,7 +71,7 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
      * Using the previousPolicy _id on the policies that are missing payment data,
      * find the paymentMethond from their previous policy.
      *
-     * @param $id string
+     * @param string $id
      * @return PaymentMethod
      * @throws MongoDBException
      */
@@ -91,8 +91,8 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
     /**
      * Set the old policy's payment method onto the current active policy.
      *
-     * @param $id string
-     * @param $oldPayMethod PaymentMethod
+     * @param string        $id
+     * @param PaymentMethod $oldPayMethod
      * @return mixed
      * @throws MongoDBException
      */
