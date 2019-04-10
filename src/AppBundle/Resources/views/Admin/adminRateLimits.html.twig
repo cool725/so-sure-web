@@ -1,41 +1,68 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-rate-limits' %}
+
+{% block title %}so-sure - Rate Limits{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-8">
-            <h2>so-sure Rate Limits</h2>
-        </div>
-    </div>
 
-    {% if rateLimits|length == 0 %}
-    <div class="row-fluid">
-        <h2>No rate limits present</h2>
-    </div>
-    {% else %}
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Count</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for name, count in rateLimits %}
-                        <tr>
-                            <td>{{ name }}</td>
-                            <td>{{ count }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Rate Limits</h1>
             </div>
+            {# Controls area #}
+{#             <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
+                        <div class="form-group">
+                            {{ form_label(form.imei, 'Search IMEI: ', {'label_attr': {'class': 'mr-md-2'}}) }}
+                            {{ form_widget(form.imei, {'attr': {'class': 'form-control mr-md-2'}}) }}
+                            <div class="with-errors">{{ form_errors(form.imei) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success btn-square ml-md-2'}}) }}
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div> #}
+            {# Content area #}
+            {% if rateLimits|length == 0 %}
+                <p class="mb-5">No rate limits present</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Available tests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for name, count in rateLimits %}
+                                <tr>
+                                    <td>{{ name }}</td>
+                                    <td>{{ count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
-    </div>
-    {% endif %}
-</div>
+    </section>
 
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}

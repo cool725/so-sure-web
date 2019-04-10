@@ -1415,7 +1415,13 @@ class BacsService
         ]);
 
         if (!$file) {
-            $this->logger->error("Serial number {$serialNumber} is not found on pending accesspay file.");
+            $message = "Serial number {$serialNumber} is not found on a pending accesspay file";
+            /** @var AccessPayFile $file */
+            $file = $repo->findOneBy(['serialNumber' => AccessPayFile::unformatSerialNumber($serialNumber)]);
+            if ($file) {
+                $message .= ", but it is found on file with status ".$file->getStatus();
+            }
+            $this->logger->error("{$message}.");
             return false;
         }
 
