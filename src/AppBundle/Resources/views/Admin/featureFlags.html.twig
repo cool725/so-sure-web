@@ -1,62 +1,64 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/feature.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-feature-flags' %}
+
+{% block title %}so-sure - Feature Flags{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-8">
-            <h2>so-sure Feature Flags</h2>
-        </div>
-    </div>
 
-    {% if features|length == 0 %}
-    <div class="row-fluid">
-        <h2>No features are present in the db</h2>
-    </div>
-    {% else %}
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Enabled</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for feature in features %}
-                        <tr>
-                            <td>{{ feature.name }}</td>
-                            <td>{{ descriptions[feature.name] }}</td>
-                            <td>
-                                {% if feature.enabled %}
-                                Enabled
-                                <button title="Deactive Feature" type="button" class="btn btn-success feature-active" data-token="{{ csrf_token('default') }}"
-                                        data-active="{{ path('admin_feature_flags_active', {'id': feature.id}) }}"><i class="fa fa-power-off"></i></button>
-                                {% else %}
-                                Disabled
-                                <button title="Activate Feature" type="button" class="btn btn-danger feature-active" data-token="{{ csrf_token('default') }}"
-                                        data-active="{{ path('admin_feature_flags_active', {'id': feature.id}) }}"><i class="fa fa-power-off"></i></button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Feature Flags</h1>
             </div>
+            {# TODO: Content area #}
+            {% if features|length == 0 %}
+                <p class="mb-5">No features found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feature in features %}
+                                <tr>
+                                    <td class="h6 mb-0">{{ feature.name }}</td>
+                                    <td>{{ descriptions[feature.name] }}</td>
+                                    <td>
+                                        <button title="Deactive Feature"
+                                                type="button"
+                                                class="btn {% if feature.enabled %}btn-success{% else %}btn-danger{% endif %} btn-square btn-sm feature"
+                                                data-token="{{ csrf_token('default') }}"
+                                                data-active="{{ path('admin_feature_flags_active', {'id': feature.id}) }}"
+                                                data-feature="{{ feature.name }}">
+                                                <i class="far fa-power-off"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
-    </div>
-    {% endif %}
-</div>
+    </section>
 
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/features.js') }}"></script>
 {% endblock %}

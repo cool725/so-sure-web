@@ -1,51 +1,64 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-invoices' %}
+
+{% block title %}so-sure - Invoices{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>so-sure Invoices</h1>
-    </div>
-</div>
-    {% if invoices|length == 0 %}
-    <div class="row-fluid">
-        <h2>No invoices found</h2>
-    </div>
-    {% else %}
-    <div class="row">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Number</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Total</th>
-                        <th>Downloads</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for invoice in invoices %}
-                        <tr>
-                            <td>{{ invoice.invoiceNumber }}</td>
-                            <td>{{ invoice.name }}</td>
-                            <td>{{ invoice.date|date }}</td>
-                            <td>£{{ invoice.total|number_format(2, '.', ',') }}</td>
-                            <td>
-                                {% for file in invoice.invoiceFiles %}
-                                    <a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.filename }}</a>
-                                {% endfor %}
-                            </td>
-
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Invoices</h1>
             </div>
+            {# TODO: Content area #}
+            {% if invoices|length == 0 %}
+                <p class="mb-5">No invoices found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Number</th>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.invoiceNumber }}</td>
+                                    <td>{{ invoice.name }}</td>
+                                    <td>{{ invoice.date|date }}</td>
+                                    <td>&pound;{{ invoice.total|number_format(2, '.', ',') }}</td>
+                                    <td>
+                                        {% for file in invoice.invoiceFiles %}
+                                            <a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.filename }}</a>
+                                        {% endfor %}
+                                    </td>
+
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
-    </div>
-    {% endif %}
-</div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/features.js') }}"></script> #}
 {% endblock %}

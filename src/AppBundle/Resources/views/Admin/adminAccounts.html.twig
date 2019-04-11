@@ -17,7 +17,7 @@
         <div class="container-fluid">
             {# TODO: Heading area #}
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
-                <h1 class="h2">so-sure accounts {{ month }} / {{ year }}</h1>
+                <h1 class="h2">Accounts {{ month }} / {{ year }}</h1>
             </div>
             {# TODO: Controls area #}
             <div class="card card-page-filter mb-5">
@@ -52,7 +52,7 @@
                             {{ form_start(salvaForm) }}
                                 <a class="btn btn-info btn-square mr-md-2" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
                                     <i class="fa fa-print fa-fw"></i></a>
-                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': "btn btn-warning salva-export btn-square"}}) }}
+                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': 'btn btn-warning salva-export btn-square'}}) }}
                             {{ form_end(salvaForm) }}
                         </div>
                     </form>

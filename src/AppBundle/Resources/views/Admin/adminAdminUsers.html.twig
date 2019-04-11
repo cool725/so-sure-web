@@ -1,33 +1,52 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-    {% block body %}
-    <div class="container">
-        <h2>so-sure Admin Users</h2>
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
+{# Set vars #}
+{% set body_class = 'admin-admin-users' %}
+
+{% block title %}so-sure - Admin Users{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Admin Users</h1>
+            </div>
+            {# Content area #}
+            <div class="table-responsive-sm mb-5">
                 <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>ROLE</th>
-                        <th>MFA</th>
-                    </tr>
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>ROLE</th>
+                            <th>MFA</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {% for user in users %}
-                        <tr class="{% if user.googleAuthenticatorSecret | length <= 0 %}danger{% endif %}">
-                            <td><a href="{{ path('admin_admin_user', {id: user.id}) }}">{{ user.name }}</a></td>
-                            <td><a href="{{ path('admin_admin_user', {id: user.id}) }}">{{ user.email }}</a></td>
-                            <td>{{ user.roles|json_encode }}</td>
-                            <td>{% if user.googleAuthenticatorSecret | length > 0 %}Yes{% else %}No{% endif %}</td>
-                        </tr>
-                    {% endfor %}
+                        {% for user in users %}
+                            <tr class="{% if user.googleAuthenticatorSecret | length <= 0 %}table-danger{% else %}table-success{% endif %}">
+                                <td><a href="{{ path('admin_admin_user', {id: user.id}) }}">{{ user.name }}</a></td>
+                                <td><a href="{{ path('admin_admin_user', {id: user.id}) }}">{{ user.email }}</a></td>
+                                <td>{{ user.roles|json_encode }}</td>
+                                <td>{% if user.googleAuthenticatorSecret | length > 0 %}Yes{% else %}No{% endif %}</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
