@@ -34,16 +34,35 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var Cursor $result */
-        $result = $this->getOutstanding();
+        try {
+            $result = $this->getOutstanding();
+        } catch (MongoDBException $e) {
+            $output->writeln("Could not find policies, the following error occurred: {$e->getMessage()}");
+            exit($e->getTraceAsString());
+        }
         /** @var SalvaPhonePolicy $policy */
         while ($result->hasNext()) {
             /** @var SalvaPhonePolicy $next */
             $next = $result->getNext();
+            $id = $next->getId();
+            $output->writeln("Updating $id as it is missing paymentMethod");
             $previousId = $next->getPreviousPolicy()->getId();
             /** @var SalvaPhonePolicy $oldPaymethod */
-            $oldPayMethod = $this->getPreviousPayMethod($previousId);
-            /** @var Cursor $update */
-            $this->updateNewPayMethodWithOld($next->getId(), $oldPayMethod);
+            $oldPayMethod = null;
+            try {
+                $oldPayMethod = $this->getPreviousPayMethod($previousId);
+            } catch (MongoDBException $e) {
+                $output->writeln("Could not find previous policy for $id, error occurred: {$e->getMessage()}");
+            }
+            if ($oldPayMethod === null) {
+                $output->writeln("Policy $id has no paymentMethod and the previous policy does not have one either.");
+            } else {
+                try {
+                    $this->updateNewPayMethodWithOld($next->getId(), $oldPayMethod);
+                } catch (MongoDBException $e) {
+                    $output->writeln("Update of paymentMethod for $id failed with the reason {$e->getMessage()}");
+                }
+            }
         }
     }
 
@@ -59,20 +78,32 @@ class PolicyUpdatePaymentCommand extends ContainerAwareCommand
         $qb = $this->dm->createQueryBuilder(Policy::class);
         return $qb->field('status')->equals('active')
             ->field('previousPolicy')->exists(true)
-            ->addOr($qb->expr()->field('paymentMethod')->equals(''))
-            ->addOr($qb->expr()->field('paymentMethod')->exists(false))
-            ->addOr($qb->expr()->field('paymentMethod.bankAccount')->equals(''))
-            ->addOr($qb->expr()->field('paymentMethod.bankAccount')->exists(false))
+            ->addOr(
+                $qb->expr()
+                    ->addOr($qb->expr()->field('paymentMethod')->exists(false))
+                    ->addOr($qb->expr()->field('paymentMethod')->equals(''))
+            )
+            ->addOr(
+                $qb->expr()->field('paymentMethod.type')->equals('bacs')
+                    ->addOr($qb->expr()->field('paymentMethod.bankAccount')->exists(false))
+                    ->addOr($qb->expr()->field('paymentMethod.bankAccount')->equals(''))
+            )
+            ->addOr(
+                $qb->expr()
+                    ->field('paymentMethod.type')->notEqual('bacs')
+                    ->addOr($qb->expr()->field('paymentMethod.cardToken')->exists(false))
+                    ->addOr($qb->expr()->field('paymentMethod.cardToken')->equals(''))
+            )
             ->getQuery()
             ->execute();
     }
 
     /**
      * Using the previousPolicy _id on the policies that are missing payment data,
-     * find the paymentMethond from their previous policy.
+     * find the paymentMethod from their previous policy.
      *
      * @param string $id
-     * @return PaymentMethod
+     * @return PaymentMethod|null
      * @throws MongoDBException
      */
     private function getPreviousPayMethod($id)
