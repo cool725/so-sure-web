@@ -21,10 +21,13 @@ class DoctrinePolicyListener extends BaseDoctrineListener
 
     /** @var EventDispatcherInterface */
     protected $dispatcher;
+    /** @var string */
+    protected $environment;
 
-    public function __construct($dispatcher)
+    public function __construct($dispatcher, $environment)
     {
         $this->dispatcher = $dispatcher;
+        $this->environment = $environment;
     }
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
@@ -32,7 +35,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         /** @var Policy $policy */
         $policy = $eventArgs->getDocument();
         if ($policy instanceof Policy) {
-            if (!$policy->isValidPolicy()) {
+            if (!$policy->isValidPolicy(mb_strtoupper($this->environment))) {
                 return;
             }
         }
@@ -118,6 +121,15 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             $event = new PolicyEvent($policy);
             $event->setPreviousPaymentMethod($oldValue->getType());
             $this->dispatcher->dispatch(PolicyEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
+        }
+
+        var_dump($eventArgs);
+        die("yeet");
+        if (
+            $this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT, Policy::class) &&
+            $policy->getHubspotId()
+        ) {
+            $this->triggerEvent($user, PolicyEvent::EVENT_UPDATED_HUBSPOT);
         }
     }
 

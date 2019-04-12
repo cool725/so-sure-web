@@ -43,7 +43,8 @@ trait QueueTrait
         }
         $progressBar = null;
         if ($output) {
-            $progressBar = new ProgressBar($output);
+            $progressBar = new ProgressBar($output, $this->redis->llen($this->queueKey));
+            $progressBar->start();
         }
         $requeued = 0;
         $processed = 0;
@@ -85,7 +86,6 @@ trait QueueTrait
             }
         }
         if ($progressBar) {
-            $progressBar->finish();
             $output->writeln("");
         }
         return ["processed" => $processed, "requeued" => $requeued, "dropped" => $dropped];

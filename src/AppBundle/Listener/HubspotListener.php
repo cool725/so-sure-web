@@ -27,7 +27,7 @@ class HubspotListener
     }
 
     /**
-     * Hubspot actions for when a user is updated.
+     * Hubspot actions for when a user is updated or created.
      * @param UserEvent $event is the event object representing the user update.
      */
     public function onUserUpdatedEvent(UserEvent $event)
@@ -36,46 +36,10 @@ class HubspotListener
     }
 
     /**
-     * Hubspot actions for when a policy starts.
-     * @param PolicyEvent $event represents the policy starting.
+     * Hubspot actions for when a policy changes or is created.
+     * @param PolicyEvent $event represents the policy.
      */
-    public function onPolicyStartEvent(PolicyEvent $event)
-    {
-        $this->hubspotService->queueUpdateDeal($event->getPolicy());
-    }
-
-    /**
-     * Hubspot actions for when a policy changes status.
-     * @param PolicyEvent $event represents the policy that is changing status.
-     */
-    public function onPolicyUpdatedStatusEvent(PolicyEvent $event)
-    {
-        $this->hubspotService->queueUpdateDeal($event->getPolicy());
-    }
-
-    /**
-     * Hubspot actions for when a policy is cancelled.
-     * @param PolicyEvent $event is the event object representing the cancellation.
-     */
-    public function onPolicyCancelledEvent(PolicyEvent $event)
-    {
-        $this->hubspotService->queueUpdateDeal($event->getPolicy());
-    }
-
-    /**
-     * Hubspot actions for when a policy goes unpaid.
-     * @param PolicyEvent $event represents the policy going unpaid.
-     */
-    public function onPolicyUnpaidEvent(PolicyEvent $event)
-    {
-        $this->hubspotService->queueUpdateDeal($event->getPolicy());
-    }
-
-    /**
-     * Hubspot actions for when a policy is reactivated.
-     * @param PolicyEvent $event represents the reactivation.
-     */
-    public function onPolicyReactivatedEvent(PolicyEvent $event)
+    public function onPolicyUpdatedEvent(PolicyEvent $event)
     {
         $this->hubspotService->queueUpdateDeal($event->getPolicy());
     }

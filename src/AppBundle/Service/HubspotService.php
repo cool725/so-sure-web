@@ -216,6 +216,7 @@ class HubspotService
     public function deleteUser($user)
     {
         $this->deleteContact($user->getHubspotId());
+        $user->setHubspotId(null);
     }
 
     /**
@@ -225,6 +226,7 @@ class HubspotService
     public function deletePolicy($policy)
     {
         $this->deleteDeal($policy->getHubspotId());
+        $policy->setHubspotId(null);
     }
 
     /**

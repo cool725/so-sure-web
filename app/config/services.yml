@@ -1194,10 +1194,7 @@ services:
             - "@app.hubspot"
         tags:
             -  { name: kernel.event_listener, event: event.user.updated.hubspot, method: onUserUpdatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
-            -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyStartEvent }
-            -  { name: kernel.event_listener, event: event.policy.unpaid, method: onPolicyUnpaidEvent }
-            -  { name: kernel.event_listener, event: event.policy.reactivated, method: onPolicyReactivatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated.hubspot, method: onPolicyUpdatedEvent }
 
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
