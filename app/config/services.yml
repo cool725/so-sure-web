@@ -1067,6 +1067,10 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.policy:
+        parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrinePolicyListener
         arguments:
             - "@event_dispatcher"

@@ -123,13 +123,11 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             $this->dispatcher->dispatch(PolicyEvent::EVENT_PAYMENT_METHOD_CHANGED, $event);
         }
 
-        var_dump($eventArgs);
-        die("yeet");
         if (
             $this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT, Policy::class) &&
             $policy->getHubspotId()
         ) {
-            $this->triggerEvent($user, PolicyEvent::EVENT_UPDATED_HUBSPOT);
+            $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED_HUBSPOT);
         }
     }
 
