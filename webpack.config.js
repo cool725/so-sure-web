@@ -43,6 +43,7 @@ Encore
     .addEntry('landing-snapchat-b', './src/AppBundle/Resources/public/rebrand/js/pages/landing-snapchat-b.js')
     .addEntry('landing-twitter', './src/AppBundle/Resources/public/rebrand/js/pages/landing-twitter.js')
     .addEntry('landing-facebook', './src/AppBundle/Resources/public/rebrand/js/pages/landing-facebook.js')
+    .addEntry('landing-youtube', './src/AppBundle/Resources/public/rebrand/js/pages/landing-youtube.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
@@ -53,6 +54,7 @@ Encore
     .addEntry('rewards', './src/AppBundle/Resources/public/rebrand/js/pages/admin/rewards.js')
     .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
     .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
+    .addEntry('features', './src/AppBundle/Resources/public/rebrand/js/pages/admin/features.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')

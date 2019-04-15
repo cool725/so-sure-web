@@ -1158,7 +1158,7 @@ class MonitorService
         if ($policies) {
             $items = [];
             foreach ($policies as $policy) {
-                $items[] = $policy->getId()." -> ".$policy->getNextPolicy()->getId();
+                $items[] = $policy->getId()." - ".$policy->getNextPolicy()->getId();
             }
             throw new MonitorException(sprintf(
                 "%d policies have unpaid reward pot discount due to previously open claims: %s",

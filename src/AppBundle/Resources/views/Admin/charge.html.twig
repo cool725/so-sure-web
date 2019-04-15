@@ -1,104 +1,114 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/formMonth.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-charges' %}
+
+{% block title %}so-sure - Charges {{ month }} / {{ year }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-
-<div class="row">
-    <h1 class="col-md-6">so-sure Charges for {{ month }} / {{ year }}</h1>
-    <div class="col-md-6" style="padding-top:15px">
-        {{ form_start(form) }}
-            {{ form_errors(form) }}
-            <div class="form-inline col-md-4">
-                {{ form_widget(form.type) }}
-                {{ form_errors(form.type) }}
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Charges {{ month }} / {{ year }}</h1>
             </div>
-            <div class="form-inline col-md-4">
-                <div class='input-group date month'>
-                    {{ form_widget(form.date) }}
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': { 'class': 'form-inline '}}) }}
+                        <div class="form-group mr-md-2">
+                            <label class="mr-md-2">Choose date:</label>
+                            <div class="input-group date"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="">
+                                {{ form_widget(form.date) }}
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(form.type, {'attr':{'class':'mr-md-2 form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(form.type) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_row(form.build, {
+                                'label': 'Build report',
+                                'attr': {
+                                    'class': 'btn btn-success btn-square'
+                            }}) }}
+                        </div>
+                    {{ form_end(form) }}
                 </div>
-                {{ form_errors(form.date) }}
             </div>
-            <div class="form-inline input-group-btn col-md-4">
-                {{ form_row(form.build) }}
-            </div>
-            {{ form_end(form) }}
+            {# TODO: Content area #}
+            {% if charges|length == 0 %}
+                <p class="mb-5">No charges found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Type</th>
+                                <th>Total (ex VAT)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item, value in summary %}
+                                <tr>
+                                    <td>{{ item }}</td>
+                                    <td>&pound;{{ value|number_format(2, '.', ',') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount (ex VAT)</th>
+                                <th>Type</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for charge in charges %}
+                                <tr>
+                                    <td>{{ charge.createdDate|date }}</td>
+                                    <td>£{{ charge.amount|number_format(2, '.', ',') }}</td>
+                                    <td>{{ charge.type }}</td>
+                                    <td>
+                                        {% if charge.user %}
+                                            By <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                        {% endif %}
+                                        {% if charge.policy %}
+                                            &nbsp;For <a href="{{ path('admin_policy', {'id': charge.policy.id })}}">{{ charge.policy.policyNumber }}</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
         </div>
-    </div>
-    {% if charges|length == 0 %}
-    <div class="row-fluid">
-        <h2>No charges found</h2>
-    </div>
-    {% else %}
-    <h3>Summary</h3>
-    <div class="row">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Total (ex VAT)</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item, value in summary %}
-                        <tr>
-                            <td>{{ item }}</td>
-                            <td>£{{ value|number_format(2, '.', ',') }}</td>
+    </section>
 
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <h3>Details</h3>
-    <div class="row">
-        <div class="col-md-11">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Amount (ex VAT)</th>
-                        <th>Type</th>
-                        <th>Details</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for charge in charges %}
-                        <tr>
-                            <td>{{ charge.createdDate|date }}</td>
-                            <td>£{{ charge.amount|number_format(2, '.', ',') }}</td>
-                            <td>{{ charge.type }}</td>
-                            <td>
-                                {% if charge.user %}
-                                    By <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
-                                {% endif %}
-                                {% if charge.policy %}
-                                    &nbsp;For <a href="{{ path('admin_policy', {'id': charge.policy.id })}}">{{ charge.policy.policyNumber }}</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}

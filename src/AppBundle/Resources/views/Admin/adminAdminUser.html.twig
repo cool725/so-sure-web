@@ -1,43 +1,69 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
 
-    {% block body %}
-    <div class="container">
-        <h2>so-sure Admin User - {{ user.name }}</h2>
-    <div class="row-fluid">
-        <div class="col-md-11">
-            <div class="table-responsive">
+{# Set vars #}
+{% set body_class = 'admin-admin-users' %}
+
+{% block title %}so-sure - Admin Users - {{ user.name }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Admin Users - {{ user.name }}</h1>
+            </div>
+            {# Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="{{ path('admin_admin_users') }}" class="btn btn-success btn-square">Back to users</a>
+                </div>
+            </div>
+            {# Content area #}
+            <div class="table-responsive-sm mb-5">
                 <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td>{{ user.name }}</a></td>
-                        </tr>
-                        <tr>
-                            <td>Email</td>
-                            <td>{{ user.email }}</td>
-                        </tr>
-                        <tr>
-                            <td>MFA</td>
-                            <td>
+                        <td><strong>{{ user.name }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td align="center">
                             {% if user.googleAuthenticatorSecret | length > 0 %}
-                                {{ user.googleAuthenticatorSecret }}
-                                <br />
+                                <strong class="mr-2">{{ user.googleAuthenticatorSecret }}</strong>
                                 <img src="{{ mfa_image_url }}" />
-                                <br />
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.googleAuthenticatorSecret | length > 0 %}
                                 {{ form_start(disable_mfa_form) }}
-                                {{ form_widget(disable_mfa_form.disable, {'label': 'Disable MFA', 'attr': {'class': 'btn btn-danger confirm-cancel'}}) }}
+                                {{ form_widget(disable_mfa_form.disable, {'label': 'Disable MFA', 'attr': {'class': 'btn btn-danger btn-square btn-sm'}}) }}
                                 {{ form_end(disable_mfa_form) }}
                             {% else %}
                                 {{ form_start(enable_mfa_form) }}
-                                {{ form_widget(enable_mfa_form.enable, {'label': 'Enable MFA', 'attr': {'class': 'btn btn-primary'}}) }}
+                                {{ form_widget(enable_mfa_form.enable, {'label': 'Enable MFA', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
                                 {{ form_end(enable_mfa_form) }}
                             {% endif %}
-                            </td>
-                        </tr>
+                        </td>
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
