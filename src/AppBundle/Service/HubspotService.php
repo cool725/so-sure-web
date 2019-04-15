@@ -104,7 +104,7 @@ class HubspotService
     }
 
     /**
-     * Gives you the email of every user contact on hubspot.
+     * Gives you the hubspot id of every user contact on hubspot.
      * @return \Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
      */
     public function getAllContacts()
@@ -114,20 +114,23 @@ class HubspotService
         while (true) {
             $response = $this->client->contacts()->all([
                 "count" => 100,
+                "property" => "customer",
                 "offset" => $offset
             ]);
             foreach ($response["contacts"] as $contact) {
-                yield $contact->vid;
+                if (array_key_exists("customer", $contact["properties"]) && $contact["properties"]["customer"]) {
+                    yield $contact["vid"];
+                }
             }
-            if (!property_exists($response["data"], "has-more") || !$response["data"]["has-more"]) {
+            if (!$response["has-more"]) {
                 return;
             }
-            $offset = $response["data"]["vid-offset"];
+            $offset = $response["vid-offset"];
         }
     }
 
     /**
-     * Gives you the policy number stored in each customer deal on hubspot.
+     * Gives you the hubspot id of each customer deal on hubspot.
      * @return \Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
      */
     public function getAllDeals()
@@ -136,15 +139,18 @@ class HubspotService
         while (true) {
             $response = $this->client->deals()->getAll([
                 "count" => 100,
-                "offset" => $offset
+                "offset" => $offset,
+                "properties" => "pipeline"
             ]);
             foreach ($response["deals"] as $deal) {
-                yield $deal["dealId"];
+                if (array_key_exists("pipeline", $deal["properties"]) && $deal["properties"]["pipeline"]["value"] == $this->dealPipelineKey) {
+                    yield $deal["dealId"];
+                }
             }
-            if (!property_exists($response["data"], "hasMore") || !$response["data"]["hasMore"]) {
+            if (!$response["hasMore"]) {
                 return;
             }
-            $offset = $response["data"]["offset"];
+            $offset = $response["offset"];
         }
     }
 

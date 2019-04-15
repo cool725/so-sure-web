@@ -199,4 +199,13 @@ class UserRepository extends DocumentRepository
         }
         return $qb->getQuery()->execute();
     }
+
+    /**
+     * Removes every hubspot id on a policy in the system. This is used with a mass delete to remove all references to
+     * data that has been deleted on hubspot already.
+     */
+    public function removeHubspotIds()
+    {
+        $qb = $this->createQueryBuilder()->updateMany()->field("hubspotId")->unsetField()->getQuery()->execute();
+    }
 }

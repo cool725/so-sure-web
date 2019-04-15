@@ -3,7 +3,9 @@
 namespace App\Command;
 
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\HubspotService;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -208,6 +210,15 @@ class HubspotCommand extends ContainerAwareCommand
         }
         $progressBar->finish();
         $output->writeln("");
+        // Delete all hubspot ids out of our system since all hubspot contacts and deals were just deleted.
+        /** @var UserRepository */
+        $userRepo = $this->dm->getRepository(User::class);
+        /** @var PolicyRepository */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $userRepo->removeHubspotIds();
+        $policyRepo->removeHubspotIds();
+        $this->dm->flush();
+        // Final output.
         $output->writeln("Dropped <info>{$dealCount}</info> deals.");
         $output->writeln("Dropped <info>{$contactCount}</info> contacts.");
     }
