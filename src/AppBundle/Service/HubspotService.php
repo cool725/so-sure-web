@@ -143,7 +143,8 @@ class HubspotService
                 "properties" => "pipeline"
             ]);
             foreach ($response["deals"] as $deal) {
-                if (array_key_exists("pipeline", $deal["properties"]) && $deal["properties"]["pipeline"]["value"] == $this->dealPipelineKey) {
+                if (array_key_exists("pipeline", $deal["properties"]) &&
+                    $deal["properties"]["pipeline"]["value"] == $this->dealPipelineKey) {
                     yield $deal["dealId"];
                 }
             }
