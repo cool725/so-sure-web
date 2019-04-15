@@ -105,7 +105,7 @@ class HubspotService
 
     /**
      * Gives you the email of every user contact on hubspot.
-     * @return Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
+     * @return \Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
      */
     public function getAllContacts()
     {
@@ -116,19 +116,19 @@ class HubspotService
                 "count" => 100,
                 "offset" => $offset
             ]);
-            foreach ($response->contacts as $contact) {
+            foreach ($response["contacts"] as $contact) {
                 yield $contact->vid;
             }
-            if (!property_exists($response->data, "has-more") || !$response->data->{"has-more"}) {
+            if (!property_exists($response["data"], "has-more") || !$response["data"]["has-more"]) {
                 return;
             }
-            $offset = $response->data->{"vid-offset"};
+            $offset = $response["data"]["vid-offset"];
         }
     }
 
     /**
      * Gives you the policy number stored in each customer deal on hubspot.
-     * @return Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
+     * @return \Generator to iterate over them all as you cannot get them in one go due to hubspot paging it.
      */
     public function getAllDeals()
     {
@@ -138,13 +138,13 @@ class HubspotService
                 "count" => 100,
                 "offset" => $offset
             ]);
-            foreach ($response->deals as $deal) {
-                yield $deal->dealId;
+            foreach ($response["deals"] as $deal) {
+                yield $deal["dealId"];
             }
-            if (!property_exists($response->data, "hasMore") || !$response->data->hasMore) {
+            if (!property_exists($response["data"], "hasMore") || !$response["data"]["hasMore"]) {
                 return;
             }
-            $offset = $response->data->offset;
+            $offset = $response["data"]["offset"];
         }
     }
 
@@ -235,7 +235,7 @@ class HubspotService
      */
     public function deleteContact($hubspotId)
     {
-        $response = $this->client->contacts()->delete($hubspotId);
+        $response = $this->client->contacts()->delete((int)$hubspotId);
     }
 
     /**
@@ -244,7 +244,7 @@ class HubspotService
      */
     public function deleteDeal($hubspotId)
     {
-        $response = $this->client->deals()->delete($hubspotId);
+        $response = $this->client->deals()->delete((int)$hubspotId);
     }
 
     /**
@@ -265,9 +265,9 @@ class HubspotService
             case self::QUEUE_DELETE_USER:
                 $user = $this->userFromMessage($message);
                 foreach ($user->getPolicies() as $policy) {
-                    $this->deleteDeal($policy);
+                    $this->deletePolicy($policy);
                 }
-                $this->deleteContact($user);
+                $this->deleteUser($user);
                 break;
             case self::QUEUE_UPDATE_POLICY:
                 $policy = $this->policyFromMessage($message);
@@ -275,7 +275,7 @@ class HubspotService
                 break;
             case self::QUEUE_DELETE_POLICY:
                 $policy = $this->policyFromMessage($message);
-                $this->deleteDeal($policy);
+                $this->deletePolicy($policy);
                 break;
             default:
                 throw new UnknownMessageException(sprintf('Unknown message in queue %s', json_encode($message)));

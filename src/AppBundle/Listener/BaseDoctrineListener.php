@@ -263,7 +263,7 @@ class BaseDoctrineListener
      * Tells you if data has changed within a given datachange category.
      * @param PreUpdateEventArgs $eventArgs is stuff.
      * @param string             $category  is the category we are checking in.
-     * @param class              $class     is an optional type that the data changing object must belong to.
+     * @param string|null        $class     is an optional type that the data changing object must belong to.
      * @return boolean true if data has changed and false for other cases.
      */
     protected function hasDataChangedByCategory(PreUpdateEventArgs $eventArgs, $category, $class = null)
