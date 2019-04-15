@@ -235,7 +235,7 @@ class HubspotService
      */
     public function deleteContact($hubspotId)
     {
-        $response = $this->client->contacts()->delete((int)$hubspotId);
+        $response = $this->client->contacts()->delete((int) $hubspotId);
     }
 
     /**
@@ -244,7 +244,7 @@ class HubspotService
      */
     public function deleteDeal($hubspotId)
     {
-        $response = $this->client->deals()->delete((int)$hubspotId);
+        $response = $this->client->deals()->delete((int) $hubspotId);
     }
 
     /**
