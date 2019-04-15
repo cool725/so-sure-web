@@ -458,7 +458,7 @@ class PhoneInsuranceController extends BaseController
             }
 
             // A/B Homepage USPS test
-            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USPS);
+            // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USPS);
         }
 
         // Hyphenate Model for images/template
