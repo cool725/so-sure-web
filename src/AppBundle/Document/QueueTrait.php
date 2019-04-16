@@ -83,7 +83,7 @@ trait QueueTrait
                 $this->logger->error($e->getMessage());
                 $dropped++;
             } catch (\Exception $e) {
-                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "exception" => $e->getMessage(), "type" => get_class($e)]);
+                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "type" => get_class($e)]);
                 if ($this->queue($data, true)) {
                     $requeued++;
                 }
