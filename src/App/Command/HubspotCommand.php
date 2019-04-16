@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Exception\QueueException;
 use AppBundle\Service\HubspotService;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -122,11 +123,13 @@ class HubspotCommand extends ContainerAwareCommand
                     $this->process($output, $process);
                     break;
                 default:
-                    throw new \Exception("'{$action}' is not a valid action.");
+                    throw new QueueException("'{$action}' is not a valid action.");
             }
+        } catch (QueueException $e) {
+            $output->writeln("<error>".$e->getMessage()."</error>\n");
         } catch (\Exception $e) {
             $output->writeln(
-                "<info>An error occurred:</info>\n<error>".$e->getMessage()."</error>\n".$e->getTraceAsString()
+                "<info>An error occurred:</info>\n<error>".$e->getMessage()."</error>\n".get_class($e)
             );
         }
     }

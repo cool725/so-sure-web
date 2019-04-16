@@ -8,9 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\QueueTrait;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Repository\PolicyRepository;
-use AppBundle\Exception\Queue\QueueException;
-use AppBundle\Exception\Queue\MalformedMessageException;
-use AppBundle\Exception\Queue\UnknownMessageException;
+use AppBundle\Exception\QueueException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use CensusBundle\Service\SearchService;
 use Predis\Client as RedisClient;
@@ -265,8 +263,12 @@ class HubspotService
             case self::QUEUE_UPDATE_USER:
                 $user = $this->userFromMessage($message);
                 $this->createOrUpdateContact($user);
+                // If policy has not been synced to hubspot before we should join policy and user sync so that user is
+                // certain to be synced before policy is.
                 foreach ($user->getPolicies() as $policy) {
-                    $this->createOrUpdateDeal($policy);
+                    if (!$policy->getHubspotId()) {
+                        $this->createOrUpdateDeal($policy);
+                    }
                 }
                 break;
             case self::QUEUE_DELETE_USER:
@@ -293,19 +295,19 @@ class HubspotService
      * Loads a user record based on the userId property in an array.
      * @param array $data is the message array that we are getting the user id from.
      * @return User the user found.
-     * @throws MalformedMessageException when there is not a user id or the id doesn't represent a user.
+     * @throws QueueException when there is not a user id or the id doesn't represent a user.
      */
     private function userFromMessage($data)
     {
         if (!isset($data["userId"])) {
-            throw new MalformedMessageException(sprintf("message lacks userId %s", json_encode($data)));
+            throw new QueueException(sprintf("message lacks userId %s", json_encode($data)));
         }
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         /** @var User $user */
         $user = $userRepo->find($data["userId"]);
         if (!$user) {
-            throw new MalformedMessageException(sprintf("userId not valid %s", json_encode($data)));
+            throw new QueueException(sprintf("userId not valid %s", json_encode($data)));
         }
         return $user;
     }
@@ -313,20 +315,20 @@ class HubspotService
     /**
      * Loads a policy record based on the policyId property in a message array.
      * @param array $data is the content of the message from which we must get the policyId.
-     * @throws MalformedMessageException when there is no policy id or it doesn't represent a policy.
+     * @throws QueueException when there is no policy id or it doesn't represent a policy.
      * @return Policy the policy found.
      */
     private function policyFromMessage($data)
     {
         if (!isset($data["policyId"])) {
-            throw new MalformedMessageException(sprintf("message lacks policyId %s", json_encode($data)));
+            throw new QueueException(sprintf("message lacks policyId %s", json_encode($data)));
         }
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $policyRepo->find($data["policyId"]);
         if (!$policy) {
-            throw new MalformedMessageException(sprintf("policyId not valid %s", json_encode($data)));
+            throw new QueueException(sprintf("policyId not valid %s", json_encode($data)));
         }
         return $policy;
     }

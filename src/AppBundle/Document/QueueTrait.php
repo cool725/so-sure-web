@@ -2,9 +2,9 @@
 
 namespace AppBundle\Document;
 
+use SevenShores\Hubspot\Exceptions\BadRequest;
 use Symfony\Component\Console\Helper\ProgressBar;
-use AppBundle\Exception\Queue\QueueException;
-use AppBundle\Exception\Queue\UnknownMessageException;
+use AppBundle\Exception\QueueException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -59,7 +59,7 @@ trait QueueTrait
                 $data = unserialize($message);
                 if (!$data || !isset($data["action"])) {
                     $message = sprintf("Actionless message in {$this->queueKey} queue %s", json_encode($data));
-                    throw new UnknownMessageException($message);
+                    throw new QueueException($message);
                 }
                 if (!$this->messageReady($data)) {
                     if ($this->queue($data)) {
@@ -74,13 +74,17 @@ trait QueueTrait
                 }
                 $this->action($data);
                 $processed++;
+            } catch (BadRequest $e) {
+                $this->logger->error($e->getMessage());
+                $data["attempts"] = $data["attempts"] ? $data["attempts"] - 1 : 1;
+                $this->queue($data, true);
+                $requeued++;
             } catch (QueueException $e) {
-                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "exception" => $e->getMessage()]);
+                $this->logger->error($e->getMessage());
                 $dropped++;
             } catch (\Exception $e) {
-                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "exception" => $e->getMessage()]);
-                $retrial = $this->queue($data, true);
-                if ($retrial) {
+                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "exception" => $e->getMessage(), "type" => get_class($e)]);
+                if ($this->queue($data, true)) {
                     $requeued++;
                 }
             }
