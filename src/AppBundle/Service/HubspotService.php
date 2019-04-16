@@ -255,7 +255,7 @@ class HubspotService
     /**
      * Actions a queue message.
      * @param array $message is the message to action.
-     * @throws UnknownMessageException if the message lacks an action parameter.
+     * @throws QueueException if the message lacks an action parameter.
      */
     protected function action($message)
     {
@@ -287,7 +287,7 @@ class HubspotService
                 $this->deletePolicy($policy);
                 break;
             default:
-                throw new UnknownMessageException(sprintf('Unknown message in queue %s', json_encode($message)));
+                throw new QueueException(sprintf('Unknown message in queue %s', json_encode($message)));
         }
     }
 

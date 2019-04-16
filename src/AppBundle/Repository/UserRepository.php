@@ -212,7 +212,7 @@ class UserRepository extends DocumentRepository
     /**
      * Gives you all the users in the system in groups of a given size so that you can do something with those groups.
      * @param int $size is the size of each group.
-     * @return |Generator which will give you each individual group of users as an array in turn.
+     * @return \Generator which will give you each individual group of users as an array in turn.
      */
     public function findAllUsersGrouped($size = 500)
     {

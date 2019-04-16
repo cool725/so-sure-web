@@ -24,8 +24,9 @@ class UserRepositoryTest extends WebTestCase
         $kernel = static::createKernel();
         $kernel->boot();
         self::$container = $kernel->getContainer();
-        /** @var DocumentManager */
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
     }
 
     /**
@@ -34,6 +35,7 @@ class UserRepositoryTest extends WebTestCase
      */
     public function testFindAllUsersGrouped()
     {
+        /** @var UserRepository */
         $userRepo = self::$dm->getRepository(User::class);
         $count = $userRepo->countAll();
         $groups = $userRepo->findAllUsersGrouped(555);
@@ -49,6 +51,7 @@ class UserRepositoryTest extends WebTestCase
      */
     public function testFindAllUsersBatched()
     {
+        /** @var UserRepository */
         $userRepo = self::$dm->getRepository(User::class);
         $count = $userRepo->countAll();
         $users = $userRepo->findAllUsersBatched();
