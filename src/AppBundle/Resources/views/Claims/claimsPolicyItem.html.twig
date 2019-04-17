@@ -508,7 +508,7 @@
                                             <br>
                                             Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
                                             {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
-                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.simplifiedMandateCancelledReason }}
+                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.mandateCancelledExplanation }}
                                             {% endif %}
                                             <br>
                                             Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
