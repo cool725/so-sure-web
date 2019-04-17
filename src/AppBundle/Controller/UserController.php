@@ -1199,7 +1199,6 @@ class UserController extends BaseController
         }
 
         if ($includeCard && $amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
-            $rescheduled = $policy->getNextRescheduledScheduledPayment();
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
@@ -1207,6 +1206,20 @@ class UserController extends BaseController
                 $request->headers->get('User-Agent'),
                 JudopayService::WEB_TYPE_UNPAID
             );
+            // Make sure upcoming rescheduled scheduled payments that also cover this debt are now cancelled.
+            $rescheduled = $policy->getNextRescheduledScheduledPayment();
+            if ($rescheduled) {
+                if ($this->areEqualToTwoDp($rescheduled->getAmount(), $amount)) {
+                    $rescheduled->cancel();
+                    $notes = $scheduled->getNotes();
+                    $rescheduled->setNotes("{$notes} --- cancelled as web payment made.");
+                } else {
+                    $id = $policy->getId();
+                    $this->get('logger')->error(
+                        "INVESTIGATE: {$id} performed web payment for amount not equal to upcoming rescheduled payment."
+                    );
+                }
+            }
         }
 
         if (in_array($unpaidReason, [
