@@ -1158,6 +1158,7 @@ class UserController extends BaseController
             );
 
             /** @var BacsService $bacsService */
+            // TODO: delete this god willing.
             $bacsService = $this->get('app.bacs');
             $bacsService->scheduleBacsPayment(
                 $policy,
@@ -1198,6 +1199,7 @@ class UserController extends BaseController
         }
 
         if ($includeCard && $amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
+            $rescheduled = $policy->getNextRescheduledScheduledPayment();
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
