@@ -1211,8 +1211,8 @@ class UserController extends BaseController
             if ($rescheduled) {
                 if ($this->areEqualToTwoDp($rescheduled->getAmount(), $amount)) {
                     $rescheduled->cancel();
-                    $notes = $scheduled->getNotes();
-                    $rescheduled->setNotes("{$notes} --- cancelled as web payment made.");
+                    $rescheduled->setNotes("cancelled as web payment made.");
+                    $this->getManager()->flush();
                 } else {
                     $id = $policy->getId();
                     $this->get('logger')->error(
