@@ -77,6 +77,11 @@ class AdminReportsCommand extends ContainerAwareCommand
         $this->reporting->getCumulativePolicies(new \DateTime(SoSure::POLICY_START), new \DateTime(), false);
     }
 
+    private function cacheConnectionsReport()
+    {
+        $this->reporting->connectionReport();
+    }
+
     /**
      * Runs the accounts reports that need caching so that they get cached.
      */
