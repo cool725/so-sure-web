@@ -55,9 +55,12 @@ Encore
     .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
     .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
     .addEntry('features', './src/AppBundle/Resources/public/rebrand/js/pages/admin/features.js')
+    .addEntry('phone', './src/AppBundle/Resources/public/rebrand/js/pages/admin/phone.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
+    .addEntry('datepicker-day', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-day.js')
+    .addEntry('datepicker-day-time', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-day-time.js')
     .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
 
     // User files
@@ -75,6 +78,8 @@ Encore
 
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
+
+    // .enableSingleRuntimeChunk()
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
@@ -102,9 +107,21 @@ Encore
             doT: "dot/doT.js",
             moment: "moment",
             fitText: "fitText",
+
         })
     )
 ;
 
+var config = Encore.getWebpackConfig();
+
+// disable amd, for datatable
+config.module.rules.unshift({
+  parser: {
+    amd: false
+  }
+});
+
+module.exports = config;
+
 // export the final configuration
-module.exports = Encore.getWebpackConfig();
+// module.exports = Encore.getWebpackConfig();
