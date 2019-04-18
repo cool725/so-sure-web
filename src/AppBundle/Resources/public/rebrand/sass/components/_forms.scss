@@ -48,6 +48,22 @@ label {
     }
 }
 
+.form-control-white {
+    background-color: $lily-white;
+
+    &.is-valid-ss,
+    &.is-valid-ss:focus,
+    &:focus {
+        border-color: $dodger-blue;
+        background-color: $white;
+        box-shadow: rgba(37, 147, 243, 0.1);
+    }
+}
+
+.form-control-white + .is-invalid {
+    color: #fff;
+}
+
 .form-text {
     color: rgba(23, 11, 56, 0.4);
 }
