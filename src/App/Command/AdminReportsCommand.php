@@ -40,6 +40,7 @@ class AdminReportsCommand extends ContainerAwareCommand
             ->addOption('kpi', null, InputOption::VALUE_NONE, "Run the 'kpi' report")
             ->addOption('claims', null, InputOption::VALUE_NONE, "Run the 'claims' report")
             ->addOption('accounts', null, InputOption::VALUE_NONE, "Run the 'accounts' report")
+            ->addOption('connections', null, InputOption::VALUE_NONE, "Run the 'connections' report")
         ;
     }
 
@@ -55,6 +56,10 @@ class AdminReportsCommand extends ContainerAwareCommand
 
         if ($input->getOption('accounts')) {
             $this->cacheAccountsReport($output);
+        }
+
+        if ($input->getOption('connections')) {
+            $this->cacheConnectionsReport();
         }
     }
 
