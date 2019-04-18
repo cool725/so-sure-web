@@ -680,7 +680,13 @@ class ReportingService
 
     public function connectionReport()
     {
-        $redisKey = sprintf('ConnectionReport');
+        $today = new DateTime();
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            'ConnectionReport',
+            'Cached',
+            $today->format('Y-m-d')
+        );
         if ($this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
@@ -705,6 +711,7 @@ class ReportingService
         $data['policyConnections']['total']['total'] = 0;
         $data['policyConnections']['total']['1claim'] = 0;
         $data['policyConnections']['total']['2+claims'] = 0;
+        /** @var Policy $policy */
         foreach ($policies as $policy) {
             $connections = count($policy->getConnections());
             if ($connections > 10) {
