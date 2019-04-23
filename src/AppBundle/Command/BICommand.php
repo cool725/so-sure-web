@@ -82,7 +82,7 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'only run 1 export [policies, claims, users, invitations, connections, phones]'
+                'only run 1 export [policies, claims, users, invitations, connections, phones, unpaidCalls]'
             )
             ->addOption(
                 'skip-s3',
@@ -144,6 +144,13 @@ class BICommand extends ContainerAwareCommand
 
         if (!$only || $only == 'phones') {
             $lines = $this->exportPhones($skipS3, $timezone);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
+        }
+
+        if (!$only || $only == 'unpaidCalls') {
+            $lines = $this->exportUnpaidCalls($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
@@ -494,6 +501,12 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
+    /**
+     * Creates an array in the style of a csv file containing the current data on connections.
+     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTime $timezone is the timezone to give dates in.
+     * @return array containing first a row of column names and then rows of connection data.
+     */
     private function exportConnections($skipS3, \DateTimeZone $timezone)
     {
         $repo = $this->dm->getRepository(StandardConnection::class);
@@ -508,24 +521,107 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($connections as $connection) {
             /** @var Connection $connection */
-            // @codingStandardsIgnoreStart
             $lines[] = implode(',', [
-                sprintf('"%s"', $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''),
-                sprintf('"%s"', $connection->getLinkedPolicy() ? $connection->getLinkedPolicy()->getPolicyNumber() : ''),
-                sprintf('"%s"', $this->timezoneFormat($connection->getInitialInvitationDate(), $timezone, 'Y-m-d H:i:s')),
-                sprintf('"%s"', $connection->getInvitation() ? $connection->getInvitation()->getChannel() : ''),
-                sprintf('"%s"', $this->timezoneFormat($connection->getDate(), $timezone, 'Y-m-d H:i:s')),
+                sprintf(
+                    '"%s"',
+                    $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''
+                ),
+                sprintf(
+                    '"%s"',
+                    $connection->getLinkedPolicy() ? $connection->getLinkedPolicy()->getPolicyNumber() : ''
+                ),
+                sprintf(
+                    '"%s"',
+                    $this->timezoneFormat($connection->getInitialInvitationDate(), $timezone, 'Y-m-d H:i:s')
+                ),
+                sprintf(
+                    '"%s"',
+                    $connection->getInvitation() ? $connection->getInvitation()->getChannel() : ''
+                ),
+                sprintf(
+                    '"%s"',
+                    $this->timezoneFormat($connection->getDate(), $timezone, 'Y-m-d H:i:s')
+                )
             ]);
-            // @codingStandardsIgnoreEnd
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'connections.csv');
         }
-
         return $lines;
     }
 
-    public function uploadS3($data, $filename)
+    /**
+     * Creates an array in the style of a csv file containing the current data on unpaid calls.
+     * @param boolean   $skipS3   determines whether the created csv should be uploaded to S3 storage.
+     * @param \DateTime $timezone is the timezone in which dates should be given.
+     * @return array containing first a row of column names, and then rows of unpaid call data.
+     */
+    private function exportUnpaidCalls($skipS3, \DateTime $timezone)
+    {
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policies = $policyRepo->createQueryBuilder()->eagerCursor(true)->field('user')->prime(true)
+            ->field('notesList.type')->equals('call')
+            ->getQuery()->execute();
+        $lines = [];
+        $lines[] = implode(',', [
+            '"Date"',
+            '"Name"',
+            '"Email"',
+            '"PolicyNumber"',
+            '"Phone Number"',
+            '"Claim"',
+            '"Cost of claims"',
+            '"Termination Date"',
+            '"Days Before Termination"',
+            '"Present status"',
+            '"Call"',
+            '"Note"',
+            '"Voicemail"',
+            '"Other Actions"',
+            '"All actions"',
+            '"Category"',
+            '"Termination week number"',
+            '"Call week number"',
+            '"Call month"',
+            '"Cancellation month"'
+        ]);
+        foreach ($policies as $policy) {
+            $note = $policy->getLatestNoteByType(Note::TYPE_CALL);
+            $approvedClaims = $policy->getApprovedClaims(true);
+            $claimsCost = 0;
+            foreach ($approvedClaims as $approvedClaim) {
+                /** @var Claim $approvedClaim */
+                $claimsCost += $approvedClaim->getTotalIncurred();
+            }
+            $lines[] = implode(',', [
+                $note->getDate()->format('Y-m-d'),
+                $policy->getUser()->getName(),
+                $policy->getUser()->getEmail(),
+                $policy->getPolicyNumber(),
+                $policy->getUser()->getMobileNumber(),
+                count($approvedClaims),
+                $claimsCost,
+                $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('Y-m-d') : null,
+                'FORMULA',
+                $policy->getStatus(),
+                'Yes',
+                $note->getResult(),
+                $note->getVoicemail() ? 'Yes' : '',
+                $note->getOtherActions(),
+                $note->getActions(true),
+                $note->getCategory(),
+                $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
+                $note->getDate()->format('W'),
+                $note->getDate()->format('M'),
+                $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null
+            ]);
+        }
+    }
+
+    /**
+     * Uploads
+    private function uploadS3($data, $filename)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
 
