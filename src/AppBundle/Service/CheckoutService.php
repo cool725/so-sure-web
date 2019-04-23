@@ -321,7 +321,6 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        die("top");
         $this->statsd->startTiming("judopay.add");
         // doesn't make sense to add payments for expired policies
         if (in_array($policy->getStatus(), [
