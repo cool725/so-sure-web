@@ -1776,9 +1776,11 @@ class UserControllerTest extends BaseControllerTest
         // check that the scheduled payment has been cancelled.
         /** @var ScheduledPaymentRepository */
         $scheduledPaymentRepo = self::$dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment */
         $cancelledPayment = $scheduledPaymentRepo->find($rescheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $cancelledPayment->getStatus());
         $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
+        /** @var ScheduledPayment */
         $scheduledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
     }
