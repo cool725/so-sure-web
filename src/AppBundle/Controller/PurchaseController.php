@@ -1586,7 +1586,7 @@ class PurchaseController extends BaseController
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
             } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, $e->getErrorMessage());
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown Error');
             }
         }
     }

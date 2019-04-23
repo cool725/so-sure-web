@@ -13,6 +13,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\BacsPaymentRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Tests\Service\CheckoutServiceTest;
@@ -1732,10 +1733,17 @@ class UserControllerTest extends BaseControllerTest
             $oneMonthAgo,
             CheckoutPayment::RESULT_DECLINED
         );
+        $rescheduledPayment = new ScheduledPayment();
+        $rescheduledPayment->setScheduled($this->addDays(new \DateTime(), 5));
+        $rescheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $rescheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $rescheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $policy->addScheduledPayment($rescheduledPayment);
+        self::$dm->persist($rescheduledPayment);
         $scheduledPayment = new ScheduledPayment();
-        $scheduledPayment->setScheduled($this->addDays(new \DateTime(), 5));
+        $scheduledPayment->setScheduled($this->addDays(new \DateTime(), 30));
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-        $scheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
         $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $policy->addScheduledPayment($scheduledPayment);
         self::$dm->persist($scheduledPayment);
@@ -1768,9 +1776,11 @@ class UserControllerTest extends BaseControllerTest
         // check that the scheduled payment has been cancelled.
         /** @var ScheduledPaymentRepository */
         $scheduledPaymentRepo = self::$dm->getRepository(ScheduledPayment::class);
-        $cancelledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
+        $cancelledPayment = $scheduledPaymentRepo->find($rescheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $cancelledPayment->getStatus());
         $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
+        $scheduledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
     }
 
     public function testUserInvalidPolicy()
