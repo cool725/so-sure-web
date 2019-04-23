@@ -1,91 +1,124 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme cashback_search_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/month.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-cashback' %}
+
+{% block title %}so-sure - Cashback{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>so-sure Cashback for {{ month }} / {{ year }}</h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-3">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_cashback') }}">
-                <input name="charge" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Cashback for {{ month }} / {{ year }}</h1>
             </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline mb-4"
+                          method="POST"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_cashback') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                    </form>
+                    {{ form_start(cashback_search_form, {'attr':{'class':'form-inline'}}) }}
+                        <div class="form-group">
+                            {{ form_label(cashback_search_form.status, 'Status:', { 'label_attr': {'class': 'mr-2'} }) }}
+                            {{ form_widget(cashback_search_form.status) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(cashback_search_form.search, {'attr':{'class':'btn btn-primary btn-square'}}) }}
+                        </div>
+                    {{ form_end(cashback_search_form) }}
                 </div>
             </div>
-        </div>
-    </div>
-    </form>
-</div>
-    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-        {{ form_start(cashback_search_form) }}
-        <div class="row">
-            <div class="col-md-8">
-                {{ form_widget(cashback_search_form.status) }}
-            </div>
-            <div class="col-md-4">
-                {{ form_widget(cashback_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
-            </div>
-        </div>
-        {{ form_end(cashback_search_form) }}
-    </div>
-    {% if cashback|length == 0 %}
-    <div class="row-fluid">
-        <h2>No cashback items found</h2>
-    </div>
-    {% else %}
-    <h3>Cashback</h3>
-    {% for cashback_item in cashback %}
-        <div class="row">
-            <div class="col-md-6">
-                <a href="{{ path('admin_policy', {'id': cashback_item.policy.id}) }}">{{ cashback_item.policy.policyNumber }}</a>
-                 -
-                £{{ cashback_item.getDisplayableAmount|number_format(2, '.',',') }} ({{ cashback_item.status }})
-            </div>
-            {% if cashback_item.status == 'pending-payment' %}
-            <div class="col-md-4">
-                {{ cashback_item.accountName }} {{ cashback_item.sortCode }} {{ cashback_item.accountNumber }}
-            </div>
-            <div class="col-md-2">
-                <form method="POST" action="{{ url('admin_cashback_action', {'id': cashback_item.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
-                    <input type="hidden" name="status" value="paid">
-                    <input type="hidden" name="return_url" value="{{ app.request.uri }}">
-                    <input type="submit" class="btn btn-danger" value="Set as paid">
-                </form>
-            </div>
-            {% elseif cashback_item.status == 'paid' %}
-            <div class="col-md-4">
-                {{ cashback_item.accountName }} {{ cashback_item.sortCode }} {{ cashback_item.accountNumber }}
-            </div>
-            <div class="col-md-2">
-                <form method="POST" action="{{ url('admin_cashback_action', {'id': cashback_item.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
-                    <input type="hidden" name="status" value="failed">
-                    <input type="hidden" name="return_url" value="{{ app.request.uri }}">
-                    <input type="submit" class="btn btn-danger" value="Set as failed">
-                </form>
-            </div>
+            {# TODO: Content area #}
+            {% if cashback|length == 0 %}
+                <p class="mb-5">No cashback items found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Policy</th>
+                                <th>Ammount</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cashback_item in cashback %}
+                                <td><a href="{{ path('admin_policy', {'id': cashback_item.policy.id}) }}">{{ cashback_item.policy.policyNumber }}</a></td>
+                                <td>&pound;{{ cashback_item.getDisplayableAmount|number_format(2, '.',',') }} ({{ cashback_item.status }})</td>
+                                <td>
+                                    {% if cashback_item.status == 'pending-payment' or cashback_item.status == 'paid' %}
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">{{ cashback_item.accountName }}</li>
+                                            <li class="list-inline-item">{{ cashback_item.sortCode }}</li>
+                                            <li class="list-inline-item">{{ cashback_item.accountNumber }}</li>
+                                        </ul>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if cashback_item.status == 'pending-payment' %}
+                                        <form method="POST"
+                                              action="{{ url('admin_cashback_action', {'id': cashback_item.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
+                                            <input type="hidden" name="status" value="paid">
+                                            <input type="hidden" name="return_url" value="{{ app.request.uri }}">
+                                            <input type="submit" class="btn btn-danger btn-square" value="Set as paid">
+                                        </form>
+                                    {% elseif cashback_item.status == 'paid' %}
+                                        <form method="POST"
+                                              action="{{ url('admin_cashback_action', {'id': cashback_item.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
+                                            <input type="hidden" name="status" value="failed">
+                                            <input type="hidden" name="return_url" value="{{ app.request.uri }}">
+                                            <input type="submit" class="btn btn-danger btn-square" value="Set as failed">
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% endif %}
         </div>
-    {% endfor %}
-    {% endif %}
-</div>
+    </section>
+
+    {# Page Modals #}
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}
