@@ -1206,20 +1206,6 @@ class UserController extends BaseController
                 $request->headers->get('User-Agent'),
                 JudopayService::WEB_TYPE_UNPAID
             );
-            // Make sure upcoming rescheduled scheduled payments that also cover this debt are now cancelled.
-            $rescheduled = $policy->getNextRescheduledScheduledPayment();
-            if ($rescheduled) {
-                if ($this->areEqualToTwoDp($rescheduled->getAmount(), $amount)) {
-                    $rescheduled->cancel();
-                    $rescheduled->setNotes("cancelled as web payment made.");
-                    $this->getManager()->flush();
-                } else {
-                    $id = $policy->getId();
-                    $this->get('logger')->error(
-                        "INVESTIGATE: {$id} performed web payment for amount not equal to upcoming rescheduled payment."
-                    );
-                }
-            }
         }
 
         if (in_array($unpaidReason, [

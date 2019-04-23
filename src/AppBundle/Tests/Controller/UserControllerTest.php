@@ -1715,9 +1715,9 @@ class UserControllerTest extends BaseControllerTest
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
         $oneMonthAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
+        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
         $twoMonthsAgo = \DateTime::createFromFormat('U', time());
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P1M'));
         $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
         self::setCheckoutPaymentMethodForPolicy($policy);
         static::$policyService->setEnvironment('prod');
@@ -1736,21 +1736,16 @@ class UserControllerTest extends BaseControllerTest
         $scheduledPayment->setScheduled($this->addDays(new \DateTime(), 5));
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
         $scheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $policy->addScheduledPayment($scheduledPayment);
         self::$dm->persist($scheduledPayment);
         self::$dm->flush();
         $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
-        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
         self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
         $crawler = $this->login($email, $password, 'user/unpaid');
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Unpaid Policy', $crawler->html());
-
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
         $token = self::$checkoutService->createCardToken(
@@ -1765,12 +1760,17 @@ class UserControllerTest extends BaseControllerTest
             'csrf' => $csrf,
         ]);
         $data = self::verifyResponse(200);
-
         $crawler = self::$client->request('GET', '/user/unpaid');
         $this->expectFlashSuccess($crawler, 'successfully completed');
         $this->assertContains('paid up to date', $crawler->html());
+        self::$dm->flush();
+        self::$dm->clear();
         // check that the scheduled payment has been cancelled.
-        $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
+        /** @var ScheduledPaymentRepository */
+        $scheduledPaymentRepo = self::$dm->getRepository(ScheduledPayment::class);
+        $cancelledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $cancelledPayment->getStatus());
+        $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
     }
 
     public function testUserInvalidPolicy()

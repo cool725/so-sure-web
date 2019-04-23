@@ -321,6 +321,7 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
+        die("top");
         $this->statsd->startTiming("judopay.add");
         // doesn't make sense to add payments for expired policies
         if (in_array($policy->getStatus(), [
@@ -826,6 +827,20 @@ class CheckoutService
 
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+
+            // Make sure upcoming rescheduled scheduled payments that also cover this debt are now cancelled.
+            $rescheduled = $policy->getNextRescheduledScheduledPayment();
+            if ($rescheduled) {
+                if ($this->areEqualToTwoDp($rescheduled->getAmount(), $amount)) {
+                    $rescheduled->cancel();
+                    $rescheduled->setNotes("cancelled as web payment made.");
+                } else {
+                    $id = $policy->getId();
+                    $this->logger->error(
+                        "{$id} performed web payment for amount not equal to upcoming rescheduled payment."
+                    );
+                }
+            }
 
             if ($details && $payment) {
                 $payment->setReceipt($details->getId());
