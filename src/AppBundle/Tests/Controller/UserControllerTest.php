@@ -1715,14 +1715,14 @@ class UserControllerTest extends BaseControllerTest
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
-        $oneMonthAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P5D'));
-        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P1M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
+        $startDate = $this->addDays(new \DateTime(), -40);
+        $failDate = $this->addDays(new \DateTime(), -4);
+        $rescheduleDate = $this->addDays(new \DateTime(), 5);
+        $scheduleDate = $this->addDays(new \DateTime(), 30);
+        $policy = self::initPolicy($user, self::$dm, $phone, $startDate, true, false);
         self::setCheckoutPaymentMethodForPolicy($policy);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, $twoMonthsAgo);
+        static::$policyService->create($policy, $startDate);
         static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_UNPAID);
         static::addCheckoutPayment(
@@ -1730,18 +1730,18 @@ class UserControllerTest extends BaseControllerTest
             $policy->getPremium()->getMonthlyPremiumPrice(),
             Salva::MONTHLY_TOTAL_COMMISSION,
             null,
-            $oneMonthAgo,
+            $failDate,
             CheckoutPayment::RESULT_DECLINED
         );
         $rescheduledPayment = new ScheduledPayment();
-        $rescheduledPayment->setScheduled($this->addDays(new \DateTime(), 5));
+        $rescheduledPayment->setScheduled($rescheduleDate);
         $rescheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
         $rescheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
         $rescheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $policy->addScheduledPayment($rescheduledPayment);
         self::$dm->persist($rescheduledPayment);
         $scheduledPayment = new ScheduledPayment();
-        $scheduledPayment->setScheduled($this->addDays(new \DateTime(), 30));
+        $scheduledPayment->setScheduled($scheduleDate);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
         $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
         $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());

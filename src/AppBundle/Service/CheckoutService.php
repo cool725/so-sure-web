@@ -828,19 +828,12 @@ class CheckoutService
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
 
             // Make sure upcoming rescheduled scheduled payments that also cover this debt are now cancelled.
-            $rescheduled = $policy->getNextRescheduledScheduledPayment();
-            if ($rescheduled) {
-                if ($this->areEqualToTwoDp($rescheduled->getAmount(), $amount)) {
-                    $rescheduled->cancel();
-                    $rescheduled->setNotes("cancelled as web payment made.");
-                } else {
-                    $id = $policy->getId();
-                    $this->logger->error(
-                        "{$id} performed web payment for amount not equal to upcoming rescheduled payment."
-                    );
-                }
+            /** @var ScheduledPaymentRepository */
+            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+            foreach ($scheduledPaymentRepo->findRescheduled($policy) as $rescheduled) {
+                $rescheduled->cancel();
+                $rescheduled->setNotes("cancelled as web payment made.");
             }
-
             if ($details && $payment) {
                 $payment->setReceipt($details->getId());
                 $payment->setAmount($this->convertFromPennies($details->getValue()));
