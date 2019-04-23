@@ -1747,6 +1747,12 @@ class UserControllerTest extends BaseControllerTest
         $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $policy->addScheduledPayment($scheduledPayment);
         self::$dm->persist($scheduledPayment);
+        $unrelatedPayment = new ScheduledPayment();
+        $unrelatedPayment->setScheduled($scheduleDate);
+        $unrelatedPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $unrelatedPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $unrelatedPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        self::$dm->persist($unrelatedPayment);
         self::$dm->flush();
         $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
@@ -1782,6 +1788,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
         /** @var ScheduledPayment */
         $scheduledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
+        /** @var ScheduledPayment */
+        $unrelatedPayment = $scheduledPaymentRepo->find($unrelatedPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
     }
 

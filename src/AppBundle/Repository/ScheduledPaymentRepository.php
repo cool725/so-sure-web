@@ -23,6 +23,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         $query = $this->createQueryBuilder()
             ->field("status")->equals(ScheduledPayment::STATUS_SCHEDULED)
             ->field("type")->equals(ScheduledPayment::TYPE_RESCHEDULED)
+            ->field("policy")->references($policy)
             ->field("payment")->equals(null);
         if ($start) {
             $query->field("scheduled")->gte($start);
