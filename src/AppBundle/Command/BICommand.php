@@ -27,6 +27,9 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
+/**
+ * Command for exporting CSV reports on various collections of company data.
+ */
 class BICommand extends ContainerAwareCommand
 {
     use DateTrait;
@@ -46,6 +49,14 @@ class BICommand extends ContainerAwareCommand
     /** @var SearchService */
     protected $searchService;
 
+    /**
+     * inserts the required dependencies into the command.
+     * @param S3Client $s3 is the amazon s3 client for uploading generated reports.
+     * @param DocumentManager $dm is the document manager for loading data.
+     * @param string $environment is the environment name used to upload to the right location in amazon s3.
+     * @param LoggerInterface $logger is used for logging.
+     * @param SearchService $searchService provides geographical information about users.
+     */
     public function __construct(
         S3Client $s3,
         DocumentManager $dm,
@@ -61,6 +72,9 @@ class BICommand extends ContainerAwareCommand
         $this->searchService = $searchService;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function configure()
     {
         $this
@@ -99,6 +113,9 @@ class BICommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $debug = $input->getOption('debug');
@@ -106,49 +123,42 @@ class BICommand extends ContainerAwareCommand
         $only = $input->getOption('only');
         $skipS3 = true === $input->getOption('skip-s3');
         $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
-
         if (!$only || $only == 'policies') {
             $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-
         if (!$only || $only == 'claims') {
             $lines = $this->exportClaims($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-
         if (!$only || $only == 'users') {
             $lines = $this->exportUsers($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-
         if (!$only || $only == 'invitations') {
             $lines = $this->exportInvitations($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-
         if (!$only || $only == 'connections') {
             $lines = $this->exportConnections($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-
         if (!$only || $only == 'phones') {
             $lines = $this->exportPhones($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-
         if (!$only || $only == 'unpaidCalls') {
             $lines = $this->exportUnpaidCalls($skipS3, $timezone);
             if ($debug) {
@@ -157,6 +167,12 @@ class BICommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * Creates an array in the style of a csv file containing the current data on phones.
+     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTime $timezone is the timezone to give dates in.
+     * @return array containing first a row of column names and then rows of phone data.
+     */
     private function exportPhones($skipS3, \DateTimeZone $timezone)
     {
         /** @var PhoneRepository $repo */
@@ -183,10 +199,15 @@ class BICommand extends ContainerAwareCommand
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'phones.csv');
         }
-
         return $lines;
     }
 
+    /**
+     * Creates an array in the style of a csv file containing the current data on claims.
+     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTime $timezone is the timezone to give dates in.
+     * @return array containing first a row of column names and then rows of claim data.
+     */
     private function exportClaims($skipS3, \DateTimeZone $timezone)
     {
         /** @var ClaimRepository $repo */
@@ -247,18 +268,15 @@ class BICommand extends ContainerAwareCommand
                 sprintf(
                     '"%s"',
                     $policy->getCancelledReason() ?
-                        $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d H:i:s') :
-                        ""
+                        $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d H:i:s') : ''
                 ),
-
-                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ""),
+                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ''),
                 sprintf('"%s"', count($policy->getStandardConnections())),
                 'N/A',
                 sprintf(
                     '"%s"',
                     $policy->getCancelledReason() && $policy->getCancelledReason() == Policy::CANCELLED_UPGRADE ?
-                        'yes' :
-                        'no'
+                        'yes' : 'no'
                 ),
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
@@ -289,10 +307,15 @@ class BICommand extends ContainerAwareCommand
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
         }
-
         return $lines;
     }
 
+    /**
+     * Creates an array in the style of a csv file containing the current data on policies.
+     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTime $timezone is the timezone to give dates in.
+     * @return array containing first a row of column names and then rows of policy data.
+     */
     private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
     {
         /** @var PhonePolicyRepository $repo */
@@ -423,10 +446,15 @@ class BICommand extends ContainerAwareCommand
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
         }
-
         return $lines;
     }
 
+    /**
+     * Creates an array in the style of a csv file containing the current data on users.
+     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTime $timezone is the timezone to give dates in.
+     * @return array containing first a row of column names and then rows of user data.
+     */
     private function exportUsers($skipS3, \DateTimeZone $timezone)
     {
         /** @var UserRepository $repo */
@@ -457,22 +485,26 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $this->timezoneFormat($user->getCreated(), $timezone, 'Y-m-d')),
-
                 sprintf('"%s"', count($user->getCreatedPolicies()) > 0 ? 'yes' : 'no'),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : '')
             ]);
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'users.csv');
         }
-
         return $lines;
     }
 
+    /**
+     * Creates an array in the style of a csv file containing the current data on invitations.
+     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTime $timezone is the timezone to give dates in.
+     * @return array containing first a row of column names and then rows of invitation data.
+     */
     private function exportInvitations($skipS3, \DateTimeZone $timezone)
     {
         $repo = $this->dm->getRepository(Invitation::class);
@@ -490,14 +522,12 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $this->timezoneFormat($invitation->getCreated(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $invitation->getChannel()),
-                sprintf('"%s"', $this->timezoneFormat($invitation->getAccepted(), $timezone, 'Y-m-d H:i:s')),
-
+                sprintf('"%s"', $this->timezoneFormat($invitation->getAccepted(), $timezone, 'Y-m-d H:i:s'))
             ]);
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'invitations.csv');
         }
-
         return $lines;
     }
 
@@ -614,10 +644,16 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $note->getOtherActions()),
                 sprintf('"%s"', $note->getActions(true)),
                 sprintf('"%s"', $note->getCategory()),
-                sprintf('"%s"', $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null),
+                sprintf(
+                    '"%s"',
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null
+                ),
                 sprintf('"%s"', $note->getDate()->format('W')),
                 sprintf('"%s"', $note->getDate()->format('M')),
-                sprintf('"%s"', $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null)
+                sprintf(
+                    '"%s"',
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null
+                )
             ]);
         }
     }
@@ -631,23 +667,17 @@ class BICommand extends ContainerAwareCommand
     private function uploadS3($data, $filename)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
-
         $result = file_put_contents($tmpFile, $data);
-
         if (!$result) {
             throw new \Exception($filename . ' could not be processed into a tmp file.');
         }
-
         $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);
-
         $result = $this->s3->putObject(array(
             'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key'    => $s3Key,
             'SourceFile' => $tmpFile,
         ));
-
         unlink($tmpFile);
-
         return $s3Key;
     }
 }
