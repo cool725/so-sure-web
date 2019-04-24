@@ -62,11 +62,11 @@
                 </div>
             </div>
             {# TODO: Content area #}
-            <div class="table-responsive-sm mb-5">
+            {# <div class="table-responsive-sm mb-5"> #}
                 <table class="table table-striped">
                     <thead class="thead-light">
                         <tr>
-                            <th></th>
+                            <th width="40%"></th>
                             {% for week in weeks %}
                                 <th>
                                     Ending <strong>{{ week.end_date_disp|date('d M Y') }}</strong><br><small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small><br><small>{{ week.start_date|date('H:i') }} - {{ week.end_date_disp|date('H:i') }}</small>
@@ -575,7 +575,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            {# </div> #}
         </div>
     </section>
 
