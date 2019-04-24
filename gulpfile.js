@@ -40,4 +40,8 @@ gulp.task('default', function() {
     gulp.src(['node_modules/flickity/css/flickity.css'])
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
+    // DataTables.css
+    gulp.src(['node_modules/datatables.net-dt/css/jquery.dataTables.css'])
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
+
 });

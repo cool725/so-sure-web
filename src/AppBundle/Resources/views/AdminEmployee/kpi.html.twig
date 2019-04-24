@@ -1,79 +1,109 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{# {% form_theme cashback_search_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %} #}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/kpi.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-kpi' %}
+
+{% block title %}so-sure - KPI{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-    <div class="row">
-        <div class="col-md-6">
-            <h1>so-sure KPI</h1>
-        </div>
-        <form id='kpi-form' method="POST">
-            <div class="col-md-2">
-                <div class="form-group" style="padding-top: 15px;">
-                    <div class='input-group date' id='kpi'>
-                        <input name="kpi" type='text' class="form-control" value="{{ now|date('d-m-Y') }}" />
-                        <span class="input-group-addon">
-                            <span class="fa fa-calendar"></span>
-                        </span>
-                    </div>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">KPI</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="POST"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{ now|date('d-m-Y') }}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <a href="{{ previous_page }}" class="btn btn-primary btn-square mr-2">
+                                <i class="fa fa-arrow-left fa-fw"></i>
+                            </a>
+                        </div>
+                        <div class="form-group">
+                            <a href="{{ next_page }}" class="btn btn-primary btn-square">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="form-group" style="padding-top: 15px;">
-                    <button class="btn btn-primary">Adjust date</button>
-                <a href="{{ previous_page }}"><i class="fa fa-arrow-left"></i></a>
-                <a href="{{ next_page }}"><i class="fa fa-arrow-right"></i></a>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="row">
-        <div class="col-md-11">
-            <div class="table-responsive">
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
                 <table class="table table-striped">
-                    <thead>
-                    <tr>
-                    <th></th>
-                    {% for week in weeks %}
-                        <td>Ending <b>{{ week.end_date_disp|date('d M Y') }}</b><br>
-                            <small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small><br>
-                            <small>{{ week.start_date|date('H:i') }} - {{ week.end_date_disp|date('H:i') }}</small>
-                        </td>
-                    {% endfor %}
-                    </tr>
+                    <thead class="thead-light">
+                        <tr>
+                            <th width="40%"></th>
+                            {% for week in weeks %}
+                                <th width="15%">
+                                    Ending <strong>{{ week.end_date_disp|date('d M Y') }}</strong><br><small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small><br><small>{{ week.start_date|date('H:i') }} - {{ week.end_date_disp|date('H:i') }}</small>
+                                </th>
+                            {% endfor %}
+                        </tr>
                     </thead>
-                    {# dump(weeks) #}
                     <tbody>
                         <tr>
-                            <td>Run Rate Premium [KPI: 12]</td>
+                            <td>
+                                Run Rate Premium [KPI: <strong>12</strong>]</td>
                             {% for week in weeks %}
                                 <td>£{{ week.total.data['totalRunRate'] |number_format(2, '.', ',') }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active Policies [KPI: 14]</td>
+                            <td>
+                                Active Policies [KPI: <strong>14</strong>]</td>
                             {% for week in weeks %}
                                 {# as upgrades will be included in new and taken off ending is the same as if using adjUpgrade on both #}
                                 <td>{{ (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']) }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Percentage of FNOL within 30days policy inception [KPI: 72]</td>
+                            <td>
+                                Percentage of FNOL within 30 days policy inception [KPI: <strong>72</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['fnol30Claims']|number_format(1, '.', ',') }}%</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Overall Approved Claim Rate- rolling 12mo [KPI: 73] <i class="fa fa-info" title="12 month FNOL that were approved / current active policies"></i></td>
+                            <td>
+                                Overall Approved Claim Rate- rolling 12mo [KPI: <strong>73</strong>]
+                                <i class="fas fa-info-circle"
+                                   title="12 month FNOL that were approved / current active policies"
+                                   data-toggle="tooltip"></i>
+                            </td>
                             {% for week in weeks %}
                                 <td>{%  if (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']) != 0  %}
                                         {{ (100 * week.period.data['rolling-yearly-claims-totals'] / (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']))|number_format(1, '.', ',') }}%
@@ -84,124 +114,141 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Average cost of claims in month [KPI: 74]</td>
+                            <td>
+                                Average cost of claims in month [KPI: <strong>74</strong>]</td>
                             {% for week in weeks %}
                                 <td></td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># of User aquired [KPI: 91]</td>
+                            <td>
+                                # of User aquired [KPI: <strong>91</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newUsers'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># of New Policyholders [KPI: 93]</td>
+                            <td>
+                                # of New Policyholders [KPI: <strong>93</strong>]</td>
                             {% for week in weeks %}
                                 <td></td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>New Policies [KPI: 97] (excludes upgrades & renewals)</td>
+                            <td>
+                                New Policies [KPI: <strong>97</strong>] (excludes upgrades &amp; renewals)</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newPoliciesAdjUpgradeRenewals'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Policy Upgrades [KPI: 99]
+                            <td>
+                                Policy Upgrades [KPI: <strong>99</strong>]
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingUpgradePolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Policy Expired [KPI: 102]
+                            <td>
+                                Policy Expired [KPI: <strong>102</strong>]
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingExpiredPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Policy Renewed [KPI: 103]
+                            <td>
+                                Policy Renewed [KPI: <strong>103</strong>]
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingPoliciesRenewed'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Policy unable to renew (so-sure declined) [KPI: 104]
+                            <td>
+                                Policy unable to renew (so-sure declined) [KPI: <strong>104</strong>]
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingPoliciesRenewedDeclined'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Cancellations - User Requested [KPI: 114]</td>
+                            <td>
+                                Total Cancellations - User Requested [KPI: <strong>114</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingUserRequestedPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Cancellations - Unpaid [KPI: 115]</td>
+                            <td>
+                                Total Cancellations - Unpaid [KPI: <strong>115</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingUnpaidPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Cooloffs [KPI: 116]</td>
+                            <td>
+                                Total Cooloffs [KPI: <strong>116</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingCooloffPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Cancellations - Other [KPI: 117]</td>
+                            <td>
+                                Total Cancellations - Other [KPI: <strong>117</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ (week.period.data['endingActualFraudPolicies'] + week.period.data['endingSuspectedFraudPolicies'] + week.period.data['endingBadRiskPolicies'] + week.period.data['endingDispossessionPolicies'] + week.period.data['endingWreckagePolicies']  )}}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Undesired Cancellations - User Requested [KPI: 120]</td>
+                            <td>
+                                Undesired Cancellations - User Requested [KPI: <strong>120</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ (week.period.data['endingUserRequestedPolicies'] - week.period.data['desiredEndingUserRequestedPolicies']) }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Undesired Cancellations - Unpaid [KPI: 121]</td>
+                            <td>
+                                Undesired Cancellations - Unpaid [KPI: <strong>121</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ (week.period.data['endingUnpaidPolicies'] - week.period.data['desiredEndingUnpaidPolicies']) }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Undesired Cooloffs [KPI: 122]</td>
+                            <td>
+                                Undesired Cooloffs [KPI: <strong>122</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ (week.period.data['endingCooloffPolicies'] - week.period.data['desiredEndingCooloffPolicies']) }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Undesired Cancellations - Other [KPI: 123]</td>
+                            <td>
+                                Undesired Cancellations - Other [KPI: <strong>123</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ ( week.period.data['endingActualFraudPolicies'] + week.period.data['endingSuspectedFraudPolicies'] + week.period.data['endingBadRiskPolicies'] + week.period.data['endingDispossessionPolicies'] + week.period.data['endingWreckagePolicies']  - week.period.data['desiredEndingActualFraudPolicies'] - week.period.data['desiredEndingSuspectedFraudPolicies'] - week.period.data['desiredEndingBadRiskPolicies'] - week.period.data['desiredEndingDispossessionPolicies'] - week.period.data['desiredEndingWreckagePolicies'] ) }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># of Total Policies that are Cancelled w/approved Claim (Payment owed) [KPI: 127]</td>
+                            <td>
+                                # of Total Policies that are Cancelled w/approved Claim (Payment owed) [KPI: <strong>127</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-cancelled-payment-owed'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># of Policies Paid that were Cancelled w/approved Claim (Payment owed) [KPI: 128]</td>
+                            <td>
+                                # of Policies Paid that were Cancelled w/approved Claim (Payment owed) [KPI: <strong>128</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-cancelled-payment-paid'] }}</td>
                             {% endfor %}
                         </tr>
-
                         <tr>
-                            <td>Activation Policies [KPI??] (excludes upgrades & renewals)<br>
-                            <span title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date">
-                                <i class="fa fa-warning"></i>
-                                before 31/3/18 data is suspect!
-                            </span>
+                            <td>
+                                Activation Policies [KPI??] (excludes upgrades &amp; renewals) <br>
+                                <i class="fas fa-exclamation-triangle"
+                                   title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date"
+                                   data-toggle="tooltip"></i> before 31/3/18 data is suspect!
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['activatedPoliciesActivatedAdjUpgradeRenewals'] }} / {{ week.period.data['activatedPoliciesTotalAdjUpgradeRenewals'] }}
@@ -212,11 +259,11 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Hard Activation Policies [KPI??] (excludes upgrades & renewals)
-                                <span title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date">
-                                <i class="fa fa-warning"></i>
-                                before 15/1/18 data is suspect!
-                            </span>
+                            <td>
+                                Hard Activation Policies [KPI??] (excludes upgrades &amp; renewals) <br>
+                                <i class="fas fa-exclamation-triangle"
+                                   title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date"
+                                   data-toggle="tooltip"></i> before 15/1/18 data is suspect!
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['hardActivatedPoliciesAdjUpgradeRenewals'] }} / {{ week.period.data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] }}
@@ -226,41 +273,55 @@
                                 </td>
                             {% endfor %}
                         </tr>
-
                         <tr>
-                            <td>Number of active Policyholders [KPI: 131]</td>
+                            <td>
+                                Number of active Policyholders [KPI: <strong>131</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['totalActivePolicyHolders'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>% of active policyholders with >1 policy [KPI: 132]</td>
+                            <td>
+                                % of active policyholders with >1 policy [KPI: <strong>132</strong>]</td>
                             {% for week in weeks %}
                                 <td></td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>FNOL Claims [KPI: 135]
-                                    <span class="badge" title="Days delayed - requires input by davies so may be missed">-3 (approx)</span>
+                            <td>
+                                FNOL Claims [KPI: <strong>135</strong>]
+                                <span class="badge badge-pill badge-zaffre"
+                                      title="Days delayed - requires input by davies so may be missed"
+                                      data-toggle="tooltip">-3 (approx)</span>
                             </td>
                             {% for week in weeks %}
-                                <td>{{ week.period['claims']['total'] }}
-                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                <td>
+                                    {{ week.period['claims']['total'] }}
+                                    <i class="fas fa-clock"
+                                       title="Value is delayed"
+                                       data-toggle="tooltip"></i>
                                 </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Approved Claims [KPI: 137]
-                                    <span class="badge" title="Days delayed - requires input by davies so may be missed">-3 (approx)</span>
+                            <td>
+                                Approved Claims [KPI: <strong>137</strong>]
+                                <span class="badge badge-pill badge-zaffre"
+                                      title="Days delayed - requires input by davies so may be missed"
+                                      data-toggle="tooltip">-3 (approx)</span>
                             </td>
                             {% for week in weeks %}
-                                <td>{{ week.period['approvedClaims']['total'] }}
-                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                <td>
+                                    {{ week.period['approvedClaims']['total'] }}
+                                    <i class="fas fa-clock"
+                                       title="Value is delayed"
+                                       data-toggle="tooltip"></i>
                                 </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Approved Claim Freq (avg weekly)</td>
+                            <td>
+                                Approved Claim Freq (avg weekly)</td>
                             {% for week in weeks %}
                                 <td>{{ (100 * week['freq-claims']) | number_format(1, '.', ',') }}%</td>
                             {% endfor %}
@@ -280,198 +341,236 @@
                         </tr>
                         #}
                         <tr>
-                            <td># Total Unique Policies w/Connections [KPI: 145]</td>
+                            <td>
+                                # Total Unique Policies w/Connections [KPI: <strong>145</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newTotalPoliciesWithConnections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td><span title="Was: New Policies via Invitation">Number of policies acquired through invite [KPI: 151]</span></td>
+                            <td>
+                                <span title="Was: New Policies via Invitation" data-toggle="tooltip">Number of policies acquired through invite [KPI: <strong>151</strong>]</span></td>
                             {% for week in weeks %}
                                 <td>{{ (week.period.data['newInvitationPolicies'] + week.period.data['newSCodePolicies']) }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total # pic-sure unstarted policies (pic-sure policy, but no upload) [KPI: 160]</td>
+                            <td>
+                                Total # pic-sure unstarted policies (pic-sure policy, but no upload) [KPI: <strong>160</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-picsure-unstarted-policies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total # pic-sure invalid policies, (pic-sure started, but not completed) [KPI: 161]</td>
+                            <td>
+                                Total # pic-sure invalid policies, (pic-sure started, but not completed) [KPI: <strong>161</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-invalid-policies'] is defined %}{{ week['kpi-picsure-invalid-policies'] }}{% else %}-{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total # pic-sure approved policies [KPI: 162]</td>
+                            <td>
+                                Total # pic-sure approved policies [KPI: <strong>162</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-picsure-approved-policies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total # pic-sure pre-approved (renewals) policies [KPI: 163]</td>
+                            <td>
+                                Total # pic-sure pre-approved (renewals) policies [KPI: <strong>163</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-picsure-preapproved-policies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total # pic-sure claims approved (rejected/invalid/unstarted -> claims -> claims-approved) policies [KPI: ??]</td>
+                            <td>
+                                Total # pic-sure claims approved (rejected/invalid/unstarted -> claims -> claims-approved) policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-claims-approved-policies'] is defined %}{{ week['kpi-picsure-claims-approved-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total # pic-sure rejected policies [KPI: ??]</td>
+                            <td>
+                                Total # pic-sure rejected policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-picsure-rejected-policies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active # pic-sure unstarted policies (pic-sure policy, but no upload) [KPI: ??]</td>
+                            <td>
+                                Active # pic-sure unstarted policies (pic-sure policy, but no upload) [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-unstarted-policies'] is defined %}{{ week['kpi-picsure-active-unstarted-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active # pic-sure invalid policies, (pic-sure started, but not completed) [KPI: ??]</td>
+                            <td>
+                                Active # pic-sure invalid policies, (pic-sure started, but not completed) [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-invalid-policies'] is defined %}{{ week['kpi-picsure-active-invalid-policies'] }}{% else %}-{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active # pic-sure approved policies [KPI: ??]</td>
+                            <td>
+                                Active # pic-sure approved policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-approved-policies'] is defined %}{{ week['kpi-picsure-active-approved-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active # pic-sure pre-approved (renewals) policies [KPI: ??]</td>
+                            <td>
+                                Active # pic-sure pre-approved (renewals) policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-preapproved-policies'] is defined %}{{ week['kpi-picsure-active-preapproved-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active # pic-sure claims approved (rejected/invalid/unstarted -> claims -> claims-approved) policies [KPI: ??]</td>
+                            <td>
+                                Active # pic-sure claims approved (rejected/invalid/unstarted -> claims -> claims-approved) policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-claims-approved-policies'] is defined %}{{ week['kpi-picsure-active-claims-approved-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Active # pic-sure rejected policies [KPI: ??]</td>
+                            <td>
+                                Active # pic-sure rejected policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-rejected-policies'] is defined %}{{ week['kpi-picsure-active-rejected-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Claim Attribution [KPI: REMOVED]</td>
+                            <td>
+                                Claim Attribution [KPI: REMOVED]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['claimAttributionText'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Rolling 12 month Claim Attribution [KPI: REMOVED]</td>
+                            <td>
+                                Rolling 12 month Claim Attribution [KPI: REMOVED]</td>
                             {% for week in weeks %}
-                                <td>{{ week.period.data['rolling12MonthClaimAttributionText'] }}</td>
+                                <td><span title="{{ week.period.data['rolling12MonthClaimAttributionText'] }}"
+                                          data-toggle="tooltip">Hover me to see!</span></td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>App New Policy Holders [KPI: 235]</td>
+                            <td>
+                                App New Policy Holders [KPI: <strong>235</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-purchase-policy-app-attrib'] is defined %}{{ week['mixpanel-purchase-policy-app-attrib'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Total Site Visitors [KPI: 456]</td>
+                            <td>
+                                Total Site Visitors [KPI: <strong>456</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-total-site-visitors'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Quote Page UK [KPI: 457]</td>
+                            <td>
+                                Quote Page UK [KPI: <strong>457</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-quotes-uk'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>CPC Quote Page [KPI: 458]</td>
+                            <td>
+                                CPC Quote Page [KPI: <strong>458</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-cpc-quotes-uk'] is defined %}{{ week['mixpanel-cpc-quotes-uk'] }}{% elseif week['mixpanel-landing-uk'] is defined %}{{ week['mixpanel-landing-uk'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>CPC Manufacturer Page [KPI: 459]</td>
+                            <td>
+                                CPC Manufacturer Page [KPI: <strong>459</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-cpc-manufacturer-uk'] is defined %}{{ week['mixpanel-cpc-manufacturer-uk'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>CPC Competitors Page [KPI: 460]</td>
+                            <td>
+                                CPC Competitors Page [KPI: <strong>460</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-cpc-competitors-uk'] is defined %}{{ week['mixpanel-cpc-competitors-uk'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Click Buy Now [KPI: 461]</td>
+                            <td>
+                                Click Buy Now [KPI: <strong>461</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-click-buy-now'] is defined %}{{ week['mixpanel-click-buy-now'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Receive Personal Details [KPI: 462]</td>
+                            <td>
+                                Receive Personal Details [KPI: <strong>462</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-receive-personal-details'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># Sent Invitations - Email & SMS [KPI: 515]</td>
+                            <td>
+                                # Sent Invitations - Email &amp; SMS [KPI: <strong>515</strong>]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newInvitationPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># Sent Invitations - SCode [KPI: 516]</td>
+                            <td>
+                                # Sent Invitations - SCode [KPI: <strong>516</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-invite-someone'] is defined %}{{ week['mixpanel-invite-someone'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># Viewed Invitations - Email [KPI: 519]</td>
+                            <td>
+                                # Viewed Invitations - Email [KPI: <strong>519</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-view-invitation-email'] is defined %}{{ week['mixpanel-view-invitation-email'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># Viewed Invitations - SCode [KPI: 520]</td>
+                            <td>
+                                # Viewed Invitations - SCode [KPI: <strong>520</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-view-invitation-scode'] is defined %}{{ week['mixpanel-view-invitation-scode'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># Viewed Invitations - SMS [KPI: 521]</td>
+                            <td>
+                                # Viewed Invitations - SMS [KPI: <strong>521</strong>]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-invite-someone'] is defined %}{{ week['mixpanel-invite-someone'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Apple App Installs [KPI: 524]
-                                    <span class="badge" title="Days delayed">-4</span>
+                            <td>
+                                Apple App Installs [KPI: <strong>524</strong>]
+                                <span class="badge badge-pill badge-zaffre"
+                                      data-toggle="tooltip">-4</span>
                             </td>
                             {% for week in weeks %}
                                 <td>
                                     {{ week['install-apple'] }}
-                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                    <i class="fas fa-clock"
+                                       title="Value is delayed"
+                                       data-toggle="tooltip"></i>
                                 </td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Google App Installs [KPI: 525]
-                                    <span class="badge" title="Days delayed">-4</span>
+                            <td>
+                                Google App Installs [KPI: <strong>525</strong>]
+                                <span class="badge badge-pill badge-zaffre"
+                                      data-toggle="tooltip">-4</span>
                             </td>
                             {% for week in weeks %}
                                 <td>
                                     {{ week['install-google'] }}
-                                    <i class="fa fa-clock-o" title="Value is delayed"></i>
+                                    <i class="fas fa-clock"
+                                       title="Value is delayed"
+                                       data-toggle="tooltip"></i>
                                 </td>
                             {% endfor %}
                         </tr>
@@ -479,6 +578,13 @@
                 </table>
             </div>
         </div>
-    </div>
-</div>
+    </section>
+
+    {# Page Modals #}
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/kpi.js') }}"></script>
 {% endblock %}

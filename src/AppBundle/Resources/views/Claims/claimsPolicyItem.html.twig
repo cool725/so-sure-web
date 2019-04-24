@@ -508,7 +508,7 @@
                                             <br>
                                             Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
                                             {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
-                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.simplifiedMandateCancelledReason }}
+                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.mandateCancelledExplanation }}
                                             {% endif %}
                                             <br>
                                             Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
@@ -2005,11 +2005,9 @@
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:invalidImeiForm', 'params': {'id': policy.id }, 'id': 'invalidImeiForm'} %}
-    {% endif %}
-
-    {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
     {% endif %}
+
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
 
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">

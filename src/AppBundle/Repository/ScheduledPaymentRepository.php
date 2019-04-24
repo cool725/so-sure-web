@@ -12,6 +12,28 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
 {
     use DateTrait;
 
+    /**
+     * Finds all rescheduled payments for a given user and optionally also within certain dates.
+     * @param Policy    $policy is the policy to find rescheduled payments for.
+     * @param \DateTime $start  is the minimum date that the payments must be scheduled for or null for no minimum.
+     * @return array containing all the found rescheduled payments.
+     */
+    public function findRescheduled($policy, \DateTime $start = null, \DateTime $end = null)
+    {
+        $query = $this->createQueryBuilder()
+            ->field("status")->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field("type")->equals(ScheduledPayment::TYPE_RESCHEDULED)
+            ->field("policy")->references($policy)
+            ->field("payment")->equals(null);
+        if ($start) {
+            $query->field("scheduled")->gte($start);
+        }
+        if ($end) {
+            $query->field("scheduled")->lt($end);
+        }
+        return $query->getQuery()->execute();
+    }
+
     public function findScheduled(\DateTime $date = null)
     {
         if (!$date) {
