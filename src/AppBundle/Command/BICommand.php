@@ -2,9 +2,18 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Phone;
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\User;
+use AppBundle\Document\Claim;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
@@ -18,13 +27,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
-use AppBundle\Document\DateTrait;
-use AppBundle\Document\User;
-use AppBundle\Document\Claim;
-use AppBundle\Document\Policy;
-use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
 /**

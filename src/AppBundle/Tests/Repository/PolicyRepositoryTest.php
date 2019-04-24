@@ -6,7 +6,9 @@ use AppBundle\Document\Note\Note;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\DateTrait;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Tests\UserClassTrait;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -27,8 +29,12 @@ class PolicyRepositoryTest extends KernelTestCase
     protected function setUp()
     {
         $kernel = self::bootKernel();
-        self::$dm = $kernel->getContainer()->get('doctrine_mongodb')->getManager();
-        $this->policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var DocumentManager */
+        $dm = $kernel->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
+        /** @var PolicyRepository */
+        $policyRepo = self::$dm->getRepository(Policy::class);
+        $this->policyRepo = $policyRepo;
     }
 
     /**

@@ -311,8 +311,8 @@ class PolicyRepository extends BaseDocumentRepository
 
     /**
      * Gives a list of policies that have been called for being unpaid optionally within a set of dates.
-     * @param DateTime $start is the first date that the calls can be within or null for whenever.
-     * @param DateTime $end   is the date that the calls must be before.
+     * @param \DateTime $start is the first date that the calls can be within or null for whenever.
+     * @param \DateTime $end   is the date that the calls must be before.
      * @return array containing these called policies.
      */
     public function findUnpaidCalls(\DateTime $start = null, \DateTime $end = null)
