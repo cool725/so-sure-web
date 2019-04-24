@@ -51,11 +51,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * inserts the required dependencies into the command.
-     * @param S3Client $s3 is the amazon s3 client for uploading generated reports.
-     * @param DocumentManager $dm is the document manager for loading data.
-     * @param string $environment is the environment name used to upload to the right location in amazon s3.
-     * @param LoggerInterface $logger is used for logging.
-     * @param SearchService $searchService provides geographical information about users.
+     * @param S3Client        $s3            is the amazon s3 client for uploading generated reports.
+     * @param DocumentManager $dm            is the document manager for loading data.
+     * @param string          $environment   is the environment name used to upload to the right location in amazon s3.
+     * @param LoggerInterface $logger        is used for logging.
+     * @param SearchService   $searchService provides geographical information about users.
      */
     public function __construct(
         S3Client $s3,
@@ -312,6 +312,7 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on policies.
+     * @param string    $prefix   is the policy prefix for which we are checking on policies.
      * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
      * @param \DateTime $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of policy data.
