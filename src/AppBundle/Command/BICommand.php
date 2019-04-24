@@ -587,10 +587,10 @@ class BICommand extends ContainerAwareCommand
      * @param \DateTimeZone $timezone is the timezone in which dates should be given.
      * @return array containing first a row of column names, and then rows of unpaid call data.
      */
-    private function exportUnpaidCalls($skipS3, \DateTime $timezone)
+    private function exportUnpaidCalls($skipS3, \DateTimeZone $timezone)
     {
         /** @var PolicyRepository $policyRepo */
-        $policyRepo = $dm->getRepository(Policy::class);
+        $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->createQueryBuilder()->eagerCursor(true)->field('user')->prime(true)
             ->field('notesList.type')->equals('call')
             ->getQuery()->execute();

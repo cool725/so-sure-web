@@ -308,4 +308,25 @@ class PolicyRepository extends BaseDocumentRepository
             return true;
         });
     }
+
+    /**
+     * Gives a list of policies that have been called for being unpaid optionally within a set of dates.
+     * @param DateTime $start is the first date that the calls can be within or null for whenever.
+     * @param DateTime $end   is the date that the calls must be before.
+     * @return array containing these called policies.
+     */
+    public function findUnpaidCalls(\DateTime $start = null, \DateTime $end = null)
+    {
+        $query = $this->createQueryBuilder();
+        $noteQuery = $query->expr()
+            ->field('type')->equals('call');
+        if ($start) {
+            $noteQuery->field('date')->gte($start);
+        }
+        if ($end) {
+            $noteQuery->field('date')->lt($end);
+        }
+        $query->field('notesList')->elemMatch($noteQuery);
+        return $query->getQuery()->execute();
+    }
 }
