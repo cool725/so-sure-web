@@ -56,6 +56,7 @@ Encore
     .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
     .addEntry('features', './src/AppBundle/Resources/public/rebrand/js/pages/admin/features.js')
     .addEntry('phone', './src/AppBundle/Resources/public/rebrand/js/pages/admin/phone.js')
+    .addEntry('kpi', './src/AppBundle/Resources/public/rebrand/js/pages/admin/kpi.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
