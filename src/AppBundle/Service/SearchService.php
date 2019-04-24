@@ -31,9 +31,6 @@ class SearchService
      */
     private $form;
 
-    /**
-     * @var UserRepository
-     */
     private $userRepo;
 
     /**
@@ -41,9 +38,6 @@ class SearchService
      */
     private $userQb;
 
-    /**
-     * @var  PolicyRepository
-     */
     private $policyRepo;
 
     /**
@@ -58,8 +52,8 @@ class SearchService
 
     /**
      * SearchService constructor.
-     * @param DocumentManager    $dm
-     * @param FormInterface|null $form
+     * @param DocumentManager $dm
+     * @param FormInterface   $form
      */
     public function __construct(DocumentManager $dm, FormInterface $form = null)
     {
@@ -165,7 +159,7 @@ class SearchService
     }
 
     /**
-     * @param $status
+     * @param string $status
      * @throws \Exception
      */
     private function addStatusQuery($status)
@@ -217,7 +211,7 @@ class SearchService
     }
 
     /**
-     * @param $status
+     * @param string $status
      * @return array
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */

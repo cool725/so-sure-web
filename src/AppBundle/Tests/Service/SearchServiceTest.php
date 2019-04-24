@@ -11,7 +11,6 @@ use AppBundle\Form\Type\PolicySearchType;
 use AppBundle\Service\SearchService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class SearchServiceTest extends WebTestCase
 {
@@ -20,15 +19,7 @@ class SearchServiceTest extends WebTestCase
      */
     protected static $container;
 
-    /**
-     * @var SearchService
-     */
     private static $searchService;
-
-    /**
-     * @var RequestStack
-     */
-    protected static $request;
 
     public static function setUpBeforeClass()
     {
@@ -40,7 +31,6 @@ class SearchServiceTest extends WebTestCase
         self::$container = $kernel->getContainer();
 
         self::$searchService = self::$container->get('app.search');
-        self::$request = self::$container->get('request_stack');
     }
 
     /**
