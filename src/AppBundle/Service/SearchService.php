@@ -145,6 +145,7 @@ class SearchService
 
     private function addStatusQuery($status)
     {
+        var_dump($status);
         if ($status == 'current') {
             $this->policyQb->addAnd(
                 $this->policyQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
@@ -187,6 +188,10 @@ class SearchService
         } elseif ($status == Policy::STATUS_PENDING_RENEWAL) {
             $this->policyQb->addAnd(
                 $this->policyQb->expr()->field('status')->in([Policy::STATUS_PENDING_RENEWAL])
+            );
+        } elseif ($status !== null) {
+            $this->policyQb->addAnd(
+                $this->policyQb->expr()->field('status')->equals($status)
             );
         }
     }
