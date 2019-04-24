@@ -827,13 +827,6 @@ class CheckoutService
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
 
-            // Make sure upcoming rescheduled scheduled payments that also cover this debt are now cancelled.
-            /** @var ScheduledPaymentRepository */
-            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
-            foreach ($scheduledPaymentRepo->findRescheduled($policy) as $rescheduled) {
-                $rescheduled->cancel();
-                $rescheduled->setNotes("cancelled as web payment made.");
-            }
             if ($details && $payment) {
                 $payment->setReceipt($details->getId());
                 $payment->setAmount($this->convertFromPennies($details->getValue()));
@@ -868,6 +861,17 @@ class CheckoutService
                     $payment->setRiskScore($details->getRiskCheck());
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
+            }
+            // Make sure upcoming rescheduled scheduled payments are now cancelled.
+            /** @var ScheduledPaymentRepository */
+            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+            $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
+            foreach ($rescheduledPayments as $rescheduled) {
+                $rescheduled->cancel();
+                $rescheduled->setNotes("cancelled as web payment made.");
+            }
+            if (count($rescheduledPayments > 0) {
+                $this->dm->flush();
             }
         } catch (\Exception $e) {
             $this->logger->error(
