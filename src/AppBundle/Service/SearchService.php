@@ -116,7 +116,7 @@ class SearchService
             $users = $this->userQb->getQuery()->execute()->toArray();
             $searchUsers = [];
             foreach ($users as $user) {
-                $searchUsers[] = $user->getId();
+                $searchUsers[] = new \MongoId($user->getId());
             }
 
             if (!empty($searchUsers)) {
