@@ -870,7 +870,7 @@ class CheckoutService
                 $rescheduled->cancel();
                 $rescheduled->setNotes("cancelled as web payment made.");
             }
-            if (count($rescheduledPayments > 0) {
+            if (count($rescheduledPayments) > 0) {
                 $this->dm->flush();
             }
         } catch (\Exception $e) {
