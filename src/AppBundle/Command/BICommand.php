@@ -595,32 +595,39 @@ class BICommand extends ContainerAwareCommand
                 $claimsCost += $approvedClaim->getTotalIncurred();
             }
             $lines[] = implode(',', [
-                $note->getDate()->format('Y-m-d'),
-                $policy->getUser()->getName(),
-                $policy->getUser()->getEmail(),
-                $policy->getPolicyNumber(),
-                $policy->getUser()->getMobileNumber(),
-                count($approvedClaims),
-                $claimsCost,
-                $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('Y-m-d') : null,
-                'FORMULA',
-                $policy->getStatus(),
-                'Yes',
-                $note->getResult(),
-                $note->getVoicemail() ? 'Yes' : '',
-                $note->getOtherActions(),
-                $note->getActions(true),
-                $note->getCategory(),
-                $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null,
-                $note->getDate()->format('W'),
-                $note->getDate()->format('M'),
-                $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null
+                sprintf('"%s"', $note->getDate()->format('Y-m-d')),
+                sprintf('"%s"', $policy->getUser()->getName()),
+                sprintf('"%s"', $policy->getUser()->getEmail()),
+                sprintf('"%s"', $policy->getPolicyNumber()),
+                sprintf('"%s"', $policy->getUser()->getMobileNumber()),
+                sprintf('"%s"', count($approvedClaims)),
+                sprintf('"%s"', $claimsCost),
+                sprintf(
+                    '"%s"',
+                    $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('Y-m-d') : null
+                ),
+                sprintf('"%s"', 'FORMULA'),
+                sprintf('"%s"', $policy->getStatus()),
+                sprintf('"%s"', 'Yes'),
+                sprintf('"%s"', $note->getResult()),
+                sprintf('"%s"', $note->getVoicemail() ? 'Yes' : ''),
+                sprintf('"%s"', $note->getOtherActions()),
+                sprintf('"%s"', $note->getActions(true)),
+                sprintf('"%s"', $note->getCategory()),
+                sprintf('"%s"', $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('W') : null),
+                sprintf('"%s"', $note->getDate()->format('W')),
+                sprintf('"%s"', $note->getDate()->format('M')),
+                sprintf('"%s"', $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null)
             ]);
         }
     }
 
     /**
-     * Uploads
+     * Uploads an array of data to s3 as lines in a file.
+     * @param array  $data     is the data to write to the file.
+     * @param string $filename is the name of the file to write it to.
+     * @return string the key to the file on s3.
+     */
     private function uploadS3($data, $filename)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
