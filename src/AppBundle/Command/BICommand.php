@@ -659,6 +659,10 @@ class BICommand extends ContainerAwareCommand
                 )
             ]);
         }
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'unpaidCalls.csv');
+        }
+        return $lines;
     }
 
     /**

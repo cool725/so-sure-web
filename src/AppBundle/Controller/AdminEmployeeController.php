@@ -498,6 +498,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->field('notesList.date')->gte($start)
             ->field('notesList.date')->lt($end)
             ->getQuery()->execute();
+        // TODO: the above query contains a bug which is fixed in PolicyRepository::findUnpaidCalls
         // Build the response content.
         $response->setCallback(function () use ($policies) {
             $handle = fopen('php://output', 'w+');
