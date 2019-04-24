@@ -169,8 +169,8 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on phones.
-     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTime $timezone is the timezone to give dates in.
+     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of phone data.
      */
     private function exportPhones($skipS3, \DateTimeZone $timezone)
@@ -204,8 +204,8 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on claims.
-     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTime $timezone is the timezone to give dates in.
+     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of claim data.
      */
     private function exportClaims($skipS3, \DateTimeZone $timezone)
@@ -312,9 +312,9 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on policies.
-     * @param string    $prefix   is the policy prefix for which we are checking on policies.
-     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTime $timezone is the timezone to give dates in.
+     * @param string        $prefix   is the policy prefix for which we are checking on policies.
+     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of policy data.
      */
     private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
@@ -452,8 +452,8 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on users.
-     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTime $timezone is the timezone to give dates in.
+     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of user data.
      */
     private function exportUsers($skipS3, \DateTimeZone $timezone)
@@ -502,8 +502,8 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on invitations.
-     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTime $timezone is the timezone to give dates in.
+     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of invitation data.
      */
     private function exportInvitations($skipS3, \DateTimeZone $timezone)
@@ -534,8 +534,8 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on connections.
-     * @param boolean   $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTime $timezone is the timezone to give dates in.
+     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of connection data.
      */
     private function exportConnections($skipS3, \DateTimeZone $timezone)
@@ -583,8 +583,8 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on unpaid calls.
-     * @param boolean   $skipS3   determines whether the created csv should be uploaded to S3 storage.
-     * @param \DateTime $timezone is the timezone in which dates should be given.
+     * @param boolean       $skipS3   determines whether the created csv should be uploaded to S3 storage.
+     * @param \DateTimeZone $timezone is the timezone in which dates should be given.
      * @return array containing first a row of column names, and then rows of unpaid call data.
      */
     private function exportUnpaidCalls($skipS3, \DateTime $timezone)
