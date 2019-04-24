@@ -145,7 +145,6 @@ class SearchService
 
     private function addStatusQuery($status)
     {
-        var_dump($status);
         if ($status == 'current') {
             $this->policyQb->addAnd(
                 $this->policyQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
