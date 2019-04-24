@@ -9,11 +9,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Query\Builder;
-use MongoDB\BSON\ObjectId;
-use Prophecy\Exception\Doubler\InterfaceNotFoundException;
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 /**
  * Class SearchService
@@ -26,11 +22,11 @@ class SearchService
      */
     private $dm;
 
-    /**
-     * @var FormInterface
-     */
     private $form;
 
+    /**
+     * @var UserRepository
+     */
     private $userRepo;
 
     /**
@@ -38,6 +34,9 @@ class SearchService
      */
     private $userQb;
 
+    /**
+     * @var  PolicyRepository
+     */
     private $policyRepo;
 
     /**
@@ -50,11 +49,6 @@ class SearchService
      */
     private $searchWithUsers = false;
 
-    /**
-     * SearchService constructor.
-     * @param DocumentManager $dm
-     * @param FormInterface   $form
-     */
     public function __construct(DocumentManager $dm, FormInterface $form = null)
     {
         $this->dm = $dm;
@@ -62,10 +56,6 @@ class SearchService
         $this->initQueryBuilders();
     }
 
-    /**
-     * @throws MissingDependencyException
-     * @return FormInterface
-     */
     public function getForm(): FormInterface
     {
         if ($this->form == null) {
@@ -74,21 +64,12 @@ class SearchService
         return $this->form;
     }
 
-    /**
-     * @param FormInterface $form
-     * @return SearchService
-     */
     public function setForm(FormInterface $form): SearchService
     {
         $this->form = $form;
         return $this;
     }
 
-    /**
-     * @return array
-     * @throws \Doctrine\ODM\MongoDB\MongoDBException
-     * @throws \MongoException
-     */
     public function searchPolicies()
     {
         if (empty($this->form->getNormData())) {
@@ -135,7 +116,7 @@ class SearchService
             $users = $this->userQb->getQuery()->execute()->toArray();
             $searchUsers = [];
             foreach ($users as $user) {
-                $searchUsers[] = new ObjectId($user->getId());
+                $searchUsers[] = $user->getId();
             }
 
             if (!empty($searchUsers)) {
@@ -147,21 +128,21 @@ class SearchService
         return $this->sortResults($data['status']);
     }
 
-    /**
-     *
-     */
     public function initQueryBuilders()
     {
-        $this->userRepo = $this->dm->getRepository(User::class);
-        $this->userQb = $this->userRepo->createQueryBuilder();
-        $this->policyRepo = $this->dm->getRepository(Policy::class);
-        $this->policyQb = $this->policyRepo->createQueryBuilder();
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+        $userQb = $userRepo->createQueryBuilder();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policyQb = $policyRepo->createQueryBuilder();
+
+        $this->userRepo = $userRepo;
+        $this->userQb = $userQb;
+        $this->policyRepo = $policyRepo;
+        $this->policyQb = $policyQb;
     }
 
-    /**
-     * @param string $status
-     * @throws \Exception
-     */
     private function addStatusQuery($status)
     {
         if ($status == 'current') {
@@ -210,11 +191,6 @@ class SearchService
         }
     }
 
-    /**
-     * @param string $status
-     * @return array
-     * @throws \Doctrine\ODM\MongoDB\MongoDBException
-     */
     private function sortResults($status)
     {
         if ($status == Policy::STATUS_UNPAID) {

@@ -10,16 +10,12 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Form\Type\PolicySearchType;
 use AppBundle\Service\SearchService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormInterface;
 
 class SearchServiceTest extends WebTestCase
 {
-    /**
-     * @var ContainerInterface
-     */
     protected static $container;
-
-    private static $searchService;
+    protected static $searchService;
 
     public static function setUpBeforeClass()
     {
@@ -57,7 +53,7 @@ class SearchServiceTest extends WebTestCase
     {
         self::$searchService->setForm($this->createForm());
         $form = self::$searchService->getForm();
-        self::assertInstanceOf(PolicySearchType::class, $form, "The type is correct");
+        self::assertInstanceOf(FormInterface::class, $form, "The type is correct");
     }
 
     private function setRequest()
