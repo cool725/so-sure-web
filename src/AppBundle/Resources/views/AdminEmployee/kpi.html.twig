@@ -62,13 +62,13 @@
                 </div>
             </div>
             {# TODO: Content area #}
-            {# <div class="table-responsive-sm mb-5"> #}
+            <div class="table-responsive-sm mb-5">
                 <table class="table table-striped">
                     <thead class="thead-light">
                         <tr>
                             <th width="40%"></th>
                             {% for week in weeks %}
-                                <th>
+                                <th width="15%">
                                     Ending <strong>{{ week.end_date_disp|date('d M Y') }}</strong><br><small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small><br><small>{{ week.start_date|date('H:i') }} - {{ week.end_date_disp|date('H:i') }}</small>
                                 </th>
                             {% endfor %}
@@ -449,7 +449,8 @@
                             <td>
                                 Rolling 12 month Claim Attribution [KPI: REMOVED]</td>
                             {% for week in weeks %}
-                                <td>{{ week.period.data['rolling12MonthClaimAttributionText'] }}</td>
+                                <td><span title="{{ week.period.data['rolling12MonthClaimAttributionText'] }}"
+                                          data-toggle="tooltip">Hover me to see!</span></td>
                             {% endfor %}
                         </tr>
                         <tr>
@@ -575,7 +576,7 @@
                         </tr>
                     </tbody>
                 </table>
-            {# </div> #}
+            </div>
         </div>
     </section>
 
