@@ -2052,6 +2052,24 @@ abstract class Policy
         return $scheduledPayments;
     }
 
+    /**
+     * Gets the next upcoming rescheduled scheduled payment.
+     * @return ScheduledPayment|null which has been found, or null if no rescheduled scheduled payments are found with
+     *                               status scheduled.
+     */
+    public function getNextRescheduledScheduledPayment()
+    {
+        $next = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED &&
+                $scheduledPayment->getType() == ScheduledPayment::TYPE_RESCHEDULED &&
+                (!$next || $next->getScheduled() > $scheduledPayment->getScheduled())) {
+                $next = $scheduledPayment;
+            }
+        }
+        return $next;
+    }
+
     public function getLastEmailed()
     {
         return $this->lastEmailed;

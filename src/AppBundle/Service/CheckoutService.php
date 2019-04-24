@@ -862,6 +862,17 @@ class CheckoutService
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
             }
+            // Make sure upcoming rescheduled scheduled payments are now cancelled.
+            /** @var ScheduledPaymentRepository */
+            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+            $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
+            foreach ($rescheduledPayments as $rescheduled) {
+                $rescheduled->cancel();
+                $rescheduled->setNotes("cancelled as web payment made.");
+            }
+            if (count($rescheduledPayments) > 0) {
+                $this->dm->flush();
+            }
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
