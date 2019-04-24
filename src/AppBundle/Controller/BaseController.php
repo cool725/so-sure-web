@@ -15,7 +15,9 @@ use AppBundle\Repository\UserRepository;
 use AppBundle\Security\CognitoIdentityAuthenticator;
 use AppBundle\Service\MaxMindIpService;
 use AppBundle\Service\QuoteService;
+use AppBundle\Service\SearchService;
 use Doctrine\MongoDB\Cursor;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\QueryBuilder;
@@ -840,16 +842,9 @@ abstract class BaseController extends Controller
 
     protected function searchPolicies(Request $request, $includeInvalidPolicies = null)
     {
+        /** @var DocumentManager $dm */
         $dm = $this->getManager();
-        /** @var UserRepository $userRepo */
-        $userRepo = $dm->getRepository(User::class);
-        /** @var PolicyRepository $policyRepo */
-        $policyRepo = $dm->getRepository(Policy::class);
 
-        /** @var Builder $policiesQb */
-        $policiesQb = $policyRepo->createQueryBuilder()
-            ->eagerCursor(true)
-            ->field('user')->prime(true);
         $form = $this->createForm(PolicySearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
         if ($includeInvalidPolicies === null) {
@@ -876,181 +871,11 @@ abstract class BaseController extends Controller
         }
 
         $status = (string) $form->get('status')->getData();
-        // having a - in the name of the status requires a special case
-        if ($status == 'current') {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
-            );
-        } elseif ($status == 'current-discounted') {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
-            );
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('policyDiscountPresent')->equals(true)
-            );
-        } elseif ($status == 'past-due') {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_CANCELLED])
-            );
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('cancelledReason')->notIn([Policy::CANCELLED_UPGRADE])
-            );
-        } elseif ($status == 'call') {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_UNPAID])
-            );
-        } elseif ($status == 'called') {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('notesList.type')->equals('call')
-            );
-            $oneWeekAgo = \DateTime::createFromFormat('U', time());
-            $oneWeekAgo = $oneWeekAgo->sub(new \DateInterval('P7D'));
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('notesList.date')->gte($oneWeekAgo)
-            );
-        } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_CLAIMABLE])
-            );
-        } elseif ($status == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_WAIT_CLAIM])
-            );
-        } elseif ($status == Policy::STATUS_PENDING_RENEWAL) {
-            $policiesQb = $policiesQb->addAnd(
-                $policiesQb->expr()->field('status')->in([Policy::STATUS_PENDING_RENEWAL])
-            );
-        } else {
-            $this->formToMongoSearch(
-                $form,
-                $policiesQb,
-                'status',
-                'status',
-                false,
-                self::MONGO_QUERY_TYPE_EQUAL
-            );
-        }
+        $search = new SearchService($dm, $form);
 
-        $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');
-        $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei');
-        $this->formToMongoSearch(
-            $form,
-            $policiesQb,
-            'id',
-            '_id',
-            false,
-            self::MONGO_QUERY_TYPE_ID
-        );
-        $this->formToMongoSearch($form, $policiesQb, 'serial', 'serialNumber');
-        if ($form->get('phone')->getData()) {
-            $this->dataToMongoSearch(
-                $policiesQb,
-                $form->get('phone')->getData()->getId(),
-                'phone.$id',
-                false,
-                self::MONGO_QUERY_TYPE_ID
-            );
-        }
-        $this->formToMongoSearch(
-            $form,
-            $policiesQb,
-            'bacsReference',
-            'paymentMethod.bankAccount.reference',
-            false,
-            self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT
-        );
+        $policies = $search->searchPolicies();
 
-        $this->formToMongoSearch(
-            $form,
-            $policiesQb,
-            'paymentMethod',
-            'paymentMethod.type',
-            false,
-            self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT
-        );
-
-        if (!$includeInvalidPolicies) {
-            $policy = new PhonePolicy();
-            $search = sprintf('%s/', $policy->getPolicyNumberPrefix());
-            $this->dataToMongoSearch($policiesQb, $search, 'policyNumber');
-        }
-
-        $userFormData = [
-            'email' => 'emailCanonical',
-            'firstname' => 'firstName',
-            'lastname' => 'lastName',
-            'mobile' => 'mobileNumber',
-            'paymentMethod' => 'paymentMethod.type',
-            'bacsReference' => 'paymentMethod.bankAccount.reference',
-            'postcode' => 'billingAddress.postcode',
-            'facebookId' => 'facebookId',
-        ];
-        foreach ($userFormData as $formField => $dataField) {
-            $queryType = self::MONGO_QUERY_TYPE_REGEX;
-            if ($dataField == 'mobileNumber') {
-                $queryType = self::MONGO_QUERY_TYPE_MOBILE;
-            } elseif ($dataField == 'paymentMethod.type') {
-                $queryType = self::MONGO_QUERY_TYPE_REGEX_REQUIRED_OBJECT;
-            } elseif ($dataField == 'paymentMethod.bankAccount.reference') {
-                $queryType = self::MONGO_QUERY_TYPE_EQUAL_REQUIRED_OBJECT;
-            }
-            $ids = $this->dataToMongoSearch(
-                $userRepo->createQueryBuilder(),
-                (string) $form->get($formField)->getData(),
-                $dataField,
-                true,
-                $queryType,
-                function ($data) {
-                    return $data->getId();
-                }
-            );
-            $this->queryPoliciesWithUserIds($policiesQb, $ids);
-        }
-
-        if ($status == Policy::STATUS_UNPAID) {
-            $policies = $policiesQb->getQuery()->execute()->toArray();
-            // sort older to more recent
-            usort($policies, function ($a, $b) {
-                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
-            });
-            $pager = $this->arrayPager($request, $policies);
-        } elseif ($status == 'past-due') {
-            $policies = $policiesQb->getQuery()->execute()->toArray();
-            $policies = array_filter($policies, function ($policy) {
-                return $policy->isCancelledAndPaymentOwed();
-            });
-            // sort older to more recent
-            usort($policies, function ($a, $b) {
-                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
-            });
-            $pager = $this->arrayPager($request, $policies);
-        } elseif ($status == 'call') {
-            $policies = $policiesQb->getQuery()->execute()->toArray();
-            $policies = array_filter($policies, function ($policy) {
-                /** @var Policy $policy */
-                $fourteenDays = \DateTime::createFromFormat('U', time());
-                $fourteenDays = $fourteenDays->sub(new \DateInterval('P14D'));
-                $sevenDays = \DateTime::createFromFormat('U', time());
-                $sevenDays = $fourteenDays->sub(new \DateInterval('P7D'));
-
-                // 14 days & no calls or 7 days & at most 1 call
-                if ($policy->getPolicyExpirationDateDays() <= 14 && $policy->getNoteCalledCount($fourteenDays) == 0) {
-                    return true;
-                } elseif ($policy->getPolicyExpirationDateDays() <= 7 &&
-                    $policy->getNoteCalledCount($fourteenDays) <= 1) {
-                    return true;
-                } else {
-                    return false;
-                }
-            });
-            // sort older to more recent
-            usort($policies, function ($a, $b) {
-                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
-            });
-            $pager = $this->arrayPager($request, $policies);
-        } else {
-            $pager = $this->pager($request, $policiesQb);
-        }
+        $pager = $this->arrayPager($request, $policies);
 
         return [
             'policies' => $pager->getCurrentPageResults(),
