@@ -91,6 +91,7 @@
 
     &-header {
         background: none;
+        padding: 2rem;
         @include border-radius(0);
     }
 }

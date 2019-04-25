@@ -25,6 +25,15 @@ strong {
     }
 }
 
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
+.h1 a, .h2 a, .h3 a, .h4 a, .h5 a, .h6 a {
+    font-family: $g-bold;
+
+    .sub {
+        font-family: $g-regular;
+    }
+}
+
 .opacity-05 {
     opacity: 0.5;
 }

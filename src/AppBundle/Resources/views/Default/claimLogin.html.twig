@@ -1,70 +1,94 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'make-a-claim' %}
 
-{% block title %}so-sure - Make a claim
+{% block title %}so-sure - Claim Login{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/make-a-claim.css') }}">
 {% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/claim.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{# {% block nav %}{% endblock %} #}
 
 {% block body %}
 
-    {# Claims Form #}
-    <section class="section--pad claim__form" id="claim-form-container" >
-        <div class="container">
+    <section class="hero">
+        <div class="container container-xtra">
             <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" width="220px" class="img-center img-circle" alt="Broken phone logo">
-                    <h3>Enter your email and we'll send you a link to review your claim.</h3>
-                    {{ form_start(claim_email_form, {
-                        'attr': {
-                            'data-toggle': 'validator',
-                            'class': 'validate-form',
-                            'id':'claim-email-form',
-                            'data-client-validation': form_client_validation
-                    }}) }}
-                        <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
-                            {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email Address'}}) }}
-                            <div class="help-block"><span class="text-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please use the email address associated with your so-sure policy</span></div>
-                            <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
-                        </div>
-                        <div class="form-group">
-                           {{ form_widget(claim_email_form.submit, {
-                                'label': 'Send me the link',
-                                'attr': {
-                                    'class': 'btn btn-blue btn-pad btn-lg'
-                            }}) }}
-                        </div>
-                    {{ form_end(claim_email_form) }}
-                    <p class="lead"><br><strong>Prefer to speak to a human?</strong><br>Call our claims team on <strong><a href="tel:01133209722" class="text-nowrap text-blue">0113 320 9722</a></strong> (local rates apply).</p>
+                <div class="col-lg-7">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-white fit">Review your claim</h1>
+                        <h4 class="text-columbia-blue-e">Enter your email and we'll send you a link</h4>
+                        <p class="mb-4 text-white">Prefer to speak to a human? Call our claims team on <a href="tel:01133209722" class="text-white text-nowrap"><u>0113 320 9722</u></a> (local rates apply).</p>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        {{ form_start(claim_email_form, {
+                            'attr': {
+                                'data-toggle': 'validator',
+                                'class': 'validate-form form-inline',
+                                'data-client-validation': form_client_validation,
+                                'autocomplete': 'off'
+                        }}) }}
+                            <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
+                                {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control form-control-white mr-2', 'placeholder': 'Email address'}}) }}
+                                <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
+                            </div>
+                            <div class="form-group">
+                               {{ form_widget(claim_email_form.submit, {
+                                    'label': 'Send me the link',
+                                    'attr': {
+                                        'class': 'btn btn-success btn-square'
+                                }}) }}
+                            </div>
+                        {{ form_end(claim_email_form) }}
+                        <small class="form-text text-white">Only use the email associated with your so-sure policy</small>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_broken-phone-hero.png" alt="so-sure - social insurance" class="lozad d-block mx-auto" width="260px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="claims py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-3 text-primary">How the claims process works</h2>
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px" class="lozad">
+                    </div>
+                    <h5 class="text-primary">Launch your claim online</h5>
+                    <p class="mb-5">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Continue using the form above</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px" class="lozad">
+                    </div>
+                    <h5 class="text-primary">Review Claim</h5>
+                    <p class="mb-5">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px" class="lozad">
+                    </div>
+                    <h5 class="text-primary">Approve Claim</h5>
+                    <p class="mb-2">Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours</p>
                 </div>
             </div>
         </div>
     </section>
 
     {# Page Modals #}
-    {# End Page Modals #}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/moment/moment.min.js'
-    'components/jquery-mask-plugin/jquery.mask.min.js'
-    'components/jquery-validation/jquery.validate.min.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-    '@AppBundle/Resources/public/js/Default/claim.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/make-a-claim.js') }}"></script>
 {% endblock %}

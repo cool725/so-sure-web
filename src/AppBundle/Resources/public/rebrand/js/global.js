@@ -12,10 +12,11 @@ require('./common/fbLogin.js');
 require('./common/toggleText.js');
 require('./common/appendEmail.js');
 require('./components/nav.js');
-require('./components/getQuote.js');
-require('./components/phoneSearchDropdown.js');
+require('./components/get-quote.js');
+require('./components/phone-search-dropdown.js');
+require('./components/memory-search-dropdown.js');
 require('./components/select.js');
-require('./components/customSelect.js');
+require('./components/custom-select.js');
 require('./components/cardbox.js');
 require('./components/modalVideo.js');
 

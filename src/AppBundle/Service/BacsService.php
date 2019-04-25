@@ -628,7 +628,7 @@ class BacsService
                 continue;
             }
 
-            $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+            $bacs->getBankAccount()->cancelMandate(BankAccount::CANCELLER_ADDACS, $reason);
             $this->dm->flush();
 
             $referenceId = null;
@@ -1039,7 +1039,7 @@ class BacsService
                 $referencePolicy = $referenceUser->getLatestPolicy();
             }
 
-            $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+            $bacsPaymentMethod->getBankAccount()->cancelMandate(BankAccount::CANCELLER_DDICS, $reasonCode);
             $this->logger->warning(sprintf(
                 'Cancelled bacs mandate [User %s / Policy %s] due to DDIC. Review as cancellation may not be needed.',
                 $referenceUser ? $referenceUser->getId() : null,
@@ -1339,8 +1339,7 @@ class BacsService
                     self::AUDDIS_REASON_MISSING_SERVICE_NAME,
                     self::AUDDIS_REASON_INCORRECT_DETAILS,
                 ])) {
-                    $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-
+                    $bacsPaymentMethod->getBankAccount()->cancelMandate(BankAccount::CANCELLER_AUDDIS, $reason);
                     if ($referencePolicy) {
                         $referencePolicy->setPolicyStatusUnpaidIfActive();
                     } elseif ($referenceUser) {
@@ -1417,6 +1416,13 @@ class BacsService
         ]);
 
         if (!$file) {
+            $message = "Serial number {$serialNumber} is not found on a pending accesspay file";
+            /** @var AccessPayFile $file */
+            $file = $repo->findOneBy(['serialNumber' => AccessPayFile::unformatSerialNumber($serialNumber)]);
+            if ($file) {
+                $message .= ", but it is found on file with status ".$file->getStatus();
+            }
+            $this->logger->error("{$message}.");
             return false;
         }
 
@@ -2205,12 +2211,12 @@ class BacsService
         if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
             if (!$ignoreNotEnoughTime) {
                 $msg = sprintf(
-                    'Skipping (scheduled) payment %s as payment date is after expiration date',
+                    'Cancelling (scheduled) payment %s as payment date is after expiration date',
                     $id
                 );
                 $this->warnings[] = $msg;
 
-                return self::VALIDATE_SKIP;
+                return self::VALIDATE_CANCEL;
             }
 
             // @codingStandardsIgnoreStart

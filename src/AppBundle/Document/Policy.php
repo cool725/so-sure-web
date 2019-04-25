@@ -2084,6 +2084,24 @@ abstract class Policy
         return $scheduledPayments;
     }
 
+    /**
+     * Gets the next upcoming rescheduled scheduled payment.
+     * @return ScheduledPayment|null which has been found, or null if no rescheduled scheduled payments are found with
+     *                               status scheduled.
+     */
+    public function getNextRescheduledScheduledPayment()
+    {
+        $next = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED &&
+                $scheduledPayment->getType() == ScheduledPayment::TYPE_RESCHEDULED &&
+                (!$next || $next->getScheduled() > $scheduledPayment->getScheduled())) {
+                $next = $scheduledPayment;
+            }
+        }
+        return $next;
+    }
+
     public function getLastEmailed()
     {
         return $this->lastEmailed;
@@ -4284,6 +4302,10 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_UNRENEWED);
     }
 
+    /**
+     * @param \DateTime|null $date
+     * @throws \Exception
+     */
     public function activate(\DateTime $date = null)
     {
         if ($date == null) {
@@ -4317,6 +4339,17 @@ abstract class Policy
         }
 
         $this->setStatus(Policy::STATUS_ACTIVE);
+
+        /**
+         * Before we begin updating the connections and the pot we really need to make sure that we have
+         * the correct payment details on the renewal policy.
+         * In the case of BACs this should be the same account as the existing policy
+         * and so we can just copy them over.
+         * However if the amount has changed, we will need to notify the account holder.
+         */
+        if ($this->getPreviousPolicy() && $this->getPreviousPolicy()->getPaymentMethod()) {
+            $this->setPaymentMethod($this->getPreviousPolicy()->getPaymentMethod());
+        }
 
         foreach ($this->getRenewalConnections() as $connection) {
             if ($connection->getRenew()) {

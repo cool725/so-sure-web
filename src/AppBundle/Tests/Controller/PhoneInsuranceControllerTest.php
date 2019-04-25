@@ -25,7 +25,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/phone-insurance/apple+iphone+7');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchPhoneInsuranceByPhoneId()
@@ -47,7 +47,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertEquals($redirectUrl, $this->getClientResponseTargetUrl());
         $crawler = self::$client->followRedirect();
 
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testSessionPurchasePhone()
@@ -114,7 +114,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
             sprintf('http://localhost/'),
             self::$client->getHistory()->current()->getUri()
         );
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchInsureSamsung()
@@ -133,41 +133,41 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
             self::$client->getHistory()->current()->getUri()
         );
 
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchInsuranceCrackedScreen()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/cracked-screen');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchInsuranceTheft()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/theft');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchInsuranceWaterDamage()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/water-damage');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchInsuranceBrokenPhone()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/broken-phone');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function testPhoneSearchInsuranceLost()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/loss');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 }

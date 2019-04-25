@@ -38,10 +38,12 @@ Encore
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
     .addEntry('careers', './src/AppBundle/Resources/public/rebrand/js/pages/careers.js')
     .addEntry('seo-pages', './src/AppBundle/Resources/public/rebrand/js/pages/seo-pages.js')
+    .addEntry('phone-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance.js')
     .addEntry('landing-snapchat', './src/AppBundle/Resources/public/rebrand/js/pages/landing-snapchat.js')
     .addEntry('landing-snapchat-b', './src/AppBundle/Resources/public/rebrand/js/pages/landing-snapchat-b.js')
     .addEntry('landing-twitter', './src/AppBundle/Resources/public/rebrand/js/pages/landing-twitter.js')
     .addEntry('landing-facebook', './src/AppBundle/Resources/public/rebrand/js/pages/landing-facebook.js')
+    .addEntry('landing-youtube', './src/AppBundle/Resources/public/rebrand/js/pages/landing-youtube.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
@@ -52,9 +54,14 @@ Encore
     .addEntry('rewards', './src/AppBundle/Resources/public/rebrand/js/pages/admin/rewards.js')
     .addEntry('company', './src/AppBundle/Resources/public/rebrand/js/pages/admin/company.js')
     .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
+    .addEntry('features', './src/AppBundle/Resources/public/rebrand/js/pages/admin/features.js')
+    .addEntry('phone', './src/AppBundle/Resources/public/rebrand/js/pages/admin/phone.js')
+    .addEntry('kpi', './src/AppBundle/Resources/public/rebrand/js/pages/admin/kpi.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')
+    .addEntry('datepicker-day', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-day.js')
+    .addEntry('datepicker-day-time', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-day-time.js')
     .addEntry('confirm-modal', './src/AppBundle/Resources/public/rebrand/js/pages/admin/confirm-modal.js')
 
     // User files
@@ -64,11 +71,16 @@ Encore
     .addEntry('user-purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-purchase-bacs.js')
     .addEntry('user-payment', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-payment.js')
 
+    // Claim
+     .addEntry('make-a-claim', './src/AppBundle/Resources/public/rebrand/js/pages/make-a-claim.js')
+
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
+
+    // .enableSingleRuntimeChunk()
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
@@ -96,9 +108,21 @@ Encore
             doT: "dot/doT.js",
             moment: "moment",
             fitText: "fitText",
+
         })
     )
 ;
 
+var config = Encore.getWebpackConfig();
+
+// disable amd, for datatable
+config.module.rules.unshift({
+  parser: {
+    amd: false
+  }
+});
+
+module.exports = config;
+
 // export the final configuration
-module.exports = Encore.getWebpackConfig();
+// module.exports = Encore.getWebpackConfig();

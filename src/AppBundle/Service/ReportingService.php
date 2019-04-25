@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Stats;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\ClaimRepository;
@@ -776,11 +777,11 @@ class ReportingService
         return $total;
     }
 
-    public function payments(\DateTime $date, $judoOnly = false)
+    public function payments(\DateTime $date, $judoOnly = false, $checkoutOnly = false)
     {
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
-        $payments = $repo->getAllPaymentsForReport($date, $judoOnly);
+        $payments = $repo->getAllPaymentsForReport($date, $judoOnly, $checkoutOnly);
         $sources = [
             Payment::SOURCE_TOKEN,
             Payment::SOURCE_WEB,
@@ -818,7 +819,8 @@ class ReportingService
             if ($payment->isSuccess()) {
                 $data[$day][$payment->getSource()]['success']++;
 
-                if ($payment instanceof JudoPayment && $payment->getSource() == Payment::SOURCE_WEB) {
+                if (($payment instanceof JudoPayment || $payment instanceof CheckoutPayment) &&
+                    $payment->getSource() == Payment::SOURCE_WEB) {
                     if ($payment->getWebType()) {
                         $data[$day][sprintf('web-%s', $payment->getWebType())]['success']++;
                     }
@@ -829,7 +831,8 @@ class ReportingService
             } else {
                 $data[$day][$payment->getSource()]['failure']++;
 
-                if ($payment instanceof JudoPayment && $payment->getSource() == Payment::SOURCE_WEB) {
+                if (($payment instanceof JudoPayment || $payment instanceof CheckoutPayment) &&
+                    $payment->getSource() == Payment::SOURCE_WEB) {
                     if ($payment->getWebType()) {
                         $data[$day][sprintf('web-%s', $payment->getWebType())]['failure']++;
                     }
@@ -844,7 +847,8 @@ class ReportingService
                 $data[$day][$payment->getSource()]['total'];
             $data[$day][$payment->getSource()]['failure_percent'] = $data[$day][$payment->getSource()]['failure'] /
                 $data[$day][$payment->getSource()]['total'];
-            if ($payment instanceof JudoPayment && $payment->getSource() == Payment::SOURCE_WEB &&
+            if (($payment instanceof JudoPayment || $payment instanceof CheckoutPayment) &&
+                $payment->getSource() == Payment::SOURCE_WEB &&
                 $payment->getWebType()) {
                 $webSource = sprintf('web-%s', $payment->getWebType());
                 $data[$day][$webSource]['total']++;
@@ -929,6 +933,7 @@ class ReportingService
         $data = [
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'checkout' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
@@ -1302,6 +1307,25 @@ class ReportingService
         }
         $this->redis->setex($key, self::REPORT_CACHE_TIME, serialize($report));
         return $report;
+    }
+
+    /**
+     * Gives a list of time periods to report on.
+     * @return array which associates a name for each period to another array containing string representations of the
+     *               start and end of that period.
+     */
+    public static function getPeriodList()
+    {
+        $periods = [];
+        foreach (self::REPORT_PERIODS as $key => $periodChoice) {
+            if (array_key_exists("month", $periodChoice)) {
+                $start = (new \DateTime($periodChoice["start"]))->format("F Y");
+                $periods[$start] = $key;
+            } else {
+                $periods[$key] = $key;
+            }
+        }
+        return $periods;
     }
 
     /**

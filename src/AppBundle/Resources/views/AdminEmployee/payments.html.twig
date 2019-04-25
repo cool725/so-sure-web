@@ -1,66 +1,163 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{# {% form_theme promotionForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/AdminEmployee/payments.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-payments' %}
+
+{% block title %}so-sure - Card Payments for {{ month }} / {{ year }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>Card Payments for {{ month }} / {{ year }}</h1>
-    </div>
-    <form id='payments-form' method="POST">
-    <div class="col-md-2">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class='input-group date' id='payments'>
-                <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Card Payments for {{ month }} / {{ year }}</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="POST"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="/admin/payments">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <ul class="nav nav-tabs mb-5"
+                id="banking_tabs"
+                role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="checkout_tab"
+                       data-toggle="tab"
+                       href="#checkout_content"
+                       role="tab"
+                       aria-controls="checkout_content"
+                       aria-selected="true">Checkout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="judo_tab"
+                       data-toggle="tab"
+                       href="#judo_content"
+                       role="tab"
+                       aria-controls="judo_content"
+                       aria-selected="false">Judo</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="banking_tabs_content">
+                <div class="tab-pane fade show active"
+                     id="checkout_content"
+                     role="tabpanel"
+                     aria-labelledby="checkout_tab">
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Web Overall</th>
+                                    <th>Web Standard</th>
+                                    <th>Web Unpaid</th>
+                                    <th>Web Remainder</th>
+                                    <th>Web (unique/eventual paid Policy)</th>
+                                    <th>Token</th>
+                                    <th>Mobile</th>
+                                    <th>ApplePay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in 1..31 %}
+                                    <tr>
+                                        <td>{{i }}</td>
+                                        <td>{{ judo[i]['web']['success'] }} / {{ judo[i]['web']['total'] }} ({{ (judo[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['web-standard']['success'] }} / {{ judo[i]['web-standard']['total'] }} ({{ (judo[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['web-unpaid']['success'] }} / {{ judo[i]['web-unpaid']['total'] }} ({{ (judo[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['web-remainder']['success'] }} / {{ judo[i]['web-remainder']['total'] }} ({{ (judo[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['policy']['success'] }} / {{ judo[i]['policy']['total'] }} ({{ (judo[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['token']['success'] }} / {{ judo[i]['token']['total'] }} ({{ (judo[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['mobile']['success'] }} / {{ judo[i]['mobile']['total'] }} ({{ (judo[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ judo[i]['apple-pay']['success'] }} / {{ judo[i]['apple-pay']['total'] }} ({{ (judo[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade"
+                     id="judo_content"
+                     role="tabpanel"
+                     aria-labelledby="judo_tab">
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Web Overall</th>
+                                    <th>Web Standard</th>
+                                    <th>Web Unpaid</th>
+                                    <th>Web Remainder</th>
+                                    <th>Web (unique/eventual paid Policy)</th>
+                                    <th>Token</th>
+                                    <th>Mobile</th>
+                                    <th>ApplePay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for i in 1..31 %}
+                                    <tr>
+                                        <td>{{i }}</td>
+                                        <td>{{ checkout[i]['web']['success'] }} / {{ checkout[i]['web']['total'] }} ({{ (checkout[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['web-standard']['success'] }} / {{ checkout[i]['web-standard']['total'] }} ({{ (checkout[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['web-unpaid']['success'] }} / {{ checkout[i]['web-unpaid']['total'] }} ({{ (checkout[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['web-remainder']['success'] }} / {{ checkout[i]['web-remainder']['total'] }} ({{ (checkout[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['policy']['success'] }} / {{ checkout[i]['policy']['total'] }} ({{ (checkout[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['token']['success'] }} / {{ checkout[i]['token']['total'] }} ({{ (checkout[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['mobile']['success'] }} / {{ checkout[i]['mobile']['total'] }} ({{ (checkout[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                        <td>{{ checkout[i]['apple-pay']['success'] }} / {{ checkout[i]['apple-pay']['total'] }} ({{ (checkout[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="form-group" style="padding-top: 15px;">
-            <button class="btn btn-primary">View Month</button>
-        </div>
-    </div>
-    </form>
-</div>
+    </section>
 
-<table>
-    <tr>
-        <th width="15%">Day</th>
-        <th width="15%">Web Overall</th>
-        <th width="15%">Web Standard</th>
-        <th width="15%">Web Unpaid</th>
-        <th width="15%">Web Remainder</th>
-        <th width="15%">Web (unique/eventual paid Policy)</th>
-        <th width="15%">Token</th>
-        <th width="15%">Mobile</th>
-        <th width="15%">ApplePay</th>
-    </tr>
-    {% for i in 1..31 %}
-        <tr>
-            <td width="15%">{{i }}</td>
-            <td width="15%">{{ data[i]['web']['success'] }} / {{ data[i]['web']['total'] }} ({{ (data[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['web-standard']['success'] }} / {{ data[i]['web-standard']['total'] }} ({{ (data[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['web-unpaid']['success'] }} / {{ data[i]['web-unpaid']['total'] }} ({{ (data[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['web-remainder']['success'] }} / {{ data[i]['web-remainder']['total'] }} ({{ (data[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['policy']['success'] }} / {{ data[i]['policy']['total'] }} ({{ (data[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['token']['success'] }} / {{ data[i]['token']['total'] }} ({{ (data[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['mobile']['success'] }} / {{ data[i]['mobile']['total'] }} ({{ (data[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-            <td width="15%">{{ data[i]['apple-pay']['success'] }} / {{ data[i]['apple-pay']['total'] }} ({{ (data[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-        </tr>
-    {% endfor %}
-</table>
+    {# Page Modals #}
 
-</div>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}

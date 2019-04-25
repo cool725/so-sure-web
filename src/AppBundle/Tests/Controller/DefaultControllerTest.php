@@ -131,7 +131,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
-        $this->assertHasFormAction($crawler, '/select-phone-dropdown');
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
     public function areLinksValid($name, $key, $allKeys, $phoneLinks)

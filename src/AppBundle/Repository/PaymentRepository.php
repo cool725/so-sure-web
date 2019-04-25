@@ -27,6 +27,7 @@ class PaymentRepository extends DocumentRepository
             ->field('date')->lt($nextMonth)
             ->field('type')->in([
                 'judo',
+                'checkout',
                 'bacs',
                 'bacsIndemnity',
                 'sosure',
@@ -46,14 +47,16 @@ class PaymentRepository extends DocumentRepository
         return $qb->execute();
     }
 
-    public function getAllPaymentsForReport(\DateTime $date, $judoOnly = false)
+    public function getAllPaymentsForReport(\DateTime $date, $judoOnly = false, $checkoutOnly = false)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
 
-        $payments = ['judo', 'bacs', 'sosure'];
+        $payments = ['judo', 'checkout', 'bacs', 'sosure'];
         if ($judoOnly) {
             $payments = ['judo'];
+        } elseif ($checkoutOnly) {
+            $payments = ['checkout'];
         }
 
         return $this->createQueryBuilder()
@@ -69,7 +72,7 @@ class PaymentRepository extends DocumentRepository
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
         if (!$type) {
-            $type = ['judo', 'bacs', 'bacsIndemnity', 'sosure', 'chargeback', 'debtCollection'];
+            $type = ['judo', 'checkout', 'bacs', 'bacsIndemnity', 'sosure', 'chargeback', 'debtCollection'];
         } elseif (is_string($type)) {
             $type = [$type];
         }

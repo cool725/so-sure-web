@@ -392,7 +392,7 @@
                                                     <br>
                                                     {% if policy.isPolicy and policy.start %}
                                                         {% if policy.end < now %}
-                                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy
+                                                            Premium of £{{ policy.getProratedPremium(policy.end) | number_format(2, '.', ',') }} was due on policy (disregarding cancellation or claims)
                                                         {% else %}
                                                             Premium of £{{ policy.getProratedPremium() | number_format(2, '.', ',') }} due (daily calc)
                                                         {% endif %}
@@ -507,6 +507,9 @@
                                             Reference: {{ policy.getPolicyOrUserBacsBankAccount.reference }}
                                             <br>
                                             Mandate: {{ policy.getPolicyOrUserBacsBankAccount.mandateStatus }}
+                                            {% if policy.getPolicyOrUserBacsBankAccount.isMandateInvalid %}
+                                                - Reason: {{ policy.getPolicyOrUserBacsBankAccount.mandateCancelledExplanation }}
+                                            {% endif %}
                                             <br>
                                             Initial date: {{  policy.getPolicyOrUserBacsBankAccount.initialNotificationDate| date('d M Y')   }}
                                             <br>
@@ -533,7 +536,7 @@
                                     <div class="col-sm-8">
                                         <b>{{ note.date|date }} by {{ note.userName }}</b>
                                     </div>
-                                    {% if note.action is not null %}
+                                    {% if note.action is defined and note.action is not null %}
                                         <div class="col-sm-4">
                                             Action: {{ note.action }}
                                         </div>
@@ -2002,11 +2005,9 @@
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:linkClaimForm', 'policy': policy, 'id': 'linkClaimForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:invalidImeiForm', 'params': {'id': policy.id }, 'id': 'invalidImeiForm'} %}
-    {% endif %}
-
-    {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:policyStatusForm', 'policy': policy, 'id': 'policyStatusForm'} %}
     {% endif %}
+
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
 
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">

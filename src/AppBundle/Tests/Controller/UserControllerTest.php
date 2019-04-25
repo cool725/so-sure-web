@@ -13,6 +13,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\BacsPaymentRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Tests\Service\CheckoutServiceTest;
@@ -1702,6 +1703,95 @@ class UserControllerTest extends BaseControllerTest
             sprintf('http://localhost/user/unpaid'),
             self::$client->getHistory()->current()->getUri()
         );
+    }
+
+    /**
+     * Tests to make sure that when a user pays their policy up to date with a manual web payment, it automatically
+     * cancels any rescheduled scheduled payments that were trying to take out this amount.
+     */
+    public function testUserUnpaidRescheduledPaymentScheduled()
+    {
+        $email = self::generateEmail('testUserUnpaidRescheduledPaymentScheduled', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
+        $startDate = $this->addDays(new \DateTime(), -40);
+        $failDate = $this->addDays(new \DateTime(), -4);
+        $rescheduleDate = $this->addDays(new \DateTime(), 5);
+        $scheduleDate = $this->addDays(new \DateTime(), 30);
+        $policy = self::initPolicy($user, self::$dm, $phone, $startDate, true, false);
+        self::setCheckoutPaymentMethodForPolicy($policy);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $startDate);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        static::addCheckoutPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $failDate,
+            CheckoutPayment::RESULT_DECLINED
+        );
+        $rescheduledPayment = new ScheduledPayment();
+        $rescheduledPayment->setScheduled($rescheduleDate);
+        $rescheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $rescheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $rescheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $policy->addScheduledPayment($rescheduledPayment);
+        self::$dm->persist($rescheduledPayment);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setScheduled($scheduleDate);
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+        $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $policy->addScheduledPayment($scheduledPayment);
+        self::$dm->persist($scheduledPayment);
+        $unrelatedPayment = new ScheduledPayment();
+        $unrelatedPayment->setScheduled($scheduleDate);
+        $unrelatedPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $unrelatedPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $unrelatedPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        self::$dm->persist($unrelatedPayment);
+        self::$dm->flush();
+        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+        self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
+        $crawler = $this->login($email, $password, 'user/unpaid');
+        $this->validateCheckoutForm($crawler, true);
+        $this->assertContains('Unpaid Policy', $crawler->html());
+        $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
+        $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
+        $token = self::$checkoutService->createCardToken(
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
+            CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
+        );
+        $url = sprintf('/purchase/checkout/%s/unpaid', $policy->getId());
+        $crawler = self::$client->request('POST', $url, [
+            'token' => $token->getId(),
+            'pennies' => $pennies,
+            'csrf' => $csrf,
+        ]);
+        $data = self::verifyResponse(200);
+        $crawler = self::$client->request('GET', '/user/unpaid');
+        $this->expectFlashSuccess($crawler, 'successfully completed');
+        $this->assertContains('paid up to date', $crawler->html());
+        self::$dm->flush();
+        self::$dm->clear();
+        // check that the scheduled payment has been cancelled.
+        /** @var ScheduledPaymentRepository */
+        $scheduledPaymentRepo = self::$dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment */
+        $cancelledPayment = $scheduledPaymentRepo->find($rescheduledPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $cancelledPayment->getStatus());
+        $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
+        /** @var ScheduledPayment */
+        $scheduledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
+        /** @var ScheduledPayment */
+        $unrelatedPayment = $scheduledPaymentRepo->find($unrelatedPayment->getId());
+        $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
     }
 
     public function testUserInvalidPolicy()
@@ -3401,4 +3491,3 @@ class UserControllerTest extends BaseControllerTest
         }
     }
 }
-

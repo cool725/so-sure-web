@@ -285,9 +285,10 @@ class BacsPayment extends Payment
 
         if (!$this->canAction(self::ACTION_APPROVE, $date) && !$ignoreReversedDate) {
             throw new \Exception(sprintf(
-                'Attempting to approve payment %s before reversal date (%s) is past',
+                'Attempting to approve payment %s before reversal date (%s) is past. policy: %s',
                 $this->getId(),
-                $this->getBacsReversedDate()->format('d m Y')
+                $this->getBacsReversedDate()->format('d m Y'),
+                $this->getPolicy()->getPolicyNumber()
             ));
         }
 
@@ -337,9 +338,10 @@ class BacsPayment extends Payment
 
         if (!$this->canAction(self::ACTION_REJECT, $date)) {
             throw new \Exception(sprintf(
-                'Attempting to reject payment %s before reversal date (%s) is past',
+                'Attempting to reject payment %s before reversal date (%s) is past. policy: %s',
                 $this->getId(),
-                $this->getBacsReversedDate()->format('d m Y')
+                $this->getBacsReversedDate()->format('d m Y'),
+                $this->getPolicy()->getPolicyNumber()
             ));
         }
 
