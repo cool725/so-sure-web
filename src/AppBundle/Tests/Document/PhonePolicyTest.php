@@ -5840,7 +5840,7 @@ class PhonePolicyTest extends WebTestCase
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
             $scheduledPayment->setAmount(1.1);
-            $scheduledPayment->setScheduled(clone $date);
+            $scheduledPayment->setScheduled($date);
             $policy->addScheduledPayment($scheduledPayment);
         }
         // refunds.
@@ -5849,8 +5849,8 @@ class PhonePolicyTest extends WebTestCase
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
-            $scheduledPayment->setAmount(0.82);
-            $scheduledPayment->setScheduled(clone $date);
+            $scheduledPayment->setAmount(rand(0, 100) / 100);
+            $scheduledPayment->setScheduled($date);
             $policy->addScheduledPayment($scheduledPayment);
             $refunds[] = $scheduledPayment;
         }
