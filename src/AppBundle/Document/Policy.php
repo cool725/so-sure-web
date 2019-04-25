@@ -2020,7 +2020,7 @@ abstract class Policy
         $payments = $this->getScheduledPayments();
         $refunds = [];
         foreach ($payments as $payment) {
-            if ($payment->getType == ScheduledPayment::TYPE_REFUND) {
+            if ($payment->getType() == ScheduledPayment::TYPE_REFUND) {
                 $refunds[] = $payment;
             }
         }
@@ -2036,7 +2036,7 @@ abstract class Policy
         $payments = $this->getScheduledPayments();
         $total = 0;
         foreach ($payments as $payment) {
-            if ($payment->getType == ScheduledPayment::TYPE_REFUND) {
+            if ($payment->getType() == ScheduledPayment::TYPE_REFUND) {
                 $total -= $payment->getAmount();
             }
         }

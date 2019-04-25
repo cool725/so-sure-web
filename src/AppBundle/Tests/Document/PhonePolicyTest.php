@@ -5828,43 +5828,4 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPolicyStatusUnpaidIfActive(true);
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
     }
-
-    /**
-     * Tests if the get scheduled payment refunds method works correctly.
-     */
-    public function testGetScheduledPaymentRefunds()
-    {
-        // not refunds.
-        for ($i = 0; $i < 5; $i++) {
-            $scheduledPayment = new ScheduledPayment();
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-            $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
-            $scheduledPayment->setAmount(1.1);
-            $scheduledPayment->setScheduled($date);
-            $policy->addScheduledPayment($scheduledPayment);
-        }
-        // refunds.
-        $refunds = [];
-        for ($i = 0; $i < 5; $i++) {
-            $scheduledPayment = new ScheduledPayment();
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-            $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
-            $scheduledPayment->setAmount(rand(0, 100) / 100);
-            $scheduledPayment->setScheduled($date);
-            $policy->addScheduledPayment($scheduledPayment);
-            $refunds[] = $scheduledPayment;
-        }
-        // now see
-
-
-
-    }
-
-    /**
-     * Tests if the get scheduled payment refunds method works correctly.
-     */
-    public function testGetScheduledPaymentRefundAmount()
-    {
-
-    }
 }
