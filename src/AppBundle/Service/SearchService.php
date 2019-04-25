@@ -73,7 +73,7 @@ class SearchService
     public function searchPolicies()
     {
         if (empty($this->form->getNormData())) {
-            return [];
+            return $this->sortResults('current');
         }
         $data = $this->form->getNormData();
         if (!array_key_exists('invalid', $data)) {
