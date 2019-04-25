@@ -49,3 +49,12 @@
     <input type="number" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %} />
 {% endspaceless %}
 {% endblock app_number_widget %}
+
+{% block file_widget %}
+    {% spaceless %}
+    <div class="custom-file">
+        <input type="file" {{ block('widget_attributes') }} class="custom-file-input" id="{{ id }}">
+        <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+    {% endspaceless %}
+{% endblock file_widget %}

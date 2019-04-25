@@ -1,43 +1,51 @@
-<h2>Indemnity Payments</h2>
-{% if indemnity|length == 0 %}
-<p>No payments present</p>
-{% else %}
+<h3 class="mb-4">Indemnity Payments</h3>
 
-    <table class="table table-striped">
-        <tr>
-            <th width="10%">Status</th>
-            <th width="20%">Policy</th>
-            <th width="5%">Amount</th>
-            <th width="15%">Date</th>
-        </tr>
-
-        {% for payment in indemnity if indemnity %}
-            <tr>
-                <td width="10%">
-                    {{ payment.status }}
-                    {% if payment.success %}
-                        <i class="fa fa-check text-success"></i>
-                    {% elseif payment.success is null %}
-                        <i class="fa fa-question"></i>
-                    {% else %}
-                        <i class="fa fa-minus text-danger"></i>
-                    {% endif %}
-                </td>
-                <td width="20%">
-                    <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.user.name }}</a>
-                </td>
-                <td width="5%">
-                    £{{ payment.amount|number_format(2, '.', ',') }}
-                </td>
-                <td width="15%">
-                    {% if payment.date %}
-                        {{ payment.date|date('d M Y', 'Europe/London') }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
-        {%  endfor %}
-    </table>
+{% if payments is defined %}
+    {% if indemnity|length == 0 %}
+        <p class="mb-5">No files present</p>
+    {% else %}
+        <div class="table-responsive-sm mb-5">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Status</th>
+                        <th>Policy</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in indemnity if indemnity %}
+                        <tr>
+                            <td>
+                                {{ payment.status }}
+                                {% if payment.success %}
+                                    <i class="fas fa-check fa-fw text-success"></i>
+                                {% elseif payment.success is null %}
+                                    <i class="fas fa-question fa-fw text-primary"></i>
+                                {% else %}
+                                    <i class="fas fa-minus fa-fw text-danger"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.user.name }}</a>
+                            </td>
+                            <td>
+                                &pound;{{ payment.amount|number_format(2, '.', ',') }}
+                            </td>
+                            <td>
+                                {% if payment.date %}
+                                    {{ payment.date|date('d M Y', 'Europe/London') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {%  endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 {% endif %}
-<hr />
+
+<hr>
