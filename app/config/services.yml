@@ -1670,11 +1670,3 @@ services:
            class: Twig_Extensions_Extension_Text
            tags:
                - { name: twig.extension }
-
-    app.search:
-        alias: AppBundle\Service\SearchService
-        public: true
-
-    AppBundle\Service\SearchService:
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
