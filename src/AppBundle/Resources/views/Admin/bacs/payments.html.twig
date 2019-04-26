@@ -12,7 +12,7 @@
                     {% if payment.serialNumber %}
                         <a href="#"
                            data-toggle="modal"
-                           data-target="#serialNumberModal"
+                           data-target="#serial_number_modal"
                            data-serial="{{ payment.serialNumber }}"
                            data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': payment.serialNumber} ) }}">
                             {{ payment.serialNumber }}</a>
@@ -114,7 +114,7 @@
                                         data-serial-number="{{ payment.serialNumber }}"
                                         data-serial-number-url="{{ path('admin_bacs_payment_serial', {'id': payment.id}) }}"
                                         data-toggle="modal"
-                                        data-target="#editSerialNumberModal">
+                                        data-target="#edit_serial_number_modal">
                                         Edit Serial</button>
                             {% endif %}
                         </td>

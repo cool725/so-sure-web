@@ -25,7 +25,7 @@
                                    <i class="fas fa-file-download fa-fw"></i></a>
                                 <a href="#"
                                    data-toggle="modal"
-                                   data-target="#serialNumberModal"
+                                   data-target="#serial_number_modal"
                                    data-serial="{{ file.serialNumber }}"
                                    data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
                                     {{ file.serialNumber }}</a>
@@ -63,7 +63,7 @@
                                         data-serial-number="{{ file.serialNumber }}"
                                         data-serial-number-url="{{ path('admin_bacs_update_serial_number', {'id': file.id }) }}"
                                         data-toggle="modal"
-                                        data-target="#editSerialNumberModal">
+                                        data-target="#edit_serial_number_modal">
                                     <i class="fal fa-edit fa-fw"></i></button>
                             </td>
                         </tr>
