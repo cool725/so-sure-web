@@ -225,6 +225,8 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $future = \DateTime::createFromFormat('U', time());
         $future = $this->addBusinessDays($future, 1);
+        // 1 hour in case of daylight savings time
+        $future = $future->sub(new \DateInterval('PT1H'));
         $future = $future->sub(new \DateInterval('PT1S'));
         $phone->changePrice(
             9,

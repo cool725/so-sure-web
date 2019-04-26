@@ -1,0 +1,28 @@
+{% extends 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig' %}
+
+{% block phone_hero_text %}
+    <p class="mb-4">With a wide range of unwanted situations covered, insuring your <strong>HTC One</strong> smartphone is as easy as it gets with so-sure: takes only a few minutes, comes with great coverage and you can get up to 80% cashback at the end of the policy year.</p>
+{% endblock %}
+
+{% block phone_why_insure_text %}
+    <p>What's cool about HTC One models? A lot of things, actually. The HTC One smartphone series range from low-end models, focused on all the necessary things a phone should do, to high-end handsets that tend to blow minds with their specs, designs, capabilities and others.</p>
+    <p>Whilst all our mobile phone insurance packages are great, it's worth noting some of things we cover: phones up to 3 years old, including second hand and refurbished devices, unauthorised network charges up the value of &pound;1000 (inc VAT), the typical theft &amp; loss and accidental damage and plenty more.</p>
+    <p>The following HTC One models are covered so far: <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+A9', 'memory': 16}) }}">HTC One A9</a>, <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+M8s', 'memory': 16}) }}">HTC One M8s</a>, <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+M9', 'memory': 32}) }}">HTC One M9</a> and <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+X9', 'memory': 32}) }}">HTC One X9</a>.</p>
+{% endblock %}
+
+{% block extra_content_one %}
+    <h2 class="h3 mb-4 text-primary">Your HTC One phone is essential, let us give you piece of mind</h2>
+    <p>Your phone is one of life's few essential items &mdash; a device you use for everything from keeping in touch with friends and family to managing your emails, setting your schedule, staying on top of important tasks and even for 2FA. Ubiquitous and important, without a question. Losing it or accidentally breaking it could be a serious setback for many people.</p>
+    <p>And whilst some of the HTC One models are no longer the newest smartphones around, they still stand out from the crowd, which means they do get stolen every now and then.</p>
+    <p>That's why our insurance keeps your handsets covered in case it gets lost, stolen or suffers accidental damage as a standard, letting you use it as intended with total confidence. And not only are you covered for those, but we also cover second-hand and refurbished HTC phones that are up to 3 years old and even if they break when out of warranty.</p>
+    <p>From cracked screens to water damage, we offer fast, effective repairs to get your device back in your hands as quickly as possible. Peace of mind is what we aim to give you.</p>
+{% endblock %}
+
+{% block extra_content_two %}
+    <h2 class="h3 mb-4 text-primary">We do phone insurance for breakfast, lunch and dinner. We got you covered.</h2>
+    <p>Our HTC One insurance makes using your phone easier, safer and less stressful than ever before, whether you're out and about in your home city or traveling the world (up to 90 days), because <a href="{{ path('phone_insurance') }}">insuring mobile phones</a> and gadgets is just we do all year round and we're good at it.</p>
+    <p>With full cover against theft, loss and accidental damage as a standard, you'll be happy to learn that we can be up to 40% cheaper than the competition. We'll also keep you covered for accessories with a value of up to &pound;100 including VAT, meaning there's no need to worry if your favorite headphones go missing too.</p>
+    <p>With up to 90 days of worldwide travel, out-of-warranty breakdowns and up to &pound;1,000 worth of unauthorised network charges covered, we try to ensure that you're never caught unprepared by the unexpected and enjoy your time, whatever you do.</p>
+    <p>so-sure offers social insurance, which means that we offer up to 80% of your premiums back as cash if you and your connections don't make any insurance claims when a policy year ends.</p>
+    <p>The following HTC One models are covered so far: <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+A9', 'memory': 16}) }}">HTC One A9</a>, <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+M8s', 'memory': 16}) }}">HTC One M8s</a>, <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+M9', 'memory': 32}) }}">HTC One M9</a> and <a href="{{ path('quote_make_model_memory', {'make': 'samsung', 'model': 'HTC+One+X9', 'memory': 32}) }}">HTC One X9</a>.</p>
+{% endblock %}

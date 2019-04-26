@@ -1,111 +1,96 @@
- {% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'make-a-claim' %}
 
-{% block title %}so-sure - Make a claim
+{% block title %}so-sure - Make a Claim{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/make-a-claim.css') }}">
 {% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/claim.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{# {% block nav %}{% endblock %} #}
 
 {% block body %}
 
-    {# Claims Form #}
-    <section class="section--pad claim__hero" id="claim-form-container" >
-        <div class="container">
+    <section class="hero">
+        <div class="container container-xtra">
             <div class="row">
-                <div class="col-md-6 col-md-offset-3">
-                <h1 class="text-blue">Need to make a claim?</h1>
-                    <h3>Enter your email and we'll send you a link to get started.</h3>
-                    {{ form_start(claim_email_form, {
-                        'attr': {
-                            'data-toggle': 'validator',
-                            'class': 'validate-form',
-                            'id':'claim-email-form',
-                            'data-client-validation': form_client_validation
-                    }}) }}
-                        <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
-                            {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email Address'}}) }}
-                            <div class="help-block"><span class="text-danger"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Please use the email address associated with your so-sure policy</span></div>
-                            <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
-                        </div>
-                        <div class="form-group">
-                           {{ form_widget(claim_email_form.submit, {
-                                'label': 'Send me the link',
-                                'attr': {
-                                    'class': 'btn btn-blue btn-pad btn-lg'
-                            }}) }}
-                        </div>
-                    {{ form_end(claim_email_form) }}
-                    <p>Need to check an existing claim? Please <a href="{{ url('claim_login') }}">login here</a>.</p>
+                <div class="col-lg-8">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-white fit">Make a claim</h1>
+                        <h4 class="text-columbia-blue-e">Firstly, is your phone lost or stolen?</h4>
+                        <p class="text-white mb-4">If you had your phone stolen or lost, please call your network to <strong>block your phone</strong> then request both <strong>proof of barring</strong> and <strong>proof of usage documents</strong>. Finally get a <strong>crime reference number</strong> from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap text-white" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
+                        <h5 class="text-columbia-blue-e">Ready to claim? We'll email you a link to get started</h5>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        {{ form_start(claim_email_form, {
+                            'attr': {
+                                'data-toggle': 'validator',
+                                'class': 'validate-form form-inline',
+                                'data-client-validation': form_client_validation,
+                                'autocomplete': 'off'
+                        }}) }}
+                            <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
+                                {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control form-control-white mr-2', 'placeholder': 'Email address'}}) }}
+                                <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
+                            </div>
+                            <div class="form-group">
+                               {{ form_widget(claim_email_form.submit, {
+                                    'label': 'Send me the link',
+                                    'attr': {
+                                        'class': 'btn btn-success btn-square'
+                                }}) }}
+                            </div>
+                        {{ form_end(claim_email_form) }}
+                        <small class="form-text text-white">Only use the email associated with your so-sure policy</small>
+                    </div>
+                    <p class="mb-4 text-white">Need to check an existing claim? Please <a href="{{ url('claim_login') }}" class="text-nowrap text-white"><u>login here</u></a>.</p>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_broken-phone-hero.png" alt="so-sure - social insurance" class="lozad d-block mx-auto" width="260px">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    {# Claims Process #}
-    <section class="section--pad claim__process">
-        <div class="container">
-            <h2 class="text-blue h1">Our claims process</h2>
+    <section class="claims py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="h3 mb-3 text-primary">How the claims process works</h2>
             <div class="row">
-                <div class="col-md-4">
-                    <span class="large-no large-no--arrow">1</span>
-                    <h3 class="text-blue">Contact Claims Team</h3>
-                    <p>Let us know what happened. You can start our online claims process by <a href="#" class="text-nowrap scroll-to h4 text-blue" data-scroll-to-anchor="#claim-email-form">entering your email in the form above</a>.</p>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_make-a-claim.png" alt="so-sure - Make a claim" width="180px" class="lozad">
+                    </div>
+                    <h5 class="text-primary">Launch your claim online</h5>
+                    <p class="mb-5">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Get started using the form above</p>
                 </div>
-                <div class="col-md-4">
-                    <span class="large-no large-no--arrow">2</span>
-                    <h3 class="text-blue">Review Claim</h3>
-                    <p>Our UK based claims team will review your claim and reach out with a request for any further details or documents (if necessary). </p>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="180px" class="lozad">
+                    </div>
+                    <h5 class="text-primary">Review Claim</h5>
+                    <p class="mb-5">Our UK based claims team will review your claim and reach out with a request for any further details or documents</p>
                 </div>
-                <div class="col-md-4">
-                    <span class="large-no">3</span>
-                    <h3 class="text-blue">Approve Claim</h3>
-                    <p>Once approved, we take your excess payment over the phone. We aim to repair or replace your phone within 24-72 hours, however some repairs can take a little longer.</p>
+                <div class="col-md-6 col-lg-4">
+                    <div class="claims__step">
+                        <div class="claims__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_delivery.png" alt="so-sure - Approve claim" width="180px" class="lozad">
+                    </div>
+                    <h5 class="text-primary">Approve Claim</h5>
+                    <p class="mb-2">Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours</p>
                 </div>
             </div>
         </div>
     </section>
-
-    {# Claims Report Loss #}
-    <section class="section--pad claim__loss">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <img src="{{ cdn_url }}/images/mobile_mike/so-sure_mobile_mike_loss_dark.png" width="220px" class="img-center img-circle" alt="">
-                </div>
-                <div class="col-md-7">
-                    <h2 class="h-nom h1">Lost or stolen phone?</h2>
-                    <p class="h3 h-light">If you had your phone stolen or lost, please call your network to block your phone  (request both proof of barring &amp; proof of usage documents), and get a crime reference number from your local police station.</p>
-                    <p class="h3 h-light">For loss you can also declare online at <a href="https://www.reportmyloss.com/uk/register" target="_blank" rel="noopener noreferrer"><strong>Report My Loss</strong></a>.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
 
     {# Page Modals #}
-    {# End Page Modals #}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/moment/moment.min.js'
-    'components/jquery-mask-plugin/jquery.mask.min.js'
-    'components/jquery-validation/jquery.validate.min.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-    '@AppBundle/Resources/public/js/Default/claim.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/make-a-claim.js') }}"></script>
 {% endblock %}

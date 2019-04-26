@@ -24,6 +24,7 @@ use AppBundle\Document\ScheduledPayment;
  * @MongoDB\DiscriminatorMap({
  *      "judo"="JudoPayment",
  *      "sosure"="SoSurePayment",
+ *      "checkout"="CheckoutPayment",
  *      "bacs"="BacsPayment",
  *      "bacsIndemnity"="BacsIndemnityPayment",
  *      "chargeback"="ChargebackPayment",
@@ -33,6 +34,8 @@ use AppBundle\Document\ScheduledPayment;
  *      "sosurePotReward"="SoSurePotRewardPayment",
  *      "debtCollection"="DebtCollectionPayment"
  * })
+ * @MongoDB\Index(keys={"type"="asc"}, sparse="true")
+ * @MongoDB\Index(keys={"type"="asc","date"="asc"}, sparse="true")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Payment

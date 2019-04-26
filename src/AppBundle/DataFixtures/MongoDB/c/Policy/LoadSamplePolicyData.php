@@ -554,18 +554,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $bankAccount->setAccountName($policy->getUser()->getName());
             }
             $bankAccount->setMandateSerialNumber(0);
-            $status = rand(0, 4);
-            if ($status == 0) {
-                $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-            } elseif ($status == 1) {
-                $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
-            } elseif ($status == 2) {
-                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
-            } elseif ($status == 3) {
-                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
-            } elseif ($status == 4) {
-                $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
-            }
+            $this->giveRandomMandateStatus($bankAccount);
             $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());
             $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
             $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
@@ -1097,6 +1086,33 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $policy->addClaim($claim);
         $manager->persist($claim);
+    }
+
+    /**
+     * Sets the bank account's madate status and potentially cancellation reasons and cancellers.
+     * @param BankAccount $bankAccount is the bank account that we are operating on.
+     */
+    protected function giveRandomMandateStatus($bankAccount)
+    {
+        $status = rand(0, 4);
+        if ($status == 0) {
+            $canceller = BankAccount::CANCELLERS[array_rand(BankAccount::CANCELLERS)];
+            if (array_key_exists($canceller, BankAccount::CANCEL_REASONS)) {
+                $bankAccount->cancelMandate($canceller, array_rand(BankAccount::CANCEL_REASONS[$canceller]));
+            } elseif ($canceller == BankAccount::CANCELLER_SOSURE) {
+                $bankAccount->cancelMandate($canceller, BankAccount::CANCEL_REASON_PERSONAL_DETAILS);
+            } else {
+                $bankAccount->cancelMandate($canceller, uniqid());
+            }
+        } elseif ($status == 1) {
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
+        } elseif ($status == 2) {
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+        } elseif ($status == 3) {
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
+        } elseif ($status == 4) {
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+        }
     }
 
     protected function getRandomDescription($claim)

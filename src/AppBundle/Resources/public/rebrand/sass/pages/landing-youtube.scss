@@ -1,0 +1,202 @@
+// landing-youtube.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+
+.hero {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+    overflow: hidden;
+
+    @include blue-gradient;
+
+    .container {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__intro {
+
+        h1 {
+            // font-size: 1.4rem;
+
+            @include media-breakpoint-up(ss) {
+                // font-size: 1.86rem;
+            }
+
+            @include media-breakpoint-up(sm) {
+                // font-size: 2.2rem;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 2rem;
+        }
+
+        @include media-breakpoint-up(xl) {
+            // padding-top: 4rem;
+        }
+
+    }
+
+    &__illustration {
+        position: relative;
+        z-index: 4;
+
+        // @include media-breakpoint-up(lg) {
+        //     width: 740px;
+        //     position: absolute;
+        //     top: 150px; right: 0;
+        // }
+
+        // @include media-breakpoint-up(fl) {
+        //     top: 200px;
+        // }
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/youtube/so-sure_youtube-hero-background-offset-mobile.svg');
+        background-size: cover;
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/youtube/so-sure_youtube-hero-background-offset.svg');
+        }
+    }
+}
+
+.cred {
+    text-align: center;
+    background-color: $ultramarine;
+    position: relative;
+    z-index: 5;
+
+    img {
+        width: 100px;
+        margin: 0.5rem;
+        // opacity: 0.3;
+
+        @include media-breakpoint-up(lg) {
+            width: 120px;
+            margin: 0;
+        }
+    }
+}
+
+.intro {
+    text-align: center;
+    @include blue-gradient;
+}
+
+.comparison-table {
+
+}
+
+.cover {
+    position: relative;
+
+    &__illustration__mobile {
+        height: 240px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    &__mobile {
+        background-color: $pattens-blue;
+    }
+
+    &__list {
+        margin-top: 7rem;
+    }
+
+    svg {
+        position: absolute;
+        bottom: -1px; left: 0; right: 0;
+    }
+}
+
+.differently {
+    position: relative;
+    z-index: 1;
+    // background-color: $pattens-blue;
+
+    @include media-breakpoint-up(lg) {
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 200px;
+        background-size: 500px;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: -40px 200px;
+        background-size: 600px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 500px 200px;
+        background-size: 600px;
+    }
+
+    &__illustration__mobile {
+        position: relative;
+    }
+}
+
+.claims {
+    @include blue-gradient-0;
+    text-align: center;
+
+    &__step {
+        width: 180px;
+        margin: 0 auto;
+        position: relative;
+
+        img {
+            display: none;
+
+            @include media-breakpoint-up(sm) {
+                display: inline;
+            }
+        }
+    }
+
+    &__number {
+        width: 55px; height: 55px;
+        background-color: $white;
+        margin: 0 auto 1.2rem;
+
+        @include border-radius(50%);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+
+        @include media-breakpoint-up(sm) {
+            position: absolute;
+            top: 20%; left: -20px;
+        }
+    }
+}
+
+.banner {
+    position: relative;
+    text-align: center;
+
+    @include blue-gradient;
+
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+    }
+}

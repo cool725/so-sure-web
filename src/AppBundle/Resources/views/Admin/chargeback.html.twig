@@ -1,144 +1,160 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme chargeback_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/month.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{# Set vars #}
+{% set body_class = 'admin-chargeback' %}
+
+{% block title %}so-sure - Card Payments for {{ month }} / {{ year }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-5">
-        <h1>
-            {% if app.request.get('_route') == "admin_chargeback" %}
-                Unassigned Chargebacks
-            {% else %}
-                Chargebacks for {{ month }} / {{ year }}
-            {% endif %}
-        </h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-3">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_chargeback') }}">
-                <input name="charge" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
-            </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-1">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="btn-group">
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newChargebackModal"
-                    > Add</button>
-            </div>
-        </div>
-    </div>
-    </form>
-    <div class="col-md-3">
-        <div class="form-group" style="padding-top: 15px;">
-            <form action="https://portal.judopay.com/payments/history?SearchQueryType=1&AppName=&DeviceId=&From=&To=&AppId=0" method="GET">
-                <input type="text" name="SearchQuery" placeholder="Last 4 digits" style="width: 100px;">
-                <input type="hidden" name="SearchQueryType" value="1">
-                <button type="submit" class="btn btn-success">Query Judo</button>
-            </form>
-        </div>
-    </div>
-
-</div>
-    {% if chargebacks|length == 0 %}
-    <div class="row-fluid">
-        <h2>No chargeback items found</h2>
-    </div>
-    {% else %}
-        <h3>Chargebacks</h3>
-        {% for chargeback in chargebacks %}
-            <div class="row" style="margin-bottom: 20px;">
-                <div class="col-md-2">
-                    <strong>{{ chargeback.reference }}</strong>
-                </div>
-                <div class="col-md-2">
-                    £{{ (0 - chargeback.amount)|number_format(2, '.', ',') }}
-                </div>
-                <div class="col-md-6">
-                    {% if chargeback.policy %}
-                        <a href="{{ path('admin_policy', {'id': chargeback.policy.id })}}">{{ chargeback.policy.policyNumber }}</a>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">
+                    {% if app.request.get('_route') == "admin_chargeback" %}
+                        Unassigned Chargebacks
                     {% else %}
-                        Unknown policy (assign via policy / admin tab)
+                        Chargebacks for {{ month }} / {{ year }}
                     {% endif %}
+                </h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body d-lg-flex justify-content-lg-between">
+                    <form id="month_form"
+                          class="form-inline mb-2 mb-lg-0"
+                          method="POST"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_chargeback') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-primary btn-square mr-2"
+                                    data-toggle="modal"
+                                    data-target="#new_chargeback_modal">
+                                <i class="fal fa-plus fa-fw"></i> Add chargeback</button>
+                        </div>
+                    </form>
+                    <form action="https://portal.judopay.com/payments/history?SearchQueryType=1&AppName=&DeviceId=&From=&To=&AppId=0"
+                          method="GET"
+                          class="form-inline">
+                        <div class="form-group">
+                            <input type="text" name="SearchQuery" placeholder="Last 4 digits" class="form-control mr-2">
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" name="SearchQueryType" value="1">
+                            <button type="submit" class="btn btn-success btn-square">Query Judo</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
+            {% if chargebacks|length == 0 %}
+                <p class="mb-5">No chargeback items found</p>
+            {% else %}
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+{#                         <thead class="thead-light">
+                            <tr>
 
-    <div class="modal fade" id="newChargebackModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-        {{ form_start(chargeback_form) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">New Chargeback</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="form-group col-sm-2">
-                    {{ form_label(chargeback_form.reference, 'Reference') }}
+                            </tr>
+                        </thead> #}
+                        <tbody>
+                            {% for chargeback in chargebacks %}
+                                <tr>
+                                    <td>{{ chargeback.reference }}</td>
+                                    <td>&pound;{{ (0 - chargeback.amount)|number_format(2, '.', ',') }}</td>
+                                    <td>
+                                        {% if chargeback.policy %}
+                                            <a href="{{ path('admin_policy', {'id': chargeback.policy.id })}}">{{ chargeback.policy.policyNumber }}</a>
+                                        {% else %}
+                                            Unknown policy (assign via policy / admin tab)
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="form-group col-sm-6">
-                    {{ form_errors(chargeback_form.reference) }}
-                    {{ form_widget(chargeback_form.reference) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-2">
-                    {{ form_label(chargeback_form.amount, 'Amount') }}
-                </div>
-                <div class="form-group col-sm-6">
-                    {{ form_errors(chargeback_form.amount) }}
-                    {{ form_widget(chargeback_form.amount) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-2">
-                    {{ form_label(chargeback_form.refundTotalCommission, 'Total Commission') }}<br>
-                    £10.72 for annual or £0.89 / month 
-                </div>
-                <div class="form-group col-sm-6">
-                    {{ form_errors(chargeback_form.refundTotalCommission) }}
-                    {{ form_widget(chargeback_form.refundTotalCommission) }}<br>
-                    (use positive number - system will adjust to refund)
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-2">
-                    {{ form_label(chargeback_form.date, 'Date') }}
-                </div>
-                <div class="form-group col-sm-6">
-                    {{ form_errors(chargeback_form.date) }}
-                    {{ form_widget(chargeback_form.date) }}
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            {{ form_widget(chargeback_form.add, {'attr':{'class': 'btn btn-success'}}) }}
-          </div>
-        {{ form_end(chargeback_form) }}
+            {% endif %}
         </div>
-      </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="new_chargeback_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="new_chargeback_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Chargeback</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(chargeback_form) }}
+                        <div class="form-group">
+                            {{ form_label(chargeback_form.reference, 'Reference') }}
+                            {{ form_widget(chargeback_form.reference, {'attr': {'class':'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(chargeback_form.reference) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(chargeback_form.amount, 'Amount') }}
+                            {{ form_widget(chargeback_form.amount, {'attr': {'class':'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(chargeback_form.amount) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(chargeback_form.refundTotalCommission, 'Total Commission') }}
+                            {{ form_widget(chargeback_form.refundTotalCommission, {'attr': {'class':'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(chargeback_form.refundTotalCommission) }}</div>
+                            <small class="form-text">&pound;10.72 for annual or &pound;0.89 / month</small>
+                            <small class="form-text">use positive number - system will adjust to refund</small>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(chargeback_form.date, 'Date') }}
+                            {{ form_widget(chargeback_form.date) }}
+                            <div class="with-errors">{{ form_errors(chargeback_form.date) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(chargeback_form.add, {'attr':{'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(chargeback_form) }}
+                </div>
+            </div>
+        </div>
     </div>
 
-</div>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
 {% endblock %}

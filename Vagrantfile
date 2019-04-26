@@ -121,11 +121,12 @@ Vagrant.configure("2") do |config|
   config.vm.define "dev1804_nonfs", primary: false, autostart: false do |dev1804_nonfs_config|
     dev1804_nonfs_config.vm.box = "geerlingguy/ubuntu1804"
     dev1804_nonfs_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
+    dev1804_nonfs_config.vm.network "forwarded_port", guest: 8008, host: 40088 # apache sosure website
     dev1804_nonfs_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
     dev1804_nonfs_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
     dev1804_nonfs_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
     dev1804_nonfs_config.vm.network "private_network", ip: "10.0.4.2"
-    dev1804_nonfs_config.vm.synced_folder ".", "/vagrant"
+    dev1804_nonfs_config.vm.synced_folder ".", "/vagrant" , mount_options: ["dmode=777,fmode=777"]
     dev1804_nonfs_config.ssh.forward_agent = true
 
     dev1804_nonfs_config.vm.provision "shell",
@@ -139,8 +140,8 @@ Vagrant.configure("2") do |config|
 
     dev1804_nonfs_config.vm.provision "ansible_local" do |a|
         a.playbook = "vagrant1804.yml"
-        a.provisioning_path = "/vagrant/ops/ansible"
-        a.inventory_path = "/vagrant/ops/ansible/vagrant_inventory"
+        a.provisioning_path = "/var/ops/ansible"
+        a.inventory_path = "/var/ops/ansible/vagrant_inventory"
         a.limit = "vagrant"
         a.install = false
     end

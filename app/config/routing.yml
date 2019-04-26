@@ -537,3 +537,327 @@ redirect_iphone_seven_plus_mobile_network:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison
         permanent: true
+
+redirect_mobile_insurance_make_model:
+    path: /a/mobile-insurance/{make}-{model}
+    requirements:
+        make: '[a-zA-Z]+'
+        model: '[\+\-\.a-zA-Z0-9() ]+'
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: quote_make_model
+
+# SEO Redirects
+redirect_seo_mobile_insurance:
+    path: /mobile-insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance
+        permanent: true
+
+redirect_seo_blackberry:
+    path: /mobile-insurance/blackberry
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/blackberry+dekt50
+        permanent: true
+
+redirect_seo_htc_desire:
+    path: /mobile-insurance/htc-desire
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/htc+desire+626
+        permanent: true
+
+# Multi-links in sitemap to one template
+# HTC One A9 insurance
+# HTC One M8s insurance
+# HTC One M9 insurance
+# HTC One X9 insurance
+redirect_seo_htc_one:
+    path: /mobile-insurance/htc-one
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/htc+one+a9
+        permanent: true
+
+redirect_seo_huawei_mate_10_pro:
+    path: /mobile-insurance/huawei-mate-10-pro
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/huawei+mate+10+pro
+        permanent: true
+
+redirect_seo_huawei_mate_8:
+    path: /mobile-insurance/huawei-mate-8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/huawei+mate+8
+        permanent: true
+
+redirect_seo_huawei_mate_9:
+    path: /mobile-insurance/huawei-mate-9
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/huawei+mate+9
+        permanent: true
+
+# Multi-links in sitemap to one template
+# Huawei P9 Plus insurance
+# Huawei P9 lite insurance
+# Huawei P9 insurance
+redirect_seo_huawei_p9:
+    path: /mobile-insurance/huawei-p9
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/huawei+p9
+        permanent: true
+
+redirect_seo_iphone_6:
+    path: /mobile-insurance/iphone-6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+6s
+        permanent: true
+
+redirect_seo_iphone_6_plus:
+    path: /mobile-insurance/iphone-6-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+6s+plus
+        permanent: true
+
+redirect_seo_iphone_7:
+    path: /mobile-insurance/iphone-7
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+7
+        permanent: true
+
+redirect_seo_iphone_7_plus:
+    path: /mobile-insurance/iphone-7-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+7+plus
+        permanent: true
+
+redirect_seo_iphone_8:
+    path: /mobile-insurance/iphone-8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+8
+        permanent: true
+
+redirect_seo_iphone_8_plus:
+    path: /mobile-insurance/iphone-8-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+8+plus
+        permanent: true
+
+redirect_seo_iphone_se:
+    path: /mobile-insurance/iphone-se
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+se
+        permanent: true
+
+redirect_seo_iphone_x:
+    path: /mobile-insurance/iphone-x
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+x
+        permanent: true
+
+redirect_seo_iphone_xr:
+    path: /mobile-insurance/iphone-xr
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+xr
+        permanent: true
+
+redirect_seo_iphone_xs:
+    path: /mobile-insurance/iphone-xs
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+xs
+        permanent: true
+
+redirect_seo_iphone_xs_max:
+    path: /mobile-insurance/iphone-xs-max
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+xs+max
+        permanent: true
+
+# Multi-links in sitemap to one template
+redirect_seo_motorola_moto:
+    path: /mobile-insurance/motorola-moto
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/motorola+moto+g5
+        permanent: true
+
+redirect_seo_oneplus_6:
+    path: /mobile-insurance/oneplus-6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/oneplus+6
+        permanent: true
+
+redirect_seo_oneplus_6t:
+    path: /mobile-insurance/oneplus-6t
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/oneplus+6t
+        permanent: true
+
+redirect_seo_pixel:
+    path: /mobile-insurance/pixel
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/google+pixel
+        permanent: true
+
+redirect_seo_pixel_2:
+    path: /mobile-insurance/pixel-2
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/google+pixel+2
+        permanent: true
+
+redirect_seo_pixel_3:
+    path: /mobile-insurance/pixel-3
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/google+pixel+3
+        permanent: true
+
+redirect_seo_galaxy_j3_2016:
+    path: /mobile-insurance/samsung-galaxy-j3
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+j3+(2016)
+        permanent: true
+
+redirect_seo_galaxy_j5_2017:
+    path: /mobile-insurance/samsung-galaxy-j5-2017
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+j5+(2017)
+        permanent: true
+
+redirect_seo_galaxy_j6:
+    path: /mobile-insurance/samsung-galaxy-j6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+j6
+        permanent: true
+
+redirect_seo_galaxy_note_8:
+    path: /mobile-insurance/samsung-galaxy-note-8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+note+8
+        permanent: true
+
+redirect_seo_galaxy_note_9:
+    path: /mobile-insurance/samsung-galaxy-note-9
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+note+9
+        permanent: true
+
+redirect_seo_galaxy_s5:
+    path: /mobile-insurance/samsung-galaxy-s5
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s5+mini
+        permanent: true
+
+redirect_seo_galaxy_s6:
+    path: /mobile-insurance/samsung-galaxy-s6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s6
+        permanent: true
+
+redirect_seo_galaxy_s7:
+    path: /mobile-insurance/samsung-galaxy-s7
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s7
+        permanent: true
+
+redirect_seo_galaxy_s7_edge:
+    path: /mobile-insurance/samsung-galaxy-s7-edge
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s7+edge
+        permanent: true
+
+redirect_seo_galaxy_s8:
+    path: /mobile-insurance/samsung-galaxy-s8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s8
+        permanent: true
+
+redirect_seo_galaxy_s8:
+    path: /mobile-insurance/samsung-galaxy-s8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s8
+        permanent: true
+
+redirect_seo_galaxy_s8_plus:
+    path: /mobile-insurance/samsung-galaxy-s8-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s8-plus
+        permanent: true
+
+redirect_seo_galaxy_s9:
+    path: /mobile-insurance/samsung-galaxy-s9
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s9
+        permanent: true
+
+redirect_seo_galaxy_s9_plus:
+    path: /mobile-insurance/samsung-galaxy-s9-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s9-plus
+        permanent: true
+
+# Multi-links in sitemap to one template
+# Sony Xperia E4g insurance
+# Sony Xperia E4 insurance
+# Sony Xperia XZ1 Compact insurance
+# Sony Xperia E5 insurance
+# Sony Xperia XZ1 insurance
+# Sony Xperia ZX insurance
+# Sony Xperia Z5 Premium insurance
+# Sony Xperia Z5 Compact insurance
+# Sony Xperia Z5 insurance
+# Sony Xperia M4 Aqua insurance
+# Sony Xperia XZ3 insurance
+# Sony Xperia XZ2 Compact insurance
+# Sony Xperia XZ2 insurance
+# Sony Xperia Z3+ insurance
+# Sony Xperia XZ Premium insurance
+# Sony Xperia XA2 Ultra insurance
+# Sony Xperia XA2 insurance
+# Sony Xperia XA1 Ultra insurance
+# Sony Xperia XA1 insurance
+# Sony Xperia XA Ultra insurance
+# Sony Xperia XA insurance
+# Sony Xperia X insurance
+# Sony Xperia M5 insurance
+redirect_seo_xperia:
+    path: /mobile-insurance/sony-xperia
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/sony+xperia+zx
+        permanent: true

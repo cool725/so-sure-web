@@ -49,15 +49,8 @@
         </div>
     </section>
 
-    <section class="cred">
-        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian" class="lozad">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times" class="lozad">
-        </div>
-    </section>
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     <section class="intro py-lg-5">
         <div class="container container-xtra py-5">
@@ -141,7 +134,7 @@
                     <div class="text-center text-lg-left">
                         <h2 class="h3 mb-3 text-primary">Reward Pot <br><span class="sub">FAQs</span></h2>
                         <p class="mb-4">Here's the top questions we get asked.</p>
-                        <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
+                        <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="d-none d-md-block btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
                     </div>
                 </div>
                 <div class="col-md-8">
@@ -211,6 +204,7 @@
                             </div>
                         </div>
                     </div>
+                    <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="d-md-none btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
                 </div>
             </div>
         </div>

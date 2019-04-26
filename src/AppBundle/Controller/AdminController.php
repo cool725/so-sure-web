@@ -11,17 +11,20 @@ use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportDdicFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\CashflowsFile;
+use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
-use AppBundle\Document\Form\JudoRefund;
+use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
-use AppBundle\Form\Type\JudoRefundType;
+use AppBundle\Form\Type\CardRefundType;
+use AppBundle\Form\Type\CheckoutFileType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -36,6 +39,7 @@ use AppBundle\Repository\File\BacsReportInputFileRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\CashflowsFileRepository;
+use AppBundle\Repository\File\CheckoutFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
 use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
@@ -46,6 +50,7 @@ use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
 use AppBundle\Service\CashflowsService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\ClaimsService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\LloydsService;
@@ -245,10 +250,10 @@ class AdminController extends BaseController
             throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
         }
 
-        $judoRefund = new JudoRefund();
+        $judoRefund = new CardRefund();
         $judoRefund->setPolicy($policy);
         $judoRefundForm = $this->get('form.factory')
-            ->createNamedBuilder('judo_refund_form', JudoRefundType::class, $judoRefund)
+            ->createNamedBuilder('judo_refund_form', CardRefundType::class, $judoRefund)
             ->setAction($this->generateUrl(
                 'judo_refund_form',
                 ['id' => $policy->getId()]
@@ -300,6 +305,78 @@ class AdminController extends BaseController
         ];
     }
 
+    /**
+     * @Route("/checkout-refund/{id}", name="checkout_refund_form")
+     * @Template
+     */
+    public function checkoutRefundFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+
+        /** @var Policy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $checkoutRefund = new CardRefund();
+        $checkoutRefund->setPolicy($policy);
+        $checkoutRefundForm = $this->get('form.factory')
+            ->createNamedBuilder('checkout_refund_form', CardRefundType::class, $checkoutRefund)
+            ->setAction($this->generateUrl(
+                'checkout_refund_form',
+                ['id' => $policy->getId()]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('checkout_refund_form')) {
+                $checkoutRefundForm->handleRequest($request);
+                if ($checkoutRefundForm->isValid()) {
+                    /** @var CheckoutService $checkoutService */
+                    $checkoutService = $this->get('app.checkout');
+
+                    try {
+                        $checkoutService->refund(
+                            $checkoutRefund->getPayment(),
+                            $checkoutRefund->getAmount(),
+                            $checkoutRefund->getTotalCommission(),
+                            $checkoutRefund->getNotes()
+                        );
+
+                        $policy->addNoteDetails(
+                            $checkoutRefund->getNotes(),
+                            $this->getUser(),
+                            'Checkout Refund'
+                        );
+
+                        $dm->flush();
+
+                        $this->addFlash(
+                            'success',
+                            sprintf('Successfully refunded payment of £%s', $checkoutRefund->getAmount())
+                        );
+                    } catch (\Exception $e) {
+                        $this->addFlash(
+                            'error',
+                            sprintf('Error processing refund: %s', $e)
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'checkout_refund_form' => $checkoutRefundForm->createView(),
+            'policy' => $policy,
+        ];
+    }
 
     /**
      * @Route("/phone", name="admin_phone_add")
@@ -1116,6 +1193,9 @@ class AdminController extends BaseController
     /**
      * @Route("/banking", name="admin_banking")
      * @Route("/banking/{year}/{month}", name="admin_banking_date")
+     * @Route("/banking/card/{year}/{month}", name="admin_banking_card_date")
+     * @Route("/banking/merchant/{year}/{month}", name="admin_banking_merchant_date")
+     * @Route("/banking/bacs/{year}/{month}", name="admin_banking_bacs_date")
      * @Template
      */
     public function adminBankingAction(Request $request, $year = null, $month = null)
@@ -1139,7 +1219,7 @@ class AdminController extends BaseController
         $inputRepo = $dm->getRepository(BacsReportInputFile::class);
         /** @var BacsReportAruddFileRepository $aruddRepo */
         $aruddRepo = $dm->getRepository(BacsReportAruddFile::class);
-        /** @var BacsReportDdicFileRepository $aruddRepo */
+        /** @var BacsReportDdicFileRepository $ddicRepo */
         $ddicRepo = $dm->getRepository(BacsReportDdicFile::class);
         /** @var BacsPaymentRepository $bacsPaymentRepo */
         $bacsPaymentRepo = $dm->getRepository(BacsPayment::class);
@@ -1155,6 +1235,10 @@ class AdminController extends BaseController
         $judoFile = new JudoFile();
         $judoForm = $this->get('form.factory')
             ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
+            ->getForm();
+        $checkoutFile = new CheckoutFile();
+        $checkoutForm = $this->get('form.factory')
+            ->createNamedBuilder('checkout', CheckoutFileType::class, $checkoutFile)
             ->getForm();
         $barclaysFile = new BarclaysFile();
         $barclaysForm = $this->get('form.factory')
@@ -1190,6 +1274,24 @@ class AdminController extends BaseController
                     $data = $judoService->processCsv($judoFile);
 
                     $dm->persist($judoFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('n'),
+                    ]);
+                }
+            } elseif ($request->request->has('checkout')) {
+                $checkoutForm->handleRequest($request);
+                if ($checkoutForm->isSubmitted() && $checkoutForm->isValid()) {
+                    $dm = $this->getManager();
+                    $checkoutFile->setBucket(SoSure::S3_BUCKET_ADMIN);
+                    $checkoutFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $checkoutService = $this->get('app.checkout');
+                    $data = $checkoutService->processCsv($checkoutFile);
+
+                    $dm->persist($checkoutFile);
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
@@ -1291,27 +1393,39 @@ class AdminController extends BaseController
             }
         }
 
-        return [
+        $data = [
             'judoForm' => $judoForm->createView(),
+            'checkoutForm' => $checkoutForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
             'barclaysStatementForm' => $barclaysStatementForm->createView(),
             'lloydsForm' => $lloydsForm->createView(),
             'reconciliationForm' => $reconciliationForm->createView(),
             'cashflowsForm' => $cashflowsForm->createView(),
             'dates' => $this->getYMD($year, $month),
-            'lloyds' => $this->getLloydsBanking($date, $year, $month),
-            'barclays' => $this->getBarclaysBanking($date, $year, $month),
+            'salva' => $this->getSalvaBanking($date, $year, $month),
             'sosure' => $sosure,
             'reconciliation' => $this->getReconcilationBanking($date),
-            'salva' => $this->getSalvaBanking($date, $year, $month),
-            'judo' => $this->getJudoBanking($date, $year, $month),
-            'cashflows' => $this->getCashflowsBanking($date, $year, $month),
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
-            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
-            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
-            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
-            'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false),
+            'year' => $date->format('Y'),
+            'month' => $date->format('n'),
         ];
+
+        if ($request->get('_route') == 'admin_banking_card_date') {
+            $data['judo'] = $this->getJudoBanking($date, $year, $month);
+            $data['checkout'] = $this->getCheckoutBanking($date, $year, $month);
+        } elseif ($request->get('_route') == 'admin_banking_merchant_date') {
+            $data['cashflows'] = $this->getCashflowsBanking($date, $year, $month);
+            $data['barclays'] = $this->getBarclaysBanking($date, $year, $month);
+            $data['lloyds'] = $this->getLloydsBanking($date, $year, $month);
+        } elseif ($request->get('_route') == 'admin_banking_bacs_date') {
+            $data['lloyds'] = $this->getLloydsBanking($date, $year, $month);
+            $data['bacsInputFiles'] = $inputRepo->getMonthlyFiles($date);
+            $data['bacsAruddFiles'] = $aruddRepo->getMonthlyFiles($date);
+            $data['bacsDdicFiles'] = $ddicRepo->getMonthlyFiles($date);
+            $data['manualBacsPayments'] = Payment::sumPayments($manualBacsPayments, false);
+        }
+
+        return $data;
     }
 
     private function getYMD($year, $month, $daysInNextMonth = 3)
@@ -1405,9 +1519,14 @@ class AdminController extends BaseController
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd),
             'dailyShiftedTransaction' => Payment::dailyPayments($payments, $isProd, null, $tz),
             'dailyJudoTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
+            'dailyCheckoutTransaction' => Payment::dailyPayments($payments, $isProd, CheckoutPayment::class),
             'monthlyJudoTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'monthlyCheckoutTransaction' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
             'dailyJudoShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
+            'dailyCheckoutShiftedTransaction' =>
+                Payment::dailyPayments($payments, $isProd, CheckoutPayment::class, $tz),
             'monthlyJudoShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'monthlyCheckoutShiftedTransaction' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
             'dailyCreditBacsTransaction' => Payment::dailyPayments(
                 $extraCreditPayments,
                 $isProd,
@@ -1478,6 +1597,33 @@ class AdminController extends BaseController
         ];
 
         return $judo;
+    }
+
+    private function getCheckoutBanking(\DateTime $date, $year, $month)
+    {
+        $dm = $this->getManager();
+
+        /** @var CheckoutFileRepository $checkoutFileRepo */
+        $checkoutFileRepo = $dm->getRepository(CheckoutFile::class);
+
+        $monthlyCheckoutFiles = $checkoutFileRepo->getMonthlyFiles($date);
+        $monthlyPerDayCheckoutTransaction = CheckoutFile::combineDailyTransactions($monthlyCheckoutFiles);
+
+        $yearlyCheckoutFiles = $checkoutFileRepo->getYearlyFilesToDate($date);
+        $yearlyPerDayCheckoutTransaction = CheckoutFile::combineDailyTransactions($yearlyCheckoutFiles);
+
+        $allCheckoutFiles = $checkoutFileRepo->getAllFilesToDate($date);
+        $allCheckoutTransaction = CheckoutFile::combineDailyTransactions($allCheckoutFiles);
+
+        $checkout = [
+            'dailyTransaction' => $monthlyPerDayCheckoutTransaction,
+            'monthlyTransaction' => CheckoutFile::totalCombinedFiles($monthlyPerDayCheckoutTransaction, $year, $month),
+            'yearlyTransaction' => CheckoutFile::totalCombinedFiles($yearlyPerDayCheckoutTransaction),
+            'allTransaction' => CheckoutFile::totalCombinedFiles($allCheckoutTransaction),
+            'files' => $monthlyCheckoutFiles,
+        ];
+
+        return $checkout;
     }
 
     private function getSalvaBanking(\DateTime $date, $year, $month)

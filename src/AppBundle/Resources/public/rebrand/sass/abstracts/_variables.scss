@@ -52,8 +52,10 @@ $input-btn-padding-y:            .6rem;
 $input-color:                    $zaffre;
 
 $input-group-addon-color:        $white;
-$input-group-addon-bg:           $dodger-blue;
-$input-group-addon-border-color: $dodger-blue;
+$input-group-addon-bg:           $primary;
+$input-group-addon-border-color: $primary;
+
+$custom-file-button-color:       $white;
 
 // Dropdowns
 $dropdown-border-color:          $columbia-blue-e;
@@ -81,7 +83,7 @@ $hamburger-padding-y:            15px;
 $hamburger-layer-width:          25px;
 $hamburger-layer-height:         3px;
 $hamburger-layer-spacing:        5px;
-$hamburger-layer-color:          $columbia-blue-e;
+$hamburger-layer-color:          $white;
 $hamburger-layer-border-radius:  2px;
 
 // Carousel

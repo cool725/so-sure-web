@@ -88,17 +88,17 @@ class DefaultController extends BaseController
         $template = 'AppBundle:Default:index.html.twig';
 
         // A/B Homepage USPS test
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_USPS,
-            ['homepage', 'homepage-usps']
-        );
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_HOMEPAGE_USPS,
+        //     ['homepage', 'homepage-usps']
+        // );
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'exp'       => $exp,
+            // 'exp'       => $exp,
         );
 
         return $this->render($template, $data);
@@ -190,6 +190,25 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/snapchat-b", name="snapchat-b")
+     */
+    public function snapchatbLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'snapchat-b'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexSnapchatB.html.twig', $data);
+    }
+
+    /**
      * @Route("/twitter", name="twitter")
      */
     public function twitterLanding()
@@ -206,6 +225,44 @@ class DefaultController extends BaseController
         ];
 
         return $this->render('AppBundle:Default:indexTwitter.html.twig', $data);
+    }
+
+    /**
+     * @Route("/facebook", name="facebook")
+     */
+    public function facebookLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'facebook'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexFacebook.html.twig', $data);
+    }
+
+    /**
+     * @Route("/youtube", name="youtube")
+     */
+    public function youtubeLanding()
+    {
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+            'page' => 'youtube'
+        ]);
+
+        $data = [
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
+        ];
+
+        return $this->render('AppBundle:Default:indexYoutube.html.twig', $data);
     }
 
     private function competitorsData()

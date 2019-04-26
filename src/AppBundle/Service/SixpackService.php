@@ -37,7 +37,7 @@ class SixpackService
     // Exp 3
     // const EXPERIMENT_HOME_COMPARISON = 'home-comparison';
     // Exp 4
-    const EXPERIMENT_HOMEPAGE_USPS = 'homepage-usps';
+    // const EXPERIMENT_HOMEPAGE_USPS = 'homepage-usps';
     // Exp 5
     //
     // Exp 6
@@ -118,6 +118,7 @@ class SixpackService
         'ebay-landing-1',
         'ebay-landing-2',
         'home-comparison',
+        'homepage-usps',
     ];
 
     public static $unauthExperiments = [
@@ -129,7 +130,7 @@ class SixpackService
         // Exp 3
         // self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
-        self::EXPERIMENT_HOMEPAGE_USPS,
+        // self::EXPERIMENT_HOMEPAGE_USPS,
         // Exp 5
         //
         // Exp 6
@@ -217,7 +218,7 @@ class SixpackService
         // Exp 3
         // self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
-        self::EXPERIMENT_HOMEPAGE_USPS,
+        // self::EXPERIMENT_HOMEPAGE_USPS,
         // Exp 5
         //
         // Exp 6

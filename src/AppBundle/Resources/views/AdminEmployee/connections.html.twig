@@ -1,54 +1,76 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-connections' %}
+
+{% block title %}so-sure - Connections{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
-<div class="row">
-    <div class="col-md-8">
-        <h2>Connections</h2>
-    </div>
-    <div class="col-md-4">
-        <a href="{{ path('admin_connections_print')}}"><i class="fa fa-print fa-large" style="margin-top: 15px;"></i></a>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <table class="table table-striped">
-            <tr>
-                <th style="width: 10%">Policy Number</th>
-                <th>Policy Inception Date</th>
-                <th>Number of Connections</th>
-                <th>Connection Date 1</th>
-                <th>Connection Date 2</th>
-                <th>Connection Date 3</th>
-                <th>Connection Date 4</th>
-                <th>Connection Date 5</th>
-                <th>Connection Date 6</th>
-                <th>Connection Date 7</th>
-                <th>Connection Date 8</th>
-            </tr>
-            {% set total = 0 %}
-            {% for policy in data %}
-                {% set total = total + policy.connection_count %}
-                <tr>
-                    <td style="width: 10%" class="{% if policy.isCancelled %}bg-danger{% endif %}">
-                        <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a>
-                    </td>
-                    <td>{{ policy.date }}</td>
-                    <td>{{ policy.connection_count }}</td>
-                    {% for connection in policy.connections_details %}
-                        <td class="{% if connection.value == 0 %}bg-danger{% endif %}">{{ connection.date }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-            <tr></tr>
-            <tr>
-                <td><strong>Total</strong></td>
-                <td></td>
-                <td>{{ total }}</td>
-            </tr>
-        </table>
 
-    </div>
-</div>
-</div>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Connections</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a class="btn btn-info btn-square mr-md-2"
+                       target="_blank"
+                       href="{{ path('admin_connections_print')}}"
+                       rel="noopener noreferrer">
+                        <i class="fa fa-print fa-fw"></i></a>
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Policy Number</th>
+                            <th>Policy Inception Date</th>
+                            <th>Number of Connections</th>
+                            <th>Connection Date 1</th>
+                            <th>Connection Date 2</th>
+                            <th>Connection Date 3</th>
+                            <th>Connection Date 4</th>
+                            <th>Connection Date 5</th>
+                            <th>Connection Date 6</th>
+                            <th>Connection Date 7</th>
+                            <th>Connection Date 8</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set total = 0 %}
+                        {% for policy in data %}
+                            {% set total = total + policy.connection_count %}
+                            <tr>
+                                <td class="{% if policy.isCancelled %}table-danger{% endif %}">
+                                    <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a>
+                                </td>
+                                <td>{{ policy.date }}</td>
+                                <td align="middle">{{ policy.connection_count }}</td>
+                                {% for connection in policy.connections_details %}
+                                    <td class="{% if connection.value == 0 %}table-danger{% endif %}">{{ connection.date }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
 {% endblock %}
