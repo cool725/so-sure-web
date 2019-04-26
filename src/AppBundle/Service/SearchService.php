@@ -73,7 +73,11 @@ class SearchService
     public function searchPolicies()
     {
         if (empty($this->form->getNormData())) {
-            return $this->sortResults('current');
+            return $this->policyQb->sort('created', -1)
+                ->limit(50)
+                ->getQuery()
+                ->execute()
+                ->toArray();
         }
         $data = $this->form->getNormData();
         if (!array_key_exists('invalid', $data)) {
@@ -237,6 +241,10 @@ class SearchService
             });
         } else {
             $policies = $this->policyQb->getQuery()->execute()->toArray();
+            //Sort newer to older
+            usort($policies, function ($a, $b) {
+                return $a->getPolicyExpirationDate() < $b->getPolicyExpirationDate();
+            });
         }
         return $policies;
     }
