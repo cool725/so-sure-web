@@ -1078,7 +1078,6 @@ nelmio_security:
                 - https://t.co
                 - https://www.tagserve.com
                 - https://*.doubleclick.net
-                - https://*.googleadservices.com
                 - https://*.fbcdn.net
                 - https://*.vimeocdn.com
                 - https://*.linkedin.com
@@ -1089,7 +1088,6 @@ nelmio_security:
                 - https://chart.googleapis.com
                 - https://bat.bing.com
                 - https://www.googletagmanager.com
-                - https://www.googleadservices.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
