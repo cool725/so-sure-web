@@ -41,6 +41,7 @@ class AdminReportsCommand extends ContainerAwareCommand
             ->addOption('claims', null, InputOption::VALUE_NONE, "Run the 'claims' report")
             ->addOption('accounts', null, InputOption::VALUE_NONE, "Run the 'accounts' report")
             ->addOption('connections', null, InputOption::VALUE_NONE, "Run the 'connections' report")
+            ->addOption('pnl', null, InputOption::VALUE_NONE, 'Run the quarterly P&L report')
         ;
     }
 
@@ -60,6 +61,10 @@ class AdminReportsCommand extends ContainerAwareCommand
 
         if ($input->getOption('connections')) {
             $this->cacheConnectionsReport();
+        }
+
+        if ($input->getOption('pnl')) {
+            $this->cachePNLReport();
         }
     }
 
@@ -107,5 +112,11 @@ class AdminReportsCommand extends ContainerAwareCommand
         $this->reporting->getAllPaymentTotals($isProd, $twoMonths, false);
         $output->writeln(sprintf('Caching accounts for %s', $threeMonths->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $threeMonths, false);
+    }
+
+    private function cachePNLReport()
+    {
+        $date = new \DateTime();
+        $this->reporting->getQuarterlyPL($date);
     }
 }
