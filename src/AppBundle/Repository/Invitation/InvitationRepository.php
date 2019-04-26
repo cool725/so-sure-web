@@ -30,4 +30,16 @@ class InvitationRepository extends BaseDocumentRepository
             ->execute()
             ->count();
     }
+
+    /**
+     * Takes a policy and finds the policy that invited it to join if one does exist.
+     * @param Policy $policy is the policy to look into.
+     * @return Policy|null the inviter or null if there is no inviter.
+     */
+    public function getOwnInvitation($policy)
+    {
+        $query = $this->createQueryBuilder()
+            ->field('invitee')->references($policy->getUser())
+            ->getQuery()->getSingleResult();
+    }
 }

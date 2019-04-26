@@ -288,6 +288,8 @@ class BICommand extends ContainerAwareCommand
 
     private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
     {
+        /** @var InvitationRepository */
+        $invitationRepo = $this->dm->getRepository(Invitation::class);
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
@@ -337,11 +339,17 @@ class BICommand extends ContainerAwareCommand
             '"First time policy"',
             '"Successful Payment"',
             '"Bacs Mandate Cancelled Reason"',
-            '"Premium Installments"'
+            '"Premium Installments"',
+            '"Inviter"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $user = $policy->getUser();
+            $inviter = null;
+            $invitation = $invitationRepo->getOwnInvitation($policy);
+            if ($invitation) {
+                $inviter = $invitation->getPolicy();
+            }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
@@ -410,7 +418,8 @@ class BICommand extends ContainerAwareCommand
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() :
                         null
                 ),
-                sprintf('"%s"', $policy->getPremiumInstallments())
+                sprintf('"%s"', $policy->getPremiumInstallments()),
+                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : 'NO')
             ]);
         }
         if (!$skipS3) {
