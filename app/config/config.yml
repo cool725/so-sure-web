@@ -522,7 +522,6 @@ nelmio_security:
                 - https://www.linkedin.com
                 - https://angel.co
                 - https://www.bing.com
-                - fbrpc://call
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -763,7 +762,6 @@ nelmio_security:
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
                 - https://tr-shadow.snapchat.com
-                - fbrpc://
             script-src:
                 - 'self'
                 - 'unsafe-inline'
