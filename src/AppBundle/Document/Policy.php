@@ -2908,9 +2908,9 @@ abstract class Policy
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffPremiumRefund($skipValidate) + $offset;
+            return $this->getCooloffPremiumRefund($skipValidate) - $offset;
         } else {
-            return $this->getProratedPremiumRefund($this->getEnd()) + $offset;
+            return $this->getProratedPremiumRefund($this->getEnd()) - $offset;
         }
     }
 
