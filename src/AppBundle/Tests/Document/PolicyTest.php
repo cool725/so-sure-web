@@ -93,7 +93,7 @@ class PolicyTest extends WebTestCase
         $nNonRefunds = rand(5, 50);
         $nRefunds = rand(5, 50);
         $nonRefundAmount = rand(0, 100) / 90;
-        $refundAmount = rand(0, 100) / 90;
+        $refundAmount = rand(-100, -1) / 90;
         $date = new \DateTime();
         $policy = self::createUserPolicy(
             true,
@@ -119,6 +119,6 @@ class PolicyTest extends WebTestCase
             $policy->addScheduledPayment($scheduledPayment);
         }
         // Now check if it works.
-        $this->assertEquals(-1 * $nRefunds * $refundAmount, $policy->getScheduledPaymentRefundAmount());
+        $this->assertEquals(abs($nRefunds * $refundAmount), $policy->getScheduledPaymentRefundAmount());
     }
 }
