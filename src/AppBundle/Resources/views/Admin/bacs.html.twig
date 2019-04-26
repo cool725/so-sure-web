@@ -1,86 +1,108 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme uploadCreditForm with ['AppBundle:Form:fields.html.twig'] %}
+{% form_theme uploadDebitForm with ['AppBundle:Form:fields.html.twig'] %}
+{% form_theme approvePaymentsForm with ['AppBundle:Form:fields.html.twig'] %}
+{% form_theme uploadForm with ['AppBundle:Form:fields.html.twig'] %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        'components/datatables.net-bs/dataTables.bootstrap.min.css'
-        '@AppBundle/Resources/public/sass/page/admin.scss'
-    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
+{# Set vars #}
+{% set body_class = 'admin-bacs' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        'components/datatables.net/jquery.dataTables.min.js'
-        'components/datatables.net-bs/dataTables.bootstrap.min.js'
-        '@AppBundle/Resources/public/js/Admin/month.js'
-        '@AppBundle/Resources/public/js/Admin/bacs.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{% block title %}so-sure - Bacs{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
 {% endblock %}
 
 {% block body %}
-<div class="container" style="margin-bottom: 50px">
 
-    <div class="row">
-        <div class="col-md-4">
-            <h1>so-sure Bacs <br> {{ month }} / {{ year }}</h1>
-        </div>
-        <form class="month-form form-inline" method="POST" autocomplete="off">
-            <div class="col-md-3">
-                <div class="form-group">
-                    <div class="input-group date month" data-url="{{ path('admin_bacs') }}">
-                        <input name="bacs" type='text' class="form-control" value="{{month}}-{{year}}" />
-                        <span class="input-group-addon">
-                            <span class="fa fa-calendar"></span>
-                        </span>
-                    </div>
-                    <div class="input-group">
-                        <div class="input-group-btn">
-                            <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Bacs {{ month }} / {{ year }}</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter  mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="POST"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-2">Choose date:</label>
+                            <div class="input-group date mr-2 mb-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_bacs') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-square mr-2 mb-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-warning btn-square bacs-serial-edit mr-2 mb-2"
+                                    type="button"
+                                    title="Current Sequence File"
+                                    data-toggle="modal"
+                                    data-target="#edit_sequence_serial_number_modal">
+                                    Sequence ({{ currentSequence.seq }})</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    title="Actionable Mandates"
+                                    data-toggle="modal"
+                                    data-target="#mandates_modal">
+                                    Mandates ({{ outstandingMandates }})</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    title="Bacs Credit"
+                                    data-toggle="modal"
+                                    data-target="#upload_credit_modal">
+                                    Bacs Credit</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    title="Bacs Debit"
+                                    data-toggle="modal"
+                                    data-target="#upload_debit_modal">
+                                    Bacs Debit</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    title="Bacs Debit"
+                                    data-toggle="modal"
+                                    data-target="#approve_payments_modal">
+                                    Approve Payments</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    title="Upload Report"
+                                    data-toggle="modal"
+                                    data-target="#upload_modal">
+                                    <i class="fas fa-file-upload fa-fw"></i> Upload Report</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="col-md-5">
-                <div class="form-group">
-                    <div class="btn-group">
-                        <button type="button"
-                                class="btn btn-primary dropdown-toggle"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false">
-                            Page actions <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" data-toggle="modal" data-target="#uploadModal">Upload Report</a></li>
-                            <li><a href="#" data-toggle="modal" data-target="#approvePaymentsModal">Approve Payments</a></li>
-                            <li><a href="#" data-toggle="modal" data-target="#uploadDebitModal">Bacs Debit</a></li>
-                            <li><a href="#" data-toggle="modal" data-target="#uploadCreditModal">Bacs Credit</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments">Payments</a></li>
-                            <li><a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports">Bacs Report</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button class="btn btn-warning bacs-serial-edit" type="button"
-                            data-toggle="modal" data-target="#editSequenceSerialNumberModal">
-                        <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
-                    </button>
-                </div>
-                <div class="form-group">
-                    <div class="form-group">
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
-                        > Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div id="claimPolicyItem" style="margin-top: 20px">
-        <ul class="nav nav-tabs nav-justified" role="tablist">
+
             {% set dailyCount = 0 %}
             {% for file in files %}
                 {% if not file.isActioned %}
@@ -98,265 +120,333 @@
                 {% set paymentsCount = '?' %}
             {% endif %}
 
-            <li role="presentation"
-                class="{% if not payments is defined and not input is defined %}active{% endif %}">
-                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#dddc"
-                   role="tab"
-                   data-toggle="tab"
-                   aria-controls="dddc">
-                    Debits/Credits
-                    <span class="badge" title="Actionable Files">{{ dailyCount }}</span>
-                </a>
-            </li>
-            <li role="presentation"
-                class="{% if payments is defined %}active{% endif %}">
-                <a href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}#payments"
-                   role="tab"
-                   data-toggle="tab"
-                   aria-controls="payments">
-                    Payments
-                    <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span>
-                </a>
-            </li>
-            <li role="presentation"
-                class="{% if input is defined %}active{% endif %}">
-                <a href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}#reports"
-                   role="tab"
-                   data-toggle="tab"
-                   aria-controls="reports">
-                    Bacs Reports
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-debit"
-                   role="tab"
-                   data-toggle="tab"
-                   aria-controls="reconciliation-debit">
-                    Reconciliation Debit
-                </a>
-            </li>
-            <li role="presentation">
-                <a href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}#reconciliation-credit"
-                   role="tab"
-                   data-toggle="tab"
-                   aria-controls="reconciliation-credit">
-                    Reconciliation Credit
-                </a>
-            </li>
-        </ul>
-        <div class="tab-content">
-            <div role="tabpanel"
-                 class="tab-pane {% if not payments is defined and not input is defined %}active{% endif %}"
-                 id="dddc">
-                {% if files is defined %}
+            <ul class="nav nav-tabs mb-5"
+                id="bacs_tabs"
+                role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {% if not payments is defined and not input is defined %}active{% endif %}"
+                       id="direct_debits_credits_tab"
+                       {# data-toggle="tab" #}
+                       {# href="#direct_debits_credits_content" #}
+                       href="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}"
+                       role="tab"
+                       aria-controls="direct_debits_credits_content"
+                       aria-selected="{% if not payments is defined and not input is defined %}true{% else %}false{% endif %}">
+                        Debits/Credits ({{ dailyCount }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if payments is defined %}active{% endif %}"
+                       id="payments_tab"
+                       {# data-toggle="tab" #}
+                       {# href="#payments_content" #}
+                       href="{{ path('admin_bacs_payments', {'year': year, 'month': month}) }}"
+                       role="tab"
+                       aria-controls="payments_content"
+                       aria-selected="{% if payments is defined %}true{% else %}false{% endif %}">
+                        Payments ({{ paymentsCount }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if input is defined %}active{% endif %}"
+                       id="bacs_report_tab"
+                       {# data-toggle="tab" #}
+                       {# href="#bacs_report_content" #}
+                       href="{{ path('admin_bacs_reports', {'year': year, 'month': month}) }}"
+                       role="tab"
+                       aria-controls="bacs_report_content"
+                       aria-selected="{% if input is defined %}false{% else %}true{% endif %}">
+                        Bacs Reports
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="reconciliation_debit_tab"
+                       data-toggle="tab"
+                       href="#reconciliation_debit_content"
+                       data-url="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}"
+                       role="tab"
+                       aria-controls="reconciliation_debit_content"
+                       aria-selected="false">
+                        Reconciliation Debit
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="reconciliation_credit_tab"
+                       data-toggle="tab"
+                       href="#reconciliation_credit_content"
+                       data-url="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}"
+                       role="tab"
+                       aria-controls="reconciliation_credit_content"
+                       aria-selected="false">
+                        Reconciliation Credit
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="bacs_tabs_content">
+                <div class="tab-pane fade {% if not payments is defined and not input is defined %}show active{% endif %}"
+                     id="checkout_content"
+                     role="tabpanel"
+                     aria-labelledby="checkout_tab">
                     {% include 'AppBundle::Admin/bacs/dddc.html.twig' %}
-                {% endif %}
-            </div>
-            <div role="tabpanel"
-                 class="tab-pane {% if payments is defined %}active{% endif %}"
-                 id="payments">
-                {% if payments is defined %}
-                    {% include 'AppBundle::Admin/bacs/indemnity.html.twig' %}
+                </div>
+                <div class="tab-pane fade {% if payments is defined %}show active{% endif %}"
+                     id="payments_content"
+                     role="tabpanel"
+                     aria-labelledby="payments_tab">
                     {% include 'AppBundle::Admin/bacs/payments.html.twig' %}
-                {% else %}
-                    <h4>Use temp link in page actions 👆</h4>
-                {% endif %}
-            </div>
-            <div role="tabpanel"
-                 class="tab-pane {% if input is defined %}active{% endif %}"
-                 id="reports">
-                {% if input is defined %}
+                    {% include 'AppBundle::Admin/bacs/indemnity.html.twig' %}
+                </div>
+                <div class="tab-pane fade {% if input is defined %}show active{% endif %}"
+                     id="bacs_report_content"
+                     role="tabpanel"
+                     aria-labelledby="bacs_report_tab">
                     {% include 'AppBundle::Admin/bacs/reports.html.twig' %}
-                {% else %}
-                    <h4>Use temp link in page actions 👆</h4>
-                {% endif %}
-            </div>
-            <div role="tabpanel"
-                 class="tab-pane"
-                 id="reconciliation-debit">
-                {% if files is defined %}
+                </div>
+                <div class="tab-pane fade"
+                     id="reconciliation_debit_content"
+                     role="tabpanel"
+                     aria-labelledby="reconciliation_debit_tab">
                     {% include 'AppBundle::Admin/bacs/reconciliation_debit.html.twig' %}
-                {% endif %}
-            </div>
-            <div role="tabpanel"
-                 class="tab-pane"
-                 id="reconciliation-credit">
-                {% if files is defined %}
+                </div>
+                <div class="tab-pane fade"
+                     id="reconciliation_credit_content"
+                     role="tabpanel"
+                     aria-labelledby="reconciliation_credit_tab">
                     {% include 'AppBundle::Admin/bacs/reconciliation_credit.html.twig' %}
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-
-    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Bacs Report Upload</h4>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(uploadForm) }}
-                    <div class="form-group">
-                        {{ form_label(uploadForm.file, 'File') }}
-                        {{ form_errors(uploadForm.file) }}
-                        {{ form_widget(uploadForm.file) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(uploadForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
-                    </div>
-                    {{ form_end(uploadForm) }}
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="modal fade" id="uploadDebitModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+            {# TODO: Content area #}
+
+        </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="mandates_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="mandates_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Bacs Debit (Payments from Customers) File Upload</h4>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(uploadDebitForm) }}
-                    <div class="form-group">
-                        {{ form_label(uploadDebitForm.file, 'File') }}
-                        {{ form_errors(uploadDebitForm.file) }}
-                        {{ form_widget(uploadDebitForm.file) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(uploadDebitForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
-                    </div>
-                    {{ form_end(uploadDebitForm) }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="uploadCreditModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Bacs Credit (Refunds to Customers) File Upload</h4>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(uploadCreditForm) }}
-                    <div class="form-group">
-                        {{ form_label(uploadCreditForm.file, 'File') }}
-                        {{ form_errors(uploadCreditForm.file) }}
-                        {{ form_widget(uploadCreditForm.file) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(uploadCreditForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
-                    </div>
-                    {{ form_end(uploadCreditForm) }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="mandatesModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Approve Mandates</h4>
+                    <h5 class="modal-title">Approve Mandates</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {{ form_start(mandatesForm) }}
-                    <div class="form-group">
-                        {{ form_label(mandatesForm.serialNumber, 'Serial number') }}
-                        {{ form_errors(mandatesForm.serialNumber) }}
-                        {{ form_widget(mandatesForm.serialNumber) }}
-                    </div>
-                    <div class="form-group">
-                        {{ form_widget(mandatesForm.approve, {'label': 'Approve', 'attr': {'class': 'btn btn-success'}}) }}
-                    </div>
+                        <div class="form-group">
+                            {{ form_label(mandatesForm.serialNumber, 'Serial number') }}
+                            {{ form_widget(mandatesForm.serialNumber, {'attr':{'class':'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(mandatesForm.serialNumber) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(mandatesForm.approve, {'label': 'Approve', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
                     {{ form_end(mandatesForm) }}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="editSerialNumberModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade"
+         id="edit_sequence_serial_number_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="edit_sequence_serial_number_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Edit Serial Number</h4>
-                </div>
-                <div class="modal-body">
-                    <form id="editSerialNumberForm" method="post">
-                        <input type="text" id="editSerialNumber" name="serialNumber">
-                        <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                        <button type="submit" class="btn btn-success">Update Serial Number</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="editSequenceSerialNumberModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Edit Sequence Serial Number</h4>
+                    <h5 class="modal-title">Edit Sequence Serial Number</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {{ form_start(sequenceForm) }}
-                    {{ form_widget(sequenceForm.seq) }}
-                    {{ form_widget(sequenceForm.update, {'attr': {'class': 'btn btn-success'}}) }}
+                        <div class="form-group">
+                            {{ form_widget(sequenceForm.seq, {'attr':{'class':'form-control'}}) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(sequenceForm.update, {'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
                     {{ form_end(sequenceForm) }}
                 </div>
             </div>
         </div>
     </div>
 
-
-    <div class="modal fade" id="serialNumberModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document" style="width: 60%;">
+    <div class="modal fade"
+         id="upload_credit_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="upload_credit_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form id="phone-update-form" class="form-horizontal" method="post">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="exampleModalLabel">Loading</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div id="serial-details-wrapper">
-                            {# <table id="serial-details" width="100%" cellspacing="0" class="table-striped"></table> #}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-<div class="modal fade" id="approvePaymentsModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Approve all payments ( reversed date <= today ) </h4>
-            </div>
-            <div class="modal-body">
-                {{ form_start(approvePaymentsForm) }}
-                <div class="form-group">
-                    <p>ARUDD File(s) for today have been upload (or are not present) {{ form_widget(approvePaymentsForm.confirm) }}</p>
-
-                    {{ form_widget(approvePaymentsForm.approve, {'label': 'Approve All Payments', 'attr': {'class': 'btn btn-success'}}) }}
+                <div class="modal-header">
+                    <h5 class="modal-title">Bacs Credit File Upload <small>(Refunds to Customers)</small></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
-                {{ form_end(approvePaymentsForm) }}
+                <div class="modal-body">
+                    {{ form_start(uploadCreditForm) }}
+                        <div class="form-group">
+                            {{ form_label(uploadCreditForm.file, 'File') }}
+                            {{ form_widget(uploadCreditForm.file) }}
+                            <div class="with-errors">{{ form_errors(uploadCreditForm.file) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(uploadCreditForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger btn-square'}}) }}
+                        </div>
+                    {{ form_end(uploadCreditForm) }}
+                </div>
             </div>
         </div>
     </div>
-</div>
 
+    <div class="modal fade"
+         id="upload_debit_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="upload_debit_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bacs Debit File Upload <small>(Payments from Customers) </small></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(uploadDebitForm) }}
+                        <div class="form-group">
+                            {{ form_label(uploadDebitForm.file, 'File') }}
+                            {{ form_widget(uploadDebitForm.file) }}
+                            <div class="with-errors">{{ form_errors(uploadCreditForm.file) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(uploadDebitForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger btn-square'}}) }}
+                        </div>
+                    {{ form_end(uploadDebitForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="approve_payments_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="approve_payments_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Approve all payments <small>(Reversed date <= today) </small></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(approvePaymentsForm) }}
+                        <div class="form-group">
+                            {{ form_widget(approvePaymentsForm.confirm, {
+                                'label': 'ARUDD File(s) for today have been upload (or are not present)',
+                                'attr': {'class':'custom-control-input'}}) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(approvePaymentsForm.approve, {'label': 'Approve All Payments', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(approvePaymentsForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="upload_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="upload_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bacs Report Upload</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(uploadForm) }}
+                        <div class="form-group">
+                            {{ form_label(uploadForm.file, 'File') }}
+                            {{ form_widget(uploadForm.file) }}
+                            <div class="with-errors">{{ form_errors(uploadForm.file) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(uploadForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(uploadForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade modal-fullscreen"
+         id="serial_number_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="serial_number_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-dialog" role="document">
+            <div class="modal-content modal-fullscreen-content">
+                <div class="modal-header modal-fullscreen-header">
+                    <h5 class="modal-title h3 text-zaffre">Loading</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times fa-lg fa-fw text-primary"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-fullscreen-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="edit_serial_number_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="edit_serial_number_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Serial Numbering</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit_serial_number_form" method="post">
+                        <div class="form-group">
+                            <input type="text" id="edit_serial_number" class="form-control" name="serialNumber">
+                            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success btn-square">Update Serial Number</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
+    <script src="{{ asset('css-js/bacs.js') }}"></script>
 {% endblock %}
