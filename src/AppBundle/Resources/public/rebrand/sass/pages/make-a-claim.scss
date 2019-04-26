@@ -64,18 +64,14 @@
 
 .cred {
     text-align: center;
-    background-color: $ultramarine;
-    position: relative;
-    z-index: 5;
+    background-color: darken($pattens-blue, 5%);
 
     img {
         width: 100px;
-        margin: 0.5rem;
-        // opacity: 0.3;
+        opacity: 0.3;
 
         @include media-breakpoint-up(lg) {
             width: 120px;
-            margin: 0;
         }
     }
 }

@@ -1,112 +1,128 @@
-<div class="row">
-    <div class="col-sm-4">
-        <h2>Payments</h2>
-    </div>
-    <div class="col-sm-8">
+<h3 class="mb-4">Payments</h3>
 
-    </div>
-</div>
-{% if payments|length == 0 %}
-    <p>No payments present</p>
-{% else %}
-    {% set serial = '' %}
-    {% for payment in payments if payment.serialNumber and payment.submittedDate %}
-        {% if serial != payment.serialNumber %}
-            {% if serial != '' %}</table>{% endif %}
-            <h4>
-                {% if payment.serialNumber %}
-                    <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ payment.serialNumber }}"
-                       data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': payment.serialNumber} ) }}">
+{% if payments is defined %}
+    {% if payments|length == 0 %}
+        <p class="mb-5">No files present</p>
+    {% else %}
+        {% set serial = '' %}
+        {% for payment in payments if payment.serialNumber and payment.submittedDate %}
+             {% if serial != payment.serialNumber %}
+                {% if serial != '' %}</table></div>{% endif %}
+                <h4>
+                    {% if payment.serialNumber %}
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#serial_number_modal"
+                           data-serial="{{ payment.serialNumber }}"
+                           data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': payment.serialNumber} ) }}">
+                            {{ payment.serialNumber }}</a>
+                    {% else %}
                         {{ payment.serialNumber }}
-                    </a>
-                {% else %}
-                    {{ payment.serialNumber }}
-                {% endif %}
-                {% for file in files %}
-                    {% if file.serialNumber == payment.serialNumber %}
-                        (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
                     {% endif %}
-                {% endfor %}
-            </h4>
-            <table class="table table-striped">
-            <tr>
-                <th width="10%">Status</th>
-                <th width="20%">Policy</th>
-                <th width="5%">Amount</th>
-                <th width="15%">Submitted Date</th>
-                <th width="15%">Bacs Credit Date</th>
-                <th width="15%">Bacs Reversed Date</th>
-                <th width="20%">Actions</th>
-            </tr>
-        {% endif %}
-        <tr>
-            <td width="10%">
-                {{ payment.status }}
-                {% if payment.success %}
-                    <i class="fa fa-check text-success"></i>
-                {% elseif payment.success is null %}
-                    <i class="fa fa-question"></i>
-                {% else %}
-                    <i class="fa fa-minus text-danger"></i>
+                    {% for file in files %}
+                        {% if file.serialNumber == payment.serialNumber %}
+                            <small>(Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})</small>
+                        {% endif %}
+                    {% endfor %}
+                </h4>
+                <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Status</th>
+                                <th>Policy</th>
+                                <th>Amount</th>
+                                <th>Submitted Date</th>
+                                <th>Bacs Credit Date</th>
+                                <th>Bacs Reversed Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
                 {% endif %}
-            </td>
-            <td width="20%">
-                <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.user.name }}</a>
-            </td>
-            <td width="5%">
-                £{{ payment.amount|number_format(2, '.', ',') }}
-            </td>
-            <td width="15%">
-                {% if payment.submittedDate %}
-                    {{ payment.submittedDate|date('d M Y', 'Europe/London') }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td width="15%">
-                {% if payment.bacsCreditDate %}
-                    {{ payment.bacsCreditDate|date('d M Y', 'Europe/London') }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td width="15%">
-                {% if payment.bacsReversedDate %}
-                    {{ payment.bacsReversedDate|date('d M Y', 'Europe/London') }}
-                {% else %}
-                    -
-                {% endif %}
-            </td>
-            <td width="20%">
-                {% set can_action = false %}
-                {% if payment.canAction('approve') %}
-                    <button title="Mark as approved" type="button" class="btn btn-success bacs-approve" data-token="{{ csrf_token('default') }}"
-                            data-bacs-approve-url="{{ path('admin_bacs_payment_approve', {'id': payment.id}) }}">Approve</button>
-                    {% set can_action = true %}
-                {% endif %}
-                {% if payment.canAction('reject') %}
-                    <button title="Mark as rejected" type="button" class="btn btn-danger bacs-reject" data-token="{{ csrf_token('default') }}"
-                            data-bacs-reject-url="{{ path('admin_bacs_payment_reject', {'id': payment.id}) }}">Reject</button>
-                    {% set can_action = true %}
-                {% endif %}
+                <tbody>
+                    <tr>
+                        <td>
+                            {{ payment.status }}
+                            {% if payment.success %}
+                                <i class="fas fa-check fa-fw text-success"></i>
+                            {% elseif payment.success is null %}
+                                <i class="fas fa-question fa-fw text-primary"></i>
+                            {% else %}
+                                <i class="fas fa-minus fa-fw text-danger"></i>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.user.name }}</a>
+                        </td>
+                        <td>
+                            &pound;{{ payment.amount|number_format(2, '.', ',') }}
+                        </td>
+                        <td>
+                            {% if payment.submittedDate %}
+                                {{ payment.submittedDate|date('d M Y', 'Europe/London') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if payment.bacsCreditDate %}
+                                {{ payment.bacsCreditDate|date('d M Y', 'Europe/London') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if payment.bacsReversedDate %}
+                                {{ payment.bacsReversedDate|date('d M Y', 'Europe/London') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set can_action = false %}
+                            {% if payment.canAction('approve') %}
+                                <button title="Mark as approved"
+                                        type="button"
+                                        class="btn btn-success btn-square btn-sm mb-1 mr-md-2 bacs-approve"
+                                        data-token="{{ csrf_token('default') }}"
+                                        data-bacs-approve-url="{{ path('admin_bacs_payment_approve', {'id': payment.id}) }}">
+                                        Approve</button>
+                                {% set can_action = true %}
+                            {% endif %}
+                            {% if payment.canAction('reject') %}
+                                <button title="Mark as rejected"
+                                        type="button"
+                                        class="btn btn-danger btn-square btn-sm mb-1 mr-md-2 bacs-reject"
+                                        data-token="{{ csrf_token('default') }}"
+                                        data-bacs-reject-url="{{ path('admin_bacs_payment_reject', {'id': payment.id}) }}">
+                                        Reject</button>
+                                {% set can_action = true %}
+                            {% endif %}
 
-                {% if can_action %}
-                    {# nothing to do #}
-                {% elseif not payment.inProgress %}
-                    Already actioned
-                {% else %}
-                    Wait
-                {% endif %}
-                {% if payment.inProgress %}
-                    <button title="Edit Serial" type="button" class="btn btn-warning bacs-serial"
-                            data-token="{{ csrf_token('default') }}"
-                            data-serial-number="{{ payment.serialNumber }}"
-                            data-serial-number-url="{{ path('admin_bacs_payment_serial', {'id': payment.id}) }}"
-                            data-toggle="modal" data-target="#editSerialNumberModal">Edit Serial</button>
-                {% endif %}
-            </td>
-        </tr>
-        {% set serial = payment.serialNumber %}
-    {% endfor %}
-    </table>
+                            {% if can_action %}
+                                {# nothing to do #}
+                            {% elseif not payment.inProgress %}
+                                Already actioned
+                            {% else %}
+                                Wait
+                            {% endif %}
+                            {% if payment.inProgress %}
+                                <button title="Edit Serial"
+                                        type="button"
+                                        class="btn btn-warning btn-square btn-sm mb-1 mr-md-2 bacs-serial"
+                                        data-token="{{ csrf_token('default') }}"
+                                        data-serial-number="{{ payment.serialNumber }}"
+                                        data-serial-number-url="{{ path('admin_bacs_payment_serial', {'id': payment.id}) }}"
+                                        data-toggle="modal"
+                                        data-target="#edit_serial_number_modal">
+                                        Edit Serial</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+                {% set serial = payment.serialNumber %}
+            {% endfor %}
+            </table>
+        </div>
+    {% endif %}
 {% endif %}

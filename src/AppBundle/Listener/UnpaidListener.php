@@ -58,7 +58,7 @@ class UnpaidListener
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $failedPayments = $scheduledPaymentRepo->countUnpaidScheduledPayments($policy);
         $nextScheduledPayment = null;
-        if ($failedPayments <= 3) {
+        if ($failedPayments <= 3 && $event->getCanRetry()) {
             /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayment = $scheduledPaymentRepo->mostRecentWithStatuses(
                 $policy,
@@ -85,14 +85,12 @@ class UnpaidListener
         if ($number < 1 || $number > 4) {
             return;
         }
-
         $baseTemplate = $this->selectBaseEmail($policy);
         if (!$baseTemplate) {
             return;
         }
         $htmlTemplate = sprintf("AppBundle:Email:%s-%d.html.twig", $baseTemplate, $number);
         $textTemplate = sprintf("AppBundle:Email:%s-%d.txt.twig", $baseTemplate, $number);
-
         $subject = sprintf("Payment failure for your so-sure policy %s", $policy->getPolicyNumber());
         $this->mailerService->sendTemplateToUser(
             $subject,

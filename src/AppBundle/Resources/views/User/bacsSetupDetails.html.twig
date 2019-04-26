@@ -50,7 +50,7 @@
         {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'e.g. 83748596', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
     </div>
-
+    
     <div class="form-group {% if form_errors(bacs_form.validateAccountNumber) %}has-error{% endif %}">
         {{ form_label(bacs_form.validateAccountNumber, 'Confirm account number', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="bacs_form[accountNumber]" class="text-secondary">
@@ -67,6 +67,23 @@
         {{ form_widget(bacs_form.validateAccountNumber, {'attr': {'placeholder': '👆', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.validateAccountNumber) }}</div>
     </div>
+    
+    <div class="form-group {% if form_errors(bacs_form.billingDate) %}has-error{% endif %}">
+        {{ form_label(bacs_form.billingDate, 'Billing date', { 'label_attr': {'class': 'sr-only'} }) }}
+        <label for="bacs_form[accountNumber]" class="text-secondary">
+            Billing date
+            <span class="ml-2 text-dodger-blue">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#billing_date"
+                   role="button">
+                    <i class="fal fa-info-circle"></i>
+                </a>
+            </span>
+        </label>
+        {{ form_widget(bacs_form.billingDate, {'attr': {'class': 'form-control', 'data-hj-suppress': ''}}) }}
+        <div class="with-errors">{{ form_errors(bacs_form.billingDate) }}</div>
+    </div>    
 
     <div class="form-group">
         {{ form_widget(bacs_form.soleSignature, {

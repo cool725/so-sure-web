@@ -645,7 +645,14 @@ class PurchaseController extends BaseController
                     $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
                 } elseif ($bacsConfirmForm->isValid()) {
                     $identityLog = $this->getIdentityLogWeb($request);
-                    $policyService->create($policy, null, true, null, $identityLog);
+                    $policyService->create(
+                        $policy,
+                        null,
+                        true,
+                        null,
+                        $identityLog,
+                        $bacsConfirm->getCalculatedBillingDate()
+                    );
                     $paymentService->confirmBacs(
                         $policy,
                         $bacsConfirm->transformBacsPaymentMethod($identityLog)
@@ -683,6 +690,7 @@ class PurchaseController extends BaseController
         }
 
         $phone = $policy->getPhone();
+        $billingDate = $this->addDays($this->startOfMonth(new \DateTime()), $bacs->getBillingDate());
 
         $data = array(
             'phone' => $phone,
@@ -1586,7 +1594,7 @@ class PurchaseController extends BaseController
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
             } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown error');
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown Error');
             }
         }
     }

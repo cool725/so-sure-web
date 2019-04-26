@@ -1,762 +1,919 @@
-{% extends 'admin_claims_base.html.twig' %}
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig', 'AppBundle:Form:inline-choice.html.twig'] %}
 
-{% macro display_actions(phone) %}
-  <button title="Alternatives" type="button" class="btn {% if phone.suggestedReplacement %}btn-info{% elseif phone.replacementPrice > 0 %}btn-info{% else %}btn-primary{% endif %}" data-toggle="modal" data-target="#alternativeModal"
-      data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': phone.id}) }}{% endif %}"
-      data-phone="{{ phone.toAlternativeArray()|json_encode }}"
-      {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}
-      ><i class="fa fa-book"></i></button>
-  <button title="Add Pricing" type="button" class="btn btn-primary" data-toggle="modal" data-target="#phoneModal"
-      data-update="{{ path('admin_phone_price', {'id': phone.id}) }}"
-      data-ipt-rate="{{ phone.currentIptRate }}"
-      data-salva-standard="{{ phone.getSalvaBinderMonthlyPremium }}"
-      data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
-      data-phone="{{ phone.toPriceArray()|json_encode }}"><i class="fa fa-gbp"></i></button>
-  <button title="Edit Phone Details" type="button" class="btn {% if phone.description|length > 0 or phone.funFacts|length > 0 %}btn-primary{% else %}btn-info{% endif %}" data-toggle="modal" data-target="#detailsModal"
-      data-update="{{ path('admin_phone_details', {'id': phone.id}) }}"
-      data-phone="{{ phone.toDetailsArray()|json_encode }}"><i class="fa fa-pencil"></i></button>
-  <button title="Deactive Phone" type="button" class="btn btn-warning phone-active" data-token="{{ csrf_token('default') }}"
-          data-active="{{ path('admin_phone_active', {'id': phone.id}) }}"><i class="fa fa-power-off"></i></button>
-  <button title="(Un)Highlight Phone" type="button" class="btn {% if phone.highlight %}btn-danger{% else %}btn-warning{% endif %} phone-highlight" data-token="{{ csrf_token('default') }}"
-          data-highlight="{{ path('admin_phone_highlight', {'id': phone.id}) }}"><i class="fa fa-flash"></i></button>
-  <button title="Notify users there will be a delay with claims due to the phone being new and in high demand" type="button"
-          class="btn {% if phone.isNewHighDemand %}btn-danger{% else %}btn-warning{% endif %} phone-newhighdemand" data-token="{{ csrf_token('default') }}"
-          data-newhighdemand="{{ path('admin_phone_newhighdemand', {'id': phone.id}) }}">
-        <i class="fa fa-gift"></i></button>
-{% endmacro display_actions %}
+{# Set vars #}
+{% set body_class = 'admin-phones' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    'components/datatables.net-bs/dataTables.bootstrap.min.css'
-    '@AppBundle/Resources/public/sass/page/admin.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        'components/datatables.net/jquery.dataTables.min.js'
-        'components/datatables.net-bs/dataTables.bootstrap.min.js'
-        '@AppBundle/Resources/public/js/tabs.js'
-        '@AppBundle/Resources/public/js/AdminEmployee/phone.js'
-        '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-{% endblock %}
+{# Macros #}
+{% macro phoneActions(phone) %}
+    {# Alernative #}
+    <button title="Alternatives"
+            type="button"
+            class="btn btn-primary btn-square btn-sm mb-2 mr-2 {% if phone.replacementPrice > 0 %}disabled{% endif %}"
+            data-toggle="modal"
+            data-target="#alternative_modal"
+            data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': phone.id}) }}{% endif %}"
+            data-phone="{{ phone.toAlternativeArray()|json_encode }}"
+            {% if phone.replacementPrice > 0 %}disabled="disabled"{% endif %}>
+        <i class="fal fa-mobile fa-fw"></i></i></button>
+    {# Pricing #}
+    <button title="Add Pricing"
+            type="button"
+            class="btn btn-primary btn-square btn-sm mb-2 mr-2 "
+            data-toggle="modal"
+            data-target="#phone_modal"
+            data-update="{{ path('admin_phone_price', {'id': phone.id}) }}"
+            data-ipt-rate="{{ phone.currentIptRate }}"
+            data-salva-standard="{{ phone.getSalvaBinderMonthlyPremium }}"
+            data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
+            data-phone="{{ phone.toPriceArray()|json_encode }}">
+        <i class="far fa-pound-sign fa-fw"></i></button>
+    {# Edit Phone Details #}
+    <button title="Edit Phone Details"
+            type="button"
+            class="btn btn-primary btn-square btn-sm mb-2 mr-2"
+            data-toggle="modal"
+            data-target="#details_modal"
+            data-update="{{ path('admin_phone_details', {'id': phone.id}) }}"
+            data-phone="{{ phone.toDetailsArray()|json_encode }}">
+        <i class="far fa-pencil fa-fw"></i></button>
+    {# Highlight Device #}
+    <button title="{% if phone.highlight %}Highlight Phone{% else %}Un-highlight Phone{% endif %} "
+            type="button"
+            class="btn btn-square btn-sm mb-2 mr-2 {% if phone.highlight %}btn-primary{% else %}btn-warning{% endif %} phone-highlight"
+            data-token="{{ csrf_token('default') }}"
+            data-highlight="{{ path('admin_phone_highlight', {'id': phone.id}) }}">
+        <i class="fas fa-highlighter fa-fw"></i></button>
+    <button title="Notify users there will be a delay with claims due to the phone being new and in high demand"
+            type="button"
+            class="btn btn-square btn-sm mb-2 mr-2 {% if phone.isNewHighDemand %}btn-warning{% else %}btn-primary{% endif %} phone-newhighdemand"
+            data-token="{{ csrf_token('default') }}"
+            data-newhighdemand="{{ path('admin_phone_newhighdemand', {'id': phone.id}) }}">
+        <i class="far fa-chart-line fa-fw"></i></button>
+    {# Deactivate Phone #}
+    <button title="Deactive Phone"
+            type="button"
+            class="btn btn-warning btn-square btn-sm mb-2 mr-2 phone-active"
+            data-token="{{ csrf_token('default') }}"
+            data-active="{{ path('admin_phone_active', {'id': phone.id}) }}">
+        <i class="far fa-power-off fa-fw"></i></button>
+{% endmacro phoneActions %}
 
 {% import _self as this %}
+
+{% block title %}so-sure - Phones{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
 {% block body %}
-<div class="container">
-    <div class="bg-info" style="border-radius: 10px; padding: 10px;">
-    <div class="row">
-      <div class="col-sm-5">
-        <h4 class="text-center"><strong>Phones</strong></h4>
-      </div>
-      <div class="col-sm-7">
-          <div class="btn-group" role="group" aria-label="Basic example">
-            <button class="btn btn-success"  data-toggle="modal" data-target="#newPhoneModal">
-              <i class="fa fa-plus"></i> Upcoming phone
-            </button>
-            {% if is_granted('ROLE_ADMIN') %}
-              <button class="btn btn-success"  data-toggle="modal" data-target="#additionalPhonesModal">
-                  <i class="fa fa-refresh"></i> Import phones
-              </button>
-            {% endif %}
-            <button class="btn btn-success"  data-toggle="modal" data-target="#checkPriceModal">
-              <i class="fa fa-calculator"></i> Premium
-            </button>
-              <a href="{{ path('admin_phones_download') }}" target="_blank" rel="noopener noreferrer" class="btn btn-success">
-                  <i class="fa fa-download"></i> Phone Links
-              </a>
-          </div>
-      </div>
-    </div>
-    <div class="row">
-    {{ form_start(form) }}
-        <div class="form-group col-sm-8">
-            {{ form_label(form.os, 'Os', {'label_attr': {'class': 'col-sm-2'}}) }}
-            {{ form_errors(form.os) }}
-            {{ form_widget(form.os, {'attr': {'class': 'col-sm-10 os'}}) }}
-        </div>
-        <div class="form-group col-sm-4">
-            {{ form_label(form.active, 'Active', {'label_attr': {'class': 'col-sm-4'}}) }}
-            {{ form_errors(form.active) }}
-            {{ form_widget(form.active, {'attr': {'class': 'col-sm-6'}}) }}
-        </div>
-        <div class="form-group col-sm-3">
-            {{ form_label(form.rules, 'Business rules', {'label_attr': {'class': 'col-sm-6'}}) }}
-            {{ form_errors(form.rules) }}
-            {{ form_widget(form.rules, {'attr': {'class': 'col-sm-6'}}) }}
-        </div>
-        <div class="form-group col-sm-3">
-            {{ form_label(form.make, 'Make', {'label_attr': {'class': 'col-sm-4'}}) }}
-            {{ form_errors(form.make) }}
-            {{ form_widget(form.make, {'attr': {'class': 'col-sm-8'}}) }}
-        </div>
-        <div class="form-group col-sm-3">
-            {{ form_label(form.model, 'Model', {'label_attr': {'class': 'col-sm-4'}}) }}
-            {{ form_errors(form.model) }}
-            {{ form_widget(form.model, {'attr': {'class': 'col-sm-8'}}) }}
-        </div>
-        <div class="form-group col-sm-3">
-          <div class="col-sm-2 col-sm-offset-3 text-center">
-            {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
-          </div>
-        </div>
 
-    {{ form_end(form) }}
-    </div>
-  </div>
-  <form style="margin: 20px 0;">
-    <ul class="nav nav-tabs nav-justified">
-      <li role="presentation" class="active"><a href="#financial">Financial</a></li>
-      <li role="presentation"><a href="#device">Device</a></li>
-      <li role="presentation"><a href="#replacement">Replacement</a></li>
-    </ul>
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="financial">
-            <div class="table-responsive">
-                <table class="table table-striped table-condensed">
-                    <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Monthly Premium</th>
-                        <th>Binder Monthly Premium (Min)</th>
-                        <th>Yearly Premium</th>
-                        <th>Max Pot / Max Connections</th>
-                        <th>Policy Profit ({{ expected_claim_frequency * 100 }}% Claims)
-                          <i class="fa fa-question" title=""></i>
-                        </th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for phone in phones %}
-                      {% set phoneProfit = phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate) %}
-                        <tr {% if not phone.active %}class="danger"{% endif %}>
-                            <td><a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a>
-                            {% if phone.shouldBeRetired %}<span class="text-danger"><i class="fa fa-time" title="{{ phone.monthAge }} months old"></i></span>{% endif %}
-                            </td>
-                            {% if phone.currentPhonePrice %}
-                            <td>
-                              £{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
-                              {% if phone.previousPhonePrices | length > 0 %}
-                                <i class="fa fa-history" style="cursor: pointer" title="{{ phone.getPreviousPhonePricesAsString }}"></i>
-                              {% endif %}
-                              {% if phone.futurePhonePrices | length > 0 %}
-                                <i class="fa fa-level-up" style="cursor: pointer" title="{{ phone.getFuturePhonePricesAsString }}"></i>
-                              {% endif %}
-                            </td>
-                            <td>
-                              £{{ phone.getSalvaBinderMonthlyPremium|number_format(2, '.', ',') }}
-                              (£{{ phone.getSalvaMiniumumBinderMonthlyPremium|number_format(2, '.', ',') }})
-                            </td>
-                            <td>£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
-                            <td>£{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} /
-                            {{ phone.currentPhonePrice.maxConnections }}</td>
-                            <td><span class="{% if phoneProfit > 0 %}text-success{% else %}text-warning{%endif %}">
-                            {% if phoneProfit is null %}unknown{% else %}{{ phoneProfit|number_format(2, '.', ',') }}{% endif %}
-                            </span>
-                            </td>
-                            {% else %}
-                              <td>-</td>
-                              <td>
-                                {% if phone.getSalvaBinderMonthlyPremium %}-
-                                {% else %}
-                                  <b>No possible binder!</b>
-                                {% endif %}
-                              </td>
-                              <td>-</td>
-                              <td>-</td>
-                              <td>-</td>
-                            {% endif %}
-                            <td width="202px">
-                              {{ this.display_actions(phone) }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Phones</h1>
             </div>
-            <div class="pagerfanta">
-                {{ pagerfanta(pager, 'twitter_bootstrap3') }}
-            </div>
-        </div>
-        <div role="tabpanel" class="tab-pane" id="device">
-            <div class="table-responsive">
-                <table class="table table-striped table-condensed">
-                    <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Devices</th>
-                        <th>Os</th>
-                        <th>Processor</th>
-                        <th>Ram</th>
-                        <th>SSD Slot</th>
-                        <th>Physical Screen</th>
-                        <th>Screen Resolution</th>
-                        <th>Camera</th>
-                        <th>4G</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for phone in phones %}
-                        <tr {% if not phone.active %}class="danger"{% endif %}>
-                            <td>{{ phone }}</td>
-                            <td><span title="{{ phone.devices|join(", ") }}">{{ phone.devices|length }}</span></td>
-                            <td>{{ phone.osString }}</td>
-                            <td>{{ phone.processorSpeed }}Mhz ({{ phone.processorCores }} cores)</td>
-                            <td>{{ phone.ram }} MB</td>
-                            <td>{% if phone.ssd %}Yes{%else%}No{%endif%}</td>
-                            <td>{{ phone.screenPhysicalInch }}" ({{ phone.screenPhysical }} mm)</td>
-                            <td>{{ phone.screenResolution }}</td>
-                            <td>{{ phone.camera }} MP</td>
-                            <td>{% if phone.lte %}Yes{%else%}No{%endif%}</td>
-                            <td width="202px">
-                              {{ this.display_actions(phone) }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagerfanta">
-                {{ pagerfanta(pager, 'twitter_bootstrap3') }}
-            </div>
-        </div>
-        <div role="tabpanel" class="tab-pane" id="replacement">
-            <div class="table-responsive">
-                <table class="table table-striped table-condensed">
-                    <thead>
-                    <tr>
-                        <th>Phone</th>
-                        <th>Initial Price</th>
-                        <th>Replacement Price</th>
-                        <th>Suggested Replacement Phone</th>
-                        <th>Age</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for phone in phones %}
-                        <tr {% if not phone.active %}class="danger"{% endif %}>
-                            <td>{{ phone }}</td>
-                            <td>£{{ phone.initialPrice|number_format(2, '.', ',') }}</td>
-                            <td>
-                                {% if phone.suggestedReplacement %}
-                                    £{{ phone.suggestedReplacement.replacementPrice|number_format(2, '.', ',') }}
-                                    <i class="fa fa-info-circle" title="Replacement Price for suggested {{ phone.suggestedReplacement }}"></i>
-                                    {% if phone.suggestedReplacement.initialPrice > phone.initialPrice + 30 %}
-                                      <i class="fa fa-warning" title="Suggested replacement phone is more than £30 than original (£{{ phone.suggestedReplacement.initialPrice - phone.initialPrice }})"></i>
-                                    {% endif %}
-                                {% elseif phone.replacementPrice > 0 %}
-                                    £{{ phone.replacementPrice|number_format(2, '.', ',') }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if phone.suggestedReplacement %}
-                                    {{ phone.suggestedReplacement }}
-                                {% elseif phone.replacementPrice %}
-                                  Direct replacement available
-                                {% endif %}
-                            </td>
-                            <td><span class="{% if phone.shouldBeRetired %}text-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</span></td>
-                            <td width="152px">
-                              {{ this.display_actions(phone) }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="pagerfanta">
-                {{ pagerfanta(pager, 'twitter_bootstrap3') }}
-            </div>
-        </div>
-    </div>
-  </form>
-</div>
-
-    {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}
-
-    <div class="modal fade" id="phoneModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-          <form id="phone-update-form" class="form-horizontal" method="post">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="exampleModalLabel">New phone</h4>
-          </div>
-          <div class="modal-body">
-            <table id="prices" width="100%" cellspacing="0" class="table-striped"></table>
-            <hr class="strong" />
-            <h4>Add new price</h4>
-
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="panel panel-default">
-                      <div class="panel-heading">
-                          <h3 class="panel-title">Dates</h3>
-                      </div>
-                      <div class="panel-body">
-                          <div class="row">
-                              <div class="col-sm-12">
-                                <div class="form-group">
-                                  <label for="phone-gwp" class="control-label col-sm-3">
-                                      {# from tech perspective, 1 second, from business perspective 1 business day #}
-                                    <i class="fa fa-warning" title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."></i>&nbsp;
-                                    From:
-                                  </label>
-                                  <div class="col-sm-9">
-                                    <div class='input-group date' id='phone-from-group'>
-                                      <input type="text" class="form-control" id="phone-from" name="from" required="required">
-                                      <span class="input-group-addon">
-                                        <span class="fa fa-calendar"></span>
-                                      </span>
-                                    </div>
-                                      <br>
-                                      Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later <br>
-                                      (1 business day)
-                                  </div>
-                                </div>
-                              </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-sm-12">
-                                <div class="form-group">
-                                  <label for="phone-gwp" class="control-label col-sm-3">To:</label>
-                                  <div class="col-sm-9">
-                                    <div class='input-group date' id='phone-to-group'>
-                                      <input type="text" class="form-control" id="phone-to" name="to">
-                                      <span class="input-group-addon">
-                                        <span class="fa fa-calendar"></span>
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="panel panel-default">
-                      <div class="panel-heading">
-                          <h3 class="panel-title">Price</h3>
-                      </div>
-                      <div class="panel-body">
-                          <div class="row">
-                              <div class="col-sm-12">
-                                  <div class="form-group">
-                                      <label for="phone-gwp" class="control-label col-sm-3">Desired Premium:</label>
-                                      <div class="col-sm-9">
-                                          <div class="input-group has-warning has-feedback">
-                                    <span class="input-group-addon">
-                                      <span>£</span>
-                                    </span>
-                                              <input title="This field does not save and will only calculate the GWP field if calculate is clicked"
-                                                     type="text" class="form-control" id="phone-desired-premium" name="desired-premium">
-                                              <span class="input-group-btn">
-                                                <button type="button" id="phone-desired-premium-btn" class="btn btn-success">Calc GWP</button>
-                                              </span>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="row">
-                            <div class="col-sm-12">
-                              <div class="form-group">
-                                <label for="phone-gwp" class="control-label col-sm-3">GWP:</label>
-                                <div class="col-sm-9">
-                                  <div class="input-group">
-                                    <span class="input-group-addon">
-                                      <span>£</span>
-                                    </span>
-                                    <input type="text" class="form-control" id="phone-gwp" name="gwp">
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="row">
-                              <div class="col-sm-12">
-                                <div class="form-group">
-                                  <label for="phone-premium" class="control-label col-sm-3">Premium:</label>
-                                  <div class="col-sm-9">
-                                    <div class="input-group">
-                                      <span class="input-group-addon">
-                                        <span>£</span>
-                                      </span>
-                                      <input type="text" class="form-control" id="phone-premium" name="premium" readonly="true" disabled="disabled">
-                                    </div>
-                                      <br>
-                                      <label for="phone-premium" class="control-label col-sm-6">Salva Std/Min:</label>
-                                      <div class="col-sm-6">
-                                          <label class="control-label" id="phone-salva" name="salva"></label>
-                                      </div>
-
-                                  </div>
-                                </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <div class="form-group">
-                        <label for="phone-notes" class="control-label col-sm-2">Notes</label>
-                        <div class="col-sm-10">
-                          <textarea class="control-label" id="phone-notes" name="notes" style="width:100%;text-align: left;"></textarea>
-                        </div>
-                      </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <div class="mb-2">
+                        <button class="btn btn-primary btn-square mr-2 mb-2"
+                                data-toggle="modal"
+                                data-target="#new_phone_modal">
+                            <i class="fal fa-bullhorn fa-fw"></i> Upcoming phone</button>
+                        <button class="btn btn-primary btn-square mr-2 mb-2"
+                                data-toggle="modal"
+                                data-target="#check_price_modal">
+                            <i class="fal fa-calculator fa-fw"></i> Premium</button>
+                        <a href="{{ path('admin_phones_download') }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-primary btn-square mr-2 mb-2">
+                            <i class="fal fa-link fa-fw"></i> Phone Links</a>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <button class="btn btn-primary btn-square mr-2 mb-2"
+                                    data-toggle="modal"
+                                    data-target="#additional_phones_modal">
+                                <i class="fal fa-file-import fa-fw"></i> Import phones</button>
+                        {% endif %}
                     </div>
-                  </div>
+                    {{ form_start(form) }}
+                        <div class="form-row">
+                            <div class="form-group col-lg">
+                                {{ form_label(form.os, 'Operating System') }}
+                                {{ form_widget(form.os) }}
+                                <div class="with-errors">{{ form_errors(form.os) }}</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-lg">
+                                {{ form_label(form.active, 'Active') }}
+                                {{ form_widget(form.active, {'attr': {'class': 'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(form.active) }}</div>
+                            </div>
+                            <div class="form-group col-lg">
+                                {{ form_label(form.rules, 'Business rules') }}
+                                {{ form_widget(form.rules, {'attr': {'class': 'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(form.rules) }}</div>
+                            </div>
+                            <div class="form-group col-lg">
+                                {{ form_label(form.make, 'Make') }}
+                                {{ form_widget(form.make, {'attr': {'class': 'form-control', 'placeholder': 'e.g. Apple'}}) }}
+                                <div class="with-errors">{{ form_errors(form.make) }}</div>
+                            </div>
+                            <div class="form-group col-lg">
+                                {{ form_label(form.model, 'Model') }}
+                                {{ form_widget(form.model, {'attr': {'class': 'form-control', 'placeholder': 'e.g. iPhone X'}}) }}
+                                <div class="with-errors">{{ form_errors(form.model) }}</div>
+                            </div>
+                            <div class="form-group col-lg">
+                                {# TODO: There must be a better way???? #}
+                                <label for="">&nbsp;</label>
+                                <div>
+                                    {{ form_widget(form.search, {
+                                        'label': 'Search',
+                                        'fa': 'far fa-search fa-fw',
+                                        'left': true,
+                                        'attr': {
+                                            'class': 'btn btn-success btn-square'
+                                    }}) }}
+                                </div>
+                            </div>
+                        </div>
+                    {{ form_end(form) }}
                 </div>
-                <div class="col-sm-6">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Excess</h3>
-                        </div>
-                        {# normal premium #}
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="damage-excess" class="control-label col-sm-3">Damage:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="damage-excess" name="damage-excess"
-                                                    autocomplete="off" placeholder="default: {{ excess.damage }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="warranty-excess" class="control-label col-sm-3">Warranty:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="warranty-excess" name="warranty-excess"
-                                                    autocomplete="off" placeholder="default: {{ excess.warranty }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="extended-warranty-excess" class="control-label col-sm-3">Extended Warranty:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="extended-warranty-excess" name="extended-warranty-excess"
-                                                    autocomplete="off" placeholder="default: {{ excess.extendedWarranty }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="loss-excess" class="control-label col-sm-3">Loss:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="loss-excess" name="loss-excess"
-                                                    autocomplete="off" placeholder="default: {{ excess.loss }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="theft-excess" class="control-label col-sm-3">Theft:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="theft-excess" name="theft-excess"
-                                                    autocomplete="off" placeholder="default: {{ excess.theft }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+
+            {# TODO: Content area #}
+            <ul class="nav nav-tabs mb-5"
+                id="phones_tabs"
+                role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active"
+                       id="financial_tab"
+                       data-toggle="tab"
+                       href="#financial_content"
+                       role="tab"
+                       aria-controls="financial_content"
+                       aria-selected="true">Financial</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="device_tab"
+                       data-toggle="tab"
+                       href="#device_content"
+                       role="tab"
+                       aria-controls="device_content"
+                       aria-selected="false">Device</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       id="replacement_tab"
+                       data-toggle="tab"
+                       href="#replacement_content"
+                       role="tab"
+                       aria-controls="replacement_content"
+                       aria-selected="false">Replacement</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="phones_tabs_content">
+                <div class="tab-pane fade show active"
+                     id="financial_content"
+                     role="tabpanel"
+                     aria-labelledby="financial_tab">
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Monthly Premium</th>
+                                    <th>Binder Monthly Premium (Min)</th>
+                                    <th>Yearly Premium</th>
+                                    <th>Max Pot / Max Connections</th>
+                                    <th>Policy Profit ({{ expected_claim_frequency * 100 }}% Claims)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for phone in phones %}
+                                    {% set phoneProfit = phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate) %}
+                                    <tr class="{% if not phone.active %}table-danger{% endif %}">
+                                        <td>
+                                            <a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a>
+                                            {% if phone.shouldBeRetired %}
+                                                <i class="fas fa-calendar-times text-danger fa-fw" title="{{ phone.monthAge }} months old"
+                                                data-toggle="tooltip"></i>
+                                            {% endif %}
+                                        </td>
+                                        {% if phone.currentPhonePrice %}
+                                            <td>
+                                                {# Current premium #}
+                                                &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                                {# Previous premium #}
+                                                {% if phone.previousPhonePrices | length > 0 %}
+                                                    <i class="fas fa-history fa-fw"
+                                                       title="{{ phone.getPreviousPhonePricesAsString }}"
+                                                       data-toggle="tooltip"></i>
+                                                {% endif %}
+                                                {# Future premium #}
+                                                {% if phone.futurePhonePrices | length > 0 %}
+                                                    <i class="fas fa-level-up fa-fw"
+                                                       title="{{ phone.getFuturePhonePricesAsString }}"
+                                                       data-toggle="tooltip"></i>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                &pound;{{ phone.getSalvaBinderMonthlyPremium|number_format(2, '.', ',') }} <br>
+                                                <small>(&pound;{{ phone.getSalvaMiniumumBinderMonthlyPremium|number_format(2, '.', ',') }})</small>
+                                            </td>
+                                            <td>&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                                            <td>&pound;{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} / {{ phone.currentPhonePrice.maxConnections }}</td>
+                                            <td class="{% if phoneProfit > 0 %}table-success{% else %}table-warning{% endif %}">
+                                                {% if phoneProfit is null %}Unknown{% else %}{{ phoneProfit|number_format(2, '.', ',') }}{% endif %}
+                                            </td>
+                                        {% else %}
+                                          <td>-</td>
+                                          <td>
+                                            {% if phone.getSalvaBinderMonthlyPremium %}
+                                                -
+                                            {% else %}
+                                              <b>No possible binder!</b>
+                                            {% endif %}
+                                          </td>
+                                          <td>-</td>
+                                          <td>-</td>
+                                          <td>-</td>
+                                        {% endif %}
+                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">pic-sure Excess</h3>
-                        </div>
-                        {# picsure premium #}
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="picsure-damage-excess" class="control-label col-sm-3">Damage:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="picsure-damage-excess" name="picsure-damage-excess"
-                                                    autocomplete="off" placeholder="default: {{ picsureExcess.damage }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="picsure-warranty-excess" class="control-label col-sm-3">Warranty:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="picsure-warranty-excess" name="picsure-warranty-excess"
-                                                    autocomplete="off" placeholder="default: {{ picsureExcess.warranty }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="picsure-extended-warranty-excess" class="control-label col-sm-3">Extended Warranty:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="picsure-extended-warranty-excess" name="picsure-extended-warranty-excess"
-                                                    autocomplete="off" placeholder="default: {{ picsureExcess.extendedWarranty }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="picsure-loss-excess" class="control-label col-sm-3">Loss:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="picsure-loss-excess" name="picsure-loss-excess"
-                                                    autocomplete="off" placeholder="default: {{ picsureExcess.loss }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="picsure-theft-excess" class="control-label col-sm-3">Theft:</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><span>£</span></span>
-                                                <input type="text" class="form-control" id="picsure-theft-excess" name="picsure-theft-excess"
-                                                    autocomplete="off" placeholder="default: {{ picsureExcess.theft }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-center mb-5">
+                        {{ pagerfanta(pager, 'twitter_bootstrap4') }}
                     </div>
                 </div>
-              </div>
-          </div>
-          <div class="modal-footer">
-            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Add</button>
-          </div>
-        </form>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-        <form id="details-update-form" class="form-horizontal" method="post">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="exampleModalLabel">Edit Phone Details</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-sm-8 col-offset-2">
-                <div class="form-group">
-                  <label for="details-description" class="control-label col-sm-2">Description</label>
-                  <div class="col-sm-10">
-                    <textarea class="control-label" id="details-description" name="description" style="width:100%;text-align: left;"></textarea>
-                  </div>
+                <div class="tab-pane fade"
+                     id="device_content"
+                     role="tabpanel"
+                     aria-labelledby="device_tab">
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Devices</th>
+                                    <th>OS</th>
+                                    <th>Processor</th>
+                                    <th>Ram</th>
+                                    <th>SSD Slot</th>
+                                    <th>Physical Screen</th>
+                                    <th>Screen Resolution</th>
+                                    <th>Camera</th>
+                                    <th>4G</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for phone in phones %}
+                                    <tr class="{% if not phone.active %}table-danger{% endif %}">
+                                        <td><a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a></td>
+                                        <td>{{ phone.devices|length }}</td>
+                                        <td>{{ phone.osString }}</td>
+                                        <td>{{ phone.processorSpeed }}Mhz ({{ phone.processorCores }} cores)</td>
+                                        <td>{{ phone.ram }} MB</td>
+                                        <td>{% if phone.ssd %}Yes{% else %}No{% endif %}</td>
+                                        <td>{{ phone.screenPhysicalInch }}" ({{ phone.screenPhysical }} mm)</td>
+                                        <td>{{ phone.screenResolution }}</td>
+                                        <td>{{ phone.camera }} MP</td>
+                                        <td>{% if phone.lte %}Yes{% else %}No{% endif %}</td>
+                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-center mb-5">
+                        {{ pagerfanta(pager, 'twitter_bootstrap4') }}
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-8 col-offset-2">
-                <div class="form-group">
-                  <label for="details-fun-facts" class="control-label col-sm-2">Fun Facts</label>
-                  <div class="col-sm-10">
-                    <textarea class="control-label" id="details-fun-facts" name="fun-facts" style="width:100%;text-align: left;"></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-            <div class="row">
-                <div class="col-sm-8 col-offset-2">
-                    <div class="form-group">
-                        <label for="details-canonical-path" class="control-label col-sm-2">Canonical Path</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="control-label" id="details-canonical-path" name="canonical-path" placeholder="/mobile-insurance/iphone-7" style="width:100%;text-align: left;"></input><br>
-                            This will set the canonical path on the quote page as well as adjust the sitemap entries.
-                        </div>
+                <div class="tab-pane fade"
+                     id="replacement_content"
+                     role="tabpanel"
+                     aria-labelledby="replacement_tab">
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Initial Price</th>
+                                    <th>Replacement Price</th>
+                                    <th>Suggested Replacement Phone</th>
+                                    <th>Age</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for phone in phones %}
+                                    <tr class="{% if not phone.active %}table-danger{% endif %}">
+                                        <td><a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a></td>
+                                        <td>&pound;{{ phone.initialPrice|number_format(2, '.', ',') }}</td>
+                                        <td>
+                                            {% if phone.suggestedReplacement %}
+                                                &pound;{{ phone.suggestedReplacement.replacementPrice|number_format(2, '.', ',') }}
+                                                <i class="fas fa-info-circle"
+                                                   title="Replacement Price for suggested {{ phone.suggestedReplacement }}"
+                                                   data-toggle="tooltip"></i>
+                                                <i class="fas fa-exclamation-triangle"
+                                                   title="Suggested replacement phone is more than £30 than original (£{{ phone.suggestedReplacement.initialPrice - phone.initialPrice }})"
+                                                   data-toggle="tooltip"></i>
+                                            {% elseif phone.replacementPrice > 0 %}
+                                                &pound;{{ phone.replacementPrice|number_format(2, '.', ',') }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if phone.suggestedReplacement %}
+                                                {{ phone.suggestedReplacement }}
+                                            {% elseif phone.replacementPrice %}
+                                                Direct replacement available
+                                            {% endif %}
+                                        </td>
+                                        <td class="{% if phone.shouldBeRetired %}table-danger{% else %}text-muted{% endif %}">{{ phone.monthAge }} months</td>
+                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-center mb-5">
+                        {{ pagerfanta(pager, 'twitter_bootstrap4') }}
                     </div>
                 </div>
             </div>
-          <div class="modal-footer">
-            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Update</button>
-          </div>
-        </form>
         </div>
-      </div>
+    </section>
+
+    {# Page Modals #}
+
+    {# Phone Alternative Modal #}
+    <div class="modal fade modal-fullscreen"
+         id="alternative_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="alternative_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-dialog" role="document">
+            <div class="modal-content modal-fullscreen-content">
+                <div class="modal-header modal-fullscreen-header">
+                    <h5 class="modal-title text-zaffre">Alternatives</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times fa-lg fa-fw text-primary"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-fullscreen-body">
+                    <h3 class="h4 mb-4">Current Phone</h3>
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Replacement Price</th>
+                                    <th>OS</th>
+                                    <th>Processor Speed</th>
+                                    <th>Processor Cores</th>
+                                    <th>Ram</th>
+                                    <th>SSD Slot</th>
+                                    <th>Screen size</th>
+                                    <th>Screen resolution</th>
+                                    <th>Camera</th>
+                                    <th>4G</th>
+                                    <th>Age</th>
+                                    <th>Initial Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="current_table_body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3 class="h4 mb-4">Suggested Replacement Phone</h3>
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Replacement Price</th>
+                                    <th>OS</th>
+                                    <th>Processor Speed</th>
+                                    <th>Processor Cores</th>
+                                    <th>Ram</th>
+                                    <th>SSD Slot</th>
+                                    <th>Screen size</th>
+                                    <th>Screen resolution</th>
+                                    <th>Camera</th>
+                                    <th>4G</th>
+                                    <th>Age</th>
+                                    <th>Initial Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="replacement_table_body">
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3 class="h4 mb-4">Alternative Replacement Phones</h3>
+                    <div class="table-responsive-sm mb-5">
+                        <table class="table table-striped">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Phone</th>
+                                    <th>Replacement Price</th>
+                                    <th>OS</th>
+                                    <th>Processor Speed</th>
+                                    <th>Processor Cores</th>
+                                    <th>Ram</th>
+                                    <th>SSD Slot</th>
+                                    <th>Screen size</th>
+                                    <th>Screen resolution</th>
+                                    <th>Camera</th>
+                                    <th>4G</th>
+                                    <th>Age</th>
+                                    <th>Initial Price</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alternative_table_body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="modal fade" id="checkPriceModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document" style="width: 60%;">
+    {# Phone Modal #}
+    <div class="modal fade modal-fullscreen"
+         id="phone_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="phone_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-dialog" role="document">
+            <div class="modal-content modal-fullscreen-content">
+                <div class="modal-header modal-fullscreen-header">
+                    <h5 class="modal-title h3 text-zaffre">New Phone</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times fa-lg fa-fw text-primary"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-fullscreen-body">
+                    <form id="phone_update_form" method="post">
+                        <div class="mb-5 d-md-flex align-items-md-center justify-content-md-between">
+                            <h4>Update pricing</h4>
+                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                        </div>
+                        <table id="prices"
+                               class="table table-striped mb-5"
+                               data-sorting="true"
+                               data-empty="No data">{# Prices Table #}</table>
+                        <div class="row mt-5">
+                            <div class="col-lg">
+                                <div class="card mb-5">
+                                    <div class="card-header h5">Dates</div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-exclamation-triangle fa-fw"
+                                                   title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."
+                                                   data-toggle="tooltip"></i>
+                                                From
+                                            </label>
+                                            <div class="input-group date-time-picker date"
+                                                 id="date_time_picker_from"
+                                                 data-target-input="nearest">
+                                                <input type="text"
+                                                       id="phone_from"
+                                                       name="from"
+                                                       required="required"
+                                                       class="form-control datetimepicker-input"
+                                                       data-target="#date_time_picker_from"/>
+                                                <div class="input-group-append"
+                                                     data-target="#date_time_picker_from"
+                                                     data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                                </div>
+                                            </div>
+                                            <small class="form-text">Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later (1 business day)</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="mr-2">To</label>
+                                            <div class="input-group date-time-picker date"
+                                                 id="date_time_picker_to"
+                                                 data-target-input="nearest">
+                                                <input type="text"
+                                                       id="phone_to"
+                                                       name="to"
+                                                       required="required"
+                                                       class="form-control datetimepicker-input"
+                                                       data-target="#date_time_picker_to"/>
+                                                <div class="input-group-append"
+                                                     data-target="#date_time_picker_to"
+                                                     data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card mb-5">
+                                    <div class="card-header h5">Notes</div>
+                                    <div class="card-body">
+                                        <textarea class="form-control"
+                                                  id="phone_notes"
+                                                  name="notes">
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg">
+                                <div class="card mb-5">
+                                    <div class="card-header h5">Price</div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label>Desired Premium</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="phone_desired_premium"
+                                                     class="form-control"
+                                                     name="desired-premium">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-success btn-square"
+                                                            type="button"
+                                                            id="phone_desired_premium_btn">Calc GWP
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="form-text">This field does not save and will only calculate the GWP field if calculate is clicked</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>GWP</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="phone_gwp"
+                                                     name="gwp"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Premium</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="phone_premium"
+                                                     name="premium"
+                                                     readonly="true"
+                                                     disabled="disabled"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="h6">Salva Std/Min: <span class="phone_salva"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg">
+                                <div class="card mb-5">
+                                    <div class="card-header h5">Excess</div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label>Damage</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="damage_excess"
+                                                     name="damage-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ excess.damage }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Warranty</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="warranty_excess"
+                                                     name="warranty-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ excess.warranty }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Extended Warranty</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="extended_warranty_excess"
+                                                     name="extended_warranty-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ excess.extendedWarranty }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Loss</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="loss_excess"
+                                                     name="loss-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ excess.loss }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Theft</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="theft_excess"
+                                                     name="theft-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ excess.theft }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg">
+                                <div class="card mb-5">
+                                    <div class="card-header h5">Excess - pic-sure</div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label>Damage</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="picsure_damage_excess"
+                                                     name="picsure-damage-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ picsureExcess.damage }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Warranty</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="picsure_warranty_excess"
+                                                     name="picsure-warranty-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ picsureExcess.warranty }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Extended Warranty</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="picsure_extended_warranty_excess"
+                                                     name="picsure-extended-warranty-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ picsureExcess.extendedWarranty }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Loss</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="picsure_loss_excess"
+                                                     name="picsure-loss-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ picsureExcess.loss }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Theft</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="far fa-pound-sign"></i></span>
+                                                </div>
+                                                <input type="text"
+                                                     id="picsure_theft_excess"
+                                                     name="picsure-theft-excess"
+                                                     autocomplete="off"
+                                                     placeholder="Default: {{ picsureExcess.theft }}"
+                                                     class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Details Modal #}
+    <div class="modal fade"
+         id="details_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="details_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <form id="check-price-form" class="form-horizontal" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Phone Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="details_update_form" method="post">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control"
+                                      id="details_description"
+                                      name="description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Fun Facts</label>
+                            <textarea class="form-control"
+                                      id="details_fun_facts"
+                                      name="fun-facts"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Canonical Path</label>
+                            <input type="url" class="form-control" id="details_canonical_path" name="canonical-path" placeholder="/mobile-insurance/iphone-7">
+                            <small class="form-text">This will set the canonical path on the quote page as well as adjust the sitemap entries.</small>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Calculate Premium Modal #}
+    <div class="modal fade"
+         id="check_price_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="check_price_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Calculate Premium</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="check_price_form" method="post">
+                        <div class="form-group">
+                            <label>Enter original phone price</label>
+                            <input type="number"
+                                   class="form-control"
+                                   id="check_initial_price"
+                                   name="initial-price"/>
+                            <small class="form-text">Tip: Get release price online from independant sites</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Calculated monthly premium</label>
+                            <input type="text"
+                                   class="form-control disabled"
+                                   id="check_calculated_premium"
+                                   name="calculated"
+                                   readonly/>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-success btn-square" data-token="{{ csrf_token('default') }}" id="check_premium_button">Calculate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# New Phone Modal #}
+    <div class="modal fade"
+         id="new_phone_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="new_phone_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Phone Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(new_phone) }}
+                        <div class="form-group">
+                            {{ form_label(new_phone.make, 'Make') }}
+                            {{ form_widget(new_phone.make, {'attr':{ 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(new_phone.make) }}</div>
+                            <small class="form-text">
+                                <ul class="list-inline">
+                                    {% for make in makes %}<li class="list-inline-item">{{ make }}</li>{% endfor %}
+                                </ul>
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(new_phone.model, 'Model') }}
+                            {{ form_widget(new_phone.model, {'attr':{ 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(new_phone.model) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(new_phone.os, 'OS') }}
+                            {{ form_widget(new_phone.os, {'attr':{ 'class': 'form-control' }}) }}
+                            <div class="with-errors">{{ form_errors(new_phone.os) }}</div>
+                        </div>
+                        <div class="form-group">
+                            <p>Remember to set <strong>active</strong> afterwards!</p>
+                            {{ form_widget(new_phone.add, {'attr':{'class': 'btn btn-success btn-square'}}) }}
+                        </div>
+                    {{ form_end(new_phone) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Import Phone Data #}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="modal fade"
+             id="additional_phones_modal"
+             tabindex="-1" role="dialog"
+             aria-labelledby="additional_phones_modal"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="exampleModalLabel">Calculate monthly premium based on original phone price</h4>
+                        <h5 class="modal-title">Import Phones</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-sm-8 col-offset-2">
-                                <div class="form-group">
-                                    <label for="details-description" class="control-label col-sm-6">Enter original phone price</label>
-                                    <div class="col-sm-6">
-                                        <input type="number" class="control-label" id="check-initial-price" name="initial-price" style="width:100%;text-align: left;"/>
-                                    </div>
-                                </div>
+                        {{ form_start(additional_phones) }}
+                            <div class="form-group">
+                                {{ form_label(additional_phones.file, 'File') }}
+                                {{ form_widget(additional_phones.file, {'attr':{ 'class': 'form-control' }}) }}
+                                <div class="with-errors">{{ form_errors(additional_phones.file) }}</div>
+                                <small class="form-text">Please select the file of additional phones to load into the database</small>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-8 col-offset-2">
-                                <div class="form-group">
-                                    <label for="details-fun-facts" class="control-label col-sm-6">Calculated monthly premium</label>
-                                    <div class="col-sm-6">
-                                        <input type="text" readonly class="control-label" id="check-calculated-premium" name="calculated" style="width:100%;text-align: left;"/>
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                                {{ form_widget(additional_phones.load, {'attr':{'class': 'btn btn-success btn-square'}}) }}
                             </div>
-                        </div>
+                        {{ form_end(additional_phones) }}
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" data-token="{{ csrf_token('default') }}" id="checkPremiumButton">Calculate Premium</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-
-
-    <div class="modal fade" id="newPhoneModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-        {{ form_start(new_phone) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">New Phone Details</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(new_phone.make, 'Make') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(new_phone.make) }}
-                    {{ form_widget(new_phone.make) }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {% for make in makes %}<span class="small">{{ make }}</span> {% endfor %}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(new_phone.model, 'Model') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(new_phone.model) }}
-                    {{ form_widget(new_phone.model) }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(new_phone.os, 'OS') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(new_phone.os) }}
-                    {{ form_widget(new_phone.os) }}
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <p>Remember to set active afterwards!</p>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            {{ form_widget(new_phone.add, {'attr':{'class': 'btn btn-success'}}) }}
-          </div>
-        {{ form_end(new_phone) }}
-        </div>
-      </div>
-    </div>
-
-    {% if is_granted('ROLE_ADMIN') %}
-    <div class="modal fade" id="additionalPhonesModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document" style="width: 60%;">
-        <div class="modal-content">
-        {{ form_start(additional_phones) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Additional Phones</h4>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-                <div class="col-sm-12">
-                  <p>Please select the file of additional phones to load into the database.</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-sm-4">
-                    {{ form_label(additional_phones.file, 'File') }}
-                </div>
-                <div class="form-group col-sm-4">
-                    {{ form_errors(additional_phones.file) }}
-                    {{ form_widget(additional_phones.file) }}
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            {{ form_widget(additional_phones.load, {'attr':{'class': 'btn btn-success'}}) }}
-          </div>
-        {{ form_end(additional_phones) }}
-        </div>
-      </div>
-    </div>
     {% endif %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/phone.js') }}"></script>
 {% endblock %}

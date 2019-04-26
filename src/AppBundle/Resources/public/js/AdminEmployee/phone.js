@@ -3,7 +3,7 @@ $(function () {
         format: "DD-MM-YYYY HH:mm",
         allowInputToggle: true,
         showTodayButton: true,
-        useCurrent: false 
+        useCurrent: false
     });
     $('#phone-to-group').datetimepicker({
         format: "DD-MM-YYYY HH:mm",

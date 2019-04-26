@@ -2076,6 +2076,24 @@ abstract class Policy
         return $scheduledPayments;
     }
 
+    /**
+     * Gets the next upcoming rescheduled scheduled payment.
+     * @return ScheduledPayment|null which has been found, or null if no rescheduled scheduled payments are found with
+     *                               status scheduled.
+     */
+    public function getNextRescheduledScheduledPayment()
+    {
+        $next = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED &&
+                $scheduledPayment->getType() == ScheduledPayment::TYPE_RESCHEDULED &&
+                (!$next || $next->getScheduled() > $scheduledPayment->getScheduled())) {
+                $next = $scheduledPayment;
+            }
+        }
+        return $next;
+    }
+
     public function getLastEmailed()
     {
         return $this->lastEmailed;
@@ -2632,7 +2650,7 @@ abstract class Policy
         return true;
     }
 
-    public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
+    public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1, $billing = null)
     {
         $issueDate = \DateTime::createFromFormat('U', time());
         if (!$startDate) {
@@ -2660,7 +2678,12 @@ abstract class Policy
 
         $this->setStart($startDate);
         $this->setIssueDate($issueDate);
-        $this->setBilling($this->getStartForBilling());
+
+        if ($billing) {
+            $this->setBilling($billing);
+        } else {
+            $this->setBilling($this->getStartForBilling());
+        }
         $nextYear = clone $this->getStart();
         // This is same date/time but add 1 to the year
         $nextYear = $nextYear->modify('+1 year');
