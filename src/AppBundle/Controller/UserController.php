@@ -1158,6 +1158,7 @@ class UserController extends BaseController
             );
 
             /** @var BacsService $bacsService */
+            // TODO: delete this god willing.
             $bacsService = $this->get('app.bacs');
             $bacsService->scheduleBacsPayment(
                 $policy,
