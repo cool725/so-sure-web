@@ -452,7 +452,7 @@ class BICommand extends ContainerAwareCommand
                         null
                 ),
                 sprintf('"%s"', $policy->getPremiumInstallments()),
-                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : 'NO')
+                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : '')
             ]);
         }
         if (!$skipS3) {

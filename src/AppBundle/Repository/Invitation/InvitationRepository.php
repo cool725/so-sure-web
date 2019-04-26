@@ -32,13 +32,13 @@ class InvitationRepository extends BaseDocumentRepository
     }
 
     /**
-     * Takes a policy and finds the policy that invited it to join if one does exist.
+     * Takes a policy and finds the policy that invited the owning user to join if one exists.
      * @param Policy $policy is the policy to look into.
      * @return Policy|null the inviter or null if there is no inviter.
      */
     public function getOwnInvitation($policy)
     {
-        $query = $this->createQueryBuilder()
+        return $this->createQueryBuilder()
             ->field('invitee')->references($policy->getUser())
             ->getQuery()->getSingleResult();
     }
