@@ -1,12 +1,12 @@
 <?php
-namespace AppBundle\Tests\Repository;
+namespace AppBundle\Tests\Repository\Invitation;
 
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\DateTrait;
-use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Tests\UserClassTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -69,9 +69,12 @@ class InvitationRepositoryTest extends KernelTestCase
         }
         self::$dm->flush();
         // check that it worked as planned.
+        /** @var Invitation */
         $bInvitation = $this->invitationRepo->getOwnInvitation($policies[1]);
+        /** @var User */
+        $bInvitee = $bInvitation->getInvitee();
         $this->assertEquals($policies[0]->getUser()->getId(), $bInvitation->getInviter()->getId());
-        $this->assertEquals($policies[1]->getUser()->getId(), $bInvitation->getInvitee()->getId());
+        $this->assertEquals($policies[1]->getUser()->getId(), $bInvitee->getId());
         $this->assertNull($this->invitationRepo->getOwnInvitation($policies[0]));
         $this->assertNull($this->invitationRepo->getOwnInvitation($policies[2]));
     }
