@@ -191,6 +191,17 @@ class HubspotCommand extends ContainerAwareCommand
      */
     private function drop($input, $output)
     {
+        $this->environment = "prod";
+        // make sure that we are good to do this.
+        if ($this->environment == "prod") {
+            $helper = $this->getHelper('question');
+            $question = new ConfirmationQuestion("This is PROD. Definitely remove all users from Hubspot?", false);
+            if (!$helper->ask($input, $output, $question)) {
+                $output->writeln("Aborting");
+                return;
+            }
+        }
+        // begin.
         $dealCount = 0;
         $contactCount = 0;
         // Delete policies
