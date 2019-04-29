@@ -121,14 +121,14 @@
                                                 </del>
                                             {% endif %}
                                             {% if scheduledPayment.policy.status == 'unpaid' %}
-                                                <i class="fas fa-exclamation-triangle"
+                                                <i class="far fa-exclamation-triangle"
                                                    title="Policy is unpaid. Unless payment is made, policy will be automatically cancelled on {{ scheduledPayment.policy.getPolicyExpirationDate|date('d M Y H:i', 'Europe/London') }}"
                                                    data-toggle="tooltip"></i>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if scheduledPayment.type == 'scheduled' %}
-                                                <i class="fas fa-clock"
+                                                <i class="fal fa-clock"
                                                    title="Scheduled Payment"
                                                    data-toggle="tooltip"></i>
                                             {% elseif scheduledPayment.type == 'rescheduled' %}
@@ -204,14 +204,14 @@
                                                 </del>
                                             {% endif %}
                                             {% if scheduledPayment.policy.status == 'unpaid' %}
-                                                <i class="fas fa-exclamation-triangle"
+                                                <i class="far fa-exclamation-triangle"
                                                    title="Policy is unpaid. Unless payment is made, policy will be automatically cancelled on {{ scheduledPayment.policy.getPolicyExpirationDate|date('d M Y H:i', 'Europe/London') }}"
                                                    data-toggl="tooltip"></i>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if scheduledPayment.type == 'scheduled' %}
-                                                <i class="fas fa-clock"
+                                                <i class="fal fa-clock"
                                                    title="Scheduled Payment"
                                                    data-toggle="tooltip"></i>
                                             {% elseif scheduledPayment.type == 'rescheduled' %}

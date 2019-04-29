@@ -100,7 +100,7 @@
                         <tr>
                             <td>
                                 Overall Approved Claim Rate- rolling 12mo [KPI: <strong>73</strong>]
-                                <i class="fas fa-info-circle"
+                                <i class="fal fa-info-circle"
                                    title="12 month FNOL that were approved / current active policies"
                                    data-toggle="tooltip"></i>
                             </td>
@@ -246,7 +246,7 @@
                         <tr>
                             <td>
                                 Activation Policies [KPI??] (excludes upgrades &amp; renewals) <br>
-                                <i class="fas fa-exclamation-triangle"
+                                <i class="far fa-exclamation-triangle"
                                    title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date"
                                    data-toggle="tooltip"></i> before 31/3/18 data is suspect!
                             </td>
@@ -261,7 +261,7 @@
                         <tr>
                             <td>
                                 Hard Activation Policies [KPI??] (excludes upgrades &amp; renewals) <br>
-                                <i class="fas fa-exclamation-triangle"
+                                <i class="far fa-exclamation-triangle"
                                    title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date"
                                    data-toggle="tooltip"></i> before 15/1/18 data is suspect!
                             </td>
@@ -297,7 +297,7 @@
                             {% for week in weeks %}
                                 <td>
                                     {{ week.period['claims']['total'] }}
-                                    <i class="fas fa-clock"
+                                    <i class="fal fa-clock"
                                        title="Value is delayed"
                                        data-toggle="tooltip"></i>
                                 </td>
@@ -313,7 +313,7 @@
                             {% for week in weeks %}
                                 <td>
                                     {{ week.period['approvedClaims']['total'] }}
-                                    <i class="fas fa-clock"
+                                    <i class="fal fa-clock"
                                        title="Value is delayed"
                                        data-toggle="tooltip"></i>
                                 </td>
@@ -553,7 +553,7 @@
                             {% for week in weeks %}
                                 <td>
                                     {{ week['install-apple'] }}
-                                    <i class="fas fa-clock"
+                                    <i class="fal fa-clock"
                                        title="Value is delayed"
                                        data-toggle="tooltip"></i>
                                 </td>
@@ -568,7 +568,7 @@
                             {% for week in weeks %}
                                 <td>
                                     {{ week['install-google'] }}
-                                    <i class="fas fa-clock"
+                                    <i class="fal fa-clock"
                                        title="Value is delayed"
                                        data-toggle="tooltip"></i>
                                 </td>

@@ -470,6 +470,7 @@ nelmio_security:
                 - https://angel.co
                 - https://intercom-sheets.com
                 - https://js.intercomcdn.com
+                - https://www.intercom-reporting.com
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
                 - 'data:'
@@ -504,6 +505,7 @@ nelmio_security:
                 - https://*.hotjar.com
                 - wss://*.hotjar.com
                 - https://vc.hotjar.io
+                - https://script.hotjar.com
                 - https://graylog.hotjar.com # necessary?
                 - gsa://onpageload # necessary?
                 - https://www.youtube.com
