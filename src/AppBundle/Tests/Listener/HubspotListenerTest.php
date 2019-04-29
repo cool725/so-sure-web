@@ -144,6 +144,14 @@ class HubspotListenerTest extends WebTestCase
     }
 
     /**
+     * Tests that policy events are actually fired.
+     */
+    public function testPolicyListening()
+    {
+
+    }
+
+    /**
      * Creates a policy and user with a phone and persisted, but not initialised.
      * @param string $name is the name of the email account that the policy holder will be given.
      * @return Policy the new policy created.
