@@ -447,9 +447,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
                 sprintf(
                     '"%s"',
-                    $policy->getPolicyOrUserBacsBankAccount() ?
-                        $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() :
-                        null
+                    ($policy->getPolicyOrUserBacsBankAccount() && $policy->isActive(true)) ?
+                        $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() : ''
                 ),
                 sprintf('"%s"', $policy->getPremiumInstallments()),
                 sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : '')
