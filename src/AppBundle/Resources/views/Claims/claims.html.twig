@@ -99,6 +99,7 @@
                         <th>Claim Status</th>
                         <th>Policy Status</th>
                         <th>Notification Date</th>
+                        <th>Submitted Date</th>
                         <th>Approval Date</th>
                         <th>Replacement</th>
                     </tr>
@@ -128,6 +129,7 @@
                             <td>{{ claim.status }}</td>
                             <td>{{ claim.policy.status }}</td>
                             <td>{{ claim.notificationDate|date('d-m-Y', 'Europe/London') }}</td>
+                            <td>{{ claim.submissionDate|date('d-m-Y') }}</td>
                             <td class="{% if claim.approvedDate and claim.replacementReceivedDate and claim.approvedDate > claim.replacementReceivedDate %}danger{% endif %}">
                                 {% if claim.approvedDate %}
                                     {{ claim.approvedDate|date('d-m-Y', 'Europe/London') }}</td>
