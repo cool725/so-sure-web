@@ -1,4 +1,4 @@
-// datepicker-month.js
+// kpi.js
 
 // require('../../../sass/pages/admin.scss');
 

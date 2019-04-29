@@ -325,10 +325,10 @@
                                         <td>
                                             {% if phone.suggestedReplacement %}
                                                 &pound;{{ phone.suggestedReplacement.replacementPrice|number_format(2, '.', ',') }}
-                                                <i class="fas fa-info-circle"
+                                                <i class="fal fa-info-circle"
                                                    title="Replacement Price for suggested {{ phone.suggestedReplacement }}"
                                                    data-toggle="tooltip"></i>
-                                                <i class="fas fa-exclamation-triangle"
+                                                <i class="far fa-exclamation-triangle"
                                                    title="Suggested replacement phone is more than £30 than original (£{{ phone.suggestedReplacement.initialPrice - phone.initialPrice }})"
                                                    data-toggle="tooltip"></i>
                                             {% elseif phone.replacementPrice > 0 %}
@@ -368,7 +368,7 @@
         <div class="modal-dialog modal-fullscreen-dialog" role="document">
             <div class="modal-content modal-fullscreen-content">
                 <div class="modal-header modal-fullscreen-header">
-                    <h5 class="modal-title">Alternatives</h5>
+                    <h5 class="modal-title text-zaffre">Alternatives</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <i class="fal fa-times fa-lg fa-fw text-primary"></i>
                     </button>
@@ -482,7 +482,7 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label>
-                                                <i class="fas fa-exclamation-triangle fa-fw"
+                                                <i class="far fa-exclamation-triangle fa-fw"
                                                    title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."
                                                    data-toggle="tooltip"></i>
                                                 From
