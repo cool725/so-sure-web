@@ -391,8 +391,6 @@ class HubspotService
         $this->addProperty("email", $user->getEmailCanonical(), $data);
         $this->addProperty("mobilephone", $user->getMobileNumber(), $data);
         $this->addProperty("gender", $user->getGender(), $data);
-        $this->addProperty("attribution", $user->getAttribution(), $data);
-        $this->addProperty("lastest_attribution", $user->getLatestAttribution(), $data);
         $this->addProperty("customer", true, $data);
         $this->addProperty("hs_facebookid", $user->getFacebookId(), $data);
         if ($user->getBirthday()) {
@@ -407,7 +405,21 @@ class HubspotService
                 $data[] = $this->buildProperty("total_weekly_income", $income->getTotal()->getIncome());
             }
         }
+        // attribution data.
+        $this->addProperty("attribution", $user->getAttribution(), $data);
+        $this->addProperty("latest_attribution", $user->getLatestAttribution(), $data);
         return $data;
+    }
+
+    /**
+     * Adds a user's attribution data to a hubspot property array.
+     * @param boolean $latest is whether to use the latest attribution or original attribution. true means latest.
+     * @param array   $array  is the data array to add the property to. NB: it's edited directly.
+     */
+    private function addUserAttributionProperties($latest, &$array)
+    {
+
+
     }
 
     /**

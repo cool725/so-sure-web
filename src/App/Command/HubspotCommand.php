@@ -44,17 +44,20 @@ class HubspotCommand extends ContainerAwareCommand
     private $logger;
     /** @var DocumentManager */
     private $dm;
+    private $environment;
 
     /**
      * Builds the command object.
-     * @param HubspotService  $hubspot is the hubspot service which this command drives.
-     * @param DocumentManager $dm      document manager used for accessing repository data.
+     * @param HubspotService  $hubspot     is the hubspot service which this command drives.
+     * @param DocumentManager $dm          document manager used for accessing repository data.
+     * @param string          $environment is the environme4nt that this is running in.
      */
-    public function __construct(HubspotService $hubspot, DocumentManager $dm)
+    public function __construct(HubspotService $hubspot, DocumentManager $dm, $environment)
     {
         parent::__construct();
         $this->hubspot = $hubspot;
         $this->dm = $dm;
+        $this->environment = $environment;
     }
 
     /**
@@ -66,7 +69,7 @@ class HubspotCommand extends ContainerAwareCommand
             ->addArgument(
                 "action",
                 InputArgument::REQUIRED,
-                "sync-all|sync-user|drop|queue-count|queue-show|queue-clear|test|process"
+                "sync-all|sync-new|sync-user|drop|queue-count|queue-show|queue-clear|test|process"
             )
             ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
             ->addOption(
@@ -94,6 +97,9 @@ class HubspotCommand extends ContainerAwareCommand
             switch ($action) {
                 case "sync-all":
                     $this->syncAllUsers($output);
+                    break;
+                case "sync-new":
+                    $this->syncNew($output);
                     break;
                 case "sync-user":
                     /** @var User $user */
@@ -184,6 +190,12 @@ class HubspotCommand extends ContainerAwareCommand
         $output->writeln(sprintf("Queued %d Users", $count));
     }
 
+    private function syncNew(OutputInterface $output)
+    {
+        $count = 0;
+        // Do users first since that will catch most policies at the same time.
+    }
+
     /**
      * Deletes all customers and associated deals on hubspot.
      * @param InputInterface  $input  is used to take user confirmation.
@@ -191,7 +203,6 @@ class HubspotCommand extends ContainerAwareCommand
      */
     private function drop($input, $output)
     {
-        $this->environment = "prod";
         // make sure that we are good to do this.
         if ($this->environment == "prod") {
             $helper = $this->getHelper('question');

@@ -254,6 +254,13 @@ services:
             - "@snc_redis.default"
             - "@census.search"
 
+    app.hubspot.command:
+        class: AppBundle\Command\HubspotCommand
+        arguments:
+            - "app.hubspot"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "%kernel.environment%"
+
     app.bacs:
         alias: AppBundle\Service\BacsService
         public: true

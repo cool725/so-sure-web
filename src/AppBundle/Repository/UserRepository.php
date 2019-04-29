@@ -250,4 +250,15 @@ class UserRepository extends DocumentRepository
     {
         $this->createQueryBuilder()->updateMany()->field("hubspotId")->unsetField()->getQuery()->execute();
     }
+
+    /**
+     * Gives a list of all users that do not have a hubspot id stored.
+     * @return array Containing all of these users.
+     */
+    public function findNonHubspotUsers()
+    {
+        return $this->createQueryBuilder()->find()
+            ->field("hubspotId")->exists(false)
+            ->getQuery()->execute()->toArray();
+    }
 }
