@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Classes\SoSure;
 
 trait DateTrait
