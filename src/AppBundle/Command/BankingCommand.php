@@ -31,8 +31,12 @@ class BankingCommand extends ContainerAwareCommand
     /** @var S3Client */
     protected $s3;
 
-    public function __construct(DocumentManager $dm, BankingService $bankingService, LloydsService $lloydsService, S3Client $s3)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        BankingService $bankingService,
+        LloydsService $lloydsService,
+        S3Client $s3
+    ) {
         parent::__construct();
         $this->dm = $dm;
         $this->bankingService = $bankingService;
@@ -55,7 +59,7 @@ class BankingCommand extends ContainerAwareCommand
                 'cache',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'cache the required tab (salva, cards, or merchant)'
+                'Cache banking data for the given date'
             )
         ;
     }
@@ -82,27 +86,20 @@ class BankingCommand extends ContainerAwareCommand
                 'Key' => $lloydsFile->getKey(),
                 'SourceFile' => $lloyds,
             ));
-        }
-        elseif (!empty($cache)) {
-            $now = \DateTime::createFromFormat('U', time());
-            $year = $now->format('Y');
-            $month = $now->format('m');
+        } elseif (!empty($cache)) {
+            $date = new \DateTime($cache);
+            $year = $date->format('Y');
+            $month = $date->format('m');
             $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
-            $output->writeln(sprintf('Caching %s for %d-%d', $cache, $year, $month));
-            if ($cache === "salva") {
-                $this->bankingService->getSoSureBanking($date);
-                $this->bankingService->getSalvaBanking($date, $year, $month);
-                $this->bankingService->getReconcilationBanking($date);
-            }
-            elseif ($cache === "cards") {
-                $this->bankingService->getJudoBanking($date, $year, $month);
-                $this->bankingService->getCheckoutBanking($date, $year, $month);
-            }
-            elseif ($cache === "merchant") {
-                $this->bankingService->getCashflowsBanking($date, $year, $month);
-                $this->bankingService->getBarclaysBanking($date, $year, $month);
-            }
-            $this->bankingService->getLloydsBanking($date, $year, $month);
+            $output->writeln(sprintf('Caching for %d-%d', $year, $month));
+            $this->bankingService->getSoSureBanking($date, false);
+            $this->bankingService->getSalvaBanking($date, $year, $month, false);
+            $this->bankingService->getReconcilationBanking($date, false);
+            $this->bankingService->getJudoBanking($date, $year, $month, false);
+            $this->bankingService->getCheckoutBanking($date, $year, $month, false);
+            $this->bankingService->getCashflowsBanking($date, $year, $month, false);
+            $this->bankingService->getBarclaysBanking($date, $year, $month, false);
+            $this->bankingService->getLloydsBanking($date, $year, $month, false);
         }
         $output->writeln('');
     }
