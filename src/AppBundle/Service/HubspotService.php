@@ -406,8 +406,8 @@ class HubspotService
             }
         }
         // attribution data.
-        $this->addProperty("attribution", $user->getAttribution(), $data);
-        $this->addProperty("latest_attribution", $user->getLatestAttribution(), $data);
+        $this->addUserAttributionProperties($user, false, $data);
+        $this->addUserAttributionProperties($user, true, $data);
         return $data;
     }
 
