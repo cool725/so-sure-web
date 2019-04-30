@@ -413,13 +413,22 @@ class HubspotService
 
     /**
      * Adds a user's attribution data to a hubspot property array.
+     * @param User    $user   is the user to get the data out of.
      * @param boolean $latest is whether to use the latest attribution or original attribution. true means latest.
      * @param array   $array  is the data array to add the property to. NB: it's edited directly.
      */
-    private function addUserAttributionProperties($latest, &$array)
+    private function addUserAttributionProperties($user, $latest, &$array)
     {
-
-
+        $attribution = $latest ? $user->getAttribution() : $user->getLatestAttribution();
+        if (!$attribution) {
+            return;
+        }
+        $name = $latest ? "attribution" : "latestAttribution";
+        $array[] = $this->buildProperty("{$name}_campaign_name", $attribution->getCampaignName());
+        $array[] = $this->buildProperty("{$name}_campaign_source", $attribution->getCampaignSource());
+        $array[] = $this->buildProperty("{$name}_campaign_medium", $attribution->getCampaignMedium());
+        $array[] = $this->buildProperty("{$name}_device_category", $attribution->getDeviceCategory());
+        $array[] = $this->buildProperty("{$name}_device_os", $attribution->getDeviceOs());
     }
 
     /**

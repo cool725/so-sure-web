@@ -31,7 +31,7 @@ class HubspotCommand extends ContainerAwareCommand
     private const COMMAND_NAME = "sosure:hubspot";
     protected static $defaultName = self::COMMAND_NAME;
 
-    const QUEUE_RATE_DEFAULT = 50;
+    const QUEUE_RATE_DEFAULT = 15;
     const QUEUE_MAX_SHOW = 100;
 
     const PROPERTY_NAME = "sosure";
@@ -76,7 +76,7 @@ class HubspotCommand extends ContainerAwareCommand
                 "n",
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "Number of messages to process (default 50)",
+                "Number of messages to process (default 15)",
                 self::QUEUE_RATE_DEFAULT
             );
     }

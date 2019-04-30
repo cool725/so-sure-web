@@ -74,16 +74,10 @@ trait QueueTrait
                 }
                 $this->action($data);
                 $processed++;
-            } catch (BadRequest $e) {
-                $this->logger->error($e->getMessage());
-                $data["attempts"] = $data["attempts"] ? $data["attempts"] - 1 : 1;
-                $this->queue($data, true);
-                $requeued++;
             } catch (QueueException $e) {
                 $this->logger->error($e->getMessage());
                 $dropped++;
             } catch (\Exception $e) {
-                $this->logger->error($e->getMessage(), ["msg" => json_encode($data), "type" => get_class($e)]);
                 if ($this->queue($data, true)) {
                     $requeued++;
                 }
