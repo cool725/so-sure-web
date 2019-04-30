@@ -423,7 +423,7 @@ class HubspotService
         if (!$attribution) {
             return;
         }
-        $name = $latest ? "attribution" : "latestAttribution";
+        $name = $latest ? "attribution" : "latest_attribution";
         $array[] = $this->buildProperty("{$name}_campaign_name", $attribution->getCampaignName());
         $array[] = $this->buildProperty("{$name}_campaign_source", $attribution->getCampaignSource());
         $array[] = $this->buildProperty("{$name}_campaign_medium", $attribution->getCampaignMedium());
