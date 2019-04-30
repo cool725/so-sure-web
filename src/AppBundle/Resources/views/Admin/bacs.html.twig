@@ -31,7 +31,7 @@
                           autocomplete="off">
                         <div class="form-group">
                             <label class="mr-2">Choose date:</label>
-                            <div class="input-group date mr-2"
+                            <div class="input-group date mr-2 mb-2"
                                  id="date_time_picker"
                                  data-target-input="nearest"
                                  data-url="{{ path('admin_bacs') }}">
@@ -47,12 +47,12 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-success btn-square mr-2">
+                            <button class="btn btn-success btn-square mr-2 mb-2">
                                 <i class="fa fa-arrow-right fa-fw"></i>
                             </button>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-warning btn-square bacs-serial-edit mr-2"
+                            <button class="btn btn-warning btn-square bacs-serial-edit mr-2 mb-2"
                                     type="button"
                                     title="Current Sequence File"
                                     data-toggle="modal"
@@ -61,7 +61,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
                                     title="Actionable Mandates"
                                     data-toggle="modal"
                                     data-target="#mandates_modal">
@@ -69,7 +69,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
                                     title="Bacs Credit"
                                     data-toggle="modal"
                                     data-target="#upload_credit_modal">
@@ -77,7 +77,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
                                     title="Bacs Debit"
                                     data-toggle="modal"
                                     data-target="#upload_debit_modal">
@@ -85,7 +85,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
                                     title="Bacs Debit"
                                     data-toggle="modal"
                                     data-target="#approve_payments_modal">
@@ -93,7 +93,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2"
+                                    class="btn btn-primary btn-square mr-2 mb-2"
                                     title="Upload Report"
                                     data-toggle="modal"
                                     data-target="#upload_modal">
@@ -397,9 +397,56 @@
         </div>
     </div>
 
+    <div class="modal fade modal-fullscreen"
+         id="serial_number_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="serial_number_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-dialog" role="document">
+            <div class="modal-content modal-fullscreen-content">
+                <div class="modal-header modal-fullscreen-header">
+                    <h5 class="modal-title h3 text-zaffre">Loading</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times fa-lg fa-fw text-primary"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-fullscreen-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="edit_serial_number_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="edit_serial_number_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Serial Numbering</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit_serial_number_form" method="post">
+                        <div class="form-group">
+                            <input type="text" id="edit_serial_number" class="form-control" name="serialNumber">
+                            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success btn-square">Update Serial Number</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
+    <script src="{{ asset('css-js/bacs.js') }}"></script>
 {% endblock %}

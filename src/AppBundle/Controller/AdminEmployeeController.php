@@ -493,11 +493,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
-        $policies = $policyRepo->createQueryBuilder()->eagerCursor(true)->field('user')->prime(true)
-            ->field('notesList.type')->equals('call')
-            ->field('notesList.date')->gte($start)
-            ->field('notesList.date')->lt($end)
-            ->getQuery()->execute();
+        $policies = $policyRepo->findUnpaidCalls($start, $end);
         // Build the response content.
         $response->setCallback(function () use ($policies) {
             $handle = fopen('php://output', 'w+');

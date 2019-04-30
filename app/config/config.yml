@@ -470,6 +470,7 @@ nelmio_security:
                 - https://angel.co
                 - https://intercom-sheets.com
                 - https://js.intercomcdn.com
+                - https://www.intercom-reporting.com
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
                 - 'data:'
@@ -504,6 +505,7 @@ nelmio_security:
                 - https://*.hotjar.com
                 - wss://*.hotjar.com
                 - https://vc.hotjar.io
+                - https://script.hotjar.com
                 - https://graylog.hotjar.com # necessary?
                 - gsa://onpageload # necessary?
                 - https://www.youtube.com
@@ -522,7 +524,6 @@ nelmio_security:
                 - https://www.linkedin.com
                 - https://angel.co
                 - https://www.bing.com
-                - fbrpc://call
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -763,7 +764,6 @@ nelmio_security:
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
                 - https://tr-shadow.snapchat.com
-                - fbrpc://
             script-src:
                 - 'self'
                 - 'unsafe-inline'
