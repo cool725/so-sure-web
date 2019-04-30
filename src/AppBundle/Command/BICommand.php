@@ -13,6 +13,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -321,6 +322,8 @@ class BICommand extends ContainerAwareCommand
      */
     private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
     {
+        /** @var InvitationRepository */
+        $invitationRepo = $this->dm->getRepository(Invitation::class);
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
@@ -370,11 +373,17 @@ class BICommand extends ContainerAwareCommand
             '"First time policy"',
             '"Successful Payment"',
             '"Bacs Mandate Cancelled Reason"',
-            '"Premium Installments"'
+            '"Premium Installments"',
+            '"Inviter"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $user = $policy->getUser();
+            $inviter = null;
+            $invitation = $invitationRepo->getOwnInvitation($policy);
+            if ($invitation) {
+                $inviter = $invitation->getPolicy();
+            }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
@@ -442,7 +451,8 @@ class BICommand extends ContainerAwareCommand
                     ($policy->getPolicyOrUserBacsBankAccount() && $policy->isActive(true)) ?
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() : ''
                 ),
-                sprintf('"%s"', $policy->getPremiumInstallments())
+                sprintf('"%s"', $policy->getPremiumInstallments()),
+                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : '')
             ]);
         }
         if (!$skipS3) {
