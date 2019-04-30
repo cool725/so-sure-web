@@ -325,10 +325,10 @@
                                         <td>
                                             {% if phone.suggestedReplacement %}
                                                 &pound;{{ phone.suggestedReplacement.replacementPrice|number_format(2, '.', ',') }}
-                                                <i class="fas fa-info-circle"
+                                                <i class="fal fa-info-circle"
                                                    title="Replacement Price for suggested {{ phone.suggestedReplacement }}"
                                                    data-toggle="tooltip"></i>
-                                                <i class="fas fa-exclamation-triangle"
+                                                <i class="far fa-exclamation-triangle"
                                                    title="Suggested replacement phone is more than £30 than original (£{{ phone.suggestedReplacement.initialPrice - phone.initialPrice }})"
                                                    data-toggle="tooltip"></i>
                                             {% elseif phone.replacementPrice > 0 %}
@@ -482,7 +482,7 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label>
-                                                <i class="fas fa-exclamation-triangle fa-fw"
+                                                <i class="far fa-exclamation-triangle fa-fw"
                                                    title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."
                                                    data-toggle="tooltip"></i>
                                                 From

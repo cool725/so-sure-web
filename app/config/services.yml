@@ -185,6 +185,17 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
+    app.banking:
+        alias: AppBundle\Service\BankingService
+        public: true
+
+    AppBundle\Service\BankingService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%kernel.environment%"
+            - "@snc_redis.default"
+
     app.user.launch:
         alias: AppBundle\Service\LaunchUserService
 

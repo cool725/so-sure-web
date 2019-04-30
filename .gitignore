@@ -40,3 +40,4 @@ deploy/*
 .php_cs.cache
 yarn-error.log
 .scannerwork
+*.swp
