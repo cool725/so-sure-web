@@ -451,7 +451,8 @@ class PolicyService
         \DateTime $date = null,
         $setActive = false,
         $numPayments = null,
-        IdentityLog $identityLog = null
+        IdentityLog $identityLog = null,
+        $billing = null
     ) {
         $this->statsd->startTiming("policy.create");
         try {
@@ -524,10 +525,18 @@ class PolicyService
                 $policy->create(
                     $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID),
                     $prefix,
-                    $date
+                    $date,
+                    1,
+                    $billing
                 );
             } else {
-                $policy->create($this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE), null, $date);
+                $policy->create(
+                    $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE),
+                    null,
+                    $date,
+                    1,
+                    $billing
+                );
             }
 
             $this->setPromoCode($policy);

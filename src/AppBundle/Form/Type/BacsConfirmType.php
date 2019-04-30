@@ -47,6 +47,7 @@ class BacsConfirmType extends AbstractType
             ->add('sortCode', HiddenType::class, ['required' => true])
             ->add('accountNumber', HiddenType::class, ['required' => true])
             ->add('reference', HiddenType::class, ['required' => true])
+            ->add('billingDate', HiddenType::class, ['required' => true])
             ->add('save', SubmitType::class)
             ->add('back', SubmitType::class)
         ;

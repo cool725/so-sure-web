@@ -67,6 +67,9 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[accountNumber]": {
                     required: true,
                 },
+                "bacs_form[billingDate]": {
+                    required: true,
+                },
                 "bacs_form[validateAccountNumber]": {
                     required: true,
                     equalTo: '#bacs_form_accountNumber',
@@ -85,6 +88,9 @@ sosure.purchaseStepBacs = (function() {
                 },
                 "bacs_form[accountNumber]": {
                     required: 'Please enter your account number',
+                },
+                "bacs_form[billingDate]": {
+                    required: 'Please select a billing date',
                 },
                 "bacs_form[validateAccountNumber]": {
                     required: 'Please confirm your account number',

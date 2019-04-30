@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Form;
 
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Address;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
@@ -15,6 +16,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 class Bacs extends BankAccount
 {
     use BacsTrait;
+    use DateTrait;
 
     /**
      * @Assert\Type("bool")
@@ -30,6 +32,11 @@ class Bacs extends BankAccount
     protected $validateName;
 
     /**
+     * @Assert\Range(min="1", max="28")
+     */
+    protected $billingDate;
+
+   /**
      * @AppAssert\AlphanumericSpaceDot()
      * @AppAssert\Token()
      * @var string
@@ -42,6 +49,7 @@ class Bacs extends BankAccount
      * @var string
      */
     protected $validateAccountNumber;
+
 
     public function setSoleSignature($soleSignature)
     {
@@ -63,6 +71,25 @@ class Bacs extends BankAccount
         return $this->validateName;
     }
 
+    public function setBillingDate($billingDate)
+    {
+        $this->billingDate = $billingDate;
+    }
+
+    public function getBillingDate()
+    {
+        return $this->billingDate;
+    }
+
+    /**
+     * The stored billing date value is only an integer so this converts it to a day of the month.
+     * @return \DateTime the day of the month as a date in the current month.
+     */
+    public function getCalculatedBillingDate()
+    {
+        return $this->addDays($this->startOfMonth(), $this->billingDate);
+    }
+  
     public function setValidateSortCode($validateSortCode)
     {
         $this->validateSortCode = $validateSortCode;

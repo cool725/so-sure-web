@@ -58,6 +58,7 @@ class BacsService
     const SUN = '176198';
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
+    const KEY_BACS_PROCESSED = 'bacs:processed';
 
     // special key to use to adjust file date instead of storing in metadata
     const SPECIAL_METADATA_FILE_DATE = 'file-date';
@@ -68,6 +69,7 @@ class BacsService
     const BACS_COMMAND_CANCEL_MANDATE = '0C';
     const BACS_COMMAND_FIRST_DIRECT_DEBIT = '01';
     const BACS_COMMAND_DIRECT_DEBIT = '17';
+    const BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION = '18';
     const BACS_COMMAND_DIRECT_CREDIT = '99';
 
     const ADDACS_REASON_BANK = 0;
@@ -308,6 +310,14 @@ class BacsService
             }
         }
 
+        // State that bacs has been processed for the rest of the day.
+        $time = new \DateTime(SoSure::TIMEZONE);
+        $this->redis->setex(
+            self::KEY_BACS_PROCESSED,
+            $this->endOfDay($time)->getTimestamp() - $time->getTimestamp(),
+            $time->format("d-m-Y H:i")
+        );
+
         return $results;
     }
 
@@ -472,7 +482,14 @@ class BacsService
                 continue;
             }
             $lineData = str_getcsv($line, ",", '"');
-            if (in_array($lineData[2], [self::BACS_COMMAND_FIRST_DIRECT_DEBIT, self::BACS_COMMAND_DIRECT_DEBIT])) {
+            if (in_array(
+                $lineData[2],
+                [
+                    self::BACS_COMMAND_FIRST_DIRECT_DEBIT,
+                    self::BACS_COMMAND_DIRECT_DEBIT,
+                    self::BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION
+                ]
+            )) {
                 $metadata['debits']++;
                 $metadata['debit-amount'] += $lineData[6];
             } elseif ($lineData[2] == self::BACS_COMMAND_CANCEL_MANDATE) {
@@ -853,7 +870,7 @@ class BacsService
                     if ($scheduledPayment) {
                         $this->dispatcher->dispatch(
                             ScheduledPaymentEvent::EVENT_FAILED,
-                            new ScheduledPaymentEvent($scheduledPayment)
+                            new ScheduledPaymentEvent($scheduledPayment, null, $returnCode == 0)
                         );
                     }
                     $results['failed-payments']++;
@@ -2292,12 +2309,19 @@ class BacsService
                 $processingDate = $date;
             }
 
+            // Find which submission code the debit should be sent with.
+            $bacsCode = null;
+            if ($bankAccount->isFirstPayment()) {
+                $bacsCode = self::BACS_COMMAND_FIRST_DIRECT_DEBIT;
+            } elseif ($payment->getScheduledPayment()->getType() == ScheduledPayment::TYPE_RESCHEDULED) {
+                $bacsCode = self::BACS_COMMAND_DIRECT_DEBIT_RE_PRESENTATION;
+            } else {
+                $bacsCode = self::BACS_COMMAND_DIRECT_DEBIT;
+            }
             $lines[] = implode(',', [
                 sprintf('"%s"', $processingDate->format('d/m/y')),
                 '"Scheduled Payment"',
-                $bankAccount->isFirstPayment() ?
-                    sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
-                    sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
+                sprintf('"%s"', $bacsCode),
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),
