@@ -1038,6 +1038,16 @@ class ReportingService
      */
     public function getQuarterlyPL(\DateTime $date, \DateTime $now = null)
     {
+        $redisKey = sprintf(
+            self::REPORT_KEY_FORMAT,
+            'QuarterlyPLReport',
+            'Cached',
+            $date->format('Y-m')
+        );
+        if ($this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
         if (!$now) {
             $now = \DateTime::createFromFormat('U', time());
         }
@@ -1110,6 +1120,8 @@ class ReportingService
             $data['profitSalva'] += $this->toTwoDp($data['profit'] * 0.4);
             $data['profitSoSure'] += $this->toTwoDp($data['profit'] * 0.6);
         }
+
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
 
         return $data;
     }
