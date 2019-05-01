@@ -708,8 +708,6 @@ class BICommand extends ContainerAwareCommand
                     if ($invitee) {
                         $other = $invitee->getLatestPolicy();
                     }
-                } else {
-                    continue;
                 }
             } else {
                 $other = $invitation->getPolicy();
