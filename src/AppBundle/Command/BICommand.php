@@ -706,7 +706,7 @@ class BICommand extends ContainerAwareCommand
                 if ($invitation) {
                     $invitee = $invitation->getInvitee();
                     if ($invitee) {
-                        $other = $invitatee->getLatestPolicy();
+                        $other = $invitee->getLatestPolicy();
                     }
                 } else {
                     continue;
