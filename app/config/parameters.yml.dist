@@ -164,3 +164,6 @@ parameters:
 
     recaptcha_public_key: ""
     recaptcha_private_key: ""
+
+    hubspot_app_key: ""
+    hubspot_deal_pipeline: ""

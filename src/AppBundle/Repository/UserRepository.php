@@ -199,4 +199,66 @@ class UserRepository extends DocumentRepository
         }
         return $qb->getQuery()->execute();
     }
+
+    /**
+     * Gives you the total number of users in the system.
+     * @return int containing the number of users that there are.
+     */
+    public function countAll()
+    {
+        return $this->createQueryBuilder()->getQuery()->execute()->count();
+    }
+
+    /**
+     * Gives you all the users in the system in groups of a given size so that you can do something with those groups.
+     * @param int $size is the size of each group.
+     * @return \Generator which will give you each individual group of users as an array in turn.
+     */
+    public function findAllUsersGrouped($size = 500)
+    {
+        $count = 0;
+        while (true) {
+            $users = $this->createQueryBuilder()->find()->skip($count)->limit($size)->getQuery()->execute();
+            if (!$users->dead()) {
+                yield $users;
+                $count += $size;
+            } else {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Gives you an iterator over all the users that does not load them all into memory at once so that you can process
+     * them individually while using less memory.
+     * @return \Generator which gives you individual users.
+     */
+    public function findAllUsersBatched()
+    {
+        foreach ($this->findAllUsersGrouped() as $group) {
+            foreach ($group as $user) {
+                yield $user;
+            }
+        }
+    }
+
+    /**
+     * Removes every hubspot id on a policy in the system. This is used with a mass delete to remove all references to
+     * data that has been deleted on hubspot already.
+     */
+    public function removeHubspotIds()
+    {
+        $this->createQueryBuilder()->updateMany()->field("hubspotId")->unsetField()->getQuery()->execute();
+    }
+
+    /**
+     * Gives a list of all users that do not have a hubspot id stored.
+     * @return array Containing all of these users.
+     */
+    public function findNonHubspotUsers()
+    {
+        return $this->createQueryBuilder()->find()
+            ->field("hubspotId")->exists(false)
+            ->getQuery()->execute()->toArray();
+    }
 }
