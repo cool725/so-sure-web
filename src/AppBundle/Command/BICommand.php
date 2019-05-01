@@ -702,7 +702,7 @@ class BICommand extends ContainerAwareCommand
             $invitation = $invitationRepo->getOwnInvitation($policy);
             if (!$invitation) {
                 $inverted = true;
-                $invitation = $invitation->getFirstMadeInvitation();
+                $invitation = $invitationRepo->getFirstMadeInvitation($policy);
                 if ($invitation) {
                     $invitee = $invitation->getInvitee();
                     if ($invitee) {
