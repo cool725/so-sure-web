@@ -698,7 +698,7 @@ class BICommand extends ContainerAwareCommand
             /** @var Invitation $invitation */
             $invitation = $invitationRepo->getOwnInvitation($policy);
             $lines[] = implode(',', [
-                sprintf('"%s"', $invitation->getPolicy()->getPolicyNumber()),
+                sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $policy->getPolicyNumber())
             ]);
         }
