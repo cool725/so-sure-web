@@ -684,7 +684,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        /** @var IvitationRepository $invitationRepo */
+        /** @var InvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
         $policies = $policyRepo->createQueryBuilder()
             ->field('leadSource')->in(['scode', 'invitation'])
