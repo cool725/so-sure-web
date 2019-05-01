@@ -70,7 +70,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @Assert\Email(strict=false)
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom,invitation-link", comparison="case-insensitive")
+     * @DataChange(categories="intercom,invitation-link,hubspot", comparison="case-insensitive")
      */
     protected $email;
 
@@ -150,7 +150,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom")
+     * @DataChange(categories="intercom,hubspot")
      */
     protected $firstName;
 
@@ -159,7 +159,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom")
+     * @DataChange(categories="intercom,hubspot")
      */
     protected $lastName;
 
@@ -167,6 +167,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\Choice({"male", "female", "unknown"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $gender;
 
@@ -176,6 +177,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $facebookId;
 
@@ -261,7 +263,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @AppAssert\Mobile()
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @DataChange(categories="intercom,invitation-link")
+     * @DataChange(categories="intercom,invitation-link,hubspot")
      */
     protected $mobileNumber;
 
@@ -343,6 +345,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\EmbedOne(targetDocument="Attribution")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false)
+     * @DataChange(categories="hubspot")
      * @var Attribution
      */
     protected $attribution;
@@ -350,6 +353,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @MongoDB\EmbedOne(targetDocument="Attribution")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $latestAttribution;
 
@@ -357,6 +361,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      * @var \DateTime
      */
     protected $birthday;
@@ -375,6 +380,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Index(unique=true, sparse=true)
      */
     protected $intercomId;
+
+    /**
+     * Vid of the user's representation as a contact on hubspot. Note that hubspot contacts can be manually deleted, so
+     * this value is not a guarantee that there is currently a contact on hubspot representing this user.
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $hubspotId;
 
     /**
      * @AppAssert\Token()
@@ -1754,6 +1769,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function getHubspotId()
+    {
+        return $this->hubspotId;
+    }
+
+    public function setHubspotId($hubspotId)
+    {
+        $this->hubspotId = $hubspotId;
     }
 
     public function getIntercomUserId()

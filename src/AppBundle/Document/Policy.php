@@ -39,6 +39,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Exception\ClaimException;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -248,6 +249,7 @@ abstract class Policy
      *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $status;
 
@@ -385,6 +387,7 @@ abstract class Policy
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false, sparse=true)
+     * @DataChange(categories="hubspot")
      */
     protected $start;
 
@@ -400,6 +403,7 @@ abstract class Policy
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false, sparse=true)
+     * @DataChange(categories="hubspot")
      */
     protected $end;
 
@@ -588,6 +592,16 @@ abstract class Policy
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Participation")
      */
     protected $participations = array();
+
+    /**
+     * Vid of the policy's representation as a deal on hubspot. Note that hubspot deals can be manually deleted, so
+     * this value is not a guarantee that there is currently a deal on hubspot representing this policy.
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $hubspotId;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PaymentMethod\PaymentMethod")
@@ -1531,6 +1545,16 @@ abstract class Policy
         $this->participations[] = $participation;
     }
 
+    public function getHubspotId()
+    {
+        return $this->hubspotId;
+    }
+
+    public function setHubspotId($hubspotId)
+    {
+        $this->hubspotId = $hubspotId;
+    }
+
     public function getStandardConnections()
     {
         $connections = [];
@@ -2009,6 +2033,38 @@ abstract class Policy
     public function getScheduledPayments()
     {
         return $this->scheduledPayments;
+    }
+
+    /**
+     * Gets all scheduled refunds in the future.
+     * @return array containing all of these refunds.
+     */
+    public function getScheduledPaymentRefunds()
+    {
+        $payments = $this->getScheduledPayments();
+        $refunds = [];
+        foreach ($payments as $payment) {
+            if ($payment->getType() == ScheduledPayment::TYPE_REFUND) {
+                $refunds[] = $payment;
+            }
+        }
+        return $refunds;
+    }
+
+    /**
+     * Adds up the total amount of money in scheduled payments.
+     * @return float the total amount.
+     */
+    public function getScheduledPaymentRefundAmount()
+    {
+        $payments = $this->getScheduledPayments();
+        $total = 0;
+        foreach ($payments as $payment) {
+            if ($payment->getType() == ScheduledPayment::TYPE_REFUND) {
+                $total -= $payment->getAmount();
+            }
+        }
+        return $total;
     }
 
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)
@@ -2859,7 +2915,7 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false)
+    public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false, $countScheduled = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
@@ -2872,13 +2928,18 @@ abstract class Policy
             }
         }
 
+        $offset = 0;
+        if ($countScheduled) {
+            $offset = $this->getScheduledPaymentRefundAmount();
+        }
+
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffPremiumRefund($skipValidate);
+            return $this->getCooloffPremiumRefund($skipValidate) - $offset;
         } else {
-            return $this->getProratedPremiumRefund($this->getEnd());
+            return $this->getProratedPremiumRefund($this->getEnd()) - $offset;
         }
     }
 

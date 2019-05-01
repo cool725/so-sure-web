@@ -2,8 +2,9 @@
 
 namespace AppBundle\Repository\Invitation;
 
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Policy;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Repository\BaseDocumentRepository;
 
 class InvitationRepository extends BaseDocumentRepository
@@ -29,5 +30,35 @@ class InvitationRepository extends BaseDocumentRepository
         return $qb->getQuery()
             ->execute()
             ->count();
+    }
+
+    /**
+     * Takes a policy and finds the policy that invited the owning user to join if one exists.
+     * @param Policy $policy is the policy to look into.
+     * @return Invitation|null the inviter or null if there is no inviter.
+     */
+    public function getOwnInvitation($policy)
+    {
+        /** @var Invitation */
+        $invitation = $this->createQueryBuilder()
+            ->field('invitee')->references($policy->getUser())
+            ->sort('created', 'asc')
+            ->getQuery()->getSingleResult();
+        return $invitation;
+    }
+
+    /**
+     * Gets the first invitation made by this policy.
+     * @param Policy $policy is the policy to check.
+     * @return Invitation|null the found invitation or null if they never made any.
+     */
+    public function getFirstMadeInvitation($policy)
+    {
+        /** @var Invitation */
+        $invitation = $this->createQueryBuilder()
+            ->field('inviter')->references($policy->getUser())
+            ->sort('created', 'asc')
+            ->getQuery()->getSingleResult();
+        return $invitation;
     }
 }

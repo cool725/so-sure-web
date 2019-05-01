@@ -185,6 +185,17 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
+    app.banking:
+        alias: AppBundle\Service\BankingService
+        public: true
+
+    AppBundle\Service\BankingService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%kernel.environment%"
+            - "@snc_redis.default"
+
     app.user.launch:
         alias: AppBundle\Service\LaunchUserService
 
@@ -243,6 +254,23 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@app.mailer"
             - "@logger"
+
+    app.hubspot:
+        class: AppBundle\Service\HubspotService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%hubspot_app_key%"
+            - "%hubspot_deal_pipeline%"
+            - "@snc_redis.default"
+            - "@census.search"
+
+    app.hubspot.command:
+        class: AppBundle\Command\HubspotCommand
+        arguments:
+            - "app.hubspot"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "%kernel.environment%"
 
     app.bacs:
         alias: AppBundle\Service\BacsService
@@ -859,6 +887,7 @@ services:
             - "@logger"
             - "@snc_redis.default"
             - "@app.intercom"
+            - "@app.hubspot"
             - "@app.mixpanel"
             - "@app.judopay"
 
@@ -1056,6 +1085,10 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.policy:
+        parent: base.doctrine
+        autowire: false
+        autoconfigure: false
+        public: true
         class:   AppBundle\Listener\DoctrinePolicyListener
         arguments:
             - "@event_dispatcher"
@@ -1177,6 +1210,14 @@ services:
             -  { name: kernel.event_listener, event: event.picsure.invalid, method: onPicSureInvalidEvent }
             -  { name: kernel.event_listener, event: event.picsure.rejected, method: onPicSureDamagedEvent }
 
+    app.listener.hubspot:
+        class: AppBundle\Listener\HubspotListener
+        arguments:
+            - "@app.hubspot"
+        tags:
+            -  { name: kernel.event_listener, event: event.user.updated.hubspot, method: onUserUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated.hubspot, method: onPolicyUpdatedEvent }
+
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
         arguments:
@@ -1265,7 +1306,7 @@ services:
             -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
-    app.listener.hubspot:
+    app.listener.hubspot.kernel:
         class:   AppBundle\Listener\HubspotKernelListener
         arguments:
             - "@logger"

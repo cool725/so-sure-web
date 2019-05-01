@@ -385,7 +385,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrinePolicyListener($dispatcher);
+        $listener = new DoctrinePolicyListener($dispatcher, "test");
         /** @var Reader $reader */
         $reader = static::$container->get('annotations.reader');
         $listener->setReader($reader);
@@ -405,7 +405,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             ->method('dispatch')
             ->with($eventType, $event);
 
-        $listener = new DoctrinePolicyListener($dispatcher);
+        $listener = new DoctrinePolicyListener($dispatcher, "test");
         /** @var Reader $reader */
         $reader = static::$container->get('annotations.reader');
         $listener->setReader($reader);
@@ -426,7 +426,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             ->method('dispatch')
             ->with($eventType, $event);
 
-        $listener = new DoctrinePolicyListener($dispatcher);
+        $listener = new DoctrinePolicyListener($dispatcher, "test");
         /** @var Reader $reader */
         $reader = static::$container->get('annotations.reader');
         $listener->setReader($reader);
@@ -452,7 +452,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             ->method('dispatch')
             ->with($eventType, $event);
 
-        $listener = new DoctrinePolicyListener($dispatcher);
+        $listener = new DoctrinePolicyListener($dispatcher, "test");
         /** @var Reader $reader */
         $reader = static::$container->get('annotations.reader');
         $listener->setReader($reader);
