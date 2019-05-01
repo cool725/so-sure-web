@@ -704,9 +704,9 @@ class BICommand extends ContainerAwareCommand
                 $inverted = true;
                 $invitation = $invitation->getFirstMadeInvitation();
                 if ($invitation) {
-                    $other = $invitation->getInvitee()->getLatestPolicy();
-                    if (!$other) {
-                        continue;
+                    $invitee = $invitation->getInvitee();
+                    if ($invitee) {
+                        $other = $invitatee->getLatestPolicy();
                     }
                 } else {
                     continue;
@@ -715,7 +715,7 @@ class BICommand extends ContainerAwareCommand
                 $other = $invitation->getPolicy();
             }
             $lines[] = implode(',', [
-                sprintf('"%s"', $other ? $other->getPolicyNumber() : ''),
+                sprintf('"%s"', $other ? $other->getPolicyNumber() : 'N/A'),
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $inverted ? "Yes" : "No")
             ]);
