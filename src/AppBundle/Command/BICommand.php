@@ -697,22 +697,25 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($policies as $policy) {
             $inverted = false;
+            $other = null;
             /** @var Invitation $invitation */
             $invitation = $invitationRepo->getOwnInvitation($policy);
             if (!$invitation) {
                 $inverted = true;
                 $invitation = $invitation->getFirstMadeInvitation();
                 if ($invitation) {
-                    $policy = $invitation->getInvitee()->getLatestPolicy();
-                    if (!$policy) {
+                    $other = $invitation->getInvitee()->getLatestPolicy();
+                    if (!$other) {
                         continue;
                     }
                 } else {
                     continue;
                 }
+            } else {
+                $other = $invitation->getPolicy();
             }
             $lines[] = implode(',', [
-                sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
+                sprintf('"%s"', $other ? $other->getPolicyNumber() : ''),
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $inverted ? "Yes" : "No")
             ]);
