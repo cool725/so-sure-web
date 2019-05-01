@@ -685,9 +685,9 @@ class RefundListenerTest extends WebTestCase
 
     /**
      * @param Policy $policy
-     * @param null   $date
-     * @param bool   $monthly
-     * @param int    $adjustment
+     * @param \DateTime $date
+     * @param bool     $monthly
+     * @param int      $adjustment
      * @throws \Exception
      * @return CheckoutPayment
      */
@@ -699,11 +699,11 @@ class RefundListenerTest extends WebTestCase
     ) {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
-            $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice();
             $commission = Salva::MONTHLY_TOTAL_COMMISSION;
         } else {
             $policy->setPremiumInstallments(1);
-            $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
+            $premium = $policy->getPremium()->getYearlyPremiumPrice();
             $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
         if ($adjustment) {
