@@ -682,27 +682,25 @@ class BICommand extends ContainerAwareCommand
 
     private function exportLeadSource($skipS3, \DateTimeZone $timezone)
     {
-        /** @var UserRepository $userRepo */
-        $userRepo = $this->dm->getRepository(User::class);
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
         /** @var IvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
-        $users = $userRepo->createQueryBuilder()->field('leadSource')->in(['scode', 'invitation']);
+        $policies = $policyRepo->createQueryBuilder()
+            ->field('leadSource')->in(['scode', 'invitation'])
+            ->getQuery()->execute();
         $lines = [];
         $lines[] = implode(',', [
             '"Inviter"',
             '"Invitee"'
         ]);
-        foreach ($users as $user) {
-            $inviter = $invitation->createQueryBuilder()
-                ->field('invitee')->references($user)
-                ->sort('created')->ascending()
-                ->getQuery()->getSingleResult();
-            foreach ($user->getPolicies() as $policy) {
-                $lines[] = implode(',', [
-                    sprintf('"%s"', $inviter->getPolicy()->getPolicyNumber()),
-                    sprintf('"%s"', $policy->getPolicyNumber())
-                ]);
-            }
+        foreach ($policies as $policy) {
+            /** @var Invitation $invitation */
+            $invitation = $invitationRepo->getOwnInvitation();
+            $lines[] = implode(',', [
+                sprintf('"%s"', $invitation->getPolicy()->getPolicyNumber()),
+                sprintf('"%s"', $policy->getPolicyNumber())
+            ]);
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'leadSource.csv');

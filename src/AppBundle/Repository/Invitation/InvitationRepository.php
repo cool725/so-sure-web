@@ -42,7 +42,7 @@ class InvitationRepository extends BaseDocumentRepository
         /** @var Invitation */
         $invitation = $this->createQueryBuilder()
             ->field('invitee')->references($policy->getUser())
-            ->field('accepted')->exists(true)
+            ->sort('created', 'asc')
             ->getQuery()->getSingleResult();
         return $invitation;
     }
