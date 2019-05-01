@@ -10,6 +10,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
@@ -113,6 +114,7 @@ class PhonePolicy extends Policy
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $imei;
 
@@ -144,6 +146,7 @@ class PhonePolicy extends Policy
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $serialNumber;
 
@@ -778,7 +781,7 @@ class PhonePolicy extends Policy
 
         return $status;
     }
-    
+
     public function getPicSureStatusWithClaims()
     {
         $status = $this->getPicSureStatus();
