@@ -684,10 +684,10 @@ class RefundListenerTest extends WebTestCase
     }
 
     /**
-     * @param Policy $policy
+     * @param Policy    $policy
      * @param \DateTime $date
-     * @param bool     $monthly
-     * @param int      $adjustment
+     * @param bool      $monthly
+     * @param int       $adjustment
      * @throws \Exception
      * @return CheckoutPayment
      */
