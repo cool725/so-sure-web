@@ -318,7 +318,7 @@ class PolicyRepository extends BaseDocumentRepository
         $this->createQueryBuilder()->updateMany()->field("hubspotId")->unsetField()->getQuery()->execute();
     }
 
-    /*
+    /**
      * Gives a list of policies that have been called for being unpaid optionally within a set of dates.
      * @param \DateTime $start is the first date that the calls can be within or null for whenever.
      * @param \DateTime $end   is the date that the calls must be before.
