@@ -3,9 +3,10 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Service\BacsService;
-use AppBundle\Service\JudopayService;
+use AppBundle\Service\CheckoutService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use AppBundle\Classes\Salva;
@@ -18,7 +19,6 @@ use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 
 class RefundListener
@@ -28,8 +28,8 @@ class RefundListener
     /** @var DocumentManager */
     protected $dm;
 
-    /** @var JudopayService */
-    protected $judopayService;
+    /** @var CheckoutService */
+    protected $checkoutService;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -42,20 +42,20 @@ class RefundListener
 
     /**
      * @param DocumentManager $dm
-     * @param JudopayService  $judopayService
+     * @param CheckoutService $checkoutService
      * @param LoggerInterface $logger
      * @param string          $environment
      * @param BacsService     $bacsService
      */
     public function __construct(
         DocumentManager $dm,
-        JudopayService $judopayService,
+        CheckoutService $checkoutService,
         LoggerInterface $logger,
         $environment,
         BacsService $bacsService
     ) {
         $this->dm = $dm;
-        $this->judopayService = $judopayService;
+        $this->checkoutService = $checkoutService;
         $this->logger = $logger;
         $this->environment = $environment;
         $this->bacsService = $bacsService;
@@ -63,6 +63,7 @@ class RefundListener
 
     /**
      * @param PolicyEvent $event
+     * @throws \Exception
      */
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
@@ -145,8 +146,8 @@ class RefundListener
             }
             try {
                 $notes = sprintf('cancelled %s', $policy->getCancelledReason());
-                if ($payment instanceof JudoPayment) {
-                    $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
+                if ($payment instanceof CheckoutPayment) {
+                    $this->checkoutService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
                 } elseif ($payment instanceof BacsPayment) {
                     // Refund is a negative payment
                     $this->bacsService->scheduleBacsPayment(
@@ -203,8 +204,8 @@ class RefundListener
         }
 
         $payment = $policy->getLastSuccessfulUserPaymentCredit();
-        // Only run against JudoPayments
-        if (!$payment instanceof JudoPayment) {
+        // Only run against CheckoutPayment
+        if (!$payment instanceof CheckoutPayment) {
             return;
         }
 
@@ -226,7 +227,7 @@ class RefundListener
 
             return;
         }
-        $this->judopayService->refund(
+        $this->checkoutService->refund(
             $payment,
             $refundAmount,
             $refundCommissionAmount,
