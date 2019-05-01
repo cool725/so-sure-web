@@ -680,7 +680,8 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportLeadSource($skipS3, \DateTimeZone $timezone) {
+    private function exportLeadSource($skipS3, \DateTimeZone $timezone)
+    {
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         /** @var IvitationRepository $invitationRepo */
@@ -698,7 +699,7 @@ class BICommand extends ContainerAwareCommand
                 ->getQuery()->getSingleResult();
             foreach ($user->getPolicies() as $policy) {
                 $lines[] = implode(',', [
-                    sprintf('"%s"', $inviter->getPolicyNumber()),
+                    sprintf('"%s"', $inviter->getPolicy()->getPolicyNumber()),
                     sprintf('"%s"', $policy->getPolicyNumber())
                 ]);
             }
