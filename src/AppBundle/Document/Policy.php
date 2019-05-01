@@ -2035,6 +2035,38 @@ abstract class Policy
         return $this->scheduledPayments;
     }
 
+    /**
+     * Gets all scheduled refunds in the future.
+     * @return array containing all of these refunds.
+     */
+    public function getScheduledPaymentRefunds()
+    {
+        $payments = $this->getScheduledPayments();
+        $refunds = [];
+        foreach ($payments as $payment) {
+            if ($payment->getType() == ScheduledPayment::TYPE_REFUND) {
+                $refunds[] = $payment;
+            }
+        }
+        return $refunds;
+    }
+
+    /**
+     * Adds up the total amount of money in scheduled payments.
+     * @return float the total amount.
+     */
+    public function getScheduledPaymentRefundAmount()
+    {
+        $payments = $this->getScheduledPayments();
+        $total = 0;
+        foreach ($payments as $payment) {
+            if ($payment->getType() == ScheduledPayment::TYPE_REFUND) {
+                $total -= $payment->getAmount();
+            }
+        }
+        return $total;
+    }
+
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)
     {
         // For some reason, duplicate scheduled payments occurred in production
@@ -2883,7 +2915,7 @@ abstract class Policy
         }
     }
 
-    public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false)
+    public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false, $countScheduled = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
         if (!$this->isCancelled()) {
@@ -2896,13 +2928,18 @@ abstract class Policy
             }
         }
 
+        $offset = 0;
+        if ($countScheduled) {
+            $offset = $this->getScheduledPaymentRefundAmount();
+        }
+
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
 
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffPremiumRefund($skipValidate);
+            return $this->getCooloffPremiumRefund($skipValidate) - $offset;
         } else {
-            return $this->getProratedPremiumRefund($this->getEnd());
+            return $this->getProratedPremiumRefund($this->getEnd()) - $offset;
         }
     }
 

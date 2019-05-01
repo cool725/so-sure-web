@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Aws\S3\S3Client;
 use AppBundle\Classes\SoSure;
+use AppBundle\Service\BankingService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Document\File\LloydsFile;
 
@@ -21,16 +22,24 @@ class BankingCommand extends ContainerAwareCommand
     /** @var DocumentManager  */
     protected $dm;
 
+    /** @var BankingService */
+    protected $bankingService;
+
     /** @var LloydsService */
     protected $lloydsService;
 
     /** @var S3Client */
     protected $s3;
 
-    public function __construct(DocumentManager $dm, LloydsService $lloydsService, S3Client $s3)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        BankingService $bankingService,
+        LloydsService $lloydsService,
+        S3Client $s3
+    ) {
         parent::__construct();
         $this->dm = $dm;
+        $this->bankingService = $bankingService;
         $this->lloydsService = $lloydsService;
         $this->s3 = $s3;
     }
@@ -38,13 +47,19 @@ class BankingCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:banking:import')
-            ->setDescription('Import reports for banking')
+            ->setName('sosure:banking')
+            ->setDescription('Import reports for banking or cache data for banking')
             ->addOption(
                 'lloyds',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Import the specified Lloyds report'
+            )
+            ->addOption(
+                'cache',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Cache banking data for the given date'
             )
         ;
     }
@@ -52,6 +67,7 @@ class BankingCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $lloyds = $input->getOption('lloyds');
+        $cache = $input->getOption('cache');
         if (!empty($lloyds)) {
             $lloydsFile = new LloydsFile();
             $lloydsFile->setBucket(SoSure::S3_BUCKET_ADMIN);
@@ -70,6 +86,20 @@ class BankingCommand extends ContainerAwareCommand
                 'Key' => $lloydsFile->getKey(),
                 'SourceFile' => $lloyds,
             ));
+        } elseif (!empty($cache)) {
+            $date = new \DateTime($cache);
+            $year = $date->format('Y');
+            $month = $date->format('m');
+            $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+            $output->writeln(sprintf('Caching for %d-%d', $year, $month));
+            $this->bankingService->getSoSureBanking($date, false);
+            $this->bankingService->getSalvaBanking($date, $year, $month, false);
+            $this->bankingService->getReconcilationBanking($date, false);
+            $this->bankingService->getJudoBanking($date, $year, $month, false);
+            $this->bankingService->getCheckoutBanking($date, $year, $month, false);
+            $this->bankingService->getCashflowsBanking($date, $year, $month, false);
+            $this->bankingService->getBarclaysBanking($date, $year, $month, false);
+            $this->bankingService->getLloydsBanking($date, $year, $month, false);
         }
         $output->writeln('');
     }
