@@ -692,14 +692,16 @@ class BICommand extends ContainerAwareCommand
         $lines = [];
         $lines[] = implode(',', [
             '"Inviter"',
-            '"Invitee"'
+            '"Invitee"',
+            '"Accepted"'
         ]);
         foreach ($policies as $policy) {
             /** @var Invitation $invitation */
             $invitation = $invitationRepo->getOwnInvitation();
             $lines[] = implode(',', [
                 sprintf('"%s"', $invitation->getPolicy()->getPolicyNumber()),
-                sprintf('"%s"', $policy->getPolicyNumber())
+                sprintf('"%s"', $policy->getPolicyNumber()),
+                sprintf('"%s"', $invitation->getAccepted() ? "Yes" : "No")
             ]);
         }
         if (!$skipS3) {
