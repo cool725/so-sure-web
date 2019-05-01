@@ -31,6 +31,8 @@ class PolicyEvent extends Event
 
     const EVENT_PAYMENT_METHOD_CHANGED = 'event.policy.payment-method.changed';
 
+    const EVENT_UPDATED_HUBSPOT = 'event.policy.updated.hubspot';
+
     /** @var Policy */
     protected $policy;
     protected $date;

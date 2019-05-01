@@ -259,9 +259,19 @@ class BaseDoctrineListener
         return false;
     }
 
-    protected function hasDataChangedByCategory(PreUpdateEventArgs $eventArgs, $category)
+    /**
+     * Tells you if data has changed within a given datachange category.
+     * @param PreUpdateEventArgs $eventArgs is stuff.
+     * @param string             $category  is the category we are checking in.
+     * @param string|null        $class     is an optional type that the data changing object must belong to.
+     * @return boolean true if data has changed and false for other cases.
+     */
+    protected function hasDataChangedByCategory(PreUpdateEventArgs $eventArgs, $category, $class = null)
     {
         $document = $eventArgs->getDocument();
+        if ($class && !$document instanceof $class) {
+            return false;
+        }
         $annotations = $this->getDataChangeAnnotation($document, $category);
         foreach ($annotations as $property => $data) {
             if ($this->hasDataFieldChanged($eventArgs, get_class($document), $property, $data['comparison'])) {
