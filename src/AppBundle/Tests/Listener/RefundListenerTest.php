@@ -683,14 +683,6 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($total['refunded'] < 0);
     }
 
-    /**
-     * @param Policy    $policy
-     * @param \DateTime $date
-     * @param bool      $monthly
-     * @param int       $adjustment
-     * @throws \Exception
-     * @return CheckoutPayment
-     */
     private static function prepCheckoutPaymentToAdd(
         Policy $policy,
         $date = null,
