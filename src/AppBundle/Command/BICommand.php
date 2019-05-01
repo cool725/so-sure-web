@@ -99,7 +99,7 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'only run 1 export [policies, claims, users, invitations, connections, phones, unpaidCalls]'
+                'only run 1 export [policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource]'
             )
             ->addOption(
                 'skip-s3',
@@ -164,6 +164,12 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$only || $only == 'unpaidCalls') {
             $lines = $this->exportUnpaidCalls($skipS3, $timezone);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
+        }
+        if (!$only || $only == 'leadSource') {
+            $lines = $this->exportLeadSource($skipS3, $timezone);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
@@ -670,6 +676,34 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'unpaidCalls.csv');
+        }
+        return $lines;
+    }
+
+    private function exportLeadSource($skipS3, \DateTimeZone $timezone)
+    {
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        /** @var InvitationRepository $invitationRepo */
+        $invitationRepo = $this->dm->getRepository(Invitation::class);
+        $policies = $policyRepo->createQueryBuilder()
+            ->field('leadSource')->in(['scode', 'invitation'])
+            ->getQuery()->execute();
+        $lines = [];
+        $lines[] = implode(',', [
+            '"Inviter"',
+            '"Invitee"'
+        ]);
+        foreach ($policies as $policy) {
+            /** @var Invitation $invitation */
+            $invitation = $invitationRepo->getOwnInvitation($policy);
+            $lines[] = implode(',', [
+                sprintf('"%s"', $invitation->getPolicy()->getPolicyNumber()),
+                sprintf('"%s"', $policy->getPolicyNumber())
+            ]);
+        }
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'leadSource.csv');
         }
         return $lines;
     }
