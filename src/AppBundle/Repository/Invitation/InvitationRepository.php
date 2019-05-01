@@ -46,4 +46,19 @@ class InvitationRepository extends BaseDocumentRepository
             ->getQuery()->getSingleResult();
         return $invitation;
     }
+
+    /**
+     * Gets the first invitation made by this policy.
+     * @param Policy $policy is the policy to check.
+     * @return Invitation|null the found invitation or null if they never made any.
+     */
+    public function getFirstMadeInvitation($policy)
+    {
+        /** @var Invitation */
+        $invitation = $this->createQueryBuilder()
+            ->field('inviter')->references($policy->getUser())
+            ->sort('created', 'asc')
+            ->getQuery()->getSingleResult();
+        return $invitation;
+    }
 }
