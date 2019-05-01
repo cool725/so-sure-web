@@ -42,7 +42,12 @@ class AdminReportsCommand extends ContainerAwareCommand
             ->addOption('accounts', null, InputOption::VALUE_NONE, "Run the 'accounts' report")
             ->addOption('connections', null, InputOption::VALUE_NONE, "Run the 'connections' report")
             ->addOption('pnl', null, InputOption::VALUE_NONE, 'Run the quarterly P&L report')
-            ->addOption('date', null, InputOption::VALUE_OPTIONAL, "Use with pnl to cache historic reports. Format yyyy/mm")
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "Use with pnl to cache historic reports. Format yyyy/mm"
+            )
         ;
     }
 
@@ -71,7 +76,7 @@ class AdminReportsCommand extends ContainerAwareCommand
          */
         if ($input->getOption('date')) {
             $toUse = explode('/', $input->getOption('date'));
-            if (strlen($toUse[0]) === 4 && strlen($toUse[1]) === 2) {
+            if (mb_strlen($toUse[0]) === 4 && mb_strlen($toUse[1]) === 2) {
                 $date->setDate((int) $toUse[0], (int) $toUse[1], 1);
             }
         }
