@@ -261,4 +261,26 @@ class UserRepository extends DocumentRepository
             ->field("hubspotId")->exists(false)
             ->getQuery()->execute()->toArray();
     }
+
+    /**
+     * Finds all users that have a hubspot id in groups of some size.
+     * @param int $n is the max size of each group.
+     * @return \Generator which lets you iterate over each group.
+     */
+    public function findHubspotUsersGrouped($n = 100)
+    {
+        $start = 0;
+        while (true) {
+            $users = $this->createQueryBuilder()
+            ->field('hubspotId')->exists(true)
+            ->skip($start)->limit($n)
+            ->getQuery()->execute();
+            if ($users->dead()) {
+                return;
+            } else {
+                yield $users;
+            }
+            $start += $n;
+        }
+    }
 }
