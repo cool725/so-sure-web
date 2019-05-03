@@ -48,6 +48,7 @@ class RefundListener
     /**
      * @param DocumentManager $dm
      * @param CheckoutService $checkoutService
+     * @param JudopayService  $judopayService
      * @param LoggerInterface $logger
      * @param string          $environment
      * @param BacsService     $bacsService

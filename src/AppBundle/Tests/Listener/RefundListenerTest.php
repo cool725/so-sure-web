@@ -702,8 +702,7 @@ class RefundListenerTest extends WebTestCase
         $date = null,
         $monthly = true,
         $adjustment = 0
-    )
-    {
+    ) {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
             $premium = $policy->getPremium()->getMonthlyPremiumPrice();
