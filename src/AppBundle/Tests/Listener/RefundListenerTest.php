@@ -46,6 +46,7 @@ class RefundListenerTest extends WebTestCase
     protected static $dm;
     protected static $userRepo;
     protected static $checkoutpayService;
+    protected static $judopayService;
     protected static $redis;
     protected static $logger;
     /** @var BacsService */
@@ -70,6 +71,7 @@ class RefundListenerTest extends WebTestCase
         self::$policyService = self::$container->get('app.policy');
         self::$redis = self::$container->get('snc_redis.default');
         self::$checkoutpayService = self::$container->get('app.checkout');
+        self::$judopayService = self::$container->get('app.judopay');
         self::$logger = self::$container->get('logger');
         /** @var BacsService $bacsService */
         $bacsService = self::$container->get('app.bacs');
@@ -97,6 +99,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -122,6 +125,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -151,7 +155,7 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
-        
+
         // simulate a free month - checkout refund + so-sure addition
         static::addPayment(
             $policy,
@@ -169,6 +173,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -183,7 +188,7 @@ class RefundListenerTest extends WebTestCase
 
         $total = Payment::sumPayments($policy->getPayments(), false);
         $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-        
+
         // checkout initial, checkout refund for free month
         // so-sure payment to offset checkout refund, so-sure refund for cancellation
         $this->assertEquals(4, count($policy->getPayments()));
@@ -211,7 +216,7 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
-        
+
         // simulate a free month - checkout refund + so-sure addition
         static::addPayment(
             $policy,
@@ -229,6 +234,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -243,7 +249,7 @@ class RefundListenerTest extends WebTestCase
 
         $total = Payment::sumPayments($policy->getPayments(), false);
         $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-        
+
         // checkout initial, checkout refund for free month
         // so-sure payment to offset checkout refund, so-sure refund for cancellation
         $this->assertEquals(5, count($policy->getPayments()));
@@ -288,6 +294,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -340,6 +347,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -383,6 +391,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -416,6 +425,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -444,6 +454,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -497,6 +508,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -564,6 +576,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -643,7 +656,7 @@ class RefundListenerTest extends WebTestCase
             Payment::sumPayments($renewalPolicy->getPayments(), false, PolicyDiscountPayment::class)['total']
         );
 
-        static::prepCheckoutPaymentToAdd($renewalPolicy, new \DateTime('2017-01-01'), true, 10/12);
+        static::prepCheckoutPaymentToAdd($renewalPolicy, new \DateTime('2017-01-01'), true, 10 / 12);
 
         $renewalPolicy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
         $renewalPolicy->setStatus(PhonePolicy::STATUS_CANCELLED);
@@ -656,6 +669,7 @@ class RefundListenerTest extends WebTestCase
         $listener = new RefundListener(
             static::$dm,
             static::$checkoutpayService,
+            static::$judopayService,
             static::$logger,
             'test',
             self::$bacsService
@@ -688,7 +702,8 @@ class RefundListenerTest extends WebTestCase
         $date = null,
         $monthly = true,
         $adjustment = 0
-    ) {
+    )
+    {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
             $premium = $policy->getPremium()->getMonthlyPremiumPrice();
