@@ -41,6 +41,13 @@ class AdminReportsCommand extends ContainerAwareCommand
             ->addOption('claims', null, InputOption::VALUE_NONE, "Run the 'claims' report")
             ->addOption('accounts', null, InputOption::VALUE_NONE, "Run the 'accounts' report")
             ->addOption('connections', null, InputOption::VALUE_NONE, "Run the 'connections' report")
+            ->addOption('pnl', null, InputOption::VALUE_NONE, 'Run the quarterly P&L report')
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "Use with pnl to cache historic reports. Format yyyy/mm"
+            )
         ;
     }
 
@@ -60,6 +67,22 @@ class AdminReportsCommand extends ContainerAwareCommand
 
         if ($input->getOption('connections')) {
             $this->cacheConnectionsReport();
+        }
+
+        $date = new \DateTime();
+        /**
+         * If we have a date option, check that it is yyyy/mm
+         * So long as it is, then set the date to the 1st of that month and year
+         */
+        if ($input->getOption('date')) {
+            $toUse = explode('/', $input->getOption('date'));
+            if (mb_strlen($toUse[0]) === 4 && mb_strlen($toUse[1]) === 2) {
+                $date->setDate((int) $toUse[0], (int) $toUse[1], 1);
+            }
+        }
+
+        if ($input->getOption('pnl')) {
+            $this->cachePNLReport($date);
         }
     }
 
@@ -107,5 +130,10 @@ class AdminReportsCommand extends ContainerAwareCommand
         $this->reporting->getAllPaymentTotals($isProd, $twoMonths, false);
         $output->writeln(sprintf('Caching accounts for %s', $threeMonths->format(\DateTime::ATOM)));
         $this->reporting->getAllPaymentTotals($isProd, $threeMonths, false);
+    }
+
+    private function cachePNLReport($date)
+    {
+        $this->reporting->getQuarterlyPL($date);
     }
 }
