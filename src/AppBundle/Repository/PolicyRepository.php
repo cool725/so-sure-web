@@ -352,7 +352,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('hubspotId')->exists(true)
             ->skip($start)->limit($n)
             ->getQuery()->execute();
-            if ($policies->isDead()) {
+            if ($policies->dead()) {
                 return;
             } else {
                 yield $policies;

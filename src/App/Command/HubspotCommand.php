@@ -65,7 +65,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setDescription("Syncs our data with HubSpot")
+        $this->setDescription("Controls the Hubspot service which syncs data to a hubspo")
             ->addArgument(
                 "action",
                 InputArgument::REQUIRED,
@@ -236,7 +236,7 @@ class HubspotCommand extends ContainerAwareCommand
     }
 
     /**
-     * Synchronously uploads a given property for every hubspot user to hubspot.
+     * Synchronously uploads a given property for every hubspot policy to hubspot.
      * @param OutputInterface $output     is output for showing some info about what we are doing.
      * @param array           $properties is the list of properties to sync. It can not be empty.
      */
@@ -246,9 +246,9 @@ class HubspotCommand extends ContainerAwareCommand
             $output->writeln("Property not given.");
             return;
         }
-        /** @var UserRepository */
-        $userRepo = $this->dm->getRepository(User::class);
-        $groups = $userRepo->findHubspotPoliciesGrouped();
+        /** @var PolicyRepository */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $groups = $policyRepo->findHubspotPoliciesGrouped();
         $progressBar = new ProgressBar($output);
         $started = false;
         foreach ($groups as $group) {
@@ -256,7 +256,7 @@ class HubspotCommand extends ContainerAwareCommand
                 $progressBar->start($group->count());
                 $started = true;
             }
-            $this->hubspot->createOrUpdateDealBatch($group, $properties);
+            $this->hubspot->updateDealBatch($group, $properties);
             $progressBar->advance($group->count(true));
         }
         $progressBar->finish();
