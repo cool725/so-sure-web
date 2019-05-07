@@ -1429,10 +1429,7 @@ class CheckoutService
          * so seeing as we are now going to be using the account updaters
          * to automatically update expired cards, we don't need to check this anymore.
          */
-        if (
-            ($policy->hasPaymentMethod() && $recurring) ||
-            $policy->hasPolicyOrUserValidPaymentMethod()
-        ) {
+        if (($policy->hasPaymentMethod() && $recurring) || $policy->hasPolicyOrUserValidPaymentMethod()) {
             $tokenPaymentDetails = $this->runTokenPayment(
                 $policy,
                 $amount,
