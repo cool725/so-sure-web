@@ -1424,7 +1424,12 @@ class CheckoutService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        if ($policy->hasPolicyOrUserValidPaymentMethod()) {
+        /**
+         * The isValid check only checks for expired cards,
+         * so seeing as we are now going to be using the account updaters
+         * to automatically update expired cards, we don't need to check this anymore.
+         */
+        if ($policy->hasPaymentMethod()) {
             $tokenPaymentDetails = $this->runTokenPayment(
                 $policy,
                 $amount,
