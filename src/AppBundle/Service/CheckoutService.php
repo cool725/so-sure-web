@@ -1425,7 +1425,13 @@ class CheckoutService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         if ($policy->hasPolicyOrUserValidPaymentMethod()) {
-            $tokenPaymentDetails = $this->runTokenPayment($policy, $amount, $payment->getId(), $policy->getId(), $recurring);
+            $tokenPaymentDetails = $this->runTokenPayment(
+                $policy,
+                $amount,
+                $payment->getId(),
+                $policy->getId(),
+                $recurring
+            );
 
             $payment->setReceipt($tokenPaymentDetails->getId());
             $payment->setAmount($this->convertFromPennies($tokenPaymentDetails->getValue()));
