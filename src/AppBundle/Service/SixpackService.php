@@ -31,9 +31,9 @@ class SixpackService
     const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
-    const EXPERIMENT_SCODE_LANDING_TEXT = 'scode-landing-text';
+    // const EXPERIMENT_SCODE_LANDING_TEXT = 'scode-landing-text';
     // Exp 2
-    const EXPERIMENT_EMAIL_LANDING_TEXT = 'email-landing-text';
+    // const EXPERIMENT_EMAIL_LANDING_TEXT = 'email-landing-text';
     // Exp 3
     // const EXPERIMENT_HOME_COMPARISON = 'home-comparison';
     // Exp 4
@@ -119,14 +119,16 @@ class SixpackService
         'ebay-landing-2',
         'home-comparison',
         'homepage-usps',
+        'scode-landing-text',
+        'email-landing-text',
     ];
 
     public static $unauthExperiments = [
         self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-        self::EXPERIMENT_SCODE_LANDING_TEXT,
+        // self::EXPERIMENT_SCODE_LANDING_TEXT,
         // Exp 2
-        self::EXPERIMENT_EMAIL_LANDING_TEXT,
+        // self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
         // self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
@@ -212,9 +214,9 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_SCODE_LANDING_TEXT,
+        // self::EXPERIMENT_SCODE_LANDING_TEXT,
         // Exp 2
-        self::EXPERIMENT_EMAIL_LANDING_TEXT,
+        // self::EXPERIMENT_EMAIL_LANDING_TEXT,
         // Exp 3
         // self::EXPERIMENT_HOME_COMPARISON,
         // Exp 4
