@@ -544,7 +544,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * @return PaymentMethod that has been freshly created according to the given specifications.
      */
 
-    private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs)
+    private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs = false)
     {
         $paymentMethod = null;
         if ($isPaymentMethodBacs) {
@@ -664,7 +664,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
-        $policy->setPaymentMethod($this->getPaymentMethod($policy, $isPaymentMethodBacs));
+        $policy->setPaymentMethod(
+            $this->getPaymentMethod($policy, ($isPaymentMethodBacs !== null) ? $isPaymentMethodBacs : (rand(0, 1) == 0))
+        );
         $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
