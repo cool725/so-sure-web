@@ -1272,6 +1272,7 @@ services:
         class:   AppBundle\Listener\RefundListener
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.checkout"
             - "@app.judopay"
             - "@logger"
             - "%kernel.environment%"
