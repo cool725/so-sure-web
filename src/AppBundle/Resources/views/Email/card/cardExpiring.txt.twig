@@ -5,7 +5,11 @@ Did you know your card is due to expire?
     Your card ending {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.cardLastFour }} will expire on {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod.getCardEndDateAsDate | date('m/y', 'Europe/London') }}.
 {% endif %}
 
-Please update your payment details by clicking the link below.
+If your card is enrolled with the Card Updater Scheme, the details will be updated automatically.
+
+To find out if your card is enrolled for the Card Updater Scheme, or for more information or to opt out, please contact your card issuer.
+
+If you are not enrolled, or do not want to have your card details automatically updated, then please update your payment details by clicking the link below.
 
 Update my payment details: {{ branch_card_url }}
 
