@@ -704,6 +704,7 @@ class CheckoutService
     /**
      * @param Policy $policy
      * @param string $token
+     * @param mixed  $amount
      */
     public function capturePaymentMethod(
         Policy $policy,
@@ -1123,7 +1124,8 @@ class CheckoutService
                 $scheduledPayment->getAmount(),
                 $scheduledPayment->getNotes() ?: $scheduledPayment->getType(),
                 $abortOnMultipleSameDayPayment,
-                $date
+                $date,
+                true
             );
         } catch (SameDayPaymentException $e) {
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1318,7 +1320,7 @@ class CheckoutService
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
     }
 
-    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId)
+    public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $recurring = false)
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
@@ -1350,6 +1352,9 @@ class CheckoutService
             $chargeCreate->setTrackId($paymentRef);
             $chargeCreate->setMetadata(['policy_id' => $policyId]);
             $chargeCreate->setCardId($paymentMethod->getCardToken());
+            if ($recurring) {
+                $chargeCreate->setTransactionIndicator(2);
+            }
 
             $chargeResponse = $chargeService->chargeWithCardId($chargeCreate);
 
@@ -1373,7 +1378,8 @@ class CheckoutService
         $amount = null,
         $notes = null,
         $abortOnMultipleSameDayPayment = true,
-        \DateTime $date = null
+        \DateTime $date = null,
+        $recurring = false
     ) {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -1418,8 +1424,19 @@ class CheckoutService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        if ($policy->hasPolicyOrUserValidPaymentMethod()) {
-            $tokenPaymentDetails = $this->runTokenPayment($policy, $amount, $payment->getId(), $policy->getId());
+        /**
+         * The isValid check only checks for expired cards,
+         * so seeing as we are now going to be using the account updaters
+         * to automatically update expired cards, we don't need to check this anymore.
+         */
+        if (($policy->hasPaymentMethod() && $recurring) || $policy->hasPolicyOrUserValidPaymentMethod()) {
+            $tokenPaymentDetails = $this->runTokenPayment(
+                $policy,
+                $amount,
+                $payment->getId(),
+                $policy->getId(),
+                $recurring
+            );
 
             $payment->setReceipt($tokenPaymentDetails->getId());
             $payment->setAmount($this->convertFromPennies($tokenPaymentDetails->getValue()));
