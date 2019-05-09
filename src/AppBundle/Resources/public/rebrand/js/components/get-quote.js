@@ -27,12 +27,9 @@ $(function() {
         quoteModal.toggleClass('getquote--open');
     }
 
-    $(window).on('load', function() {
-        // Trigger by class
-        quoteToggle.on('click', function(e) {
-            e.preventDefault();
-            getQuote();
-        });
+    quoteToggle.on('click', function(e) {
+        e.preventDefault();
+        getQuote();
     });
 
     // Escape key close

@@ -79,7 +79,7 @@ class InvitationController extends BaseController
                      'Invitation Method' => $invitation->getChannel(),
                      'Invitation Action' => 'declined',
                 ]);
-                $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT);
+                // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT);
                 return $this->redirectToRoute('invitation', [
                     'id' => $id,
                 ]);
@@ -103,16 +103,16 @@ class InvitationController extends BaseController
             // @codingStandardsIgnoreEnd
         }
 
-        $landingText = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT,
-            ['email-landing-text-a', 'email-landing-text-b']
-        );
+        // $landingText = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT,
+        //     ['email-landing-text-a', 'email-landing-text-b']
+        // );
 
         return array(
             'invitation' => $invitation,
             'form' => $declineForm->createView(),
-            'landing_text' => $landingText,
+            // 'landing_text' => $landingText,
         );
     }
 }

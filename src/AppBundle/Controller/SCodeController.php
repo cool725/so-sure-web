@@ -81,15 +81,15 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        $landingText = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_SCODE_LANDING_TEXT,
-            ['scode-landing-text-a', 'scode-landing-text-b']
-        );
+        // $landingText = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_SCODE_LANDING_TEXT,
+        //     ['scode-landing-text-a', 'scode-landing-text-b']
+        // );
 
         return array(
             'scode' => $scode,
-            'landing_text' => $landingText,
+            // 'landing_text' => $landingText,
         );
     }
 }
