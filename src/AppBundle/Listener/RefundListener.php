@@ -215,7 +215,7 @@ class RefundListener
 
         $payment = $policy->getLastSuccessfulUserPaymentCredit();
         // Only run against Checkout or JudoPay
-        if (!$payment instanceof CheckoutPayment || !$payment instanceof JudoPayment) {
+        if (!$payment instanceof CheckoutPayment && !$payment instanceof JudoPayment) {
             return;
         }
 
