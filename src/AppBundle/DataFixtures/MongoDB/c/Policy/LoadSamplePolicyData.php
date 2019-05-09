@@ -537,6 +537,19 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs)
     {
+        
+
+
+
+
+
+
+
+
+
+
+
+
         $bacs = false;
         if ($isPaymentMethodBacs === null) {
             $bacs = random_int(0, 1) == 0;
