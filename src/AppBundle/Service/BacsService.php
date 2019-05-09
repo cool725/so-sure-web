@@ -292,7 +292,13 @@ class BacsService
                 $error = true;
                 $errorCount++;
                 $this->logger->error(
-                    sprintf('Failed processing file %s in %s', $unzippedFile, $file),
+                    sprintf(
+                        'Failed processing file %s in %s with error: %s, stack trace: %s',
+                        $unzippedFile,
+                        $file,
+                        $e->getMessage(),
+                        $e->getTraceAsString()
+                    ),
                     ['exception' => $e]
                 );
             }
