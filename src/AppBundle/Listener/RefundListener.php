@@ -3,8 +3,11 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
@@ -18,7 +21,6 @@ use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 
 class RefundListener
@@ -27,6 +29,9 @@ class RefundListener
 
     /** @var DocumentManager */
     protected $dm;
+
+    /** @var CheckoutService */
+    protected $checkoutService;
 
     /** @var JudopayService */
     protected $judopayService;
@@ -42,6 +47,7 @@ class RefundListener
 
     /**
      * @param DocumentManager $dm
+     * @param CheckoutService $checkoutService
      * @param JudopayService  $judopayService
      * @param LoggerInterface $logger
      * @param string          $environment
@@ -49,12 +55,14 @@ class RefundListener
      */
     public function __construct(
         DocumentManager $dm,
+        CheckoutService $checkoutService,
         JudopayService $judopayService,
         LoggerInterface $logger,
         $environment,
         BacsService $bacsService
     ) {
         $this->dm = $dm;
+        $this->checkoutService = $checkoutService;
         $this->judopayService = $judopayService;
         $this->logger = $logger;
         $this->environment = $environment;
@@ -63,6 +71,7 @@ class RefundListener
 
     /**
      * @param PolicyEvent $event
+     * @throws \Exception
      */
     public function onPolicyCancelledEvent(PolicyEvent $event)
     {
@@ -145,7 +154,9 @@ class RefundListener
             }
             try {
                 $notes = sprintf('cancelled %s', $policy->getCancelledReason());
-                if ($payment instanceof JudoPayment) {
+                if ($payment instanceof CheckoutPayment) {
+                    $this->checkoutService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
+                } elseif ($payment instanceof JudoPayment) {
                     $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
                 } elseif ($payment instanceof BacsPayment) {
                     // Refund is a negative payment
@@ -203,8 +214,8 @@ class RefundListener
         }
 
         $payment = $policy->getLastSuccessfulUserPaymentCredit();
-        // Only run against JudoPayments
-        if (!$payment instanceof JudoPayment) {
+        // Only run against Checkout or JudoPay
+        if (!$payment instanceof CheckoutPayment && !$payment instanceof JudoPayment) {
             return;
         }
 
@@ -226,13 +237,36 @@ class RefundListener
 
             return;
         }
-        $this->judopayService->refund(
-            $payment,
-            $refundAmount,
-            $refundCommissionAmount,
-            sprintf('promo %s refund', $policy->getPromoCode()),
-            Payment::SOURCE_SYSTEM
-        );
+        try {
+            if ($payment instanceof CheckoutPayment) {
+                $this->checkoutService->refund(
+                    $payment,
+                    $refundAmount,
+                    $refundCommissionAmount,
+                    sprintf('promo %s refund', $policy->getPromoCode()),
+                    Payment::SOURCE_SYSTEM
+                );
+            } elseif ($payment instanceof JudoPayment) {
+                $this->judopayService->refund(
+                    $payment,
+                    $refundAmount,
+                    $refundCommissionAmount,
+                    sprintf('promo %s refund', $policy->getPromoCode()),
+                    Payment::SOURCE_SYSTEM
+                );
+            }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf(
+                    'Failed to refund free month promo on policy %s for %0.2f.',
+                    $policy->getId(),
+                    $refundAmount
+                ),
+                ['exception' => $e]
+            );
+            return;
+        }
+
         $sosurePayment = SoSurePayment::init(Payment::SOURCE_SYSTEM);
         $sosurePayment->setAmount($refundAmount);
         $sosurePayment->setTotalCommission($refundCommissionAmount);

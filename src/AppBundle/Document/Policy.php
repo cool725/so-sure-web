@@ -39,6 +39,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Exception\ClaimException;
+use AppBundle\Annotation\DataChange;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -248,6 +249,7 @@ abstract class Policy
      *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @DataChange(categories="hubspot")
      */
     protected $status;
 
@@ -385,6 +387,7 @@ abstract class Policy
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false, sparse=true)
+     * @DataChange(categories="hubspot")
      */
     protected $start;
 
@@ -400,6 +403,7 @@ abstract class Policy
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      * @MongoDB\Index(unique=false, sparse=true)
+     * @DataChange(categories="hubspot")
      */
     protected $end;
 
@@ -588,6 +592,16 @@ abstract class Policy
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Participation")
      */
     protected $participations = array();
+
+    /**
+     * Vid of the policy's representation as a deal on hubspot. Note that hubspot deals can be manually deleted, so
+     * this value is not a guarantee that there is currently a deal on hubspot representing this policy.
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $hubspotId;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PaymentMethod\PaymentMethod")
@@ -1529,6 +1543,16 @@ abstract class Policy
     {
         $participation->setPolicy($this);
         $this->participations[] = $participation;
+    }
+
+    public function getHubspotId()
+    {
+        return $this->hubspotId;
+    }
+
+    public function setHubspotId($hubspotId)
+    {
+        $this->hubspotId = $hubspotId;
     }
 
     public function getStandardConnections()

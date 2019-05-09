@@ -70,14 +70,16 @@ class BankingService
             $this->environment === "prod" ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
 
         /** @var CashflowsFileRepository $cashflowsFileRepo */
         $cashflowsFileRepo = $this->dm->getRepository(CashflowsFile::class);
-
         $monthlyCashflowFiles = $cashflowsFileRepo->getMonthlyFiles($date);
+
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            $cashflows = unserialize($this->redis->get($redisKey));
+            $cashflows['files'] = $monthlyCashflowFiles;
+            return $cashflows;
+        }
 
         $monthlyPerDayCashflowsTransaction = CashflowsFile::combineDailyTransactions($monthlyCashflowFiles);
         $monthlyPerDayCashflowsProcessing = CashflowsFile::combineDailyProcessing($monthlyCashflowFiles);
@@ -100,10 +102,11 @@ class BankingService
             'yearlyProcessed' => CashflowsFile::totalCombinedFiles($yearlyCashflowsProcessing),
             'allTransaction' => CashflowsFile::totalCombinedFiles($allCashflowsTransaction),
             'allProcessed' => CashflowsFile::totalCombinedFiles($allCashflowsProcessing),
-            'files' => json_decode(json_encode($monthlyCashflowFiles), true),
         ];
 
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($cashflows));
+
+        $cashflows['files'] = $monthlyCashflowFiles;
 
         return $cashflows;
     }
@@ -180,14 +183,17 @@ class BankingService
             $this->environment === "prod" ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
 
         /** @var ReconcilationFileRepository $reconcilationFileRepo */
         $reconcilationFileRepo = $this->dm->getRepository(ReconciliationFile::class);
-
         $monthlyReconcilationFiles = $reconcilationFileRepo->getMonthlyFiles($date);
+
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            $reconciliation = unserialize($this->redis->get($redisKey));
+            $reconciliation['files'] = $monthlyReconcilationFiles;
+            return $reconciliation;
+        }
+
         $yearlyReconcilationFiles = $reconcilationFileRepo->getYearlyFilesToDate($date);
         $allReconcilationFiles = $reconcilationFileRepo->getAllFilesToDate($date);
 
@@ -195,10 +201,11 @@ class BankingService
             'monthlyTransaction' => ReconciliationFile::combineMonthlyTotal($monthlyReconcilationFiles),
             'yearlyTransaction' => ReconciliationFile::combineMonthlyTotal($yearlyReconcilationFiles),
             'allTransaction' => ReconciliationFile::combineMonthlyTotal($allReconcilationFiles),
-            'files' => json_decode(json_encode($monthlyReconcilationFiles), true),
         ];
 
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($reconciliation));
+
+        $reconciliation['files'] = $monthlyReconcilationFiles;
 
         return $reconciliation;
     }
@@ -211,14 +218,17 @@ class BankingService
             $this->environment === "prod" ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
 
         /** @var JudoFileRepository $judoFileRepo */
         $judoFileRepo = $this->dm->getRepository(JudoFile::class);
-
         $monthlyJudoFiles = $judoFileRepo->getMonthlyFiles($date);
+
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            $judo = unserialize($this->redis->get($redisKey));
+            $judo['files'] = $monthlyJudoFiles;
+            return $judo;
+        }
+
         $monthlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($monthlyJudoFiles);
 
         $yearlyJudoFiles = $judoFileRepo->getYearlyFilesToDate($date);
@@ -232,10 +242,11 @@ class BankingService
             'monthlyTransaction' => JudoFile::totalCombinedFiles($monthlyPerDayJudoTransaction, $year, $month),
             'yearlyTransaction' => JudoFile::totalCombinedFiles($yearlyPerDayJudoTransaction),
             'allTransaction' => JudoFile::totalCombinedFiles($allJudoTransaction),
-            'files' => json_decode(json_encode($monthlyJudoFiles), true),
         ];
 
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($judo));
+
+        $judo['files'] = $monthlyJudoFiles;
 
         return $judo;
     }
@@ -248,14 +259,17 @@ class BankingService
             $this->environment === "prod" ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
 
         /** @var CheckoutFileRepository $checkoutFileRepo */
         $checkoutFileRepo = $this->dm->getRepository(CheckoutFile::class);
-
         $monthlyCheckoutFiles = $checkoutFileRepo->getMonthlyFiles($date);
+
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            $checkout = unserialize($this->redis->get($redisKey));
+            $checkout['files'] = $monthlyCheckoutFiles;
+            return $checkout;
+        }
+
         $monthlyPerDayCheckoutTransaction = CheckoutFile::combineDailyTransactions($monthlyCheckoutFiles);
 
         $yearlyCheckoutFiles = $checkoutFileRepo->getYearlyFilesToDate($date);
@@ -269,10 +283,11 @@ class BankingService
             'monthlyTransaction' => CheckoutFile::totalCombinedFiles($monthlyPerDayCheckoutTransaction, $year, $month),
             'yearlyTransaction' => CheckoutFile::totalCombinedFiles($yearlyPerDayCheckoutTransaction),
             'allTransaction' => CheckoutFile::totalCombinedFiles($allCheckoutTransaction),
-            'files' => json_decode(json_encode($monthlyCheckoutFiles), true),
         ];
 
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($checkout));
+
+        $checkout['files'] = $monthlyCheckoutFiles;
 
         return $checkout;
     }
@@ -317,14 +332,17 @@ class BankingService
             $this->environment === "prod" ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
 
         /** @var BarclaysFileRepository $barclaysFileRepo */
         $barclaysFileRepo = $this->dm->getRepository(BarclaysFile::class);
-
         $monthlyBarclaysFiles = $barclaysFileRepo->getMonthlyFiles($date);
+
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            $barclays = unserialize($this->redis->get($redisKey));
+            $barclays['files'] = $monthlyBarclaysFiles;
+            return $barclays;
+        }
+
         $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
         $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
 
@@ -345,10 +363,11 @@ class BankingService
             'yearlyProcessed' => BarclaysFile::totalCombinedFiles($yearlyBarclaysProcessing),
             'allTransaction' => BarclaysFile::totalCombinedFiles($allBarclaysTransaction),
             'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysProcessing),
-            'files' => json_decode(json_encode($monthlyBarclaysFiles), true),
         ];
 
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($barclays));
+
+        $barclays['files'] = $monthlyBarclaysFiles;
 
         return $barclays;
     }
@@ -361,14 +380,17 @@ class BankingService
             $this->environment === "prod" ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
-        if ($useCache === true && $this->redis->exists($redisKey)) {
-            return unserialize($this->redis->get($redisKey));
-        }
 
         /** @var LloydsFileRepository $lloydsFileRepo */
         $lloydsFileRepo = $this->dm->getRepository(LloydsFile::class);
-
         $monthlyLloydsFiles = $lloydsFileRepo->getMonthlyFiles($date);
+
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            $lloyds = unserialize($this->redis->get($redisKey));
+            $lloyds['files'] = $monthlyLloydsFiles;
+            return $lloyds;
+        }
+
         $monthlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($monthlyLloydsFiles);
         $monthlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($monthlyLloydsFiles);
         $monthlyPerDayLloydsBacs = LloydsFile::combineDailyBacs($monthlyLloydsFiles);
@@ -400,10 +422,11 @@ class BankingService
             'allReceived' => LloydsFile::totalCombinedFiles($allLloydsReceived),
             'allProcessed' => LloydsFile::totalCombinedFiles($allLloydsProcessing),
             'allBacs' => LloydsFile::totalCombinedFiles($allLloydsBacs),
-            'files' => json_decode(json_encode($monthlyLloydsFiles), true),
         ];
 
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($lloyds));
+
+        $lloyds['files'] = $monthlyLloydsFiles;
 
         return $lloyds;
     }

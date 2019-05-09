@@ -10,6 +10,7 @@ $(function() {
             model  = $('.phone-search-dropdown__model'),
             memory = $('.phone-search-dropdown__memory'),
             button = $('.phone-search-dropdown__button'),
+            quote  = $('.get-a-quote'),
             arule  = $('#a-rule');
 
         const updateModels = () => {
@@ -68,6 +69,7 @@ $(function() {
             updateModels();
 
             make.resizeselect();
+            quote.removeClass('disabled');
 
             make.on('change', function() {
 

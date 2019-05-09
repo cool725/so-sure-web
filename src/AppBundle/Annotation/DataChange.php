@@ -7,6 +7,7 @@ namespace AppBundle\Annotation;
 class DataChange
 {
     const CATEGORY_SALVA_CLAIM = 'salva-claim';
+    const CATEGORY_HUBSPOT = 'hubspot';
     const CATEGORY_INTERCOM = 'intercom';
     const CATEGORY_INVITATION_LINK = 'invitation-link';
 

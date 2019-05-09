@@ -91,15 +91,15 @@ class BankingCommand extends ContainerAwareCommand
             $year = $date->format('Y');
             $month = $date->format('m');
             $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
-            $output->writeln(sprintf('Caching for %d-%d', $year, $month));
-            $this->bankingService->getSoSureBanking($date, false);
-            $this->bankingService->getSalvaBanking($date, $year, $month, false);
-            $this->bankingService->getReconcilationBanking($date, false);
-            $this->bankingService->getJudoBanking($date, $year, $month, false);
-            $this->bankingService->getCheckoutBanking($date, $year, $month, false);
-            $this->bankingService->getCashflowsBanking($date, $year, $month, false);
-            $this->bankingService->getBarclaysBanking($date, $year, $month, false);
-            $this->bankingService->getLloydsBanking($date, $year, $month, false);
+            $output->writeln(sprintf('Caching for %s', $date->format('Y-m-d')));
+            $this->bankingService->getSoSureBanking(clone $date, false);
+            $this->bankingService->getSalvaBanking(clone $date, $year, $month, false);
+            $this->bankingService->getReconcilationBanking(clone $date, false);
+            $this->bankingService->getJudoBanking(clone $date, $year, $month, false);
+            $this->bankingService->getCheckoutBanking(clone $date, $year, $month, false);
+            $this->bankingService->getCashflowsBanking(clone $date, $year, $month, false);
+            $this->bankingService->getBarclaysBanking(clone $date, $year, $month, false);
+            $this->bankingService->getLloydsBanking(clone $date, $year, $month, false);
         }
         $output->writeln('');
     }

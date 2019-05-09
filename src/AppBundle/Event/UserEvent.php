@@ -8,6 +8,7 @@ use AppBundle\Document\User;
 class UserEvent extends Event
 {
     const EVENT_CREATED = 'event.user.created';
+    const EVENT_UPDATED_HUBSPOT = 'event.user.updated.hubspot';
     const EVENT_UPDATED_INTERCOM = 'event.user.updated.intercom';
     const EVENT_UPDATED_INVITATION_LINK = 'event.user.updated.invitation-link';
     const EVENT_NAME_UPDATED = 'event.user.name.updated';
