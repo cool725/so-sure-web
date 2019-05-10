@@ -2,6 +2,7 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\BankAccount;
