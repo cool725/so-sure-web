@@ -83,6 +83,18 @@ class BICommand extends ContainerAwareCommand
      */
     protected function configure()
     {
+        $onlyOptions = [
+            "policies",
+            "claims",
+            "users",
+            "invitations",
+            "connections",
+            "phones",
+            "unpaidCalls",
+            "leadSource",
+            "checkoutTransactions"
+        ];
+        $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
         $this
             ->setName('sosure:bi')
             ->setDescription('Run a bi export')
@@ -102,10 +114,7 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                <<<EOD
-only run 1 export
-[policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource, checkoutTransactions]
-EOD
+                $onlyMessage
             )
             ->addOption(
                 'skip-s3',
