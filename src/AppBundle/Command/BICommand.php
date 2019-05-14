@@ -102,7 +102,8 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'only run 1 export [policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource]'
+                'only run 1 export' .
+                '[policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource, checkoutTransactions]'
             )
             ->addOption(
                 'skip-s3',
@@ -183,7 +184,7 @@ class BICommand extends ContainerAwareCommand
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
         }
-        if (!$only || $only == 'transactions') {
+        if (!$only || $only == 'checkoutTransactions') {
             $date = $input->getOption('date');
             $lines = $this->exportCheckoutTransactions($skipS3, $timezone, $date);
             if ($debug) {
