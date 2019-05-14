@@ -1981,6 +1981,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->find($id);
 
         if (!$user) {
@@ -2045,6 +2046,38 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('delete_form')
             ->add('delete', SubmitType::class)
             ->getForm();
+
+        if ($user->getIsBlacklisted()) {
+            $blacklistForm = $this->get('form.factory')
+                ->createNamedBuilder('blacklist_user_form')
+                ->add(
+                    'unblacklist',
+                    SubmitType::class,
+                    [
+                        "label" => 'Unblacklist',
+                        'attr' => [
+                            "unblacklist" => true,
+                            'class' => 'btn btn-danger btn-square btn-sm mb-1 confirm-blacklist-user'
+                        ]
+                    ]
+                )
+                ->getForm();
+        } else {
+            $blacklistForm = $this->get('form.factory')
+                ->createNamedBuilder('blacklist_user_form')
+                ->add(
+                    'blacklist',
+                    SubmitType::class,
+                    [
+                        "label" => 'Blacklist',
+                        'attr' => [
+                            "blacklist" => true,
+                            'class' => 'btn btn-danger btn-square btn-sm mb-1 confirm-blacklist-user'
+                        ]
+                    ]
+                )
+                ->getForm();
+        }
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('user_role_form')) {
@@ -2277,6 +2310,28 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('blacklist_user_form')) {
+                $form = $request->request->get('blacklist_user_form');
+                $blacklist = isset($form['blacklist']);
+                $unblacklist = isset($form['unblacklist']);
+                $blacklistForm->handleRequest($request);
+                if ($blacklist) {
+                    $user->setIsBlacklisted(true);
+                    $dm->flush();
+                    $this->addFlash(
+                        'error',
+                        'User Blacklisted!'
+                    );
+                } elseif ($unblacklist) {
+                    $user->setIsBlacklisted(false);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        "User Unblacklisted"
+                    );
+                }
+
+                return $this->redirectToRoute('admin_user', ['id' => $id]);
             } elseif ($request->request->has('delete_form')) {
                 $deleteForm->handleRequest($request);
                 if ($deleteForm->isValid()) {
@@ -2307,6 +2362,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'makemodel_form' => $makeModelForm->createView(),
             'sanctions_form' => $sanctionsForm->createView(),
             'handling_team_form' => $handlingTeamForm->createView(),
+            'blacklist_user_form' => $blacklistForm->createView(),
             'delete_form' => $deleteForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
