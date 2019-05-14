@@ -106,7 +106,6 @@ class BICommand extends ContainerAwareCommand
 only run 1 export
 [policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource, checkoutTransactions]
 EOD
-
             )
             ->addOption(
                 'skip-s3',
