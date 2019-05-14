@@ -102,8 +102,11 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'only run 1 export' .
-                '[policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource, checkoutTransactions]'
+                <<<EOD
+only run 1 export
+[policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource, checkoutTransactions]
+EOD
+
             )
             ->addOption(
                 'skip-s3',
