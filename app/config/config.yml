@@ -803,6 +803,7 @@ nelmio_security:
                 - http://www.google-analytics.com
                 - https://www.googletagmanager.com
                 - http://www.googletagmanager.com
+                - https://www.googleadservices.com
                 - https://tagmanager.google.com
                 - https://*.googlesyndication.com
                 - https://*.doubleclick.net
