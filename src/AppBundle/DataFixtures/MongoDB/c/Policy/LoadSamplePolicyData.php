@@ -544,7 +544,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * @param boolean $isPaymentMethodBacs true iff this payment method should use bacs. Otherwise it will use checkout.
      * @return PaymentMethod that has been freshly created according to the given specifications.
      */
-
     private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs = false)
     {
         $paymentMethod = null;
