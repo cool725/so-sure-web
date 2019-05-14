@@ -2095,7 +2095,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('reset_form')) {
                 $resetForm->handleRequest($request);
                 if ($resetForm->isValid()) {
-                    if (null === $user->getConfirmationToken()) {
+                    if (null == $user->getConfirmationToken()) {
                         /** @var \FOS\UserBundle\Util\TokenGeneratorInterface $tokenGenerator */
                         $tokenGenerator = $this->get('fos_user.util.token_generator');
                         $user->setConfirmationToken($tokenGenerator->generateToken());
