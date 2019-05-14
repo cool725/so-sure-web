@@ -4,6 +4,8 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
@@ -14,6 +16,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -80,6 +83,18 @@ class BICommand extends ContainerAwareCommand
      */
     protected function configure()
     {
+        $onlyOptions = [
+            "policies",
+            "claims",
+            "users",
+            "invitations",
+            "connections",
+            "phones",
+            "unpaidCalls",
+            "leadSource",
+            "checkoutTransactions"
+        ];
+        $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
         $this
             ->setName('sosure:bi')
             ->setDescription('Run a bi export')
@@ -99,7 +114,7 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'only run 1 export [policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource]'
+                $onlyMessage
             )
             ->addOption(
                 'skip-s3',
@@ -112,6 +127,12 @@ class BICommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 "Choose a timezone to use for policies report"
+            )
+            ->addOption(
+                "date",
+                null,
+                InputOption::VALUE_REQUIRED,
+                "Set the date you want to query transactions for - MM/YY."
             )
         ;
     }
@@ -170,6 +191,13 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$only || $only == 'leadSource') {
             $lines = $this->exportLeadSource($skipS3, $timezone);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
+        }
+        if (!$only || $only == 'checkoutTransactions') {
+            $date = $input->getOption('date');
+            $lines = $this->exportCheckoutTransactions($skipS3, $timezone, $date);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
@@ -721,6 +749,53 @@ class BICommand extends ContainerAwareCommand
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'leadSource.csv');
         }
+        return $lines;
+    }
+
+    private function exportCheckoutTransactions($skipS3, \DateTimeZone $timezone, $date)
+    {
+        /** @var PaymentRepository $repo */
+        $repo = $this->dm->getRepository(Payment::class);
+
+        if ($date === null) {
+            $date = date('Y-m');
+        }
+        $now = new \DateTime($date);
+        $nextMonth = new \DateTime($date);
+        $nextMonth->add(new \DateInterval('P1M'));
+
+        $transactions = $repo->createQueryBuilder()
+            ->field('date')->gte($now)
+            ->field('date')->lt($nextMonth)
+            ->field('type')->equals('checkout')
+            ->getQuery()->execute();
+
+
+        $lines = [];
+        $lines[] = implode(',', [
+            "Transaction ID",
+            "Policy Number",
+            "Message",
+            "Details"
+        ]);
+
+        /** @var CheckoutPayment $transaction */
+        foreach ($transactions as $transaction) {
+            /** @var Policy $policy */
+            $policy = $transaction->getPolicy();
+
+            $lines[] = implode(',', [
+                $transaction->getReceipt(),
+                $policy->getPolicyNumber(),
+                $transaction->getMessage(),
+                $transaction->getDetails()
+            ]);
+        }
+        if (!$skipS3) {
+            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
+            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
+        }
+
         return $lines;
     }
 
