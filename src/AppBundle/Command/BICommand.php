@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\DateTrait;
@@ -766,7 +767,7 @@ class BICommand extends ContainerAwareCommand
             "Details"
         ]);
 
-        /** @var Payment $transaction */
+        /** @var CheckoutPayment $transaction */
         foreach ($transactions as $transaction) {
             /** @var Policy $policy */
             $policy = $transaction->getPolicy();
