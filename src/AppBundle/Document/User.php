@@ -463,6 +463,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $userFiles = array();
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $isBlacklisted = false;
+
     public function __construct()
     {
         parent::__construct();
@@ -961,6 +968,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
+        if ($this->isBlacklisted) {
+            return false;
+        }
         // TODO only difference in purchase vs re-purchase if if the policy previously exists and there
         // is a dispossession/wreckage. As the imei check will perform that validation, its ok for now
         // although a better solution would be nice
@@ -998,6 +1008,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
+        if ($this->isBlacklisted) {
+            return false;
+        }
+
         // TODO: Consider if we want to block a different user doing a re-purchase
 
         // TODO only difference in purchase vs re-purchase if if the policy previously exists and there
@@ -1026,6 +1040,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if ($this->getAvgPolicyClaims() > 2 && !$this->areEqualToTwoDp(2, $this->getAvgPolicyClaims())) {
+            return false;
+        }
+
+        if ($this->getIsBlacklisted()) {
             return false;
         }
 
@@ -1650,6 +1668,24 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function addUserFile(S3File $file)
     {
         $this->userFiles[] = $file;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsBlacklisted()
+    {
+        return $this->isBlacklisted;
+    }
+
+    /**
+     * @param mixed $isBlacklisted
+     * @return User
+     */
+    public function setIsBlacklisted($isBlacklisted)
+    {
+        $this->isBlacklisted = $isBlacklisted;
+        return $this;
     }
 
     public function hasEmail()

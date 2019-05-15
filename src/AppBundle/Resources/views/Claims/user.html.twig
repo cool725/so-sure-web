@@ -360,6 +360,20 @@
                                 </tr>
                             {% endif %}
                             <tr>
+                                <td><strong>User Blacklisted</strong></td>
+                                <td>
+                                    {%  if user.isBlacklisted %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {%  endif %}
+                                </td>
+                                <td>
+                                    {{ form_start(blacklist_user_form) }}
+                                    {{ form_end(blacklist_user_form) }}
+                                </td>
+                            </tr>
+                            <tr>
                                 <td><strong>Delete</strong></td>
                                 <td></td>
                                 <td>
