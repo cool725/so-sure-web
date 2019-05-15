@@ -5820,4 +5820,47 @@ class PolicyServiceTest extends WebTestCase
         $policyB->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policyB, new \DateTime('2016-01-01'), true);
     }
+
+    /**
+     * @expectedException \Exception Unable to create a pending renewal for policy
+     * @throws \Exception
+     */
+    public function testCannotRenewBlacklistedUser()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCannotRenewBlacklistedUser', $this, true),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $thisUser = $policy->getUser();
+        $thisUser->setIsBlacklisted(true);
+        static::$dm->flush();
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('test');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+
+        try {
+            static::$policyService->createPendingRenewal(
+                $policy,
+                new \DateTime('2016-12-15')
+            );
+        } catch (\Exception $e) {
+            return;
+        }
+    }
 }
