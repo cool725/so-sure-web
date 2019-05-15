@@ -768,12 +768,15 @@ class BICommand extends ContainerAwareCommand
             ->field('date')->gte($now)
             ->field('date')->lt($nextMonth)
             ->field('type')->equals('checkout')
+            ->sort('created', 1)
             ->getQuery()->execute();
 
 
         $lines = [];
         $lines[] = implode(',', [
+            "Date",
             "Transaction ID",
+            "Result",
             "Policy Number",
             "Message",
             "Details"
@@ -785,7 +788,9 @@ class BICommand extends ContainerAwareCommand
             $policy = $transaction->getPolicy();
 
             $lines[] = implode(',', [
+                $transaction->getDate()->format('jS M Y H:i'),
                 $transaction->getReceipt(),
+                $transaction->getResult(),
                 $policy->getPolicyNumber(),
                 $transaction->getMessage(),
                 $transaction->getDetails()
@@ -807,7 +812,19 @@ class BICommand extends ContainerAwareCommand
      */
     private function uploadS3($data, $filename)
     {
-        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+        /**
+         * It is possible that the filename can be a path, but the permissions on prod do not
+         * allow for a subdir to be created but S3 does.
+         * This means that there can be instances where the cron will fail.
+         * Solution is that if a path is passed in, explode it and take the last part
+         * for the tmp filename, but still use the full filename with path for s3.
+         */
+        $tmpFilename = $filename;
+        if (strpos($filename, '/') !== false) {
+            $parts = explode('/', $filename);
+            $tmpFilename = array_pop($parts);
+        }
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $tmpFilename);
         $result = file_put_contents($tmpFile, $data);
         if (!$result) {
             throw new \Exception($filename . ' could not be processed into a tmp file.');
