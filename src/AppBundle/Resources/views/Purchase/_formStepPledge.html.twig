@@ -5,6 +5,8 @@
     'autocomplete': 'off'
 }}) }}
 
+    {% set label_excess = 'I understand the standard excess is £'~ phone.currentPhonePrice.excess.damage ~', and only reduced when validated with the so-sure app (£'~ phone.currentPhonePrice.picsureexcess.damage ~' for damage/breakdown & £'~ phone.currentPhonePrice.picsureexcess.loss ~' for loss/theft)' %}
+
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
 
     <h2 class="text-dodger-blue text-center">Pledge of Honesty</h2>
@@ -33,7 +35,7 @@
         </div>
         <div class="form-group">
             {{ form_widget(purchase_form.agreedExcess, {
-                'label': 'I understand the standard excess is £150, and only reduced when validated with the so-sure app (£50 for damage/breakdown & £70 for loss/theft)',
+                'label': label_excess,
                 'attr': {'class':'custom-control-input'}}
             ) }}
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
