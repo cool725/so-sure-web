@@ -802,9 +802,13 @@ nelmio_security:
                 - https://www.google-analytics.com
                 - http://www.google-analytics.com
                 - https://www.googletagmanager.com
+                - https://www.googletagmanager.com
                 - http://www.googletagmanager.com
                 - https://tagmanager.google.com
+                - http://*.googleadservices.com
+                - https://*.googleadservices.com
                 - https://*.googlesyndication.com
+                - https://www.googleadservices.com # necessary?
                 - https://*.doubleclick.net
                 - https://www.google.com
                 - https://*.doubleclick.net
