@@ -820,7 +820,7 @@ class BICommand extends ContainerAwareCommand
          * for the tmp filename, but still use the full filename with path for s3.
          */
         $tmpFilename = $filename;
-        if (strpos($filename, '/') !== false) {
+        if (mb_strpos($filename, '/') !== false) {
             $parts = explode('/', $filename);
             $tmpFilename = array_pop($parts);
         }
