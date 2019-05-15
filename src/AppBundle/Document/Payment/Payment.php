@@ -575,6 +575,13 @@ abstract class Payment
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
         } else {
+
+
+
+
+
+
+
             throw new \Exception(sprintf(
                 'Failed set correct commission for %f (policy %s)',
                 $this->getAmount(),
