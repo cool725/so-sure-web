@@ -299,8 +299,7 @@ class HubspotService
             case self::QUEUE_UPDATE_USER:
                 $user = $this->userFromMessage($message);
                 $this->createOrUpdateContact($user);
-                // If policy has not been synced to hubspot before we should join policy and user sync so that user is
-                // certain to be synced before policy is.
+                // also sync any new policies.
                 foreach ($user->getPolicies() as $policy) {
                     if (!$policy->getHubspotId()) {
                         $this->createOrUpdateDeal($policy);
@@ -374,7 +373,7 @@ class HubspotService
      * @param Policy $policy is the policy whose data is being used.
      * @return array containing the data formatted for sending to the hubspot apis.
      */
-    private function buildHubspotPolicyData(Policy $policy)
+    private function buildHubspotPolicyData(Policy $policy, $filter = [])
     {
         $stage = "pre-pending";
         $status = $policy->getStatus();
@@ -390,21 +389,21 @@ class HubspotService
             $stage = "expired";
         }
         $data = [];
-        $this->addProperty("pipeline", $this->dealPipelineKey, $data, true);
-        $this->addProperty("dealname", $policy->getPolicyNumber(), $data, true);
-        $this->addProperty("dealstage", $this->getDealStageId($stage), $data, true);
+        $this->addProperty("pipeline", $this->dealPipelineKey, $data, true, $filter);
+        $this->addProperty("dealname", $policy->getPolicyNumber(), $data, true, $filter);
+        $this->addProperty("dealstage", $this->getDealStageId($stage), $data, true, $filter);
         if ($policy->getStart()) {
-            $data[] = $this->buildProperty("start", $policy->getStart()->format("d-m-Y H:i"), true);
+            $this->addProperty("start", $policy->getStart()->format("d-m-Y H:i"), $data, true, $filter);
         }
         if ($policy->getEnd()) {
-            $data[] = $this->buildProperty("end", $policy->getEnd()->format("d-m-Y H:i"), true);
+            $this->addProperty("end", $policy->getEnd()->format("d-m-Y H:i"), $data, true, $filter);
         }
         if ($policy instanceof PhonePolicy) {
-            $this->addProperty("phone_model", $policy->getPhone()->getModel(), $data, true);
-            $this->addProperty("phone_make", $policy->getPhone()->getMake(), $data, true);
-            $this->addProperty("phone_memory", $policy->getPhone()->getMemory(), $data, true);
-            $this->addProperty("imei", $policy->getImei(), $data, true);
-            $this->addProperty("serial", $policy->getSerialNumber(), $data, true);
+            $this->addProperty("phone_model", $policy->getPhone()->getModel(), $data, true, $filter);
+            $this->addProperty("phone_make", $policy->getPhone()->getMake(), $data, true, $filter);
+            $this->addProperty("phone_memory", $policy->getPhone()->getMemory(), $data, true, $filter);
+            $this->addProperty("imei", $policy->getImei(), $data, true, $filter);
+            $this->addProperty("serial", $policy->getSerialNumber(), $data, true, $filter);
         }
         return [
             "associations" => [

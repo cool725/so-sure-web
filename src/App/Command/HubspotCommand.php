@@ -90,7 +90,7 @@ class HubspotCommand extends ContainerAwareCommand
                 "p",
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                "Property to be synced when <info>sync-user-property</info> or <info>sync-deal-property</info> is run."
+                "Properties to be synced by <info>sync-user-property</info> or <info>sync-policy-property</info>."
             );
     }
 
