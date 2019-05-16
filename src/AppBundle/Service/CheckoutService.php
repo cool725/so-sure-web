@@ -684,7 +684,7 @@ class CheckoutService
         $diff = $date->diff($created);
         if ($diff->days > 0 || $diff->h >= self::MAX_HOUR_DELAY_FOR_RECEIPTS) {
             $msg = sprintf(
-                'Checkout chage %s is older than expected (%d:%d hours).',
+                'Checkout charge %s is older than expected (%d:%d hours).',
                 $chargeId,
                 $diff->days,
                 $diff->h
