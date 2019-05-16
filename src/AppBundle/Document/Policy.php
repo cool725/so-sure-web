@@ -4143,7 +4143,7 @@ abstract class Policy
             throw new \Exception('Cooloff automatically provides full refund. Full Refund flag should not be set.');
         }
         if (!$this->canCancel($reason, $date)) {
-            throw new \Exception(sprintf('Unable to cancel policy %s/%s.',$this->getPolicyNumber(), $this->getId()));
+            throw new \Exception(sprintf('Unable to cancel policy %s/%s.', $this->getPolicyNumber(), $this->getId()));
         }
         if ($date === null) {
             $date = \DateTime::createFromFormat('U', time());
