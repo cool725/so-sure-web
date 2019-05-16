@@ -119,7 +119,7 @@
         </div>
         <div class="col-md-8">
             <h4 class="my-4 text-columbia-blue-e">Excess</h4>
-            <p class="mb-5 text-white">Our excess is as low as &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} for accidental damage and &pound;{{ phone.currentPhonePrice.picsureexcess.loss }} for loss and theft when you validate your phone with our app. If you don't validate your phone with our app the excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</p>
+            <p class="mb-5 text-white">Our excess is as low as &pound;{{ phone_price.picsureexcess.damage }} for accidental damage and &pound;{{ phone_price.picsureexcess.loss }} for loss and theft when you validate your phone with our app. If you don't validate your phone with our app the excess is &pound;{{ phone_price.excess.damage }}</p>
             <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure" target="_blank" class="btn btn-outline-white">Find out more</a>
         </div>
     </div>
@@ -153,7 +153,7 @@
                     <li>Instant cover from purchase</li>
                     <li>24-72 hour replacement once your claim is approved</li>
                     <li>Hassle-Free Claims</li>
-                    <li>Low excess from just &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</li>
+                    <li>Low excess from just &pound;{{ phone_price.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone_price.excess.damage }}</li>
                     <li>Insure mobiles up to 3 years old</li>
                     <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
                     <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
@@ -167,8 +167,8 @@
                 How much is excess? <i class="far fa-chevron-down text-white fa-lg"></i>
             </h5>
             <div class="expanding-cardbox__expand text-white mt-4">
-                <p>Our excess is as low as &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} for accidental damage and &pound;{{ phone.currentPhonePrice.picsureexcess.loss }} for loss and theft when you validate your phone with our anti-fraud technology.</p>
-                <p class="mb-0"><strong>If you don't validate your phone with pic-sure the excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</strong>.</p>
+                <p>Our excess is as low as &pound;{{ phone_price.picsureexcess.damage }} for accidental damage and &pound;{{ phone_price.picsureexcess.loss }} for loss and theft when you validate your phone with our anti-fraud technology.</p>
+                <p class="mb-0"><strong>If you don't validate your phone with pic-sure the excess is &pound;{{ phone_price.excess.damage }}</strong>.</p>
             </div>
         </div>
     </div>

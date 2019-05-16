@@ -7,9 +7,9 @@ pic-sure failed to validate your phone
 Unfortunately, your phone did not pass the pic-sure validation process.
 
 Your excess for policy {{ policy.policyNumber }} is:
-• Accidental Damage: £150
-• Breakdown: £150
-• Theft: £150
-• Loss: £150
+• Accidental Damage: £{{ policy.premium.excess.damage }}
+• Breakdown: £{{ policy.premium.excess.warranty }}
+• Theft: £{{ policy.premium.excess.theft }}
+• Loss: £{{ policy.premium.excess.loss }}
 
 {% endblock body %}

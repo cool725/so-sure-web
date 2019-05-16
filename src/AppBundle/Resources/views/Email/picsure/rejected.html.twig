@@ -13,13 +13,13 @@
 				<br><br>
                 Your excess for policy {{ policy.policyNumber }} is:
                 <br>
-                    • Accidental Damage: £150
+                    • Accidental Damage: £{{ policy.premium.excess.damage }}
                 <br>
-                    • Breakdown: £150
+                    • Breakdown: £{{ policy.premium.excess.warranty }}
                 <br>
-                    • Theft: £150
+                    • Theft: £{{ policy.premium.excess.theft }}
                 <br>
-                    • Loss: £150
+                    • Loss: £{{ policy.premium.excess.loss }}
 				<br><br>
 			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
 		   </div>

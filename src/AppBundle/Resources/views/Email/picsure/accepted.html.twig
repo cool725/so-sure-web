@@ -13,13 +13,13 @@
 				<br><br>
                 Your excess for policy {{ policy.policyNumber }} is now:
                 <br>
-                    • Accidental Damage: £50
+                    • Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
                 <br>
-                    • Breakdown: £50
+                    • Breakdown: £{{ policy.premium.picSureExcess.warranty }}
                 <br>
-                    • Theft: £70
+                    • Theft: £{{ policy.premium.picSureExcess.theft }}
                 <br>
-                    • Loss: £70
+                    • Loss: £{{ policy.premium.picSureExcess.loss }}
 				<br><br>
 			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
 		   </div>

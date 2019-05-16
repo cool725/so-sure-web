@@ -29,7 +29,7 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-			   Your excess is currently £150, however, you can easily reduce this amount to £50 (£70 for Theft/Loss) by validating your phone with pic-sure.
+			   Your excess is currently £{{ policy.premium.excess.damage }}, however, you can easily reduce this amount to £{{ policy.premium.picSureExcess.damage }} (£{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with pic-sure.
 			   {% if policy.phone.isITunes %}
 			   <a href="{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}">Download our iOS App</a>, login, and complete the pic-sure validation process.
 			   {% elseif policy.phone.isGooglePlay %}
