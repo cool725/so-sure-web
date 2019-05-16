@@ -871,9 +871,8 @@ class CheckoutService
                 $rescheduled->cancel();
                 $rescheduled->setNotes("cancelled as web payment made.");
             }
-            if (count($rescheduledPayments) > 0) {
-                $this->dm->flush();
-            }
+            $policy->setPolicyStatusActiveIfUnpaid();
+            $this->dm->flush();
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
