@@ -93,7 +93,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutPaymentPolicyNoReload()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutPaymentPolicyNoReload', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutPaymentPolicyNoReload', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -140,7 +140,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutReceiptMonthly()
     {
-        $user = $this->createValidUser(static::generateEmail('checkout-receipt', $this));
+        $user = $this->createValidUser(static::generateEmail('checkout-receipt', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -170,7 +170,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutReceiptYearly()
     {
-        $user = $this->createValidUser(static::generateEmail('checkout-receipt-yearly', $this));
+        $user = $this->createValidUser(static::generateEmail('checkout-receipt-yearly', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -203,7 +203,7 @@ class CheckoutServiceTest extends WebTestCase
      */
     public function testCheckoutReceiptYearlyPenny()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptYearlyPenny', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptYearlyPenny', $this, true));
         $phone = static::getPhoneByPrice(static::$dm, 5.61);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -230,7 +230,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutReceiptTooOld()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptTooOld', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptTooOld', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -265,7 +265,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutReceiptRefunded()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptRefunded', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptRefunded', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -303,7 +303,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutReceiptRefundFull()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptRefundFull', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptRefundFull', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -341,7 +341,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutReceiptPaymentDiff()
     {
-        $user = $this->createValidUser(static::generateEmail('checkout-receipt-exception', $this));
+        $user = $this->createValidUser(static::generateEmail('checkout-receipt-exception', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -367,7 +367,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutExceptionStatusPending()
     {
-        $user = $this->createValidUser(static::generateEmail('checkout-exception-pending', $this));
+        $user = $this->createValidUser(static::generateEmail('checkout-exception-pending', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -400,7 +400,13 @@ class CheckoutServiceTest extends WebTestCase
      */
     public function testCheckoutReceiptPaymentDeclinedException()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutReceiptPaymentDeclinedException', $this));
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutReceiptPaymentDeclinedException',
+                $this,
+                true
+            )
+        );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -423,7 +429,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutAdd()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutAdd', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutAdd', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
@@ -448,8 +454,8 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutAddDisassociate()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutAddDisassociate-user', $this));
-        $payer = $this->createValidUser(static::generateEmail('testCheckoutAddDisassociate-payer', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutAddDisassociate-user', $this, true));
+        $payer = $this->createValidUser(static::generateEmail('testCheckoutAddDisassociate-payer', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
@@ -476,7 +482,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutAdditionalUnexpectedPayment()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutAdditionalUnexpectedPayment', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutAdditionalUnexpectedPayment', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
@@ -515,7 +521,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutRefund()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutRefund', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutRefund', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
@@ -556,7 +562,7 @@ class CheckoutServiceTest extends WebTestCase
      */
     public function testCheckoutRefundExceeded()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutRefundExceeded', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutRefundExceeded', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
@@ -585,7 +591,7 @@ class CheckoutServiceTest extends WebTestCase
      */
     public function testCheckoutScheduledPaymentNotRunnable()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPaymentNotRunnable', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPaymentNotRunnable', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -623,7 +629,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutScheduledPayment()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPayment', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPayment', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -674,7 +680,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutScheduledPaymentDelayed()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPaymentDelayed', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPaymentDelayed', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -726,7 +732,7 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutScheduledPaymentExpiredCard()
     {
         /** @var User $user */
-        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPaymentExpiredCard', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPaymentExpiredCard', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -775,7 +781,7 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutScheduledPaymentInvalidPaymentMethod()
     {
         $user = $this->createValidUser(
-            static::generateEmail('testCheckoutScheduledPaymentInvalidPaymentMethod', $this)
+            static::generateEmail('testCheckoutScheduledPaymentInvalidPaymentMethod', $this, true)
         );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -921,7 +927,7 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutMultipleSameDayPayments()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('testMultipleSameDayPayments', $this));
+        $user = $this->createValidUser(static::generateEmail('testMultipleSameDayPayments', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
         static::$dm->persist($policy);
@@ -984,7 +990,7 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutPaymentFirstProblem()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('testCheckoutPaymentFirstProblem', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutPaymentFirstProblem', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
         static::$dm->persist($policy);
@@ -1137,7 +1143,13 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutRemainderPaymentCancelledPolicy()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutRemainderPaymentCancelledPolicy', $this));
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutRemainderPaymentCancelledPolicy',
+                $this,
+                true
+            )
+        );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
         static::$dm->persist($policy);
@@ -1201,7 +1213,13 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutFailedProcessScheduledPaymentResult()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('testCheckoutFailedProcessScheduledPaymentResult', $this));
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutFailedProcessScheduledPaymentResult',
+                $this,
+                true
+            )
+        );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
         static::$dm->persist($policy);
@@ -1240,7 +1258,7 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutCommission()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('testCheckoutCommission', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutCommission', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -1320,7 +1338,7 @@ class CheckoutServiceTest extends WebTestCase
     public function testCheckoutCardExpiringEmail()
     {
         $this->clearEmail(static::$container);
-        $user = $this->createValidUser(static::generateEmail('testCheckoutCardExpiringEmail', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutCardExpiringEmail', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
 
@@ -1461,7 +1479,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutExisting()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutExisting', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutExisting', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy1 = static::initPolicy($user, static::$dm, $phone, null, false, false);
         $policy2 = static::initPolicy($user, static::$dm, $phone);
@@ -1537,7 +1555,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutCommissionAmounts()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmounts', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmounts', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
         $payment = new CheckoutPayment();
@@ -1576,7 +1594,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutCommissionAmountsWithDiscount()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmountsWithDiscount', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmountsWithDiscount', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
 
@@ -1640,7 +1658,7 @@ class CheckoutServiceTest extends WebTestCase
 
     public function testCheckoutCommissionActual()
     {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionActual', $this));
+        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionActual', $this, true));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
@@ -1702,5 +1720,165 @@ class CheckoutServiceTest extends WebTestCase
             Salva::MONTHLY_TOTAL_COMMISSION * 10 + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
         );
+    }
+
+    public function testCheckoutWithPreviousChargeIdNotSetSuccessfulTransaction()
+    {
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutWithPreviousChargeIdNotSetSuccessfulTransaction',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /**
+         * This test creates a new user, so they will not have a previous charge
+         */
+        $this->assertFalse($policy->getUser()->hasPreviousChargeId());
+
+        $details = self::$checkout->testPayDetails(
+            $policy,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN,
+            $policy->getId()
+        );
+        $this->assertNotNull($details);
+        if (!$details) {
+            return;
+        }
+        $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
+
+        /**
+         * So long as the transaction was successful, the user will now have a previousChargeId set
+         */
+        $this->assertTrue($policy->getUser()->hasPreviousChargeId());
+    }
+
+    public function testCheckoutWithPreviousChargeIdSetSuccessfulTransaction()
+    {
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutWithPreviousChargeIdSetSuccessfulTransaction',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /**
+         * This test creates a new user, so they will not have a previous charge
+         * we will need to add one to see if it is sent.
+         */
+        $policy->getUser()->setPreviousChargeId("charge_test_PHPUNITTEST12345");
+
+        $details = self::$checkout->testPayDetails(
+            $policy,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN,
+            $policy->getId()
+        );
+        $this->assertNotNull($details);
+        if (!$details) {
+            return;
+        }
+        $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
+
+        /**
+         * So long as the transaction was successful, the user will still have the same previousChargeId
+         */
+        $this->assertEquals("charge_test_PHPUNITTEST12345", $policy->getUser()->getPreviousChargeId());
+    }
+
+    public function testCheckoutWithPreviousChargeIdNotSetFailedTransaction()
+    {
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutWithPreviousChargeIdNotSetFailedTransaction',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /**
+         * This test creates a new user, so they will not have a previous charge.
+         */
+        $this->assertFalse($policy->getUser()->hasPreviousChargeId());
+
+        $details = self::$checkout->testPayDetails(
+            $policy,
+            $policy->getId(),
+            self::$CHECKOUT_TEST_CARD_FAIL_AMOUNT,
+            self::$CHECKOUT_TEST_CARD_FAIL_NUM,
+            self::$CHECKOUT_TEST_CARD_FAIL_EXP,
+            self::$CHECKOUT_TEST_CARD_FAIL_PIN,
+            $policy->getId()
+        );
+        $this->assertNotNull($details);
+        if (!$details) {
+            return;
+        }
+        $this->assertEquals(CheckoutPayment::RESULT_DECLINED, $details->getStatus());
+
+        /**
+         * We should not have a previousChargeId set here as the transaction should have failed.
+         */
+        $this->assertFalse($policy->getUser()->hasPreviousChargeId());
+    }
+
+    public function testCheckoutWithPreviousChargeIdSetFailedTransaction()
+    {
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutWithPreviousChargeIdSetFailedTransaction',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /**
+         * This test creates a new user, so they will not have a previous charge.
+         * We want to set one so that we know that there is one to remove on the
+         * failed payment attempt.
+         */
+        $policy->getUser()->setPreviousChargeId("charge_test_PHPUNITTEST12345");
+        $this->assertTrue($policy->getUser()->hasPreviousChargeId());
+
+        $details = self::$checkout->testPayDetails(
+            $policy,
+            $policy->getId(),
+            self::$CHECKOUT_TEST_CARD_FAIL_AMOUNT,
+            self::$CHECKOUT_TEST_CARD_FAIL_NUM,
+            self::$CHECKOUT_TEST_CARD_FAIL_EXP,
+            self::$CHECKOUT_TEST_CARD_FAIL_PIN,
+            $policy->getId()
+        );
+        $this->assertNotNull($details);
+        if (!$details) {
+            return;
+        }
+        $this->assertEquals(CheckoutPayment::RESULT_DECLINED, $details->getStatus());
+
+        /**
+         * We should not have a previousChargeId set here as the transaction should have failed.
+         */
+        $this->assertFalse($policy->getUser()->hasPreviousChargeId());
     }
 }

@@ -470,6 +470,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $isBlacklisted = false;
 
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $previousChargeId = 'none';
+
     public function __construct()
     {
         parent::__construct();
@@ -1686,6 +1692,34 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->isBlacklisted = $isBlacklisted;
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreviousChargeId()
+    {
+        return $this->previousChargeId;
+    }
+
+    /**
+     * @param $id
+     * @return $this
+     */
+    public function setPreviousChargeId($id)
+    {
+        $this->previousChargeId = $id;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPreviousChargeId()
+    {
+        $isNone = $this->getPreviousChargeId() === "none";
+        $isEmpty = mb_strlen($this->getPreviousChargeId()) == 0;
+        return !$isNone && !$isEmpty;
     }
 
     public function hasEmail()

@@ -519,6 +519,9 @@ class CheckoutService
             */
             $pennies = $this->convertToPennies($amount);
             $charge = new CardChargeCreate();
+            if ($user->hasPreviousChargeId()) {
+                $charge->setPreviousChargeId($user->getPreviousChargeId());
+            }
             $charge->setEmail($user->getEmail());
             $charge->setAutoCapTime(0);
             $charge->setAutoCapture('N');
@@ -533,12 +536,24 @@ class CheckoutService
             $service = $this->client->chargeService();
             $details = $service->chargeWithCard($charge);
             if ($details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
+                /**
+                 * If the payment was not authorized, we will need to unset the
+                 * previousChargeId so that on the next successful payment the
+                 * new chargeId is set as previousChargeId for future payments.
+                 */
+                $user->setPreviousChargeId('none');
+                $this->dm->flush();
                 return $details;
             }
 
             $capture = new ChargeCapture();
             $capture->setChargeId($details->getId());
             $capture->setValue($this->convertToPennies($amount));
+
+            if (!$user->hasPreviousChargeId()) {
+                $user->setPreviousChargeId($details->getId());
+                $this->dm->flush();
+            }
 
             $service = $this->client->chargeService();
             $details = $service->CaptureCardCharge($capture);
@@ -717,7 +732,12 @@ class CheckoutService
         try {
             $service = $this->client->chargeService();
 
+            $user = $policy->getUser();
+
             $charge = new CardTokenChargeCreate();
+            if ($user->hasPreviousChargeId()) {
+                $charge->setPreviousChargeId($user->getPreviousChargeId());
+            }
             $charge->setEmail($user->getEmail());
             $charge->setAutoCapTime(0);
             $charge->setAutoCapture('N');
@@ -732,6 +752,13 @@ class CheckoutService
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
 
             if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
+                /**
+                 * If the payment was not authorized, we will need to unset the
+                 * previousChargeId so that on the next successful payment the
+                 * new chargeId is set as previousChargeId for future payments.
+                 */
+                $user->setPreviousChargeId('none');
+                $this->dm->flush();
                 throw new PaymentDeclinedException($details->getResponseMessage());
             }
 
@@ -745,6 +772,11 @@ class CheckoutService
             if ($amount) {
                 $capture = new ChargeCapture();
                 $capture->setChargeId($details->getId());
+
+                if (!$user->hasPreviousChargeId()) {
+                    $user->setPreviousChargeId($details->getId());
+                }
+
                 $details = $service->CaptureCardCharge($capture);
                 $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
 
@@ -838,6 +870,13 @@ class CheckoutService
             }
 
             if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
+                /**
+                 * If the payment was not authorized, we will need to unset the
+                 * previousChargeId so that on the next successful payment the
+                 * new chargeId is set as previousChargeId for future payments.
+                 */
+                $user->setPreviousChargeId('none');
+                $this->dm->flush();
                 throw new PaymentDeclinedException($details->getResponseMessage());
             }
 
@@ -851,6 +890,13 @@ class CheckoutService
             if ($amount) {
                 $capture = new ChargeCapture();
                 $capture->setChargeId($details->getId());
+                /**
+                 * This is updating the card details, so we want to start a new chain of
+                 * transactions using this chargeId for the new previousChargeId, so
+                 * at this point we do not care if they have a previousChargeId set or
+                 * not, we just want to set it to the new one anyway.
+                 */
+                $user->setPreviousChargeId($details->getId());
                 $details = $service->CaptureCardCharge($capture);
                 $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
 
@@ -1337,6 +1383,9 @@ class CheckoutService
 
             $chargeService = $this->client->chargeService();
             $chargeCreate = new CardIdChargeCreate();
+            if ($user->hasPreviousChargeId()) {
+                $chargeCreate->setPreviousChargeId($user->getPreviousChargeId());
+            }
             $chargeCreate->setBillingDetails($this->getCheckoutAddress($user));
 
             // Can only use 1
@@ -1361,6 +1410,10 @@ class CheckoutService
             $capture = new ChargeCapture();
             $capture->setChargeId($chargeResponse->getId());
             $capture->setValue($this->convertToPennies($amount));
+            if (!$user->hasPreviousChargeId()) {
+                $user->setPreviousChargeId($capture->getChargeId());
+                $this->dm->flush();
+            }
 
             /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
             $chargeResponse = $chargeService->CaptureCardCharge($capture);
