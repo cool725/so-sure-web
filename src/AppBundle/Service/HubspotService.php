@@ -195,10 +195,10 @@ class HubspotService
     /**
      * Sync a bunch of users into a group of hubspot contacts. If there is not an exception at the end you can
      * consider it successful.
-     * @param array      $users      is the list of users to sync.
-     * @param array|null $properties is the list of properties to sync or null to sync it all.
+     * @param array      $users  is the list of users to sync.
+     * @param array|null $filter is the list of properties to sync or null to sync it all.
      */
-    public function createOrUpdateContactBatch($users, $filter = [])
+    public function updateContactBatch($users, $filter = [])
     {
         $data = [];
         foreach ($users as $user) {
@@ -234,8 +234,8 @@ class HubspotService
     /**
      * Sync a bunch of policies into a group of hubspot deals. If there is not an exception at the end you can
      * consider it successful.
-     * @param array      $policies   is the list of policies to sync.
-     * @param array|null $properties is the list of properties to sync or null to sync it all.
+     * @param array      $policies is the list of policies to sync.
+     * @param array|null $filter   is the list of properties to sync or null to sync it all.
      */
     public function updateDealBatch($policies, $filter = [])
     {

@@ -228,7 +228,7 @@ class HubspotCommand extends ContainerAwareCommand
                 $progressBar->start($group->count());
                 $started = true;
             }
-            $this->hubspot->createOrUpdateContactBatch($group, $properties);
+            $this->hubspot->updateContactBatch($group, $properties);
             $progressBar->advance($group->count(true));
         }
         $progressBar->finish();
