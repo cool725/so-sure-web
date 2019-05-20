@@ -119,8 +119,33 @@
         </div>
         <div class="col-md-8">
             <h4 class="my-4 text-columbia-blue-e">Excess</h4>
-            <p class="mb-5 text-white">Our excess is as low as &pound;{{ phone_price.picsureexcess.damage }} for accidental damage and &pound;{{ phone_price.picsureexcess.loss }} for loss and theft when you validate your phone with our app. If you don't validate your phone with our app the excess is &pound;{{ phone_price.excess.damage }}</p>
-            <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure" target="_blank" class="btn btn-outline-white">Find out more</a>
+            <p class="mb-5 text-white">Prove your {{ device.make }} {{ device.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered text-white">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Damage</th>
+                            <th>Loss</th>
+                            <th>Theft</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Validated with app</td>
+                            <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
+                            <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
+                            <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
+                        </tr>
+                        <tr>
+                            <td>Not validated with app</td>
+                            <td>&pound;{{ phone_price.excess.damage }}</td>
+                            <td>&pound;{{ phone_price.excess.loss }}</td>
+                            <td>&pound;{{ phone_price.excess.theft }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -134,9 +159,7 @@
             <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
                 <h5 class="text-columbia-blue-e">How?</h5>
             <p class="mb-5">Connect to friends/family and each receive up to £10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
-            {# TODO: Add video #}
-            {# <a href="#" class="btn btn-outline-columbia-blue-e mr-lg-2"><i class="far fa-play-circle fa-lg"></i> Watch video</a> #}
-            <a href="{{ path('faq') }}#social-insurance-and-reward-pot" target="_blank" class="btn btn-outline-white">Find out more</a>
+            <a href="{{ path('social_insurance') }}" target="_blank" class="btn btn-outline-white">Find out more</a>
         </div>
     </div>
 </div>
