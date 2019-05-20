@@ -1917,7 +1917,11 @@ class CheckoutServiceTest extends WebTestCase
         }
         $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
 
-        $token = self::$checkout->createCardToken(self::$CHECKOUT_TEST_CARD2_NUM, self::$CHECKOUT_TEST_CARD2_EXP, self::$CHECKOUT_TEST_CARD2_PIN);
+        $token = self::$checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD2_NUM,
+            self::$CHECKOUT_TEST_CARD2_EXP,
+            self::$CHECKOUT_TEST_CARD2_PIN
+        );
 
         self::$checkout->updatePaymentMethod($policy, $token->token);
         $this->assertEquals('none', $policy->getUser()->getPreviousChargeId());
