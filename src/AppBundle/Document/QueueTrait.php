@@ -44,6 +44,7 @@ trait QueueTrait
         $progressBar = null;
         if ($output) {
             $progressBar = new ProgressBar($output, $this->redis->llen($this->queueKey));
+            $progressBar->setFormat("[%bar%] %message%");
             $progressBar->start();
         }
         $requeued = 0;
@@ -70,6 +71,12 @@ trait QueueTrait
                     continue;
                 }
                 if ($progressBar) {
+                    $progressBar->setMessage(sprintf(
+                        "%d processed, %d requeued, %d dropped.",
+                        $processed,
+                        $requeued,
+                        $dropped
+                    ));
                     $progressBar->advance();
                 }
                 $this->action($data);
@@ -78,8 +85,11 @@ trait QueueTrait
                 $this->logger->error($e->getMessage());
                 $dropped++;
             } catch (\Exception $e) {
+                $this->logger->info($e->getMessage());
                 if ($this->queue($data, true)) {
                     $requeued++;
+                } else {
+                    $dropped++;
                 }
             }
         }
