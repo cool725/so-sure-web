@@ -415,7 +415,7 @@ class HubspotService
     /**
      * builds data array of all user properties for hubspot.
      * @param User   $user   is the user that the data will be based on.
-     * @param string $filter is the list of allowed properties or empty array for all properties.
+     * @param array  $filter is the list of allowed properties or empty array for all properties.
      * @return array of the data.
      */
     private function buildHubspotUserData(User $user, $filter = [])
@@ -429,15 +429,17 @@ class HubspotService
         $this->addProperty("customer", true, $data, false, $filter);
         $this->addProperty("hs_facebookid", $user->getFacebookId(), $data, false, $filter);
         if ($user->getBirthday()) {
-            $data[] = $this->buildProperty("date_of_birth", $user->getBirthday()->format("U") * 1000, false, $filter);
+            $this->addProperty("date_of_birth", $user->getBirthday()->format("U") * 1000, $data, false, $filter);
         }
         if ($user->getBillingAddress()) {
-            $data[] = $this->buildProperty("billing_address", $user->getBillingAddress()->__toString(), false, $filter);
-            if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->buildProperty("census_subgroup", $census->getSubGroup(), false, $filter);
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $this->addProperty("billing_address", $user->getBillingAddress()->__toString(), $data, false, $filter);
+            if ($census) {
+                $this->addProperty("census_subgroup", $census->getSubGroup(), $data, false, $filter);
             }
-            if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->buildProperty("total_weekly_income", $income->getTotal()->getIncome(), false, $filter);
+            if ($income) {
+                $this->addProperty("total_weekly_income", $income->getTotal()->getIncome(), $data, false, $filter);
             }
         }
         // attribution data.
