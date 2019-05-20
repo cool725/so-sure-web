@@ -820,7 +820,7 @@ class CheckoutService
         $details = null;
         $payment = null;
         try {
-            if ($amount) {
+            if ($amount !== null) {
                 $payment = new CheckoutPayment();
                 $payment->setAmount($amount);
                 $payment->setUser($policy->getUser());
@@ -828,6 +828,13 @@ class CheckoutService
                 $policy->addPayment($payment);
                 $this->dm->persist($payment);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            } else {
+                /**
+                 * When there is no amount on the card update, we want to unset the previousChargeId so that
+                 * on the next payment the new previousChargeId is set.
+                 */
+                $user->setPreviousChargeId('none');
+                $this->dm->flush();
             }
 
             $service = $this->client->chargeService();
@@ -887,7 +894,7 @@ class CheckoutService
                 }
             }
 
-            if ($amount) {
+            if ($amount !== null) {
                 $capture = new ChargeCapture();
                 $capture->setChargeId($details->getId());
                 /**
