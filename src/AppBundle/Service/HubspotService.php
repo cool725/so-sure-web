@@ -243,7 +243,7 @@ class HubspotService
         foreach ($policies as $policy) {
             $data[] = [
                 "objectId" => $policy->getHubspotId(),
-                "properties" => $this->buildHubspotPolicyData($policy, $filter)
+                "properties" => $this->buildHubspotPolicyData($policy, $filter)["properties"]
             ];
         }
         $this->client->deals()->updateBatch($data);
