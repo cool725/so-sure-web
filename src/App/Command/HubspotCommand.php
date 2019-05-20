@@ -65,7 +65,7 @@ class HubspotCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setDescription("Controls the Hubspot service which syncs data to a hubspo")
+        $this->setDescription("Controls the Hubspot service which syncs data to a hubspot")
             ->addArgument(
                 "action",
                 InputArgument::REQUIRED,
