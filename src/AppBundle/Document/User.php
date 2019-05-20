@@ -1703,7 +1703,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return $this
      */
     public function setPreviousChargeId($id)
