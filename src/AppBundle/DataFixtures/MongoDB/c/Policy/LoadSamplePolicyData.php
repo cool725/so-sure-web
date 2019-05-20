@@ -2,7 +2,9 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
@@ -535,15 +537,17 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $user;
     }
 
-    private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs)
+    /**
+     * Creates a randomly generated payment method and returns it.
+     * @param Policy  $policy              is the policy that will own the payment method as some of their details can
+     *                                     be needed for setting up. NB: the policy's payment method field is not set.
+     * @param boolean $isPaymentMethodBacs true iff this payment method should use bacs. Otherwise it will use checkout.
+     * @return PaymentMethod that has been freshly created according to the given specifications.
+     */
+    private function getPaymentMethod(Policy $policy, $isPaymentMethodBacs = false)
     {
-        $bacs = false;
-        if ($isPaymentMethodBacs === null) {
-            $bacs = random_int(0, 1) == 0;
-        } else {
-            $bacs = $isPaymentMethodBacs;
-        }
-        if ($bacs) {
+        $paymentMethod = null;
+        if ($isPaymentMethodBacs) {
             $bankAccount = new BankAccount();
             $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
             $reference = sprintf('SOSURE%d', random_int(1, 999999));
@@ -555,16 +559,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $bankAccount->setMandateSerialNumber(0);
             $this->giveRandomMandateStatus($bankAccount);
-            $initialPaymentSubmissionDate = \DateTime::createFromFormat('U', time());
+            $initialPaymentSubmissionDate = new \DateTime();
             $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
             $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
-
             $paymentMethod = new BacsPaymentMethod();
             $paymentMethod->setBankAccount($bankAccount);
         } else {
-            $paymentMethod = new JudoPaymentMethod();
+            $paymentMethod = new CheckoutPaymentMethod();
         }
-
         return $paymentMethod;
     }
 
@@ -662,7 +664,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
-        $policy->setPaymentMethod($this->getPaymentMethod($policy, $isPaymentMethodBacs));
+        $policy->setPaymentMethod(
+            $this->getPaymentMethod($policy, ($isPaymentMethodBacs !== null) ? $isPaymentMethodBacs : (rand(0, 1) == 0))
+        );
         $policy->setPhone($phone, null, false);
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {

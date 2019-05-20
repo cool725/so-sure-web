@@ -24,25 +24,18 @@
                 <div class="col-lg-6">
                     <div class="hero__intro">
                         {% if invitation.inviter is defined %}
-                            {% if landing_text is defined and landing_text == 'email-landing-text-a' %}
-                                <h1 class="mb-4 text-white fit">Protect your phone<br><span class="sub">with {{invitation.inviter.name}}</span></h1>
-                                <h4 class="text-zaffre h5">Connect with {{invitation.inviter.firstname}} to get money back.</h4>
-                                <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed every year if none of you claim. Yes, really!</p>
-                            {% else %}
-                                <h1 class="mb-4 text-white fit">Friends like {{invitation.inviter.name}}<br><span class="sub">are the best</span></h1>
-                                <h4 class="text-zaffre h5">Join forces with your friends and family to save big on your phone insurance.</h4>
-                                <p class="mb-4 text-white">We're rewarding our careful customers. If you, Joanna and your connections are careful and don't claim all year, you can get up to 80% of your money back. Yes really!</p>
-                            {% endif %}
+                            <h1 class="mb-4 text-white fit">Protect your phone<br><span class="sub">with {{ invitation.inviter.name }}</span></h1>
+                            <h4 class="text-zaffre h5">Connect with {{ invitation.inviter.firstname }}. Get &pound;10 each 😁</h4>
                         {% else %}
-                            <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub">that's Simply Better</span></h1>
-                            <h4 class="text-zaffre">Simple terms, pain-free claims, premium cover</h4>
-                            <p class="mb-4 text-white">By joining forces with your most careful friends and family, you could see up to 80% of your insurance premium reimbursed to you every year. Yes, really!</p>
+                            <h1 class="mb-4 text-white fit">Protect your phone <br><span class="sub">with so-sure</span></h1>
+                            <h4 class="text-zaffre">Connect with friends. Get &pound;10 each 😁</h4>
                         {% endif %}
+                        <p class="mb-4 text-white">Join forces with careful people you know and see up to 80% of your insurance premium reimbursed every year if none of you claim. Yes, really!</p>
                     </div>
                     <div class="hero__controls pb-3">
                         <a href="#"
-                           class="btn btn-white btn-block-xs mr-sm-2 track-data get-a-quote"
-                           data-event-name="{% if landing_text is defined and landing_text == 'email-landing-text-a' %}get-a-quote-email-invite-a{% elseif landing_text is defined and landing_text == 'email-landing-text-b' %}get-a-quote-email-invite-b{% else %}get-a-quote-email-invite{% endif %}">
+                           class="btn btn-success btn-block-xs mr-sm-2 track-data get-a-quote disabled"
+                           data-event-name="get-a-quote-email-invite">
                            Get a Quote</a>
                         <a href="#"
                            class="btn btn-outline-white watch-video btn-block-xs"
@@ -53,11 +46,11 @@
                             <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                             See how it works
                         </a>
-                        {% if invitation is defined and invitation %}
+                        {# {% if invitation is defined and invitation %}
                             {{ form_start(form, { 'attr': { 'class': 'mt-4 text-center text-md-left' }}) }}
                                 {{ form_widget(form) }}
                             {{ form_end(form) }}
-                        {% endif %}
+                        {% endif %} #}
                     </div>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block">
@@ -104,7 +97,7 @@
                     <p class="mb-2 text-zaffre">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
                 </div>
             </div>
-            <a href="#" class="btn btn-primary btn-block-xs mt-3 get-a-quote">Get Insured in minutes</a>
+            <a href="#" class="btn btn-primary btn-block-xs mt-3 get-a-quote disabled">Get Insured in minutes</a>
         </div>
         <div class="intro__background d-none d-lg-block">
             <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right-cut.png" alt="so-sure - Money Back" width="180px" class="d-fk-none">
@@ -225,7 +218,7 @@
                         <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                         Watch our Video
                     </a>
-                    <a href="#" class="btn btn-white btn-block-xs get-a-quote">Get a Quote</a>
+                    <a href="#" class="btn btn-white btn-block-xs get-a-quote disabled">Get a Quote</a>
                 </div>
             </div>
         </div>

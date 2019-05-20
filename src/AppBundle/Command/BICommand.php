@@ -4,6 +4,8 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
@@ -14,6 +16,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -80,6 +83,18 @@ class BICommand extends ContainerAwareCommand
      */
     protected function configure()
     {
+        $onlyOptions = [
+            "policies",
+            "claims",
+            "users",
+            "invitations",
+            "connections",
+            "phones",
+            "unpaidCalls",
+            "leadSource",
+            "checkoutTransactions"
+        ];
+        $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
         $this
             ->setName('sosure:bi')
             ->setDescription('Run a bi export')
@@ -99,7 +114,7 @@ class BICommand extends ContainerAwareCommand
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'only run 1 export [policies, claims, users, invitations, connections, phones, unpaidCalls, leadSource]'
+                $onlyMessage
             )
             ->addOption(
                 'skip-s3',
@@ -112,6 +127,12 @@ class BICommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 "Choose a timezone to use for policies report"
+            )
+            ->addOption(
+                "date",
+                null,
+                InputOption::VALUE_REQUIRED,
+                "Set the date you want to query transactions for - MM/YY."
             )
         ;
     }
@@ -170,6 +191,13 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$only || $only == 'leadSource') {
             $lines = $this->exportLeadSource($skipS3, $timezone);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
+        }
+        if (!$only || $only == 'checkoutTransactions') {
+            $date = $input->getOption('date');
+            $lines = $this->exportCheckoutTransactions($skipS3, $timezone, $date);
             if ($debug) {
                 $output->write(json_encode($lines, JSON_PRETTY_PRINT));
             }
@@ -724,6 +752,58 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
+    private function exportCheckoutTransactions($skipS3, \DateTimeZone $timezone, $date)
+    {
+        /** @var PaymentRepository $repo */
+        $repo = $this->dm->getRepository(Payment::class);
+
+        if ($date === null) {
+            $date = date('Y-m');
+        }
+        $now = new \DateTime($date);
+        $nextMonth = new \DateTime($date);
+        $nextMonth->add(new \DateInterval('P1M'));
+
+        $transactions = $repo->createQueryBuilder()
+            ->field('date')->gte($now)
+            ->field('date')->lt($nextMonth)
+            ->field('type')->equals('checkout')
+            ->sort('created', 1)
+            ->getQuery()->execute();
+
+
+        $lines = [];
+        $lines[] = implode(',', [
+            "Date",
+            "Transaction ID",
+            "Result",
+            "Policy Number",
+            "Message",
+            "Details"
+        ]);
+
+        /** @var CheckoutPayment $transaction */
+        foreach ($transactions as $transaction) {
+            /** @var Policy $policy */
+            $policy = $transaction->getPolicy();
+
+            $lines[] = implode(',', [
+                $transaction->getDate()->format('jS M Y H:i'),
+                $transaction->getReceipt(),
+                $transaction->getResult(),
+                $policy->getPolicyNumber(),
+                $transaction->getMessage(),
+                $transaction->getDetails()
+            ]);
+        }
+        if (!$skipS3) {
+            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
+            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
+        }
+
+        return $lines;
+    }
+
     /**
      * Uploads an array of data to s3 as lines in a file.
      * @param array  $data     is the data to write to the file.
@@ -732,7 +812,19 @@ class BICommand extends ContainerAwareCommand
      */
     private function uploadS3($data, $filename)
     {
-        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+        /**
+         * It is possible that the filename can be a path, but the permissions on prod do not
+         * allow for a subdir to be created but S3 does.
+         * This means that there can be instances where the cron will fail.
+         * Solution is that if a path is passed in, explode it and take the last part
+         * for the tmp filename, but still use the full filename with path for s3.
+         */
+        $tmpFilename = $filename;
+        if (mb_strpos($filename, '/') !== false) {
+            $parts = explode('/', $filename);
+            $tmpFilename = array_pop($parts);
+        }
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $tmpFilename);
         $result = file_put_contents($tmpFile, $data);
         if (!$result) {
             throw new \Exception($filename . ' could not be processed into a tmp file.');

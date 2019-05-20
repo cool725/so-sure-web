@@ -63,6 +63,7 @@ class SoSure
         'E6 1DY',
         'IG3 9JX',
         'E6 3EZ',
+        'BT15 5AP',
     ];
 
     public static function getActivationInterval()

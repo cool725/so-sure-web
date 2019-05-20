@@ -59,7 +59,7 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
-                                <a class="dropdown-item h6 get-a-quote" href="#">
+                                <a class="dropdown-item h6 get-a-quote disabled" href="#">
                                     Start a new quote
                                     <small>Not the phone you're looking for?</small>
                                 </a>
@@ -91,7 +91,7 @@
                 </div>
 
                 <div class="qpw__info__container d-none d-lg-block">
-                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                    {% include 'AppBundle::PhoneInsurance/_seeFullDetailsQuote.html.twig' %}
                     <div class="policy__info mx-4 mx-lg-5 py-5">
                         <div class="p-4 d-lg-flex rounded justify-content-lg-between align-items-lg-center">
                             <div class="text-center text-lg-left">
@@ -229,7 +229,7 @@
                         </g>
                     </g>
                 </svg>
-                {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
+                {% include 'AppBundle::PhoneInsurance/_seeFullDetailsQuote.html.twig' %}
             </div>
 
         </div>

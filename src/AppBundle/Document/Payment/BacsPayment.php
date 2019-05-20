@@ -277,7 +277,14 @@ class BacsPayment extends Payment
         }
     }
 
-    public function approve(\DateTime $date = null, $ignoreReversedDate = false)
+    /**
+     * Sets the bacs payment as having been approved.
+     * @param \DateTime $date               is the date that the payment was approved at.
+     * @param boolean   $ignoreReversedDate whether to make sure payment is not approved while it could still be undone.
+     * @param boolean   $setCommission      whether to set the commission. If setting it has already been attempted then
+     *                                      there is not any point doing it again.
+     */
+    public function approve(\DateTime $date = null, $ignoreReversedDate = false, $setCommission = true)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -297,7 +304,7 @@ class BacsPayment extends Payment
         $this->setSuccess(true);
 
         // Usually commission would not be set, however, if we may have needed to manully set the commission
-        if (!$this->getTotalCommission()) {
+        if ($setCommission && !$this->getTotalCommission()) {
             $this->setCommission();
         }
 

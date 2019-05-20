@@ -52,7 +52,7 @@
                    data-slide-to="0"
                    data-target="#onboarding_carousel">
                     <div class="onboarding-nav__number h6 mb-0">1</div>
-                    <div class="onboarding-nav__title h6 ml-3 mb-0">Welcome to so-sure</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Welcome to so-sure </div>
                 </a>
                 <a href="#"
                    class="onboarding-nav__link py-4"
@@ -156,7 +156,7 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Reduce your excess 📉</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50 for accidental damage/breakdown</strong> and <strong>&pound;70 for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;150 for all claims</strong>.</p>
+                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }} for accidental damage/breakdown</strong> and <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }} for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;{{ policy.phone.currentPhonePrice.excess.damage }} for all claims</strong>.</p>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -174,7 +174,7 @@
                                         Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
                                 {% endif %}
                             {% else %}
-                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;50 for accidental damage/breakdown</strong> and <strong>&pound;70 for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;150 for all claims</strong>.</p>
+                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }} for accidental damage/breakdown</strong> and <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }} for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;{{ policy.phone.currentPhonePrice.excess.damage }} for all claims</strong>.</p>
                                 <div class="d-flex justify-content-center">
                                     <a href="#"
                                        class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"

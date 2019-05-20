@@ -6,7 +6,10 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\CheckoutpayService;
+use AppBundle\Service\CheckoutService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +25,6 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
@@ -43,6 +45,7 @@ class RefundListenerTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $userRepo;
+    protected static $checkoutpayService;
     protected static $judopayService;
     protected static $redis;
     protected static $logger;
@@ -67,6 +70,7 @@ class RefundListenerTest extends WebTestCase
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
         self::$redis = self::$container->get('snc_redis.default');
+        self::$checkoutpayService = self::$container->get('app.checkout');
         self::$judopayService = self::$container->get('app.judopay');
         self::$logger = self::$container->get('logger');
         /** @var BacsService $bacsService */
@@ -85,7 +89,7 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerCancelledNonPolicy', $this),
+            static::generateEmail('testRefundListenerCancelledNonPolicy', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
@@ -94,6 +98,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -106,7 +111,7 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('refund-cancelled', $this),
+            static::generateEmail('refund-cancelled', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
@@ -119,6 +124,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -131,7 +137,7 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerCancelledCooloff', $this),
+            static::generateEmail('testRefundListenerCancelledCooloff', $this, true),
             'bar'
         );
         $policy = static::initPolicy(
@@ -141,7 +147,7 @@ class RefundListenerTest extends WebTestCase
             new \DateTime('2016-11-01'),
             false
         );
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'));
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-11-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -149,8 +155,8 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
-        
-        // simulate a free month - judo refund + so-sure addition
+
+        // simulate a free month - checkout refund + so-sure addition
         static::addPayment(
             $policy,
             0 - $policy->getPremium()->getMonthlyPremiumPrice(null, new \DateTime('2016-11-01')),
@@ -166,6 +172,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -181,9 +188,9 @@ class RefundListenerTest extends WebTestCase
 
         $total = Payment::sumPayments($policy->getPayments(), false);
         $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-        
-        // judo initial, judo refund for free month
-        // so-sure payment to offset judo refund, so-sure refund for cancellation
+
+        // checkout initial, checkout refund for free month
+        // so-sure payment to offset checkout refund, so-sure refund for cancellation
         $this->assertEquals(4, count($policy->getPayments()));
     }
 
@@ -191,7 +198,7 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerCancelledCooloffYearly', $this),
+            static::generateEmail('testRefundListenerCancelledCooloffYearly', $this, true),
             'bar'
         );
         $policy = static::initPolicy(
@@ -201,7 +208,7 @@ class RefundListenerTest extends WebTestCase
             new \DateTime('2016-11-01'),
             false
         );
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'), false);
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-11-01'), false);
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -209,8 +216,8 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
-        
-        // simulate a free month - judo refund + so-sure addition
+
+        // simulate a free month - checkout refund + so-sure addition
         static::addPayment(
             $policy,
             0 - $policy->getPremium()->getMonthlyPremiumPrice(null, new \DateTime('2016-11-01')),
@@ -226,6 +233,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -241,9 +249,9 @@ class RefundListenerTest extends WebTestCase
 
         $total = Payment::sumPayments($policy->getPayments(), false);
         $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
-        
-        // judo initial, judo refund for free month
-        // so-sure payment to offset judo refund, so-sure refund for cancellation
+
+        // checkout initial, checkout refund for free month
+        // so-sure payment to offset checkout refund, so-sure refund for cancellation
         $this->assertEquals(5, count($policy->getPayments()));
     }
 
@@ -253,7 +261,7 @@ class RefundListenerTest extends WebTestCase
         $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerClaimNoRefundYearly', $this),
+            static::generateEmail('testRefundListenerClaimNoRefundYearly', $this, true),
             'bar'
         );
         /** @var Policy $policy */
@@ -264,7 +272,7 @@ class RefundListenerTest extends WebTestCase
             $oneMonthAgo,
             false
         );
-        static::addJudoPayPayment(self::$judopayService, $policy, $oneMonthAgo, false);
+        static::prepCheckoutPaymentToAdd($policy, $oneMonthAgo, false);
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -285,6 +293,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -302,8 +311,8 @@ class RefundListenerTest extends WebTestCase
             $total['total']
         ));
 
-        // judo initial, judo refund for free month
-        // so-sure payment to offset judo refund, so-sure refund for cancellation
+        // checkout initial, checkout refund for free month
+        // so-sure payment to offset checkout refund, so-sure refund for cancellation
         $this->assertEquals(1, count($policy->getPayments()));
     }
 
@@ -311,7 +320,7 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerBacsCancelledCooloffYearlyManual', $this),
+            static::generateEmail('testRefundListenerBacsCancelledCooloffYearlyManual', $this, true),
             'bar'
         );
         $policy = static::initPolicy(
@@ -337,6 +346,7 @@ class RefundListenerTest extends WebTestCase
         $now = \DateTime::createFromFormat('U', time());
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -354,7 +364,7 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerBacsCancelledCooloffYearlyNonManual', $this),
+            static::generateEmail('testRefundListenerBacsCancelledCooloffYearlyNonManual', $this, true),
             'bar'
         );
         $policy = static::initPolicy(
@@ -380,6 +390,7 @@ class RefundListenerTest extends WebTestCase
         $now = \DateTime::createFromFormat('U', time());
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -397,11 +408,11 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundFreeNovPromo', $this),
+            static::generateEmail('testRefundFreeNovPromo', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-11-01'));
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-11-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -413,6 +424,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -425,11 +437,11 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundFreeDec2016Promo', $this),
+            static::generateEmail('testRefundFreeDec2016Promo', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-12-01'));
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-12-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -441,6 +453,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -453,11 +466,11 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerPolicyDiscountUnpaid', $this),
+            static::generateEmail('testRefundListenerPolicyDiscountUnpaid', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-01-01'));
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-01-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -494,6 +507,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -517,11 +531,11 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerPolicyDiscountPaid', $this),
+            static::generateEmail('testRefundListenerPolicyDiscountPaid', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-01-01'));
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-01-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -549,7 +563,7 @@ class RefundListenerTest extends WebTestCase
             Payment::sumPayments($renewalPolicy->getPayments(), false, PolicyDiscountPayment::class)['total']
         );
 
-        static::addJudoPayPayment(self::$judopayService, $renewalPolicy, new \DateTime('2017-01-01'));
+        static::prepCheckoutPaymentToAdd($renewalPolicy, new \DateTime('2017-01-01'));
 
         $renewalPolicy->setCancelledReason(PhonePolicy::CANCELLED_USER_REQUESTED);
         $renewalPolicy->setStatus(PhonePolicy::STATUS_CANCELLED);
@@ -561,6 +575,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -575,11 +590,11 @@ class RefundListenerTest extends WebTestCase
         // 10 - (10 * 20/365) = 9.45
         $this->assertTrue($this->areEqualToTwoDp(9.45, $updatedRenewalPolicy->getCashback()->getAmount()));
 
-        $judo = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, JudoPayment::class);
-        $this->assertEquals(1, $judo['numRefunded']);
-        $this->assertTrue($judo['total'] > 0);
-        $this->assertTrue($judo['received'] > 0);
-        $this->assertTrue($judo['refunded'] < 0);
+        $checkout = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, CheckoutPayment::class);
+        $this->assertEquals(1, $checkout['numRefunded']);
+        $this->assertTrue($checkout['total'] > 0);
+        $this->assertTrue($checkout['received'] > 0);
+        $this->assertTrue($checkout['refunded'] < 0);
 
         $refund = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, PolicyDiscountRefundPayment::class);
         $this->assertEquals(1, $refund['numRefunded']);
@@ -609,11 +624,11 @@ class RefundListenerTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerPolicyDiscountPaidCooloff', $this),
+            static::generateEmail('testRefundListenerPolicyDiscountPaidCooloff', $this, true),
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
-        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-01-01'));
+        static::prepCheckoutPaymentToAdd($policy, new \DateTime('2016-01-01'));
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
@@ -641,7 +656,7 @@ class RefundListenerTest extends WebTestCase
             Payment::sumPayments($renewalPolicy->getPayments(), false, PolicyDiscountPayment::class)['total']
         );
 
-        static::addJudoPayPayment(self::$judopayService, $renewalPolicy, new \DateTime('2017-01-01'), true, 10/12);
+        static::prepCheckoutPaymentToAdd($renewalPolicy, new \DateTime('2017-01-01'), true, 10 / 12);
 
         $renewalPolicy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
         $renewalPolicy->setStatus(PhonePolicy::STATUS_CANCELLED);
@@ -653,6 +668,7 @@ class RefundListenerTest extends WebTestCase
 
         $listener = new RefundListener(
             static::$dm,
+            static::$checkoutpayService,
             static::$judopayService,
             static::$logger,
             'test',
@@ -666,12 +682,12 @@ class RefundListenerTest extends WebTestCase
         $this->assertNotNull($updatedRenewalPolicy->getCashback());
         $this->assertTrue($this->areEqualToTwoDp(10, $updatedRenewalPolicy->getCashback()->getAmount()));
 
-        $judo = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, JudoPayment::class);
-        $this->assertEquals(1, $judo['numRefunded']);
-        $this->assertEquals(0, $judo['total']);
-        $this->assertTrue($judo['received'] > 0);
-        $this->assertTrue($judo['refunded'] < 0);
-        $this->assertEquals($judo['received'], 0 - $judo['refunded']);
+        $checkout = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, CheckoutPayment::class);
+        $this->assertEquals(1, $checkout['numRefunded']);
+        $this->assertEquals(0, $checkout['total']);
+        $this->assertTrue($checkout['received'] > 0);
+        $this->assertTrue($checkout['refunded'] < 0);
+        $this->assertEquals($checkout['received'], 0 - $checkout['refunded']);
 
         $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
         $this->assertEquals(2, $total['numReceived']);
@@ -679,5 +695,29 @@ class RefundListenerTest extends WebTestCase
         $this->assertEquals(0, $total['total']);
         $this->assertTrue($total['received'] > 0);
         $this->assertTrue($total['refunded'] < 0);
+    }
+
+    private static function prepCheckoutPaymentToAdd(
+        Policy $policy,
+        $date = null,
+        $monthly = true,
+        $adjustment = 0
+    ) {
+        if ($monthly) {
+            $policy->setPremiumInstallments(12);
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice();
+            $commission = Salva::MONTHLY_TOTAL_COMMISSION;
+        } else {
+            $policy->setPremiumInstallments(1);
+            $premium = $policy->getPremium()->getYearlyPremiumPrice();
+            $commission = Salva::YEARLY_TOTAL_COMMISSION;
+        }
+        if ($adjustment) {
+            $premium = $premium - $adjustment;
+            // toTwoDp
+            $premium = number_format(round($premium, 2), 2, ".", "");
+        }
+        $receiptId = random_int(1, 999999);
+        return static::addCheckoutPayment($policy, $premium, $commission, $receiptId, $date);
     }
 }

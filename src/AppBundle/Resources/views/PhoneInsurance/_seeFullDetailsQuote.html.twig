@@ -133,15 +133,15 @@
                     <tbody>
                         <tr>
                             <td>Validated with app</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</td>
+                            <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
+                            <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
+                            <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
                         </tr>
                         <tr>
                             <td>Not validated with app</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.damage }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.loss }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.theft }}</td>
+                            <td>&pound;{{ phone_price.excess.damage }}</td>
+                            <td>&pound;{{ phone_price.excess.loss }}</td>
+                            <td>&pound;{{ phone_price.excess.theft }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -176,7 +176,7 @@
                     <li>Instant cover from purchase</li>
                     <li>24-72 hour replacement once your claim is approved</li>
                     <li>Hassle-Free Claims</li>
-                    <li>Low excess from just &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</li>
+                    <li>Low excess from just &pound;{{ phone_price.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone_price.excess.damage }}</li>
                     <li>Insure mobiles up to 3 years old</li>
                     <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
                     <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
@@ -190,8 +190,8 @@
                 How much is excess? <i class="far fa-chevron-down text-white fa-lg"></i>
             </h5>
             <div class="expanding-cardbox__expand text-white mt-4">
-                <p>Our excess is as low as &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} for accidental damage and &pound;{{ phone.currentPhonePrice.picsureexcess.loss }} for loss and theft when you validate your phone with our anti-fraud technology.</p>
-                <p class="mb-0"><strong>If you don't validate your phone with pic-sure the excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</strong>.</p>
+                <p>Our excess is as low as &pound;{{ phone_price.picsureexcess.damage }} for accidental damage and &pound;{{ phone_price.picsureexcess.loss }} for loss and theft when you validate your phone with our anti-fraud technology.</p>
+                <p class="mb-0"><strong>If you don't validate your phone with pic-sure the excess is &pound;{{ phone_price.excess.damage }}</strong>.</p>
             </div>
         </div>
     </div>

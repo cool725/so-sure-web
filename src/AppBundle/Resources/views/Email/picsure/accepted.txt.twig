@@ -7,9 +7,9 @@ pic-sure is successfully validated
 Thanks for validating your phone via pic-sure. Your {{ policy.phone }} is now successfully validated.
 
 Your excess for policy {{ policy.policyNumber }} is now:
-• Accidental Damage: £50
-• Breakdown: £50
-• Theft: £70
-• Loss: £70
+• Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
+• Breakdown: £{{ policy.premium.picSureExcess.warranty }}
+• Theft: £{{ policy.premium.picSureExcess.theft }}
+• Loss: £{{ policy.premium.picSureExcess.loss }}
 
 {% endblock body %}
