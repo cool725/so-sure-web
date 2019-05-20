@@ -414,8 +414,8 @@ class HubspotService
 
     /**
      * builds data array of all user properties for hubspot.
-     * @param User   $user   is the user that the data will be based on.
-     * @param array  $filter is the list of allowed properties or empty array for all properties.
+     * @param User  $user   is the user that the data will be based on.
+     * @param array $filter is the list of allowed properties or empty array for all properties.
      * @return array of the data.
      */
     private function buildHubspotUserData(User $user, $filter = [])
