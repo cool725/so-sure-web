@@ -107,7 +107,6 @@ class HubspotService
      */
     public function getAllContacts()
     {
-        //$condition = $customer ? ["customer" => true] : [];
         $offset = 0;
         while (true) {
             $response = $this->client->contacts()->all([
