@@ -2123,6 +2123,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies[0];
     }
 
+    /**
+     * Gives the time of the start of the day on which this user was created.
+     * @return \DateTime the start of the day on which the user was created.
+     */
+    public function getCreatedDay()
+    {
+        return $this->startOfDay($this->created);
+    }
+
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
     {
         $addresses = [];
