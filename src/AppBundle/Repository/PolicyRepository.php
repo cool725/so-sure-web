@@ -338,4 +338,26 @@ class PolicyRepository extends BaseDocumentRepository
         $query->field('notesList')->elemMatch($noteQuery);
         return $query->getQuery()->execute();
     }
+
+    /**
+     * Finds all policies that have a hubspot id in groups of some size.
+     * @param int $n is the max size of each group.
+     * @return \Generator which lets you iterate over each group.
+     */
+    public function findHubspotPoliciesGrouped($n = 100)
+    {
+        $start = 0;
+        while (true) {
+            $policies = $this->createQueryBuilder()
+            ->field('hubspotId')->exists(true)
+            ->skip($start)->limit($n)
+            ->getQuery()->execute();
+            if ($policies->dead()) {
+                return;
+            } else {
+                yield $policies;
+            }
+            $start += $n;
+        }
+    }
 }

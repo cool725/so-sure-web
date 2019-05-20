@@ -65,19 +65,32 @@ class HubspotCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setDescription("Sync data with HubSpot")
+        $this->setDescription("Controls the Hubspot service which syncs data to a hubspot")
             ->addArgument(
                 "action",
                 InputArgument::REQUIRED,
-                "sync-all|sync-new|sync-user|drop|queue-count|queue-show|queue-clear|test|process"
+                // @codingStandardsIgnoreStart
+                "sync-all|sync-user|sync-user-property|sync-policy-property|drop|queue-count|queue-show|queue-clear|test|process"
+                // @codingStandardsIgnoreEnd
             )
-            ->addOption("email", null, InputOption::VALUE_OPTIONAL, "email of user to sync if syncing a user.")
+            ->addOption(
+                "email",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "email of user to sync if <info>sync-user</info> is run."
+            )
             ->addOption(
                 "n",
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "Number of messages to process (default 15)",
+                "Number of messages to process if <info>process</info> is run.",
                 self::QUEUE_RATE_DEFAULT
+            )
+            ->addOption(
+                "p",
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                "Properties to be synced by <info>sync-user-property</info> or <info>sync-policy-property</info>."
             );
     }
 
@@ -93,13 +106,17 @@ class HubspotCommand extends ContainerAwareCommand
         try {
             $action = $input->getArgument("action");
             $email = $input->getOption("email");
-            $process = (int) ($input->getOption("n") ?: self::QUEUE_RATE_DEFAULT);
+            $process = (int)$input->getOption("n");
+            $properties = $input->getOption("p");
             switch ($action) {
                 case "sync-all":
                     $this->syncAllUsers($output);
                     break;
-                case "sync-new":
-                    $this->syncNew($output);
+                case "sync-user-property":
+                    $this->syncUserProperty($output, $properties);
+                    break;
+                case "sync-policy-property":
+                    $this->syncPolicyProperty($output, $properties);
                     break;
                 case "sync-user":
                     /** @var User $user */
@@ -190,10 +207,60 @@ class HubspotCommand extends ContainerAwareCommand
         $output->writeln(sprintf("Queued %d Users", $count));
     }
 
-    private function syncNew(OutputInterface $output)
+    /**
+     * Synchronously uploads a given property for every hubspot user to hubspot.
+     * @param OutputInterface $output     is output for showing some info about what we are doing.
+     * @param array           $properties is the list of properties to sync. It can not be empty.
+     */
+    private function syncUserProperty(OutputInterface $output, $properties)
     {
-        $count = 0;
-        // Do users first since that will catch most policies at the same time.
+        if (!$properties) {
+            $output->writeln("Property not given.");
+            return;
+        }
+        /** @var UserRepository */
+        $userRepo = $this->dm->getRepository(User::class);
+        $groups = $userRepo->findHubspotUsersGrouped();
+        $progressBar = new ProgressBar($output);
+        $started = false;
+        foreach ($groups as $group) {
+            if (!$started) {
+                $progressBar->start($group->count());
+                $started = true;
+            }
+            $this->hubspot->updateContactBatch($group, $properties);
+            $progressBar->advance($group->count(true));
+        }
+        $progressBar->finish();
+        $output->writeln("");
+    }
+
+    /**
+     * Synchronously uploads a given property for every hubspot policy to hubspot.
+     * @param OutputInterface $output     is output for showing some info about what we are doing.
+     * @param array           $properties is the list of properties to sync. It can not be empty.
+     */
+    private function syncPolicyProperty(OutputInterface $output, $properties)
+    {
+        if (!$properties) {
+            $output->writeln("Property not given.");
+            return;
+        }
+        /** @var PolicyRepository */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $groups = $policyRepo->findHubspotPoliciesGrouped();
+        $progressBar = new ProgressBar($output);
+        $started = false;
+        foreach ($groups as $group) {
+            if (!$started) {
+                $progressBar->start($group->count());
+                $started = true;
+            }
+            $this->hubspot->updateDealBatch($group, $properties);
+            $progressBar->advance($group->count(true));
+        }
+        $progressBar->finish();
+        $output->writeln("");
     }
 
     /**

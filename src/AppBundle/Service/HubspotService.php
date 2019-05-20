@@ -107,7 +107,6 @@ class HubspotService
      */
     public function getAllContacts()
     {
-        //$condition = $customer ? ["customer" => true] : [];
         $offset = 0;
         while (true) {
             $response = $this->client->contacts()->all([
@@ -194,6 +193,24 @@ class HubspotService
     }
 
     /**
+     * Sync a bunch of users into a group of hubspot contacts. If there is not an exception at the end you can
+     * consider it successful.
+     * @param array $users  is the list of users to sync.
+     * @param array $filter is the list of properties to sync or null to sync it all.
+     */
+    public function updateContactBatch($users, $filter = [])
+    {
+        $data = [];
+        foreach ($users as $user) {
+            $data[] = [
+                "vid" => $user->getHubspotId(),
+                "properties" => $this->buildHubspotUserData($user, $filter)
+            ];
+        }
+        $this->client->contacts()->createOrUpdateBatch($data);
+    }
+
+    /**
      * If a given policy already exists as a hubspot deal then update it's properties, otherwise create it.
      * @param Policy $policy is the policy that the deal represents.
      * @return string containing the hubspot id of the deal.
@@ -212,6 +229,24 @@ class HubspotService
         }
         $this->client->deals()->update($policy->getHubspotId(), $hubspotPolicyArray);
         return $policy->getHubspotId();
+    }
+
+    /**
+     * Sync a bunch of policies into a group of hubspot deals. If there is not an exception at the end you can
+     * consider it successful.
+     * @param array $policies is the list of policies to sync.
+     * @param array $filter   is the list of properties to sync or null to sync it all.
+     */
+    public function updateDealBatch($policies, $filter = [])
+    {
+        $data = [];
+        foreach ($policies as $policy) {
+            $data[] = [
+                "objectId" => $policy->getHubspotId(),
+                "properties" => $this->buildHubspotPolicyData($policy, $filter)["properties"]
+            ];
+        }
+        $this->client->deals()->updateBatch($data);
     }
 
     /**
@@ -263,8 +298,7 @@ class HubspotService
             case self::QUEUE_UPDATE_USER:
                 $user = $this->userFromMessage($message);
                 $this->createOrUpdateContact($user);
-                // If policy has not been synced to hubspot before we should join policy and user sync so that user is
-                // certain to be synced before policy is.
+                // also sync any new policies.
                 foreach ($user->getPolicies() as $policy) {
                     if (!$policy->getHubspotId()) {
                         $this->createOrUpdateDeal($policy);
@@ -338,7 +372,7 @@ class HubspotService
      * @param Policy $policy is the policy whose data is being used.
      * @return array containing the data formatted for sending to the hubspot apis.
      */
-    private function buildHubspotPolicyData(Policy $policy)
+    private function buildHubspotPolicyData(Policy $policy, $filter = [])
     {
         $stage = "pre-pending";
         $status = $policy->getStatus();
@@ -354,21 +388,21 @@ class HubspotService
             $stage = "expired";
         }
         $data = [];
-        $this->addProperty("pipeline", $this->dealPipelineKey, $data, true);
-        $this->addProperty("dealname", $policy->getPolicyNumber(), $data, true);
-        $this->addProperty("dealstage", $this->getDealStageId($stage), $data, true);
+        $this->addProperty("pipeline", $this->dealPipelineKey, $data, true, $filter);
+        $this->addProperty("dealname", $policy->getPolicyNumber(), $data, true, $filter);
+        $this->addProperty("dealstage", $this->getDealStageId($stage), $data, true, $filter);
         if ($policy->getStart()) {
-            $data[] = $this->buildProperty("start", $policy->getStart()->format("d-m-Y H:i"), true);
+            $this->addProperty("start", $policy->getStart()->format("d-m-Y H:i"), $data, true, $filter);
         }
         if ($policy->getEnd()) {
-            $data[] = $this->buildProperty("end", $policy->getEnd()->format("d-m-Y H:i"), true);
+            $this->addProperty("end", $policy->getEnd()->format("d-m-Y H:i"), $data, true, $filter);
         }
         if ($policy instanceof PhonePolicy) {
-            $this->addProperty("phone_model", $policy->getPhone()->getModel(), $data, true);
-            $this->addProperty("phone_make", $policy->getPhone()->getMake(), $data, true);
-            $this->addProperty("phone_memory", $policy->getPhone()->getMemory(), $data, true);
-            $this->addProperty("imei", $policy->getImei(), $data, true);
-            $this->addProperty("serial", $policy->getSerialNumber(), $data, true);
+            $this->addProperty("phone_model", $policy->getPhone()->getModel(), $data, true, $filter);
+            $this->addProperty("phone_make", $policy->getPhone()->getMake(), $data, true, $filter);
+            $this->addProperty("phone_memory", $policy->getPhone()->getMemory(), $data, true, $filter);
+            $this->addProperty("imei", $policy->getImei(), $data, true, $filter);
+            $this->addProperty("serial", $policy->getSerialNumber(), $data, true, $filter);
         }
         return [
             "associations" => [
@@ -380,34 +414,37 @@ class HubspotService
 
     /**
      * builds data array of all user properties for hubspot.
-     * @param User $user is the user that the data will be based on.
+     * @param User  $user   is the user that the data will be based on.
+     * @param array $filter is the list of allowed properties or empty array for all properties.
      * @return array of the data.
      */
-    private function buildHubspotUserData(User $user)
+    private function buildHubspotUserData(User $user, $filter = [])
     {
         $data = [];
-        $this->addProperty("firstname", $user->getFirstName(), $data);
-        $this->addProperty("lastname", $user->getLastName(), $data);
-        $this->addProperty("email", $user->getEmailCanonical(), $data);
-        $this->addProperty("mobilephone", $user->getMobileNumber(), $data);
-        $this->addProperty("gender", $user->getGender(), $data);
-        $this->addProperty("customer", true, $data);
-        $this->addProperty("hs_facebookid", $user->getFacebookId(), $data);
+        $this->addProperty("firstname", $user->getFirstName(), $data, false, $filter);
+        $this->addProperty("lastname", $user->getLastName(), $data, false, $filter);
+        $this->addProperty("email", $user->getEmailCanonical(), $data, false, $filter);
+        $this->addProperty("mobilephone", $user->getMobileNumber(), $data, false, $filter);
+        $this->addProperty("gender", $user->getGender(), $data, false, $filter);
+        $this->addProperty("customer", true, $data, false, $filter);
+        $this->addProperty("hs_facebookid", $user->getFacebookId(), $data, false, $filter);
         if ($user->getBirthday()) {
-            $data[] = $this->buildProperty("date_of_birth", $user->getBirthday()->format("U") * 1000);
+            $this->addProperty("date_of_birth", $user->getBirthday()->format("U") * 1000, $data, false, $filter);
         }
         if ($user->getBillingAddress()) {
-            $data[] = $this->buildProperty("billing_address", $user->getBillingAddress()->__toString());
-            if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->buildProperty("census_subgroup", $census->getSubGroup());
+            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $this->addProperty("billing_address", $user->getBillingAddress()->__toString(), $data, false, $filter);
+            if ($census) {
+                $this->addProperty("census_subgroup", $census->getSubGroup(), $data, false, $filter);
             }
-            if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
-                $data[] = $this->buildProperty("total_weekly_income", $income->getTotal()->getIncome());
+            if ($income) {
+                $this->addProperty("total_weekly_income", $income->getTotal()->getIncome(), $data, false, $filter);
             }
         }
         // attribution data.
-        $this->addUserAttributionProperties($user, false, $data);
-        $this->addUserAttributionProperties($user, true, $data);
+        $this->addUserAttributionProperties($user, false, $data, $filter);
+        $this->addUserAttributionProperties($user, true, $data, $filter);
         return $data;
     }
 
@@ -416,31 +453,32 @@ class HubspotService
      * @param User    $user   is the user to get the data out of.
      * @param boolean $latest is whether to use the latest attribution or original attribution. true means latest.
      * @param array   $array  is the data array to add the property to. NB: it's edited directly.
+     * @param array   $filter is the list of parameters that can be put into the data array.
      */
-    private function addUserAttributionProperties($user, $latest, &$array)
+    private function addUserAttributionProperties($user, $latest, &$array, $filter = [])
     {
         $attribution = $latest ? $user->getAttribution() : $user->getLatestAttribution();
         if (!$attribution) {
             return;
         }
         $name = $latest ? "attribution" : "latest_attribution";
-        $array[] = $this->buildProperty("{$name}_campaign_name", $attribution->getCampaignName());
-        $array[] = $this->buildProperty("{$name}_campaign_source", $attribution->getCampaignSource());
-        $array[] = $this->buildProperty("{$name}_campaign_medium", $attribution->getCampaignMedium());
-        $array[] = $this->buildProperty("{$name}_device_category", $attribution->getDeviceCategory());
-        $array[] = $this->buildProperty("{$name}_device_os", $attribution->getDeviceOs());
+        $this->addProperty("{$name}_campaign_name", $attribution->getCampaignName(), $array, false, $filter);
+        $this->addProperty("{$name}_campaign_source", $attribution->getCampaignSource(), $array, false, $filter);
+        $this->addProperty("{$name}_campaign_medium", $attribution->getCampaignMedium(), $array, false, $filter);
+        $this->addProperty("{$name}_device_category", $attribution->getDeviceCategory(), $array, false, $filter);
+        $this->addProperty("{$name}_device_os", $attribution->getDeviceOs(), $array, false, $filter);
     }
 
     /**
      * Add a hubspot property to a list of properties if the value is not null.
      * @param string  $name  is the name of the property.
      * @param mixed   $value is the value of the property.
-     * @param array   $array is the array to add it to.
+     * @param array   $array is the array to add it to. NB: it's edited directly.
      * @param boolean $deal  is whether the property is a deal or customer property.
      */
-    private function addProperty($name, $value, &$array, $deal = false)
+    private function addProperty($name, $value, &$array, $deal = false, $filter = [])
     {
-        if ($value) {
+        if ($value && (!$filter || in_array($name, $filter))) {
             $array[] = $this->buildProperty($name, $value, $deal);
         }
     }
