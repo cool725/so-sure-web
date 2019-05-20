@@ -4129,42 +4129,29 @@ abstract class Policy
     }
 
     /**
-     * Update the policy itself, however, this should be done via the policy server in order to
-     * send out all the emails, etc
-     *
-     * @param string    $reason     CANCELLED_*
-     * @param \DateTime $date
-     * @param boolean   $fullRefund Should the user get a full refund
-     *
+     * Cancels the policy itself. Does not send out emails etc so should be called via the PoicyService::cancel method.
+     * @param string    $reason     Reason for cancellation. Should be Policy::CANCELLED_*.
+     * @param \DateTime $date       Date of cancellation.
+     * @param boolean   $fullRefund Should the user get a full refund?
      */
     public function cancel($reason, \DateTime $date = null, $fullRefund = false)
     {
         if (!$this->getId()) {
             throw new \Exception('Unable to cancel a policy that is missing an id');
         }
-
         if ($reason == self::CANCELLED_COOLOFF && $fullRefund) {
             throw new \Exception('Cooloff automatically provides full refund. Full Refund flag should not be set.');
         }
-
         if (!$this->canCancel($reason, $date)) {
-            throw new \Exception(sprintf(
-                'Unable to cancel policy %s/%s. Is claim in progress?',
-                $this->getPolicyNumber(),
-                $this->getId()
-            ));
+            throw new \Exception(sprintf('Unable to cancel policy %s/%s.', $this->getPolicyNumber(), $this->getId()));
         }
-
-        if ($date == null) {
+        if ($date === null) {
             $date = \DateTime::createFromFormat('U', time());
         }
         $this->setStatus(Policy::STATUS_CANCELLED);
         $this->setCancelledReason($reason);
         $this->setEnd($date);
         $this->setCancelledFullRefund($fullRefund);
-
-        $user = $this->getUser();
-
         // zero out the connection value for connections bound to this policy
         foreach ($this->getConnections() as $networkConnection) {
             $networkConnection->clearValue();
@@ -4173,14 +4160,11 @@ abstract class Policy
             }
             if ($inversedConnection = $networkConnection->findInversedConnection()) {
                 $inversedConnection->prorateValue($date);
-                // listener on connection will notify user
             }
             $networkConnection->getLinkedPolicy()->updatePotValue();
         }
-
         // Cancel any scheduled payments
         $this->cancelScheduledPayments();
-
         $this->updatePotValue();
     }
 
