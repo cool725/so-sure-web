@@ -485,7 +485,12 @@ class CheckoutService
     public function testPayDetails(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
-        $paymentMethod = $policy->getCheckoutPaymentMethod();
+        if ($policy->hasCheckoutPaymentMethod()) {
+            $paymentMethod = $policy->getCheckoutPaymentMethod();
+        } else {
+            $paymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($paymentMethod);
+        }
         $user = $policy->getUser();
         $details = null;
         try {
@@ -732,7 +737,12 @@ class CheckoutService
         $details = null;
         $payment = null;
         /** @var CheckoutPaymentMethod $paymentMethod */
-        $paymentMethod = $policy->getCheckoutPaymentMethod();
+        if ($policy->hasCheckoutPaymentMethod()) {
+            $paymentMethod = $policy->getCheckoutPaymentMethod();
+        } else {
+            $paymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($paymentMethod);
+        }
 
         try {
             $service = $this->client->chargeService();
@@ -1385,7 +1395,13 @@ class CheckoutService
     public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $recurring = false)
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
-        $paymentMethod = $policy->getCheckoutPaymentMethod();
+        if ($policy->hasCheckoutPaymentMethod()) {
+            $paymentMethod = $policy->getCheckoutPaymentMethod();
+        } else {
+            $paymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($paymentMethod);
+        }
+
         if (!$paymentMethod) {
             throw new \Exception(sprintf(
                 'Unknown payment method for policy %s user %s',
