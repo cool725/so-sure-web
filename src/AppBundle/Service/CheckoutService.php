@@ -486,7 +486,7 @@ class CheckoutService
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
-        if ($paymentMethod == null) {
+        if (!$paymentMethod) {
             $policy->setPaymentMethod(new CheckoutPaymentMethod());
             $paymentMethod = $policy->getCheckoutPaymentMethod();
         }
@@ -737,7 +737,7 @@ class CheckoutService
         $payment = null;
         /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
-        if ($paymentMethod == null) {
+        if (!$paymentMethod) {
             $policy->setPaymentMethod(new CheckoutPaymentMethod());
             $paymentMethod = $policy->getCheckoutPaymentMethod();
         }
@@ -835,7 +835,7 @@ class CheckoutService
 
         /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
-        if ($paymentMethod == null) {
+        if (!$paymentMethod) {
             $policy->setPaymentMethod(new CheckoutPaymentMethod());
             $paymentMethod = $policy->getCheckoutPaymentMethod();
         }
@@ -1398,11 +1398,6 @@ class CheckoutService
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
-        if ($paymentMethod == null) {
-            $policy->setPaymentMethod(new CheckoutPaymentMethod());
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
-        }
-
         if (!$paymentMethod) {
             throw new \Exception(sprintf(
                 'Unknown payment method for policy %s user %s',
