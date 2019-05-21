@@ -40,7 +40,7 @@ class CheckoutPayment extends Payment
     const RESPONSE_CODE_NO_FUNDS = 20051;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
