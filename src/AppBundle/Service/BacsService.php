@@ -861,7 +861,7 @@ class BacsService
                     $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
-                    $submittedPayment->approve($currentProcessingDate, true);
+                    $submittedPayment->approve($currentProcessingDate, true, false);
                     // Cancel scheduled payment.
                     $scheduledPayment = $submittedPayment->getScheduledPayment();
                     if ($scheduledPayment) {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f89e31915564bde093f3aa65995d9d53",
+    "content-hash": "8b5ea54fc583a730b5d36c52326676f2",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -5630,16 +5630,16 @@
         },
         {
             "name": "ryanwinchester/hubspot-php",
-            "version": "v1.1.3",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ryanwinchester/hubspot-php.git",
-                "reference": "0b42c86174f5cd54b0c2609814a3eee322363c6b"
+                "reference": "1f76eb28f5bc93ee7b0b94acd77b791b9645eca8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ryanwinchester/hubspot-php/zipball/0b42c86174f5cd54b0c2609814a3eee322363c6b",
-                "reference": "0b42c86174f5cd54b0c2609814a3eee322363c6b",
+                "url": "https://api.github.com/repos/ryanwinchester/hubspot-php/zipball/1f76eb28f5bc93ee7b0b94acd77b791b9645eca8",
+                "reference": "1f76eb28f5bc93ee7b0b94acd77b791b9645eca8",
                 "shasum": ""
             },
             "require": {
@@ -5676,7 +5676,7 @@
                 "api",
                 "hubspot"
             ],
-            "time": "2018-11-12T04:12:30+00:00"
+            "time": "2019-04-09T09:54:14+00:00"
         },
         {
             "name": "scheb/two-factor-bundle",
@@ -9403,7 +9403,6 @@
                 "mock",
                 "xunit"
             ],
-            "abandoned": true,
             "time": "2018-01-06T05:45:45+00:00"
         },
         {

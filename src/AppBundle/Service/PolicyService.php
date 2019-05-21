@@ -984,11 +984,12 @@ class PolicyService
     }
 
     /**
-     * @param Policy    $policy
-     * @param string    $reason
-     * @param boolean   $closeOpenClaims             Where we are required to cancel the policy (binder),
-     *                                               we need to close out claims
-     * @param \DateTime $date
+     * Cancels a policy.
+     * @param Policy    $policy                      The policy to cancel.
+     * @param string    $reason                      The reason for cancellation. Must be one of Policy::CANCELLED_*.
+     * @param boolean   $closeOpenClaims             Where we are required to cancel the policy (binder), we need to
+     *                                               close out claims
+     * @param \DateTime $date                        The date to say the policy is being cancelled at.
      * @param boolean   $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
      * @param boolean   $fullRefund                  Provide a full refund to the customer
      */
@@ -1033,7 +1034,6 @@ class PolicyService
                 }
             }
         }
-
         if ($closeOpenClaims && $policy->hasOpenClaim()) {
             foreach ($policy->getClaims() as $claim) {
                 if ($claim->isOpen()) {
@@ -1043,7 +1043,6 @@ class PolicyService
             }
             $this->dm->flush();
         }
-
         $policy->cancel($reason, $date, $fullRefund);
         $this->dm->flush();
         $this->cancelledPolicyEmail($policy);
