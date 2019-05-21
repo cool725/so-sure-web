@@ -1646,7 +1646,7 @@ class BacsService
         }
 
         if (isset($results['serial-number']) && mb_strlen($results['serial-number']) > 0) {
-            $results['autoBasFileSubmit'] = $this->bacsFileSubmittedBySerialNumber($results['serial-number']);
+            $results['autoBacsFileSubmit'] = $this->bacsFileSubmittedBySerialNumber($results['serial-number']);
         }
 
         return $results;
