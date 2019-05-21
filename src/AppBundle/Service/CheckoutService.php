@@ -485,12 +485,10 @@ class CheckoutService
     public function testPayDetails(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
-        if ($policy->hasCheckoutPaymentMethod()) {
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
-        } else {
-            $paymentMethod = new CheckoutPaymentMethod();
-            $policy->setPaymentMethod($paymentMethod);
+        if (!$policy->hasCheckoutPaymentMethod()) {
+            $policy->setPaymentMethod(new CheckoutPaymentMethod());
         }
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
         $user = $policy->getUser();
         $details = null;
         try {
@@ -737,12 +735,10 @@ class CheckoutService
         $details = null;
         $payment = null;
         /** @var CheckoutPaymentMethod $paymentMethod */
-        if ($policy->hasCheckoutPaymentMethod()) {
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
-        } else {
-            $paymentMethod = new CheckoutPaymentMethod();
-            $policy->setPaymentMethod($paymentMethod);
+        if (!$policy->hasCheckoutPaymentMethod()) {
+            $policy->setPaymentMethod(new CheckoutPaymentMethod());
         }
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
 
         try {
             $service = $this->client->chargeService();
@@ -836,6 +832,9 @@ class CheckoutService
         $payment = null;
 
         /** @var CheckoutPaymentMethod $paymentMethod */
+        if (!$policy->hasCheckoutPaymentMethod()) {
+            $policy->setPaymentMethod(new CheckoutPaymentMethod());
+        }
         $paymentMethod = $policy->getCheckoutPaymentMethod();
 
         try {
@@ -1395,12 +1394,10 @@ class CheckoutService
     public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $recurring = false)
     {
         /** @var CheckoutPaymentMethod $paymentMethod */
-        if ($policy->hasCheckoutPaymentMethod()) {
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
-        } else {
-            $paymentMethod = new CheckoutPaymentMethod();
-            $policy->setPaymentMethod($paymentMethod);
+        if (!$policy->hasCheckoutPaymentMethod()) {
+            $policy->setPaymentMethod(new CheckoutPaymentMethod());
         }
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
 
         if (!$paymentMethod) {
             throw new \Exception(sprintf(
