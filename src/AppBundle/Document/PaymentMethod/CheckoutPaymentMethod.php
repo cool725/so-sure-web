@@ -54,6 +54,12 @@ class CheckoutPaymentMethod extends PaymentMethod
      */
     protected $notes;
 
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $previousChargeId = 'none';
+
     public function setCustomerId($customerId)
     {
         $this->customerId = $customerId;
@@ -181,6 +187,34 @@ class CheckoutPaymentMethod extends PaymentMethod
     public function setNotes($notes)
     {
         $this->notes = $notes;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreviousChargeId()
+    {
+        return $this->previousChargeId;
+    }
+
+    /**
+     * @param string $id
+     * @return $this
+     */
+    public function setPreviousChargeId($id)
+    {
+        $this->previousChargeId = $id;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPreviousChargeId()
+    {
+        $isNone = $this->getPreviousChargeId() === "none";
+        $isEmpty = mb_strlen($this->getPreviousChargeId()) == 0;
+        return !$isNone && !$isEmpty;
     }
 
     public function __toString()
