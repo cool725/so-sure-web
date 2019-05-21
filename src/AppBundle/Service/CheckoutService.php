@@ -484,10 +484,11 @@ class CheckoutService
      */
     public function testPayDetails(Policy $policy, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
     {
+        /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
-            $policy->setPaymentMethod(new CheckoutPaymentMethod());
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
+            $paymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($paymentMethod);
         }
         $user = $policy->getUser();
         $details = null;
@@ -734,10 +735,11 @@ class CheckoutService
         $user = $policy->getUser();
         $details = null;
         $payment = null;
+        /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
-            $policy->setPaymentMethod(new CheckoutPaymentMethod());
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
+            $paymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($paymentMethod);
         }
 
         try {
@@ -831,10 +833,11 @@ class CheckoutService
         $details = null;
         $payment = null;
 
+        /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
-            $policy->setPaymentMethod(new CheckoutPaymentMethod());
-            $paymentMethod = $policy->getCheckoutPaymentMethod();
+            $paymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($paymentMethod);
         }
 
         try {
@@ -1393,6 +1396,7 @@ class CheckoutService
 
     public function runTokenPayment(Policy $policy, $amount, $paymentRef, $policyId, $recurring = false)
     {
+        /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             throw new \Exception(sprintf(
