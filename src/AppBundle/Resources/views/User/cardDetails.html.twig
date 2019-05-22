@@ -3,7 +3,7 @@
     <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</span></h6>
 {% endif %}
 
-{% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod or policy.hasCheckoutPaymentMethod %}
+{# {% if policy.hasPolicyOrPayerOrUserJudoPaymentMethod or policy.hasCheckoutPaymentMethod %}
     <div class="cardbox cardbox-100 mb-4 bg-lily-white">
         <div class="cardbox__body d-lg-flex justify-content-lg-between align-items-lg-center">
             <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo-dark.svg" alt="Direct Debit" width="140px" class="mb-2 mb-md-0">
@@ -17,7 +17,7 @@
                >Switch to Direct Debit</a>
         </div>
     </div>
-{% endif %}
+{% endif %} #}
 
 <div class="row">
     {% if bacs_feature %}
@@ -37,7 +37,7 @@
                         </p>
                         <a href="#"
                            data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
-                           class="btn {% if policy.hasCardPaymentMethod %}btn-success{% else %}btn-outline-primary{% endif %} show-tab"
+                           class="btn {% if policy.hasCardPaymentMethod %}btn-success disabled{% else %}btn-outline-primary{% endif %} show-tab"
                            >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}Switch to Direct Debit{% else %}Back to Direct Debit{% endif %}</a>
                     </div>
                 </div>
