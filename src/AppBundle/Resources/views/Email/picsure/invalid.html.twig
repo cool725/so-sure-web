@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}Sorry, we need another pic-sure{% endblock %}
+{% block title %}Sorry, please attempt phone validation again ⚠️{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
@@ -9,8 +9,8 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-				Thanks for using pic-sure. Unfortunately, the photo you sent in didn't quite give us enough information to validate your phone.
-				Please re-launch pic-sure (using the so-sure app) and re-try the process making sure that the photo you upload has the full phone in the photo and that the image is non-blury and the lighting in enough to clearly see the screen.				
+				Thanks for using our app to validate your phone. Unfortunately, the photo you sent in didn't quite give us enough information to validate your phone.
+				Please re-launch the app and re-try the process making sure that the photo you upload has the full phone in the photo and that the image is non-blury and the lighting in enough to clearly see the screen.
 				{% if additional_message|length > 0 %}
 				    <br><br>
 					Additionally, please keep the following in mind:

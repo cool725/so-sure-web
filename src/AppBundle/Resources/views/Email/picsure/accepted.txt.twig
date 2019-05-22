@@ -1,10 +1,10 @@
 {% extends 'AppBundle:Email:base.txt.twig' %}
 {% block body %}
-pic-sure is successfully validated
+Phone validation successful ✅
 
 **
 ------------------------------------------------------------
-Thanks for validating your phone via pic-sure. Your {{ policy.phone }} is now successfully validated.
+Your {{ policy.phone }} is now successfully validated
 
 Your excess for policy {{ policy.policyNumber }} is now:
 • Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
