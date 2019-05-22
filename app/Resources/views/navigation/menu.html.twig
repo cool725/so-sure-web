@@ -1,55 +1,61 @@
 <div id="menu" class="menu d-flex flex-column d-xl-none">
     <ul class="list-unstyled align-self-stretch menu__links">
-        {% if app.user is not null and app.user %}
-            <li>
-                {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('admin_home') }}" class="h5">Admin</a>
-                {% elseif is_granted('ROLE_EMPLOYEE') %}
-                    <a href="{{ path('admin_home') }}" class="h5">Admin</a>
-                {% elseif is_granted('ROLE_CLAIMS') %}
-                    <a href="{{ path('claims_home') }}" class="h5">Claims</a>
-                {% else %}
-                    <a href="{{ path('user_home') }}" class="h5">Your account</a>
-                {% endif %}
-            </li>
-        {% endif %}
         <li>
-            <a href="{{ path('claim') }}" class="h5">Make a Claim</a>
+            <a href="{{ path('social_insurance') }}" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_social_insurance.png" alt="so-sure - Social insurance" width="50px" class="mr-4">
+                Social insurance 🤔
+            </a>
         </li>
         <li>
-            <a href="{{ path('social_insurance') }}" class="h5">Social Insurance</a>
+            <a href="{{ path('comparison') }}" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_compare_cover.png" alt="so-sure - Compare cover" width="50px" class="mr-4">
+                Compare cover 😎
+            </a>
         </li>
         <li>
-            <a href="{{ path('faq') }}" class="h5">FAQs</a>
+            <a href="{{ path('faq') }}" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_faqs.png" alt="so-sure - FAQs" width="50px" class="mr-4">
+                FAQs 🤓
+            </a>
         </li>
         <li>
-            <a href="https://blog.wearesosure.com" class="h5">Blog</a>
+            <a href="{{ path('about_how_to_contact_so_sure') }}" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_contact_us.png" alt="so-sure - Contact us" width="50px" class="mr-4">
+                Contact us 💬
+            </a>
         </li>
         <li>
-            <a href="{{ path('about_how_to_contact_so_sure') }}" class="h5">Contact</a>
+            <a href="{{ path('claim') }}" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_make_a_claim.png" alt="so-sure - Make a claim" width="50px" class="mr-4">
+                Make a Claim 😢
+            </a>
         </li>
+        <li>
+            <a href="https://blog.wearesosure.com" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_reviews.png" alt="so-sure - Blog" width="50px" class="mr-4">
+                Blog 📚
+            </a>
+        </li>
+{#         <li>
+            <a href="{{ path('careers') }}" class="h5">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_careers.png" alt="so-sure - Careers" width="50px" class="mr-4">
+                Careers 👩‍💻
+            </a>
+        </li> #}
     </ul>
-    <div class="p-5 align-self-stretch menu__buttons">
-        <a href="#" class="btn btn-primary btn-block mb-3 get-a-quote disabled">Get insured</a>
-        <a href="#"
-           class="btn btn-outline-white watch-video btn-block"
-           data-event="watch-video-mobile-menu"
-           data-toggle="modal"
-           data-target="#sosure-video-modal"
-           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
-            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-            Watch our Video
-        </a>
-        <div class="menu__user-button text-center">
-            {% if app.user is not null and app.user %}
-                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="d-block h5 m-0"><i class="far fa-arrow-left fa-fw ml-2"></i> Exit <u>{{ app.user.email }}</u></a>
-                {% else %}
-                    <a href="{{ path('fos_user_security_logout') }}" class="d-block h5 m-0"><i class="far fa-arrow-left fa-fw ml-2"></i> Log out</i></a>
-                {% endif %}
+    <div class="px-5 py-4 align-self-stretch menu__buttons">
+        {% if app.user is not null and app.user %}
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block-xs">Admin</a>
+            {% elseif is_granted('ROLE_EMPLOYEE') %}
+                <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block-xs">Admin</a>
+            {% elseif is_granted('ROLE_CLAIMS') %}
+                <a href="{{ path('claims_home') }}" class="btn btn-primary btn-block-xs">Claims</a>
             {% else %}
-                <a href="{{ path('fos_user_security_login') }}" class="d-block h5 m-0">Customer log in <i class="far fa-arrow-right fa-fw mr-2"></i></a>
+                <a href="{{ path('user_home') }}" class="btn btn-primary btn-block-xs">Your account</a>
             {% endif %}
-        </div>
+        {% else %}
+            <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs get-a-quote disabled">Get a Quote</a>
+        {% endif %}
     </div>
 </div>

@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}pic-sure failed to validate your phone{% endblock %}
+{% block title %}Phone validation failed{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
@@ -10,7 +10,7 @@
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
             Policy <a href="{{ url('admin_policy', {'id': policy.id }) }}">{{ policy.policyNumber }}</a>
-            should be cancelled (cooloff) as pic-sure was rejected. Verify policy id {{ policy.id }} and pic-sure status.
+            should be cancelled (cooloff) as phone validation (pic-sure) was rejected. Verify policy id {{ policy.id }} and validation status.
 		   </div>
 		</div>
 	{{ macros.end_table() }}
