@@ -1163,7 +1163,7 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['judo'])) {
                 //No longer allow judo
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 400);
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['existing'])) {
                 if (!$this->validateFields($data['existing'], ['amount'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -1328,8 +1328,6 @@ class ApiAuthController extends BaseController
                 } else {
                     throw new ValidationException('Unsupport payment method');
                 }
-            } elseif ($judoData) {
-                throw new ValidationException('Unsupported payment method.');
             } elseif ($checkoutData) {
                 /** @var CheckoutService $checkout */
                 $checkout = $this->get('app.checkout');
