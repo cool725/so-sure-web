@@ -1,5 +1,9 @@
 // nav.js
 
+const bodyScrollLock = require('body-scroll-lock');
+const disableBodyScroll = bodyScrollLock.disableBodyScroll;
+const enableBodyScroll = bodyScrollLock.enableBodyScroll;
+
 import usrAgnt from '../common/setAgent.js';
 
 $(function() {
@@ -8,13 +12,15 @@ $(function() {
           hamburger = $('#nav_toggle'),
           menu      = $('#menu'),
           logo      = $('.navbar-brand__logo'),
-          quoteBtn  = $('#quote_btn');
+          btnSwap   = $('.btn-swap');
 
     let open = false;
 
     // Toggle - Menu
     hamburger.on('click', function(e) {
         e.preventDefault();
+
+        open = !open;
 
         // Toggle active class to hamburger
         $(this).toggleClass('is-active');
@@ -23,25 +29,14 @@ $(function() {
         menu.toggleClass('menu--open');
 
         // Toggle the quote btn class
-        quoteBtn.toggleClass('btn-white btn-outline-white btn-shadow');
+        btnSwap.toggleClass('hideme');
 
-        // Prevent scrolling whilst open
-        $('body').toggleClass('body--overflow');
-
-        if (usrAgnt == 'iOS') {
-            $('body').toggleClass('body--overflow_iOS');
+        if (open) {
+            disableBodyScroll(menu);
+        } else {
+            enableBodyScroll(menu);
         }
     });
-
-    // Fix - For iOS to stop background scrolling
-    if (usrAgnt == 'iOS') {
-
-        $('.menu--open').on('touchmove', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        });
-    }
 
     // Add navbar background if page reloads not at the top
     $(window).on('load', function(e) {

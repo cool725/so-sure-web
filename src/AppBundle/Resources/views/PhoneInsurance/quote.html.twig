@@ -38,7 +38,7 @@
                                 <small>({{ phone.memory }}GB)</small>
                             </span>
                         </h1>
-                        <div class="qpw__alt__phones dropdown dropleft">
+                        <div class="qpw__alt__phones dropdown">
                             <a href="#"
                                class="dropdown-toggle"
                                id="dropdownMenuLink"
@@ -47,20 +47,20 @@
                                aria-expanded="false">
                                 <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuLink">
                                 {% if phones | length > 1 %}
                                     {% for phone_mem in phones %}
                                         {% if phone_mem.id != phone.id  %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6" href="#">
-                                                {{ phone_mem.memory }}GB
-                                                <small>{{ phone.make }} {{ phone.model }}</small>
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6 mb-0" href="#">
+                                                {{ phone_mem.memory }}GB <br>
+                                                <small class="sub">{{ phone.make }} {{ phone.model }}</small>
                                             </a>
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
-                                <a class="dropdown-item h6 get-a-quote disabled" href="#">
-                                    Start a new quote
-                                    <small>Not the phone you're looking for?</small>
+                                <a class="dropdown-item h6 mb-0 get-a-quote disabled" href="#">
+                                    Start a new quote <br>
+                                    <small class="sub">Not the phone you're looking for?</small>
                                 </a>
                             </div>
                         </div>
