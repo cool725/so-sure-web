@@ -6,7 +6,6 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\Lead;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Security\FOSUBUserProvider;
-use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -20,7 +19,6 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 

@@ -7,11 +7,11 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\File\PaymentRequestUploadFile;
-use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\ValidatorTrait;
@@ -41,6 +41,7 @@ use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FraudService;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\PolicyService;
@@ -1786,24 +1787,24 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         ));
                     }
 
-                    /** @var JudopayService $judopay */
-                    $judopay = $this->get('app.judopay');
-                    $details = $judopay->runTokenPayment(
+                    /** @var CheckoutService $checkout */
+                    $checkout = $this->get('app.checkout');
+                    $details = $checkout->runTokenPayment(
                         $policy,
                         $amount,
                         $date->getTimestamp(),
                         $policy->getId()
                     );
                     try {
-                        /** @var JudoPaymentMethod $judoPaymentMethod */
-                        $judoPaymentMethod = $policy->getPolicyOrPayerOrUserJudoPaymentMethod();
-                        $judopay->add(
+                        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
+                        $checkoutPaymentMethod = $policy->getPolicyOrPayerOrUserCheckoutPaymentMethod();
+                        $checkout->add(
                             $policy,
                             $details['receiptId'],
                             $details['consumer']['consumerToken'],
                             $details['cardDetails']['cardToken'],
                             Payment::SOURCE_TOKEN,
-                            $judoPaymentMethod->getDeviceDna(),
+                            $checkoutPaymentMethod->getDeviceDna(),
                             $date
                         );
                         // @codingStandardsIgnoreStart

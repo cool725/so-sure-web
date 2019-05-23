@@ -2,6 +2,7 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
@@ -25,14 +26,12 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\StandardConnection;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Invitation\EmailInvitation;
-use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -739,11 +738,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $refund->approve($refund->getBacsReversedDate());
                 }
             } else {
-                $payment = new JudoPayment();
-                $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $receiptId = random_int(1, 9999999);
+                $payment = new CheckoutPayment();
+                $payment->setResult(CheckoutPayment::RESULT_AUTHORIZED);
+                $receiptId = "charge_test_" . random_int(1, 9999999);
                 while (in_array($receiptId, $this->receiptIds)) {
-                    $receiptId = random_int(1, 9999999);
+                    $receiptId = "charge_test_" . random_int(1, 9999999);
                 }
                 $this->receiptIds[] = $receiptId;
                 $payment->setReceipt($receiptId);
@@ -785,15 +784,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                         $refund->approve($refund->getBacsReversedDate());
                     }
                 } else {
-                    $payment = new JudoPayment();
+                    $payment = new CheckoutPayment();
                     if ($i == 1 || $i < $months || $lastPaymentSuccess) {
-                        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                        $payment->setResult(CheckoutPayment::RESULT_AUTHORIZED);
                     } else {
-                        $payment->setResult(JudoPayment::RESULT_DECLINED);
+                        $payment->setResult(CheckoutPayment::RESULT_DECLINED);
                     }
-                    $receiptId = random_int(1, 9999999);
+                    $receiptId = "charge_test_" . random_int(1, 9999999);
                     while (in_array($receiptId, $this->receiptIds)) {
-                        $receiptId = random_int(1, 9999999);
+                        $receiptId = "charge_test_" . random_int(1, 9999999);
                     }
                     $this->receiptIds[] = $receiptId;
                     $payment->setReceipt($receiptId);

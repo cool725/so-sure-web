@@ -6,12 +6,10 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\CheckoutFile;
-use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Repository\CheckoutPaymentRepository;
-use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
 use com\checkout\ApiClient;
@@ -31,13 +29,9 @@ use com\checkout\ApiServices\Tokens\RequestModels\PaymentTokenCreate;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
-use Judopay;
-
 use AppBundle\Classes\Salva;
 
-use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\Feature;

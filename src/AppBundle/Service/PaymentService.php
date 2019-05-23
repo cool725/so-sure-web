@@ -18,6 +18,7 @@ use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Mailer\Mailer;
+use mysql_xdevapi\Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -172,12 +173,14 @@ class PaymentService
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getPaymentMethod();
         if ($paymentMethod && $paymentMethod instanceof JudoPaymentMethod) {
-            return $this->judopay->scheduledPayment(
-                $scheduledPayment,
-                $prefix,
-                $date,
-                $abortOnMultipleSameDayPayment
-            );
+            $this->logger->alert(sprintf(
+                "Scheduled payment for Judo! For policy %s",
+                $policy->getId()
+            ));
+            throw new \Exception(sprintf(
+                'JudoPay payment method not valid for scheduled payment %s',
+                $scheduledPayment->getId()
+            ));
         } elseif ($paymentMethod && $paymentMethod instanceof CheckoutPaymentMethod) {
                 return $this->checkout->scheduledPayment(
                     $scheduledPayment,

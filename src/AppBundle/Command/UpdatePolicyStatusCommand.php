@@ -17,7 +17,6 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
 class UpdatePolicyStatusCommand extends ContainerAwareCommand

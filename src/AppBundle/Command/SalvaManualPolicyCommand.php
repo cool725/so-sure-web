@@ -4,7 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
-use AppBundle\Service\JudopayService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -16,7 +16,6 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
 class SalvaManualPolicyCommand extends ContainerAwareCommand
@@ -27,15 +26,15 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
     /** @var PolicyService */
     protected $policyService;
 
-    /** @var JudopayService */
-    protected $judopayService;
+    /** @var CheckoutService */
+    protected $checkoutService;
 
-    public function __construct(DocumentManager $dm, PolicyService $policyService, JudopayService $judopayService)
+    public function __construct(DocumentManager $dm, PolicyService $policyService, CheckoutService $checkoutService)
     {
         parent::__construct();
         $this->dm = $dm;
         $this->policyService = $policyService;
-        $this->judopayService = $judopayService;
+        $this->checkoutService = $checkoutService;
     }
 
     protected function configure()
@@ -118,7 +117,7 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
             throw new \Exception('1 or 12 payments only');
         }
 
-        $details = $this->judopayService->testPayDetails(
+        $details = $this->checkoutService->testPayDetails(
             $user,
             $policy->getId(),
             $amount,
@@ -128,7 +127,7 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
             $policy->getId()
         );
         // @codingStandardsIgnoreStart
-        $this->judopayService->add(
+        $this->checkoutService->add(
             $policy,
             $details['receiptId'],
             $details['consumer']['consumerToken'],
