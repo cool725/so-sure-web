@@ -1,41 +1,83 @@
 <ul class="nav navbar-nav flex-row align-items-center">
+    <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
+        <a href="#"
+           class="nav-link dropdown-toggle"
+           id="why_so_sure_nav"
+           role="button"
+           {# data-toggle="dropdown" #}
+           aria-haspopup="true"
+           aria-expanded="false">Why so-sure? <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+        <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="why_so_sure_nav">
+            <a class="dropdown-item dropdown-item-nav h6 mb-0"
+               href="{{ path('social_insurance') }}">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_social_insurance.png" alt="so-sure - Social insurance" width="50px" class="mr-4">
+                <span>
+                    Social insurance 🤔<br>
+                    <small class="sub text-zaffre">What is social insurance?</small>
+                </span>
+            </a>
+            <a class="dropdown-item dropdown-item-nav h6 mb-0"
+               href="{{ path('comparison') }}">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_compare_cover.png" alt="so-sure - Compare cover" width="50px" class="mr-4">
+                <span>
+                    Compare cover 😎<br>
+                    <small class="sub text-zaffre">Why we're better than the rest!</small>
+                </span>
+            </a>
+        </div>
+    </li>
+    <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
+        <a href="#"
+           class="nav-link dropdown-toggle"
+           id="about_us_nav"
+           role="button"
+           {# data-toggle="dropdown" #}
+           aria-haspopup="true"
+           aria-expanded="false">About us <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+        <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="about_us_nav">
+            <a class="dropdown-item dropdown-item-nav h6 mb-0"
+               href="{{ path('faq') }}">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_faqs.png" alt="so-sure - FAQs" width="50px" class="mr-4">
+                <span>
+                    FAQs 🤓<br>
+                    <small class="sub text-zaffre">We all need a little extra info</small>
+                </span>
+            </a>
+            <a class="dropdown-item dropdown-item-nav h6 mb-0"
+               href="{{ path('about_how_to_contact_so_sure') }}">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_contact_us.png" alt="so-sure - Contact us" width="50px" class="mr-4">
+                <span>
+                    Contact us 💬<br>
+                    <small class="sub text-zaffre">We are always happy to talk</small>
+                </span>
+            </a>
+            {# <a class="dropdown-item dropdown-item-nav h6 mb-0"
+               href="{{ path('careers') }}">
+                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_careers.png" alt="so-sure - Careers" width="50px" class="mr-4">
+                <span>
+                    Careers 👩‍💻<br>
+                    <small class="sub text-zaffre">Fancy working with us?</small>
+                </span>
+            </a> #}
+        </div>
+    </li>
     <li class="nav-item d-none d-xl-block pr-xl-5">
         <a href="{{ path('phone_insurance') }}"
            class="nav-link">
-           {# TODO: This changes in totally pages to Mobile Phone Insurane is this needed? #}
             Mobile Insurance
         </a>
     </li>
     <li class="nav-item d-none d-xl-block pr-xl-5">
         <a href="{{ path('quote_make_model_memory', {'make': 'apple', 'model': 'iphone x', 'memory': 64}) }}"
            class="nav-link">
-           {# TODO: Default to iphone top??? #}
             iPhone X Insurance
         </a>
     </li>
-    <li class="nav-item d-none d-xl-block pr-xl-5">
-        <a href="{{ path('faq') }}"
-           class="nav-link {{ app.request.get('_route') == 'faq' ? 'nav-active' }}">
-           FAQs
-        </a>
-    </li>
-    <li class="nav-item d-none d-xl-block pr-xl-5">
-        <a href="https://blog.wearesosure.com"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="nav-link">Blog</a>
-    </li>
     <li class="nav-item d-none-xxs pr-xl-5">
-        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote disabled btn-shadow">
-            {% if app.request.get('_route') == 'mobile_insurance_make_model' %}
-                Insure your phone
-            {% else %}
-                Get a Quote
-            {% endif %}
-        </a>
+        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote disabled btn-shadow">Get a Quote</a>
     </li>
     <li class="nav-item d-xl-none">
-        <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse" type="button">
+        <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse show-in-nav" type="button">
             <span class="hamburger-box">
                 <span class="hamburger-inner"></span>
             </span>

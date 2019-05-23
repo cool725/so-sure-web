@@ -10,7 +10,7 @@
         .nav-link {
             font-family: $g-medium;
             color: $white;
-            transition: all 0.2s linear;
+            transition: all 0.5s linear;
 
             &:hover {
                 color: $columbia-blue-f;
@@ -27,7 +27,16 @@
 
         .dropdown-menu {
             position: absolute;
-            right: 0;
+            left: 50%;
+            margin-left: -10rem;
+        }
+
+        .dropdown {
+            &:hover {
+                .dropdown-menu {
+                    display: block;
+                }
+            }
         }
     }
 }
@@ -174,7 +183,7 @@
 // Allow elements to show through when menu is open
 .show-in-nav {
     position: relative;
-    z-index: 1080;
+    z-index: 1081;
 }
 
 // Secondary Nav

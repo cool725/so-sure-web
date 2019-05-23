@@ -51,7 +51,7 @@
             </div>
             <div class="col-9 text-right">
                 {{ form_widget(purchase_form.next, {
-                    'label': 'Proceed to payment',
+                    'label': 'Continue',
                     'fa': 'far fa-long-arrow-right fa-lg ml-2',
                     'right': true,
                     'attr': {
@@ -61,7 +61,7 @@
         </div>
     </div>
 
-    {% if payment_provider == 'judo' %}
+{#     {% if payment_provider == 'judo' %}
         <div class="form-group text-center mt-5">
             <small class="text-grey">Payments powered by</small><br>
             <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px" class="mt-2">
@@ -71,13 +71,12 @@
             <small class="text-grey">Payments via</small><br>
             <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px" class="mt-2">
         </div>
-    {% elseif payment_provider == 'checkout' %}
+    {% elseif payment_provider == 'checkout' %} #}
         <div class="form-group text-center mt-5">
             <small class="text-grey">Payments powered by</small><br>
-            {# TODO: Checkout logo #}
-            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Checkout" title="Powered by - Checkout" width="80px" class="mt-2">
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_checkout-logo.png" alt="Checkout" title="Powered by - Checkout" width="125px" class="mt-2">
         </div>
-    {% endif %}
+    {# {% endif %} #}
 
 {{ form_end(purchase_form) }}
 
@@ -94,6 +93,9 @@
         {% elseif payment_provider == 'bacs' %}
             <small class="text-grey">Payments via</small><br>
             <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
+        {% elseif payment_provider == 'checkout' %}
+            <small class="text-grey">Payments powered by</small><br>
+            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_checkout-logo.png" alt="Checkout" title="Powered by - Checkout" width="125px" class="mt-2">
         {% endif %}
     </div>
 </div>
