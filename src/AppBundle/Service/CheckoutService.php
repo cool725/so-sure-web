@@ -223,7 +223,7 @@ class CheckoutService
             }
 
             $chargeId = $transaction->getId();
-            /** @var JudoPayment $payment */
+            /** @var CheckoutPayment $payment */
             $payment = $repo->findOneBy(['receipt' => $chargeId]);
 
             $created = null;

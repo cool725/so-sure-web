@@ -1796,15 +1796,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $policy->getId()
                     );
                     try {
-                        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
-                        $checkoutPaymentMethod = $policy->getPolicyOrPayerOrUserCheckoutPaymentMethod();
                         $checkout->add(
                             $policy,
                             $details['receiptId'],
-                            $details['consumer']['consumerToken'],
-                            $details['cardDetails']['cardToken'],
                             Payment::SOURCE_TOKEN,
-                            $checkoutPaymentMethod->getDeviceDna(),
                             $date
                         );
                         // @codingStandardsIgnoreStart

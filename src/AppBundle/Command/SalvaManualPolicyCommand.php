@@ -118,8 +118,8 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         }
 
         $details = $this->checkoutService->testPayDetails(
-            $user,
-            $policy->getId(),
+            $policy,
+            random_int(0, 999999),
             $amount,
             '4976 0000 0000 3436',
             '12/20',
@@ -130,12 +130,11 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         $this->checkoutService->add(
             $policy,
             $details['receiptId'],
-            $details['consumer']['consumerToken'],
-            $details['cardDetails']['cardToken'],
             Payment::SOURCE_WEB_API,
-            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}",
-            $date
+            $date,
+            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}"
         );
+
         // @codingStandardsIgnoreEnd
 
         $output->writeln(sprintf('Created Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));
