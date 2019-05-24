@@ -70,7 +70,6 @@ use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
-use AppBundle\Service\JudopayService;
 
 use AppBundle\Security\PolicyVoter;
 

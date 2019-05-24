@@ -6054,10 +6054,8 @@ abstract class Policy
         }
 
 
-        $cardDetails = JudoPaymentMethod::emptyApiArray();
-        if ($this->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
-            $cardDetails = $this->getPolicyOrPayerOrUserJudoPaymentMethod()->toApiArray();
-        } elseif ($this->getCheckoutPaymentMethod()) {
+        $cardDetails = CheckoutPaymentMethod::emptyApiArray();
+        if ($this->getCheckoutPaymentMethod()) {
             $cardDetails = $this->getCheckoutPaymentMethod()->toApiArray();
         }
 

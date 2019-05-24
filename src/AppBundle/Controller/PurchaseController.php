@@ -567,7 +567,7 @@ class PurchaseController extends BaseController
 
         $cardFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
+        $cardProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
 
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
@@ -600,7 +600,7 @@ class PurchaseController extends BaseController
 
         /** @var Form $toCardForm */
         $toCardForm = null;
-        if ($cardFeature) {
+        if ($cardFeature && $checkoutFeature) {
             $toCardForm =  $this->get("form.factory")
                 ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
                 ->getForm();
@@ -673,14 +673,6 @@ class PurchaseController extends BaseController
                 if ($checkoutFeature) {
                     // TODO
                     NoOp::ignore([]);
-                } else {
-                    $webpay = $this->get('app.judopay')->webpay(
-                        $policy,
-                        $amount,
-                        $request->getClientIp(),
-                        $request->headers->get('User-Agent'),
-                        JudopayService::WEB_TYPE_STANDARD
-                    );
                 }
             }
         }
@@ -894,7 +886,8 @@ class PurchaseController extends BaseController
         } elseif ($checkoutFeature) {
             $paymentProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
         } else {
-            $paymentProvider = SoSure::PAYMENT_PROVIDER_JUDO;
+            $this->get('logger')->error('No payment methods available!');
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, "Payment method not defined", 403);
         }
 
         if ('POST' === $request->getMethod()) {
@@ -928,14 +921,6 @@ class PurchaseController extends BaseController
                                         'id' => $policy->getId(),
                                         'freq' => $monthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
                                     ])
-                                );
-                            } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
-                                $webpay = $this->get('app.judopay')->webpay(
-                                    $policy,
-                                    $purchase->getAmount(),
-                                    $request->getClientIp(),
-                                    $request->headers->get('User-Agent'),
-                                    JudopayService::WEB_TYPE_STANDARD
                                 );
                             } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_CHECKOUT) {
                                 // TODO
@@ -1026,6 +1011,11 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayReceiveSuccessAction(Request $request)
     {
+        $this->get('logger')->alert('JudoPay used!');
+        $this->get('logger')->alert(sprintf(
+            'Payment successful against JudoPay for user %s',
+            $this->getUser()->getId()
+        ));
         $this->get('logger')->info(sprintf(
             'Judo Web Success ReceiptId: %s Ref: %s',
             $request->get('ReceiptId'),
@@ -1194,6 +1184,11 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayFailAction(Request $request)
     {
+        $this->get('logger')->alert('JudoPay used!');
+        $this->get('logger')->alert(sprintf(
+            'Failed payment attempt with JudoPay for user %s',
+            $this->getUser()->getId()
+        ));
         $msg = sprintf(
             'Judo Web Failure ReceiptId: %s Ref: %s',
             $request->get('ReceiptId'),
@@ -1431,7 +1426,7 @@ class PurchaseController extends BaseController
      * @Route("/remainder/{id}", name="purchase_remainder_policy")
      * @Template
      */
-    public function purchaseRemainderPolicyAction(Request $request, $id)
+    public function purchaseRemainderPolicyAction($id)
     {
         $policyRepo = $this->getManager()->getRepository(Policy::class);
         $policy = $policyRepo->find($id);
@@ -1442,26 +1437,13 @@ class PurchaseController extends BaseController
         $amount = $policy->getRemainderOfPolicyPrice();
         $webpay = null;
 
-        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
-
-        if ($amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
-            $webpay = $this->get('app.judopay')->webpay(
-                $policy,
-                $amount,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent'),
-                JudopayService::WEB_TYPE_REMAINDER
-            );
-        }
-
         $data = [
             'phone' => $policy->getPhone(),
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,
             'policy' => $policy,
-            'card_provider' => $cardProvider,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
         ];
 
         return $data;

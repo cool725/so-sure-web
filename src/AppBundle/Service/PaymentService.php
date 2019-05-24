@@ -172,12 +172,14 @@ class PaymentService
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getPaymentMethod();
         if ($paymentMethod && $paymentMethod instanceof JudoPaymentMethod) {
-            return $this->judopay->scheduledPayment(
-                $scheduledPayment,
-                $prefix,
-                $date,
-                $abortOnMultipleSameDayPayment
-            );
+            $this->logger->alert(sprintf(
+                "Scheduled payment for Judo! For policy %s",
+                $policy->getId()
+            ));
+            throw new \Exception(sprintf(
+                'JudoPay payment method not valid for scheduled payment %s',
+                $scheduledPayment->getId()
+            ));
         } elseif ($paymentMethod && $paymentMethod instanceof CheckoutPaymentMethod) {
                 return $this->checkout->scheduledPayment(
                     $scheduledPayment,

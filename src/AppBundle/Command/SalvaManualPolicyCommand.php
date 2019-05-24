@@ -4,7 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
-use AppBundle\Service\JudopayService;
+use AppBundle\Service\CheckoutService;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -16,7 +16,6 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
 class SalvaManualPolicyCommand extends ContainerAwareCommand
@@ -27,15 +26,15 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
     /** @var PolicyService */
     protected $policyService;
 
-    /** @var JudopayService */
-    protected $judopayService;
+    /** @var CheckoutService */
+    protected $checkoutService;
 
-    public function __construct(DocumentManager $dm, PolicyService $policyService, JudopayService $judopayService)
+    public function __construct(DocumentManager $dm, PolicyService $policyService, CheckoutService $checkoutService)
     {
         parent::__construct();
         $this->dm = $dm;
         $this->policyService = $policyService;
-        $this->judopayService = $judopayService;
+        $this->checkoutService = $checkoutService;
     }
 
     protected function configure()
@@ -118,9 +117,9 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
             throw new \Exception('1 or 12 payments only');
         }
 
-        $details = $this->judopayService->testPayDetails(
-            $user,
-            $policy->getId(),
+        $details = $this->checkoutService->testPayDetails(
+            $policy,
+            random_int(0, 999999),
             $amount,
             '4976 0000 0000 3436',
             '12/20',
@@ -128,15 +127,13 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
             $policy->getId()
         );
         // @codingStandardsIgnoreStart
-        $this->judopayService->add(
+        $this->checkoutService->add(
             $policy,
             $details['receiptId'],
-            $details['consumer']['consumerToken'],
-            $details['cardDetails']['cardToken'],
             Payment::SOURCE_WEB_API,
-            "{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}",
             $date
         );
+
         // @codingStandardsIgnoreEnd
 
         $output->writeln(sprintf('Created Policy %s / %s', $policy->getPolicyNumber(), $policy->getId()));

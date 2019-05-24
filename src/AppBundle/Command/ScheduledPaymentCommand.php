@@ -141,7 +141,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         } else {
             $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForTypes(
                 $prefix,
-                [JudoPaymentMethod::class, CheckoutPaymentMethod::class],
+                [CheckoutPaymentMethod::class],
                 $scheduledDate
             );
             foreach ($scheduledPayments as $scheduledPayment) {

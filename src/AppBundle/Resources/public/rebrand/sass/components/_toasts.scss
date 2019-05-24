@@ -1,0 +1,52 @@
+// toasts.scss
+
+.toast {
+    position: absolute;
+    z-index: 1028;
+
+    &-button {
+        float: none;
+        position: absolute;
+        top: .7rem; right: 1rem;
+    }
+
+    &-body {
+        padding: 1rem 2.4rem 1rem 1.4rem;
+    }
+
+    &-bottom-right {
+        bottom: 1.4rem; right: 1.4rem;
+
+        @include media-breakpoint-up(lg) {
+            bottom: 2rem; right: 3rem;
+        }
+    }
+
+    &-bottom-left {
+        bottom: 1.4rem; left: 1.4rem;
+
+        @include media-breakpoint-up(lg) {
+            bottom: 2rem; left: 3rem;
+        }
+    }
+
+    &-top-right {
+        top: 4rem; right: 1rem;
+
+        @include media-breakpoint-up(lg) {
+            top: 3.4rem; right: 3rem;
+        }
+    }
+
+    &-top-left {
+        top: 4rem; left: 1rem;
+
+        @include media-breakpoint-up(lg) {
+            top: 3.4rem; left: 3rem;
+        }
+    }
+
+    &-review {
+
+    }
+}
