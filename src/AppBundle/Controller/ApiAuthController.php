@@ -1162,10 +1162,8 @@ class ApiAuthController extends BaseController
                 // Not allow braintree
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['judo'])) {
-                if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-                }
-                $judoData = $data['judo'];
+                //No longer allow judo
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['existing'])) {
                 if (!$this->validateFields($data['existing'], ['amount'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -1296,19 +1294,6 @@ class ApiAuthController extends BaseController
                 );
             } elseif (isset($data['braintree'])) {
                 throw new \Exception('Braintree is no longer supported');
-            } elseif ($judoData) {
-                /** @var JudopayService $judo */
-                $judo = $this->get('app.judopay');
-                $judo->add(
-                    $policy,
-                    $this->getDataString($judoData, 'receipt_id'),
-                    $this->getDataString($judoData, 'consumer_token'),
-                    $this->getDataString($judoData, 'card_token'),
-                    Payment::SOURCE_MOBILE,
-                    $this->getDataString($judoData, 'device_dna'),
-                    null,
-                    $this->getIdentityLog($request)
-                );
             } elseif ($existingData) {
                 if (!$policy->hasPolicyOrUserValidPaymentMethod()) {
                     return $this->getErrorJsonResponse(
@@ -1319,12 +1304,8 @@ class ApiAuthController extends BaseController
                 }
                 $paymentMethod = $policy->getPolicyOrPayerOrUserPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
-                    /** @var JudopayService $judo */
-                    $judo = $this->get('app.judopay');
-                    if (!$judo->existing($policy, $existingData['amount'])) {
-                        throw new PaymentDeclinedException('Token payment failed');
-                    }
-                } elseif ($paymentMethod instanceof  BacsPaymentMethod) {
+                    throw new PaymentDeclinedException('Token payment failed');
+                } elseif ($paymentMethod instanceof BacsPaymentMethod) {
                     // for unpaid, we can allow a bacs payment
                     $amount = $existingData['amount'];
                     $now = \DateTime::createFromFormat('U', time());
@@ -1377,13 +1358,6 @@ class ApiAuthController extends BaseController
                 'Invalid premium paid',
                 422
             );
-        } catch (ProcessedException $e) {
-            $this->get('logger')->error(sprintf(
-                'Duplicate receipt id %s.',
-                $this->getDataString($judoData, 'receipt_id')
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED, 'Payment not valid', 422);
         } catch (DirectDebitBankException $e) {
             $this->get('logger')->info(sprintf(
                 'Direct Debit Error policy %s details %s.',
@@ -1435,9 +1409,8 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $e) {
             $this->get('logger')->warning(sprintf(
-                'Access denied policy %s receipt %s.',
-                $id,
-                $this->getDataString($judoData, 'receipt_id')
+                'Access denied for attempted Judo payment for policy %s',
+                $id
             ), ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
@@ -1481,10 +1454,8 @@ class ApiAuthController extends BaseController
                 }
                 $bacsData = $data['bank_account'];
             } elseif (isset($data['judo'])) {
-                if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-                }
-                $judoData = $data['judo'];
+                //Really don't allow judo pay
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['checkout'])) {
                 if (!$this->validateFields($data['checkout'], ['token'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
@@ -1564,16 +1535,7 @@ class ApiAuthController extends BaseController
                     $bacs
                 );
             } elseif ($judoData) {
-                /** @var JudopayService $judo */
-                $judo = $this->get('app.judopay');
-                $judo->updatePaymentMethod(
-                    $policy->getUser(),
-                    $this->getDataString($judoData, 'receipt_id'),
-                    $this->getDataString($judoData, 'consumer_token'),
-                    $this->getDataString($judoData, 'card_token'),
-                    $this->getDataString($judoData, 'device_dna'),
-                    $policy
-                );
+                throw new ValidationException('Unsupported payment method');
             } elseif ($checkoutData) {
                 /** @var CheckoutService $checkout */
                 $checkout = $this->get('app.checkout');
@@ -1584,19 +1546,11 @@ class ApiAuthController extends BaseController
             }
 
             return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
-        } catch (PaymentDeclinedException $e) {
-            $this->get('logger')->info(sprintf(
-                'Payment declined policy %s receipt %s.',
-                $id,
-                $this->getDataString($judoData, 'receipt_id')
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (InvalidPremiumException $e) {
             $this->get('logger')->error(sprintf(
                 'Invalid premium policy payment %s receipt %s.',
                 $id,
-                $this->getDataString($judoData, 'receipt_id')
+                $this->getDataString($checkoutData, 'receipt_id')
             ), ['exception' => $e]);
 
             return $this->getErrorJsonResponse(
@@ -2541,72 +2495,10 @@ class ApiAuthController extends BaseController
      * @Route("/user/{id}/payment", name="api_auth_user_payment")
      * @Method({"POST"})
      */
-    public function paymentUserAction(Request $request, $id)
+    public function paymentUserAction()
     {
-        try {
-            $data = json_decode($request->getContent(), true)['body'];
-            $judoData = null;
-            if (isset($data['bank_account'])) {
-                // Not doing anymore
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-            } elseif (isset($data['judo'])) {
-                if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-                }
-                $judoData = $data['judo'];
-            } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(User::class);
-            $user = $repo->find($id);
-            if (!$user) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_NOT_FOUND,
-                    'Unable to find user',
-                    404
-                );
-            }
-            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
-
-            if ($judoData) {
-                $judo = $this->get('app.judopay');
-                $judo->updatePaymentMethod(
-                    $user,
-                    $this->getDataString($judoData, 'receipt_id'),
-                    $this->getDataString($judoData, 'consumer_token'),
-                    $this->getDataString($judoData, 'card_token'),
-                    $this->getDataString($judoData, 'device_dna')
-                );
-            }
-
-            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
-        } catch (PaymentDeclinedException $e) {
-            $this->get('logger')->info(sprintf(
-                'Payment declined policy %s receipt %s.',
-                $id,
-                $this->getDataString($judoData, 'receipt_id')
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
-        } catch (AccessDeniedException $e) {
-            $this->get('logger')->warning(sprintf(
-                'Access denied policy %s receipt %s.',
-                $id,
-                $this->getDataString($judoData, 'receipt_id')
-            ), ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-        } catch (ValidationException $ex) {
-            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
-        } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
-
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
-        }
+        $this->get('logger')->error('Route no longer active /user/{id}/payment - api_auth_user_payment');
+        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
     }
 
     /**

@@ -2,12 +2,10 @@
 namespace AppBundle\Service;
 
 use AppBundle\Repository\ChargebackPaymentRepository;
-use AppBundle\Repository\JudoPaymentRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\Payment;
 

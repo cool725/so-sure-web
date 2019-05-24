@@ -269,8 +269,6 @@ class ScheduledPayment
         if ($days === null) {
             if ($this->getPolicy()->getPolicyOrUserBacsPaymentMethod()) {
                 $days = 6;
-            } elseif ($this->getPolicy()->getPolicyOrPayerOrUserJudoPaymentMethod()) {
-                $days = 7;
             } else {
                 $days = 7;
             }

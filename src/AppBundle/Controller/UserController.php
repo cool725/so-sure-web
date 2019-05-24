@@ -1174,7 +1174,7 @@ class UserController extends BaseController
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
+        $cardProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
 
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
@@ -1199,6 +1199,11 @@ class UserController extends BaseController
         }
 
         if ($includeCard && $amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
+            //should never be hit
+            $this->get('logger')->error(sprintf(
+                'JudoPay web payment made for user %s',
+                $user->getId()
+            ));
             $webpay = $this->get('app.judopay')->webpay(
                 $policy,
                 $amount,
@@ -1367,7 +1372,7 @@ class UserController extends BaseController
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         $swapFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_SWAP_FROM_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        $cardProvider = $checkoutFeature ? SoSure::PAYMENT_PROVIDER_CHECKOUT : SoSure::PAYMENT_PROVIDER_JUDO;
+        $cardProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
 
         // For now, only allow monthly policies with bacs
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
@@ -1383,18 +1388,6 @@ class UserController extends BaseController
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
-        if ($cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
-            try {
-                $webpay = $this->get('app.judopay')->webRegister(
-                    $user,
-                    $request->getClientIp(),
-                    $request->headers->get('User-Agent'),
-                    $policy
-                );
-            } catch (\Exception $e) {
-                $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
-            }
-        }
 
         $billing = new BillingDay();
         if ($policy) {
