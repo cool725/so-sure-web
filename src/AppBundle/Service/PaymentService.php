@@ -18,7 +18,6 @@ use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Mailer\Mailer;
-use mysql_xdevapi\Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
