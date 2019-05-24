@@ -12,6 +12,9 @@ gulp.task('default', function() {
         .pipe(concat('vendor.js'))
         .pipe(gulp.dest('web/components'));
 
+    gulp.src('node_modules/bootstrap/scss/**/**')
+        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor/bs4'));
+
     // Cookies style > vendor
     gulp.src('node_modules/cookieconsent/build/cookieconsent.min.css')
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));

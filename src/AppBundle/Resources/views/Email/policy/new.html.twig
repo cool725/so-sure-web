@@ -29,11 +29,11 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-			   Your excess is currently £{{ policy.premium.excess.damage }}, however, you can easily reduce this amount to £{{ policy.premium.picSureExcess.damage }} (£{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with pic-sure.
+			   Your excess is currently £{{ policy.premium.excess.damage }}, however, you can easily reduce this amount to £{{ policy.premium.picSureExcess.damage }} (£{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
 			   {% if policy.phone.isITunes %}
-			   <a href="{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}">Download our iOS App</a>, login, and complete the pic-sure validation process.
+			   <a href="{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}">Download our iOS App</a>, login, and complete the validation process.
 			   {% elseif policy.phone.isGooglePlay %}
-			   <a href="{{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}">Download our Android App</a>, login, and complete the pic-sure validation process.
+			   <a href="{{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}">Download our Android App</a>, login, and complete the validation process.
 			   {% else %}
 					Just email a picture of your phone's screen in the mirror to <a href="support@wearesosure.com">support@wearesosure.com</a> and we'll get started on that process.
 	 		   {% endif %}

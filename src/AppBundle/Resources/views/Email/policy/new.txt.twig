@@ -21,13 +21,13 @@ Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Acces
 Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us.
 
 {% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
-Your excess is currently £{{ policy.premium.excess.damage }}, however, you can easily reduce this amount to £{{ policy.premium.picSureExcess.damage }} (£{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with pic-sure.
+Your excess is currently £{{ policy.premium.excess.damage }}, however, you can easily reduce this amount to £{{ policy.premium.picSureExcess.damage }} (£{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
 {% if policy.phone.isITunes %}
-Download our iOS App, login, and complete the pic-sure validation process.
+Download our iOS App, login, and complete the validation process.
 {{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}
 
 {% elseif policy.phone.isGooglePlay %}
-Download our Android App</a>, login, and complete the pic-sure validation process.
+Download our Android App</a>, login, and complete the validation process.
 {{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}
 
 {% else %}

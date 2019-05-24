@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}pic-sure failed to validate your phone{% endblock %}
+{% block title %}Phone validation failed ❌{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
@@ -9,7 +9,7 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-				Unfortunately, your phone did not pass the pic-sure validation process.
+				Unfortunately, your phone did not pass our validation process.
 				<br><br>
                 Your excess for policy {{ policy.policyNumber }} is:
                 <br>

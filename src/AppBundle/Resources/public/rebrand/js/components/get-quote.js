@@ -1,5 +1,9 @@
 // get-quote.js
 
+const bodyScrollLock = require('body-scroll-lock');
+const disableBodyScroll = bodyScrollLock.disableBodyScroll;
+const enableBodyScroll = bodyScrollLock.enableBodyScroll;
+
 $(function() {
 
     const quoteToggle = $('.get-a-quote'),
@@ -7,6 +11,8 @@ $(function() {
           menu        = $('#menu'),
           hamburger   = $('#nav_toggle'),
           logo        = $('.navbar-brand__logo');
+
+    let open = false;
 
     const getQuote = () => {
 
@@ -20,8 +26,11 @@ $(function() {
             $('.phone-search-dropdown__make, .phone-search-dropdown__model').resizeselect();
         }
 
-        // Prevent scrolling whilst open
-        $('body').toggleClass('body--overflow');
+        if (open) {
+            disableBodyScroll(menu);
+        } else {
+            enableBodyScroll(menu);
+        }
 
         // Toggle 'open' class
         quoteModal.toggleClass('getquote--open');
@@ -29,7 +38,10 @@ $(function() {
 
     quoteToggle.on('click', function(e) {
         e.preventDefault();
-        getQuote();
+
+        open = !open;
+
+        getQuote(open);
     });
 
     // Escape key close
