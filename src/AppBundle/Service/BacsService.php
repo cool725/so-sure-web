@@ -1406,7 +1406,7 @@ class BacsService
 
     /**
      * Mark file as submitted and update payment data
-     * @param AccessPayFile $file
+     * @param AccessPayFile $file is the file to set as submitted.
      */
     public function bacsFileSubmitted(AccessPayFile $file)
     {
@@ -1429,28 +1429,30 @@ class BacsService
         $this->dm->flush();
     }
 
+    /**
+     * Finds the accesspay file with the given serial number and marks it to have been submitted.
+     * @param int $serialNumber is the numerical serial number.
+     * @return boolean true if it was successfully submitted and false otherwise.
+     */
     public function bacsFileSubmittedBySerialNumber($serialNumber)
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $file */
         $file = $repo->findOneBy([
-            'serialNumber' => AccessPayFile::unformatSerialNumber($serialNumber),
+            'serialNumber' => AccessPayFile::formatSerialNumber($serialNumber),
             'status' => AccessPayFile::STATUS_PENDING
         ]);
-
         if (!$file) {
             $message = "Serial number {$serialNumber} is not found on a pending accesspay file";
             /** @var AccessPayFile $file */
-            $file = $repo->findOneBy(['serialNumber' => AccessPayFile::unformatSerialNumber($serialNumber)]);
+            $file = $repo->findOneBy(['serialNumber' => AccessPayFile::formatSerialNumber($serialNumber)]);
             if ($file) {
                 $message .= ", but it is found on file with status ".$file->getStatus();
             }
             $this->logger->error("{$message}.");
             return false;
         }
-
         $this->bacsFileSubmitted($file);
-
         return true;
     }
 
@@ -1644,7 +1646,6 @@ class BacsService
             $results['debit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['debit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
         }
-
         if (isset($results['serial-number']) && mb_strlen($results['serial-number']) > 0) {
             $results['autoBacsFileSubmit'] = $this->bacsFileSubmittedBySerialNumber($results['serial-number']);
         }
