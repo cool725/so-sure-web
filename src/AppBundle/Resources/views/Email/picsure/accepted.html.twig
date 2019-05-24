@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}pic-sure is successfully validated{% endblock %}
+{% block title %}Phone validation successful ✅{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 		<h1>
@@ -9,7 +9,7 @@
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-				Thanks for validating your phone via pic-sure. Your {{ policy.phone }} is now successfully validated.
+				Your {{ policy.phone }} is now successfully validated
 				<br><br>
                 Your excess for policy {{ policy.policyNumber }} is now:
                 <br>
