@@ -1436,16 +1436,17 @@ class BacsService
      */
     public function bacsFileSubmittedBySerialNumber($serialNumber)
     {
+        $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $file */
         $file = $repo->findOneBy([
-            'serialNumber' => AccessPayFile::formatSerialNumber($serialNumber),
+            'serialNumber' => $serialNumber,
             'status' => AccessPayFile::STATUS_PENDING
         ]);
         if (!$file) {
             $message = "Serial number {$serialNumber} is not found on a pending accesspay file";
             /** @var AccessPayFile $file */
-            $file = $repo->findOneBy(['serialNumber' => AccessPayFile::formatSerialNumber($serialNumber)]);
+            $file = $repo->findOneBy(['serialNumber' => $serialNumber]);
             if ($file) {
                 $message .= ", but it is found on file with status ".$file->getStatus();
             }
