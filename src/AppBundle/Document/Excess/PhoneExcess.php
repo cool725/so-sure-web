@@ -18,35 +18,35 @@ class PhoneExcess extends Excess
     use CurrencyTrait;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=0,max=250)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $damage;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=0,max=250)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $warranty;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=0,max=250)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $extendedWarranty;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=0,max=250)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
     protected $loss;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=0,max=250)
      * @MongoDB\Field(type="float")
      * @Gedmo\Versioned
      */
