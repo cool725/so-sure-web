@@ -564,6 +564,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $lines[] = 'Warning!! Missing initial notification date';
                     }
 
+                    /*
+                    Probably not needed since we are changing the billing date
                     // if the mandate standard date and the policy billing date do not match.
                     if (!$this->isSameDay($bankAccount->getStandardNotificationDate(), $policy->getBilling())) {
                         $lines[] = sprintf(
@@ -571,6 +573,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $policy->getPolicyNumber()
                         );
                     }
+                    */
                 }
             }
         } catch (\Exception $e) {
