@@ -9,7 +9,6 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\JudoPaymentMethod;
 
 class UserRepository extends DocumentRepository
 {

@@ -217,8 +217,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $this->redis->del(['policy:validation']);
             $this->redis->del(['policy:validation:flags']);
         } else {
-            $this->redis->del(['policy:validation']);
-
             /** @var PolicyRepository $policyRepo */
             $policyRepo = $this->dm->getRepository(Policy::class);
 
@@ -253,11 +251,22 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     'unpaid' => 'all',
                     'validateCancelled' => !$skipCancelled,
                 ];
-                $lines = array_merge($lines, $this->validatePolicy($policy, $policies, $data));
+                $validation = $this->validatePolicy($policy, $policies, $data);
                 if ($updatePotValue || $adjustScheduledPayments) {
                     $this->dm->flush();
                 }
+                if (count($validation) > 0) {
+                    $lines = array_merge($lines, $validation);
+                    $csvData[$policy->getPolicyNumber()] = $validation;
+                    $this->redis->zadd('policy:validation', [serialize([
+                        'id' => $policy->getId(),
+                        'policyNumber' => $policy->getPolicyNumber(),
+                        'issues' => $validation,
+                    ]) => 0]);
+                }
             } else {
+                $this->redis->del(['policy:validation']);
+
                 $validations = [];
                 $policies = $policyRepo->findAll();
                 $lines[] = sprintf(
@@ -564,6 +573,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $lines[] = 'Warning!! Missing initial notification date';
                     }
 
+                    /*
+                    Probably not needed since we are changing the billing date
                     // if the mandate standard date and the policy billing date do not match.
                     if (!$this->isSameDay($bankAccount->getStandardNotificationDate(), $policy->getBilling())) {
                         $lines[] = sprintf(
@@ -571,6 +582,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             $policy->getPolicyNumber()
                         );
                     }
+                    */
                 }
             }
         } catch (\Exception $e) {

@@ -3,7 +3,6 @@
 namespace AppBundle\Command;
 
 use AppBundle\Service\CheckoutService;
-use AppBundle\Service\JudopayService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

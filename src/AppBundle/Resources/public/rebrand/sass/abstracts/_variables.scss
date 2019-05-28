@@ -58,24 +58,26 @@ $input-group-addon-border-color: $primary;
 $custom-file-button-color:       $white;
 
 // Dropdowns
+$dropdown-min-width:             16rem;
+$dropdown-padding-y:             0;
 $dropdown-border-color:          $columbia-blue-e;
 $dropdown-divider-bg:            $columbia-blue-e;
-$dropdown-padding-y:             0;
-$dropdown-item-padding-y:        1rem;
 $dropdown-border-radius:         6px;
+$dropdown-border-width:          0;
 
 $dropdown-link-color:            $dodger-blue;
 $dropdown-link-hover-color:      $dodger-blue;
-$dropdown-link-hover-bg:         rgba(37, 147, 243, 0.1);
+$dropdown-link-hover-bg:         rgba(153, 227, 255, 0.5);
 
 $dropdown-link-active-color:     $zaffre;
 $dropdown-link-active-bg:        rgba(37, 147, 243, 0.2);
 
+$dropdown-item-padding-y:        1.4rem;
+$dropdown-item-padding-x:        1.5rem;
+
 // Tables
 $table-head-bg:                  rgba(37, 147, 243, 0.03);
 $table-head-color:               $zaffre;
-
-$cdn_url: "https://cdn.so-sure.com";
 
 // Hamburgers
 $hamburger-padding-x:            15px;
@@ -105,3 +107,21 @@ $table-accent-bg:                rgba(229, 244, 255, 0.4);
 $nav-pills-border-radius:        0;
 $nav-pills-link-active-color:    $white;
 $nav-pills-link-active-bg:       $dodger-blue;
+
+// Toasts
+
+// $toast-max-width:                   350px !default;
+$toast-padding-x:                   2rem;
+$toast-padding-y:                   .8rem;
+$toast-font-size:                   .7rem;
+// $toast-color:                       null !default;
+$toast-background-color:            $white;
+$toast-border-width:                0;
+// $toast-border-color:                rgba(0, 0, 0, .1) !default;
+$toast-border-radius:               10px;
+$toast-box-shadow:                  0 15px 30px 0 rgba(8,27,154,0.2),
+                                    0 5px 15px 0 rgba(8,27,154,0.2);
+
+// $toast-header-color:                $gray-600 !default;
+// $toast-header-background-color:     rgba($white, .85) !default;
+// $toast-header-border-color:         rgba(0, 0, 0, .05) !default;

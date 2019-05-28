@@ -15,7 +15,6 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;

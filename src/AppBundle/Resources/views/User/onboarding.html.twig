@@ -156,7 +156,33 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Reduce your excess 📉</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }} for accidental damage/breakdown</strong> and <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }} for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;{{ policy.phone.currentPhonePrice.excess.damage }} for all claims</strong>.</p>
+                                <p>Download the so-sure app and validate your phone to reduce your excess</p>
+                                <div class="table-responsive mb-2">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="25%"></th>
+                                                <th width="25%">Damage</th>
+                                                <th width="25%">Loss</th>
+                                                <th width="25%">Theft</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td align="left"><small>Validated</small></td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.theft }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><small>Not validated</small></td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.damage }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.loss }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.theft }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
@@ -174,7 +200,34 @@
                                         Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
                                 {% endif %}
                             {% else %}
-                                <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess to just <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }} for accidental damage/breakdown</strong> and <strong>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }} for loss and theft</strong>. <strong>If you don't validate your phone, the excess is &pound;{{ policy.phone.currentPhonePrice.excess.damage }} for all claims</strong>.</p>
+                                <p>Download the so-sure app and validate your phone to reduce your excess</p>
+                                <div class="table-responsive mb-5">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="25%"></th>
+                                                <th width="25%">Damage</th>
+                                                <th width="25%">Loss</th>
+                                                <th width="25%">Theft</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td align="left">Validated</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.theft }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left">Not validated</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.damage }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.loss }}</td>
+                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.theft }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
                                 <div class="d-flex justify-content-center">
                                     <a href="#"
                                        class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center opacity-50"
@@ -302,7 +355,7 @@
                                 <div class="custom-input-with-btn mb-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
                                     <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cashback if we are connected and don't claim! Here's the link to check them out: {{ policy.standardSCode.shareLink }}</div>
-                                    <button class="btn btn-primary btn-copy btn-square btn-sm sosure-track"
+                                    <button class="btn btn-primary btn-copy btn-square btn-sm track-data"
                                         data-clipboard-target="#scode_share"
                                         data-toggle="tooltip"
                                         data-placement="top"
