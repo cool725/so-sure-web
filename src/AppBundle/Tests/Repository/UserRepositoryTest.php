@@ -68,7 +68,7 @@ class UserRepositoryTest extends WebTestCase
      */
     public function testRemoveHubspotIds()
     {
-        self::$dm->getRepository(User::class)->createQueryBuilder()->updateMany()
+        self::$dm->createQueryBuilder(User::class)->updateMany()
             ->field("hubspotId")->set("bingBingWahoo")
             ->getQuery()->execute();
         $users = self::$dm->createQueryBuilder(User::class)->find()
