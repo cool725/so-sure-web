@@ -2012,6 +2012,7 @@ class CheckoutServiceTest extends WebTestCase
         }
         $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
 
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $policy->getStatus());
         $token = self::$checkout->createCardToken(
             self::$CHECKOUT_TEST_CARD2_NUM,
             self::$CHECKOUT_TEST_CARD2_EXP,
