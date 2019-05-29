@@ -1935,7 +1935,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     'success',
                     $dontCancel ? 'Policy wont be cancelled if unpaid' : 'Policy will be cancelled if unpaid'
                 );
-                return $this->redirectToRoute('admin_policy', ['id' => $id]);                
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
             } elseif ($request->request->has('salva_update_form')) {
                 $salvaUpdateForm->handleRequest($request);
                 if ($salvaUpdateForm->isValid()) {
