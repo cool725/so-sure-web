@@ -5932,7 +5932,6 @@ abstract class Policy
             return;
         }
 
-        /* Disable for now
         if (!$this->getPolicyTerms()->isAllowedExcess($this->getPremium()->getExcess())) {
             throw new \Exception(sprintf(
                 'Unable to set phone for policy %s as excess (%s) values do not match policy terms (%s).',
@@ -5943,7 +5942,6 @@ abstract class Policy
                     'missing'
             ));
         }
-        */
     }
 
     public function hasManualBacsPayment()
