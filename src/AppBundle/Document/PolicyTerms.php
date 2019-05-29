@@ -206,14 +206,16 @@ class PolicyTerms extends PolicyDocument
 
     public function isAllowedExcess(PhoneExcess $excess = null)
     {
-        foreach ($this->getAllowedExcesses() as $allowedExcess) {
+        return true;
+        // disable for now
+        //foreach ($this->getAllowedExcesses() as $allowedExcess) {
             /** @var PhoneExcess $allowedExcess */
-            if ($allowedExcess->equal($excess)) {
-                return true;
-            }
-        }
+        //    if ($allowedExcess->equal($excess)) {
+        //        return true;
+        //    }
+        //}
 
-        return false;
+        //return false;
     }
 
     public function isAllowedPicSureExcess(PhoneExcess $excess = null)
