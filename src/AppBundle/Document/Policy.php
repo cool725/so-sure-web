@@ -4172,7 +4172,7 @@ abstract class Policy
     {
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
-                $scheduledPayment->cancel();
+                $scheduledPayment->cancel('Cancelled as all scheduled payments cancelled');
             }
         }
     }

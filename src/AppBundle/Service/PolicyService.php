@@ -834,7 +834,7 @@ class PolicyService
             }
 
             $scheduledPayments[] = $scheduledPayment;
-            $scheduledPayment->cancel();
+            $scheduledPayment->cancel('Cancelled as part of adjustment due to incorrect scheduled payments.');
             $log[] = sprintf(
                 'For Policy %s, cancelled scheduled payment %s on %s for £%0.2f',
                 $policy->getPolicyNumber(),

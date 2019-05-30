@@ -41,7 +41,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
     {
         $scheduledPayment = new ScheduledPayment();
         $this->assertNull($scheduledPayment->getStatus());
-        $scheduledPayment->cancel();
+        $scheduledPayment->cancel('bing bing wahoo');
         $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
     }
 
