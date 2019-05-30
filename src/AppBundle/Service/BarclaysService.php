@@ -213,6 +213,7 @@ class BarclaysService
                             $chargeback->setReference($ref);
                             $chargeback->setAmount($amount);
                             $chargeback->setDate($date);
+                            $chargeback->setRefundTotalCommission();
                             $this->dm->persist($chargeback);
                             $this->dm->flush();
                             $this->logger->warning(sprintf(
