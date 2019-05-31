@@ -1369,6 +1369,37 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsRefundForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
             ->getForm();
+        if ($policy->getDontCancelIfUnpaid()) {
+            $dontCancelForm = $this->get('form.factory')
+                ->createNamedBuilder('dont_cancel_form')
+                ->add(
+                    'allowCancellation',
+                    SubmitType::class,
+                    [
+                        "label" => 'Allow cancellation',
+                        'attr' => [
+                            'dontCancel' => false,
+                            'class' => 'btn btn-danger confirm-submit'
+                        ]
+                    ]
+                )
+                ->getForm();
+        } else {
+            $dontCancelForm = $this->get('form.factory')
+                ->createNamedBuilder('dont_cancel_form')
+                ->add(
+                    'dontCancel',
+                    SubmitType::class,
+                    [
+                        "label" => 'Prevent cancellation',
+                        'attr' => [
+                            'dontCancel' => true,
+                            'class' => 'btn btn-danger confirm-submit'
+                        ]
+                    ]
+                )
+                ->getForm();
+        }
         $salvaUpdateForm = $this->get('form.factory')
             ->createNamedBuilder('salva_update_form')
             ->add('update', SubmitType::class)
@@ -1893,6 +1924,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     ));
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('dont_cancel_form')) {
+                $form = $request->request->get('dont_cancel_form');
+                $dontCancel = isset($form['dontCancel']);
+                $allowCancellation = isset($form['allowCancellation']);
+                $dontCancelForm->handleRequest($request);
+                $policy->setDontCancelIfUnpaid($dontCancel);
+                $dm->flush();
+                $this->addFlash(
+                    'success',
+                    $dontCancel ? 'Policy wont be cancelled if unpaid' : 'Policy will be cancelled if unpaid'
+                );
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
             } elseif ($request->request->has('salva_update_form')) {
                 $salvaUpdateForm->handleRequest($request);
                 if ($salvaUpdateForm->isValid()) {
@@ -1953,6 +1996,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
             'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'bacs_refund_form' => $bacsRefundForm->createView(),
+            'dont_cancel_form' => $dontCancelForm->createView(),
             'salva_update_form' => $salvaUpdateForm->createView(),
             'skip_payment_form' => $skipPaymentForm->createView(),
             'fraud' => $checks,
