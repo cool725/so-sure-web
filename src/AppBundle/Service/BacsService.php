@@ -2046,12 +2046,14 @@ class BacsService
 
     /**
      * Converts scheduled refunds for bacs into bacs payments.
-     * @param string    $prefix is the policy number prefix that the owning policies must have.
-     * @param \DateTime $date   is the date to be considered the current time.
-     * @param boolean   $update is whether to update the scheduled payments or only return the list of new payments.
+     * @param string    $prefix   is the policy number prefix that the owning policies must have.
+     * @param \DateTime $date     is the date to be considered the current time.
+     * @param array     $metadata is a list of metadata to be updated.
+     * @param boolean   $update   is whether to update the scheduled payments or only return the list of new payments.
      * @return array containing the list of generated credit payments.
      */
-    public function generatePaymentsCredits($prefix, \DateTime $date, &$metadata, $update = true) {
+    public function generatePaymentsCredits($prefix, \DateTime $date, &$metadata, $update = true)
+    {
         $payments = [];
         $this->warnings = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
