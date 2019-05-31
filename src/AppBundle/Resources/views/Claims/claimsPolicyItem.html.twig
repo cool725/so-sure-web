@@ -1316,6 +1316,20 @@
                             </td>
                         </tr>
                     {% endif %}
+                    <tr>
+                        <td>
+                            Dont cancel if unpaid
+                        </td>
+                        <td>
+                            {{ form_start(dont_cancel_form, {'attr': {'class': 'form-inline'}}) }}
+                            {% if policy.dontCancelIfUnpaid %}
+                                Yes {{ form_widget(dont_cancel_form.allowCancellation) }}
+                            {% else %}
+                                No {{ form_widget(dont_cancel_form.dontCancel) }}
+                            {% endif %}
+                            {{ form_end(dont_cancel_form) }}
+                        </td>
+                    </tr>
                 {% endif %}
             </table>
 

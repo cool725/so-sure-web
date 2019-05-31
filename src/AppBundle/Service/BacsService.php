@@ -2003,7 +2003,7 @@ class BacsService
                 continue;
             } elseif ($validate == self::VALIDATE_CANCEL) {
                 if ($update) {
-                    $scheduledPayment->cancel();
+                    $scheduledPayment->cancel('Cancelled by bacs debits validation');
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
 
@@ -2081,7 +2081,7 @@ class BacsService
                 continue;
             } elseif ($validate == self::VALIDATE_CANCEL) {
                 if ($update) {
-                    $scheduledPayment->cancel();
+                    $scheduledPayment->cancel('Cancelled by bacs credits validation');
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
 
