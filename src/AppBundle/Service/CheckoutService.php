@@ -822,9 +822,9 @@ class CheckoutService
 
     /**
      * Stores new card details and starts a new chain of payments.
-     * @param Policy      $policy is the policy to whom the new details belong.
-     * @param string      $token  is the checkout token with which we can make the request to checkout.
-     * @param float|null  $amount is an optional amount of money to charge in the same request.
+     * @param Policy     $policy is the policy to whom the new details belong.
+     * @param string     $token  is the checkout token with which we can make the request to checkout.
+     * @param float|null $amount is an optional amount of money to charge in the same request.
      */
     public function updatePaymentMethod(Policy $policy, $token, $amount = null) {
         $user = $policy->getUser();
