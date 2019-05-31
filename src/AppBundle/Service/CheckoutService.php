@@ -367,16 +367,7 @@ class CheckoutService
              * We also want to make sure that the payment updates any unpaid customer to active.
              * This has not always been happening, so we will do it here.
              */
-            if (!$policy->isPolicyPaidToDate()) {
-                $amount = $policy->getOutstandingPremiumToDate();
-                if ($amount <= 0) {
-                    $this->get('logger')->warning(sprintf(
-                        'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                        $policy->getId(),
-                        $amount
-                    ));
-                }
-            } else {
+            if ($policy->isPolicyPaidToDate()) {
                 $policy->setPolicyStatusActiveIfUnpaid();
                 $this->dm->flush();
             }
@@ -952,16 +943,7 @@ class CheckoutService
                  * Finally, as the transaction was not a 0 amount, we will need to ensure that it is paid to date
                  *  and if the policy is set as unpaid, it is now set to active.
                  */
-                if (!$policy->isPolicyPaidToDate()) {
-                    $amount = $policy->getOutstandingPremiumToDate();
-                    if ($amount <= 0) {
-                        $this->get('logger')->warning(sprintf(
-                            'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                            $policy->getId(),
-                            $amount
-                        ));
-                    }
-                } else {
+                if ($policy->isPolicyPaidToDate()) {
                     $policy->setPolicyStatusActiveIfUnpaid();
                     $this->dm->flush();
                 }
