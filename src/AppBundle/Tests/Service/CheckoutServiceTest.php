@@ -1970,4 +1970,56 @@ class CheckoutServiceTest extends WebTestCase
         self::$checkout->updatePaymentMethod($policy, $token->token);
         $this->assertEquals('none', $paymentMethod->getPreviousChargeId());
     }
+
+
+
+    public function testCheckoutUnpaidUpdateCardStatusActive()
+    {
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutUnpaidUpdateCardStatusActive',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /** @var CheckoutPaymentMethod $paymentMethod */
+        $policy->setPaymentMethod(new CheckoutPaymentMethod());
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $paymentMethod = $policy->getPaymentMethod();
+        /**
+         * This test creates a new user, so they will not have a previous charge.
+         * We want to set one so that we know that there is one to remove.
+         */
+        $paymentMethod->setPreviousChargeId("charge_test_PHPUNITTEST12345");
+        $this->assertTrue($paymentMethod->hasPreviousChargeId());
+
+        $details = self::$checkout->testPayDetails(
+            $policy,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN,
+            $policy->getId()
+        );
+        $this->assertNotNull($details);
+        if (!$details) {
+            return;
+        }
+        $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
+
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $policy->getStatus());
+        $token = self::$checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD2_NUM,
+            self::$CHECKOUT_TEST_CARD2_EXP,
+            self::$CHECKOUT_TEST_CARD2_PIN
+        );
+
+        self::$checkout->updatePaymentMethod($policy, $token->token, '9.71');
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+    }
 }

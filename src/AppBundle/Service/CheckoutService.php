@@ -363,6 +363,14 @@ class CheckoutService
                 $source,
                 $date
             );
+            /**
+             * We also want to make sure that the payment updates any unpaid customer to active.
+             * This has not always been happening, so we will do it here.
+             */
+            if ($policy->isPolicyPaidToDate()) {
+                $policy->setPolicyStatusActiveIfUnpaid();
+                $this->dm->flush();
+            }
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
                 /** @var Policy $policy */
@@ -929,6 +937,15 @@ class CheckoutService
                     $payment->setMessage($details->getResponseMessage());
                     $payment->setRiskScore($details->getRiskCheck());
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                }
+
+                /**
+                 * Finally, as the transaction was not a 0 amount, we will need to ensure that it is paid to date
+                 *  and if the policy is set as unpaid, it is now set to active.
+                 */
+                if ($policy->isPolicyPaidToDate()) {
+                    $policy->setPolicyStatusActiveIfUnpaid();
+                    $this->dm->flush();
                 }
             }
             // Make sure upcoming rescheduled scheduled payments are now cancelled.
