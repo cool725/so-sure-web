@@ -610,6 +610,13 @@ abstract class Policy
      */
     protected $paymentMethod;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $dontCancelIfUnpaid;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -2635,6 +2642,16 @@ abstract class Policy
         return true;
     }
 
+    public function setDontCancelIfUnpaid($dontCancelIfUnpaid)
+    {
+        $this->dontCancelIfUnpaid = $dontCancelIfUnpaid;
+    }
+
+    public function getDontCancelIfUnpaid()
+    {
+        return $this->dontCancelIfUnpaid;
+    }
+
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
@@ -3688,6 +3705,10 @@ abstract class Policy
             return false;
         }
 
+        if ($this->getStatus() === self::STATUS_UNPAID && $this->dontCancelIfUnpaid) {
+            return false;
+        }
+
         if ($reason == Policy::CANCELLED_COOLOFF) {
             return $this->isWithinCooloffPeriod($date, $extendedCooloff) && !$this->hasMonetaryClaimed(true);
         }
@@ -3750,6 +3771,10 @@ abstract class Policy
     public function shouldCancelPolicy($prefix = null, $date = null)
     {
         if (!$this->isValidPolicy($prefix) || !$this->isActive()) {
+            return false;
+        }
+
+        if ($this->getStatus() === self::STATUS_UNPAID && $this->dontCancelIfUnpaid) {
             return false;
         }
 
@@ -4172,7 +4197,7 @@ abstract class Policy
     {
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
-                $scheduledPayment->cancel();
+                $scheduledPayment->cancel('Cancelled as all scheduled payments cancelled');
             }
         }
     }
