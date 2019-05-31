@@ -826,7 +826,8 @@ class CheckoutService
      * @param string     $token  is the checkout token with which we can make the request to checkout.
      * @param float|null $amount is an optional amount of money to charge in the same request.
      */
-    public function updatePaymentMethod(Policy $policy, $token, $amount = null) {
+    public function updatePaymentMethod(Policy $policy, $token, $amount = null)
+    {
         $user = $policy->getUser();
         $details = null;
         $payment = null;
