@@ -613,7 +613,12 @@ class BankAccount
 
     public function getNotificationDay()
     {
-        return $this->getNotificationDate()->format('j');
+        $notificationDate = $this->getNotificationDate();
+        if ($notificationDate) {
+            return $notificationDate->format('j');
+        } else {
+            return 0;
+        }
     }
 
     public function getNotificationDate()
