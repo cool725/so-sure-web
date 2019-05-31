@@ -249,8 +249,13 @@ class ScheduledPayment
         return $this->previousAttempt;
     }
 
-    public function cancel()
+    /**
+     * Sets the scheduled payment as cancelled.
+     * @param string $note is a message to append to the scheduled payment's notes about cancellation. Not optional.
+     */
+    public function cancel($note)
     {
+        $this->setNotes($this->getNotes().". ".$note);
         $this->setStatus(self::STATUS_CANCELLED);
     }
 
