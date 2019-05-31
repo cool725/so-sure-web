@@ -936,8 +936,7 @@ class CheckoutService
             $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
             $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
             foreach ($rescheduledPayments as $rescheduled) {
-                $rescheduled->cancel();
-                $rescheduled->setNotes("cancelled as web payment made.");
+                $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
             }
             if (count($rescheduledPayments) > 0) {
                 $this->dm->flush();

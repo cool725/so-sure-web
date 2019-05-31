@@ -471,10 +471,6 @@
                             <h4>Update pricing</h4>
                             <button type="submit" class="btn btn-success btn-square">Save</button>
                         </div>
-                        <table id="prices"
-                               class="table table-striped mb-5"
-                               data-sorting="true"
-                               data-empty="No data">{# Prices Table #}</table>
                         <div class="row mt-5">
                             <div class="col-lg">
                                 <div class="card mb-5">
@@ -742,6 +738,10 @@
                                 </div>
                             </div>
                         </div>
+                        <table id="prices"
+                               class="table table-striped mb-5"
+                               data-sorting="true"
+                               data-empty="No data">{# Prices Table #}</table>
                         <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
                     </form>
                 </div>

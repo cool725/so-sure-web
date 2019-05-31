@@ -136,6 +136,7 @@ $(function(){
 
         if (phone) {
             modal.find('#prices').DataTable({
+                ordering: false,
                 destroy: true,
                 paging: false,
                 searching: false,
