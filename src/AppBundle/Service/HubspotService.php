@@ -426,6 +426,7 @@ class HubspotService
         $this->addProperty("email", $user->getEmailCanonical(), $data, false, $filter);
         $this->addProperty("mobilephone", $user->getMobileNumber(), $data, false, $filter);
         $this->addProperty("gender", $user->getGender(), $data, false, $filter);
+        $this->addProperty("created", $user->getCreatedDay()->format("U") * 1000, $data, false, $filter);
         $this->addProperty("customer", true, $data, false, $filter);
         $this->addProperty("hs_facebookid", $user->getFacebookId(), $data, false, $filter);
         if ($user->getBirthday()) {
