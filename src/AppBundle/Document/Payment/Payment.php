@@ -549,7 +549,11 @@ abstract class Payment
         $this->scheduledPayment = $scheduledPayment;
     }
 
-    public function setCommission()
+    /**
+     * Sets the commission for this payment.
+     * @param boolean $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
+     */
+    public function setCommission($allowFraction = false)
     {
         if (!$this->getPolicy()) {
             throw new \Exception(sprintf(
@@ -574,6 +578,11 @@ abstract class Payment
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
+        } elseif ($allowFraction &&
+            abs($this->getAmount()) <= $this->getPolicy()->getPremium()->getMonthlyPremiumPrice()
+        ) {
+            $fraction = $this->getAmount() / $this->getPolicy()->getPremium()->getMonthlyPremiumPrice();
+            $this->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION * $fraction);
         } else {
             throw new \Exception(sprintf(
                 'Failed set correct commission for %f (policy %s)',
