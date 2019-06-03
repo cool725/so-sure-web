@@ -297,7 +297,6 @@ class CheckoutService
         IdentityLog $identityLog = null
     ) {
         $charge = $this->capturePaymentMethod($policy, $token, $amount);
-
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
 
@@ -338,6 +337,13 @@ class CheckoutService
             ));
         }
 
+        // Make sure upcoming rescheduled scheduled payments are now cancelled.
+        /** @var ScheduledPaymentRepository */
+        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+        $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
+        foreach ($rescheduledPayments as $rescheduled) {
+            $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
+        }
         if (!$policy->getStatus() ||
             in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
             // New policy
@@ -363,6 +369,14 @@ class CheckoutService
                 $source,
                 $date
             );
+            /**
+             * We also want to make sure that the payment updates any unpaid customer to active.
+             * This has not always been happening, so we will do it here.
+             */
+            if ($policy->isPolicyPaidToDate()) {
+                $policy->setPolicyStatusActiveIfUnpaid();
+                $this->dm->flush();
+            }
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
                 /** @var Policy $policy */
@@ -815,25 +829,22 @@ class CheckoutService
     }
 
     /**
-     * @param Policy $policy
-     * @param string $token
+     * Stores new card details and starts a new chain of payments.
+     * @param Policy     $policy is the policy to whom the new details belong.
+     * @param string     $token  is the checkout token with which we can make the request to checkout.
+     * @param float|null $amount is an optional amount of money to charge in the same request.
      */
-    public function updatePaymentMethod(
-        Policy $policy,
-        $token,
-        $amount = null
-    ) {
+    public function updatePaymentMethod(Policy $policy, $token, $amount = null)
+    {
         $user = $policy->getUser();
         $details = null;
         $payment = null;
-
         /** @var CheckoutPaymentMethod $paymentMethod */
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             $paymentMethod = new CheckoutPaymentMethod();
             $policy->setPaymentMethod($paymentMethod);
         }
-
         try {
             if ($amount !== null) {
                 $payment = new CheckoutPayment();
@@ -868,17 +879,6 @@ class CheckoutService
                 $charge->setTrackId($payment->getId());
             }
 
-            /*
-            $charge = new CardIdChargeCreate();
-            $charge->setEmail($user->getEmail());
-            $charge->setAutoCapTime(0);
-            $charge->setAutoCapture('N');
-            $charge->setCurrency('GBP');
-            $charge->setMetadata(['policy_id' => $policy->getId()]);
-            $charge->setCardId($token);
-            $details = $service->chargeWithCardId($charge);
-            */
-
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
 
@@ -888,6 +888,7 @@ class CheckoutService
                 $payment->setResult($details->getStatus());
                 $payment->setMessage($details->getResponseMessage());
                 $payment->setRiskScore($details->getRiskCheck());
+                $this->setCommission($payment);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             }
 
@@ -928,18 +929,24 @@ class CheckoutService
                     $payment->setResult($details->getStatus());
                     $payment->setMessage($details->getResponseMessage());
                     $payment->setRiskScore($details->getRiskCheck());
+                    // Make sure upcoming rescheduled scheduled payments are now cancelled.
+                    /** @var ScheduledPaymentRepository */
+                    $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+                    $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
+                    foreach ($rescheduledPayments as $rescheduled) {
+                        $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
+                    }
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
-            }
-            // Make sure upcoming rescheduled scheduled payments are now cancelled.
-            /** @var ScheduledPaymentRepository */
-            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
-            $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
-            foreach ($rescheduledPayments as $rescheduled) {
-                $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
-            }
-            if (count($rescheduledPayments) > 0) {
-                $this->dm->flush();
+
+                /**
+                 * Finally, as the transaction was not a 0 amount, we will need to ensure that it is paid to date
+                 *  and if the policy is set as unpaid, it is now set to active.
+                 */
+                if ($policy->isPolicyPaidToDate()) {
+                    $policy->setPolicyStatusActiveIfUnpaid();
+                    $this->dm->flush();
+                }
             }
         } catch (\Exception $e) {
             $this->logger->error(
