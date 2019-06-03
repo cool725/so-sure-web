@@ -36,6 +36,7 @@
     "datatables.net-dt": "^1.10.19",
     "dot": "^1.1.2",
     "flickity": "^2.2.0",
+    "fstream": "^1.0.12",
     "fuse.js": "^3.2.1",
     "gulp": "^3.9.1",
     "gulp-cli": "^2.0.1",
