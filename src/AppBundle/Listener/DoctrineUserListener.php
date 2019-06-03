@@ -99,8 +99,7 @@ class DoctrineUserListener extends BaseDoctrineListener
             $this->triggerEvent($user, UserEvent::EVENT_NAME_UPDATED);
         }
 
-        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT, User::class) &&
-            $user->getHubspotId()) {
+        if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT, User::class)) {
             $this->triggerEvent($user, UserEvent::EVENT_UPDATED_HUBSPOT);
         }
 

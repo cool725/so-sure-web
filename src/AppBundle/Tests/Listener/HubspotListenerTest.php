@@ -60,7 +60,14 @@ class HubspotListenerTest extends WebTestCase
         $this->checkQueue($queue, [HubspotService::QUEUE_UPDATE_USER]);
         self::$policyService->create($policy, null, true);
         $queue = self::$hubspotService->getQueueData();
-        $this->checkQueue($queue, [HubspotService::QUEUE_UPDATE_USER, HubspotService::QUEUE_UPDATE_POLICY]);
+        $this->checkQueue(
+            $queue,
+            [
+                HubspotService::QUEUE_UPDATE_USER,
+                HubspotService::QUEUE_UPDATE_POLICY,
+                HubspotService::QUEUE_UPDATE_POLICY
+            ]
+        );
     }
 
     /**
@@ -128,27 +135,20 @@ class HubspotListenerTest extends WebTestCase
         // create.
         self::$policyService->create($policy, null, true);
         $list[] = HubspotService::QUEUE_UPDATE_POLICY;
+        $list[] = HubspotService::QUEUE_UPDATE_POLICY;
         $this->checkQueue(self::$hubspotService->getQueueData(), $list);
         // unpaid.
-        self::$hubspotListener->onPolicyUnpaidEvent(new PolicyEvent($policy));
+        self::$hubspotListener->onPolicyUpdatedEvent(new PolicyEvent($policy));
         $list[] = HubspotService::QUEUE_UPDATE_POLICY;
         $this->checkQueue(self::$hubspotService->getQueueData(), $list);
         // cancelled.
-        self::$hubspotListener->onPolicyCancelledEvent(new PolicyEvent($policy));
+        self::$hubspotListener->onPolicyUpdatedEvent(new PolicyEvent($policy));
         $list[] = HubspotService::QUEUE_UPDATE_POLICY;
         $this->checkQueue(self::$hubspotService->getQueueData(), $list);
         // reactivated.
-        self::$hubspotListener->onPolicyReactivatedEvent(new PolicyEvent($policy));
+        self::$hubspotListener->onPolicyUpdatedEvent(new PolicyEvent($policy));
         $list[] = HubspotService::QUEUE_UPDATE_POLICY;
         $this->checkQueue(self::$hubspotService->getQueueData(), $list);
-    }
-
-    /**
-     * Tests that policy events are actually fired.
-     */
-    public function testPolicyListening()
-    {
-
     }
 
     /**

@@ -124,7 +124,7 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         }
 
         if ($this->hasDataChangedByCategory($eventArgs, DataChange::CATEGORY_HUBSPOT, Policy::class) &&
-            $policy->getHubspotId()) {
+            $policy->getStatus()) {
             $this->triggerEvent($policy, PolicyEvent::EVENT_UPDATED_HUBSPOT);
         }
     }
