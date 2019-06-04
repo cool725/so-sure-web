@@ -404,7 +404,7 @@ class PolicyServiceTest extends WebTestCase
             foreach ([1, 7] as $month) {
                 $user = static::createUser(
                     static::$userManager,
-                    sprintf('scheduled-monthly-%d-%d@so-sure.com', $month, $actualDay),
+                    self::generateEmail(sprintf('scheduled-monthly-%d-%d', $month, $actualDay), $this, true),
                     'bar',
                     null,
                     static::$dm
@@ -459,7 +459,7 @@ class PolicyServiceTest extends WebTestCase
             foreach ([1, 7] as $month) {
                 $user = static::createUser(
                     static::$userManager,
-                    sprintf('scheduled-monthly-tz-%d-%d@so-sure.com', $month, $actualDay),
+                    self::generateEmail(sprintf('scheduled-monthly-tz-%d-%d', $month, $actualDay), $this, true),
                     'bar',
                     null,
                     static::$dm
@@ -646,7 +646,7 @@ class PolicyServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testAdjustScheduledPayments', $this),
+            static::generateEmail('testAdjustScheduledPayments', $this, true),
             'bar',
             static::$dm
         );

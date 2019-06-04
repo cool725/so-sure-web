@@ -5161,6 +5161,8 @@ abstract class Policy
                 } elseif ($this->hasPolicyOrUserBacsPaymentMethod()) {
                     // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                } elseif ($this->hasCheckoutPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P11D'));
                 }
             } else {
                 // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
@@ -5170,6 +5172,8 @@ abstract class Policy
                 } elseif ($this->hasPolicyOrUserBacsPaymentMethod()) {
                     // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                } elseif ($this->hasCheckoutPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
                 }
             }
             if ($cancellationDate <= $date) {

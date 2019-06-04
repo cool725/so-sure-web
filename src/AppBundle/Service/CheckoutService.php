@@ -338,7 +338,7 @@ class CheckoutService
         }
 
         // Make sure upcoming rescheduled scheduled payments are now cancelled.
-        /** @var ScheduledPaymentRepository */
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
         foreach ($rescheduledPayments as $rescheduled) {
@@ -376,6 +376,21 @@ class CheckoutService
             if ($policy->isPolicyPaidToDate()) {
                 $policy->setPolicyStatusActiveIfUnpaid();
                 $this->dm->flush();
+                /**
+                 * We also want to check if there are any scheduled payments in the past
+                 * that have not been updated. So, we will check for that here and
+                 * cancel any with a status of 'scheduled'.
+                 */
+                $lastSuccess = $policy->getLastSuccessfulUserPaymentCredit()->getDate();
+                $oldUnpaid = $scheduledPaymentRepo->getPastScheduledWithNoStatusUpdate($policy, $lastSuccess);
+                /** @var ScheduledPayment $sp */
+                foreach ($oldUnpaid as $sp) {
+                    $status = $sp->getStatus();
+                    if ($status === "scheduled") {
+                        $sp->cancel('Cancelling old scheduled as payment made to bring up to date');
+                    }
+                    $this->dm->flush();
+                }
             }
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
