@@ -4,6 +4,8 @@
  * @author $user
  */
 
+namespace AppBundle\Tests\Document;
+
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Address;
 use AppBundle\Document\DateTrait;
@@ -72,7 +74,6 @@ class CancelledPaymentTest extends WebTestCase
         self::$checkout = $checkout;
 
         try {
-
             self::$user = self::createValidUser(
                 self::generateEmail(
                     'cancelledpaymentstestuser',
