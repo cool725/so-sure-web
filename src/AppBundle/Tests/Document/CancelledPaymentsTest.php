@@ -93,17 +93,8 @@ class CancelledPaymentTest extends WebTestCase
                 true
             );
         } catch (Exception $e) {
-            print_r($e->getMessage());
+            print($e->getMessage());
         }
-    }
-
-    public function testSetUp()
-    {
-        print_r("user " . self::$user->getId());
-        print_r("phone " . self::$phone->getId());
-        print_r("policy " . self::$policy->getId());
-        self::setCheckoutPaymentMethodForPolicy(self::$policy);
-
     }
 
     private function createValidUser($email)
