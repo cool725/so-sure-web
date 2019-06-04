@@ -53,13 +53,13 @@
                                     </li>
                                 {% endif %}
                                 <li class="list-group-item">
-                                   Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getExcessValue('damage')|number_format(0, '.', ',') }}</strong>
+                                   Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
                                 </li>
                                 <li class="list-group-item">
-                                    Excess for Loss <strong>&pound;{{ policyItem.getExcessValue('loss')|number_format(0, '.', ',') }}</strong>
+                                    Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
                                 </li>
                                 <li class="list-group-item">
-                                    Excess for Theft <strong>&pound;{{ policyItem.getExcessValue('theft')|number_format(0, '.', ',') }}</strong>
+                                    Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
                                 </li>
                             </ul>
 

@@ -159,6 +159,29 @@ class PolicyTerms extends PolicyDocument
         ]);
     }
 
+    /**
+     * Tells us whether we should use the global hard coded excesses for these policy terms.
+     * @return boolean true if we should use ard coded excess and false if not.
+     */
+    public function isStaticExcessEnabled()
+    {
+        return in_array($this->getVersion(), [
+            self::VERSION_0,
+            self::VERSION_1,
+            self::VERSION_2,
+            self::VERSION_3,
+            self::VERSION_4,
+            self::VERSION_5,
+            self::VERSION_6,
+            self::VERSION_7,
+            self::VERSION_8,
+            self::VERSION_9,
+            self::VERSION_10,
+            self::VERSION_11,
+            self::VERSION_12
+        ]);
+    }
+
     public function getAllowedExcesses()
     {
         if ($this->isPicSureEnabled()) {
@@ -206,25 +229,33 @@ class PolicyTerms extends PolicyDocument
 
     public function isAllowedExcess(PhoneExcess $excess = null)
     {
-        foreach ($this->getAllowedExcesses() as $allowedExcess) {
-            /** @var PhoneExcess $allowedExcess */
-            if ($allowedExcess->equal($excess)) {
-                return true;
+        if ($this->isStaticExcessEnabled()) {
+            foreach ($this->getAllowedExcesses() as $allowedExcess) {
+                /** @var PhoneExcess $allowedExcess */
+                if ($allowedExcess->equal($excess)) {
+                    return true;
+                }
             }
+            return false;
+        } else {
+            // Just a sanity check.
+            return ($excess->getMin() > 0 && $excess->getMax() < 400);
         }
-
-        return false;
     }
 
     public function isAllowedPicSureExcess(PhoneExcess $excess = null)
     {
-        foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
-            /** @var PhoneExcess $allowedExcess */
-            if ($allowedExcess->equal($excess)) {
-                return true;
+        if ($this->isStaticExcessEnabled()) {
+            foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
+                /** @var PhoneExcess $allowedExcess */
+                if ($allowedExcess->equal($excess)) {
+                    return true;
+                }
             }
+            return false;
+        } else {
+            // Just a sanity check.
+            return ($excess->getMin() > 0 && $excess->getMax() < 400);
         }
-
-        return false;
     }
 }
