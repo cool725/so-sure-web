@@ -239,7 +239,7 @@ class PolicyTerms extends PolicyDocument
             return false;
         } else {
             // Just a sanity check.
-            return ($excess->getMin() > 0 && $excess->getMax() < 400);
+            return $excess && $excess->getMin() > 0 && $excess->getMax() < 400;
         }
     }
 
@@ -255,7 +255,7 @@ class PolicyTerms extends PolicyDocument
             return false;
         } else {
             // Just a sanity check.
-            return ($excess->getMin() > 0 && $excess->getMax() < 400);
+            return $excess && $excess->getMin() > 0 && $excess->getMax() < 400;
         }
     }
 }
