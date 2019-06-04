@@ -73,28 +73,24 @@ class CancelledPaymentTest extends WebTestCase
         $checkout = self::$container->get('app.checkout');
         self::$checkout = $checkout;
 
-        try {
-            self::$user = self::createValidUser(
-                self::generateEmail(
-                    'cancelledpaymentstestuser',
-                    self::returnSelf(),
-                    true
-                )
-            );
-
-            self::$phone = static::getRandomPhone(static::$dm);
-
-            self::$policy = static::initPolicy(
-                self::$user,
-                static::$dm,
-                self::$phone,
-                null,
-                false,
+        self::$user = self::createValidUser(
+            self::generateEmail(
+                'cancelledpaymentstestuser',
+                self::returnSelf(),
                 true
-            );
-        } catch (Exception $e) {
-            print($e->getMessage());
-        }
+            )
+        );
+
+        self::$phone = static::getRandomPhone(static::$dm);
+
+        self::$policy = static::initPolicy(
+            self::$user,
+            static::$dm,
+            self::$phone,
+            null,
+            false,
+            true
+        );
     }
 
     private function createValidUser($email)
