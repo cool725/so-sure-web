@@ -8,7 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\CurrencyTrait;
 
 /**
