@@ -153,29 +153,6 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setCommission();
     }
 
-    /**
-     * Tests setting the commission for payments that will be fractional.
-     */
-    public function testSetCommissionFractions()
-    {
-        $policy = new PhonePolicy();
-        $premium = new PhonePremium();
-        $premium->setGwp(5);
-        $premium->setIpt(1);
-        $policy->setPremium($premium);
-        $payment = new BacsPayment();
-        $payment->setAmount()
-
-    }
-
-    /**
-     * Tests setting the commission for payments that will be fractional.
-     */
-    public function testSetCommissionRefundFractions()
-    {
-
-    }
- 
     public function testTimezone()
     {
         $payments = [];
