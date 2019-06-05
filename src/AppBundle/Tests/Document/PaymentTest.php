@@ -165,7 +165,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $premium->setIpt(1);
         $policy->setPremium($premium);
         $payment = new BacsPayment();
-        $payment->setAmount();
+        $payment->setAmount(-0.3);
     }
 
     /**
