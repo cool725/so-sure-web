@@ -14,12 +14,14 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Tests\UserClassTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+//@codingStandardsIgnoreFile
 class CancelledPaymentsTest extends WebTestCase
 {
     use UserClassTrait;
@@ -38,10 +40,7 @@ class CancelledPaymentsTest extends WebTestCase
     /** @var Phone */
     protected static $phone;
 
-    /** @var Policy */
     protected static $policy;
-
-    /** @var PolicyService */
     protected static $policyService;
 
     public static $CHECKOUT_TEST_CARD_NUM = '4242 4242 4242 4242';
@@ -93,7 +92,7 @@ class CancelledPaymentsTest extends WebTestCase
         );
     }
 
-    private function createValidUser($email)
+    private static function createValidUser($email)
     {
         $user = static::createUser(self::$userManager, $email, 'foo');
         $user->setFirstName('foo');
@@ -132,11 +131,16 @@ class CancelledPaymentsTest extends WebTestCase
 
         self::$dm->flush();
 
+        $price = 7.99;
+        if (self::$phone->getCurrentPhonePrice() && self::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()) {
+            $price = self::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        }
+
         $this->assertGreaterThan(0, $this->getOldUnpaid());
         $pay = self::$checkout->testPay(
             self::$policy,
             self::$policy->getId(),
-            self::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            $price,
             self::$CHECKOUT_TEST_CARD_NUM,
             self::$CHECKOUT_TEST_CARD_EXP,
             self::$CHECKOUT_TEST_CARD_PIN
@@ -155,9 +159,9 @@ class CancelledPaymentsTest extends WebTestCase
     {
         $last = new \DateTime();
         if (self::$policy->getLastSuccessfulUserPaymentCredit()) {
-            /** @var \AppBundle\Repository\ScheduledPaymentRepository $spr */
             $last = self::$policy->getLastSuccessfulUserPaymentCredit()->getDate();
         }
+        /** @var ScheduledPaymentRepository $spr */
         $spr = self::$dm->getRepository(ScheduledPayment::class);
         $oldUnpaid = $spr->getPastScheduledWithNoStatusUpdate(self::$policy, $last);
         return $oldUnpaid->count();

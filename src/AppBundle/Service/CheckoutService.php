@@ -381,7 +381,7 @@ class CheckoutService
                  * that have not been updated. So, we will check for that here and
                  * cancel any with a status of 'scheduled'.
                  */
-                if ($lastSuccess = $policy->getLastSuccessfulUserPaymentCredit()->getDate()) {
+                if ($policy->getLastSuccessfulUserPaymentCredit()) {
                     $lastSuccess = $policy->getLastSuccessfulUserPaymentCredit()->getDate();
                     $oldUnpaid = $scheduledPaymentRepo->getPastScheduledWithNoStatusUpdate($policy, $lastSuccess);
                     /** @var ScheduledPayment $sp */
