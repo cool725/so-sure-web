@@ -161,7 +161,7 @@ class PolicyTerms extends PolicyDocument
 
     /**
      * Tells us whether we should use the global hard coded excesses for these policy terms.
-     * @return boolean true if we should use ard coded excess and false if not.
+     * @return boolean true if we should use hard coded excess and false if not.
      */
     public function isStaticExcessEnabled()
     {
@@ -227,6 +227,11 @@ class PolicyTerms extends PolicyDocument
         }
     }
 
+    /**
+     * Validates that the given excess is acceptable considering the policy may not have completed picsure.
+     * @param PhoneExcess|null $excess is the excess to validate.
+     * @return boolean true if the excess is acceptable and false if not.
+     */
     public function isAllowedExcess(PhoneExcess $excess = null)
     {
         if ($this->isStaticExcessEnabled()) {
@@ -239,10 +244,15 @@ class PolicyTerms extends PolicyDocument
             return false;
         } else {
             // Just a sanity check.
-            return $excess && $excess->getMin() > 0 && $excess->getMax() < 400;
+            return $excess && $excess->getMin() > 0;
         }
     }
 
+    /**
+     * Validates that the given excess is acceptable for the policy, having completed picsure.
+     * @param PhoneExcess|null $excess is the excess to validate.
+     * @return boolean true if the excess is acceptable and false if not.
+     */
     public function isAllowedPicSureExcess(PhoneExcess $excess = null)
     {
         if ($this->isStaticExcessEnabled()) {
@@ -255,7 +265,7 @@ class PolicyTerms extends PolicyDocument
             return false;
         } else {
             // Just a sanity check.
-            return $excess && $excess->getMin() > 0 && $excess->getMax() < 400;
+            return $excess && $excess->getMin() > 0;
         }
     }
 }
