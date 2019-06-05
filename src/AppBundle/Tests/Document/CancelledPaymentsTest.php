@@ -20,7 +20,7 @@ use AppBundle\Tests\UserClassTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class CancelledPaymentTest extends WebTestCase
+class CancelledPaymentsTest extends WebTestCase
 {
     use UserClassTrait;
     use DateTrait;
@@ -153,7 +153,7 @@ class CancelledPaymentTest extends WebTestCase
 
     public function getOldUnpaid()
     {
-        $last = new DateTime();
+        $last = new \DateTime();
         if (self::$policy->getLastSuccessfulUserPaymentCredit()) {
             /** @var \AppBundle\Repository\ScheduledPaymentRepository $spr */
             $last = self::$policy->getLastSuccessfulUserPaymentCredit()->getDate();
