@@ -49,29 +49,26 @@ $(function() {
              memory.resizeselect();
         }
 
-        $(window).on('load', function() {
+        updateModels();
+        updateMemory();
 
-            updateModels();
-            updateMemory();
+        make.resizeselect();
+        model.resizeselect();
 
-            make.resizeselect();
-            model.resizeselect();
+        memory.on('change', function() {
 
-            memory.on('change', function() {
+            if ($(this).val()) {
+                $(this).addClass('valid-select');
+                sizeTxt.toggleText('for exact price', 'get covered today');
+                button.prop('disabled', '').addClass('animated heartBeat');
 
-                if ($(this).val()) {
-                    $(this).addClass('valid-select');
-                    sizeTxt.toggleText('for exact price', 'get covered today');
-                    button.prop('disabled', '').addClass('animated heartBeat');
-
-                } else {
-                    $(this).removeClass('valid-select');
-                    sizeTxt.toggleText('for exact price', 'get covered today');
-                    button.prop('disabled', 'disabled');
-                }
-
-            });
+            } else {
+                $(this).removeClass('valid-select');
+                sizeTxt.toggleText('for exact price', 'get covered today');
+                button.prop('disabled', 'disabled');
+            }
 
         });
+
     }
 });
