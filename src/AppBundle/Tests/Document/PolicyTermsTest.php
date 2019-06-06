@@ -35,12 +35,12 @@ class PolicyTermsTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($terms->isAllowedExcess(PolicyTerms::getHighExcess()));
         $this->assertFalse($terms->isAllowedExcess(PolicyTerms::getLowExcess()));
-        $this->assertTrue($terms->isAllowedPicSureExcess(PolicyTerms::getLowExcess()));
-        $this->assertFalse($terms->isAllowedPicSureExcess(PolicyTerms::getHighExcess()));
+        $this->assertTrue($terms->isAllowedExcess(PolicyTerms::getLowExcess(), true));
+        $this->assertFalse($terms->isAllowedExcess(PolicyTerms::getHighExcess(), true));
 
         $this->assertTrue($nonPicSureTerms->isAllowedExcess(PolicyTerms::getLowExcess()));
         $this->assertFalse($nonPicSureTerms->isAllowedExcess(PolicyTerms::getHighExcess()));
-        $this->assertFalse($nonPicSureTerms->isAllowedPicSureExcess(PolicyTerms::getLowExcess()));
-        $this->assertFalse($nonPicSureTerms->isAllowedPicSureExcess(PolicyTerms::getHighExcess()));
+        $this->assertFalse($nonPicSureTerms->isAllowedExcess(PolicyTerms::getLowExcess(), true));
+        $this->assertFalse($nonPicSureTerms->isAllowedExcess(PolicyTerms::getHighExcess(), true));
     }
 }
