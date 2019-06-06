@@ -165,21 +165,7 @@ class PolicyTerms extends PolicyDocument
      */
     public function isStaticExcessEnabled()
     {
-        return in_array($this->getVersion(), [
-            self::VERSION_0,
-            self::VERSION_1,
-            self::VERSION_2,
-            self::VERSION_3,
-            self::VERSION_4,
-            self::VERSION_5,
-            self::VERSION_6,
-            self::VERSION_7,
-            self::VERSION_8,
-            self::VERSION_9,
-            self::VERSION_10,
-            self::VERSION_11,
-            self::VERSION_12
-        ]);
+        return $this->getVersionNumber() < $this->getVersionNumberByVersion(self::VERSION_13);
     }
 
     public function getAllowedExcesses()
