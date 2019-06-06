@@ -246,8 +246,8 @@ class PolicyTerms extends PolicyDocument
 
     /**
      * Checks that a given excess is equivalent to one stored within a list of excesses.
-     * @param PhoneExcess $excess          is the excess to check for.
-     * @param array       $allowedExcesses is the list of excesses to check in.
+     * @param PhoneExcess|null $excess          is the excess to check for.
+     * @param array            $allowedExcesses is the list of excesses to check in.
      * @return boolean true if the excess is in the list, and false if not.
      */
     private function checkExcess(PhoneExcess $excess, $allowedExcesses)
