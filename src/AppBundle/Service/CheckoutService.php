@@ -384,12 +384,9 @@ class CheckoutService
                 if ($policy->getLastSuccessfulUserPaymentCredit()) {
                     $lastSuccess = $policy->getLastSuccessfulUserPaymentCredit()->getDate();
                     $oldUnpaid = $scheduledPaymentRepo->getPastScheduledWithNoStatusUpdate($policy, $lastSuccess);
-                    /** @var ScheduledPayment $sp */
-                    foreach ($oldUnpaid as $sp) {
-                        $status = $sp->getStatus();
-                        if ($status === "scheduled") {
-                            $sp->cancel('Cancelling old scheduled as payment made to bring up to date');
-                        }
+                    /** @var ScheduledPayment $scheduledPayment */
+                    foreach ($oldUnpaid as $scheduledPayment) {
+                        $scheduledPayment->cancel('Cancelling old scheduled as payment made to bring up to date');
                         $this->dm->flush();
                     }
                 }

@@ -130,7 +130,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
     {
         return $this->createQueryBuilder()
             ->field('policy')->references($policy)
-            ->field("status")->equals('scheduled')
+            ->field("status")->equals(ScheduledPayment::STATUS_SCHEDULED)
             ->field("scheduled")->lt($date)
             ->sort("scheduled", "desc")
             ->getQuery()
