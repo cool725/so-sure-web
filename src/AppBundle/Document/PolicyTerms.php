@@ -252,7 +252,7 @@ class PolicyTerms extends PolicyDocument
      */
     private function checkExcess(PhoneExcess $excess, $allowedExcesses)
     {
-        foreach($allowedExcesses as $allowed) {
+        foreach ($allowedExcesses as $allowed) {
             if ($allowed->equal($excess)) {
                 return true;
             }
