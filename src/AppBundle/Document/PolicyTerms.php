@@ -250,7 +250,7 @@ class PolicyTerms extends PolicyDocument
      * @param array            $allowedExcesses is the list of excesses to check in.
      * @return boolean true if the excess is in the list, and false if not.
      */
-    private function checkExcess(PhoneExcess $excess, $allowedExcesses)
+    private function checkExcess(PhoneExcess $excess = null, $allowedExcesses)
     {
         foreach ($allowedExcesses as $allowed) {
             if ($allowed->equal($excess)) {
