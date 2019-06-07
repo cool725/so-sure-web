@@ -775,6 +775,7 @@ class BICommand extends ContainerAwareCommand
         $lines = [];
         $lines[] = implode(',', [
             "Date",
+            "Payment ID",
             "Transaction ID",
             "Result",
             "Policy Number",
@@ -789,6 +790,7 @@ class BICommand extends ContainerAwareCommand
 
             $lines[] = implode(',', [
                 $transaction->getDate()->format('jS M Y H:i'),
+                $transaction->getId(),
                 $transaction->getReceipt(),
                 $transaction->getResult(),
                 $policy->getPolicyNumber(),
