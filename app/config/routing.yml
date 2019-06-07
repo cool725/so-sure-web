@@ -861,3 +861,10 @@ redirect_seo_xperia:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /phone-insurance/sony+xperia+zx
         permanent: true
+
+redirect_register_page:
+    path: /register
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
