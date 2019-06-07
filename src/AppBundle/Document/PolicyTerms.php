@@ -159,6 +159,15 @@ class PolicyTerms extends PolicyDocument
         ]);
     }
 
+    /**
+     * Tells us whether we should use the global hard coded excesses for these policy terms.
+     * @return boolean true if we should use hard coded excess and false if not.
+     */
+    public function isStaticExcessEnabled()
+    {
+        return $this->getVersionNumber() < static::getVersionNumberByVersion(self::VERSION_13);
+    }
+
     public function getAllowedExcesses()
     {
         if ($this->isPicSureEnabled()) {
@@ -204,27 +213,36 @@ class PolicyTerms extends PolicyDocument
         }
     }
 
-    public function isAllowedExcess(PhoneExcess $excess = null)
+    /**
+     * Validates that the given excess is acceptable.
+     * @param PhoneExcess|null $excess  is the excess to validate.
+     * @param boolean          $picsure is whether to validate for picsure excess or normal excess.
+     * @return boolean true if the excess is acceptable and false if not.
+     */
+    public function isAllowedExcess(PhoneExcess $excess = null, $picsure = false)
     {
-        foreach ($this->getAllowedExcesses() as $allowedExcess) {
-            /** @var PhoneExcess $allowedExcess */
-            if ($allowedExcess->equal($excess)) {
-                return true;
-            }
+        if ($this->isStaticExcessEnabled()) {
+            return $this->checkExcess(
+                $excess,
+                $picsure ? $this->getAllowedPicSureExcesses() : $this->getAllowedExcesses()
+            );
         }
-
-        return false;
+        return $excess && $excess->getMin() > 0;
     }
 
-    public function isAllowedPicSureExcess(PhoneExcess $excess = null)
+    /**
+     * Checks that a given excess is equivalent to one stored within a list of excesses.
+     * @param PhoneExcess|null $excess          is the excess to check for.
+     * @param array            $allowedExcesses is the list of excesses to check in.
+     * @return boolean true if the excess is in the list, and false if not.
+     */
+    private function checkExcess(PhoneExcess $excess = null, $allowedExcesses = [])
     {
-        foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
-            /** @var PhoneExcess $allowedExcess */
-            if ($allowedExcess->equal($excess)) {
+        foreach ($allowedExcesses as $allowed) {
+            if ($allowed->equal($excess)) {
                 return true;
             }
         }
-
         return false;
     }
 }
