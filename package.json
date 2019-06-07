@@ -48,6 +48,7 @@
     "jquery-circle-progress": "^1.2.2",
     "jquery-mask-plugin": "^1.14.15",
     "jquery-validation": "^1.17.0",
+    "js-yaml": "^3.13.1",
     "js.cookie": "^0.0.4",
     "jssocials": "git://github.com/so-sure/jssocials.git#master",
     "lozad": "^1.8.0",
