@@ -61,7 +61,7 @@ class PolicyBreakdownCommand extends ContainerAwareCommand
 
         $this->mailerService->sendTemplate(
             sprintf('so-sure Policy Breakdown Report'),
-            ['patrick@so-sure.com','dylan@so-sure.com'],
+            ['julien@so-sure.com','dylan@so-sure.com'],
             'AppBundle:Email:claimsHandler/breakdown.html.twig',
             [],
             null,

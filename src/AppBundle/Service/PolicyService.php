@@ -1847,7 +1847,7 @@ class PolicyService
         if (!$dryRun) {
             $this->mailer->sendTemplate(
                 'Biweekly cashback report',
-                ['dylan@so-sure.com', 'patrick@so-sure.com'],
+                ['dylan@so-sure.com', 'julien@so-sure.com'],
                 'AppBundle:Email:cashback/cashback_reminder.html.twig',
                 ['cashbacks' => $cashbacks]
             );

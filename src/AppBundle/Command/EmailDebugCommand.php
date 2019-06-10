@@ -343,8 +343,8 @@ class EmailDebugCommand extends ContainerAwareCommand
                 $policy = new PhonePolicy();
                 $policy->setPolicyNumber('Invalid/123');
                 $user = new User();
-                $user->setEmail('patrick@so-sure.com');
-                $user->setFirstName('Patrick');
+                $user->setEmail('julien@so-sure.com');
+                $user->setFirstName('Jules');
                 $user->setLastName('McAndrew');
                 $policy->setUser($user);
                 return $this->mailerService->trustpilot($policy, MailerService::TRUSTPILOT_PURCHASE);
