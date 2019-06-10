@@ -1098,6 +1098,7 @@ nelmio_security:
                 - https://developer.starlingbank.com
                 - https://track.omguk.com
                 - https://translate.google.com
+                - https://tapjoy.go2cloud.org
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

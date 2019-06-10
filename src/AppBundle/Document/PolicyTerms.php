@@ -165,21 +165,7 @@ class PolicyTerms extends PolicyDocument
      */
     public function isStaticExcessEnabled()
     {
-        return in_array($this->getVersion(), [
-            self::VERSION_0,
-            self::VERSION_1,
-            self::VERSION_2,
-            self::VERSION_3,
-            self::VERSION_4,
-            self::VERSION_5,
-            self::VERSION_6,
-            self::VERSION_7,
-            self::VERSION_8,
-            self::VERSION_9,
-            self::VERSION_10,
-            self::VERSION_11,
-            self::VERSION_12
-        ]);
+        return $this->getVersionNumber() < static::getVersionNumberByVersion(self::VERSION_13);
     }
 
     public function getAllowedExcesses()
@@ -228,44 +214,35 @@ class PolicyTerms extends PolicyDocument
     }
 
     /**
-     * Validates that the given excess is acceptable considering the policy may not have completed picsure.
-     * @param PhoneExcess|null $excess is the excess to validate.
+     * Validates that the given excess is acceptable.
+     * @param PhoneExcess|null $excess  is the excess to validate.
+     * @param boolean          $picsure is whether to validate for picsure excess or normal excess.
      * @return boolean true if the excess is acceptable and false if not.
      */
-    public function isAllowedExcess(PhoneExcess $excess = null)
+    public function isAllowedExcess(PhoneExcess $excess = null, $picsure = false)
     {
         if ($this->isStaticExcessEnabled()) {
-            foreach ($this->getAllowedExcesses() as $allowedExcess) {
-                /** @var PhoneExcess $allowedExcess */
-                if ($allowedExcess->equal($excess)) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            // Just a sanity check.
-            return $excess && $excess->getMin() > 0;
+            return $this->checkExcess(
+                $excess,
+                $picsure ? $this->getAllowedPicSureExcesses() : $this->getAllowedExcesses()
+            );
         }
+        return $excess && $excess->getMin() > 0;
     }
 
     /**
-     * Validates that the given excess is acceptable for the policy, having completed picsure.
-     * @param PhoneExcess|null $excess is the excess to validate.
-     * @return boolean true if the excess is acceptable and false if not.
+     * Checks that a given excess is equivalent to one stored within a list of excesses.
+     * @param PhoneExcess|null $excess          is the excess to check for.
+     * @param array            $allowedExcesses is the list of excesses to check in.
+     * @return boolean true if the excess is in the list, and false if not.
      */
-    public function isAllowedPicSureExcess(PhoneExcess $excess = null)
+    private function checkExcess(PhoneExcess $excess = null, $allowedExcesses = [])
     {
-        if ($this->isStaticExcessEnabled()) {
-            foreach ($this->getAllowedPicSureExcesses() as $allowedExcess) {
-                /** @var PhoneExcess $allowedExcess */
-                if ($allowedExcess->equal($excess)) {
-                    return true;
-                }
+        foreach ($allowedExcesses as $allowed) {
+            if ($allowed->equal($excess)) {
+                return true;
             }
-            return false;
-        } else {
-            // Just a sanity check.
-            return $excess && $excess->getMin() > 0;
         }
+        return false;
     }
 }

@@ -64,73 +64,71 @@ $(function() {
             }
         }
 
-        $(window).on('load', function() {
+        quote.removeClass('disabled');
+
+        updateModels();
+
+        make.resizeselect();
+
+        make.on('change', function() {
 
             updateModels();
 
-            make.resizeselect();
-            quote.removeClass('disabled');
+            if ($(this).val()) {
+                model.prop('disabled', '');
+                $(this).addClass('valid-select');
 
-            make.on('change', function() {
+                let value = $(this).val();
 
-                updateModels();
-
-                if ($(this).val()) {
-                    model.prop('disabled', '');
-                    $(this).addClass('valid-select');
-
-                    let value = $(this).val();
-
-                    if (value.charAt(0).match(/[AEIOU]/)) {
-                        arule.text('an')
-                    } else {
-                        arule.text('a')
-                    }
-
+                if (value.charAt(0).match(/[AEIOU]/)) {
+                    arule.text('an')
                 } else {
-                    model.prop('disabled', 'disabled').val('');
-                    $(this).removeClass('valid-select');
+                    arule.text('a')
                 }
 
+            } else {
+                model.prop('disabled', 'disabled').val('');
+                $(this).removeClass('valid-select');
+            }
+
+            button.prop('disabled', 'disabled')
+            .removeClass('btn-success btn-green-gradient')
+            .addClass('btn-outline-white');
+
+            model.resizeselect();
+
+        });
+
+        model.on('change', function() {
+
+            updateMemory();
+
+            if ($(this).val()) {
+                memory.prop('disabled', '');
+                $(this).addClass('valid-select');
+            } else {
+                memory.prop('disabled', 'disabled').val('');
+                $(this).removeClass('valid-select');
+            }
+
+            memory.resizeselect();
+
+        });
+
+        memory.on('change', function() {
+
+            if ($(this).val()) {
+                $(this).addClass('valid-select');
+                button.prop('disabled', '')
+                .removeClass('btn-outline-white')
+                .addClass('btn-success btn-green-gradient');
+            } else {
+                $(this).removeClass('valid-select');
                 button.prop('disabled', 'disabled')
                 .removeClass('btn-success btn-green-gradient')
                 .addClass('btn-outline-white');
+            }
 
-                model.resizeselect();
-
-            });
-
-            model.on('change', function() {
-
-                updateMemory();
-
-                if ($(this).val()) {
-                    memory.prop('disabled', '');
-                    $(this).addClass('valid-select');
-                } else {
-                    memory.prop('disabled', 'disabled').val('');
-                    $(this).removeClass('valid-select');
-                }
-
-                memory.resizeselect();
-
-            });
-
-            memory.on('change', function() {
-
-                if ($(this).val()) {
-                    $(this).addClass('valid-select');
-                    button.prop('disabled', '')
-                    .removeClass('btn-outline-white')
-                    .addClass('btn-success btn-green-gradient');
-                } else {
-                    $(this).removeClass('valid-select');
-                    button.prop('disabled', 'disabled')
-                    .removeClass('btn-success btn-green-gradient')
-                    .addClass('btn-outline-white');
-                }
-
-            });
         });
     }
 });

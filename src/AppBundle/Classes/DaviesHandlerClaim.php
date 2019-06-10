@@ -65,7 +65,7 @@ class DaviesHandlerClaim extends HandlerClaim
     public static $invoiceEmailAddresses = [
         'accounts.payable@davies-group.com',
         'laura.harvey@davies-group.com',
-        'patrick@so-sure.com',
+        'julien@so-sure.com',
         'dylan@so-sure.com',
     ];
 
@@ -76,7 +76,7 @@ class DaviesHandlerClaim extends HandlerClaim
         'Owen.Pugh@davies-group.com',
         'Katie.Molyneux@davies-group.com',
         'Thomas.Gibbs@davies-group.com',
-        'patrick@so-sure.com',
+        'julien@so-sure.com',
         'dylan@so-sure.com',
         'kitti@so-sure.com'
     ];
