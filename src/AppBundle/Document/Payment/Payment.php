@@ -585,7 +585,7 @@ abstract class Payment
             $this->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION * $fraction);
         } else {
             throw new \Exception(sprintf(
-                'Failed set correct commission for %f (policy %s)',
+                'Failed to set correct commission for %f (policy %s)',
                 $this->getAmount(),
                 $this->getPolicy()->getId()
             ));

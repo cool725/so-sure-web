@@ -155,25 +155,63 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests setting the commission for payments that will be fractional.
+     * Tests setting the commission for payments that will be fractional and positive or negative.
      */
-    public function testSetCommissionFractions()
+    public function testSetCommissionFractionsKnownError()
     {
+        $amount = -1.47;
         $policy = new PhonePolicy();
         $premium = new PhonePremium();
-        $premium->setGwp(5);
-        $premium->setIpt(1);
+        $premium->setGwp(8.92);
+        $premium->setIpt(1.07);
         $policy->setPremium($premium);
+        $previousPayment = new BacsPayment();
+        $previousPayment->setAmount(9.99);
+        $policy->addPayment($previousPayment);
         $payment = new BacsPayment();
-        $payment->setAmount(-0.3);
+        $policy->addPayment($payment);
+        $payment->setAmount($amount);
+        $payment->setCommission(true);
+        // Assure that the commission is now correctly set.
+        var_dump($payment->getTotalCommission());
+        $this->assertEquals(
+            abs(Salva::MONTHLY_TOTAL_COMMISSION * (-1.47 / 9.99)),
+            abs($payment->getTotalCommission()),
+            '',
+            0.01
+        );
     }
 
     /**
-     * Tests setting the commission for payments that will be fractional.
+     * Tests setting the commission for payments that will be fractional and positive or negative.
      */
-    public function testSetCommissionRefundFractions()
+    public function testSetCommissionFractions()
     {
-
+        for ($i = 0; $i < 5000; $i++) {
+            $amount = rand(1, 20) / 4 * (rand(0, 1) ? 1 : -1);
+            var_dump($amount);
+            $proportion = rand(1, 100) / 100;
+            $split = rand(0, 100) / 100;
+            $policy = new PhonePolicy();
+            $premium = new PhonePremium();
+            $premium->setGwp(abs($amount) * (1 / $proportion) * $split);
+            $premium->setIpt(abs($amount) * (1 / $proportion) * (1 - $split));
+            $policy->setPremium($premium);
+            $previousPayment = new BacsPayment();
+            $previousPayment->setAmount(abs($amount) * (1 / $proportion));
+            $policy->addPayment($previousPayment);
+            $payment = new BacsPayment();
+            $policy->addPayment($payment);
+            $payment->setAmount($amount);
+            $payment->setCommission(true);
+            // Assure that the commission is now correctly set.
+            $this->assertEquals(
+                Salva::MONTHLY_TOTAL_COMMISSION * $proportion,
+                abs($payment->getTotalCommission()),
+                '',
+                0.01
+            );
+        }
     }
 
     public function testTimezone()
