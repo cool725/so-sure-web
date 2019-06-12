@@ -50,7 +50,7 @@
         {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'e.g. 83748596', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
     </div>
-    
+
     <div class="form-group {% if form_errors(bacs_form.validateAccountNumber) %}has-error{% endif %}">
         {{ form_label(bacs_form.validateAccountNumber, 'Confirm account number', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="bacs_form[accountNumber]" class="text-secondary">
@@ -67,7 +67,7 @@
         {{ form_widget(bacs_form.validateAccountNumber, {'attr': {'placeholder': '👆', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.validateAccountNumber) }}</div>
     </div>
-    
+
     <div class="form-group {% if form_errors(bacs_form.billingDate) %}has-error{% endif %}">
         {{ form_label(bacs_form.billingDate, 'Billing date', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="bacs_form[accountNumber]" class="text-secondary">
@@ -83,7 +83,7 @@
         </label>
         {{ form_widget(bacs_form.billingDate, {'attr': {'class': 'form-control', 'data-hj-suppress': ''}}) }}
         <div class="with-errors">{{ form_errors(bacs_form.billingDate) }}</div>
-    </div>    
+    </div>
 
     <div class="form-group">
         {{ form_widget(bacs_form.soleSignature, {
@@ -118,7 +118,7 @@
         <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px">
         <small class="form-text mb-2 ml-2">
             Payments protected by the <a href="#" data-toggle="modal" data-target="#direct_debit_guarantee"><u>Direct Debit Guarantee</u></a>.
-            so-sure Ltd, Martin House, 5 Martin Lane, London EC4R 0DP <br>
+            so-sure Ltd, {{ business_address|replace({'\n':','}) }}<br>
             <a href="mailto:support@wearesosure.com">support@wearesosure.com</a>
         </small>
     </div>
