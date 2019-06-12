@@ -579,7 +579,7 @@ abstract class Payment
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
-        } elseif ($allowFraction &&
+        } elseif ($allowFraction && $policy &&
             abs($this->getAmount()) <= $this->getPolicy()->getPremium()->getMonthlyPremiumPrice()
         ) {
             $amount = $this->getAmount();
