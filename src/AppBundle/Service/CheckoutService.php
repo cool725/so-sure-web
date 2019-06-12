@@ -1563,7 +1563,7 @@ class CheckoutService
         return $payment;
     }
 
-    public function ¬setCommission($payment, $allowFraction = false)
+    public function setCommission($payment, $allowFraction = false)
     {
         try {
             $payment->setCommission($allowFraction);
