@@ -77,20 +77,9 @@ class PaymentTest extends WebTestCase
 
     private static function createValidUser($email)
     {
-        try {
-            /** @var User $user */
-            $user = static::createUser(self::$userManager, $email, 'foo');
-        } catch (\Exception $e) {
-            var_dump("Valid user could not be created - ");
-            var_dump($e->getMessage());
-        }
-
-        try {
-            $mobile = static::generateRandomMobile();
-        } catch (\Exception $e) {
-            var_dump("Could not create random mobile - ");
-            var_dump($e->getMessage());
-        }
+        /** @var User $user */
+        $user = static::createUser(self::$userManager, $email, 'foo');
+        $mobile = static::generateRandomMobile();
 
         $user->setFirstName('foo');
         $user->setLastName('bar');
