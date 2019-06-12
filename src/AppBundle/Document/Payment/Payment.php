@@ -7,6 +7,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Policy;
+use AppBundle\Exception\CommissionException;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -584,7 +585,9 @@ abstract class Payment
             $fraction = $this->getAmount() / $this->getPolicy()->getPremium()->getMonthlyPremiumPrice();
             $this->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION * $fraction);
         } else {
-            throw new \Exception(sprintf(
+            $fraction = $this->getAmount() / $this->getPolicy()->getPremium()->getMonthlyPremiumPrice();
+            $this->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION * $fraction);
+            throw new CommissionException(sprintf(
                 'Failed set correct commission for %f (policy %s)',
                 $this->getAmount(),
                 $this->getPolicy()->getId()

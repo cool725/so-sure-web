@@ -10,6 +10,7 @@ use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\PaymentDeclinedException;
@@ -1557,7 +1558,7 @@ class PurchaseController extends BaseController
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
-        } catch (PaymentDeclinedException $e) {
+        } catch (\PaymentDeclinedException $e) {
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1570,6 +1571,13 @@ class PurchaseController extends BaseController
                 return new RedirectResponse($redirectFailure);
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+            }
+        } catch (\CommissionException $e) {
+            $logger->error($e->getMessage());
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectSuccess);
+            } else {
+                return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
             $this->addFlash('error', $errorMessage);

@@ -9,6 +9,7 @@ use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Exception\CommissionException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
@@ -888,7 +889,19 @@ class CheckoutService
                 $payment->setResult($details->getStatus());
                 $payment->setMessage($details->getResponseMessage());
                 $payment->setRiskScore($details->getRiskCheck());
-                $this->setCommission($payment);
+                $throwLater = false;
+                try {
+                    $this->setCommission($payment, true);
+                } catch (CommissionException $e) {
+                    /**
+                     * The one place that uses this exception at the moment does not require this method
+                     * to return anything. So, we will re throw the error later, that way this will
+                     * not interfere with anywhere else that uses this method, but give us there result
+                     * that we want where we want it.
+                     */
+                    $throwLater = true;
+                    $thingToThrow = $e;
+                }
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             }
 
@@ -972,6 +985,9 @@ class CheckoutService
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
+        if ($throwLater) {
+            throw new $thingToThrow;
+        }
         return $details;
     }
 
@@ -1109,7 +1125,7 @@ class CheckoutService
             throw new PaymentDeclinedException();
         }
 
-        $this->setCommission($payment);
+        $this->setCommission($payment, true);
 
         return $payment;
     }
@@ -1547,10 +1563,10 @@ class CheckoutService
         return $payment;
     }
 
-    public function setCommission($payment)
+    public function ¬setCommission($payment, $allowFraction = false)
     {
         try {
-            $payment->setCommission();
+            $payment->setCommission($allowFraction);
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }
