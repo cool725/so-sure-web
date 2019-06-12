@@ -49,7 +49,7 @@ class PaymentTest extends WebTestCase
         /** @var DocumentManager */
         $dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
         static::$dm = $dm;
-        static::$userRepo = static::$dm->getRepository('User');
+        static::$userRepo = static::$dm->getRepository(User::class);
         static::$userManager = static::$container->get('fos_user.user_manager');
         static::$policyService = static::$container->get('app.policy');
         /** @var CheckoutService $checkout */
