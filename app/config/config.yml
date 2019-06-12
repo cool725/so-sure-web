@@ -832,7 +832,7 @@ nelmio_security:
                 - 'data:'
                 - https://bat.bing.com
                 - https://www.gstatic.com
-                - https://secure.quantserve.com
+                - https://*.quantserve.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1101,6 +1101,7 @@ nelmio_security:
                 - https://track.omguk.com
                 - https://translate.google.com
                 - https://tapjoy.go2cloud.org
+                - https://*.quantserve.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
