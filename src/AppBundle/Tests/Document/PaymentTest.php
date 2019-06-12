@@ -211,7 +211,6 @@ class PaymentTest extends WebTestCase
     }
 
     /**
-     * @group blake
      * @expectedException \AppBundle\Exception\CommissionException
      */
     public function testSetCommissionRemainderFailsWithFalse()
@@ -236,9 +235,6 @@ class PaymentTest extends WebTestCase
         $payment->setCommission(false);
     }
 
-    /**
-     * @group blake
-     */
     public function testSetCommissionRemainderDoesNotFailWithTrue()
     {
         $now = new \DateTime();
