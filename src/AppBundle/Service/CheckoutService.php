@@ -837,6 +837,8 @@ class CheckoutService
      */
     public function updatePaymentMethod(Policy $policy, $token, $amount = null)
     {
+        $throwLater = false;
+        $thingToThrow = null;
         $user = $policy->getUser();
         $details = null;
         $payment = null;
@@ -889,7 +891,6 @@ class CheckoutService
                 $payment->setResult($details->getStatus());
                 $payment->setMessage($details->getResponseMessage());
                 $payment->setRiskScore($details->getRiskCheck());
-                $throwLater = false;
                 try {
                     $this->setCommission($payment, true);
                 } catch (CommissionException $e) {

@@ -7,21 +7,16 @@ use AppBundle\Document\Address;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
-use AppBundle\Document\Policy;
-use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Tests\UserClassTrait;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -37,11 +32,9 @@ class PaymentTest extends WebTestCase
     protected static $dm;
     /** @var CheckoutService */
     protected static $checkout;
-    /** @var UserRepository */
     protected static $userRepo;
     /** @var User */
     protected static $user;
-    /** @var PolicyService */
     protected static $policyService;
 
     public static function setUpBeforeClass()
@@ -50,22 +43,22 @@ class PaymentTest extends WebTestCase
         $kernel = static::createKernel();
         $kernel->boot();
         //get the DI container
-        self::$container = $kernel->getContainer();
+        static::$container = $kernel->getContainer();
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         /** @var DocumentManager */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        self::$dm = $dm;
-        self::$userRepo = self::$dm->getRepository(User::class);
-        self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$policyService = self::$container->get('app.policy');
+        $dm = static::$container->get('doctrine_mongodb.odm.default_document_manager');
+        static::$dm = $dm;
+        static::$userRepo = static::$dm->getRepository('User');
+        static::$userManager = static::$container->get('fos_user.user_manager');
+        static::$policyService = static::$container->get('app.policy');
         /** @var CheckoutService $checkout */
-        $checkout = self::$container->get('app.checkout');
-        self::$checkout = $checkout;
-        self::$user = self::createValidUser(
-            self::generateEmail(
+        $checkout = static::$container->get('app.checkout');
+        static::$checkout = $checkout;
+        static::$user = static::createValidUser(
+            static::generateEmail(
                 'cancelledpaymentstestuser',
-                self::returnSelf(),
+                static::returnSelf(),
                 true
             )
         );
@@ -78,7 +71,7 @@ class PaymentTest extends WebTestCase
     private static function createValidUser($email)
     {
         /** @var User $user */
-        $user = static::createUser(self::$userManager, $email, 'foo');
+        $user = static::createUser(static::$userManager, $email, 'foo');
         $mobile = static::generateRandomMobile();
 
         $user->setFirstName('foo');
@@ -103,10 +96,10 @@ class PaymentTest extends WebTestCase
         $date = new \DateTime('2016-05-01');
         $premium = $phonePrice->createPremium(null, $date);
 
-        $phonePolicy = self::initPolicy(
-            self::$user,
-            self::$dm,
-            self::getRandomPhone(self::$dm)
+        $phonePolicy = static::initPolicy(
+            static::$user,
+            static::$dm,
+            static::getRandomPhone(static::$dm)
         );
 
         $phonePolicy->setPremium($premium);
@@ -158,10 +151,10 @@ class PaymentTest extends WebTestCase
 
     public function testSetCommissionMonthly()
     {
-        $policy = self::initPolicy(
-            self::$user,
-            self::$dm,
-            self::getRandomPhone(self::$dm)
+        $policy = static::initPolicy(
+            static::$user,
+            static::$dm,
+            static::getRandomPhone(static::$dm)
         );
 
         $premium = new PhonePremium();
@@ -195,10 +188,10 @@ class PaymentTest extends WebTestCase
 
     public function testSetCommissionYearly()
     {
-        $policy = self::initPolicy(
-            self::$user,
-            self::$dm,
-            self::getRandomPhone(self::$dm)
+        $policy = static::initPolicy(
+            static::$user,
+            static::$dm,
+            static::getRandomPhone(static::$dm)
         );
 
         $premium = new PhonePremium();
@@ -223,10 +216,10 @@ class PaymentTest extends WebTestCase
      */
     public function testSetCommissionRemainderFailsWithFalse()
     {
-        $policy = self::initPolicy(
-            self::$user,
-            self::$dm,
-            self::getRandomPhone(self::$dm)
+        $policy = static::initPolicy(
+            static::$user,
+            static::$dm,
+            static::getRandomPhone(static::$dm)
         );
 
         $premium = new PhonePremium();
@@ -250,10 +243,10 @@ class PaymentTest extends WebTestCase
     {
         $now = new \DateTime();
 
-        $policy = self::initPolicy(
-            self::$user,
-            self::$dm,
-            self::getRandomPhone(self::$dm),
+        $policy = static::initPolicy(
+            static::$user,
+            static::$dm,
+            static::getRandomPhone(static::$dm),
             $now,
             false,
             true,
@@ -275,7 +268,7 @@ class PaymentTest extends WebTestCase
 
         $commission = $payment->getTotalCommission();
         $this->assertGreaterThan(0, $commission);
-        self::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
+        static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
     }
 
     /**
@@ -283,10 +276,10 @@ class PaymentTest extends WebTestCase
      */
     public function testSetCommissionUnknown()
     {
-        $policy = self::initPolicy(
-            self::$user,
-            self::$dm,
-            self::getRandomPhone(self::$dm)
+        $policy = static::initPolicy(
+            static::$user,
+            static::$dm,
+            static::getRandomPhone(static::$dm)
         );
 
         $premium = new PhonePremium();

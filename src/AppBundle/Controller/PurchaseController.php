@@ -1459,6 +1459,7 @@ class PurchaseController extends BaseController
      */
     public function checkoutAction(Request $request, $id)
     {
+        $logger = $this->get('logger');
         $type = null;
         $successMessage = 'Success! Your payment has been successfully completed';
         $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
@@ -1486,7 +1487,6 @@ class PurchaseController extends BaseController
         }
 
         try {
-            $logger = $this->get('logger');
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
@@ -1558,7 +1558,7 @@ class PurchaseController extends BaseController
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
-        } catch (\PaymentDeclinedException $e) {
+        } catch (PaymentDeclinedException $e) {
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1572,7 +1572,7 @@ class PurchaseController extends BaseController
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
             }
-        } catch (\CommissionException $e) {
+        } catch (CommissionException $e) {
             $logger->error($e->getMessage());
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
