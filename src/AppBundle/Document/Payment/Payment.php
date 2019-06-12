@@ -565,6 +565,7 @@ abstract class Payment
 
         $salva = new Salva();
         $premium = $this->getPolicy()->getPremium();
+        $policy = $this->getPolicy();
 
         // Only set broker fees if we know the amount
         if ($this->areEqualToFourDp($this->getAmount(), $this->getPolicy()->getPremium()->getYearlyPremiumPrice())) {
@@ -581,8 +582,12 @@ abstract class Payment
         } elseif ($allowFraction &&
             abs($this->getAmount()) <= $this->getPolicy()->getPremium()->getMonthlyPremiumPrice()
         ) {
-            $fraction = $this->getAmount() / $this->getPolicy()->getPremium()->getMonthlyPremiumPrice();
-            $this->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION * $fraction);
+            $amount = $this->getAmount();
+            if ($amount < 0) {
+                $this->setTotalCommission($policy->getProratedCommissionRefund($this->getDate()));
+            } else {
+                $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
+            }
         } else {
             throw new \Exception(sprintf(
                 'Failed to set correct commission for %f (policy %s)',

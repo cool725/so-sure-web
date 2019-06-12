@@ -262,4 +262,14 @@ class PaymentService
 
         $this->dispatcher->dispatch(PolicyEvent::EVENT_BACS_CREATED, new PolicyEvent($policy));
     }
+
+    /**
+     * Sets the commission for a given payment taking into account abnormal payment amounts and the policy's schedule
+     * of payments.
+     * @param Payment $payment is the payment for which the commission will be set.
+     */
+    public function setCommission()
+    {
+        
+    }
 }
