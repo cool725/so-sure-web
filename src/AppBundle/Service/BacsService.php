@@ -858,7 +858,7 @@ class BacsService
                             ), ['exception' => $e]);
                         }
                     }
-                    $debitPayment->setRefundCommission($submittedPayment->getTotalCommission());
+                    $debitPayment->setCommissionRefund($submittedPayment->getTotalCommission());
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true, false);
