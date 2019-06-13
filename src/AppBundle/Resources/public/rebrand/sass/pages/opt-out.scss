@@ -1,4 +1,4 @@
-// ops.scss
+// opt-out.scss
 
 @import "../vendor/bs4/functions";
 @import "../vendor/bs4/variables";
@@ -8,6 +8,11 @@
 @import "../abstracts/variables";
 @import "../base/fonts";
 
-main {
-    padding: 6rem 0 8rem;
+body {
+    background-color: $selago;
 }
+
+.opt-out {
+    padding: 3rem 0;
+}
+
