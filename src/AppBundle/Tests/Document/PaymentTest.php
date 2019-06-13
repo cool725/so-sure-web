@@ -4,6 +4,8 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
@@ -11,6 +13,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
 
 /**
  * @group unit
@@ -18,6 +21,7 @@ use AppBundle\Document\CurrencyTrait;
 class PaymentTest extends \PHPUnit\Framework\TestCase
 {
     use CurrencyTrait;
+    use DateTrait;
 
     public static function setUpBeforeClass()
     {
@@ -154,38 +158,6 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setCommission();
     }
 
-    /**
-     * Tests setting the commission for payments that will be fractional and positive or negative.
-     */
-    public function testSetCommissionFractions()
-    {
-        for ($i = 0; $i < 5000; $i++) {
-            $amount = rand(1, 20) / 4 * (rand(0, 1) ? 1 : -1);
-            //var_dump($amount);
-            $proportion = rand(1, 100) / 100;
-            $split = rand(0, 100) / 100;
-            $policy = new PhonePolicy();
-            $premium = new PhonePremium();
-            $premium->setGwp(abs($amount) * (1 / $proportion) * $split);
-            $premium->setIpt(abs($amount) * (1 / $proportion) * (1 - $split));
-            $policy->setPremium($premium);
-            $previousPayment = new BacsPayment();
-            $previousPayment->setAmount(abs($amount) * (1 / $proportion));
-            $policy->addPayment($previousPayment);
-            $payment = new BacsPayment();
-            $policy->addPayment($payment);
-            $payment->setAmount($amount);
-            $payment->setCommission(true);
-            // Assure that the commission is now correctly set.
-            $this->assertEquals(
-                Salva::MONTHLY_TOTAL_COMMISSION * $proportion,
-                abs($payment->getTotalCommission()),
-                '',
-                0.01
-            );
-        }
-    }
-
     public function testTimezone()
     {
         $payments = [];
@@ -204,5 +176,107 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
         $daily = Payment::dailyPayments($payments, false, JudoPayment::class);
         $this->assertEquals(3, $daily[1]);
+    }
+
+    /**
+     * Tests setting the commission for a big payment will work fine.
+     */
+    public function testSetCommissionBigPayment()
+    {
+        $startDate = new \DateTime();
+        for ($rep = 0; $rep < 50; $rep++) {
+            // Set up policy dates.
+            $nextYear = clone $startDate;
+            $nextYear = $nextYear->modify('+1 year');
+            $nextYear->modify("-1 day");
+            $nextYear->setTime(23, 59, 59);
+            // set up policy.
+            $policy = new PhonePolicy();
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $policy->setStart($startDate);
+            $policy->setEnd($nextYear);
+            $policy->setStaticEnd($nextYear);
+            $premium = new PhonePremium();
+            $premium->setGwp(rand(10, 10000) / 100);
+            $premium->setIpt(rand(10, 10000) / 100);
+            $policy->setPremium($premium);
+            // set up payments.
+            $n = rand(0, 12);
+            $date = clone $startDate;
+            for ($i = 0; $i < $n; $i++) {
+                $this->addPayment($policy, $date);
+                $date->add(new \DateInterval("P1M"));
+            }
+            // Now do the payment at some point in the future at which the commission
+            $paymentDate = $this->addDays($date, rand(40, 100));
+            $payment = new CheckoutPayment();
+            $payment->setDate($paymentDate);
+            $payment->setAmount(rand(100, 200));
+            $policy->addPayment($payment);
+            // Make sure that the fractional commission is correct.
+            // Should be less than or equal to pro rata commission due.
+            $payment->setCommission(true);
+            $payment->setSuccess(true);
+            $this->assertTrue($policy->getProratedCommission($paymentDate) == $policy->getTotalCommissionPaid());
+        }
+    }
+
+    /**
+     * Tests that setting the commission for a fractional refund will give the correct commission value.
+     */
+    public function testSetCommissionFractionRefund()
+    {
+        $startDate = new \DateTime();
+        for ($rep = 0; $rep < 50; $rep++) {
+            // Set up policy dates.
+            $nextYear = clone $startDate;
+            $nextYear = $nextYear->modify('+1 year');
+            $nextYear->modify("-1 day");
+            $nextYear->setTime(23, 59, 59);
+            // set up policy.
+            $policy = new PhonePolicy();
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $policy->setStart($startDate);
+            $policy->setEnd($nextYear);
+
+            $policy->setStaticEnd($nextYear);
+            $premium = new PhonePremium();
+            $premium->setGwp(rand(10, 10000) / 100);
+            $premium->setIpt(rand(10, 10000) / 100);
+            $policy->setPremium($premium);
+            // set up payments.
+            $n = rand(0, 12);
+            $date = clone $startDate;
+            for ($i = 0; $i < $n; $i++) {
+                $this->addPayment($policy, $date);
+                $date->add(new \DateInterval("P1M"));
+            }
+            // the number of days past shouldn't be more than a month in reality, but this ought to work despite.
+            $refundDate = $this->addDays($date, rand(1, 66));
+            $payment = new CheckoutPayment();
+            $payment->setDate($refundDate);
+            $payment->setAmount(0 - ($premium->getMonthlyPremiumPrice() / rand(2, 100)));
+            $policy->addPayment($payment);
+            // Make sure that the fractional commission is correct.
+            // Should be less than or equal to pro rata commission due.
+            $payment->setCommissionRefund($date);
+            $payment->setSuccess(true);
+            $this->assertTrue($policy->getProratedCommission($date) >= $policy->getTotalCommissionPaid());
+        }
+    }
+
+    /**
+     * Create a normal premium payment for the given date and add it to the given policy.
+     * @param Policy    $policy is the policy to add the payment to and whose premium is used.
+     * @param \DateTime $date   is the date at which the payment occurs.
+     */
+    private function addPayment($policy, \DateTime $date)
+    {
+        $payment = new CheckoutPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setDate($date);
+        $policy->addPayment($payment);
+        $payment->setCommission();
+        $payment->setSuccess(true);
     }
 }

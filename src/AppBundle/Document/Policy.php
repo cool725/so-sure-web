@@ -3083,7 +3083,8 @@ abstract class Policy
      */
     public function getProratedCommissionRefund(\DateTime $date)
     {
-        return $this->toTwoDp($this->getTotalCommissionPaid() - $this->getProratedCommission($date));
+        $value = $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+        return $value < 0 ? $value : 0;
     }
 
     public function getDaysInPolicyYear()
