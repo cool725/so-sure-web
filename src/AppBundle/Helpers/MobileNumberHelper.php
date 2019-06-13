@@ -73,7 +73,6 @@ class MobileNumberHelper
      * internationalFormat = 00447700900000
      * Simple enough really, just prepend the required prefix onto the baseCli
      */
-
     public function getStandardFormat()
     {
         return '0' . $this->baseCli;
