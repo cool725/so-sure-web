@@ -890,6 +890,7 @@ services:
             - "@app.hubspot"
             - "@app.mixpanel"
             - "@app.judopay"
+            - "@app.checkout"
 
     app.annie:
         alias: AppBundle\Service\AppAnnieService
