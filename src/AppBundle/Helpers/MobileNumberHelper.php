@@ -14,6 +14,7 @@ class MobileNumberHelper
      * e.g. 7700900000
      *
      * MobileNumberHelper constructor.
+     *
      * @param string $cli Caller Line Identifier
      */
     public function __construct($cli)
@@ -26,7 +27,7 @@ class MobileNumberHelper
     }
 
     /**
-     * @param $cli
+     * @param string $cli
      */
     public function setOriginal($cli)
     {
