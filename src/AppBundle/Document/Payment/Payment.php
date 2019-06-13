@@ -612,7 +612,7 @@ abstract class Payment
                 $this->getId()
             ));
         } elseif (abs($amount) >= $policy->getPremium()->getMonthlyPremiumPrice()) {
-            throw new \Exeption(sprintf(
+            throw new \Exception(sprintf(
                 "Trying to set refund commission for %f refund %s greater than premium price.",
                 $amount,
                 $this->getId()
