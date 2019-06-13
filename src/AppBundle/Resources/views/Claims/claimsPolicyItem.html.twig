@@ -1522,7 +1522,7 @@
                       <th>Status</th>
                   </tr>
                   {% for payment in policy.payments if payment.amount != 0 or payment.totalCommission != 0 %}
-                    <tr>
+                    <tr class="{% if payment.isSuccess %}{% elseif payment.isSuccess is null %}danger{% else %}danger{% endif %}">
                         <td>
                             {% if payment.type == 'judo' %}
                                 <i class="fa fa-credit-card" title="JudoPay"></i>

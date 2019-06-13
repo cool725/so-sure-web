@@ -99,6 +99,7 @@ twig:
         cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
         rollbar_client_access_token: "%rollbar_client_access_token%"
         checkout_public_key: "%checkout_apipublic%"
+        business_address: "Relay Builiding\n 114 Whitechapel High Street\n London\n E1 7PT\n UK"
 
 doctrine_mongodb:
     connections:
@@ -524,6 +525,7 @@ nelmio_security:
                 - https://www.linkedin.com
                 - https://angel.co
                 - https://www.bing.com
+                - https://tr.snapchat.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -831,6 +833,9 @@ nelmio_security:
                 - 'data:'
                 - https://bat.bing.com
                 - https://www.gstatic.com
+                - https://*.quantserve.com
+                - https://secure.quantserve.com
+                - https://rules.quantcount.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1098,6 +1103,8 @@ nelmio_security:
                 - https://developer.starlingbank.com
                 - https://track.omguk.com
                 - https://translate.google.com
+                - https://tapjoy.go2cloud.org
+                - https://*.quantserve.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

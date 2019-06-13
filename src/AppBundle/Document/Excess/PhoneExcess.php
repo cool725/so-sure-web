@@ -120,6 +120,36 @@ class PhoneExcess extends Excess
         }
     }
 
+    /**
+     * Gives you the lowest type of excess's value.
+     * @return float the lowest excess.
+     */
+    public function getMin()
+    {
+        return min(
+            $this->getDamage(),
+            $this->getWarranty(),
+            $this->getExtendedWarranty(),
+            $this->getLoss(),
+            $this->getTheft()
+        );
+    }
+
+    /**
+     * Gives you the highest type of excess's value.
+     * @return float the highest excess.
+     */
+    public function getMax()
+    {
+        return max(
+            $this->getDamage(),
+            $this->getWarranty(),
+            $this->getExtendedWarranty(),
+            $this->getLoss(),
+            $this->getTheft()
+        );
+    }
+
     public function __toString()
     {
         return sprintf(

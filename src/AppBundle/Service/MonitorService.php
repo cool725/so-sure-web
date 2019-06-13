@@ -64,6 +64,9 @@ class MonitorService
     /** @var JudopayService */
     protected $judopay;
 
+    /** @var CheckoutService */
+    protected $checkout;
+
     protected $jsonEncodeOptions = 0;
 
     public function setJsonEncodeOptions($options)
@@ -79,6 +82,7 @@ class MonitorService
      * @param HubspotService  $hubspot
      * @param MixpanelService $mixpanel
      * @param JudopayService  $judopay
+     * @param CheckoutService $checkout
      */
     public function __construct(
         DocumentManager $dm,
@@ -87,7 +91,8 @@ class MonitorService
         IntercomService $intercom,
         HubspotService $hubspot,
         MixpanelService $mixpanel,
-        JudopayService $judopay
+        JudopayService $judopay,
+        CheckoutService $checkout
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -96,6 +101,7 @@ class MonitorService
         $this->hubspot = $hubspot;
         $this->mixpanel = $mixpanel;
         $this->judopay = $judopay;
+        $this->checkout = $checkout;
     }
 
     public function setDm(DocumentManager $dm)
@@ -479,6 +485,37 @@ class MonitorService
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
                 'Judopay has invalid database payment records. %s',
+                $this->quoteSafeArrayToString($results['invalid'])
+            ));
+            // @codingStandardsIgnoreEnd
+        }
+    }
+
+    public function checkoutReceipts()
+    {
+        $results = $this->checkout->getTransactions(50, false);
+        if (isset($results['additional-payments']) && count($results['additional-payments']) > 0) {
+            // @codingStandardsIgnoreStart
+            throw new MonitorException(sprintf(
+                'Checkout is recording more than 1 payment against a policy that indicates a scheduled payment issue. %s',
+                $this->quoteSafeArrayToString($results['additional-payments'])
+            ));
+            // @codingStandardsIgnoreEnd
+        }
+
+        if (isset($results['missing']) && count($results['missing']) > 0) {
+            // @codingStandardsIgnoreStart
+            throw new MonitorException(sprintf(
+                'Checkout is missing database payment records which indicates a mobile payment was received, but not recorded. %s',
+                $this->quoteSafeArrayToString($results['missing'])
+            ));
+            // @codingStandardsIgnoreEnd
+        }
+
+        if (isset($results['invalid']) && count($results['invalid']) > 0) {
+            // @codingStandardsIgnoreStart
+            throw new MonitorException(sprintf(
+                'Checkout has invalid database payment records. %s',
                 $this->quoteSafeArrayToString($results['invalid'])
             ));
             // @codingStandardsIgnoreEnd
