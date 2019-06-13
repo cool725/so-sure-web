@@ -1,45 +1,59 @@
-{% form_theme optin_form 'AppBundle:Form:fields.html.twig' %}
-{% form_theme optout_form 'AppBundle:Form:fields.html.twig' %}
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme optin_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
+{% form_theme optout_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'opt-out' %}
+
+{% block title %}so-sure - Communication Preferences{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/opt-out.css') }}">
+{% endblock %}
 
 {% block body %}
-    <section class="section--pad">
+
+    <section class="opt-out">
         <div class="container">
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <div class="panel panel-sosure">
-                        <div class="panel-body text-center">
-                            <h3>Manage your communication preferences</h3>
-                            <div class="h2">{{  email }}</div>
-                            <div class="optouts">
-                                <h4>Marketing Communications:</h4>
-                                {{ form_start(optin_form, { 'attr': {'class': ''}}) }}
-                                    <div class="form-group">
-                                        {{ form_widget(optin_form.categories) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ form_widget(optin_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-blue'}}) }}
-                                    </div>
-                                {{ form_end(optin_form) }}
-                                <h4>We respect your preferences</h4>
-                                <p class="lead">Beyond marketing communications, we also send emails related to your policy, reward pot, pic-sure and invitations from other members.</p>
-                                {{ form_start(optout_form) }}
-                                <div class="form-group">
+                <div class="col-md-8 offset-md-2">
+                    <h1 class="h4 mb-4">Communication preferences for {{ email }}</h1>
+                    <div class="cardbox cardbox-100 mb-4">
+                        <div class="cardbox__body">
+                            <h5 class="mb-3">Marketing Communications:</h5>
+                            {{ form_start(optin_form, { 'attr': {'class': ''}}) }}
+                                <div class="form-group mb-4">
+                                    {{ form_widget(optin_form.categories) }}
+                                </div>
+                                <div class="form">
+                                    {{ form_widget(optin_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-square btn-block-xs'}}) }}
+                                </div>
+                            {{ form_end(optin_form) }}
+                        </div>
+                    </div>
+                    <div class="cardbox cardbox-100">
+                        <div class="cardbox__body">
+                            <h5 class="mb-3">Preferences:</h5>
+                            <p class="mb-4">Beyond marketing communications, we also send emails related to your policy, reward pot, pic-sure and invitations from other members.</p>
+                            {{ form_start(optout_form, { 'attr': {'class': ''}}) }}
+                                <div class="form-group mb-4">
                                     {{ form_widget(optout_form.categories) }}
                                 </div>
                                 <div class="form-group">
-                                    {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-blue'}}) }}
+                                    {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-square btn-block-xs'}}) }}
                                 </div>
-                                {{ form_end(optout_form) }}
-                            </div>
+                            {{ form_end(optout_form) }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/opt-out.js') }}"></script>
 {% endblock %}
