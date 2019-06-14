@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * @group unit
  */
-class PaymentTest extends WebTestCase
+class PaymentFunctionalTest extends WebTestCase
 {
     use UserClassTrait;
     use DateTrait;
