@@ -1557,17 +1557,23 @@ class CheckoutService
 
         // TODO: Validate receipt does not set commission on failed payments, but token does
         // make consistent
-        $this->setCommission($payment);
+        $this->setCommission($payment, true);
 
         $this->triggerPaymentEvent($payment);
 
         return $payment;
     }
 
+    /**
+     * @param Payment $payment
+     * @param bool $allowFraction
+     */
     public function setCommission($payment, $allowFraction = false)
     {
         try {
             $payment->setCommission($allowFraction);
+        } catch (CommissionException $e){
+            throw new $e;
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }
