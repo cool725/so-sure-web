@@ -172,4 +172,47 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $daily = Payment::dailyPayments($payments, false, CheckoutPayment::class);
         $this->assertEquals(3, $daily[1]);
     }
+
+    /**
+     * @expectedException \AppBundle\Exception\CommissionException
+     */
+    public function testSetCommissionRemainderFailsWithFalse()
+    {
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $payment = new CheckoutPayment();
+        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+
+        $policy->addPayment($payment);
+
+        $payment->setCommission(false);
+    }
+
+    public function testSetCommissionRemainderDoesNotFailWithTrue()
+    {
+        $policy = new PhonePolicy();
+
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $payment = new CheckoutPayment();
+        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+
+        $policy->addPayment($payment);
+
+        $payment->setCommission(true);
+
+        $commission = $payment->getTotalCommission();
+        $this->assertGreaterThan(0, $commission);
+        static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
+    }
 }
