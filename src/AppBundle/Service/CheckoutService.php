@@ -987,7 +987,7 @@ class CheckoutService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         if ($throwLater) {
-            throw new $thingToThrow;
+            throw $thingToThrow;
         }
         return $details;
     }
@@ -1569,7 +1569,7 @@ class CheckoutService
         try {
             $payment->setCommission($allowFraction);
         } catch (CommissionException $e) {
-            throw new $e;
+            throw $e;
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }
