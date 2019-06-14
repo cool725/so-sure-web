@@ -3076,6 +3076,16 @@ abstract class Policy
         return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
     }
 
+    /**
+     * Gets the commission beyond a given point in time to refund.
+     * @param \DateTime $date is the date up to which commission is valid.
+     * @return float the amount of commission due on a refund for payments past the given date.
+     */
+    public function getProratedCommissionRefund(\DateTime $date)
+    {
+        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+    }
+
     public function getDaysInPolicyYear()
     {
         if (!$this->isPolicy() || !$this->getStart()) {

@@ -47,12 +47,12 @@ class PaymentFunctionalTest extends WebTestCase
      */
     public function testDuplicatePayment()
     {
-        $paymentA = new JudoPayment();
+        $paymentA = new CheckoutPayment();
         $paymentA->setReceipt(1);
         static::$dm->persist($paymentA);
         static::$dm->flush();
 
-        $paymentB = new JudoPayment();
+        $paymentB = new CheckoutPayment();
         $paymentB->setReceipt(1);
         static::$dm->persist($paymentB);
         static::$dm->flush();

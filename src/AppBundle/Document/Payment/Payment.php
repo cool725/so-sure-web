@@ -555,7 +555,6 @@ abstract class Payment
      */
     public function setCommission($allowFraction = false)
     {
-        $salva = new Salva();
         $policy = $this->getPolicy();
         if (!$policy) {
             throw new \Exception(sprintf(
@@ -564,6 +563,7 @@ abstract class Payment
                 $this->getId()
             ));
         }
+        $salva = new Salva();
         $premium = $policy->getPremium();
         $amount = $this->getAmount();
         // Only set broker fees if we know the amount
@@ -574,7 +574,6 @@ abstract class Payment
             $premium->isEvenlyDivisible($this->getAmount(), true)) {
             // payment should already be credited at this point
             $includeFinal = $this->areEqualToTwoDp(0, $this->getPolicy()->getOutstandingPremium());
-
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
@@ -587,39 +586,6 @@ abstract class Payment
                 $this->getPolicy()->getId()
             ));
         }
-    }
-
-    /**
-     * Sets the commission for a refund.
-     * @param \DateTime $date is the date of the payment that this refund is refunding and thus the period of pro rata
-     *                        commission payment to refund.
-     */
-    public function setCommissionRefund(\DateTime $date)
-    {
-        $amount = $this->getAmount();
-        $policy = $this->getPolicy();
-        // Validate.
-        if (!$policy) {
-            throw new \Exception(sprintf(
-                "Trying to set commission for %f refund %s without policy.",
-                $amount,
-                $this->getId()
-            ));
-        } elseif ($amount >= 0) {
-            throw new \Exception(sprintf(
-                "Trying to set refund commission for %f payment %s.",
-                $amount,
-                $this->getId()
-            ));
-        } elseif (abs($amount) >= $policy->getPremium()->getMonthlyPremiumPrice()) {
-            throw new \Exception(sprintf(
-                "Trying to set refund commission for %f refund %s greater than premium price.",
-                $amount,
-                $this->getId()
-            ));
-        }
-        // Set the commission.
-        $this->setRefundTotalCommission($policy->getProratedCommissionRefund($date));
     }
 
     /**

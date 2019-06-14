@@ -14,22 +14,15 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Tests\RandomTestCase;
 
 /**
  * @group unit
  */
-class PaymentTest extends \PHPUnit\Framework\TestCase
+class PaymentTest extends RandomTestCase
 {
     use CurrencyTrait;
     use DateTrait;
-
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
 
     public function testCalculatePremium()
     {
@@ -180,46 +173,43 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests setting the commission for a partial payment.
+     * @dataProvider randomFunctions
      */
-    public function testSetCommissionPartialPayment()
+    public function testSetCommissionPartialPayment($random)
     {
+        // set up dates and previous payments.
         $startDate = new \DateTime();
-        for ($rep = 0; $rep < 30; $rep++) {
-            // Set up policy dates.
-            $nextYear = clone $startDate;
-            $nextYear = $nextYear->modify('+1 year');
-            $nextYear->modify("-1 day");
-            $nextYear->setTime(23, 59, 59);
-            // set up policy.
-            $policy = new PhonePolicy();
-            $policy->setStatus(Policy::STATUS_ACTIVE);
-            $policy->setStart($startDate);
-            $policy->setEnd($nextYear);
-            $policy->setStaticEnd($nextYear);
-            $premium = new PhonePremium();
-            $premium->setGwp(rand(10, 10000) / 100);
-            $premium->setIpt(rand(10, 10000) / 100);
-            $policy->setPremium($premium);
-            // set up payments.
-            $n = rand(0, 10);
-            $date = clone $startDate;
-            for ($i = 0; $i < $n; $i++) {
-                $this->addPayment($policy, $date);
-                $date->add(new \DateInterval("P1M"));
-            }
-            // Now do the payment at some point in the future. Payment can be bigger or smaller than premium and can
-            // occur very soon or far off.
-            $paymentDate = $this->addDays($date, rand(1, 360 - 30 * n));
-            $payment = new CheckoutPayment();
-            $payment->setDate($paymentDate);
-            $payment->setAmount(rand(1, 500) / 7);
-            $policy->addPayment($payment);
-            // Make sure that the fractional commission is correct.
-            // Should be less than or equal to pro rata commission due.
-            $payment->setCommission(true);
-            $payment->setSuccess(true);
-            $this->assertTrue($policy->getProratedCommission($paymentDate) == $policy->getTotalCommissionPaid());
+        $nextYear = clone $startDate;
+        $nextYear = $nextYear->modify('+1 year');
+        $nextYear->modify("-1 day");
+        $nextYear->setTime(23, 59, 59);
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($startDate);
+        $policy->setEnd($nextYear);
+        $policy->setStaticEnd($nextYear);
+        $premium = new PhonePremium();
+        $premium->setGwp($random(10, 10000) / 100);
+        $premium->setIpt($random(10, 10000) / 100);
+        $policy->setPremium($premium);
+        $n = $random(0, 10);
+        $date = clone $startDate;
+        for ($i = 0; $i < $n; $i++) {
+            $this->addPayment($policy, $date);
+            $date->add(new \DateInterval("P1M"));
         }
+        // Now do the payment at some point in the future. Payment can be bigger or smaller than premium and can
+        // occur very soon or far off, but within a year of premium start.
+        $paymentDate = $this->addDays($date, $random(1, 360 - 30 * $n));
+        $payment = new CheckoutPayment();
+        $payment->setDate($paymentDate);
+        $payment->setAmount($random(1, 500) / 7);
+        $policy->addPayment($payment);
+        // Make sure that the fractional commission is correct.
+        // Should be equal to pro rata commission due.
+        $payment->setCommission(true);
+        $payment->setSuccess(true);
+        $this->assertTrue($policy->getProratedCommission($paymentDate) == $policy->getTotalCommissionPaid());
     }
 
     /**
