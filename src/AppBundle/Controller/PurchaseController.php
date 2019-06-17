@@ -10,6 +10,7 @@ use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\PaymentDeclinedException;
@@ -1458,6 +1459,7 @@ class PurchaseController extends BaseController
      */
     public function checkoutAction(Request $request, $id)
     {
+        $logger = $this->get('logger');
         $type = null;
         $successMessage = 'Success! Your payment has been successfully completed';
         $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
@@ -1485,7 +1487,6 @@ class PurchaseController extends BaseController
         }
 
         try {
-            $logger = $this->get('logger');
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
@@ -1570,6 +1571,13 @@ class PurchaseController extends BaseController
                 return new RedirectResponse($redirectFailure);
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
+            }
+        } catch (CommissionException $e) {
+            $logger->error($e->getMessage());
+            if ($type == 'redirect') {
+                return new RedirectResponse($redirectSuccess);
+            } else {
+                return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
             $this->addFlash('error', $errorMessage);
