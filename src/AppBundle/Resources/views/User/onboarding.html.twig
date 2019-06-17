@@ -46,12 +46,12 @@
 {% block pixel %}
     {# Pixels #}
     {% if environment == 'prod' %}
-        <img src="https://tapjoy.go2cloud.org/SL2Qs" width="1" height="1" />
+        <img src="https://tapjoy.go2cloud.org/SL2Qs" width="1" height="1" class="position-absolute invisible" />
 
-        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" />
+        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" class="position-absolute invisible" />
 
         {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
-            <img src='https://www.tagserve.com/saleServlet?MID=357&PID=513&CRID=&ORDERID={{ policy.id }}&ORDERAMNT=10&NUMOFITEMS=1&CUR=GBP' border="0" width="1" height="1">
+            <img src='https://www.tagserve.com/saleServlet?MID=357&PID=513&CRID=&ORDERID={{ policy.id }}&ORDERAMNT=10&NUMOFITEMS=1&CUR=GBP' border="0" width="1" height="1" class="position-absolute invisible">
         {% endif %}
 
     {% endif %}
