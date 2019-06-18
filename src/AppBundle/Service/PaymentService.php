@@ -15,6 +15,9 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Exception\InvalidPaymentMethodException;
+use AppBundle\Exception\SameDayPaymentException;
+use AppBundle\Exception\ScheduledPaymentException;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Mailer\Mailer;
@@ -167,7 +170,21 @@ class PaymentService
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
-        $scheduledPayment->validateRunable($prefix, $date);
+        try {
+            $scheduledPayment->validateRunable($prefix, $date);
+        } catch (ScheduledPaymentException $e) {
+            /**
+             * This should never be thrown as the only place that calls this that is not
+             * a test file has the same check before it calls this method.
+             * Nonetheless I have checked for the exception here because it would be amiss
+             * not to be conservative in my code so that even code that shouldn't ever be
+             * hit is complete, on the off chance that it could be hit.
+             * For now we will rethrow the exception too so that the calling method can
+             * decide what to do with the exception.
+             */
+            $this->logger->error($e->getMessage());
+            throw $e;
+        }
 
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getPaymentMethod();
@@ -181,12 +198,33 @@ class PaymentService
                 $scheduledPayment->getId()
             ));
         } elseif ($paymentMethod && $paymentMethod instanceof CheckoutPaymentMethod) {
-                return $this->checkout->scheduledPayment(
+            /**
+             * We could let the Exceptions bubble up here, but seeing as
+             * we are already adding in a load of try catches, we may as
+             * well be thorough about it and catch and log them here
+             * just in case they have not been logged elsewhere.
+             */
+            try {
+                $payment = $this->checkout->scheduledPayment(
                     $scheduledPayment,
                     $prefix,
                     $date,
                     $abortOnMultipleSameDayPayment
                 );
+            } catch (ScheduledPaymentException $e) {
+                $this->logger->error($e->getMessage());
+                throw $e;
+            } catch (SameDayPaymentException $e) {
+                $this->logger->error($e->getMessage());
+                throw $e;
+            } catch (InvalidPaymentMethodException $e) {
+                $this->logger->error($e->getMessage());
+                throw $e;
+            } catch (\Exception $e) {
+                $this->logger->error($e->getMessage());
+                throw $e;
+            }
+            return $payment;
         } else {
             throw new \Exception(sprintf(
                 'Payment method not valid for scheduled payment %s',

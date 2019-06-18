@@ -118,12 +118,18 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         if ($id) {
             /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayment = $repo->find($id);
-            $scheduledPayment = $this->paymentService->scheduledPayment(
-                $scheduledPayment,
-                $prefix,
-                $scheduledDate,
-                !$allowMultipleSameDayPayment
-            );
+            try {
+                $scheduledPayment = $this->paymentService->scheduledPayment(
+                    $scheduledPayment,
+                    $prefix,
+                    $scheduledDate,
+                    !$allowMultipleSameDayPayment
+                );
+            } catch (\Exception $e) {
+                $this->logger->error($e->getMessage());
+                $output->writeln($e->getMessage());
+                $this->displayScheduledPayment($scheduledPayment, $output);
+            }
             $this->displayScheduledPayment($scheduledPayment, $output);
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
