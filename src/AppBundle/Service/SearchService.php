@@ -136,6 +136,8 @@ class SearchService
                 $this->policyQb->addAnd(
                     $this->policyQb->expr()->field('user.$id')->in($searchUsers)
                 );
+            } else {
+                return $searchUsers;
             }
         }
         return $this->sortResults($data['status']);
