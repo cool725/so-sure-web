@@ -7,6 +7,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Policy;
+use AppBundle\Exception\CommissionException;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;

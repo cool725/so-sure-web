@@ -7,7 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
-use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
