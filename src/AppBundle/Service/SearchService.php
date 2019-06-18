@@ -5,6 +5,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Exception\MissingDependencyException;
+use AppBundle\Helpers\MobileNumberHelper;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -80,6 +81,14 @@ class SearchService
                 ->toArray();
         }
         $data = $this->form->getNormData();
+        if ($data['mobile']) {
+            $formatter = new MobileNumberHelper($data['mobile']);
+            /**
+             * The db stores the mobile number in mobile format i.e +44...
+             * So that is the method we will use for this query.
+             */
+            $data['mobile'] = $formatter->getMongoRegexFormat();
+        }
         if (!array_key_exists('invalid', $data)) {
             $data['invalid'] = 0;
         }
@@ -89,12 +98,12 @@ class SearchService
             'email' => 'emailCanonical',
             'firstname' => 'firstName',
             'lastname' => 'lastName',
+            'mobile' => 'mobileNumber',
             'facebookId' => 'facebookId'
         ];
 
         $map = [
             'bacsReference' => 'paymentMethod.bankAccount.reference',
-            'mobile' => 'mobileNumber',
             'paymentMethod' => 'paymentMethod.type',
             'policy' => 'policyNumber',
             'postcode' => 'billingAddress.postcode',
@@ -127,6 +136,8 @@ class SearchService
                 $this->policyQb->addAnd(
                     $this->policyQb->expr()->field('user.$id')->in($searchUsers)
                 );
+            } else {
+                return $searchUsers;
             }
         }
         return $this->sortResults($data['status']);
