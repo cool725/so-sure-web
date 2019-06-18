@@ -7,6 +7,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Policy;
+use AppBundle\Exception\InvalidPaymentException;
 use AppBundle\Exception\CommissionException;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -557,8 +558,8 @@ abstract class Payment
     public function setCommission($allowFraction = false)
     {
         $policy = $this->getPolicy();
-        if (!$policy) {
-            throw new \Exception(sprintf(
+        if (!$this->getPolicy()) {
+            throw new InvalidPaymentException(sprintf(
                 'Attempting to set commission for %f (payment %s) without a policy',
                 $this->getAmount(),
                 $this->getId()
@@ -568,13 +569,13 @@ abstract class Payment
         $premium = $policy->getPremium();
         $amount = $this->getAmount();
         // Only set broker fees if we know the amount
-        if ($this->areEqualToFourDp($this->getAmount(), $this->getPolicy()->getPremium()->getYearlyPremiumPrice())) {
+        if ($this->areEqualToFourDp($this->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
             $commission = $salva->sumBrokerFee(12, true);
             $this->setTotalCommission($commission);
         } elseif ($premium->isEvenlyDivisible($this->getAmount()) ||
             $premium->isEvenlyDivisible($this->getAmount(), true)) {
             // payment should already be credited at this point
-            $includeFinal = $this->areEqualToTwoDp(0, $this->getPolicy()->getOutstandingPremium());
+            $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
@@ -584,7 +585,7 @@ abstract class Payment
             throw new CommissionException(sprintf(
                 'Failed to set correct commission for %f (policy %s)',
                 $this->getAmount(),
-                $this->getPolicy()->getId()
+                $policy->getId()
             ));
         }
     }

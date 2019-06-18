@@ -14,6 +14,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Exception\InvalidPaymentException;
 use AppBundle\Tests\RandomTestCase;
 
 /**
@@ -235,6 +236,20 @@ class PaymentTest extends RandomTestCase
         $commission = $payment->getTotalCommission();
         $this->assertGreaterThan(0, $commission);
         static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
+    }
+
+    /**
+     * Makes sure that calling setCommission on a payment with no policy throws and invalid payment exception.
+     * @dataProvider randomFunctions
+     */
+    public function testSetComissionWithoutPolicyFails($random)
+    {
+        $payment = new CheckoutPayment();
+        $payment->setAmount($random(-50, 50));
+        $this->expectException(InvalidPaymentException::class);
+        $payment->setCommission(false);
+        $this->expectException(InvalidPaymentException::class);
+        $payment->setCommission(true);
     }
 
     /**
