@@ -5,14 +5,13 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment\BacsPayment;
-use AppBundle\Document\Payment\JudoPayment;
-use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Tests\RandomTestCase;
@@ -178,21 +177,13 @@ class PaymentTest extends RandomTestCase
      */
     public function testSetCommissionPartialPayment($random)
     {
-        // set up dates and previous payments.
         $startDate = new \DateTime();
-        $nextYear = clone $startDate;
-        $nextYear = $nextYear->modify('+1 year');
-        $nextYear->modify("-1 day");
-        $nextYear->setTime(23, 59, 59);
-        $policy = new PhonePolicy();
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-        $policy->setStart($startDate);
-        $policy->setEnd($nextYear);
-        $policy->setStaticEnd($nextYear);
-        $premium = new PhonePremium();
-        $premium->setGwp($random(10, 10000) / 100);
-        $premium->setIpt($random(10, 10000) / 100);
-        $policy->setPremium($premium);
+        $policy = $this->createEligiblePolicy(
+            $startDate,
+            $random(10, 10000) / 100,
+            $random(10, 10000) / 100,
+            $random(10, 10000) / 100
+        );
         $n = $random(0, 10);
         $date = clone $startDate;
         for ($i = 0; $i < $n; $i++) {
@@ -218,16 +209,11 @@ class PaymentTest extends RandomTestCase
      */
     public function testSetCommissionRemainderFailsWithFalse()
     {
-        $policy = new PhonePolicy();
-        $premium = new PhonePremium();
-
-        $premium->setIptRate(0.12);
-        $premium->setGwp(5);
-        $premium->setIpt(1);
-        $policy->setPremium($premium);
+        $startDate = new \DateTime();
+        $policy = $this->createEligiblePolicy($startDate, 5, 1, 0.12);
 
         $payment = new CheckoutPayment();
-        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 0.5);
 
         $policy->addPayment($payment);
 
@@ -236,16 +222,11 @@ class PaymentTest extends RandomTestCase
 
     public function testSetCommissionRemainderDoesNotFailWithTrue()
     {
-        $policy = new PhonePolicy();
-
-        $premium = new PhonePremium();
-        $premium->setIptRate(0.12);
-        $premium->setGwp(5);
-        $premium->setIpt(1);
-        $policy->setPremium($premium);
+        $startDate = new \DateTime();
+        $policy = $this->createEligiblePolicy($startDate, 5, 1, 0.12);
 
         $payment = new CheckoutPayment();
-        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 0.5);
 
         $policy->addPayment($payment);
 
@@ -254,6 +235,34 @@ class PaymentTest extends RandomTestCase
         $commission = $payment->getTotalCommission();
         $this->assertGreaterThan(0, $commission);
         static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
+    }
+
+    /**
+     * Creates a policy that is set up enough that it can calculate pro rata commission.
+     * @param \DateTime $startDate is the date at which the policy starts.
+     * @param float     $gwp       is the policy premium's GWP.
+     * @param float     $ipt       is the policy premium's IPT.
+     * @param float     $iptRate   is the policy premium's IPT rate.
+     * @return Policy that has just been created.
+     */
+    private function createEligiblePolicy(\DateTime $startDate, $gwp, $ipt, $iptRate)
+    {
+        $nextYear = clone $startDate;
+        $nextYear = $nextYear->modify('+1 year');
+        $nextYear->modify("-1 day");
+        $nextYear->setTime(23, 59, 59);
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($startDate);
+        $policy->setEnd($nextYear);
+        $policy->setStaticEnd($nextYear);
+        $premium = new PhonePremium();
+        $premium->setGwp($gwp);
+        $premium->setIpt($ipt);
+        $premium->setIptRate($iptRate);
+        $premium->setIptRate($ipt / 12);
+        $policy->setPremium($premium);
+        return $policy;
     }
 
     /**

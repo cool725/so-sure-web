@@ -581,7 +581,7 @@ abstract class Payment
         } elseif ($allowFraction && $amount >= 0) {
             $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
         } else {
-            throw new \Exception(sprintf(
+            throw new CommissionException(sprintf(
                 'Failed to set correct commission for %f (policy %s)',
                 $this->getAmount(),
                 $this->getPolicy()->getId()
