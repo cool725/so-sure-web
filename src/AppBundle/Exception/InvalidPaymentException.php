@@ -8,5 +8,4 @@ namespace AppBundle\Exception;
  */
 class InvalidPaymentException extends \Exception
 {
-    // Does nothing.
 }
