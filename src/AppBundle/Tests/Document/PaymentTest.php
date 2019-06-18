@@ -8,7 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\CurrencyTrait;
 
 /**
@@ -36,7 +36,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $phonePolicy = new SalvaPhonePolicy();
         $phonePolicy->setPremium($premium);
 
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
         $payment->setAmount(5);
         $payment->setPolicy($phonePolicy);
         $payment->calculateSplit();
@@ -46,7 +46,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testTotalCommission()
     {
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
 
         // yearly
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
@@ -74,7 +74,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
      */
     public function testOverwriteSuccess()
     {
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
         $this->assertFalse($payment->hasSuccess());
         $payment->setSuccess(true);
         $this->assertTrue($payment->hasSuccess());
@@ -92,7 +92,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setPremium($premium);
 
         for ($i = 0; $i < 11; $i++) {
-            $payment = new JudoPayment();
+            $payment = new CheckoutPayment();
             $payment->setAmount(6);
             $policy->addPayment($payment);
             $payment->setCommission();
@@ -103,7 +103,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(Salva::MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
         }
 
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
         $payment->setAmount(6);
         $policy->addPayment($payment);
         $payment->setCommission();
@@ -124,7 +124,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $premium->setIpt(1);
         $policy->setPremium($premium);
 
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
         $payment->setAmount(6 * 12);
         $policy->addPayment($payment);
         $payment->setCommission();
@@ -147,7 +147,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $premium->setIpt(1);
         $policy->setPremium($premium);
 
-        $payment = new JudoPayment();
+        $payment = new CheckoutPayment();
         $payment->setAmount(2);
         $policy->addPayment($payment);
         $payment->setCommission();
@@ -156,20 +156,63 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     public function testTimezone()
     {
         $payments = [];
-        $payment1 = new JudoPayment();
+        $payment1 = new CheckoutPayment();
         $payment1->setDate(new \DateTime('2018-04-01 00:00', new \DateTimeZone('UTC')));
         $payment1->setAmount(1);
         $payments[] = $payment1;
 
-        $payment2 = new JudoPayment();
+        $payment2 = new CheckoutPayment();
         $payment2->setDate(new \DateTime('2018-04-01 00:00', new \DateTimeZone('Europe/London')));
         $payment2->setAmount(2);
         $payments[] = $payment2;
 
-        $daily = Payment::dailyPayments($payments, false, JudoPayment::class, new \DateTimeZone('UTC'));
+        $daily = Payment::dailyPayments($payments, false, CheckoutPayment::class, new \DateTimeZone('UTC'));
         $this->assertEquals(1, $daily[1]);
 
-        $daily = Payment::dailyPayments($payments, false, JudoPayment::class);
+        $daily = Payment::dailyPayments($payments, false, CheckoutPayment::class);
         $this->assertEquals(3, $daily[1]);
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\CommissionException
+     */
+    public function testSetCommissionRemainderFailsWithFalse()
+    {
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $payment = new CheckoutPayment();
+        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+
+        $policy->addPayment($payment);
+
+        $payment->setCommission(false);
+    }
+
+    public function testSetCommissionRemainderDoesNotFailWithTrue()
+    {
+        $policy = new PhonePolicy();
+
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $payment = new CheckoutPayment();
+        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+
+        $policy->addPayment($payment);
+
+        $payment->setCommission(true);
+
+        $commission = $payment->getTotalCommission();
+        $this->assertGreaterThan(0, $commission);
+        static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
     }
 }

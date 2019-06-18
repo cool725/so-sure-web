@@ -7,7 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
-use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -47,12 +47,12 @@ class PaymentFunctionalTest extends WebTestCase
      */
     public function testDuplicatePayment()
     {
-        $paymentA = new JudoPayment();
+        $paymentA = new CheckoutPayment();
         $paymentA->setReceipt(1);
         static::$dm->persist($paymentA);
         static::$dm->flush();
 
-        $paymentB = new JudoPayment();
+        $paymentB = new CheckoutPayment();
         $paymentB->setReceipt(1);
         static::$dm->persist($paymentB);
         static::$dm->flush();
