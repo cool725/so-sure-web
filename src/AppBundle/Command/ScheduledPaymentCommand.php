@@ -128,7 +128,6 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             } catch (\Exception $e) {
                 $this->logger->error($e->getMessage());
                 $output->writeln($e->getMessage());
-                $this->displayScheduledPayment($scheduledPayment, $output);
             }
             $this->displayScheduledPayment($scheduledPayment, $output);
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);

@@ -644,9 +644,6 @@ class CheckoutServiceTest extends WebTestCase
         self::$checkout->scheduledPayment($scheduledPayment, 'TEST');
     }
 
-    /**
-     * @group blakey
-     */
     public function testCheckoutScheduledPayment()
     {
         $user = $this->createValidUser(static::generateEmail('testCheckoutScheduledPayment', $this, true));
@@ -695,8 +692,8 @@ class CheckoutServiceTest extends WebTestCase
         $repo = static::$dm->getRepository(ScheduledPayment::class);
         /** @var ScheduledPayment $updatedScheduledPayment */
         $updatedScheduledPayment = $repo->find($scheduledPayment->getId());
-//        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $updatedScheduledPayment->getStatus());
-//        $this->assertTrue($updatedScheduledPayment->getPayment()->isSuccess());
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $updatedScheduledPayment->getStatus());
+        $this->assertTrue($updatedScheduledPayment->getPayment()->isSuccess());
     }
 
     public function testCheckoutScheduledPaymentDelayed()
