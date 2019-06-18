@@ -15,12 +15,11 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Exception\InvalidPaymentException;
-use AppBundle\Tests\RandomTestCase;
 
 /**
  * @group unit
  */
-class PaymentTest extends RandomTestCase
+class PaymentTest extends \PHPUnit\Framework\TestCase
 {
     use CurrencyTrait;
     use DateTrait;
@@ -173,30 +172,42 @@ class PaymentTest extends RandomTestCase
     }
 
     /**
-     * Tests setting the commission for a partial payment.
-     * @dataProvider randomFunctions
+     * Generates testing conditions for testSetCommissionPartialPayment.
+     * @return array of sets of arguments to the test.
      */
-    public function testSetCommissionPartialPayment($random)
+    public function setCommissionPartialPaymentData()
+    {
+        return [
+            [10, 5, 12, 10, 20],
+            [8, 7, 0, 10, 1],
+            [5.4, 9.2, 5, 100, 45]
+        ];
+    }
+
+    /**
+     * Tests setting the commission for a partial payment.
+     * @param float $gwp          is the test premium GWP.
+     * @param float $ipt          is the test premium IPT.
+     * @param int   $nPayments    is the number of normal payments to make before the payment under test.
+     * @param float $finalPayment is the value of the final payment to make.
+     * @param int   $delay        is the number of days from the last scheduled payment to the final payment.
+     * @dataProvider setCommissionPartialPaymentData
+     */
+    public function testSetCommissionPartialPayment($gwp, $ipt, $nPayments, $finalPayment, $delay)
     {
         $startDate = new \DateTime();
-        $policy = $this->createEligiblePolicy(
-            $startDate,
-            $random(10, 10000) / 100,
-            $random(10, 10000) / 100,
-            $random(10, 10000) / 100
-        );
-        $n = $random(0, 10);
+        $policy = $this->createEligiblePolicy($startDate, $gwp, $ipt, 0.1);
         $date = clone $startDate;
-        for ($i = 0; $i < $n; $i++) {
+        for ($i = 0; $i < $nPayments; $i++) {
             $this->addPayment($policy, $date);
             $date->add(new \DateInterval("P1M"));
         }
         // Now do the payment at some point in the future. Payment can be bigger or smaller than premium and can
         // occur very soon or far off, but within a year of premium start.
-        $paymentDate = $this->addDays($date, $random(1, 360 - 30 * $n));
+        $paymentDate = $this->addDays($date, $delay);
         $payment = new CheckoutPayment();
         $payment->setDate($paymentDate);
-        $payment->setAmount($random(1, 500) / 7);
+        $payment->setAmount($finalPayment);
         $policy->addPayment($payment);
         // Make sure that the fractional commission is correct.
         // Should be equal to pro rata commission due.
@@ -240,12 +251,11 @@ class PaymentTest extends RandomTestCase
 
     /**
      * Makes sure that calling setCommission on a payment with no policy throws and invalid payment exception.
-     * @dataProvider randomFunctions
      */
-    public function testSetComissionWithoutPolicyFails($random)
+    public function testSetComissionWithoutPolicyFails()
     {
         $payment = new CheckoutPayment();
-        $payment->setAmount($random(-50, 50));
+        $payment->setAmount(4.3);
         $this->expectException(InvalidPaymentException::class);
         $payment->setCommission(false);
         $this->expectException(InvalidPaymentException::class);
