@@ -7,6 +7,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Exception\CommissionException;
+use AppBundle\Exception\InvalidPaymentMethodException;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
@@ -797,6 +798,9 @@ class CheckoutServiceTest extends WebTestCase
         $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
 
+    /**
+     * @expectedException \AppBundle\Exception\InvalidPaymentMethodException
+     */
     public function testCheckoutScheduledPaymentInvalidPaymentMethod()
     {
         $user = $this->createValidUser(

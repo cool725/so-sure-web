@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Document\PaymentMethod\PaymentMethod;
+use AppBundle\Exception\ScheduledPaymentException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -331,14 +332,14 @@ class ScheduledPayment
     public function validateRunable($prefix = null, \DateTime $date = null)
     {
         if (!$this->getPolicy()->isValidPolicy($prefix)) {
-            throw new \Exception(sprintf(
+            throw new ScheduledPaymentException(sprintf(
                 'Scheduled payment %s policy is not valid. Invalid Prefix?',
                 $this->getId()
             ));
         }
 
         if (!$this->isBillable()) {
-            throw new \Exception(sprintf(
+            throw new ScheduledPaymentException(sprintf(
                 'Scheduled payment %s is not billable (status: %s)',
                 $this->getId(),
                 $this->getStatus()
@@ -346,7 +347,7 @@ class ScheduledPayment
         }
 
         if (!$this->canBeRun($date)) {
-            throw new \Exception(sprintf(
+            throw new ScheduledPaymentException(sprintf(
                 'Scheduled payment %s can not yet be run (scheduled: %s)',
                 $this->getId(),
                 $this->getScheduled() ? $this->getScheduled()->format('Y-m-d H:i:s') : '?'
@@ -354,7 +355,7 @@ class ScheduledPayment
         }
 
         if ($this->getPayment() && $this->getPayment()->isSuccess()) {
-            throw new \Exception(sprintf(
+            throw new ScheduledPaymentException(sprintf(
                 'Payment already received for scheduled payment %s',
                 $this->getId()
             ));
