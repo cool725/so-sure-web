@@ -180,7 +180,8 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         return [
             [10, 5, 12, 10, 20],
             [8, 7, 0, 10, 1],
-            [5.4, 9.2, 5, 100, 45]
+            [5.4, 9.2, 5, 100, 59],
+            [3, 3, 0, 1, 0]
         ];
     }
 
@@ -202,8 +203,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $this->addPayment($policy, $date);
             $date->add(new \DateInterval("P1M"));
         }
-        // Now do the payment at some point in the future. Payment can be bigger or smaller than premium and can
-        // occur very soon or far off, but within a year of premium start.
+        // Now perform the abnormal fraction.
         $paymentDate = $this->addDays($date, $delay);
         $payment = new CheckoutPayment();
         $payment->setDate($paymentDate);
@@ -213,7 +213,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         // Should be equal to pro rata commission due.
         $payment->setCommission(true);
         $payment->setSuccess(true);
-        $this->assertTrue($policy->getProratedCommission($paymentDate) == $policy->getTotalCommissionPaid());
+        $this->assertEquals($policy->getProratedCommission($paymentDate), $policy->getTotalCommissionPaid());
     }
 
     /**
@@ -250,12 +250,27 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Makes sure that if you try to calculate the commission on a partial refund directly it will throw a commission
+     * exception.
+     */
+    public function testSetCommissionFailsWithPartialRefund()
+    {
+        $policy = $this->createEligiblePolicy(new \DateTime(), 5, 6, 1);
+        $payment = new CheckoutPayment();
+        $payment->setAmount(-4.3);
+        // Make sure this payment throws an exception when calculating commission is attempted.
+        $this->expectException(InvalidPaymentException::class);
+        $payment->setCommission(true);
+    }
+
+    /**
      * Makes sure that calling setCommission on a payment with no policy throws and invalid payment exception.
      */
     public function testSetComissionWithoutPolicyFails()
     {
         $payment = new CheckoutPayment();
         $payment->setAmount(4.3);
+        // make sure an exception is thrown for all inputs in this case.
         $this->expectException(InvalidPaymentException::class);
         $payment->setCommission(false);
         $this->expectException(InvalidPaymentException::class);
