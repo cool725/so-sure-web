@@ -125,4 +125,16 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->execute(['cursor' => true])
             ->toArray();
     }
+
+    public function getPastScheduledWithNoStatusUpdate(Policy $policy, $date)
+    {
+        return $this->createQueryBuilder()
+            ->field('policy')->references($policy)
+            ->field("status")->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field("scheduled")->lt($date)
+            ->sort("scheduled", "desc")
+            ->getQuery()
+            ->execute();
+
+    }
 }
