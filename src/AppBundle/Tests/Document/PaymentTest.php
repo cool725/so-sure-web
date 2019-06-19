@@ -178,10 +178,10 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     public function setCommissionPartialPaymentData()
     {
         return [
-            [10, 5, 12, 10, 20],
-            [8, 7, 0, 10, 1],
-            [5.4, 9.2, 5, 100, 59],
-            [3, 3, 0, 1, 0]
+            "Average case" => [10, 5, 12, 10, 20],
+            "First payment is fractional" => [8, 7, 0, 10, 1],
+            "Very large fractional payment" => [5.4, 9.2, 5, 100, 59],
+            "Very small and early fractional payment" => [3, 3, 0, 1, 0]
         ];
     }
 
