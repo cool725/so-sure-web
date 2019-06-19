@@ -6,6 +6,8 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Exception\CommissionException;
+use AppBundle\Exception\InvalidPaymentMethodException;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
@@ -796,6 +798,9 @@ class CheckoutServiceTest extends WebTestCase
         $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
 
+    /**
+     * @expectedException \AppBundle\Exception\InvalidPaymentMethodException
+     */
     public function testCheckoutScheduledPaymentInvalidPaymentMethod()
     {
         $user = $this->createValidUser(
@@ -1620,10 +1625,29 @@ class CheckoutServiceTest extends WebTestCase
         $payment = new CheckoutPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 1.5);
         $policy->addPayment($payment);
-        self::$checkout->setCommission($payment);
-        $this->assertNull($payment->getTotalCommission());
+        self::$checkout->setCommission($payment, true);
+
+        $this->assertGreaterThan(0, $payment->getTotalCommission());
     }
 
+    /**
+     * @expectedException AppBundle\Exception\CommissionException
+     */
+    public function testCheckoutCommissionForFractionThrowsExceptionWithFalse()
+    {
+        $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmounts', $this, true));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy->setPaymentMethod(new CheckoutPaymentMethod());
+
+        $payment = new CheckoutPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 1.5);
+        $policy->addPayment($payment);
+        self::$checkout->setCommission($payment);
+    }
+
+    /**
+     */
     public function testCheckoutCommissionAmountsWithDiscount()
     {
         $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmountsWithDiscount', $this, true));
@@ -1667,8 +1691,8 @@ class CheckoutServiceTest extends WebTestCase
         $payment = new CheckoutPayment();
         $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 1.5);
         $policy->addPayment($payment);
-        self::$checkout->setCommission($payment);
-        $this->assertNull($payment->getTotalCommission());
+        self::$checkout->setCommission($payment, true);
+        $this->assertGreaterThan(0, $payment->getTotalCommission());
 
         $payment = new CheckoutPayment();
         $payment->setSuccess(true);

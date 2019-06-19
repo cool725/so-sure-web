@@ -17,6 +17,7 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
+use AppBundle\Exception\DuplicatePaymentException;
 use AppBundle\Service\InvitationService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -702,7 +703,10 @@ abstract class Policy
         // perhaps an issue with cascade persist
         // seems to have no ill effects and resolves the issue
         if ($this->payments->contains($payment)) {
-            throw new \Exception('duplicate payment');
+            throw new DuplicatePaymentException(sprintf(
+                'duplicate payment %s',
+                $payment->getId()
+            ));
         }
 
         $this->payments->add($payment);

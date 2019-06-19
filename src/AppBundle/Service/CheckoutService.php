@@ -9,6 +9,10 @@ use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Exception\CommissionException;
+use AppBundle\Exception\DuplicatePaymentException;
+use AppBundle\Exception\InvalidPaymentMethodException;
+use AppBundle\Exception\ScheduledPaymentException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
@@ -850,6 +854,8 @@ class CheckoutService
      */
     public function updatePaymentMethod(Policy $policy, $token, $amount = null)
     {
+        $throwLater = false;
+        $thingToThrow = null;
         $user = $policy->getUser();
         $details = null;
         $payment = null;
@@ -902,7 +908,18 @@ class CheckoutService
                 $payment->setResult($details->getStatus());
                 $payment->setMessage($details->getResponseMessage());
                 $payment->setRiskScore($details->getRiskCheck());
-                $this->setCommission($payment);
+                try {
+                    $this->setCommission($payment, true);
+                } catch (CommissionException $e) {
+                    /**
+                     * The one place that uses this exception at the moment does not require this method
+                     * to return anything. So, we will re throw the error later, that way this will
+                     * not interfere with anywhere else that uses this method, but give us there result
+                     * that we want where we want it.
+                     */
+                    $throwLater = true;
+                    $thingToThrow = $e;
+                }
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             }
 
@@ -986,6 +1003,9 @@ class CheckoutService
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
+        if ($throwLater) {
+            throw $thingToThrow;
+        }
         return $details;
     }
 
@@ -1123,7 +1143,16 @@ class CheckoutService
             throw new PaymentDeclinedException();
         }
 
-        $this->setCommission($payment);
+        try {
+            $this->setCommission($payment, true);
+        } catch (CommissionException $e) {
+            /**
+             * At this point the commission has been set but is likely incorrect.
+             * We will log the error so that it can be manually dealt with,
+             * but for now we still want to continue with the rest of the code.
+             */
+            $this->logger->error($e->getMessage());
+        }
 
         return $payment;
     }
@@ -1194,19 +1223,32 @@ class CheckoutService
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
-        $scheduledPayment->validateRunable($prefix, $date);
+        try {
+            $scheduledPayment->validateRunable($prefix, $date);
+        } catch (ScheduledPaymentException $e) {
+            /**
+             * This should never be thrown as the only place that calls this that is not
+             * a test file has the same check before it calls this method.
+             * Nonetheless I have checked for the exception here because it would be amiss
+             * not to be conservative in my code so that even code that shouldn't ever be
+             * hit is complete, on the off chance that it could be hit.
+             * For now we will rethrow the exception too so that the calling method can
+             * decide what to do with the exception.
+             */
+            $this->logger->error($e->getMessage());
+            throw $e;
+        }
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getCheckoutPaymentMethod();
+        if (!$paymentMethod || !$paymentMethod instanceof CheckoutPaymentMethod) {
+            throw new InvalidPaymentMethodException(sprintf(
+                'Payment method not valid for scheduled payment %s',
+                $scheduledPayment->getId()
+            ));
+        }
         try {
-            if (!$paymentMethod || !$paymentMethod instanceof CheckoutPaymentMethod) {
-                throw new \Exception(sprintf(
-                    'Payment method not valid for scheduled payment %s',
-                    $scheduledPayment->getId()
-                ));
-            }
-
             $payment = $this->tokenPay(
                 $policy,
                 $scheduledPayment->getAmount(),
@@ -1231,11 +1273,36 @@ class CheckoutService
         if (!$payment) {
             $payment = new CheckoutPayment();
             $payment->setAmount(0);
-            $payment->setResult(CheckoutPayment::RESULT_SKIPPED);
+            try {
+                $payment->setResult(CheckoutPayment::RESULT_SKIPPED);
+            } catch (\Exception $e) {
+                /**
+                 * This Exception should not be thrown in this instance, as we know that we are
+                 * setting a status that is valid. So if we do, it must mean that the statuses
+                 * have changed and therefore this method needs changing.
+                 */
+                $this->logger->error(
+                    "Tried to set a CheckoutPayment status that does not exist 'CheckoutPayment::RESULT_SKIPPED"
+                );
+            }
             if ($policy->getCheckoutPaymentMethod()) {
                 $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
             }
-            $policy->addPayment($payment);
+            try {
+                $policy->addPayment($payment);
+            } catch (DuplicatePaymentException $e) {
+                /**
+                 * This exception means that we have already added the payment to the DB.
+                 * I cannot guarantee that that means that every step has been done at
+                 * this point so we may as well continue with the rest of the code.
+                 * But we should log that it did so that we can monitor it anyway.
+                 */
+                $this->logger->notice(sprintf(
+                    "Payment %s has already been added to Policy %s",
+                    $payment->getId(),
+                    $policy->getId()
+                ));
+            }
         }
         $this->processScheduledPaymentResult($scheduledPayment, $payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1420,50 +1487,43 @@ class CheckoutService
             ));
         }
 
-        try {
-            $user = $policy->getUser();
+        $user = $policy->getUser();
 
-            $chargeService = $this->client->chargeService();
-            $chargeCreate = new CardIdChargeCreate();
-            if ($paymentMethod->hasPreviousChargeId()) {
-                $chargeCreate->setPreviousChargeId($paymentMethod->getPreviousChargeId());
-            }
-            $chargeCreate->setBillingDetails($this->getCheckoutAddress($user));
-
-            // Can only use 1
-            if ($paymentMethod->getCustomerId()) {
-                $chargeCreate->setCustomerId($paymentMethod->getCustomerId());
-            } else {
-                $chargeCreate->setEmail($user->getEmail());
-            }
-            $chargeCreate->setAutoCapTime(0);
-            $chargeCreate->setAutoCapture('N');
-            $chargeCreate->setValue($this->convertToPennies($amount));
-            $chargeCreate->setCurrency('GBP');
-            $chargeCreate->setTrackId($paymentRef);
-            $chargeCreate->setMetadata(['policy_id' => $policyId]);
-            $chargeCreate->setCardId($paymentMethod->getCardToken());
-            if ($recurring) {
-                $chargeCreate->setTransactionIndicator(2);
-            }
-
-            $chargeResponse = $chargeService->chargeWithCardId($chargeCreate);
-
-            $capture = new ChargeCapture();
-            $capture->setChargeId($chargeResponse->getId());
-            $capture->setValue($this->convertToPennies($amount));
-            if (!$paymentMethod->hasPreviousChargeId()) {
-                $paymentMethod->setPreviousChargeId($capture->getChargeId());
-                $this->dm->flush();
-            }
-
-            /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
-            $chargeResponse = $chargeService->CaptureCardCharge($capture);
-        } catch (\Exception $e) {
-            $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $paymentRef, $e));
-
-            throw $e;
+        $chargeService = $this->client->chargeService();
+        $chargeCreate = new CardIdChargeCreate();
+        if ($paymentMethod->hasPreviousChargeId()) {
+            $chargeCreate->setPreviousChargeId($paymentMethod->getPreviousChargeId());
         }
+        $chargeCreate->setBillingDetails($this->getCheckoutAddress($user));
+
+        // Can only use 1
+        if ($paymentMethod->getCustomerId()) {
+            $chargeCreate->setCustomerId($paymentMethod->getCustomerId());
+        } else {
+            $chargeCreate->setEmail($user->getEmail());
+        }
+        $chargeCreate->setAutoCapTime(0);
+        $chargeCreate->setAutoCapture('N');
+        $chargeCreate->setValue($this->convertToPennies($amount));
+        $chargeCreate->setCurrency('GBP');
+        $chargeCreate->setTrackId($paymentRef);
+        $chargeCreate->setMetadata(['policy_id' => $policyId]);
+        $chargeCreate->setCardId($paymentMethod->getCardToken());
+        if ($recurring) {
+            $chargeCreate->setTransactionIndicator(2);
+        }
+
+        $chargeResponse = $chargeService->chargeWithCardId($chargeCreate);
+
+        $capture = new ChargeCapture();
+        $capture->setChargeId($chargeResponse->getId());
+        $capture->setValue($this->convertToPennies($amount));
+        if (!$paymentMethod->hasPreviousChargeId()) {
+            $paymentMethod->setPreviousChargeId($capture->getChargeId());
+            $this->dm->flush();
+        }
+        /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
+        $chargeResponse = $chargeService->CaptureCardCharge($capture);
 
         return $chargeResponse;
     }
@@ -1515,7 +1575,21 @@ class CheckoutService
         if ($policy->getCheckoutPaymentMethod()) {
             $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
         }
-        $policy->addPayment($payment);
+        try {
+            $policy->addPayment($payment);
+        } catch (DuplicatePaymentException $e) {
+            /**
+             * This exception means that we have already added the payment to the DB.
+             * I cannot guarantee that that means that every step has been done at
+             * this point so we may as well continue with the rest of the code.
+             * But we should log that it did so that we can monitor it anyway.
+             */
+            $this->logger->notice(sprintf(
+                "Payment %s has already been added to Policy %s",
+                $payment->getId(),
+                $policy->getId()
+            ));
+        }
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -1525,13 +1599,22 @@ class CheckoutService
          * to automatically update expired cards, we don't need to check this anymore.
          */
         if (($policy->hasPaymentMethod() && $recurring) || $policy->hasPolicyOrUserValidPaymentMethod()) {
-            $tokenPaymentDetails = $this->runTokenPayment(
-                $policy,
-                $amount,
-                $payment->getId(),
-                $policy->getId(),
-                $recurring
-            );
+            try {
+                $tokenPaymentDetails = $this->runTokenPayment(
+                    $policy,
+                    $amount,
+                    $payment->getId(),
+                    $policy->getId(),
+                    $recurring
+                );
+            } catch (\Exception $e) {
+                /**
+                 * At this point we cannot continue with the payment, we will log the exception
+                 * and rethrow the error so the calling method can decide how to continue.
+                 */
+                $this->logger->error($e->getMessage());
+                throw $e;
+            }
 
             $payment->setReceipt($tokenPaymentDetails->getId());
             $payment->setAmount($this->convertFromPennies($tokenPaymentDetails->getValue()));
@@ -1554,17 +1637,28 @@ class CheckoutService
 
         // TODO: Validate receipt does not set commission on failed payments, but token does
         // make consistent
-        $this->setCommission($payment);
+        try {
+            $this->setCommission($payment, true);
+        } catch (CommissionException $e) {
+            /**
+             * At this point the commission has been set but is likely incorrect.
+             * We will log the error so that it can be manually dealt with,
+             * but for now we still want to continue with the rest of the code.
+             */
+            $this->logger->error($e->getMessage());
+        }
 
         $this->triggerPaymentEvent($payment);
 
         return $payment;
     }
 
-    public function setCommission($payment)
+    public function setCommission($payment, $allowFraction = false)
     {
         try {
-            $payment->setCommission();
+            $payment->setCommission($allowFraction);
+        } catch (CommissionException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }
