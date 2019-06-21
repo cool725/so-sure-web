@@ -1,81 +1,38 @@
-{% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
-{% block titleArea %}
-    {% if policy.cashback %}
-    <h1 class="h2">
-        <span class="title-top">Your cashback request was received</span>
-    </h1>
-    <h4 class="text-center">Your cashback request will be processed <span class="text-blue">28-45</span> days after your policy has ended.</h4>
-    <h3 class="text-center">We’re sorry you’re leaving</h3>
-    {% else %}
-    <h1 class="h2">
-        <span class="title-top">We’re sorry you’re leaving</span>
-    </h1>
-    {% endif %}
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
+
+{% block title %}so-sure -  Don't Renew my Policy{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-renew.css') }}">
 {% endblock %}
 
-{% block content %}
+{% block body %}
 
-    <p class="text-center">
-        <img src="{{ cdn_url }}/images/renewals/so-sure-breakup.svg" alt="Broken phone and heart">
-    </p>
-
-    <p class="lead text-center">Are you sure you want to leave us? Your phone will no longer be covered against:</p>
-
-
-    <div class="owl-carousel owl-theme visible-xs benefits">
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-            <h5>Water damage</h5>
-        </div>
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
-            <h5>Cracked screen</h5>
-        </div>
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-            <h5>Loss</h5>
-        </div>
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-            <h5>Theft</h5>
-        </div>
-    </div>
-
-    <ul class="list-inline cover-list hidden-xs benefits">
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-            <h5 class="h-light">Water damage</h5>
-        </li>
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
-            <h5 class="h-light">Cracked screen</h5>
-        </li>
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-            <h5 class="h-light">Loss</h5>
-        </li>
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-            <h5 class="h-light">Theft</h5>
-        </li>
-    </ul>
-
-{% endblock %}
-
-{% block actions %}
-    <div class="checkout--step">
+    <section class="hero">
         <div class="container">
-            <form>
-                <div class="form-group">
-                    <a href="{{ path('user_renew_retry_policy', {'id': policy.id }) }}"
-                       class="btn btn-green btn-block btn-pad">I'd like to renew my policy</a>
-                </div>
-                <div class="form-group">
-                    <a href="{{ path('user_policy', {'policyId': policy.id }) }}"
-                       class="btn btn-blue btn-block btn-pad">Take me home</a>
-                </div>
-            </form>
+            <h1 class="h2 mb-4">We’re sorry you’re leaving 😔</h1>
+            <p class="lead">Are you sure you want to leave us?</p>
+            <p class="lead">Your phone will no longer be covered against Water damage, cracked screens, loss and theft!</p>
+            {% if policy.hasCashback %}
+                <p class="lead mb-4">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
+            {% endif %}
+            <a href="{{ path('user_policy', {'policyId': policy.id }) }}"
+               class="btn btn-outline-primary btn-block-xs mr-md-2">I'm sure</a>
+            <a href="{{ path('user_renew_retry_policy', {'id': policy.id }) }}"
+               class="btn btn-success btn-block-xs">I'd like to renew my policy</a>
         </div>
-    </div>
+    </section>
+
+    {# Page Modals #}
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}

@@ -19,8 +19,8 @@
 
         {# Renewal #}
         {% if policy.displayRenewal %}
-            <a id="user-homepage--nav-renew" href="{{ path('user_renew_policy', {'id': policy.id }) }}" class="nav-link {% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}">
-                <i class="fas fa-arrow-alt-circle-up fa-fw"></i> Renew your policy</a>
+            <a href="{{ path('user_renew_policy', {'id': policy.id }) }}" class="nav-link {% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' or app.request.get('_route') == 'user_renew_completed' or app.request.get('_route') == 'user_renew_declined' %}active{% endif %}">
+                <i class="fal fa-star-exclamation fa-fw"></i> Renew your policy</a>
         {% endif %}
 
         {# Claims #}

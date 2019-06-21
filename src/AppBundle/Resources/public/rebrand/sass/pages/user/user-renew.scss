@@ -1,0 +1,21 @@
+// user-renew.scss
+
+@import "../../vendor/bs4/functions";
+@import "../../vendor/bs4/variables";
+@import "../../vendor/bs4/mixins/breakpoints";
+@import "../../abstracts/mixins";
+@import "../../abstracts/palette";
+@import "../../abstracts/variables";
+
+// body {
+//     padding-top: 10rem;
+// }
+
+// .hero {
+//     padding-bottom: 4rem;
+// }
+
+.connection {
+    border: 2px solid rgba(37,147,243, 0.2);
+    @include border-radius(6px);
+}
