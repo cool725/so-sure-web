@@ -1,88 +1,111 @@
-{% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme renew_connections_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
-{% block titleArea %}
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-    <h1 class="h2"><span class="title-top">Thank you for renewing your policy <br class="visible-xs">with so-sure.</span></h1>
+{% block title %}so-sure -  Policy renewed{% endblock %}
 
-    {% if policy.hasCashback %}
-        <h4 class="text-center">
-            Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
-        </h4>
-    {% endif %}
-
-    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
-
-    <p class="lead text-center">Your policy
-        <span class="h4 text-blue">{{ policy.policyNumber }}</span>
-        is scheduled to be renewed on
-        <span class="h4 text-blue">{{ policy.nextPolicy.start|date("d/m/Y") }}</span>.
-    </p>
-
-    {# Maybe these lines could be combined someway ???? #}
-    <p class="lead text-center">
-        {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
-            Your monthly payment is <span class="text-blue h4">£{{ policy.nextPolicy.premium.adjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}</span>
-            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
-                (includes your pot reward discount of <span class="text-blue h4">£{{ policy.nextPolicy.premium.getMonthlyDiscount|number_format(2, '.', ',') }}</span> each month)
-            {% endif %}
-        {% else %}
-            Your annual payment is <span class="text-blue h4">£{{ policy.nextPolicy.premium.adjustedYearlyPremiumPrice|number_format(2, '.', ',') }}</span>
-            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
-                (includes your pot reward discount of <span class="text-blue h4">£{{ policy.nextPolicy.premium.annualDiscount|number_format(2, '.', ',') }}</span> for the year)
-            {% endif %}
-        {% endif %}
-    </p>
-
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-renew.css') }}">
 {% endblock %}
 
-{% block content %}
-    {% if renew_connections_form.renewalConnections|length > 0%}
-        <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
-    {% endif %}
-{% endblock %}
+{% block body %}
 
-{% block actions %}
-    {% if renew_connections_form.renewalConnections|length > 0%}
-    {{ form_start(renew_connections_form) }}
-        <div class="connections">
-            <div class="connections__list">
-                {% for renewalConnection in renew_connections_form.renewalConnections %}
-                    <div class="connections__user connections__user--selected">
-                        {{ form_row(renewalConnection.renew) }}
-                        <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"     style="width: 50px"
-                             title="{{ renewalConnection.vars.data.linkedUser.name }}"
-                             alt="{{ renewalConnection.vars.data.linkedUser.name }}"
-                             class="
-                            {% if not renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}
-                                img-circle coffee-stamp
-                            {% else %}{% endif %}" />
-                        <span class="">{{ renewalConnection.vars.data.linkedUser.name }}</span>
+    <section class="hero">
+        <div class="container">
+            <h1 class="h2 mb-4">Thank you for renewing your policy 🤗</h1>
+            {% if policy.hasCashback %}
+                <p class="lead">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
+            {% endif %}
+            <div class="d-lg-flex justify-content-lg-between mb-4">
+                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+                    <div class="cardbox__body">
+                        <h5 class="cardbox__title">
+                            Your policy
+                        </h5>
+                        <div class="cardbox__text">
+                            <div class="h4">
+                                {{ policy.policyNumber }}
+                            </div>
+                        </div>
                     </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="checkout--step">
-            <div class="container">
-                <div class="form">
-                    <div class="form-group">
-                        {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                </div>
+                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+                    <div class="cardbox__body">
+                        <h5 class="cardbox__title">
+                            Your renewal date
+                        </h5>
+                        <div class="cardbox__text">
+                            <div class="h4">
+                                {{ policy.nextPolicy.start|date("d/m/Y") }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+                </div>
+                <div class="cardbox cardbox-100 mb-4">
+                    <div class="cardbox__body">
+                        <h5 class="cardbox__title">
+                            Your premium
+                        </h5>
+                        <div class="cardbox__text">
+                            <div class="h3">
+                                {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
+                                    &pound;{{ policy.nextPolicy.premium.adjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
+                                {% else %}
+                                    &pound;{{ policy.nextPolicy.premium.adjustedYearlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per year</span>
+                                {% endif %}
+                            </div>
+                            {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
+                                {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                                    including discount of &pound;{{ policy.nextPolicy.premium.getMonthlyDiscount|number_format(2, '.', ',') }} each month
+                                {% endif %}
+                            {% else %}
+                                {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                                    including discount of &pound;{{ policy.nextPolicy.premium.annualDiscount|number_format(2, '.', ',') }} for the year
+                                {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {{ form_end(renew_connections_form) }}
-    {% else %}
-        <div class="checkout--step">
-            <div class="container">
-                <div class="form">
-                    <div class="form-group">
-                        <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+            {% if renew_connections_form.renewalConnections|length > 0%}
+                <p class="mb-4">Make sure that you continue to get your pot reward next year by renewing all your existing connections</p>
+                {{ form_start(renew_connections_form) }}
+                    <div class="row">
+                        {% for renewalConnection in renew_connections_form.renewalConnections %}
+                            <div class="col-lg-4">
+                                <div class="d-flex justify-content-start align-items-center connection mb-4 p-3">
+                                    <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}" alt="{{ renewalConnection.vars.data.linkedUser.name }}"
+                                         title="{{ renewalConnection.vars.data.linkedUser.name }}"
+                                         width="40px"
+                                         class="mr-3 rounded-circle {% if renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}border-danger{% endif %}">
+                                    <span class="h6 mb-0">{{ renewalConnection.vars.data.linkedUser.name }}</span>
+                                    <span class="ml-auto">{{ form_row(renewalConnection.renew) }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                </div>
-            </div>
+                    <div class="form-group">
+                        <a href="{{ path('user_home') }}"
+                           class="btn btn-outline-primary btn-block-xs mr-md-2">Back</a>
+                        {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
+                    </div>
+                {{ form_end(renew_connections_form) }}
+            {% else %}
+                <a href="{{ path('user_home') }}"
+                   class="btn btn-outline-primary btn-block-xs">Back</a>
+            {% endif %}
         </div>
-    {% endif %}
+    </section>
+
+    {# Page Modals #}
+
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}

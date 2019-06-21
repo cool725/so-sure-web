@@ -71,6 +71,8 @@ Encore
     .addEntry('user-unpaid', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-unpaid.js')
     .addEntry('user-purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-purchase-bacs.js')
     .addEntry('user-payment', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-payment.js')
+    .addEntry('user-renew', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-renew.js')
+    .addEntry('user-cashback', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-cashback.js')
     .addEntry('opt-out', './src/AppBundle/Resources/public/rebrand/js/pages/opt-out.js')
 
     // Claim

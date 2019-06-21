@@ -60,7 +60,7 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <button id="sms-login-btn" class="btn btn-block btn-icon btn-success arrow-right">Login via SMS</button>
+                            <button id="sms-login-btn" class="btn btn-block btn-icon btn-success">Login via SMS <i class="far fa-arrow-right fa-fw ml-2"></i></button>
                         </div>
                     </form>
                     <form id="accountkit-form"
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-success arrow-right">Login via Email</button>
+                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-success">Login via Email <i class="far fa-arrow-right fa-fw ml-2"></i></button>
                         </div>
                     </form>
                 </div>
@@ -122,27 +122,25 @@
                 <div class="login__divider"><span class="h6 text-grey">or login via</span></div>
 
                 {# Login with #}
-                <ul class="list-inline text-center mb-0">
-                    <li class="list-inline-item">
-                        <a href="#" id="swap-login" class="btn btn-primary btn-square btn-shadow"><i class="fal fa-envelope fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Email</span></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="#" id="fb-login" class="btn btn-facebook btn-square"><i class="fab fa-facebook fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Facebook</span></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}" class="btn btn-google btn-square"><i class="fab fa-google fa-lg mr-sm-1"></i> <span class="mt-1 mt-sm-0">Google</span></a>
-                    </li>
-                </ul>
+                <div class="row">
+                    <div class="col">
+                        <a href="#" id="swap-login" class="btn btn-primary btn-square btn-sm btn-block btn-shadow"><i class="fas fa-envelope fa-lg"></i> <br> <span class="mt-1">Email</span></a>
+                    </div>
+                    <div class="col">
+                        <a href="#" id="fb-login" class="btn btn-facebook btn-block btn-square btn-sm"><i class="fab fa-facebook fa-lg"></i> <br> <span class="mt-1">Facebook</span></a>
+                    </div>
+                    <div class="col">
+                        <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}" class="btn btn-google btn-block btn-square btn-sm"><i class="fab fa-google fa-lg"></i> <br> <span class="mt-1">Google</span></a>
+                    </div>
+                </div>
 
                 {# Partner Login #}
                 {% if feature_enabled('starling') %}
-                    <div class="login__divider"><span class="h6 text-grey">partner login</span></div>
-
-                    <ul class="list-inline text-center mb-0">
-                        <li class="list-inline-item">
-                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}" class="btn btn-starling btn-square"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp; <span>Starling</span></a>
-                        </li>
-                    </ul>
+                     <div class="row mt-4">
+                        <div class="col">
+                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}" class="btn btn-starling btn-block btn-square"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp; <span>Starling</span></a>
+                        </div>
+                     </div>
                 {% endif %}
             </div>
         </div>

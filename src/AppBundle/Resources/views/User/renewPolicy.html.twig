@@ -1,149 +1,133 @@
-{% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
-{% block titleArea %}
-    <h1>
-        <span class="title-top">Renew your</span>
-        <br class="visible-xs">
-        <span class="title-phone title-phone_renew text-blue text-nowrap">{{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} </span>
-        <br class="visible-xs">
-        <span class="title-top">insurance</span><br>
-        {% if policy.getPremiumPlan == 'monthly' %}
-            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}</span> per month</span>
-        {% else %}
-            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}</span> per year</span>
-        {% endif %} <br>
-    </h1>
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-    {% if policy.potValue > 0 %}
-        <div class="text-center">
-            <span class="h4 text-light-blue">
-                {% if policy.getPremiumPlan == 'monthly' %}
-                    (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}</span> per month without your <span class="text-blue">£{{ policy.potValue|number_format(2, '.', ',') }}</span> reward pot)
-                {% else %}
-                    (<span class="text-blue">£{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}</span> per year without your <span class="text-blue">£{{ policy.potValue|number_format(2, '.', ',') }}</span> reward pot)
-                {% endif %}
-            </span>
-        </div>
-    {% endif %}
+{% block title %}so-sure -  Renew your policy{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-renew.css') }}">
 {% endblock %}
 
-{% block content %}
-    <h4 class="text-center">and keep covered against:</h4>
+{% block body %}
 
-    <div class="owl-carousel owl-theme visible-xs benefits">
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-            <h5>Water damage</h5>
-        </div>
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
-            <h5>Cracked screen</h5>
-        </div>
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-            <h5>Loss</h5>
-        </div>
-        <div class="item">
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-            <h5>Theft</h5>
-        </div>
-    </div>
-
-    <ul class="list-inline cover-list hidden-xs benefits">
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-            <h5 class="h-light">Water damage</h5>
-        </li>
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
-            <h5 class="h-light">Cracked screen</h5>
-        </li>
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-            <h5 class="h-light">Loss</h5>
-        </li>
-        <li>
-            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-            <h5 class="h-light">Theft</h5>
-        </li>
-    </ul>
-{% endblock %}
-
-{% block actions %}
-    <div class="checkout--step">
+    <section class="hero">
         <div class="container">
-            <form>
-                <div class="form-step">
-                    <div class="form-group">
-                        <a href="#"
-                           class="btn btn-green btn-block btn-pad"
-                           data-toggle="modal"
-                           data-target="#renewModal">Renew my policy</a>
-                    </div>
-                    {# if there is only a single option (e.g. yearly payments w/no cashback), then no need for custom page #}
-                    <div class="form-group">
-                        {% if policy.potValue > 0 %}
-                            <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-blue btn-block btn-pad">Make changes</a>
-                        {% else %}
-                            <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-blue btn-block btn-pad">Make changes</a>
-                        {% endif %}
+            <h1 class="h2 mb-4">Renew your policy 🤗</h1>
+            <div class="d-lg-flex justify-content-lg-between mb-4">
+                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+                    <div class="cardbox__body">
+                        <h5 class="cardbox__title">
+                            Renewing your
+                        </h5>
+                        <div class="cardbox__text">
+                            <div class="h4">
+                                {{ policy.phone.make }} {{ policy.phone.model }}
+                                {% if policy.phone.memory %}<span class="sub">{{ policy.phone.memory }}GB</span>{% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <p><small>
-                    {% if renew.getMonthlyPremiumPrice < policy.premium.getMonthlyPremiumPrice %}
-                        We have great news. Your renewal premium is less than last year's premium of
-                    {% else %}
-                        Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
-                    {% endif %}
-                    {% if policy.getPremiumPlan == 'monthly' %}
-                        <span class="text-blue">£{{ policy.premium.getMonthlyPremiumPrice|number_format(2, '.', ',') }}</span> per month.
-                    {% else %}
-                        <span class="text-blue">£{{ policy.getYearlyPremiumPrice|number_format(2, '.', ',') }}</span> per year.
-                    {% endif %}
-                </small></p>
-            </form>
+                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+                    <div class="cardbox__body">
+                        <h5 class="cardbox__title">
+                            {% if policy.potValue > 0 %}
+                                Using your Reward Pot 💰
+                            {% else %}
+                                Renewal Price
+                            {% endif %}
+                        </h5>
+                        <div class="cardbox__text">
+                            <div class="h3">
+                                {% if policy.getPremiumPlan == 'monthly' %}
+                                    &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
+                                {% else %}
+                                    &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per year</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if policy.potValue > 0 %}
+                    <div class="cardbox cardbox-100 mb-4">
+                        <div class="cardbox__body">
+                            <h5 class="cardbox__title">
+                                Without Reward Pot 📈
+                            </h5>
+                            <div class="h3">
+                                {% if policy.getPremiumPlan == 'monthly' %}
+                                    &pound;{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
+                                {% else %}
+                                    &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}  <span class="sub">per year</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <p class="mb-4">
+                {% if renew.getMonthlyPremiumPrice < policy.premium.getMonthlyPremiumPrice %}
+                    We have great news. Your renewal premium is less than last year's premium of
+                {% else %}
+                    From time to time so-sure reviews its pricing to ensure we are charging the right price for a device in relation to the cost of repairs and replacement. This means your premium may move up or down at renewal. We always try to ensure we remain competitive and we never offer new customers better prices than those we offer to existing customers or any other type of introductory discounts. <u>Your premium last year was
+                {% endif %}
+                {% if policy.getPremiumPlan == 'monthly' %}
+                    &pound;{{ policy.premium.getMonthlyPremiumPrice|number_format(2, '.', ',') }} per month.
+                {% else %}
+                    &pound;{{ policy.getYearlyPremiumPrice|number_format(2, '.', ',') }} per year.
+                {% endif %}</u>
+            </p>
+            {# if there is only a single option (e.g. yearly payments w/no cashback), then no need for custom page #}
+            {% if policy.potValue > 0 %}
+                <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}"
+                   class="btn btn-outline-primary btn-block-xs mr-md-2">Make changes</a>
+            {% else %}
+                <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}"
+                   class="btn btn-outline-primary btn-block-xs mr-md-2">Make changes</a>
+            {% endif %}
+            <a href="#"
+               class="btn btn-success btn-block-xs"
+               data-toggle="modal"
+               data-target="#renew_modal">Renew my policy</a>
         </div>
-    </div>
-{% endblock %}
+    </section>
 
-{% block modals %}
-    <div class="modal modal-purchase fade"
-         id="renewModal"
-         tabindex="-1"
-         role="dialog">
+    {# Page Modals #}
+    <div class="modal fade"
+         id="renew_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="renew_modal"
+         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button"
-                            class="close"
-                            data-dismiss="modal"
-                            aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                    <h5 class="modal-title">Please confirm the following are correct</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
                     </button>
-                    <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
                 </div>
                 <div class="modal-body">
-                    <div class="modal-body__review">
-                        {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                    {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                        <p>Please be advised that if you confirm that the below is true and we later discover that it isn’t, your claim might get denied.</p>
                         <ol>
-                            <li>My phone is in full working condition and my screen is not cracked.</li>
-                            <li>I am a resident of the United Kingdom.</li>
-                            <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                            <li class="mb-3">My phone is in full working condition and my screen is not cracked</li>
+                            <li class="mb-3">I am a resident of the United Kingdom</li>
+                            <li class="mb-4">I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v12.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
                         </ol>
-                        <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                         <div class="form-group">
-                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-square btn-block-xs'}}) }}
                         </div>
-                        {{ form_end(renew_form) }}
-                    </div>
-                    <div class="modal-policy-embedded" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true, 'noH1': true }) }}" style="display: none;">
-                        <div class="text-center" style="margin-bottom: 20px;">
-                            <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading..."><br>
-                            <a href="#" id="reload-policy" class="btn btn-blue-hollow" style="display:none;"><i class="fa fa-refresh" aria-hidden="true"></i> reload</a>
-                        </div>
-                    </div>
+                    {{ form_end(renew_form) }}
                 </div>
             </div>
         </div>
     </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}
