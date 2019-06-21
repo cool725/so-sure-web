@@ -27,6 +27,14 @@ trait DateTrait
             new \DateTime('2019-08-26'),
             new \DateTime('2019-12-25'),
             new \DateTime('2019-12-26'),
+            new \DateTime('2020-01-01'),
+            new \DateTime('2020-04-10'),
+            new \DateTime('2020-04-13'),
+            new \DateTime('2020-05-08'),
+            new \DateTime('2020-05-25'),
+            new \DateTime('2020-08-31'),
+            new \DateTime('2020-12-25'),
+            new \DateTime('2020-12-28'),
         ];
     }
 

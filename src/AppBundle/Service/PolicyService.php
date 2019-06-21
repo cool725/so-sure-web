@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
 use AppBundle\Document\Feature;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
@@ -969,6 +970,20 @@ class PolicyService
             // initial purchase should start at 1 month from initial purchase
             $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
 
+            if ($policy->getPaymentMethod() instanceof BacsPaymentMethod) {
+                try {
+                    $scheduledDate = $this->adjustPaymentForBankHolidayAndWeekend($scheduledDate);
+                } catch (\Exception $e) {
+                    $this->logger->error(
+                        sprintf(
+                            "Scheduled payment for date %s - weekend or bank holiday adjustment failed",
+                            $scheduledDate
+                        )
+                    );
+                    throw $e;
+                }
+            }
+
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setScheduled($scheduledDate);
@@ -979,8 +994,60 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            $policy->addScheduledPayment($scheduledPayment);
+            if ($scheduledDate >= $policy->getStart()) {
+                $policy->addScheduledPayment($scheduledPayment);
+            } else {
+                $this->logger->notice('Attempted to set scheduled payment for before policy start.');
+            }
         }
+    }
+
+    /**
+     * Can add up to 4 days (1-2 days at a time) to a scheduled date depending on the date.
+     * Sunday will add one day
+     * Saturday will add two days
+     * Bank holiday Monday will add one day
+     * Bank holiday Friday will add 1 day.
+     * Largest addition will be:
+     * Original schedule date is bank holiday Friday
+     * add one day and move to Saturday - recurse
+     * Add two days and move to bank holiday Monday - recurse
+     * Add one day and move to Tuesday.
+     *
+     * @param \DateTime $date
+     * @return \DateTime
+     * @throws \Exception
+     */
+    public function adjustPaymentForBankHolidayAndWeekend(\DateTime $date)
+    {
+        /**
+         * If the scheduled date is a weekend, we want to move it to the next Monday.
+         * date format w returns 0-6 for Sunday to Saturday.
+         * If we get 0 we want to add 1 day, if we get 6, we want to add 2 days.
+         */
+        if (!static::isWeekDay($date)) {
+            $weekendInterval = $date->format('w') == 0 ? 1 : 2;
+            $date->add(new \DateInterval(sprintf('P%dD', $weekendInterval)));
+        }
+
+        /**
+         * Since we cannot have a bank holiday on a weekend, but we can have one after,
+         * we need to check if we have moved from a weekend to a bank holiday and adjust again.
+         */
+        if (static::isBankHoliday($date)) {
+            $date->add(new \DateInterval('P1D'));
+        }
+
+        /**
+         * Easter and Christmas make it so that we can have 2 bank holidays in a row.
+         * We also can go from a bank holiday Friday to a weekend. So we will check
+         * again. If we are still on a weekend or a bank holiday,  we need to recurse
+         * and adjust again.
+         */
+        if (static::isWeekendOrBankHoliday($date)) {
+            return $this->adjustPaymentForBankHolidayAndWeekend($date);
+        }
+        return $date;
     }
 
     /**
