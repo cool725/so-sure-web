@@ -334,7 +334,8 @@ trait UserClassTrait
         $addPayment = false,
         $createPolicy = false,
         $monthly = true,
-        $imei = null
+        $imei = null,
+        $billing = null
     ) {
         self::addAddress($user);
 
@@ -380,7 +381,7 @@ trait UserClassTrait
                 throw new \Exception('Attempted to create policy without setting a phone');
             }
 
-            $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999));
+            $policy->create(rand(1, 999999), 'TEST', $date, rand(1, 999999), $billing);
         }
 
         $dm->persist($policy);
