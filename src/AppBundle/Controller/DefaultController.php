@@ -345,6 +345,7 @@ class DefaultController extends BaseController
      * @Route("/comparison", name="comparison")
      * @Route("/vendi-app", name="vendi_app")
      * @Route("/so-sure-compared", name="so_sure_compared")
+     * @Route("/moneyback", name="moneyback")
      */
     public function affiliateLanding(Request $request)
     {
@@ -459,6 +460,14 @@ class DefaultController extends BaseController
             $data = [
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'so-sure-compared',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+        } elseif ($request->get('_route') == 'moneyback') {
+            $data = [
+                'competitor' => $this->competitorsData(),
+                'affiliate_page' => 'moneyback',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'LICI',
