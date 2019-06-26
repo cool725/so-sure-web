@@ -4133,12 +4133,16 @@ abstract class Policy
         return $this->hasPolicyPrefix(self::PREFIX_INVALID);
     }
 
+    /**
+     * Tells you if a given policy is valid.
+     * @param string|null $prefix is an optional prefix to consider as valid, otherwise use the hardcoded prefix for the
+     *                            given policy type.
+     */
     public function isValidPolicy($prefix = null)
     {
         if (!$this->isPolicy()) {
             return false;
         }
-
         return $this->hasPolicyPrefix($prefix);
     }
 
@@ -6021,8 +6025,8 @@ abstract class Policy
             return false;
         }
 
-        // if its not a valid policy, then pending - pending policies can make a bacs payment in time
-        if (!$this->isValidPolicy()) {
+        // pending policies can make a bacs payment in time
+        if (!$this->isPolicy()) {
             return true;
         }
 
