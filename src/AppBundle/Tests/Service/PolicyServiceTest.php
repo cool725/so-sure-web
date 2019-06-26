@@ -287,7 +287,11 @@ class PolicyServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            'create-policyNumber@so-sure.com',
+            self::generateEmail(
+                'create-policyNumber',
+                $this,
+                true
+            ),
             'bar',
             null,
             static::$dm
@@ -300,8 +304,8 @@ class PolicyServiceTest extends WebTestCase
         /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
-        $this->assertFalse($updatedPolicy->isValidPolicy());
-        $this->assertTrue(mb_stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
+        $this->assertTrue($updatedPolicy->isValidPolicy());
+        $this->assertFalse(mb_stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
     }
 
     public function testCreatePolicyDuplicateCreate()
@@ -4678,7 +4682,6 @@ class PolicyServiceTest extends WebTestCase
         $premium = $renewalPolicyA->getPremium();
         $this->assertEquals($premium->getYearlyPremiumPrice(), $renewalPolicyA->getTotalPremiumPrice());
         $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getTotalGwp());
-
         $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getUsedGwp());
         $this->assertEquals($premium->getYearlyIpt(), $renewalPolicyA->getTotalIpt());
         $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicyA->getTotalBrokerFee());
