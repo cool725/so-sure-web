@@ -22,13 +22,13 @@ parameters:
         - ROLE_EMPLOYEE
     sosure_ips:
         - '82.16.104.75' # patrick
-        - '82.163.118.154' # so-sure ip @ frameworks
-        - '82.163.117.184' # frameworks ip
+        - '79.173.172.226' # mindspace
+        - '79.173.172.228' # mindspace 2
         - '10.0.2.2'
     analytics_ips:
         - '82.16.104.75' # patrick
-        - '82.163.118.154' # so-sure ip @ frameworks
-        - '82.163.117.184' # frameworks ip
+        - '79.173.172.226' # mindspace
+        - '79.173.172.228' # mindspace 2
         - '10.0.2.2'
         - '87.242.130.154' # seo works
     pos_ips:
