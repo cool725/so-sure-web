@@ -766,6 +766,8 @@ nelmio_security:
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
                 - https://tr-shadow.snapchat.com
+                - https://*.criteo.net
+                - https://*.criteo.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -836,7 +838,8 @@ nelmio_security:
                 - https://*.quantserve.com
                 - https://secure.quantserve.com
                 - https://rules.quantcount.com
-                - https://static.criteo.net
+                - https://*.criteo.net
+                - https://*.criteo.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
