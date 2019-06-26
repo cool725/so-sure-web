@@ -1,5 +1,11 @@
 {% extends 'admin_claims_base_rebrand.html.twig' %}
-{# {% form_theme promotionForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
+{% form_theme reconciliationForm with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme lloydsForm with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme cashflowsForm with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme barclaysStatementForm with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme checkoutForm with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme barclaysForm with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme judoForm with 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
 {% set body_class = 'admin-banking' %}

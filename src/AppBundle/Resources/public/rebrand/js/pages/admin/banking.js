@@ -7,8 +7,11 @@
 
 // Require components
 // require('tempusdominus-bootstrap-4');
+import bsCustomFileInput from 'bs-custom-file-input';
 
 $(function(){
+
+    bsCustomFileInput.init();
 
     $('.delete-file').on('click', function(event) {
         e.preventDefault();

@@ -10,8 +10,11 @@ require('datatables.net')(window, $);
 require('datatables.net-dt')(window, $);
 require('moment');
 // require('tempusdominus-bootstrap-4');
+import bsCustomFileInput from 'bs-custom-file-input';
 
 $(function(){
+
+    bsCustomFileInput.init();
 
     $('#serial_number_modal').on('show.bs.modal', function (e) {
         let button = $(e.relatedTarget),
