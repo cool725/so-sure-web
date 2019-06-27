@@ -378,6 +378,42 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/createScheduledPayment/{id}", name="checkout_refund_form")
+     * @Template
+     */
+    public function createScheduledPaymentFormAction(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+        // Make sure the person making the request has the right permission.
+        // Create the form.
+        $scheduledPayment = new ScheduledPayment($policy);
+        $scheduledPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('create_scheduled_payment_form', CreateScheduledPaymentType::class, $scheduledPayment)
+            ->setAction($this->generateUrl('create_scheduled_payment_form', ['id' => $policy->getId()]))
+            ->getForm();
+        // process the form.
+        if ($request->getMethod() === 'POST') {
+            if ($request->request->has('create_scheduled_payment_form')) {a
+                $createScheduledPaymentForm->handleRequest($request);
+                if($createScheduledPaymentForm->isValid()) {
+
+                }
+            }
+        }
+
+
+
+        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+    }
+
+    /**
      * @Route("/phone", name="admin_phone_add")
      * @Method({"POST"})
      */
