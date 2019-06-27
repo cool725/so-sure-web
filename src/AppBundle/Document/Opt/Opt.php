@@ -100,7 +100,7 @@ abstract class Opt
     {
         return $this->id;
     }
-    
+
     public function getCreated()
     {
         return $this->created;

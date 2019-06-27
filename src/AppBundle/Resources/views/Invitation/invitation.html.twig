@@ -1,19 +1,21 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'home' %}
+{% set body_class = 'invite' %}
 
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 
 {# Set Meta #}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
+{% endblock %}
 {% set og_title = 'Sign up and save' %}
 {% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% set robots_noindex = true %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/social-insurance.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/invite.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -21,213 +23,249 @@
     <section class="hero">
         <div class="container container-xtra">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-5">
                     <div class="hero__intro">
-                        {% if invitation.inviter is defined %}
-                            <h1 class="mb-4 text-white fit">Protect your phone<br><span class="sub">with {{ invitation.inviter.name }}</span></h1>
-                            <h4 class="text-zaffre h5">Connect with {{ invitation.inviter.firstname }}. Get &pound;10 each 😁</h4>
-                        {% else %}
-                            <h1 class="mb-4 text-white fit">Protect your phone <br><span class="sub">with so-sure</span></h1>
-                            <h4 class="text-zaffre">Connect with friends. Get &pound;10 each 😁</h4>
-                        {% endif %}
-                        <p class="mb-4 text-white">Join forces with careful people you know and see up to 80% of your insurance premium reimbursed every year if none of you claim. Yes, really!</p>
-                    </div>
-                    <div class="hero__controls pb-3">
-                        <a href="#"
-                           class="btn btn-success btn-block-xs mr-sm-2 track-data get-a-quote disabled"
-                           data-event-name="get-a-quote-email-invite">
-                           Get a Quote</a>
-                        <a href="#"
-                           class="btn btn-outline-white watch-video btn-block-xs"
-                           data-event="watch-video-invitation-hero"
-                           data-toggle="modal"
-                           data-target="#sosure-video-modal"
-                           data-src="https://www.youtube.com/embed/2AjD09ZQhQ4">
-                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-                            See how it works
-                        </a>
-                        {# {% if invitation is defined and invitation %}
-                            {{ form_start(form, { 'attr': { 'class': 'mt-4 text-center text-md-left' }}) }}
-                                {{ form_widget(form) }}
-                            {{ form_end(form) }}
-                        {% endif %} #}
-                    </div>
-                </div>
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
-                    </div>
-                </div>
-            </div>
-            <div class="hero__illustration  d-block d-lg-none">
-                <img src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid animated jackInTheBox">
-            </div>
-        </div>
-    </section>
-
-    {# Cred #}
-    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
-
-    <section class="intro py-lg-5">
-        <div class="container container-xtra py-5">
-            <h2 class="h3 mb-5 text-primary">Here’s how it works</h2>
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="intro__step">
-                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">1</div>
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_connect.png" alt="so-sure - Start Connecting" width="180px">
-                    </div>
-                    <h5 class="text-primary">Start Connecting</h5>
-                    <p class="mb-5 text-zaffre">Invite as many people as you want. Your mum, dad, grandparents, or your mate Bob. You then decide who you want to connect to. Do you know who's really careful 😉?</p>
-                </div>
-                <div class="col-lg-4">
-                    <div class="intro__step">
-                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">2</div>
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - Be careful" width="180px">
-                    </div>
-                    <h5 class="text-primary">Be Careful</h5>
-                    <p class="mb-5 text-zaffre">Easy as that, don't break or lose your phone, or make any claims throughout the policy year. Oh, and make sure your connections do the same</p>
-                </div>
-                <div class="col-lg-4">
-                    <div class="intro__step">
-                        <div class="intro__number d-flex justify-content-center align-items-center h4 text-primary">3</div>
-                        <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Get Rewarded" width="180px">
-                    </div>
-                    <h5 class="text-primary">Get Rewarded</h5>
-                    <p class="mb-2 text-zaffre">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
-                </div>
-            </div>
-            <a href="#" class="btn btn-primary btn-block-xs mt-3 get-a-quote disabled">Get Insured in minutes</a>
-        </div>
-        <div class="intro__background d-none d-lg-block">
-            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right-cut.png" alt="so-sure - Money Back" width="180px" class="d-fk-none">
-            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_money-right.png" alt="so-sure - Money Back" width="250px" class="d-none d-fk-inline">
-        </div>
-    </section>
-
-    {# Cover #}
-    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
-
-    {# We do things differently #}
-    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
-
-    {# Claims Process #}
-    {# {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %} #}
-
-    <section class="reviews py-lg-5">
-        <div class="container container-xtra py-5">
-            <div class="row">
-                <div class="col-lg-6">
-                    <h2 class="h3 mb-4 text-zaffre text-center text-lg-left">Don't just take our <br class="d-inline d-sm-none"> word for it!</h2>
-                    <div id="reviews_carousel"
-                         class="carousel slide carousel-fade"
-                         data-ride="carousel"
-                         data-interval="false">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"I got &pound;80 quid back at the end of the year! I used it to reduce my monthly payments to almost nothing!"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 text-zaffre mr-2">Mark</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
+                        <h1 class="mb-4 text-columbia-blue-e fit">
+                            {% if invitation.inviter is defined %}
+                                Wow, {{ invitation.inviter.firstname }}'s such a <br class="d-none d-lg-inline"> great friend 🥰
+                            {% else %}
+                                Wow, so-sure has the <br class="d-none d-lg-inline"> best insurance 🥰
+                            {% endif %}
+                        </h1>
+                        <div id="invite_carousel"
+                             class="carousel slide mb-4"
+                             data-ride="carousel"
+                             data-interval="6000"
+                             data-wrap="true">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <div class="text-white h3">
+                                        <span class="sub">...they want <strong>you to benefit</strong> from the best mobile cover and earn great rewards</span>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <div class="text-white h3">
+                                        <span class="sub">...they want you to <strong>be rewarded</strong> and get up to 80% of your money back!</span>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <div class="text-white h3">
+                                        <span class="sub">...they don’t want you to end up with a <strong>massive repair bill</strong> when disaster strikes!</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="carousel-item">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"Thanks so sure, me and my husband didnt claim and we both got &pound;40 back, we totally forgot about it so it was a really nice surprise"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 text-zaffre mr-2">Fiona</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="carousel-item">
-                                <div class="reviews__item text-center text-lg-left">
-                                    <span class="mt-2">
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                        <i class="fas fa-star fa-lg text-primary"></i>
-                                    </span>
-                                    <p class="lead py-4">"Great to get some money back, nice one - highly recommend"</p>
-                                    <div class="reviews__footer mb-4">
-                                        <span class="h5 text-zaffre mr-2">Roddy</span> <strong class="text-primary">|</strong> <span class="ml-2">so-sure customer</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <ol class="carousel-indicators">
+                                <li data-target="#invite_carousel"
+                                    class="active"
+                                    data-slide-to="0"></li>
+                                <li data-target="#invite_carousel"
+                                    data-slide-to="1"></li>
+                                <li data-target="#invite_carousel"
+                                    data-slide-to="2"></li>
+                            </ol>
                         </div>
                     </div>
-                    <div class="reviews__controls text-center text-lg-left">
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <a href="#reviews_carousel"
-                                   class="reviews__controls__prev pr-1"
-                                   role="button"
-                                   data-slide="prev">
-                                   <i class="far fa-long-arrow-alt-left fa-2x"></i>
-                                   <span class="sr-only">prev</span>
-                                </a>
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="#reviews_carousel"
-                                   class="reviews__controls__next pl-1"
-                                   role="button"
-                                   data-slide="next">
-                                    <i class="far fa-long-arrow-alt-right fa-2x"></i>
-                                    <span class="sr-only">next</span>
-                                </a>
-                            </li>
-                        </ul>
+                    <div class="hero__controls mb-4">
+                        <a href="#"
+                           class="btn btn-white btn-block-xs mr-sm-2 track-data get-a-quote disabled"
+                           data-event="email-invite-hero-quote-btn">
+                           Get your quote</a>
+                        <a id="user_feedback_btn"
+                           href="#user_feedback"
+                           class="btn btn-outline-white btn-block-xs mr-sm-2">
+                           No thank you</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 offset-lg-1">
+                    <div class="hero__illustration">
+
+                        {# Overlays #}
+                        <img id="hero_img_overlay_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
+                             alt="Likes hearts stars smileys"
+                             class="img-fluid lozad hero__illustration__img">
+                        <img id="hero_img_overlay_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_2_overlay.png"
+                             alt="Hearts stars money"
+                             class="img-fluid hero__illustration__img">
+                        <img id="hero_img_overlay_3"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_overlay.png "
+                             alt="Unhappy warning lightning"
+                             class="img-fluid hero__illustration__img">
+
+                        {# 2nd images #}
+                        <img id="hero_img_2_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_2_1.png "
+                             alt="Reward pot money"
+                             class="img-fluid hero__illustration__img">
+
+                        {# 1st images #}
+                        <img id="hero_img_1_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_2.png "
+                             alt="Happy couple mobile"
+                             class="img-fluid lozad hero__illustration__img">
+                        <img id="hero_img_1_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png "
+                             alt="Happy so-sure phone"
+                             class="img-fluid lozad hero__illustration__img">
+
+                        {# 3rd images #}
+                        <img id="hero_img_3_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_2.png "
+                             alt="Dropped mobile phone"
+                             class="img-fluid hero__illustration__img">
+                        <img id="hero_img_3_3"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_3.png "
+                             alt="Lost mobile phone"
+                             class="img-fluid hero__illustration__img">
+                        <img id="hero_img_3_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_1.png "
+                             alt="Sad so-sure phone"
+                             class="img-fluid hero__illustration__img">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <svg class="d-lg-none"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 750 586"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="V1-Virality-LP-(Mobile)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -1144.000000)" fill="#FFFFFF">
+                    <path d="M0,1464 C146.638193,1458.82104 282.638193,1429.4877 408,1376 C533.361807,1322.5123 647.361807,1245.17896 750,1144 L750,1737 L0,1737 L0,1464 Z" id="Rectangle"></path>
+                </g>
+            </g>
+        </svg>
+        <svg class="d-none d-lg-block d-fl-none"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1440 596"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -113.000000)" fill="#FFFFFF">
+                    <path d="M1440,113.053995 L1440,709 L0,709 L0,609.415089 C115.626287,635.690524 240.187163,650 370,650 C889.293087,650 1324.54128,421.011571 1440,113.053995 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </svg>
+        <svg class="d-none d-fl-block"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1440 313"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="V1-Virality-LP-(Desktop)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -396.000000)" fill="#FFFFFF">
+                    <path d="M1703,114.218143 L1703,709 L0,709 L0,609.339943 C136.864514,635.66324 284.320516,650 438,650 C1051.40793,650 1565.66411,421.588479 1703,114.218143 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    <section class="usps pb-5 pt-md-5">
+        <div class="container container-xtra">
+            <ul class="list-unstyled icn-fa-list d-lg-flex justify-content-lg-between">
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    You get 24-72 hour replace or repair
+                </li>
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    Enjoy low excess from just &pound;50
+                </li>
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    Earn up to 80% money back
+                </li>
+                <li class="h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    New, secondhand &amp; refurbished phones
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="video d-flex align-items-center justify-content-center">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_note_left.png"
+             alt="Bank note"
+             class="lozad video__money-left">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_note_right.png"
+             alt="Bank note"
+             class="lozad video__money-right">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_pot.png"
+             alt="Pot of money"
+             class="lozad video__pot">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_male_avatar.png"
+             alt="Male avatar"
+             class="lozad video__avatar-male">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_female_avatar.png"
+             alt="Female avatar"
+             class="lozad video__avatar-female">
+        <a href="#"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/QEskwqsNgrQ"
+           class="watch-video video__play">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                 alt="Play buttonn"
+                 class="lozad"
+                 width="120px">
+        </a>
+    </section>
+
+    <section class="knowledge-base pb-lg-5">
+        <div class="container pb-5">
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+
+            <div class="end-cta end-cta__mobile d-md-none">
+                <h4 class="mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
+                <a href="#" class="btn btn-success btn-block-xs get-a-quote">Let's start!</a>
+            </div>
+            <div class="end-cta end-cta__desktop d-none d-md-block">
+                <div class="cardbox cardbox-100">
+                    <div class="cardbox__body d-flex align-items-center justify-content-start">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png"
+                             alt="Happy so-sure phone"
+                             width="180px"
+                             class="lozad">
+                        <div class="ml-5">
+                            <h4 class="mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
+                            <a href="#"
+                               class="btn btn-success btn-block-xs track-data get-a-quote"
+                               data-event="
+                                {% if scode is defined and scode and scode.policy %}
+                                    scode-bottom-quote-btn-{{ user_code }}
+                                {% else %}
+                                    scode-bottom-quote-btn
+                                {% endif %}
+                               ">Let's start!</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="banner py-5">
-        <div class="container container-xtra">
-            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
-                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline">
-                    <div class="banner__text text-center text-lg-left ml-lg-4">
-                        <h4 class="text-white">Mobile insurance designed for you</h4>
-                        <p class="lead text-white">Cover your phone in minutes </p>
-                    </div>
-                </div>
-                <div class="banner__controls text-center text-lg-left">
-                    <a href="#"
-                       class="btn btn-outline-white watch-video btn-block-xs mr-sm-2"
-                       data-event="watch-video-index-bottom-banner"
-                       data-toggle="modal"
-                       data-target="#sosure-video-modal"
-                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
-                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-                        Watch our Video
-                    </a>
-                    <a href="#" class="btn btn-white btn-block-xs get-a-quote disabled">Get a Quote</a>
-                </div>
-            </div>
+    <section id="user_feedback" class="feedback py-lg-5">
+        <div class="container container-xtra py-5">
+            {% include 'AppBundle::Components/_feedback.html.twig' %}
         </div>
     </section>
 
     {# Page Modals #}
+    {% include 'AppBundle::Components/_knowledgeBaseModals.html.twig' %}
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    <script src="{{ asset('css-js/invite.js') }}"></script>
 {% endblock %}

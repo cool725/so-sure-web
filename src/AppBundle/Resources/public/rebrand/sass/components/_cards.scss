@@ -6,13 +6,11 @@
     border: 2px solid rgba(37,147,243, 0.2);
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
-    @include border-radius(15px);
+    @include border-radius(12px);
 
     &__body {
         padding: 2rem;
     }
-
-    &__title {}
 
     &__text {
         font-size: 13px;
@@ -20,27 +18,29 @@
 
     @include media-breakpoint-up(lg) {
         width: 300px;
-        // height: 480px;
+    }
+
+    &-400 {
+        @include media-breakpoint-up(md) {
+            height: 400px;
+        }
+    }
+
+    &-460 {
+        @include media-breakpoint-up(md) {
+            height: 460px;
+        }
+    }
+
+    &-100 {
+        width: 100%;
+        max-width: none;
+    }
+
+    &-focus {
+        border: 2px solid rgba(37,147,243, 0.8);
     }
 }
-
-.cardbox-400 {
-    @include media-breakpoint-up(md) {
-        height: 400px;
-    }
-}
-
-.cardbox-460 {
-    @include media-breakpoint-up(md) {
-        height: 460px;
-    }
-}
-
-.cardbox-100 {
-    width: 100%;
-    max-width: none;
-}
-
 
 // Only using px here for consistency
 .expanding-cardbox {
@@ -61,6 +61,12 @@
             position: absolute;
             right: 0; top: 4px;
         }
+
+        .fas {
+            color: lighten($dodger-blue, 30%);
+            position: absolute;
+            right: 0; top: 1.38rem;
+        }
     }
 
     &__excerpt {
@@ -79,24 +85,18 @@
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
     }
-}
 
-.expanding-cardbox-alt {
-    border: 2px solid $columbia-blue-e;
-
-    &:hover {
+    &-alt {
         border: 2px solid $columbia-blue-e;
-        background-color: rgba(255,255,255,.08);
+
+        &:hover {
+            border: 2px solid $columbia-blue-e;
+            background-color: rgba(255,255,255,.08);
+        }
     }
-}
 
-.expanding-cardbox-white {
-    // border: 2px solid $columbia-blue-e;
-    background-color: $white;
-
-    &:hover {
-        // border: 2px solid $columbia-blue-e;
-        // background-color: rgba(255,255,255,.08);
+    &-white {
+        background-color: $white;
     }
 }
 
@@ -119,6 +119,7 @@
 
 .expanding-cardbox__open {
     background-color: $white;
+    border: 2px solid rgba(37,147,243, 0.8);
     cursor: default;
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
@@ -126,6 +127,11 @@
     &.expanding-cardbox-alt {
         background-color: rgba(255,255,255,.08);
         border: 2px solid $columbia-blue-e;
+    }
+
+    // Needs improving
+    .fas {
+        color: $dodger-blue;
     }
 }
 
@@ -225,5 +231,72 @@
             }
 
         }
+    }
+}
+
+.tabbed-cardbox-alt {
+
+    // Using BS tabs
+    .nav-tabs {
+        border: none;
+
+        // Modify - use .justify-content-between on element
+        .nav-item {
+            width: 22%;
+            margin-bottom: -2px;
+            margin-right: 3%;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            position: relative;
+            z-index: 3;
+            padding: 1rem 2rem 1rem 1rem;
+
+            line-height: 1.46;
+            font-family: $g-bold;
+            color: $dodger-blue;
+            background-color: $selago;
+            border: 2px solid rgba(37,147,243, 0.2);
+            border-bottom: none;
+            @include border-top-radius(6px);
+
+            transition: all 0.1s linear;
+
+            .fas {
+                color: lighten($dodger-blue, 30%);
+                position: absolute;
+                right: 1rem; top: 1.8rem;
+            }
+
+            &.active,
+            &:hover {
+                background-color: $white;
+                // border: 2px solid rgba(37,147,243, 0.8);
+                border-bottom: none;
+                color: $zaffre;
+                z-index: 5;
+
+                .fas {
+                    color: $dodger-blue;
+                }
+            }
+        }
+    }
+
+    .tab-content {
+        position: relative;
+        z-index: 4;
+        background-color: $white;
+        border: 2px solid rgba(37,147,243, 0.2);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+        @include border-bottom-radius(12px);
+        @include border-top-right-radius(12px);
+
+        // Pad the content
+        padding: 2rem;
     }
 }

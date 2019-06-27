@@ -44,6 +44,7 @@ Encore
     .addEntry('landing-twitter', './src/AppBundle/Resources/public/rebrand/js/pages/landing-twitter.js')
     .addEntry('landing-facebook', './src/AppBundle/Resources/public/rebrand/js/pages/landing-facebook.js')
     .addEntry('landing-youtube', './src/AppBundle/Resources/public/rebrand/js/pages/landing-youtube.js')
+    .addEntry('invite', './src/AppBundle/Resources/public/rebrand/js/pages/invite.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')

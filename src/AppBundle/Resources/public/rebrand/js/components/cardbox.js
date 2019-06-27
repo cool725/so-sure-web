@@ -19,6 +19,9 @@ $(function() {
 
         // Adjust the arrow
         $(this).find('.far').toggleClass('fa-chevron-up');
+
+        // Adjust the arrow
+        $(this).find('.fas').toggleClass('fa-arrow-circle-up');
     });
 
     // Special case - link to another box and scroll to that box
