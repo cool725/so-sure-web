@@ -1312,8 +1312,6 @@ nelmio_security:
                 - https://www.google.co.za
                 - https://www.google.co.zm
                 - https://www.google.co.zw
-            frame-src:
-                - https://gum.criteo.com
     # prevents framing of the entire site
     clickjacking:
         paths:
