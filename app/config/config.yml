@@ -768,6 +768,7 @@ nelmio_security:
                 - https://tr-shadow.snapchat.com
                 - https://*.criteo.net
                 - https://*.criteo.com
+                - https://gum.criteo.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -840,6 +841,7 @@ nelmio_security:
                 - https://rules.quantcount.com
                 - https://*.criteo.net
                 - https://*.criteo.com
+                - https://sslwidget.criteo.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1310,7 +1312,8 @@ nelmio_security:
                 - https://www.google.co.za
                 - https://www.google.co.zm
                 - https://www.google.co.zw
-
+            frame-src:
+                - https://gum.criteo.com
     # prevents framing of the entire site
     clickjacking:
         paths:
