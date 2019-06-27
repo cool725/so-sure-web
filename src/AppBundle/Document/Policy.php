@@ -3074,12 +3074,24 @@ abstract class Policy
         );
     }
 
-    public function getProratedCommissionRefund(\DateTime $date = null)
+    /**
+     * Get the commission that is owed at a given time.
+     * @param \DateTime $date is the time at which the calculation is accurate.
+     * @return float the amount of commission due.
+     */
+    public function getProratedCommissionPayment(\DateTime $date)
     {
-        $used = $this->getProratedCommission($date);
-        $paid = $this->getTotalCommissionPaid();
+        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+    }
 
-        return $this->toTwoDp($paid - $used);
+    /**
+     * Gets the commission beyond a given point in time to refund.
+     * @param \DateTime $date is the date up to which commission is valid.
+     * @return float the amount of commission due on a refund for payments past the given date.
+     */
+    public function getProratedCommissionRefund(\DateTime $date)
+    {
+        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
     }
 
     public function getDaysInPolicyYear()
@@ -4125,12 +4137,16 @@ abstract class Policy
         return $this->hasPolicyPrefix(self::PREFIX_INVALID);
     }
 
+    /**
+     * Tells you if a given policy is valid.
+     * @param string|null $prefix is an optional prefix to consider as valid, otherwise use the hardcoded prefix for the
+     *                            given policy type.
+     */
     public function isValidPolicy($prefix = null)
     {
         if (!$this->isPolicy()) {
             return false;
         }
-
         return $this->hasPolicyPrefix($prefix);
     }
 
@@ -5169,6 +5185,8 @@ abstract class Policy
                 } elseif ($this->hasPolicyOrUserBacsPaymentMethod()) {
                     // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                } elseif ($this->hasCheckoutPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P11D'));
                 }
             } else {
                 // 4 payment retries - 7, 14, 21, 28; should be 30 days unpaid before cancellation
@@ -5178,6 +5196,8 @@ abstract class Policy
                 } elseif ($this->hasPolicyOrUserBacsPaymentMethod()) {
                     // currently not rescheduling with bacs, 15 days to avoid some incorrect notifications
                     $cancellationDate = $cancellationDate->sub(new \DateInterval('P15D'));
+                } elseif ($this->hasCheckoutPaymentMethod()) {
+                    $cancellationDate = $cancellationDate->sub(new \DateInterval('P4D'));
                 }
             }
             if ($cancellationDate <= $date) {
@@ -6009,8 +6029,8 @@ abstract class Policy
             return false;
         }
 
-        // if its not a valid policy, then pending - pending policies can make a bacs payment in time
-        if (!$this->isValidPolicy()) {
+        // pending policies can make a bacs payment in time
+        if (!$this->isPolicy()) {
             return true;
         }
 

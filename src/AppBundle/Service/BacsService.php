@@ -850,7 +850,7 @@ class BacsService
                     // refund requires commission to be set, but probably isn't at this point in time
                     if (!$submittedPayment->getTotalCommission()) {
                         try {
-                            $submittedPayment->setCommission();
+                            $submittedPayment->setCommission(true);
                         } catch (\Exception $e) {
                             $this->logger->error(sprintf(
                                 'Unable to set refund commission for policy %s',

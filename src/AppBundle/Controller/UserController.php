@@ -85,6 +85,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use AppBundle\Exception\ValidationException;
 
+use AppBundle\Exception\OldDataException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SelfInviteException;
@@ -1096,148 +1097,67 @@ class UserController extends BaseController
 
     /**
      * @Route("/unpaid", name="user_unpaid_policy")
-     * @Template
+     * @Template("@AppBundle/Resources/views/User/unpaidPolicyNoBacs.html.twig")
      */
-    public function unpaidPolicyAction(Request $request)
+    public function unpaidPolicyAction()
     {
-        $amount = 0;
-        $webpay = null;
-
         /** @var User $user */
         $user = $this->getUser();
-        /** @var PhonePolicy $policy */
+        /** @var Policy $policy */
         $policy = $user->getUnpaidPolicy();
         if (!$policy) {
-            $this->get('logger')->warning(sprintf(
-                'Unable to locate unpaid policy for user %s. Policy may be in incorrect state.',
-                $user->getId()
-            ));
-
+            $this->get('logger')->error(sprintf('Unable to locate unpaid policy for user %s.', $user->getId()));
             return new RedirectResponse($this->generateUrl('user_home'));
         }
-
+        $amount = $policy->getOutstandingPremiumToDate();
+        // Validate unpaid policy.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-        if (!$policy->isPolicyPaidToDate()) {
-            $amount = $policy->getOutstandingPremiumToDate();
-            if ($amount <= 0) {
-                $this->get('logger')->warning(sprintf(
-                    'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                    $policy->getId(),
-                    $amount
-                ));
-            }
-        } else {
+        if ($policy->isPolicyPaidToDate()) {
+            // If the policy is meant to be active then there is no harm in just making it active on the spot.
             $this->get('logger')->warning(sprintf(
-                'Unpaid policy %s has unpaid status, yet is paid to date.',
+                'Policy %s has unpaid status, but paid to date. Setting to active.',
                 $policy->getId()
             ));
-        }
-
-        $form = $this->createFormBuilder()
-            ->add('amount', HiddenType::class, ['data' => $amount])
-            ->add('reschedule', SubmitType::class, array(
-                'label' => sprintf("Please take £%0.2f from my account", $amount)
-            ))
-            ->getForm();
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $formAmount = $form->getData()['amount'];
-            if (!$this->areEqualToTwoDp($formAmount, $amount)) {
-                throw new \Exception(sprintf(
-                    'User requested bacs payment amount changed inbetween form submission (%0.2f/%0.2f)',
-                    $formAmount,
-                    $amount
-                ));
-            }
-
-            $now = \DateTime::createFromFormat('U', time());
-            $notes = sprintf(
-                'User manually confirmed payment for £%0.2f on %s',
-                $amount,
-                $now->format(\DateTime::ATOM)
-            );
-
-            /** @var BacsService $bacsService */
-            // TODO: delete this god willing.
-            $bacsService = $this->get('app.bacs');
-            $bacsService->scheduleBacsPayment(
-                $policy,
-                $amount,
-                ScheduledPayment::TYPE_USER_WEB,
-                $notes,
-                $this->getIdentityLogWeb($request)
-            );
-            $this->addFlash('success', 'We will scheduled your payment within the next 3 business days');
-
-            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
-        }
-
-        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        $cardProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
-
-        // For now, only allow monthly policies with bacs
-        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
-            $bacsFeature = false;
-        }
-
-        $includeCard = false;
-        $unpaidReason = $policy->getUnpaidReason();
-        if (in_array($unpaidReason, [
-            Policy::UNPAID_CARD_EXPIRED,
-            Policy::UNPAID_CARD_PAYMENT_FAILED,
-            Policy::UNPAID_CARD_PAYMENT_MISSING,
-            Policy::UNPAID_PAYMENT_METHOD_MISSING,
-        ])) {
-            $includeCard = true;
-        } elseif (!$policy->canBacsPaymentBeMadeInTime() && in_array($unpaidReason, [
-            Policy::UNPAID_BACS_MANDATE_INVALID,
-            Policy::UNPAID_BACS_PAYMENT_FAILED,
-            Policy::UNPAID_BACS_PAYMENT_MISSING,
-        ])) {
-            $includeCard = true;
-        }
-
-        if ($includeCard && $amount > 0 && $cardProvider == SoSure::PAYMENT_PROVIDER_JUDO) {
-            //should never be hit
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $this->getManager()->flush();
+            return new RedirectResponse($this->generateUrl('user_home'));
+        } elseif ($amount <= 0) {
             $this->get('logger')->error(sprintf(
-                'JudoPay web payment made for user %s',
-                $user->getId()
+                'Policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
+                $policy->getId(),
+                $amount
             ));
-            $webpay = $this->get('app.judopay')->webpay(
-                $policy,
-                $amount,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent'),
-                JudopayService::WEB_TYPE_UNPAID
-            );
         }
-
+        $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
             Policy::UNPAID_BACS_UNKNOWN,
             Policy::UNPAID_CARD_UNKNOWN,
             Policy::UNPAID_UNKNOWN
         ])) {
             $this->get('logger')->warning(sprintf(
-                'Policy %s has an unknown unpaid reason (%s)',
+                'Policy %s has unknown unpaid reason (%s)',
                 $policy->getId(),
                 $unpaidReason
             ));
         }
-
-        $data = [
-            'phone' => $policy ? $policy->getPhone() : null,
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
-            'amount' => $amount,
+        // Check feature flags.
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
+        if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+            $bacsFeature = false;
+        }
+        if (!($bacsFeature || $checkoutFeature)) {
+            $this->get('logger')->error('No payment providers available.');
+        }
+        // Send relevant information to the template. Checkout payment happens on frontend and returns to the
+        // purchase controller via their server.
+        return [
             'policy' => $policy,
+            'amount' => $amount,
             'bacs_feature' => $bacsFeature,
             'unpaid_reason' => $unpaidReason,
-            'form' => $form->createView(),
-            'card_provider' => $cardProvider,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
         ];
-
-        return $data;
     }
 
     /**

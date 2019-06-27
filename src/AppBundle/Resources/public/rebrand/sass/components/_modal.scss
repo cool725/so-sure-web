@@ -14,6 +14,14 @@
 
     &-body {
         padding: 2rem;
+
+        ul, ol {
+            padding-left: 20px;
+
+            li {
+                padding-left: 0.5rem;
+            }
+        }
     }
 }
 

@@ -4,12 +4,17 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\DateTrait;
+use AppBundle\Exception\InvalidPaymentException;
 
 /**
  * @group unit
@@ -17,14 +22,7 @@ use AppBundle\Document\CurrencyTrait;
 class PaymentTest extends \PHPUnit\Framework\TestCase
 {
     use CurrencyTrait;
-
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
+    use DateTrait;
 
     public function testCalculatePremium()
     {
@@ -174,20 +172,60 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Generates testing conditions for testSetCommissionPartialPayment.
+     * @return array of sets of arguments to the test.
+     */
+    public function setCommissionPartialPaymentData()
+    {
+        return [
+            "Average case" => [10, 5, 12, 10, 20],
+            "First payment is fractional" => [8, 7, 0, 10, 1],
+            "Very large fractional payment" => [5.4, 9.2, 5, 100, 59],
+            "Very small and early fractional payment" => [3, 3, 0, 1, 0]
+        ];
+    }
+
+    /**
+     * Tests setting the commission for a partial payment.
+     * @param float $gwp          is the test premium GWP.
+     * @param float $ipt          is the test premium IPT.
+     * @param int   $nPayments    is the number of normal payments to make before the payment under test.
+     * @param float $finalPayment is the value of the final payment to make.
+     * @param int   $delay        is the number of days from the last scheduled payment to the final payment.
+     * @dataProvider setCommissionPartialPaymentData
+     */
+    public function testSetCommissionPartialPayment($gwp, $ipt, $nPayments, $finalPayment, $delay)
+    {
+        $startDate = new \DateTime();
+        $policy = $this->createEligiblePolicy($startDate, $gwp, $ipt, 0.1);
+        $date = clone $startDate;
+        for ($i = 0; $i < $nPayments; $i++) {
+            $this->addPayment($policy, $date);
+            $date->add(new \DateInterval("P1M"));
+        }
+        // Now perform the abnormal fraction.
+        $paymentDate = $this->addDays($date, $delay);
+        $payment = new CheckoutPayment();
+        $payment->setDate($paymentDate);
+        $payment->setAmount($finalPayment);
+        $policy->addPayment($payment);
+        // Make sure that the fractional commission is correct.
+        // Should be equal to pro rata commission due.
+        $payment->setCommission(true);
+        $payment->setSuccess(true);
+        $this->assertEquals($policy->getProratedCommission($paymentDate), $policy->getTotalCommissionPaid());
+    }
+
+    /**
      * @expectedException \AppBundle\Exception\CommissionException
      */
     public function testSetCommissionRemainderFailsWithFalse()
     {
-        $policy = new PhonePolicy();
-        $premium = new PhonePremium();
-
-        $premium->setIptRate(0.12);
-        $premium->setGwp(5);
-        $premium->setIpt(1);
-        $policy->setPremium($premium);
+        $startDate = new \DateTime();
+        $policy = $this->createEligiblePolicy($startDate, 5, 1, 0.12);
 
         $payment = new CheckoutPayment();
-        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 0.5);
 
         $policy->addPayment($payment);
 
@@ -196,16 +234,11 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testSetCommissionRemainderDoesNotFailWithTrue()
     {
-        $policy = new PhonePolicy();
-
-        $premium = new PhonePremium();
-        $premium->setIptRate(0.12);
-        $premium->setGwp(5);
-        $premium->setIpt(1);
-        $policy->setPremium($premium);
+        $startDate = new \DateTime();
+        $policy = $this->createEligiblePolicy($startDate, 5, 1, 0.12);
 
         $payment = new CheckoutPayment();
-        $payment->setAmount($premium->getMonthlyPremiumPrice() * 0.5);
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 0.5);
 
         $policy->addPayment($payment);
 
@@ -214,5 +247,76 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $commission = $payment->getTotalCommission();
         $this->assertGreaterThan(0, $commission);
         static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
+    }
+
+    /**
+     * Makes sure that if you try to calculate the commission on a partial refund directly it will throw a commission
+     * exception.
+     */
+    public function testSetCommissionFailsWithPartialRefund()
+    {
+        $policy = $this->createEligiblePolicy(new \DateTime(), 5, 6, 1);
+        $payment = new CheckoutPayment();
+        $payment->setAmount(-4.3);
+        // Make sure this payment throws an exception when calculating commission is attempted.
+        $this->expectException(InvalidPaymentException::class);
+        $payment->setCommission(true);
+    }
+
+    /**
+     * Makes sure that calling setCommission on a payment with no policy throws and invalid payment exception.
+     */
+    public function testSetComissionWithoutPolicyFails()
+    {
+        $payment = new CheckoutPayment();
+        $payment->setAmount(4.3);
+        // make sure an exception is thrown for all inputs in this case.
+        $this->expectException(InvalidPaymentException::class);
+        $payment->setCommission(false);
+        $this->expectException(InvalidPaymentException::class);
+        $payment->setCommission(true);
+    }
+
+    /**
+     * Creates a policy that is set up enough that it can calculate pro rata commission.
+     * @param \DateTime $startDate is the date at which the policy starts.
+     * @param float     $gwp       is the policy premium's GWP.
+     * @param float     $ipt       is the policy premium's IPT.
+     * @param float     $iptRate   is the policy premium's IPT rate.
+     * @return Policy that has just been created.
+     */
+    private function createEligiblePolicy(\DateTime $startDate, $gwp, $ipt, $iptRate)
+    {
+        $nextYear = clone $startDate;
+        $nextYear = $nextYear->modify('+1 year');
+        $nextYear->modify("-1 day");
+        $nextYear->setTime(23, 59, 59);
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($startDate);
+        $policy->setEnd($nextYear);
+        $policy->setStaticEnd($nextYear);
+        $premium = new PhonePremium();
+        $premium->setGwp($gwp);
+        $premium->setIpt($ipt);
+        $premium->setIptRate($iptRate);
+        $premium->setIptRate($ipt / 12);
+        $policy->setPremium($premium);
+        return $policy;
+    }
+
+    /**
+     * Create a normal premium payment for the given date and add it to the given policy.
+     * @param Policy    $policy is the policy to add the payment to and whose premium is used.
+     * @param \DateTime $date   is the date at which the payment occurs.
+     */
+    private function addPayment($policy, \DateTime $date)
+    {
+        $payment = new CheckoutPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setDate($date);
+        $policy->addPayment($payment);
+        $payment->setCommission();
+        $payment->setSuccess(true);
     }
 }

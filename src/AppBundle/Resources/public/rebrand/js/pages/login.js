@@ -128,7 +128,7 @@ sosure.login = (function() {
 
     self.btnToggle = () => {
         self.swapLogin.find('span').toggleText('SMS', 'Email');
-        self.swapLogin.find('i').toggleClass('fas fa-envelope fal fa-mobile-android');
+        self.swapLogin.find('i').toggleClass('fas fa-envelope fas fa-mobile-android');
     }
 
     // Validate the input
