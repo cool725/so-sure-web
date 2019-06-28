@@ -525,6 +525,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
             $refund = $policy->getRefundAmount(false, true);
             $refundCommission = $policy->getRefundCommissionAmount(false, true);
+            // invert the refund commission amount for non cool-off cancellations
+            // that will need a proper fix at some point but since it is only affecting validation,
+            // its probably enough for now
+            if ($policy->getCancelledReason() != null && $policy->getCancelledReason() != Policy::CANCELLED_COOLOFF) {
+                $refundCommission *= -1.0;
+            }
             $pendingBacsTotal = abs($policy->getPendingBacsPaymentsTotal(true));
             $pendingBacsTotalCommission = abs($policy->getPendingBacsPaymentsTotalCommission(true));
             $refundMismatch =  $this->greaterThanZero($refund) && $refund > $pendingBacsTotal &&
