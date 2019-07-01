@@ -110,7 +110,8 @@ class SCode
 
         $firstName = str_pad($user->getFirstName(), 1, "0");
         $lastName = str_pad($user->getLastName(), $length, "0");
-        $name = sprintf("%s%s%s", $prefix, mb_substr($firstName, 0, 1), mb_substr($lastName, 0, $length - 1));
+        $lastNameStripped = str_replace("'", "", $lastName);
+        $name = sprintf("%s%s%s", $prefix, mb_substr($firstName, 0, 1), mb_substr($lastNameStripped, 0, $length - 1));
 
         return trim(mb_strtolower($name));
     }
@@ -285,7 +286,7 @@ class SCode
 
         return null;
     }
-    
+
     public function isStandard()
     {
         return $this->getType() == self::TYPE_STANDARD;
