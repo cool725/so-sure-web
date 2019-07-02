@@ -475,7 +475,7 @@ class UserController extends BaseController
                     $this->addFlash(
                         'warning-raw',
                         sprintf(
-                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
+                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
                             $checkPolicy->getPolicyNumber(),
                             $url
                         )
