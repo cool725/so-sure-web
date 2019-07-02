@@ -1,217 +1,159 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme claim_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
-{% set distraction_free = 1 %}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-{% block title %}so-sure - Make a claim
+{% block title %}so-sure - Theft claim - {{ app.user.firstname }}{% endblock %}
+
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-claim.css') }}">
 {% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-        'components/animate.css/animate.min.css'
-        '@AppBundle/Resources/public/sass/page/claim.scss'
-    %}
-        <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-
-{# {% block nav %}{% endblock %} #}
 
 {% block body %}
-    {% set sectionCount = 1 %}
 
-    <section id="claim-form-container" class="section--pad background-off-white">
+    <section class="hero">
         <div class="container">
+            <h1 class="h2 mb-4">Complete your loss claim 💔</h1>
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-
-                    <h1 class="text-center">Complete your claim</h1>
-
-                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form claim__form-generic', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
-
-                        <div class="h4 text-center">I, {{ username }}, am making a claim for {{ claimType }}.</div>
-
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">{{ sectionCount }}. Can you find your phone?</h3>
-                                {% set sectionCount = sectionCount + 1 %}
+                <div class="col-lg-5 order-lg-12">
+                    <div class="bg-selago p-4 mb-4 rounded">
+                        <h2 class="h3 mb-4">Important info ⚠️</h2>
+                        <p>You can save your progress and come back at a later date if you need more time to get all of the required documents.</p>
+                        <p>Once you've submitted all the required documents, we will review your claim and get back to you within a working day. Once the claim is approved we are normally able to get you back up and running in 24-72 hours, however some repairs may take a little longer.</p>
+                    </div>
+                </div>
+                <div class="col-lg-7 order-lg-1">
+                    {{ form_start(claim_form, { 'attr': {
+                        'data-toggle': 'validator',
+                        'class': 'validate-form',
+                        'data-client-validation': form_client_validation
+                    }}) }}
+                        <div class="h5 mb-4">I, {{ username }}, am making a claim for Theft</div>
+                        <p>We know It sounds a bit silly, because someone just stole your phone and we're asking you if you can find it. However, we have had several cases where our customers thought that someone had stolen a phone, but instead
+                        it had accidentally slipped out of their bag and some kind person handed it in.</p>
+                        <p>We do ask that you contact the last place you can recall having your phone to see if a kind person has handed it in.</p>
+                        <p class="mb-4">We need a bit more information about your {{ claim.policy.phone }}</p>
+                        <div class="form-row mb-4">
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.contactedPlace, 'Where did you last have your phone?') }}
+                                {{ form_widget(claim_form.contactedPlace, { 'attr': {'class': 'form-control', 'placeholder': 'Home, work, shop etc...'}}) }}
+                                <div class="with-errors">{{ form_errors(claim_form.contactedPlace) }}</div>
                             </div>
-                            <div class="panel-body">
-                                We know It sounds a bit silly, because someone <strong>just stole</strong> your phone and we're asking you if you can find it.
-                                However, we have had several cases where our customers thought that someone had stolen a phone, but instead
-                                it had accidentally slipped out of their bag and some kind person handed it in.
-                                We do ask that you contact the last place you can recall having your phone to see if a kind person has handed it in.
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Did you contact the last place you had it?</label>
-                                    {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Please choose...'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.hasContacted) }}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>Where did you last have your phone?</label> {{ form_widget(claim_form.contactedPlace, { 'attr': {'class': 'form-control', 'placeholder': 'Home, work, shop etc...'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.contactedPlace) }}</span>
-                                </div>
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.hasContacted, 'Did you contact the last place you had it?') }}
+                                {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Please choose...'}}) }}
+                                <div class="with-errors">{{ form_errors(claim_form.hasContacted) }}</div>
                             </div>
                         </div>
-
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">{{ sectionCount }}. Contact your mobile network</h3>
-                                {% set sectionCount = sectionCount + 1 %}
-                            </div>
-                            <div class="panel-body">
-                                You'll need to call or email your mobile network to:
-                                <ol>
-                                    <li>
-                                        Let them know your phone has been stolen
-                                    </li>
-                                    <li>
-                                        Request that they block your phone and IMEI
-                                    </li>
-                                    <li>
-                                        Request a <strong>Proof of Barring</strong> document from them
-                                    </li>
-                                    {% if claim_form.proofOfUsage is defined %}
-                                        <li>
-                                            Request a <strong>Proof of Usage</strong> report. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.
-                                        </li>
-                                    {% endif %}
-                                </ol>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>When did you report the {{ claimType }} to {{ network }} and asked them to block your phone?</label>
-                                    {{ form_widget(claim_form.blockedDate, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.blockedDate) }}</span>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
-                                    <label>Upload your Proof of barring document from {{ network }}</label>
-                                    {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
-                                    <div class="help-block with-errors">
-                                        <a href="#" data-toggle="modal" data-target="#baringModal">
-                                            {{ claim.proofOfBarringFiles|length }} file(s) upload
-                                        </a>
+                        <p>You'll need to call or email your mobile network to:</p>
+                        <ol class="mb-4">
+                            <li class="mb-2">Let them know your phone has been stolen</li>
+                            <li class="mb-2">Request that they block your phone and IMEI</li>
+                            <li class="mb-2">Request a <u>Proof of Barring</u> document from them.</li>
+                            {% if claim_form.proofOfUsage is defined %}
+                                <li>Request a <strong>Proof of Usage</strong> document from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</li>
+                            {% endif %}
+                        </ol>
+                        <div class="form-row">
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.blockedDate, 'When did you report the ' ~ claimType ~ ' to ' ~ network ~ ' and ask them to block your phone?') }}
+                                <div class="input-group date-picker"
+                                     id="date_picker_one"
+                                     data-target-input="nearest">
+                                    {{ form_widget(claim_form.blockedDate, { 'attr': {
+                                        'class': 'form-control datetimepicker-input date_mask',
+                                        'data-target': '#date_picker_one',
+                                    }}) }}
+                                    <div class="input-group-append"
+                                         data-target="#date_picker_one"
+                                         data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
                                     </div>
-                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
                                 </div>
+                                <div class="with-errors">{{ form_errors(claim_form.blockedDate) }}</div>
                             </div>
                         </div>
-
+                        <div class="form-row">
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.proofOfBarring, 'Upload your proof of barring document from ' ~ network) }}
+                                {{ form_widget(claim_form.proofOfBarring) }}
+                                <small class="form-text">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#barring_modal">{{ claim.proofOfBarringFiles|length }} file(s) upload</a>
+                                </small>
+                                <div class="with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                            </div>
+                        </div>
                         {% if claim_form.proofOfUsage is defined %}
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
-                                        <label>Upload your Proof of usage document from {{ network }}</label>
-                                        {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">
-                                            <a href="#" data-toggle="modal" data-target="#usageModal">
-                                                {{ claim.proofOfUsageFiles|length }} file(s) upload
-                                            </a>
-                                        </div>
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                                    </div>
+                            <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                            <div class="form-row">
+                                <div class="col-md form-group">
+                                    {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
+                                    {{ form_widget(claim_form.proofOfUsage) }}
+                                    <small class="form-text">
+                                        <a href="#"
+                                           data-toggle="modal"
+                                           data-target="#usage_modal">{{ claim.proofOfUsageFiles|length }} file(s) upload</a>
+                                    </small>
+                                    <div class="with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
                                 </div>
                             </div>
                         {% endif %}
-
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">{{ sectionCount }}. Reporting your theft to the authorities</h3>
-                                {% set sectionCount = sectionCount + 1 %}
-                            </div>
-                            <div class="panel-body">
-                                Although typically there is little the police can do, occasionally, the police may stumble across your phone at a later date.  It’s good to report the theft to your local police station and receive a Crime Reference Number for your records.
+                        <p>Although typically there is little the police can do, occasionally, the police may stumble across your phone at a later date.  It's good to report the theft to your local police station and receive a Crime Reference Number for your records.</p>
+                        <div class="form-row">
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.reportedDate, 'When did you report the ' ~ claimType ~ '?') }}
+                                <div class="input-group date-picker"
+                                     id="date_picker_two"
+                                     data-target-input="nearest">
+                                    {{ form_widget(claim_form.reportedDate, { 'attr': {
+                                        'class': 'form-control datetimepicker-input date_mask',
+                                        'data-target': '#date_picker_two',
+                                    }}) }}
+                                    <div class="input-group-append"
+                                         data-target="#date_picker_two"
+                                         data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                    </div>
+                                </div>
+                                <div class="with-errors">{{ form_errors(claim_form.reportedDate) }}</div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label>When did you report the {{ claimType }} to the police? </label>
-                                    {{ form_widget(claim_form.reportedDate, { 'attr': {'class': 'form-control date_mask', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
-                                    <span class="help-block with-errors">{{ form_errors(claim_form.reportedDate) }}</span>
-                                </div>
+                        <div id="report_to_police" class="form-row">
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.force, 'Which Police Force?') }}
+                                {{ form_widget(claim_form.force, { 'attr': {'class': 'form-control required'}}) }}
+                                <div class="with-errors">{{ form_errors(claim_form.force) }}</div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group {% if form_errors(claim_form.force) %}has-error{% endif %}">
-                                    <label>Police Force</label>
-                                    {{ form_widget(claim_form.force, { 'attr': {'class': 'form-control', 'placeholder': 'Police claim no.'}}) }}
-                                    <div class="help-block with-errors">{{ form_errors(claim_form.force) }}</div>
-                                </div>
+                            <div class="col-md form-group">
+                                {{ form_label(claim_form.crimeReferenceNumber, 'Crime reference no.') }}
+                                {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control required', 'placeholder': 'Crime reference no.'}}) }}
+                                <div class="with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
-                                    <label>Police Crime Reference Number</label>
-                                    {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Police claim no.'}}) }}
-                                    <div class="help-block with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
-                                </div>
-                            </div>
-                        </div>
-
                         {% if claim_form.proofOfPurchase is defined %}
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">{{ sectionCount }}. Proof of purchase</h3>
-                                    {% set sectionCount = sectionCount + 1 %}
-                                </div>
-                                <div class="panel-body">
-                                    We require a proof of purchase document such as a receipt.
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
-                                        <label>Proof of purchase</label>
-                                        {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
-                                        <div class="help-block with-errors">
-                                            <a href="#" data-toggle="modal" data-target="#purchaseModal">
-                                                {{ claim.proofOfPurchaseFiles|length }} file(s) upload
-                                            </a>
-                                        </div>
-                                    </div>
+                            <div class="form-row">
+                                <div class="col-md form-group">
+                                    {{ form_label(claim_form.proofOfPurchase, 'Proof of purchase') }}
+                                    {{ form_widget(claim_form.proofOfPurchase) }}
+                                    <small class="form-text">
+                                        <a href="#"
+                                           data-toggle="modal"
+                                           data-target="#purchase_modal">{{ claim.proofOfPurchaseFiles|length }} file(s) upload</a>
+                                    </small>
+                                    <div class="with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
                                 </div>
                             </div>
                         {% endif %}
-
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">{{ sectionCount }}. Submit your claim</h3>
-                                {% set sectionCount = sectionCount + 1 %}
-                            </div>
-                            <div class="panel-body">
-                                Once your claim is approved, we aim to get you back up and running in 24-72 hours. You can save your progress and come back at a later date if you need more time to get all of the required documents.
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-xs-12 text-center">
-                                <div class="h4">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</div>
-                                <div class="form-group">
-                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-green btn-lg'}}) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-primary btn-lg'}}) }}
-                                </div>
-                            </div>
+                        <p class="mt-4">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
+                        <div class="form-group">
+                            {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
+                            {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(claim_form) }}
                 </div>
@@ -219,19 +161,12 @@
         </div>
     </section>
 
-    {# Page Modals #}
+    {# Page Modal #}
     {% include 'AppBundle:User:claimModals.html.twig' %}
-    {# End Page Modals #}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        'components/moment/moment.min.js'
-        'components/jquery-mask-plugin/jquery.mask.min.js'
-        'components/jquery-validation/jquery.validate.min.js'
-        '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
-        '@AppBundle/Resources/public/js/User/claimTheftLoss.js' %}
-        <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
+    <script src="{{ asset('css-js/user-claim-theft-loss.js') }}"></script>
 {% endblock %}

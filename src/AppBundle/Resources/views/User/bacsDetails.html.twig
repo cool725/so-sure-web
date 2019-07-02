@@ -3,51 +3,45 @@
     <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
 {% endif %}
 
-<div class="row">
+<div class="d-lg-flex justify-content-lg-between mb-4">
     {% if bacs %}
-        <div class="col-12 col-lg-4">
-            <div class="cardbox cardbox-100 mb-4">
-                <div class="cardbox__body">
-                    <h5 class="cardbox__title">Current payment method</h5>
-                    <div class="cardbox__text">
-                        <p>{% if policy.getPolicyOrUserPaymentMethod and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}Credit/Debit Card{% elseif policy.hasPolicyOrUserBacsPaymentMethod %}Direct Debit{% else %}Unknown{% endif %}</p>
-                        {% if not bacs_last_payment_in_progress %}
-                            {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
-                            <a href="#"
-                               data-tab-to="#payment_card_tab"
-                               class="btn btn-outline-primary show-tab">Change to Card</a>
-                        {% endif %}
-                    </div>
+        <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+            <div class="cardbox__body">
+                <h5 class="cardbox__title">Current payment method</h5>
+                <div class="cardbox__text">
+                    <p>{% if policy.getPolicyOrUserPaymentMethod and policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}Credit/Debit Card{% elseif policy.hasPolicyOrUserBacsPaymentMethod %}Direct Debit{% else %}Unknown{% endif %}</p>
+                    {% if not bacs_last_payment_in_progress %}
+                        {# TODO: store history of bacs - until then, if payment is pending, changing to card method is problematic #}
+                        <a href="#"
+                           data-tab-to="#payment_card_tab"
+                           class="btn btn-outline-primary show-tab">Change to Card</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     {% endif %}
-    <div class="col-12 col-lg-4">
-        <div class="cardbox cardbox-100 mb-4">
-            <div class="cardbox__body">
-                <h5 class="cardbox__title">Direct Debit details</h5>
-                <div class="cardbox__text">
-                    <p>{% if policy.hasPolicyOrUserBacsPaymentMethod %}{{ policy.getPolicyOrUserBacsPaymentMethod }}{% else %}Not setup{% endif %}</p>
-                    {% if policy.canUpdateBacsDetails %}
-                        <a href="#"
-                           data-tab-to="#bacs_setup_tab"
-                           class="btn btn-outline-primary show-tab">Update account details</a>
-                    {% else %}
-                        <a class="btn btn-outline-primary disabled" title="Bacs Payment Pending mr-1">Unable to Update Details</a>
-                    {% endif %}
-                </div>
+    <div class="cardbox cardbox-100 mb-4">
+        <div class="cardbox__body">
+            <h5 class="cardbox__title">Direct Debit details</h5>
+            <div class="cardbox__text">
+                <p>{% if policy.hasPolicyOrUserBacsPaymentMethod %}{{ policy.getPolicyOrUserBacsPaymentMethod }}{% else %}Not setup{% endif %}</p>
+                {% if policy.canUpdateBacsDetails %}
+                    <a href="#"
+                       data-tab-to="#bacs_setup_tab"
+                       class="btn btn-outline-primary show-tab">Update account details</a>
+                {% else %}
+                    <a class="btn btn-outline-primary disabled" title="Bacs Payment Pending mr-1">Unable to Update Details</a>
+                {% endif %}
             </div>
         </div>
     </div>
     {% if bacs %}
         {% if policy and policy.premiumPlan == 'monthly' %}
-            <div class="col-12 col-lg-4">
-                <div class="cardbox cardbox-100 mb-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">Billing date</h5>
-                        <div class="cardbox__text">
-                            <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> of the month <br><small>(or within a few days in the case of weekends/bank holidays)</small></p>
-                        </div>
+            <div class="cardbox cardbox-100 mb-4 ml-lg-4">
+                <div class="cardbox__body">
+                    <h5 class="cardbox__title">Billing date</h5>
+                    <div class="cardbox__text">
+                        <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> of the month <br><small>(or within a few days in the case of weekends/bank holidays)</small></p>
                     </div>
                 </div>
             </div>

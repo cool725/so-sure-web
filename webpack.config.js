@@ -75,6 +75,10 @@ Encore
     .addEntry('user-renew', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-renew.js')
     .addEntry('user-cashback', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-cashback.js')
     .addEntry('opt-out', './src/AppBundle/Resources/public/rebrand/js/pages/opt-out.js')
+    .addEntry('user-claim', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim.js')
+    .addEntry('user-claim-damage', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-damage.js')
+    .addEntry('user-claim-theft-loss', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-theft-loss.js')
+    .addEntry('user-claim-submitted', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-submitted.js')
 
     // Claim
      .addEntry('make-a-claim', './src/AppBundle/Resources/public/rebrand/js/pages/make-a-claim.js')
