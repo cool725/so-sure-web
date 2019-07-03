@@ -1485,7 +1485,10 @@ class PurchaseController extends BaseController
             $redirectSuccess = $this->generateUrl('user_unpaid_policy');
             $redirectFailure = $this->generateUrl('user_unpaid_policy');
         }
-
+        $token = null;
+        $pennies = null;
+        $publicKey = null;
+        $cardToken = null;
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
