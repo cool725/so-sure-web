@@ -65,7 +65,7 @@ class ApiErrorCode
     const EX_COMMISSION = 603;
 
     /**
-     * Writes an error message of the format location:<errorcode>, and then the message body on a new line.
+     * Writes an error message of the format location:errorcode:message.
      * @param string $location is the context in which the error has been caught.
      * @param int    $code     is the error code.
      * @param string $text     is the main error message.
@@ -73,6 +73,6 @@ class ApiErrorCode
      */
     public static function errorMessage($location, $code, $text)
     {
-        return "{$location}:<{$code}>\n{$text}";
+        return "{$location}:{$code}:{$text}";
     }
 }

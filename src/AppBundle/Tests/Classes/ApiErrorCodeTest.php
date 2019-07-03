@@ -15,7 +15,7 @@ class ApiErrorCodeTest extends \PHPUnit\Framework\TestCase
     public function testErrorMessage()
     {
         $this->assertEquals(
-            "location:<600>\nbingbingwahoo",
+            "location:600:bingbingwahoo",
             ApiErrorCode::errorMessage("location", ApiErrorCode::EX_UNKNOWN, "bingbingwahoo")
         );
     }
