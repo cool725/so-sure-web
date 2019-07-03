@@ -1565,7 +1565,7 @@ class PurchaseController extends BaseController
                 ApiErrorCode::EX_ACCESS_DENIED,
                 ApiErrorCode::EX_PAYMENT_DECLINED,
                 sprintf("Payment declined for policy '%s'", $policy->getId())
-            ));
+            );
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);

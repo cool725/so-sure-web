@@ -388,6 +388,23 @@ abstract class BaseController extends Controller
     }
 
     /**
+     * Joins an error code to an error location and the given class.
+     * @param LoggerInterface $logger   is the logger.
+     * @param string          $location is the context in which the error occurred.
+     * @param int             $code     is the code for the error which has occurred.
+     * @param string          $text     is the error message body.
+     * @return string the error message which has just been logged for posterity.
+     */
+    public function logError($logger, $location, $code, $text)
+    {
+        $message = "{$location}:<{$code}>\n{$text}";
+        if ($logger) {
+            $logger->error($message);
+        }
+        return $message;
+    }
+
+    /**
      * Return a standard json error message
      *
      * @param integer $errorCode
@@ -1238,18 +1255,5 @@ abstract class BaseController extends Controller
         }
 
         return new RedirectResponse($this->generateUrl($redirectRoute, ['id' => $claim->getPolicy()->getId()]));
-    }
-
-    /**
-     * Joins an error code to an error location and the given class.
-     * @param LoggerInterface $logger   is the logger.
-     * @param string          $location is the context in which the error occurred.
-     * @param int             $code     is the code for the error which has occurred.
-     * @param string          $text     is the error message body.
-     * @return string containing the full error message.
-     */
-    protected function logError($logger, $location, $code, $text)
-    {
-        $logger->error(__CLASS__.":{$location}:<{$code}>\n{$text}");
     }
 }

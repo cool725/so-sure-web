@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Controller\PurchaseController;
+use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\Phone;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -92,6 +94,21 @@ class BaseControllerTest extends WebTestCase
     public function testINeedATest()
     {
         $this->assertTrue(true);
+    }
+
+    /**
+     * Makes sure that log error generates the correct message.
+     */
+    public function testLogError()
+    {
+        $controller = new PurchaseController();
+        $message = $controller->logError(
+            null,
+            "testLogError",
+            ApiErrorCode::EX_COMMISSION,
+            "testtesttest"
+        );
+        $this->assertEquals($message, "testLogError:<602>\ntesttesttest");
     }
 
     // helpers
