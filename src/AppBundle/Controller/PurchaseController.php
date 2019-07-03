@@ -1562,10 +1562,10 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (PaymentDeclinedException $e) {
-            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
                 "Payment declined for policy '%s'",
                 $policy->getId()
-            ));
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1573,10 +1573,10 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
             }
         } catch (AccessDeniedException $e) {
-            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
                 "Access Denied for policy '%s'",
                 $policy->getId()
-            ));
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1594,14 +1594,14 @@ class PurchaseController extends BaseController
                     $pennies
                 );
             }
-            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_COMMISSION, $message);
+            $logger->error("checkoutAction", ApiErrorCode::EX_COMMISSION, $message);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
-            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+            $logger->error("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
                 "Unknown Exception for policy '%s' with message '%s'",
                 $policy->getId(),
                 $e->getMessage()

@@ -96,21 +96,6 @@ class BaseControllerTest extends WebTestCase
         $this->assertTrue(true);
     }
 
-    /**
-     * Makes sure that log error generates the correct message.
-     */
-    public function testLogError()
-    {
-        $controller = new PurchaseController();
-        $message = $controller->logError(
-            null,
-            "testLogError",
-            ApiErrorCode::EX_COMMISSION,
-            "testtesttest"
-        );
-        $this->assertEquals($message, "testLogError:<602>\ntesttesttest");
-    }
-
     // helpers
 
     /**

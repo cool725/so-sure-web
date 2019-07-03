@@ -60,7 +60,19 @@ class ApiErrorCode
     const ERROR_DETECTED_IMEI_MANUAL_PROCESSING = 500;
     // logging error codes.
     const EX_UNKNOWN = 600;
-    const EX_PAYMENT_DECLINED = 600;
-    const EX_ACCESS_DENIED = 601;
-    const EX_COMMISSION = 602;
+    const EX_PAYMENT_DECLINED = 601;
+    const EX_ACCESS_DENIED = 602;
+    const EX_COMMISSION = 603;
+
+    /**
+     * Writes an error message of the format location:<errorcode>, and then the message body on a new line.
+     * @param string $location is the context in which the error has been caught.
+     * @param int    $code     is the error code.
+     * @param string $text     is the main error message.
+     * @return string of the new message.
+     */
+    public static function errorMessage($location, $code, $text)
+    {
+        return "{$location}:<{$code}>\n{$text}";
+    }
 }
