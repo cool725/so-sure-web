@@ -59,6 +59,7 @@ use AppBundle\Validator\Constraints\FullName;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
+use Psr\Log\LoggerInterface;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use AppBundle\Validator\Constraints\AgeValidator;
@@ -1237,5 +1238,18 @@ abstract class BaseController extends Controller
         }
 
         return new RedirectResponse($this->generateUrl($redirectRoute, ['id' => $claim->getPolicy()->getId()]));
+    }
+
+    /**
+     * Joins an error code to an error location and the given class.
+     * @param LoggerInterface $logger   is the logger.
+     * @param string          $location is the context in which the error occurred.
+     * @param int             $code     is the code for the error which has occurred.
+     * @param string          $text     is the error message body.
+     * @return string containing the full error message.
+     */
+    protected function logError($logger, $location, $code, $text)
+    {
+        $logger->error(__CLASS__.":{$location}:<{$code}>\n{$text}");
     }
 }

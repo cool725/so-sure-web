@@ -58,4 +58,9 @@ class ApiErrorCode
     const ERROR_QUOTE_EXPIRED = 402;
     const ERROR_QUOTE_COMING_SOON = 403;
     const ERROR_DETECTED_IMEI_MANUAL_PROCESSING = 500;
+    // logging error codes.
+    const EX_UNKNOWN = 600;
+    const EX_PAYMENT_DECLINED = 600;
+    const EX_ACCESS_DENIED = 601;
+    const EX_COMMISSION = 602;
 }
