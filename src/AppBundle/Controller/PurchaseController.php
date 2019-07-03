@@ -1584,7 +1584,7 @@ class PurchaseController extends BaseController
             $this->logError($logger, "checkoutAction", ApiErrorCode::EX_COMMISSION, sprintf(
                 "Commission Exception for policy '%s' on payment of %d pennies",
                 $policy->getId(),
-                $pennies
+                $pennies ?: -1
             ));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
