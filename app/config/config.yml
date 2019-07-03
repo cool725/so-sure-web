@@ -843,6 +843,8 @@ nelmio_security:
                 - https://*.criteo.net
                 - https://*.criteo.com
                 - https://sslwidget.criteo.com
+                - http://outbrain.com
+                - http://*.outbrain.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1117,6 +1119,8 @@ nelmio_security:
                 - https://csm.nl.eu.criteo.net
                 - https://*.criteo.com
                 - https://*.criteo.net
+                - http://outbrain.com
+                - http://*.outbrain.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
