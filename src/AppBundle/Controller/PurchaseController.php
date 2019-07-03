@@ -1537,6 +1537,7 @@ class PurchaseController extends BaseController
             /** @var CheckoutService $checkout */
             $checkout = $this->get('app.checkout');
 
+            throw new CommissionException();
             if ($request->get('_route') == 'purchase_checkout') {
                 $checkout->pay(
                     $policy,
@@ -1594,18 +1595,18 @@ class PurchaseController extends BaseController
                     $pennies
                 );
             }
-            $logger->error("checkoutAction", ApiErrorCode::EX_COMMISSION, $message);
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
-            $logger->error("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
                 "Unknown Exception for policy '%s' with message '%s'",
                 $policy->getId(),
                 $e->getMessage()
-            ));
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
