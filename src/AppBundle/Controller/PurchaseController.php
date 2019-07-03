@@ -1581,11 +1581,17 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
             }
         } catch (CommissionException $e) {
-            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_COMMISSION, sprintf(
-                "Commission Exception for policy '%s' on payment of %d pennies",
-                $policy->getId(),
-                $pennies ?: -1
-            ));
+            $message = "";
+            if ($pennies === null) {
+                $message = sprintf("Commission Exception for policy %s on payment without amount", $policy->getId());
+            } else {
+                $message = sprintf(
+                    "Commission Exception for policy %s on payment of %d pennies",
+                    $policy->getId(),
+                    $pennies
+                );
+            }            
+            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_COMMISSION, $message);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
