@@ -1590,7 +1590,7 @@ class PurchaseController extends BaseController
                     $policy->getId(),
                     $pennies
                 );
-            }            
+            }
             $this->logError($logger, "checkoutAction", ApiErrorCode::EX_COMMISSION, $message);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
