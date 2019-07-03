@@ -1537,7 +1537,6 @@ class PurchaseController extends BaseController
             /** @var CheckoutService $checkout */
             $checkout = $this->get('app.checkout');
 
-            throw new CommissionException();
             if ($request->get('_route') == 'purchase_checkout') {
                 $checkout->pay(
                     $policy,
