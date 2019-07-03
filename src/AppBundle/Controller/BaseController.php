@@ -389,10 +389,10 @@ abstract class BaseController extends Controller
 
     /**
      * Joins an error code to an error location and the given class.
-     * @param LoggerInterface $logger   is the logger.
-     * @param string          $location is the context in which the error occurred.
-     * @param int             $code     is the code for the error which has occurred.
-     * @param string          $text     is the error message body.
+     * @param LoggerInterface|null $logger   is the logger.
+     * @param string               $location is the context in which the error occurred.
+     * @param int                  $code     is the code for the error which has occurred.
+     * @param string               $text     is the error message body.
      * @return string the error message which has just been logged for posterity.
      */
     public function logError($logger, $location, $code, $text)

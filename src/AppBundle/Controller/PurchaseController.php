@@ -1559,13 +1559,10 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (PaymentDeclinedException $e) {
-            $this->logError(
-                $logger,
-                __FUNCTION__,
-                ApiErrorCode::EX_ACCESS_DENIED,
-                ApiErrorCode::EX_PAYMENT_DECLINED,
-                sprintf("Payment declined for policy '%s'", $policy->getId())
-            );
+            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
+                "Payment declined for policy '%s'",
+                $policy->getId()
+            ));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1573,7 +1570,7 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
             }
         } catch (AccessDeniedException $e) {
-            $this->logError($logger, __FUNCTION__, ApiErrorCode::EX_ACCESS_DENIED, sprintf(
+            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
                 "Access Denied for policy '%s'",
                 $policy->getId()
             ));
@@ -1584,21 +1581,21 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
             }
         } catch (CommissionException $e) {
-            $this->logError($logger, ApiErrorCode::message("checkoutAction", ApiErrorCode::EX_COMMISSION, sprintf(
+            $this->logError("checkoutAction", ApiErrorCode::EX_COMMISSION, sprintf(
                 "Commission Exception for policy '%s' on payment of '%f'",
                 $policy->getId(),
                 $amount
-            )));
+            ));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
-            $this->logError(ApiErrorCode::message("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+            $this->logError("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
                 "Unknown Exception for policy '%s' with message '%s'",
                 $e->getMessage()
-            )));
+            ));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
