@@ -58,4 +58,21 @@ class ApiErrorCode
     const ERROR_QUOTE_EXPIRED = 402;
     const ERROR_QUOTE_COMING_SOON = 403;
     const ERROR_DETECTED_IMEI_MANUAL_PROCESSING = 500;
+    // logging error codes.
+    const EX_UNKNOWN = 600;
+    const EX_PAYMENT_DECLINED = 601;
+    const EX_ACCESS_DENIED = 602;
+    const EX_COMMISSION = 603;
+
+    /**
+     * Writes an error message of the format location:errorcode:message.
+     * @param string $location is the context in which the error has been caught.
+     * @param int    $code     is the error code.
+     * @param string $text     is the main error message.
+     * @return string of the new message.
+     */
+    public static function errorMessage($location, $code, $text)
+    {
+        return "{$location}:{$code}:{$text}";
+    }
 }

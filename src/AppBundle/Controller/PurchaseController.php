@@ -1485,7 +1485,10 @@ class PurchaseController extends BaseController
             $redirectSuccess = $this->generateUrl('user_unpaid_policy');
             $redirectFailure = $this->generateUrl('user_unpaid_policy');
         }
-
+        $token = null;
+        $pennies = null;
+        $publicKey = null;
+        $cardToken = null;
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
@@ -1559,6 +1562,10 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (PaymentDeclinedException $e) {
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
+                "Payment declined for policy '%s'",
+                $policy->getId()
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1566,6 +1573,10 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
             }
         } catch (AccessDeniedException $e) {
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
+                "Access Denied for policy '%s'",
+                $policy->getId()
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1573,13 +1584,28 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
             }
         } catch (CommissionException $e) {
-            $logger->error($e->getMessage());
+            $message = "";
+            if ($pennies === null) {
+                $message = sprintf("Commission Exception for policy %s on payment without amount", $policy->getId());
+            } else {
+                $message = sprintf(
+                    "Commission Exception for policy %s on payment of %d pennies",
+                    $policy->getId(),
+                    $pennies
+                );
+            }
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+                "Unknown Exception for policy '%s' with message '%s'",
+                $policy->getId(),
+                $e->getMessage()
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
