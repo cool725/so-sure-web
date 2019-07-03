@@ -1018,7 +1018,9 @@ class CheckoutService
             $policy->setPaymentMethod($checkoutPaymentMethod);
         }
 
-        if (!$checkoutPaymentMethod->getCustomerId()) {
+        if (!$checkoutPaymentMethod->getCustomerId() ||
+            $checkoutPaymentMethod->getCustomerId() !== $card->getCustomerId()
+        ) {
             $checkoutPaymentMethod->setCustomerId($card->getCustomerId());
         }
 
