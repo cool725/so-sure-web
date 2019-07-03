@@ -1018,6 +1018,13 @@ class CheckoutService
             $policy->setPaymentMethod($checkoutPaymentMethod);
         }
 
+        /**
+         * The original token migration used fake emails and there are ways that
+         * a payment can be made using the customers email address rather than
+         * the existing customerId that we have in the db.
+         * If the returned customerId differs from what we have, then we will
+         * update it at the same time as setting the new token.
+         */
         if (!$checkoutPaymentMethod->getCustomerId() ||
             $checkoutPaymentMethod->getCustomerId() !== $card->getCustomerId()
         ) {
