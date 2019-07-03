@@ -2,8 +2,6 @@
 
 namespace AppBundle\Tests\Controller;
 
-use AppBundle\Controller\PurchaseController;
-use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\Phone;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
