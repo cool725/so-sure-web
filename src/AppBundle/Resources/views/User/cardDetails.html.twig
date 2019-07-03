@@ -19,86 +19,80 @@
     </div>
 {% endif %} #}
 
-<div class="row">
+<div class="d-lg-flex justify-content-lg-between mb-4">
     {% if bacs_feature %}
-        <div class="col-12 col-lg-4">
-            <div class="cardbox cardbox-100 mb-4">
-                <div class="cardbox__body">
-                    <h5 class="cardbox__title">Current payment method</h5>
-                    <div class="cardbox__text">
-                        <p>
-                            {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod %}
-                                Credit/Debit Card
-                            {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
-                                Direct Debit
-                            {% else %}
-                                Unknown
-                            {% endif %}
-                        </p>
-                        <a href="#"
-                           data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
-                           class="btn {% if policy.hasCardPaymentMethod %}btn-success disabled{% else %}btn-outline-primary{% endif %} show-tab"
-                           >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}Switch to Direct Debit{% else %}Back to Direct Debit{% endif %}</a>
-                    </div>
+        <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+            <div class="cardbox__body">
+                <h5 class="cardbox__title">Current payment method</h5>
+                <div class="cardbox__text">
+                    <p>
+                        {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod %}
+                            Credit/Debit Card
+                        {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
+                            Direct Debit
+                        {% else %}
+                            Unknown
+                        {% endif %}
+                    </p>
+                    <a href="#"
+                       data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
+                       class="btn {% if policy.hasCardPaymentMethod %}btn-success disabled{% else %}btn-outline-primary{% endif %} show-tab"
+                       >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}Switch to Direct Debit{% else %}Back to Direct Debit{% endif %}</a>
                 </div>
             </div>
         </div>
     {% endif %}
-    <div class="col-12 col-lg-4">
-        <div class="cardbox cardbox-100 mb-4">
-            <div class="cardbox__body">
-                <h5 class="cardbox__title">Card details</h5>
-                <div class="cardbox__text">
-                    <p>
-                        {% if policy and policy.isDifferentPayer %}
-                            You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
-                        {% elseif policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
-                            {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
-                        {% elseif policy.hasCheckoutPaymentMethod %}
-                            {{ policy.getCheckoutPaymentMethod }}
-                        {% else %}
-                            Not setup
-                        {% endif %}
-                    </p>
-                    {% if card_provider == 'judo' %}
-                        {% if webpay_action and webpay_reference %}
-                        <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                            <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                            <input type="submit" class="btn btn-outline-primary" value="Update your card details">
-                        </form>
-                        {% endif %}
+    <div class="cardbox cardbox-100 mb-4">
+        <div class="cardbox__body">
+            <h5 class="cardbox__title">Card details</h5>
+            <div class="cardbox__text">
+                <p>
+                    {% if policy and policy.isDifferentPayer %}
+                        You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
+                    {% elseif policy.hasPolicyOrPayerOrUserJudoPaymentMethod %}
+                        {{ policy.getPolicyOrPayerOrUserJudoPaymentMethod }}
+                    {% elseif policy.hasCheckoutPaymentMethod %}
+                        {{ policy.getCheckoutPaymentMethod }}
                     {% else %}
-                        <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}"
-                              data-customer-email="{{ app.user.email }}"
-                              data-value="1"
-                              data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
-                              data-csrf="{{ csrf_token('checkout') }}"
-                              data-currency="GBP"
-                              data-payment-mode="cards"
-                              data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-                              data-title="Update card details"
-                              data-subtitle="Please enter your new card details. You will NOT be charged the £0.01 transaction fee.">
-                            <input type="button" class="btn btn-outline-primary btn-card-pay" value="Update your card details">
-                        </form>
+                        Not setup
                     {% endif %}
-                </div>
+                </p>
+                {% if card_provider == 'judo' %}
+                    {% if webpay_action and webpay_reference %}
+                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                        <input type="submit" class="btn btn-outline-primary" value="Update your card details">
+                    </form>
+                    {% endif %}
+                {% else %}
+                    <form class="payment-form" method="POST"
+                          data-public-key="{{ checkout_public_key }}"
+                          data-customer-email="{{ app.user.email }}"
+                          data-value="1"
+                          data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
+                          data-csrf="{{ csrf_token('checkout') }}"
+                          data-currency="GBP"
+                          data-payment-mode="cards"
+                          data-card-form-mode="cardTokenisation"
+                          data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                          data-title="Update card details"
+                          data-subtitle="Please enter your new card details. You will NOT be charged the £0.01 transaction fee.">
+                        <input type="button" class="btn btn-outline-primary btn-card-pay" value="Update your card details">
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>
     {% if policy and policy.premiumPlan == 'monthly' and policy.hasCardPaymentMethod %}
-        <div class="col-12 col-lg-4">
-            <div class="cardbox cardbox-100 mb-4">
-                <div class="cardbox__body">
-                    <h5 class="cardbox__title">Billing date</h5>
-                    <div class="cardbox__text">
-                        <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> around <strong>{{ policy.billing|date('H','Europe/London') }}:00</strong></p>
-                        <a href="#"
-                           class="btn btn-outline-primary"
-                           data-toggle="modal"
-                           data-target="#billing_modal">Change billing date</a>
-                    </div>
+        <div class="cardbox cardbox-100 mb-4 ml-lg-4">
+            <div class="cardbox__body">
+                <h5 class="cardbox__title">Billing date</h5>
+                <div class="cardbox__text">
+                    <p>Monthly on the <strong>{{ policy.billing|date('jS','Europe/London') }}</strong> around <strong>{{ policy.billing|date('H','Europe/London') }}:00</strong></p>
+                    <a href="#"
+                       class="btn btn-outline-primary"
+                       data-toggle="modal"
+                       data-target="#billing_modal">Change billing date</a>
                 </div>
             </div>
         </div>

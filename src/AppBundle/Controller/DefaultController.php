@@ -125,6 +125,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/free-phone-case", name="free_phone_case")
+     * @Route("/case", name="case")
      */
     public function freePhoneCase()
     {

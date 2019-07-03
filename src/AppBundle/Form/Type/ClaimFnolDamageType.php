@@ -56,7 +56,7 @@ class ClaimFnolDamageType extends AbstractType
         $builder
             ->add('typeDetails', ChoiceType::class, [
                 'required' => false,
-                'placeholder' => 'Please choose...',
+                'placeholder' => 'Choose type of damage...',
                 'choices' => [
                     'Broken screen' => Claim::DAMAGE_BROKEN_SCREEN,
                     'Water damage' => Claim::DAMAGE_WATER,
@@ -67,7 +67,7 @@ class ClaimFnolDamageType extends AbstractType
             ->add('typeDetailsOther', TextType::class, ['required' => false])
             ->add('monthOfPurchase', ChoiceType::class, [
                 'required' => false,
-                'placeholder' => 'Month Bought...',
+                'placeholder' => 'Choose...',
                 'choices' => [
                     'January' => 'January',
                     'February' => 'February',
@@ -85,12 +85,12 @@ class ClaimFnolDamageType extends AbstractType
             ])
             ->add('yearOfPurchase', ChoiceType::class, [
                 'required' => false,
-                'placeholder' => 'Year Bought...',
+                'placeholder' => 'Choose...',
                 'choices' => $years
             ])
             ->add('phoneStatus', ChoiceType::class, [
                 'required' => false,
-                'placeholder' => 'Please choose...',
+                'placeholder' => 'Choose the condition of your phone...',
                 'choices' => [
                     'New' => Claim::PHONE_STATUS_NEW,
                     'Refurbished' => Claim::PHONE_STATUS_REFURBISHED,
