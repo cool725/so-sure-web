@@ -16,6 +16,7 @@ require('./components/nav.js');
 require('./components/phone-search-dropdown.js');
 require('./components/memory-search-dropdown.js');
 require('./components/select.js');
+require('./components/animate.js');
 require('./components/custom-select.js');
 require('./components/cardbox.js');
 require('./components/modalVideo.js');

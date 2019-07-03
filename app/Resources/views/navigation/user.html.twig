@@ -46,7 +46,7 @@
             <i class="fal fa-file-invoice fa-fw"></i> My Policies</a>
 
         {# Claims #}
-        <a href="{{ path('user_claim') }}" class="nav-link">
+        <a href="{{ path('user_claim') }}" class="nav-link {% if app.request.get('_route') == 'user_claim' or app.request.get('_route') == 'user_claim_policy' or app.request.get('_route') == 'claimed_submitted_policy' or app.request.get('_route') == 'claimed_damage_policy' or app.request.get('_route') == 'claimed_theftloss_policy' %}active{% endif %}">
             <i class="fal fa-mobile-android fa-fw"></i> Claims</a>
 
     {% endif %}

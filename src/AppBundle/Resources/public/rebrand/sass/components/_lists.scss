@@ -31,6 +31,21 @@
     }
 }
 
+.emoji-list {
+
+    li {
+        position: relative;
+        padding-left: 45px;
+        padding-top: 2px;
+
+        span {
+            position: absolute;
+            left: 0; top: 0;
+            vertical-align: middle;
+        }
+    }
+}
+
 // Modify list to handle fa icons
 .icn-fa-list {
 

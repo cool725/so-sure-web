@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\InvalidEmailException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,8 +11,11 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Lead;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
+use AppBundle\Service\MailerService;
+use AppBundle\Form\Type\LeadEmailType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -76,20 +80,131 @@ class SCodeController extends BaseController
             );
         }
 
+        $lead = new Lead();
+        $lead->setSource(Lead::SOURCE_INVITE_NOT_READY);
+        $leadForm = $this->get('form.factory')
+            ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('lead_form')) {
+                try {
+                    $leadForm->handleRequest($request);
+
+                    if ($leadForm->isValid()) {
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $days = \DateTime::createFromFormat('U', time());
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 14)));
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+
+                        $this->addFlash('success', sprintf(
+                            "Thanks for registering your interest in so-sure! We'll be in touch soon."
+                        ));
+                    } else {
+                        $this->addFlash('error', sprintf(
+                            "Sorry, didn't quite catch that email.  Please try again."
+                        ));
+                    }
+                } catch (InvalidEmailException $ex) {
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
+                    $this->addFlash('error', sprintf(
+                        "Sorry, didn't quite catch that email.  Please try again."
+                    ));
+                }
+            }
+        }
+
         if ($scode && $this->getUser()) {
             // Let the user just invite the person directly
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        // $landingText = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_SCODE_LANDING_TEXT,
-        //     ['scode-landing-text-a', 'scode-landing-text-b']
-        // );
-
         return array(
-            'scode' => $scode,
-            // 'landing_text' => $landingText,
+            'scode'     => $scode,
+            'user_code' => $code,
+            'lead_form' => $leadForm->createView(),
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'LICI',
         );
+    }
+
+    private function competitorsData()
+    {
+        $competitor = [
+            'PYB' => [
+                'name' => 'Protect Your Bubble',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 4
+            ],
+            'GC' => [
+                'name' => 'Gadget<br>Cover',
+                'days' => '<strong>5 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'SS' => [
+                'name' => 'Simplesurance',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'CC' => [
+                'name' => 'CloudCover',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 3,
+            ],
+            'END' => [
+                'name' => 'Endsleigh',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-check',
+                'oldphones' => 'fa-check',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'LICI' => [
+                'name' => 'Loveit<br>coverIt.co.uk',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'fa-times',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ]
+        ];
+
+        return $competitor;
     }
 }

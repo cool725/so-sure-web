@@ -29,6 +29,7 @@ class Feature
     const FEATURE_APP_PICSURE_ACCELEROMETER = 'app-picsure-accelerometer';
     const FEATURE_APP_PICSURE_DOTCODE = 'app-picsure-dotcode';
     const FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION = 'app-facebook-userfriends-permission';
+    const FEATURE_APP_BACS_ENABLED = 'app-bacs-enabled';
     const FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP = 'claims-default-direct-group';
     const FEATURE_RATE_LIMITING = 'rate-limiting';
     const FEATURE_PAYMENTS_BCC = 'bcc-payments';
@@ -50,6 +51,7 @@ class Feature
         self::FEATURE_APP_PICSURE_ACCELEROMETER,
         self::FEATURE_APP_PICSURE_DOTCODE,
         self::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION,
+        self::FEATURE_APP_BACS_ENABLED,
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP,
         self::FEATURE_RATE_LIMITING,
         self::FEATURE_PAYMENTS_BCC,
@@ -74,6 +76,7 @@ class Feature
         self::FEATURE_APP_PICSURE_ACCELEROMETER => 'If enabled it will use the accelerometer data to check any sudden movements while taking the picsure and prevent doing picsure if any are detected as an anti-fraud measure.',
         self::FEATURE_APP_PICSURE_DOTCODE => 'Display dotcode on iOS for on the background image. Allows us to validate the imei in cases of suspected hacking.',
         self::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION => 'Request user friends from Facebook. Requires permission from Facebook we lost in 2018 (but could re-request)',
+        self::FEATURE_APP_BACS_ENABLED => 'Can the mobile apps pass payments through BACS?',
         self::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP => 'Should direct group be the default claim handler for new claims. If changing update phone system as well.',
         self::FEATURE_RATE_LIMITING => 'Use rate limiting functionality for various items including recipero imei checks and policy creation.',
         self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',

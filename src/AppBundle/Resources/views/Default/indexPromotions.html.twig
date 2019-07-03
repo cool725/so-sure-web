@@ -23,12 +23,16 @@
     {% endif %}
 
     <section class="hero">
+
+        {# Toasts #}
+        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %}
+
         <div class="container container-xtra">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
                         {% if page_type == 'tastecard' %}
-                            <h1 class="mb-4 text-white">soo-yummy <br><span class="sub">FREE tastecard membership worth &pound;79.99</span></h1>
+                            <h1 class="mb-4 text-white fit">soo-yummy <br><span class="sub">FREE tastecard membership worth &pound;79.99</span></h1>
                             <h4 class="text-zaffre">Get a FREE tastecard membership when you buy a policy and share with 5 friends</h4>
                             <p class="mb-4 text-white">
                                 So what are you waiting for, get your mobile protected!<br>
@@ -39,7 +43,7 @@
                                    role="button"><small><u>Terms &amp; Conditions</u></small></a>
                             </p>
                         {% elseif page_type == 'phonecase' %}
-                            <h1 class="mb-4 text-white">Double Protection <br><span class="sub">for your Mobile </span></h1>
+                            <h1 class="mb-4 text-white fit">Double Protection <br><span class="sub">for your Mobile </span></h1>
                             <h4 class="text-zaffre">We're giving away FREE cases of your choice worth &pound;19 from our partners at <a href="https://www.layercase.co.uk/" target="_blank" rel="noopener noreferrer" class="text-zaffre h4"><u>LayerCase</u></a>. Hurry while stock lasts!</h4>
                             <p class="mb-4 text-white">
                                 <a href="#"
@@ -99,23 +103,8 @@
         </div>
     </section>
 
-    <section class="cred">
-        <div class="container container-xtra py-4 d-lg-flex align-items-center justify-content-between">
-            {% if page_type == 'tastecard' %}
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-frankie-and-bennys.png" alt="Frankie &amp; Bennys" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-zizzi.png" alt="Zizzi" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-strada.png" alt="Strada" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-giraffe.png" alt="giraffe" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/tastecard/so-sure_credbar-bella-italia.png" alt="Bella Italia" class="lozad">
-            {% else %}
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-trustpilot.png" alt="Trustpilot" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-money.png" alt="Money" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-gocompare.png" alt="GoCompare" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-theguardian.png" alt="The Guardian" class="lozad">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/credbar/so-sure_credbar-ft.png" alt="The Financial Times" class="lozad">
-            {% endif %}
-        </div>
-    </section>
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     <section class="intro py-lg-5">
         <div class="container container-xtra py-5">
@@ -308,7 +297,7 @@
                     {% elseif page_type == 'phonecase' %}
                         <h5>Terms and conditions</h5>
                         <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if customer has made no claims.</p>
-                        <p>Promotion valid from 8th January 2019 until 30th June 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
+                        <p>Promotion valid from 1st July 2019 until 1st November 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at anytime.</p>
                     {% elseif page_type == 'vdayphonecase' %}
                         <h5>Terms and conditions</h5>
                         <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>

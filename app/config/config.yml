@@ -769,6 +769,7 @@ nelmio_security:
                 - https://*.criteo.net
                 - https://*.criteo.com
                 - https://gum.criteo.com
+                - https://dis.eu.criteo.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -842,6 +843,8 @@ nelmio_security:
                 - https://*.criteo.net
                 - https://*.criteo.com
                 - https://sslwidget.criteo.com
+                - http://outbrain.com
+                - http://*.outbrain.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1112,6 +1115,12 @@ nelmio_security:
                 - https://tapjoy.go2cloud.org
                 - https://*.quantserve.com
                 - https://pixel.quantserve.com
+                - https://www.topcashback.co.uk
+                - https://csm.nl.eu.criteo.net
+                - https://*.criteo.com
+                - https://*.criteo.net
+                - http://outbrain.com
+                - http://*.outbrain.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
@@ -1312,8 +1321,6 @@ nelmio_security:
                 - https://www.google.co.za
                 - https://www.google.co.zm
                 - https://www.google.co.zw
-            frame-src:
-                - https://gum.criteo.com
     # prevents framing of the entire site
     clickjacking:
         paths:

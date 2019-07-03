@@ -1,0 +1,105 @@
+<h2 class="text-white text-center mb-5">I don’t need 🙈 mobile insurance because…</h2>
+<div id="feedback_carousel"
+     class="carousel slide mb-4"
+     data-wrap="true">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="feedback-item">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reason_not_ready.png"
+                             alt="Not ready to insure"
+                             class="lozad d-none d-lg-block"
+                             width="260px">
+                        <a href="#"
+                           data-event="invite-page-not-ready"
+                           data-feedback-reason="not-ready"
+                           data-target="#feedback_carousel"
+                           data-slide-to="1"
+                           class="btn btn-white btn-block-xs btn-feedback track-data mb-4">I'm not ready</a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feedback-item">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reason_already_insured.png"
+                             alt="Alread insured"
+                             class="lozad d-none d-lg-block"
+                             width="260px">
+                        <a href="#"
+                           data-event="invite-page-already-insured"
+                           data-feedback-reason="already-insured"
+                           data-target="#feedback_carousel"
+                           data-slide-to="2"
+                           class="btn btn-white btn-block-xs btn-feedback track-data mb-4">I have insurance</a>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feedback-item">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reason_old_phone.png"
+                             alt="My phone is old"
+                             class="lozad d-none d-lg-block"
+                             width="260px">
+                        <a href="#"
+                           data-event="invite-page-phone-is-old"
+                           data-feedback-reason="phone-is-old"
+                           data-target="#feedback_carousel"
+                           data-slide-to="3"
+                           class="btn btn-white btn-block-xs btn-feedback track-data">My phone is old?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="feedback-answer">
+                <h3 class="mb-4">📅 Remind me again sometime?</h3>
+                {{ form_start(lead_form, {'attr': {
+                    'data-toggle': 'validator',
+                    'class': 'validate-form my-4',
+                    'data-client-validation': form_client_validation,
+                    'autocomplete': 'off',
+                }}) }}
+                    <div class="form-group">
+                        {{ form_widget(lead_form.email, {
+                            'attr':{
+                                'class': 'form-control form-control-white',
+                                'placeholder': 'Enter your email'
+                        }}) }}
+                        <div class="with-errors"></div>
+                    </div>
+                    <div class="form-group">
+                        <a href="#"
+                           class="btn btn-outline-white mr-2"
+                           data-target="#feedback_carousel"
+                           data-slide-to="0">Back</a>
+                        {{ form_widget(lead_form.save, {
+                        'label': 'Remind me',
+                            'attr': {
+                                'class':'btn btn-success'
+                        }}) }}
+                    </div>
+                {{ form_end(lead_form) }}
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="feedback-answer">
+                <h3 class="mb-4">Want simply better insurance with up to 80% cashback? <br class="d-none d-md-inline"><a href="#" class="text-white open-intercom"><u>Get in touch</u></a> about switching today.</h3>
+                <a href="#"
+                   class="btn btn-outline-white"
+                   data-target="#feedback_carousel"
+                   data-slide-to="0">Back</a>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="feedback-answer">
+                <h3 class="mb-4">🧱 We insure secondhand &amp; refurbished phones up to 3 years old <br class="d-none d-md-inline"> <a href="#" class="get-a-quote text-white"><u>get a quote</u></a> to see if we cover yours</h3>
+                <a href="#"
+                   class="btn btn-outline-white"
+                   data-target="#feedback_carousel"
+                   data-slide-to="0">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
