@@ -1581,10 +1581,10 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
             }
         } catch (CommissionException $e) {
-            $this->logError("checkoutAction", ApiErrorCode::EX_COMMISSION, sprintf(
-                "Commission Exception for policy '%s' on payment of '%f'",
+            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_COMMISSION, sprintf(
+                "Commission Exception for policy '%s' on payment of %d pennies",
                 $policy->getId(),
-                $amount
+                $pennies
             ));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
@@ -1592,8 +1592,9 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
-            $this->logError("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+            $this->logError($logger, "checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
                 "Unknown Exception for policy '%s' with message '%s'",
+                $policy->getId(),
                 $e->getMessage()
             ));
             $this->addFlash('error', $errorMessage);
