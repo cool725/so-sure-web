@@ -582,6 +582,13 @@ class CheckoutService
             $capture->setChargeId($details->getId());
             $capture->setValue($this->convertToPennies($amount));
 
+            if ($details) {
+                $card = $details->getCard();
+                if ($card) {
+                    $this->setCardToken($policy, $card);
+                }
+            }
+
             if (!$paymentMethod->hasPreviousChargeId()) {
                 $paymentMethod->setPreviousChargeId($details->getId());
                 $this->dm->flush();
