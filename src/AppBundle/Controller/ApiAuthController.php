@@ -1323,8 +1323,8 @@ class ApiAuthController extends BaseController
                         $notes,
                         $this->getIdentityLog($request)
                     );
-                    if ($policy->isPolicyPaidToDate()) {
-                        $policy->setPolicyStatusActiveIfUnpaid(null, true);
+                    if ($policy->isPolicyPaidToDate(null, true)) {
+                        $policy->setPolicyStatusActiveIfUnpaid();
                     }
                     $dm->flush();
                 } else {
