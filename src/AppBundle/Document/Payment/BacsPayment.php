@@ -236,7 +236,7 @@ class BacsPayment extends Payment
      */
     public function setPolicyStatusActiveIfUnpaidAndPaidToDate()
     {
-        if ($this->getPolicy() && $this->getPolicy()->isPolicyPaidToDate()) {
+        if ($this->getPolicy() && $this->getPolicy()->isPolicyPaidToDate(null, true)) {
             $this->getPolicy()->setPolicyStatusActiveIfUnpaid();
         }
     }
