@@ -2008,6 +2008,7 @@ class UserController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Unknown policy');
         }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         $amount = $policy->getRemainderOfPolicyPrice();
         $webpay = null;
         return [
