@@ -1424,33 +1424,6 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/remainder/{id}", name="purchase_remainder_policy")
-     * @Template
-     */
-    public function purchaseRemainderPolicyAction($id)
-    {
-        $policyRepo = $this->getManager()->getRepository(Policy::class);
-        $policy = $policyRepo->find($id);
-        if (!$policy) {
-            throw $this->createNotFoundException('Unknown policy');
-        }
-
-        $amount = $policy->getRemainderOfPolicyPrice();
-        $webpay = null;
-
-        $data = [
-            'phone' => $policy->getPhone(),
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
-            'amount' => $amount,
-            'policy' => $policy,
-            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
-        ];
-
-        return $data;
-    }
-
-    /**
      * @Route("/checkout/{id}", name="purchase_checkout")
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
