@@ -391,8 +391,8 @@ class CheckoutService
                     /** @var ScheduledPayment $scheduledPayment */
                     foreach ($oldUnpaid as $scheduledPayment) {
                         $scheduledPayment->cancel('Cancelling old scheduled as payment made to bring up to date');
-                        $this->dm->flush();
                     }
+                    $this->dm->flush();
                 }
             }
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
@@ -977,6 +977,14 @@ class CheckoutService
                 if ($policy->isPolicyPaidToDate()) {
                     $policy->setPolicyStatusActiveIfUnpaid();
                     $this->dm->flush();
+                    if ($this->areEqualToTwpDp($policy->getOutstandingPremium(), 0)) {
+                        $oldUnpaid = $scheduledPaymentRepo->getPastScheduledWithNoStatusUpdate($policy, $lastSuccess);
+                        /** @var ScheduledPayment $scheduledPayment */
+                        foreach ($oldUnpaid as $scheduledPayment) {
+                            $scheduledPayment->cancel('Cancelling old scheduled as whole premium paid');
+                        }
+                        $this->dm->flush();
+                    }
                 }
             }
         } catch (\Exception $e) {
