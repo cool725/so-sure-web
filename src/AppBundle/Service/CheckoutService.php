@@ -977,7 +977,7 @@ class CheckoutService
                     $policy->setPolicyStatusActiveIfUnpaid();
                     $this->dm->flush();
                     if ($this->areEqualToTwoDp($policy->getOutstandingPremium(), 0)) {
-                        $futureSchedule = $scheduledPaymentRepo->getStillScheduled($policy,);
+                        $futureSchedule = $scheduledPaymentRepo->getStillScheduled($policy);
                         /** @var ScheduledPayment $scheduledPayment */
                         foreach ($futureSchedule as $scheduledPayment) {
                             $scheduledPayment->cancel('Cancelling old scheduled as whole premium paid');
