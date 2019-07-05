@@ -2,10 +2,10 @@
 
 namespace AppBundle\Document\Form;
 
-use AppBundle\Document\Policy;
+use DateTime;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\ScheduledPayment;
 use Symfony\Component\Validator\Constraints as Assert;
-use AppBundle\Validator\Constraints as AppAssert;
 
 /**
  * Represents a request to create a scheduled payment via a form.
@@ -13,49 +13,93 @@ use AppBundle\Validator\Constraints as AppAssert;
 class CreateScheduledPayment
 {
     /**
-     * @var Policy
-     * @Assert\NotNull(message="Policy is required.")
-     */
-    protected $policy;
-
-    /**
      * @var \DateTime
      * @Assert\NotNull(message="Date must be set")
+     */
     protected $date;
 
     /**
      * @var string
-     * @Assert\NotNull(message="Claims Type is required.")
+     * @Assert\NotNull(message="Must justify manual payment")
      */
-    protected $type;
+    protected $notes;
 
-    public function getPolicy()
+    /**
+     * @var array
+     */
+    protected $disabledDates;
+
+    public function getDate()
     {
-        return $this->policy;
+        return $this->date;
     }
 
-    public function setPolicy(Policy $policy)
+    public function setDate($date)
     {
-        $this->policy = $policy;
+        $this->date = $date;
     }
 
-    public function getClaim()
+    /**
+     * @return mixed
+     */
+    public function getNotes()
     {
-        return $this->claim;
+        return $this->notes;
     }
 
-    public function setClaim($claim)
+    /**
+     * @param mixed $notes
+     * @return CreateScheduledPayment
+     */
+    public function setNotes($notes)
     {
-        $this->claim = $claim;
+        $this->notes = $notes;
+        return $this;
     }
 
-    public function getType()
+    public function getDisabledDatesJson()
     {
-        return $this->type;
+        return json_encode($this->disabledDates);
     }
 
-    public function setType($type)
+    /**
+     * @return array
+     */
+    public function getDisabledDates(): array
     {
-        $this->type = $type;
+        return $this->disabledDates;
+    }
+
+    /**
+     * @param array $disabledDates
+     * @return CreateScheduledPayment
+     */
+    public function setDisabledDates(array $disabledDates): CreateScheduledPayment
+    {
+        $this->disabledDates = $disabledDates;
+        return $this;
+    }
+
+    public function __construct($bankHolidays, $scheduledPayments)
+    {
+        $this->createDisabledDateArray($bankHolidays, $scheduledPayments);
+    }
+
+
+    protected function createDisabledDateArray($bankHolidays, $scheduledPayments)
+    {
+        $now = new \DateTime();
+        foreach ($bankHolidays as $bankHoliday) {
+            if ($bankHoliday > $now) {
+                $this->disabledDates[] = $bankHoliday;
+            }
+        }
+        /** @var ScheduledPayment $scheduledPayment */
+        foreach ($scheduledPayments as $scheduledPayment) {
+            if ($scheduledPayment->getScheduled() > $now) {
+                $this->disabledDates[] = $scheduledPayment->getScheduled();
+            }
+        }
+
     }
 }

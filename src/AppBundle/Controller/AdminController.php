@@ -15,6 +15,7 @@ use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Form\CardRefund;
+use AppBundle\Document\Form\CreateScheduledPayment;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Sequence;
@@ -25,6 +26,7 @@ use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\CardRefundType;
 use AppBundle\Form\Type\CheckoutFileType;
+use AppBundle\Form\Type\CreateScheduledPaymentType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -378,39 +380,58 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/createScheduledPayment/{id}", name="checkout_refund_form")
+     * @Route("/create-scheduled-payment/{id}", name="create_scheduled_payment_form")
      * @Template
      */
-    public function createScheduledPaymentFormAction(Request $request)
+    public function createScheduledPaymentFormAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         /** @var PolicyRepository $repo */
         $repo = $dm->getRepository(Policy::class);
-        /** @var Policy $policy */
+        /** @var PhonePolicy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
         }
         // Make sure the person making the request has the right permission.
         // Create the form.
-        $scheduledPayment = new ScheduledPayment($policy);
-        $scheduledPaymentForm = $this->get('form.factory')
-            ->createNamedBuilder('create_scheduled_payment_form', CreateScheduledPaymentType::class, $scheduledPayment)
+        $createScheduledPayment = new CreateScheduledPayment(self::getBankHolidays(), $policy->getScheduledPayments());
+        $createScheduledPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('create_scheduled_payment_form', CreateScheduledPaymentType::class, $createScheduledPayment)
             ->setAction($this->generateUrl('create_scheduled_payment_form', ['id' => $policy->getId()]))
             ->getForm();
         // process the form.
         if ($request->getMethod() === 'POST') {
-            if ($request->request->has('create_scheduled_payment_form')) {a
+            if ($request->request->has('create_scheduled_payment_form')) {
                 $createScheduledPaymentForm->handleRequest($request);
+                $monthlyPremium = $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice();
                 if($createScheduledPaymentForm->isValid()) {
-
+                    $date = new \DateTime($createScheduledPayment->getDate());
+                    $scheduledPayment = new ScheduledPayment();
+                    $scheduledPayment->setScheduled($date);
+                    $scheduledPayment->setNotes($createScheduledPayment->getNotes());
+                    $scheduledPayment->setAmount($monthlyPremium);
+                    $scheduledPayment->setPolicy($policy);
+                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                    try {
+                        $policy->addScheduledPayment($scheduledPayment);
+                        $dm->flush();
+                        $this->addFlash('success', "Payment scheduled successfully.");
+                    } catch (\Exception $e) {
+                        $this->addFlash(
+                            'error',
+                            sprintf("Could not scheduled payment: %s", $e->getMessage())
+                        );
+                    }
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             }
         }
 
-
-
-        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        return [
+            'create_scheduled_payment_form' => $createScheduledPaymentForm->createView(),
+            'policy' => $policy,
+        ];
     }
 
     /**

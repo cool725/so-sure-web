@@ -57,6 +57,20 @@ $(document).ready(function(){
         minDate: moment()
     });
 
+    var receivedDates = JSON.parse($('#create_scheduled_payment_form_disabledDatesJson').val());
+    var disabledDates = [];
+    for (var i = 0; i < receivedDates.length; i++) {
+        disabledDates[i] = receivedDates[i].date;
+    }
+    $('.datetimepickercreatescheduledpayment').datetimepicker({
+        format: "DD-MM-YYYY HH:mm",
+        showTodayButton: true,
+        useCurrent: false,
+        daysOfWeekDisabled: [0, 6],
+        minDate: moment().add(1, 'days'),
+        disabledDates: disabledDates
+    });
+
     // Copy button on scode
     var clipboard = new Clipboard('.btn-copy');
 
