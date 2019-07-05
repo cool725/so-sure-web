@@ -59,6 +59,7 @@ use AppBundle\Validator\Constraints\FullName;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
+use Psr\Log\LoggerInterface;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use AppBundle\Validator\Constraints\AgeValidator;

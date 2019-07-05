@@ -1424,33 +1424,6 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/remainder/{id}", name="purchase_remainder_policy")
-     * @Template
-     */
-    public function purchaseRemainderPolicyAction($id)
-    {
-        $policyRepo = $this->getManager()->getRepository(Policy::class);
-        $policy = $policyRepo->find($id);
-        if (!$policy) {
-            throw $this->createNotFoundException('Unknown policy');
-        }
-
-        $amount = $policy->getRemainderOfPolicyPrice();
-        $webpay = null;
-
-        $data = [
-            'phone' => $policy->getPhone(),
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
-            'amount' => $amount,
-            'policy' => $policy,
-            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
-        ];
-
-        return $data;
-    }
-
-    /**
      * @Route("/checkout/{id}", name="purchase_checkout")
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
@@ -1485,7 +1458,10 @@ class PurchaseController extends BaseController
             $redirectSuccess = $this->generateUrl('user_unpaid_policy');
             $redirectFailure = $this->generateUrl('user_unpaid_policy');
         }
-
+        $token = null;
+        $pennies = null;
+        $publicKey = null;
+        $cardToken = null;
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
@@ -1559,6 +1535,10 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (PaymentDeclinedException $e) {
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
+                "Payment declined for policy '%s'",
+                $policy->getId()
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1566,6 +1546,10 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
             }
         } catch (AccessDeniedException $e) {
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
+                "Access Denied for policy '%s'",
+                $policy->getId()
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
@@ -1573,13 +1557,28 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied');
             }
         } catch (CommissionException $e) {
-            $logger->error($e->getMessage());
+            $message = "";
+            if ($pennies === null) {
+                $message = sprintf("Commission Exception for policy %s on payment without amount", $policy->getId());
+            } else {
+                $message = sprintf(
+                    "Commission Exception for policy %s on payment of %d pennies",
+                    $policy->getId(),
+                    $pennies
+                );
+            }
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+                "Unknown Exception for policy '%s' with message '%s'",
+                $policy->getId(),
+                $e->getMessage()
+            )));
             $this->addFlash('error', $errorMessage);
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
