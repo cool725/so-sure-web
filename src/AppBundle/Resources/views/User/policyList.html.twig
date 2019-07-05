@@ -76,7 +76,11 @@
                                 </ul>
                             {% endif %}
                             {% if policyItem.displayRepurchase %}
-                                <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success">Repurchase Policy</a>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success btn-square">Repurchase Policy</a>
+                                    </li>
+                                </ul>
                             {% endif %}
                         </div>
                     </div>
