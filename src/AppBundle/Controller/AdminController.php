@@ -397,7 +397,11 @@ class AdminController extends BaseController
         // Create the form.
         $createScheduledPayment = new CreateScheduledPayment(self::getBankHolidays(), $policy->getScheduledPayments());
         $createScheduledPaymentForm = $this->get('form.factory')
-            ->createNamedBuilder('create_scheduled_payment_form', CreateScheduledPaymentType::class, $createScheduledPayment)
+            ->createNamedBuilder(
+                'create_scheduled_payment_form',
+                CreateScheduledPaymentType::class,
+                $createScheduledPayment
+            )
             ->setAction($this->generateUrl('create_scheduled_payment_form', ['id' => $policy->getId()]))
             ->getForm();
         // process the form.
@@ -405,7 +409,7 @@ class AdminController extends BaseController
             if ($request->request->has('create_scheduled_payment_form')) {
                 $createScheduledPaymentForm->handleRequest($request);
                 $monthlyPremium = $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice();
-                if($createScheduledPaymentForm->isValid()) {
+                if ($createScheduledPaymentForm->isValid()) {
                     $date = new \DateTime($createScheduledPayment->getDate());
                     $scheduledPayment = new ScheduledPayment();
                     $scheduledPayment->setScheduled($date);
