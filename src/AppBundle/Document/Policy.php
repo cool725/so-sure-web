@@ -1011,7 +1011,7 @@ abstract class Policy
      */
     public function getLastRevertedScheduledPayment()
     {
-        $lastPayment = usort(array_filter($this->getScheduledPayments(), function($scheduledPayment) {
+        $lastPayment = usort(array_filter($this->getScheduledPayments(), function ($scheduledPayment) {
             return !in_array($scheduledPayment->getStatus(), [
                 ScheduledPayment::STATUS_SCHEDULED,
                 ScheduledPayment::STATUS_PENDING
