@@ -358,6 +358,8 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var InvitationRepository */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
+        $scheduledPaymentRepository = $this->dn->getRepository(ScheduledPayment::class);
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
@@ -408,7 +410,8 @@ class BICommand extends ContainerAwareCommand
             '"Successful Payment"',
             '"Bacs Mandate Cancelled Reason"',
             '"Premium Installments"',
-            '"Inviter"'
+            '"Inviter"',
+            '"Latest Payment failed without reschedule"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -420,6 +423,11 @@ class BICommand extends ContainerAwareCommand
             }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $lastReverted = $policy->getLastRevertedScheduledPayment();
+            $reschedule = null;
+            if ($lastReverted) {
+                $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
+            }
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
@@ -486,7 +494,8 @@ class BICommand extends ContainerAwareCommand
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() : ''
                 ),
                 sprintf('"%s"', $policy->getPremiumInstallments()),
-                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : '')
+                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : ''),
+                sprintf('"%s"', $reschedule ? "no" : "yes")
             ]);
         }
         if (!$skipS3) {

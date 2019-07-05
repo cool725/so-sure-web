@@ -1006,6 +1006,23 @@ abstract class Policy
     }
 
     /**
+     * Gets the most recent scheduled payment if it is reverted.
+     * @return ScheduledPayment|null the scheduled payment or if there is not one of those you get null.
+     */
+    public function getLastRevertedScheduledPayment()
+    {
+        $lastPayment = usort(array_filter($this->getScheduledPayments(), function($scheduledPayment) {
+            return !in_array($scheduledPayment->getStatus(), [
+                ScheduledPayment::STATUS_SCHEDULED,
+                ScheduledPayment::STATUS_PENDING
+            ]);
+        }), function ($a, $b) {
+            return $a->getScheduled() > $b->getScheduled();
+        })[0];
+        return $lastPayment->getStatus() == ScheduledPayment::STATUS_REVERTED ? $lastPayment : null;
+    }
+
+    /**
      * @return Payment|null
      */
     public function getLastSuccessfulUserPaymentCredit()
