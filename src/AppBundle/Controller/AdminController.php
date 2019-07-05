@@ -408,13 +408,13 @@ class AdminController extends BaseController
         if ($request->getMethod() === 'POST') {
             if ($request->request->has('create_scheduled_payment_form')) {
                 $createScheduledPaymentForm->handleRequest($request);
-                $monthlyPremium = $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice();
-                if (!$monthlyPremium) {
+                if (!$policy->getPhone()->getCurrentPhonePrice()) {
                     throw $this->createNotFoundException(sprintf(
                         "Monthly premium could not be set for policy %s",
                         $policy->getId()
                     ));
                 }
+                $monthlyPremium = $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice();
                 if ($createScheduledPaymentForm->isValid()) {
                     $date = new \DateTime($createScheduledPayment->getDate());
                     $scheduledPayment = new ScheduledPayment();
