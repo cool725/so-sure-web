@@ -27,7 +27,7 @@ body {
         margin: 0;
 
         li {
-            @include border-radius(12px);
+            @include border-radius(50%);
         }
     }
 

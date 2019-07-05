@@ -1,11 +1,16 @@
 {% if claim.proofOfBarringFiles is defined %}
-<div class="modal fade" id="baringModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="notes-update-form" class="form-horizontal" method="post">
+    <div class="modal fade"
+         id="baring_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="baring_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Proof of Baring</h4>
+                    <h5 class="modal-title">Proof of Baring</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {% if claim.proofOfBarringFiles|length == 0 %}
@@ -14,24 +19,26 @@
                     {% for file in claim.proofOfBarringFiles %}
                         <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
                     {% endfor %}
-                </div>
-                <div class="modal-footer">
                     <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
+
 {% if claim.proofOfUsageFiles is defined %}
-<div class="modal fade" id="usageModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="notes-update-form" class="form-horizontal" method="post">
+    <div class="modal fade"
+         id="usage_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="usage_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Proof of Usage</h4>
+                    <h5 class="modal-title">Proof of Usage</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {% if claim.proofOfUsageFiles|length == 0 %}
@@ -40,24 +47,26 @@
                     {% for file in claim.proofOfUsageFiles %}
                         <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
                     {% endfor %}
-                </div>
-                <div class="modal-footer">
                     <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
+
 {% if claim.proofOfPurchaseFiles is defined %}
-<div class="modal fade" id="purchaseModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="notes-update-form" class="form-horizontal" method="post">
+    <div class="modal fade"
+         id="purchase_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="purchase_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Proof of Purchase</h4>
+                    <h5 class="modal-title">Proof of Purchase</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {% if claim.proofOfPurchaseFiles|length == 0 %}
@@ -66,24 +75,26 @@
                     {% for file in claim.proofOfPurchaseFiles %}
                         <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
                     {% endfor %}
-                </div>
-                <div class="modal-footer">
                     <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
+
 {% if claim.proofOfLossFiles is defined %}
-<div class="modal fade" id="lossModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="notes-update-form" class="form-horizontal" method="post">
+    <div class="modal fade"
+         id="loss_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="loss_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Proof of Loss</h4>
+                    <h5 class="modal-title">Proof of Loss</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {% if claim.proofOfLossFiles|length == 0 %}
@@ -92,24 +103,26 @@
                     {% for file in claim.proofOfLossFiles %}
                         <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
                     {% endfor %}
-                </div>
-                <div class="modal-footer">
                     <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 {% endif %}
+
 {% if claim.damagePictureFiles is defined %}
-<div class="modal fade" id="pictureModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="notes-update-form" class="form-horizontal" method="post">
+    <div class="modal fade"
+         id="picture_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="picture_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Picture of Damage</h4>
+                    <h5 class="modal-title">Picture of Damage</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     {% if claim.damagePictureFiles|length == 0 %}
@@ -118,40 +131,37 @@
                     {% for file in claim.damagePictureFiles %}
                         <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
                     {% endfor %}
-                </div>
-                <div class="modal-footer">
                     <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% if claim.otherFiles is defined %}
-    <div class="modal fade" id="otherModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="notes-update-form" class="form-horizontal" method="post">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Other Files</h4>
-                    </div>
-                    <div class="modal-body">
-                        {% if claim.otherFiles|length == 0 %}
-                            <p>No files are uploaded</p>
-                        {% endif %}
-                        {% for file in claim.otherFiles %}
-                            <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
-                        {% endfor %}
-                    </div>
-                    <div class="modal-footer">
-                        <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 {% endif %}
 
+{% if claim.otherFiles is defined %}
+    <div class="modal fade"
+         id="other_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="other_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Other Files</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if claim.otherFiles|length == 0 %}
+                        <p>No files are uploaded</p>
+                    {% endif %}
+                    {% for file in claim.otherFiles %}
+                        <p><a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.fileName }}</a> (Uploaded {{ file.created|date }})</p>
+                    {% endfor %}
+                    <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

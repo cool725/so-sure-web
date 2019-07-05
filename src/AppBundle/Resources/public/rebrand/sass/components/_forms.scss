@@ -201,3 +201,10 @@ label {
 
     }
 }
+
+.custom-file-label {
+
+    &:after {
+        border-radius: 0 8px 8px 0;
+    }
+}

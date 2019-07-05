@@ -28,8 +28,14 @@
 // Video modal
 .modal-video {
 
+    .modal-content {
+        background: none;
+        @include  border-radius(0);
+    }
+
     .modal-body {
         position: relative;
+        padding: 0;
 
         .close {
             position: absolute;

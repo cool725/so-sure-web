@@ -47,7 +47,10 @@ $(function() {
     // Escape key close
     $(document).keyup(function(e) {
         if (quoteModal.is('.getquote--open') && e.keyCode === 27) {
-            getQuote();
+
+            open = !open;
+
+            getQuote(open);
         }
     });
 

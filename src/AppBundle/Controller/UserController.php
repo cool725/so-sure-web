@@ -475,7 +475,7 @@ class UserController extends BaseController
                     $this->addFlash(
                         'warning-raw',
                         sprintf(
-                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
+                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
                             $checkPolicy->getPolicyNumber(),
                             $url
                         )
@@ -1994,6 +1994,31 @@ class UserController extends BaseController
         }
 
         return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
+    }
+
+    /**
+     * Allows users to pay for the whole of their premium at once, either because they are unpaid or for other reasons.
+     * @Route("/remainder/{id}", name="purchase_remainder_policy")
+     * @Template
+     */
+    public function purchaseRemainderPolicyAction($id)
+    {
+        $policyRepo = $this->getManager()->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unknown policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        $amount = $policy->getRemainderOfPolicyPrice();
+        $webpay = null;
+        return [
+            'phone' => $policy->getPhone(),
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'amount' => $amount,
+            'policy' => $policy,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
+        ];
     }
 
     private function getFacebookFriends($request, $policy)

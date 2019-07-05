@@ -54,16 +54,12 @@ class ClaimFnolType extends AbstractType
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
             ])
-            ->add('time', ChoiceType::class, [
-                'required' => true,
-                'placeholder' => 'Select',
-                'choices' => $hoursChoices,
-            ])
+            ->add('time', TextType::class)
             ->add('where', TextType::class)
             ->add('timeToReach', TextType::class)
             ->add('type', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'My phone is...',
+                'placeholder' => 'Choose...',
                 'choices' => [
                     'Lost' => Claim::TYPE_LOSS,
                     'Stolen' => Claim::TYPE_THEFT,
@@ -72,7 +68,7 @@ class ClaimFnolType extends AbstractType
             ])
             ->add('network', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'My network operator is ...',
+                'placeholder' => 'Choose...',
                 'choices' => Claim::$networks,
                 'preferred_choices' => Claim::$preferedNetworks,
             ])
