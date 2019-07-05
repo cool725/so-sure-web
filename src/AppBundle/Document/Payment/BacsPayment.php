@@ -239,7 +239,7 @@ class BacsPayment extends Payment
      */
     public function setPolicyStatusActiveIfUnpaidAndPaidToDate(\DateTime $date)
     {
-        $outstandingPremium = $this->getPolicy()->getOutstandingPremiumToDate($date, false, false);
+        $outstandingPremium = $this->getPolicy()->getOutstandingPremiumToDate($date);
         if ($this->getPolicy() && $outstandingPremium <= $this->amount) {
             $this->getPolicy()->setPolicyStatusActiveIfUnpaid();
         }

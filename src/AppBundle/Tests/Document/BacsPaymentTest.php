@@ -216,4 +216,40 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->addPayment($bacs);
         $bacs->reject();
     }
+
+    /**
+     * Makes sure that if a user owes more than a month worth of cash then they will not be set to active after a single
+     * payment.
+     */
+    public function testRemainUnpaidIfVeryLate()
+    {
+        $premium = new PhonePremium();
+        $premium->setGwp(100);
+        $premium->setIpt(1);
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $policy->setPremium($premium);
+        $policy->setPremiumInstallments(12);
+        $policy->setStart(new \DateTime('2018-02-01'));
+        $policy->setBilling(new \DateTime('2018-02-01'));
+        // one payment late.
+        $bacs = new BacsPayment();
+        $bacs->setPolicy($policy);
+        $bacs->setSubmittedDate(new \DateTime('2018-03-02'));
+        $bacs->setAmount($premium->getMonthlyPremiumPrice());
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
+        $bacs->submit(new \DateTime('2018-03-02'));
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
+        // another one.
+        // Technically we can not test multiple payments in a unit test. As a workaround, just double the value of this
+        // payment to pretend it is two payments.
+        $bacs = new BacsPayment();
+        $bacs->setPolicy($policy);
+        $bacs->setSubmittedDate(new \DateTime('2018-03-10'));
+        $bacs->setAmount($premium->getMonthlyPremiumPrice() * 2);
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
+        $bacs->submit(new \DateTime('2018-03-10'));
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $bacs->getPolicy()->getStatus());
+
+    }
 }
