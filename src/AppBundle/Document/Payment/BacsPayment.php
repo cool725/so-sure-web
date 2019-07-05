@@ -228,15 +228,19 @@ class BacsPayment extends Payment
         $this->setSubmittedDate($date);
         $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));
         $this->setBacsReversedDate($this->addBusinessDays($date, self::DAYS_REVERSE));
-        $this->setPolicyStatusActiveIfUnpaidAndPaidToDate();
+        if ($this->getPolicy()) {
+            $this->setPolicyStatusActiveIfUnpaidAndPaidToDate($date);
+        }
     }
 
     /**
      * If this payment has a policy with status unpaid and that policy is paid to date, then it is set to active.
+     * @param \DateTime $date is the date they must be paid up at.
      */
-    public function setPolicyStatusActiveIfUnpaidAndPaidToDate()
+    public function setPolicyStatusActiveIfUnpaidAndPaidToDate(\DateTime $date)
     {
-        if ($this->getPolicy() && $this->getPolicy()->isPolicyPaidToDate(null, true)) {
+        $outstandingPremium = $this->getPolicy()->getOutstandingPremiumToDate($date, false, false);
+        if ($this->getPolicy() && $outstandingPremium <= $this->amount) {
             $this->getPolicy()->setPolicyStatusActiveIfUnpaid();
         }
     }
@@ -336,8 +340,7 @@ class BacsPayment extends Payment
                 $policy->addScheduledPayment($scheduledPayment);
             }
         }
-
-        $this->setPolicyStatusActiveIfUnpaidAndPaidToDate();
+        $this->setPolicyStatusActiveIfUnpaidAndPaidToDate($date);
     }
 
     public function reject(\DateTime $date = null)
