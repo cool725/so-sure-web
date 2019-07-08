@@ -1323,7 +1323,9 @@ class ApiAuthController extends BaseController
                         $notes,
                         $this->getIdentityLog($request)
                     );
-                    $policy->setPolicyStatusActiveIfUnpaid();
+                    if ($policy->isPolicyPaidToDate(null, true)) {
+                        $policy->setPolicyStatusActiveIfUnpaid();
+                    }
                     $dm->flush();
                 } else {
                     throw new ValidationException('Unsupport payment method');
