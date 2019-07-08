@@ -976,7 +976,7 @@ class CheckoutService
                 if ($policy->isPolicyPaidToDate()) {
                     $policy->setPolicyStatusActiveIfUnpaid();
                     $this->dm->flush();
-                    if ($this->areEqualToTwoDp($policy->getOutstandingPremium(), 0)) {
+                    if ($policy->getOutstandingPremium() <= 0) {
                         $futureSchedule = $scheduledPaymentRepo->getStillScheduled($policy);
                         /** @var ScheduledPayment $scheduledPayment */
                         foreach ($futureSchedule as $scheduledPayment) {
