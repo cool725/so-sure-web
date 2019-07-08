@@ -267,7 +267,9 @@ class PaymentService
         if ($policy->isDifferentPayer()) {
             $policy->setPayer($policy->getUser());
         }
-        $policy->setPolicyStatusActiveIfUnpaid();
+        if ($policy->isPolicyPaidToDate(null, true)) {
+            $policy->setPolicyStatusActiveIfUnpaid();
+        }
 
         if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
             $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_FAILURE);
