@@ -28,7 +28,7 @@ class SixpackService
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
-    const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
+    // const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
     // const EXPERIMENT_SCODE_LANDING_TEXT = 'scode-landing-text';
@@ -121,10 +121,11 @@ class SixpackService
         'homepage-usps',
         'scode-landing-text',
         'email-landing-text',
+        'ad-landing-quotepage',
     ];
 
     public static $unauthExperiments = [
-        self::EXPERIMENT_SOCIAL_AD_LANDING,
+        // self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
         // self::EXPERIMENT_SCODE_LANDING_TEXT,
         // Exp 2
@@ -183,7 +184,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        self::EXPERIMENT_SOCIAL_AD_LANDING,
+        // self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
         //
         // Exp 2
