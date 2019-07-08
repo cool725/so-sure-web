@@ -1011,15 +1011,20 @@ abstract class Policy
      */
     public function getLastRevertedScheduledPayment()
     {
-        $lastPayment = usort(array_filter($this->getScheduledPayments(), function ($scheduledPayment) {
+        $pastPayments = array_filter($this->getScheduledPayments(), function ($scheduledPayment) {
             return !in_array($scheduledPayment->getStatus(), [
                 ScheduledPayment::STATUS_SCHEDULED,
                 ScheduledPayment::STATUS_PENDING
             ]);
-        }), function ($a, $b) {
+        });
+        $lastPayment = usort($pastPayments, function ($a, $b) {
             return $a->getScheduled() > $b->getScheduled();
         })[0];
-        return $lastPayment->getStatus() == ScheduledPayment::STATUS_REVERTED ? $lastPayment : null;
+        if ($lastPayment->getStatus() == ScheduledPayment::STATUS_REVERTED) {
+            return $lastPayment;
+        } else {
+            return null;
+        }
     }
 
     /**
