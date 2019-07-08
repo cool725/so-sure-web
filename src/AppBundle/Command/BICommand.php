@@ -6,6 +6,7 @@ use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
@@ -359,7 +360,7 @@ class BICommand extends ContainerAwareCommand
         /** @var InvitationRepository */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
         /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
-        $scheduledPaymentRepository = $this->dn->getRepository(ScheduledPayment::class);
+        $scheduledPaymentRepository = $this->dm->getRepository(ScheduledPayment::class);
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
