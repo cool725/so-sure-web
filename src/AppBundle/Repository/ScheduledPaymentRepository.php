@@ -140,7 +140,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
 
     /**
      * Takes a scheduled payment and returns the scheduled payment that reschedules it.
-     * @param ScheduledPayment is the scheduled payment that is rescheduled.
+     * @param ScheduledPayment $scheduledPayment is the scheduled payment that is rescheduled.
      * @return ScheduledPayment|null the scheduled payment if it exists or null if there is nothing.
      */
     public function getRescheduledBy($scheduledPayment)
