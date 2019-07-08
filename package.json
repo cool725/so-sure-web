@@ -19,7 +19,7 @@
     "webpack": "^4.12.2",
     "webpack-cli": "^3.1.0",
     "webpack-dev-middleware": "^2.0.6",
-    "webpack-dev-server": "^3.1.5",
+    "webpack-dev-server": "^3.1.11",
     "webpack-notifier": "^1.6.0"
   },
   "dependencies": {
@@ -53,6 +53,7 @@
     "js.cookie": "^0.0.4",
     "jssocials": "git://github.com/so-sure/jssocials.git#master",
     "lozad": "^1.8.0",
+    "mem": "^5.1.1",
     "moment": "^2.24.0",
     "popper.js": "^1.15.0",
     "tempusdominus-bootstrap-4": "^5.1.2",

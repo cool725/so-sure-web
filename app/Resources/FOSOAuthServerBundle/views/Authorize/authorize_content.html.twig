@@ -1,22 +1,27 @@
-{% extends '::base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set exclude_remote_scripts = true %}
-{% set new_stylesheet = 1 %}
-{% set distraction_free = 1 %}
+{% set body_class = 'login' %}
+{% set light_nav  = 1 %}
+{# TODO: Do we need to hide the nav or at least the login button #}
+{% set quote_mode = 1 %}
+{% block title %}so-sure - Authorise{% endblock %}
+{% block meta %}
+    <meta name="robots" content="noindex">
+{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/login.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
 {% endblock %}
 
 {% block body %}
-    <section class="section--pad login">
-        <div class="container">
-            <div class="panel login__panel">
-                <div class="panel-body">
+    <div class="login  p-3 d-flex align-items-center">
+        <div class="login__inner">
+
+            <h1 class="text-white text-center mb-4">so-sure 🔐</h1>
+
+            <div class="login__card">
+                <div class="login__card__body">
                     {{ form_start(form, {
                         'method': 'POST',
                         'action': path('fos_oauth_server_authorize'),
@@ -25,20 +30,31 @@
                             'class': 'fos_oauth_server_authorize'}
                     }) }}
                         <p class="lead">{{ form.vars.value.scope|oauth2ScopeDescription }}</p>
-                        <hr>
-                        <input class="btn btn-success" type="submit" name="accepted" value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
-                        <input class="btn btn-outline-primary" type="submit" name="rejected" value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />
+                        <div class="login__divider__solid"></div>
+                        <input class="btn btn-success btn-square"
+                               type="submit"
+                               name="accepted"
+                               value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
+                        <input class="btn btn-outline-primary btn-square"
+                               type="submit"
+                               name="rejected"
+                               value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />
                         {{ form_row(form.client_id) }}
                         {{ form_row(form.response_type) }}
                         {{ form_row(form.redirect_uri) }}
                         {{ form_row(form.state) }}
                         {{ form_row(form.scope) }}
                         {{ form_rest(form) }}
-                    </form>
+                    {{ form_end(form) }}
                 </div>
             </div>
+
         </div>
-    </section>
+        <span class="login__phone__background animated fadeInLeft"></span>
+        <span class="login__money__background animated jackInTheBox"></span>
+    </div>
 {% endblock %}
 
-{% block footer %}{% endblock %}
+{% block footer %}
+    {# Overirde and hide footer #}
+{% endblock %}
