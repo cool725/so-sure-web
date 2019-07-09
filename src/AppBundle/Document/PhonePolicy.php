@@ -959,6 +959,7 @@ class PhonePolicy extends Policy
     {
         $picSureEnabled = $this->isPicSurePolicy();
         $picSureValidated = $this->isPicSureValidated();
+        /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
         $excess = $phonePremium->getExcess();
         $picsureExcess = $phonePremium->getPicsureExcess();
