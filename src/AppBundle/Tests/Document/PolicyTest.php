@@ -124,7 +124,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $date->add(new \DateInterval("P1M"));
         }
         // now get the reverted scheduled payment.
-        $this->assertEquals($revertedPayment, $policy->getLastRevertedScheduledPayment());
+        $foundRevertedPayment = $policy->getLastRevertedScheduledPayment();
+        $this->assertEquals($revertedPayment, $foundRevertedPayment);
     }
 
     /**
@@ -152,6 +153,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $date->add(new \DateInterval("P1M"));
         }
         // try to to get nonexistent reverted scheduled payment.
-        $this->assertNull($policy->getLastRevertedScheduledPayment());
+        $foundRevertedPayment = $policy->getLastRevertedScheduledPayment();
+        $this->assertNull($foundRevertedPayment);
     }
 }
