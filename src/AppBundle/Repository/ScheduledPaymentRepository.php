@@ -152,7 +152,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->getSingleResult();
     }
 
-    /*
+    /**
      * Gives a list of all scheduled payments for the given policy that are set as scheduled.
      * @param Policy $policy is the policy for which to find the scheduled payments.
      * @return array of all the scheduled payments that were found.
