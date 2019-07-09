@@ -582,6 +582,13 @@ class CheckoutService
             $capture->setChargeId($details->getId());
             $capture->setValue($this->convertToPennies($amount));
 
+            if ($details) {
+                $card = $details->getCard();
+                if ($card) {
+                    $this->setCardToken($policy, $card);
+                }
+            }
+
             if (!$paymentMethod->hasPreviousChargeId()) {
                 $paymentMethod->setPreviousChargeId($details->getId());
                 $this->dm->flush();
@@ -1025,7 +1032,16 @@ class CheckoutService
             $policy->setPaymentMethod($checkoutPaymentMethod);
         }
 
-        if (!$checkoutPaymentMethod->getCustomerId()) {
+        /**
+         * The original token migration used fake emails and there are ways that
+         * a payment can be made using the customers email address rather than
+         * the existing customerId that we have in the db.
+         * If the returned customerId differs from what we have, then we will
+         * update it at the same time as setting the new token.
+         */
+        if (!$checkoutPaymentMethod->getCustomerId() ||
+            $checkoutPaymentMethod->getCustomerId() !== $card->getCustomerId()
+        ) {
             $checkoutPaymentMethod->setCustomerId($card->getCustomerId());
         }
 
