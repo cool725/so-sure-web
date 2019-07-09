@@ -959,7 +959,9 @@ class PhonePolicy extends Policy
     {
         $picSureEnabled = $this->isPicSurePolicy();
         $picSureValidated = $this->isPicSureValidated();
-
+        $phonePremium = $this->getPremium();
+        $excess = $phonePremium->getExcess();
+        $picsureExcess = $phonePremium->getPicsureExcess();
         return array_merge(parent::toApiArray(), [
             'phone_policy' => [
                 'imei' => $this->getImei(),
@@ -969,6 +971,8 @@ class PhonePolicy extends Policy
                     $this->getDefaultName(),
                 'picsure_status' => $this->getPicSureStatusForApi(),
                 'excesses' => $this->getCurrentExcess() ? $this->getCurrentExcess()->toApiArray() : [],
+                'expected_excesses' => $excess ? $excess->toApiArray() : [],
+                'expected_picsure_excesses' => $picsureExcess() ? $picsureExcess->toApiArray() : [],
                 'detected_imei' => $this->getDetectedImei(),
             ],
         ]);
