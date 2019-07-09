@@ -962,7 +962,7 @@ class PhonePolicy extends Policy
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
         $excess = $phonePremium->getExcess();
-        $picsureExcess = $phonePremium->getPicsureExcess();
+        $picsureExcess = $phonePremium->getPicSureExcess();
         return array_merge(parent::toApiArray(), [
             'phone_policy' => [
                 'imei' => $this->getImei(),
