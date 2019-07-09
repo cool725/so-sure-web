@@ -433,6 +433,18 @@ class AdminController extends BaseController
                             sprintf("Could not scheduled payment: %s", $e->getMessage())
                         );
                     }
+                    /**
+                     * We also want to add the notes to the policy notes
+                     */
+                    $policy->addNoteDetails(
+                        sprintf(
+                            "Manually scheduled payment for %s. Justification: %s",
+                            $date->format('l jS F Y'),
+                            $createScheduledPayment->getNotes()
+                        ),
+                        $this->getUser()
+                    );
+                    $dm->flush();
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             }
