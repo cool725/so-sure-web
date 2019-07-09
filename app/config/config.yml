@@ -770,6 +770,7 @@ nelmio_security:
                 - https://*.criteo.com
                 - https://gum.criteo.com
                 - https://dis.eu.criteo.com
+                - https://static.criteo.net
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -842,9 +843,13 @@ nelmio_security:
                 - https://rules.quantcount.com
                 - https://*.criteo.net
                 - https://*.criteo.com
+                - https://gum.criteo.com
+                - https://dis.eu.criteo.com
+                - https://static.criteo.net
                 - https://sslwidget.criteo.com
-                - http://outbrain.com
-                - http://*.outbrain.com
+                - https://outbrain.com
+                - https://*.outbrain.com
+                - https://amplify.outbrain.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1119,8 +1124,9 @@ nelmio_security:
                 - https://csm.nl.eu.criteo.net
                 - https://*.criteo.com
                 - https://*.criteo.net
-                - http://outbrain.com
-                - http://*.outbrain.com
+                - https://outbrain.com
+                - https://*.outbrain.com
+                - https://adserver.adtech.de
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

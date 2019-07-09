@@ -169,18 +169,6 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        if ($request->get('_route') === 'test_insurance_make_model_memory') {
-            $adLanding = $this->sixpackSimple(SixpackService::EXPERIMENT_SOCIAL_AD_LANDING, $request);
-            if ($adLanding === 'ad-landing-quotepage') {
-                return $this->redirectToRoute('insurance_make_model_memory', [
-                    'make' => $make,
-                    'model' => $model,
-                    'memory' => $memory,
-                ]);
-            }
-            return $this->redirectToRoute('homepage');
-        }
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
@@ -754,30 +742,5 @@ class PhoneInsuranceController extends BaseController
         }
 
         return $phonesMem;
-    }
-
-    private function willRunQuoteTest(Request $request, $make, $model, $memory) //: ?RedirectResponse
-    {
-        if ($request->get('_route') === 'test_insurance_make_model_memory') {
-            $adLanding = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_SOCIAL_AD_LANDING,
-                ['ad-landing-quotepage-homepage', 'ad-landing-quotepage']
-            );
-            if ($adLanding === 'ad-landing-quotepage') {
-                return $this->redirectToRoute(
-                    'insurance_make_model_memory',
-                    [
-                        'make' => $make,
-                        'model' => $model,
-                        'memory' => $memory,
-                    ]
-                );
-            }
-
-            return $this->redirectToRoute('homepage');
-        }
-
-        return null;
     }
 }

@@ -785,8 +785,8 @@ class ApiController extends BaseController
             }
 
             // Breaking change to return all the policies objects to support renewals
-            if (($platform == 'ios' && version_compare($version, '1.5.66', '<')) ||
-                ($platform == 'android' && version_compare($version, '1.5.71.0', '<')) ) {
+            if (($platform == 'ios' && version_compare($version, '1.5.67', '<')) ||
+                ($platform == 'android' && version_compare($version, '1.5.72.0', '<')) ) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_UPGRADE_APP,
                     sprintf('%s %s must be upgraded due to payment method change', $platform, $version),

@@ -68,7 +68,7 @@
                             <p>Just take a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.</p>
                             <div class="form-row mb-4">
                                 <div class="col-md form-group">
-                                    {{ form_label(claim_form.typeDetailsOther, 'Picture of damaged phone') }}
+                                    {{ form_label(claim_form.pictureOfPhone, 'Picture of damaged phone') }}
                                     {{ form_widget(claim_form.pictureOfPhone) }}
                                     <small class="form-text">
                                         <a href="#"
@@ -127,7 +127,7 @@
                         <p>Upload any other files that will support your claim or as requested by the claims team.</p>
                         <div class="form-row mb-4">
                             <div class="col-md form-group">
-                                {{ form_label(claim_form.other, 'Proof of purchase') }}
+                                {{ form_label(claim_form.other, 'Supporting files') }}
                                 {{ form_widget(claim_form.other) }}
                                 <small class="form-text">
                                     <a href="#"
