@@ -2046,4 +2046,65 @@ class CheckoutServiceTest extends WebTestCase
         self::$checkout->updatePaymentMethod($policy, $token->token, 9.71);
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
     }
+
+    public function testUpdateCustomerIdOnManualPayment()
+    {
+        $now = new \DateTime();
+        $pastMonth = clone $now->sub(new \DateInterval("P1M"));
+
+        $user = $this->createValidUser("testUpdateCustomerIdOnManualPayment" . time() . "@so-sure.com");
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, false, false);
+
+        self::$dm->flush();
+
+        $payment = self::$checkout->testPay(
+            $policy,
+            "oldPay",
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$CHECKOUT_TEST_CARD2_NUM,
+            self::$CHECKOUT_TEST_CARD2_EXP,
+            self::$CHECKOUT_TEST_CARD2_PIN
+        );
+
+        $paymentA = new CheckoutPayment();
+        $paymentA->setDate($pastMonth);
+        $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $paymentA->setSource(Payment::SOURCE_WEB);
+        $policy->addPayment($paymentA);
+        $paymentA->setCommission(true);
+        $paymentA->setSuccess(true);
+        $paymentA->setReceipt($payment);
+
+
+        $paymentMethod = $policy->getCheckoutPaymentMethod();
+        $originalId = $paymentMethod->getCustomerId();
+
+        self::$dm->flush();
+
+        $user->setEmail("testUpdateCustomerIdOnManualPaymentSecondEmail" . time() . "@so-sure.com");
+        self::$dm->flush();
+
+        $payment = self::$checkout->testPay(
+            $policy,
+            "newPay",
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+
+        $paymentA = new CheckoutPayment();
+        $paymentA->setDate($now);
+        $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $paymentA->setSource(Payment::SOURCE_WEB);
+        $policy->addPayment($paymentA);
+        $paymentA->setCommission(true);
+        $paymentA->setSuccess(true);
+        $paymentA->setReceipt($payment);
+
+        $newId = $paymentMethod->getCustomerId();
+
+        self::assertNotEquals($originalId, $newId);
+    }
 }
