@@ -497,7 +497,7 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf('"%s"', $policy->getPremiumInstallments()),
                 sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : ''),
-                sprintf('"%s"', $reschedule ? "no" : "yes")
+                sprintf('"%s"', ($lastReverted && !$reschedule) ? "yes" : "no")
             ]);
         }
         if (!$skipS3) {

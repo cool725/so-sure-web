@@ -146,8 +146,9 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
     public function getRescheduledBy($scheduledPayment)
     {
         return $this->createQueryBuilder()
-            ->field("reschedules")->references($scheduledPayment)
+            ->field("previousAttempt")->references($scheduledPayment)
             ->getQuery()
-            ->execute();
+            ->execute()
+            ->getSingleResult();
     }
 }
