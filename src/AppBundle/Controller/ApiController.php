@@ -181,6 +181,10 @@ class ApiController extends BaseController
                 )) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
+            } elseif ($accountKitUserData) {
+                // user was found with mobile number above.
+                $user->setMobileNumberVerified(true);
+                $dm->flush();
             }
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
