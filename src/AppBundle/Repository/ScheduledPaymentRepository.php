@@ -137,4 +137,19 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->execute();
 
     }
+
+    /**
+     * Gives a list of all scheduled payments for the given policy that are set as scheduled.
+     * @param Policy $policy is the policy for which to find the scheduled payments.
+     * @return array of all the scheduled payments that were found.
+     */
+    public function getStillScheduled(Policy $policy)
+    {
+        return $this->createQueryBuilder()
+            ->field("policy")->references($policy)
+            ->field("status")->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->sort("scheduled", "desc")
+            ->getQuery()
+            ->execute();
+    }
 }

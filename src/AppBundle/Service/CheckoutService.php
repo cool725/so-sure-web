@@ -391,8 +391,8 @@ class CheckoutService
                     /** @var ScheduledPayment $scheduledPayment */
                     foreach ($oldUnpaid as $scheduledPayment) {
                         $scheduledPayment->cancel('Cancelling old scheduled as payment made to bring up to date');
-                        $this->dm->flush();
                     }
+                    $this->dm->flush();
                 }
             }
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
@@ -961,6 +961,8 @@ class CheckoutService
                 $details = $service->CaptureCardCharge($capture);
                 $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
 
+                /** @var ScheduledPaymentRepository */
+                $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
                 if ($details && $payment) {
                     $payment->setReceipt($details->getId());
                     $payment->setAmount($this->convertFromPennies($details->getValue()));
@@ -968,15 +970,12 @@ class CheckoutService
                     $payment->setMessage($details->getResponseMessage());
                     $payment->setRiskScore($details->getRiskCheck());
                     // Make sure upcoming rescheduled scheduled payments are now cancelled.
-                    /** @var ScheduledPaymentRepository */
-                    $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
                     $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
                     foreach ($rescheduledPayments as $rescheduled) {
                         $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
                     }
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
-
                 /**
                  * Finally, as the transaction was not a 0 amount, we will need to ensure that it is paid to date
                  *  and if the policy is set as unpaid, it is now set to active.
@@ -984,6 +983,14 @@ class CheckoutService
                 if ($policy->isPolicyPaidToDate()) {
                     $policy->setPolicyStatusActiveIfUnpaid();
                     $this->dm->flush();
+                    if ($policy->getOutstandingPremium() <= 0) {
+                        $futureSchedule = $scheduledPaymentRepo->getStillScheduled($policy);
+                        /** @var ScheduledPayment $scheduledPayment */
+                        foreach ($futureSchedule as $scheduledPayment) {
+                            $scheduledPayment->cancel('Cancelling old scheduled as whole premium paid');
+                        }
+                        $this->dm->flush();
+                    }
                 }
             }
         } catch (\Exception $e) {
