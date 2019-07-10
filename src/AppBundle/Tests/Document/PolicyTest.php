@@ -3,42 +3,18 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
-use AppBundle\Tests\UserClassTrait;
-use AppBundle\Document\CurrencyTrait;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Tests the behaviour of the policy document.
- * @group functional-nonet
+ * @group unit
  */
-class PolicyTest extends WebTestCase
+class PolicyTest extends \PHPUnit\Framework\TestCase
 {
-    use \AppBundle\Tests\PhingKernelClassTrait;
-    use UserClassTrait;
     use DateTrait;
-
-    protected static $container;
-    /** @var DocumentManager */
-    protected static $dm;
-
-    public static function setUpBeforeClass()
-    {
-        //start the symfony kernel
-        $kernel = static::createKernel();
-        $kernel->boot();
-
-        //get the DI container
-        self::$container = $kernel->getContainer();
-
-        //now we can instantiate our service (if you want a fresh one for
-        //each test method, do this in setUp() instead
-        /** @var DocumentManager */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        self::$dm = $dm;
-    }
 
     /**
      * Tests if the get scheduled payment refunds method works correctly.
@@ -51,13 +27,7 @@ class PolicyTest extends WebTestCase
         $nonRefundAmount = rand(0, 100) / 90;
         $refundAmount = rand(0, 100) / 90;
         $date = new \DateTime();
-        $policy = self::createUserPolicy(
-            true,
-            $this->subDays($date, 60),
-            false,
-            uniqid()."@gmail.com",
-            $this->generateRandomImei()
-        );
+        $policy = new PhonePolicy();
         for ($i = 0; $i < $nNonRefunds; $i++) {
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
@@ -95,13 +65,7 @@ class PolicyTest extends WebTestCase
         $nonRefundAmount = rand(0, 100) / 90;
         $refundAmount = rand(-100, -1) / 90;
         $date = new \DateTime();
-        $policy = self::createUserPolicy(
-            true,
-            $this->subDays($date, 60),
-            false,
-            uniqid()."@gmail.com",
-            $this->generateRandomImei()
-        );
+        $policy = new PhonePolicy();
         for ($i = 0; $i < $nNonRefunds; $i++) {
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
@@ -120,5 +84,76 @@ class PolicyTest extends WebTestCase
         }
         // Now check if it works.
         $this->assertEquals(abs($nRefunds * $refundAmount), $policy->getScheduledPaymentRefundAmount());
+    }
+
+    /**
+     * Tests to make sure that get last reverted scheduled payment works correctly when there is normal data.
+     */
+    public function testGetLastRevertedScheduledPaymentNormal()
+    {
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(5.3);
+        $premium->setIpt(1.2);
+        $policy->setPremium($premium);
+        $startDate = new \DateTime();
+        $date = clone $startDate;
+        for ($i = 0; $i < 5; $i++) {
+            $payment = new ScheduledPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $payment->setScheduled($date);
+            $payment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            $policy->addScheduledPayment($payment);
+            $date = clone $date;
+            $date->add(new \DateInterval("P1M"));
+        }
+        $revertedPayment = new ScheduledPayment();
+        $revertedPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $revertedPayment->setScheduled($date);
+        $revertedPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
+        $policy->addScheduledPayment($revertedPayment);
+        $date = clone $date;
+        $date->add(new \DateInterval("P1M"));
+        for ($i = 0; $i < 3; $i++) {
+            $payment = new ScheduledPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $payment->setScheduled($date);
+            $payment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $policy->addScheduledPayment($payment);
+            $date = clone $date;
+            $date->add(new \DateInterval("P1M"));
+        }
+        // now get the reverted scheduled payment.
+        $foundRevertedPayment = $policy->getLastRevertedScheduledPayment();
+        $this->assertEquals($revertedPayment, $foundRevertedPayment);
+    }
+
+    /**
+     * Tests to make sure that get last reverted scheduled payment works correctly when there are no scheduled payments.
+     */
+    public function testGetLastRevertedScheduledPaymentEmpty()
+    {
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(5.3);
+        $premium->setIpt(1.2);
+        $policy->setPremium($premium);
+        // now try to get the reverted scheduled payment but actually it does not exist.
+        $this->assertNull($policy->getLastRevertedScheduledPayment());
+        // now do it again with schedule but no revert.
+        $startDate = new \DateTime();
+        $date = clone $startDate;
+        for ($i = 0; $i < 5; $i++) {
+            $payment = new ScheduledPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $payment->setScheduled($date);
+            $payment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            $policy->addScheduledPayment($payment);
+            $date = clone $date;
+            $date->add(new \DateInterval("P1M"));
+        }
+        // try to to get nonexistent reverted scheduled payment.
+        $foundRevertedPayment = $policy->getLastRevertedScheduledPayment();
+        $this->assertNull($foundRevertedPayment);
     }
 }

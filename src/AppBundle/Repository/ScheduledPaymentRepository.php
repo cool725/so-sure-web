@@ -139,6 +139,20 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
     }
 
     /**
+     * Takes a scheduled payment and returns the scheduled payment that reschedules it.
+     * @param ScheduledPayment $scheduledPayment is the scheduled payment that is rescheduled.
+     * @return ScheduledPayment|null the scheduled payment if it exists or null if there is nothing.
+     */
+    public function getRescheduledBy($scheduledPayment)
+    {
+        return $this->createQueryBuilder()
+            ->field("previousAttempt")->references($scheduledPayment)
+            ->getQuery()
+            ->execute()
+            ->getSingleResult();
+    }
+
+    /**
      * Gives a list of all scheduled payments for the given policy that are set as scheduled.
      * @param Policy $policy is the policy for which to find the scheduled payments.
      * @return array of all the scheduled payments that were found.
