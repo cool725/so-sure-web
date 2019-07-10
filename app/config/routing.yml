@@ -868,3 +868,10 @@ redirect_register_page:
         _controller: FrameworkBundle:Redirect:redirect
         route: homepage
         permanent: true
+
+redirect_old_company_insurance_page:
+    path: /mobile-phone-insurance-for-your-company
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: company_phone_insurance
+        permanent: true
