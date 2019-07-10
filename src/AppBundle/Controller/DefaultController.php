@@ -778,14 +778,13 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/mobile-phone-insurance-for-your-company",
-     *  name="mobile_phone_insurance_for_your_company",
+     * @Route("/company-phone-insurance",
+     *  name="company_phone_insurance",
      *  options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
-     * @Route("/mobile-phone-insurance-for-your-company/thank-you",
-     *  name="mobile_phone_insurance_for_your_company_thanks")
-     * @Template
+     * @Route("/company-phone-insurance/thank-you",
+     *  name="company_phone_insurance_thanks")
      */
-    public function mobileInsuranceForYourCompany(Request $request)
+    public function companyAction(Request $request)
     {
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', CompanyLeadType::class)
@@ -821,7 +820,7 @@ class DefaultController extends BaseController
                         "Thanks. We'll be in touch shortly"
                     );
 
-                    return $this->redirectToRoute('mobile_phone_insurance_for_your_company_thanks');
+                    return $this->redirectToRoute('company_phone_insurance_thanks');
                 } else {
                     $this->addFlash(
                         'error',
@@ -831,9 +830,11 @@ class DefaultController extends BaseController
             }
         }
 
-        return [
+        $data = [
             'lead_form' => $leadForm->createView(),
         ];
+
+        return $this->render('AppBundle:Default:indexCompany.html.twig', $data);
     }
 
     /**

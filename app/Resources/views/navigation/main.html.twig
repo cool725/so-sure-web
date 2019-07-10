@@ -24,6 +24,8 @@
         {% include '::navigation/onboarding.html.twig' %}
     {% elseif seo_mode is defined and seo_mode == true %}
         {% include '::navigation/seo.html.twig' %}
+    {% elseif company_mode is defined and company_mode == true %}
+        {% include '::navigation/company.html.twig' %}
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
             <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
