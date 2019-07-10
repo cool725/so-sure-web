@@ -18,8 +18,10 @@ use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Form\CreateScheduledPayment;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\PolicyPhonePrice;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\PolicyPhonePriceException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
@@ -414,7 +416,15 @@ class AdminController extends BaseController
                         $policy->getId()
                     ));
                 }
-                $monthlyPremium = $policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+                $monthlyPremium = null;
+                try {
+                    $policyPhonePrice = new PolicyPhonePrice($policy);
+                    $monthlyPremium = $policyPhonePrice->getMonthlyPremiumPrice();
+                } catch (PolicyPhonePriceException $e) {
+                    $this->get('logger')->error(
+                        $e->getMessage() . " " . $e->getCode()
+                    );
+                }
                 if ($createScheduledPaymentForm->isValid()) {
                     $date = new \DateTime($createScheduledPayment->getDate());
                     $scheduledPayment = new ScheduledPayment();
