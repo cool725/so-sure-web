@@ -365,6 +365,13 @@ class ScheduledPayment
 
     public function hasCorrectBillingDay()
     {
+        /**
+         * If the billing day has not been set, then the scheduled payments will be against the
+         * policy start date. So we don't need to do anything if billing day is null.
+         */
+        if (!$this->policy->getBillingDay()) {
+            return true;
+        }
         if ($this->getType() == self::TYPE_RESCHEDULED || !$this->getScheduled()) {
             return null;
         }

@@ -491,7 +491,12 @@ class PolicyService
             }
 
             if ($numPayments === null) {
-                $this->generateScheduledPayments($policy, $date, $numPayments);
+                $dateToBill = $date;
+                if ($billing) {
+                    $dateToBill = $billing;
+                }
+                $this->generateScheduledPayments($policy, $dateToBill, $numPayments);
+                $policy->arePolicyScheduledPaymentsCorrect(true);
             } else {
                 $policy->setPremiumInstallments($numPayments);
             }
@@ -963,14 +968,23 @@ class PolicyService
             }
             $numPaidPayments = 0;
         }
+        $isBacs = $policy->getPaymentMethod() instanceof BacsPaymentMethod;
         $numScheduledPayments = $numPayments - $numPaidPayments;
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
-            $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
-            // initial purchase should start at 1 month from initial purchase
-            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
-
-            if ($policy->getPaymentMethod() instanceof BacsPaymentMethod) {
+            /**
+             * If this is the initial payment and it is bacs, it should be 7 days from today
+             * regardless of the billing date the customer has set.
+             */
+            if ($numPaidPayments === 0 && $isBacs && $i === 1) {
+                $scheduledDate = new \DateTime();
+                $scheduledDate->add(new \DateInterval('P7D'));
+            } else {
+                $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
+                // initial purchase should start at 1 month from initial purchase
+                $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
+            }
+            if ($isBacs) {
                 try {
                     $scheduledDate = $this->adjustPaymentForBankHolidayAndWeekend($scheduledDate);
                 } catch (\Exception $e) {

@@ -5786,7 +5786,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $userB = static::createUser(
             static::$userManager,
-            static::generateEmail('testCreateWithDuplicateImeiB', $this),
+            static::generateEmail('testCreateWithDuplicateImeiB', $this, true),
             'bar',
             static::$dm
         );

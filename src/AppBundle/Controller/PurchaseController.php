@@ -646,6 +646,10 @@ class PurchaseController extends BaseController
                     $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
                 } elseif ($bacsConfirmForm->isValid()) {
                     $identityLog = $this->getIdentityLogWeb($request);
+                    $paymentService->confirmBacs(
+                        $policy,
+                        $bacsConfirm->transformBacsPaymentMethod($identityLog)
+                    );
                     $policyService->create(
                         $policy,
                         null,
@@ -653,10 +657,6 @@ class PurchaseController extends BaseController
                         null,
                         $identityLog,
                         $bacsConfirm->getCalculatedBillingDate()
-                    );
-                    $paymentService->confirmBacs(
-                        $policy,
-                        $bacsConfirm->transformBacsPaymentMethod($identityLog)
                     );
 
                     $this->addFlash(
