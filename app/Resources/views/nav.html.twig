@@ -22,10 +22,10 @@
 
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
+                {% if app.request.get('_route') == 'company_phone_insurance' %}
                     <li><a href="{{ path('homepage') }}">Personal phones</a></li>
                 {% else %}
-                    <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a></li>
+                    <li><a href="{{ path('company_phone_insurance') }}">Company phones</a></li>
                 {% endif %}
                 <li><a href="{{ path('faq') }}">FAQ</a></li>
                 {% if app.user is not null and app.user %}
