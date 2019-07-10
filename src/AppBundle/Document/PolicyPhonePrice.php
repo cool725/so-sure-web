@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AppBundle\Document;
-
 
 use AppBundle\Exception\PolicyPhonePriceException;
 
@@ -143,6 +141,5 @@ class PolicyPhonePrice
         $this->monthlyPremiumPrice = $monthlyPremiumPrice;
         return $this;
     }
-
 
 }
