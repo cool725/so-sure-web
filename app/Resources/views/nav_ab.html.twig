@@ -62,10 +62,10 @@
                     </li>
                 {% endif %}
                 {# Link to personal or company insurance #}
-                {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
+                {% if app.request.get('_route') == 'company_phone_insurance' %}
                     <li><a href="{{ path('homepage') }}?nav=1">Personal phones</a></li>
                 {% else %}
-                    <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}?nav=1">Company phones</a></li>
+                    <li><a href="{{ path('company_phone_insurance') }}?nav=1">Company phones</a></li>
                 {% endif %}
                 <li><a href="{{ path('claim') }}?nav=1">Make a claim</a></li>
                 <li><a href="{{ path('faq') }}?nav=1#social-insurance-and-reward-pot">Reward Pot</a></li>
