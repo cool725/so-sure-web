@@ -141,5 +141,4 @@ class PolicyPhonePrice
         $this->monthlyPremiumPrice = $monthlyPremiumPrice;
         return $this;
     }
-
 }
