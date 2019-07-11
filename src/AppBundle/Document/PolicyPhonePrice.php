@@ -17,7 +17,7 @@ class PolicyPhonePrice
     private $phone;
 
     /**
-     * @var Price
+     * @var PhonePrice|null
      */
     private $currentPhonePrice;
 
@@ -38,7 +38,7 @@ class PolicyPhonePrice
         } catch (\Exception $e) {
             throw new PolicyPhonePriceException(
                 sprintf(
-                    "Could not get phone for policy",
+                    "Could not get phone for policy %s",
                     $policy->getId()
                 ),
                 self::FAILED_TO_GET_PHONE
@@ -57,6 +57,16 @@ class PolicyPhonePrice
             );
         }
         try {
+            if (!$this->getCurrentPhonePrice()) {
+                throw new PolicyPhonePriceException(
+                    sprintf(
+                        "Could not get current phone price for phone %s on policy %s",
+                        $this->getPhone()->getId(),
+                        $policy->getId()
+                    ),
+                    self::FAILED_TO_GET_PRICE
+                );
+            }
             $this->setMonthlyPremiumPrice($this->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         } catch (\Exception $e) {
             throw new PolicyPhonePriceException(
@@ -73,7 +83,7 @@ class PolicyPhonePrice
     /**
      * @return PhonePolicy
      */
-    public function getPolicy(): PhonePolicy
+    public function getPolicy()
     {
         return $this->policy;
     }
@@ -82,7 +92,7 @@ class PolicyPhonePrice
      * @param PhonePolicy $policy
      * @return PolicyPhonePrice
      */
-    public function setPolicy(PhonePolicy $policy): PolicyPhonePrice
+    public function setPolicy(PhonePolicy $policy)
     {
         $this->policy = $policy;
         return $this;
@@ -91,7 +101,7 @@ class PolicyPhonePrice
     /**
      * @return Phone
      */
-    public function getPhone(): Phone
+    public function getPhone()
     {
         return $this->phone;
     }
@@ -100,25 +110,25 @@ class PolicyPhonePrice
      * @param Phone $phone
      * @return PolicyPhonePrice
      */
-    public function setPhone(Phone $phone): PolicyPhonePrice
+    public function setPhone(Phone $phone)
     {
         $this->phone = $phone;
         return $this;
     }
 
     /**
-     * @return Price
+     * @return PhonePrice|null
      */
-    public function getCurrentPhonePrice(): Price
+    public function getCurrentPhonePrice()
     {
         return $this->currentPhonePrice;
     }
 
     /**
-     * @param Price $currentPhonePrice
+     * @param PhonePrice|null $currentPhonePrice
      * @return PolicyPhonePrice
      */
-    public function setCurrentPhonePrice(Price $currentPhonePrice): PolicyPhonePrice
+    public function setCurrentPhonePrice(PhonePrice $currentPhonePrice = null)
     {
         $this->currentPhonePrice = $currentPhonePrice;
         return $this;
@@ -127,7 +137,7 @@ class PolicyPhonePrice
     /**
      * @return float
      */
-    public function getMonthlyPremiumPrice(): float
+    public function getMonthlyPremiumPrice()
     {
         return $this->monthlyPremiumPrice;
     }
@@ -136,7 +146,7 @@ class PolicyPhonePrice
      * @param float $monthlyPremiumPrice
      * @return PolicyPhonePrice
      */
-    public function setMonthlyPremiumPrice(float $monthlyPremiumPrice): PolicyPhonePrice
+    public function setMonthlyPremiumPrice(float $monthlyPremiumPrice)
     {
         $this->monthlyPremiumPrice = $monthlyPremiumPrice;
         return $this;
