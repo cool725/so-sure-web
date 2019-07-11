@@ -80,6 +80,26 @@ input[type="submit"][class*="btn-outline-"], {
     }
 }
 
+.btn-turquoise-gradient {
+    border: none;
+    @include linear-gradient(100deg, $java, $turquoise);
+
+    &:hover,
+    &:focus,
+    &:active {
+        @include linear-gradient(100deg, $turquoise, $java);
+    }
+
+    &:not(:disabled):not(.disabled).active,
+    &:not(:disabled):not(.disabled):active {
+        @include linear-gradient(100deg, $turquoise, $turquoise);
+
+        &:focus {
+          @include linear-gradient(100deg, $turquoise, $turquoise);
+        }
+    }
+}
+
 // Add square buttons for icons to button rather than modifying the core css
 .btn-square {
     padding: .6rem 1rem;
