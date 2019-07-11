@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AppBundle\Validator\Constraints;
-
 
 use AppBundle\Document\DateTrait;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -14,14 +12,14 @@ class CreateScheduledPaymentValidator extends ConstraintValidator
     use DateTrait;
 
     /**
-     * @param mixed $value
+     * @param mixed      $value
      * @param Constraint $constraint
      * @return bool
      * @throws \Exception
      */
     public function validate($value, Constraint $constraint)
     {
-        if(!$constraint instanceof CreateScheduledPayment) {
+        if (!$constraint instanceof CreateScheduledPayment) {
             throw new UnexpectedTypeException($constraint, CreateScheduledPayment::class);
         }
         if (!$value instanceof \DateTime) {
