@@ -18,7 +18,6 @@ use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Form\CreateScheduledPayment;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
-use AppBundle\Document\PolicyPhonePrice;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PolicyPhonePriceException;
@@ -130,6 +129,7 @@ use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\BarclaysStatementFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
+use AppBundle\Helpers\PolicyPhonePriceHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -412,7 +412,7 @@ class AdminController extends BaseController
                 $createScheduledPaymentForm->handleRequest($request);
                 $monthlyPremium = null;
                 try {
-                    $policyPhonePrice = new PolicyPhonePrice($policy);
+                    $policyPhonePrice = new PolicyPhonePriceHelper($policy);
                     $monthlyPremium = $policyPhonePrice->getMonthlyPremiumPrice();
                 } catch (PolicyPhonePriceException $e) {
                     $this->get('logger')->error(

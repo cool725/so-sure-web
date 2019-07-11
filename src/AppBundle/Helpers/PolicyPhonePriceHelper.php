@@ -1,10 +1,13 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Helpers;
 
+use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Exception\PolicyPhonePriceException;
 
-class PolicyPhonePrice
+class PolicyPhonePriceHelper
 {
     /**
      * @var PhonePolicy
@@ -90,7 +93,7 @@ class PolicyPhonePrice
 
     /**
      * @param PhonePolicy $policy
-     * @return PolicyPhonePrice
+     * @return PolicyPhonePriceHelper
      */
     public function setPolicy(PhonePolicy $policy)
     {
@@ -108,7 +111,7 @@ class PolicyPhonePrice
 
     /**
      * @param Phone $phone
-     * @return PolicyPhonePrice
+     * @return PolicyPhonePriceHelper
      */
     public function setPhone(Phone $phone)
     {
@@ -126,7 +129,7 @@ class PolicyPhonePrice
 
     /**
      * @param PhonePrice|null $currentPhonePrice
-     * @return PolicyPhonePrice
+     * @return PolicyPhonePriceHelper
      */
     public function setCurrentPhonePrice(PhonePrice $currentPhonePrice = null)
     {
@@ -144,7 +147,7 @@ class PolicyPhonePrice
 
     /**
      * @param float $monthlyPremiumPrice
-     * @return PolicyPhonePrice
+     * @return PolicyPhonePriceHelper
      */
     public function setMonthlyPremiumPrice(float $monthlyPremiumPrice)
     {
