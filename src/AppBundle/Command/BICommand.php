@@ -6,6 +6,7 @@ use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
@@ -17,6 +18,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
@@ -358,6 +360,8 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var InvitationRepository */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
+        $scheduledPaymentRepository = $this->dm->getRepository(ScheduledPayment::class);
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
@@ -408,7 +412,8 @@ class BICommand extends ContainerAwareCommand
             '"Successful Payment"',
             '"Bacs Mandate Cancelled Reason"',
             '"Premium Installments"',
-            '"Inviter"'
+            '"Inviter"',
+            '"Latest Payment failed without reschedule"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -420,6 +425,11 @@ class BICommand extends ContainerAwareCommand
             }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $lastReverted = $policy->getLastRevertedScheduledPayment();
+            $reschedule = null;
+            if ($lastReverted) {
+                $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
+            }
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
@@ -486,7 +496,8 @@ class BICommand extends ContainerAwareCommand
                         $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() : ''
                 ),
                 sprintf('"%s"', $policy->getPremiumInstallments()),
-                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : '')
+                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : ''),
+                sprintf('"%s"', ($lastReverted && !$reschedule) ? "yes" : "no")
             ]);
         }
         if (!$skipS3) {

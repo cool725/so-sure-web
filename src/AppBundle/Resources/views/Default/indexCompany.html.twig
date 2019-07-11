@@ -1,0 +1,250 @@
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme lead_form '@EWZRecaptcha/Form/ewz_recaptcha_widget.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'company-phones' %}
+{% set company_mode = true %}
+
+{% block title %}so-sure - Mobile Insurance for your company{% endblock %}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Insure your company phones and up to 80% money back"/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/company-phones.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container container-xtra">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-turquoise">
+                            <span class="sub text-white">Mobile Insurance</span><br>
+                            for your company,<br>
+                            <span class="sub text-white">it's easier than you think</span>
+                        </h1>
+                        <ul class="list-unstyled icn-fa-list mb-5">
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                24-72 hour replace or repair
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                Low excess from just &pound;50
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                Up to 80% money back
+                            </li>
+                            <li class="h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                New, secondhand &amp; refurbished phones
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="hero__controls pb-4">
+                        <a href="#" class="btn btn-success btn-turquoise-gradient get-in-touch btn-block-xs mr-sm-2">Request a quote</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration d-block d-lg-none">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hero-partnerships-hero-illustration.png" alt="Cityscape" class="img-fluid animated zoomInUp lozad">
+            </div>
+            <span class="hero__illustration__left d-none d-lg-block animated zoomInDown">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hero-partnerships-buildings-left.png " alt="Cityscape" class="lozad">
+            </span>
+            <span class="hero__illustration__right d-none d-lg-block animated zoomInDown">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hero-partnerships-hero-illustration.png" alt="Cityscape" width="660px" class="lozad">
+            </span>
+        </div>
+        <div class="hero__base d-none d-lg-block">
+            <svg viewBox="0 0 1440 117"
+                 preserveAspectRatio="xMinYMin meet"
+                 version="1.1"
+                 xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 class="animated fadeInUp">
+                <g id="make_for_web" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.297712054">
+                    <g id="Artboard" transform="translate(-255.000000, -410.000000)" fill="#00AFFD">
+                        <g id="hills">
+                            <path d="M1694.81033,526.075685 L1694.81033,435.061523 C1562.23625,421.443534 1457.27861,455.007925 1366.65269,444.511474 C1254.20674,431.486352 1192.02424,418.14683 1086.12582,453.045174 C829.649526,469.331068 879.571549,381.622592 692.773656,446.788624 C534.404004,414.091077 408.696101,393.942561 255,426.667057 L255,526.075685 L1694.81033,526.075685 Z" id="Path" style="mix-blend-mode: overlay;" opacity="0.75"></path>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="intro py-lg-5">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                {# TODO: Needs copy #}
+                <div class="col-md-6 col-lg-4">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
+                    <h5 class="text-primary">24-72 hour replace or repair</h5>
+                    <p class="mb-5">We aim to replace or repair your phone within <span class="text-nowrap">24-72</span> hours after your claim is approved</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="180px" class="lozad">
+                    <h5 class="text-primary">Up to 80% money back</h5>
+                    <p class="mb-5">Connect your employees devices and get rewarded when they don't claim</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - bring employees together" width="180px" class="lozad">
+                    <h5 class="text-primary">Enjoy a night out!</h5>
+                    <p class="mb-5">Bring the team together for lunch or a night out with their rewards for being careful</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Cover #}
+    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
+
+    {# We do things differently #}
+    {# {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %} #}
+
+    <section class="reward py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_why-illustration.png ">
+        <div class="container container-xtra py-5">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="text-center text-lg-left">
+                        <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
+                        <p class="mb-4">Get up to 80% money back and increase employee engagement</p>
+                        <a href="#" class="btn btn-success btn-turquoise-gradient btn-block-xs get-in-touch mx-auto mb-5">Request a quote</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
+                            <h5 class="cardbox__title text-dodger-blue">Connect</h5>
+                            <div class="cardbox__text">Group your employees into teams of 1-10. These employees will be connected to one another</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
+                        <h5 class="text-primary">Connect</h5>
+                        <p class="mb-5">Group your employees into teams of 1-10. These employees will be connected to one another</p>
+                    </div>
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
+                            <h5 class="cardbox__title text-dodger-blue">Enjoy a night out!</h5>
+                            <div class="cardbox__text">Bring the team together for lunch or a night out with their rewards for being careful</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - connect" width="180px" class="lozad">
+                        <h5 class="text-primary">Be careful</h5>
+                        <p class="mb-5">Incentivise your employees to take care of their phones over the year to get rewarded</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="so-sure - connect" width="180px" class="lozad">
+                            <h5 class="cardbox__title text-dodger-blue">Be careful</h5>
+                            <div class="cardbox__text">Incentivise your employees to take care of their phones over the year to get rewarded</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
+                        <h5 class="text-primary">Enjoy a night out!</h5>
+                        <p class="mb-5">Bring the team together for lunch or a night out with their rewards for being careful</p>
+                    </div>
+                    <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
+                        <div class="cardbox__body">
+                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
+                            <h5 class="cardbox__title text-dodger-blue">How much? 💰</h5>
+                            <div class="cardbox__text">Say for a team of nine employees each using an iPhone 6s device, if nobody claims in the year thats a saving of &pound;690</div>
+                        </div>
+                    </div>
+                    <div class="d-block d-lg-none text-center">
+                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
+                        <h5 class="text-primary">How much? 💰</h5>
+                        <p class="mb-5">Say for a team of nine employees each using an iPhone 6s device, if nobody claims in the year thats a saving of &pound;690</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="get_in_touch" class="contact py-lg-5">
+        <div class="container container-xtra py-5">
+            <h2 class="text-white text-center mb-4">Contact us for a quote 💬</h2>
+            {{ form_start(lead_form, {
+                'attr': {
+                    'data-toggle': 'validator',
+                    'class': 'validate-form',
+                    'data-client-validation': form_client_validation,
+                    'autocomplete': 'off',
+                    'novalidate': 'novalidate'
+            }}) }}
+                <div class="form-row">
+                    <div class="col-md form-group">
+                        {{ form_label(lead_form.name, 'Name', { 'label_attr': {'class': 'sr-only'} }) }}
+                        {{ form_widget(lead_form.name, { 'attr': {'class': 'form-control form-control-white', 'placeholder': 'Name'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.name) }}</div>
+                    </div>
+                    <div class="col-md form-group">
+                        {{ form_label(lead_form.company, 'Company', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.company, { 'attr': {'class': 'form-control form-control-white', 'placeholder': 'Company'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.company) }}</div>
+                    </div>
+                    <div class="col-md form-group">
+                        {{ form_label(lead_form.phone, 'Phone', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.phone, { 'attr': {'class': 'form-control form-control-white', 'placeholder': 'Contact number'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.phone) }}</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md form-group">
+                        {{ form_label(lead_form.email, 'Email', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.email, { 'attr': {'class': 'form-control form-control-white', 'placeholder': 'Email'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
+                    </div>
+                    <div class="col-md form-group">
+                        {{ form_label(lead_form.phones, 'Phones', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.phones, { 'attr': {'class': 'form-control form-control-white'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.phones) }}</div>
+                    </div>
+                    <div class="col-md form-group">
+                        {{ form_label(lead_form.timeframe, 'Timeframe', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.timeframe, { 'attr': {'class': 'form-control form-control-white'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.timeframe) }}</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-8 form-group">
+                        {{ form_label(lead_form.message, 'Message', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.message, { 'attr': {'class': 'form-control form-control form-control-white', 'rows': '5', 'placeholder': 'Message'}}) }}
+                        <div class="with-errors">{{ form_errors(lead_form.message) }}</div>
+                    </div>
+                    <div class="col-md-4 form-group text-center">
+                        {{ form_label(lead_form.recaptcha, 'Recaptcha', { 'label_attr': {'class': 'sr-only'}}) }}
+                        {{ form_widget(lead_form.recaptcha) }}
+                        <div class="with-errors">{{ form_errors(lead_form.recaptcha) }}</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md form-group text-center mt-4">
+                        {{ form_widget(lead_form.submit, { 'label': 'Request a quote', 'attr': {'class': 'btn btn-success btn-turquoise-gradient btn-block-xs'}}) }}
+                    </div>
+                </div>
+            {{ form_end(lead_form) }}
+        </div>
+    </section>
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/company-phones.js') }}"></script>
+{% endblock %}

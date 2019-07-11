@@ -1,0 +1,177 @@
+// company-phones.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+.hero {
+    position: relative;
+    padding-top: 6rem;
+    // padding-bottom: 4rem;
+
+    @include blue-gradient;
+
+    .container {
+        position: relative;
+        z-index: 6;
+    }
+
+    &__intro {
+        position: relative;
+        z-index: 7;
+
+        h1 {
+            font-size: 1.4rem;
+
+            @include media-breakpoint-up(ss) {
+                font-size: 1.86rem;
+            }
+
+            @include media-breakpoint-up(sm) {
+                font-size: 2.2rem;
+            }
+        }
+    }
+
+    &__base {
+        position: relative;
+        z-index: 4;
+        margin-top: 30px;
+        height: 140px;
+        @include linear-gradient(180deg, $crayon-blue, $deep-sky-blue-b);
+
+        svg {
+            position: absolute;
+            bottom: 100%;
+            z-index: 3;
+        }
+    }
+
+    &__illustration__left {
+        position: absolute;
+        z-index: 3;
+        right: 100%; bottom: -60px;
+    }
+
+    &__illustration__right {
+        position: absolute;
+        z-index: 3;
+        right: -140px; bottom: -40px;
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+    }
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 10rem;
+
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+        }
+    }
+
+}
+
+.cred {
+    text-align: center;
+    background-color: $ultramarine;
+    position: relative;
+    z-index: 5;
+
+    img {
+        width: 100px;
+        margin: 0.5rem;
+        // opacity: 0.3;
+
+        @include media-breakpoint-up(lg) {
+            width: 120px;
+            margin: 0;
+        }
+    }
+}
+
+.intro {
+    text-align: center;
+    background-color: $pattens-blue;
+}
+
+.cover {
+    position: relative;
+
+    &__illustration__mobile {
+        height: 240px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    &__mobile {
+        background-color: $pattens-blue;
+    }
+
+    &__list {
+        margin-top: 7rem;
+    }
+
+    svg {
+        position: absolute;
+        bottom: -1px; left: 0; right: 0;
+    }
+}
+
+.differently {
+    position: relative;
+    z-index: 1;
+    background-color: $pattens-blue;
+
+    @include media-breakpoint-up(lg) {
+        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 200px;
+        background-size: 500px;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: -40px 200px;
+        background-size: 600px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 500px 200px;
+        background-size: 600px;
+    }
+
+    &__illustration__mobile {
+        position: relative;
+    }
+}
+
+.reward {
+    // background-color: $white;
+
+    @include media-breakpoint-up(lg) {
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png') no-repeat -220px 440px;
+        background-size: 480px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 500px 440px;
+    }
+}
+
+.contact {
+    @include blue-gradient;
+
+    .g-recaptcha {
+        display: inline-block;
+    }
+}
