@@ -1,0 +1,22 @@
+// user-cancel.scss
+
+@import "../../vendor/bs4/functions";
+@import "../../vendor/bs4/variables";
+@import "../../vendor/bs4/mixins/breakpoints";
+@import "../../abstracts/mixins";
+@import "../../abstracts/palette";
+@import "../../abstracts/variables";
+
+.hero {
+    text-align: center;
+}
+
+.reason {
+    text-align: left;
+    display: none;
+}
+
+.cancel-text {
+    max-width: 600px;
+    margin: 0 auto;
+}

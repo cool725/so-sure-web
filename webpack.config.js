@@ -80,6 +80,7 @@ Encore
     .addEntry('user-claim-damage', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-damage.js')
     .addEntry('user-claim-theft-loss', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-theft-loss.js')
     .addEntry('user-claim-submitted', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-submitted.js')
+    .addEntry('user-cancel', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-cancel.js')
 
     // Claim
      .addEntry('make-a-claim', './src/AppBundle/Resources/public/rebrand/js/pages/make-a-claim.js')
