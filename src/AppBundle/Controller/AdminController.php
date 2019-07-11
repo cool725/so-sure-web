@@ -421,33 +421,50 @@ class AdminController extends BaseController
                 }
                 if ($createScheduledPaymentForm->isValid()) {
                     $date = new \DateTime($createScheduledPayment->getDate());
-                    $scheduledPayment = new ScheduledPayment();
-                    $scheduledPayment->setScheduled($date);
-                    $scheduledPayment->setNotes($createScheduledPayment->getNotes());
-                    $scheduledPayment->setAmount($monthlyPremium);
-                    $scheduledPayment->setPolicy($policy);
-                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-                    try {
-                        $policy->addScheduledPayment($scheduledPayment);
-                        $dm->flush();
-                        $this->addFlash('success', "Payment scheduled successfully.");
-                    } catch (\Exception $e) {
+                    if ($policy->hasScheduledPaymentOnDate($date)) {
                         $this->addFlash(
                             'error',
-                            sprintf("Could not scheduled payment: %s", $e->getMessage())
+                            sprintf(
+                                'Payment already scheduled for %s, please use date picker to choose available date',
+                                $date->format('l jS F Y')
+                            )
                         );
+                    } else {
+                        $scheduledPayment = new ScheduledPayment();
+                        $scheduledPayment->setScheduled($date);
+                        $scheduledPayment->setNotes($createScheduledPayment->getNotes());
+                        $scheduledPayment->setAmount($monthlyPremium);
+                        $scheduledPayment->setPolicy($policy);
+                        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+
+                        $addPolicyNote = true;
+
+                        try {
+                            $policy->addScheduledPayment($scheduledPayment);
+                            $dm->flush();
+                            $this->addFlash('success', "Payment scheduled successfully.");
+                        } catch (\Exception $e) {
+                            $this->addFlash(
+                                'error',
+                                sprintf("Could not scheduled payment: %s", $e->getMessage())
+                            );
+                            $addPolicyNote = false;
+                        }
+                        /**
+                         * We also want to add the notes to the policy notes if the scheduled
+                         * payment was successfully added.
+                         */
+                        if ($addPolicyNote) {
+                            $policy->addNoteDetails(
+                                sprintf(
+                                    "Manually scheduled payment for %s. Justification: %s",
+                                    $date->format('l jS F Y'),
+                                    $createScheduledPayment->getNotes()
+                                ),
+                                $this->getUser()
+                            );
+                        }
                     }
-                    /**
-                     * We also want to add the notes to the policy notes
-                     */
-                    $policy->addNoteDetails(
-                        sprintf(
-                            "Manually scheduled payment for %s. Justification: %s",
-                            $date->format('l jS F Y'),
-                            $createScheduledPayment->getNotes()
-                        ),
-                        $this->getUser()
-                    );
                     $dm->flush();
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }

@@ -5146,6 +5146,21 @@ abstract class Policy
         return false;
     }
 
+    public function hasScheduledPaymentOnDate(\DateTime $date)
+    {
+        if (!$date) {
+            throw new \InvalidArgumentException("A date must be provided to look up scheduled payment by date");
+        }
+
+        $scheduledPayments = $this->getScheduledPayments();
+        foreach ($scheduledPayments as $scheduledPayment) {
+            if ($scheduledPayment->getScheduled()->format('Ymd') === $date->format('Ymd')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getOutstandingScheduledPaymentsAmount()
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
