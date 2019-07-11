@@ -1,341 +1,98 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'user' %}
+{# {% set user_mode = true %} #}
 
-{% block title %}so-sure - Better Phone Insurance{% endblock %}
+{% block title %}so-sure - Cancel your policy{% endblock %}
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+    <meta name="robots" content="noindex">
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/cancel.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-cancel.css') }}">
 {% endblock %}
 
 {% block body %}
-    <section class="section--pad">
+
+    <section class="hero">
         <div class="container">
-
-            <div class="reasons">
-                <div class="row">
-                    <div class="col-sm-3 col-md-3">
-                        <p class="lead"><img src="{{ cdn_url }}/images/emails/sad_phone_so-sure.png " alt="sad phone so-sure" width="140px" class="sad-phone"></p>
+            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" class="img-center" alt="Broken phone logo" width="160px" />
+            <h1 class="h2 mb-4">Cancel your policy</h1>
+            <p>Please tell us why you'd like to cancel:</p>
+            {{ form_start(cancel_form, {'attr': {
+                'data-toggle': 'validator',
+                'class': 'validate-form',
+                'data-client-validation': form_client_validation
+            }}) }}
+                <div class="cancel-text">
+                    <div class="form-group">
+                        {{ form_widget(cancel_form.reason, {'attr': {'class': 'form-control'}}) }}
                     </div>
-                    <div class="col-sm-8 col-md-8 text-left">
-                        <h1>We’d be sad to see you go...</h1>
-                        <p class="lead">We appreciate that sometimes people have a change of heart. To help us improve, we'd love to know why you'd like to cancel.</p>
+                    <div id="reason_1" class="reason">
+                        <p>We understand mistakes happen, so if your phone is already damaged (the screen is cracked or the phone does not work) you now have to cancel your policy. If your phone has cosmetic damage, like a few scratches, you can keep your policy and remain covered.</p>
+                        <p class="mb-4">Please keep in mind that we take fraud seriously and do prosecute. If you purchased a policy knowing that your phone is damaged this is fraud. We can exercise our right to cancel a policy at anytime and report any instance of fraud to the police.</p>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-1"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-damage"
-                                   data-reason="Already broken or damaged"
-                                   data-target="#reason-1-info">Already broken or damaged</a>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-2"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-cost"
-                                   data-reason="Too expensive"
-                                   data-target="#reason-2-info">I found a cheaper quote</a>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-3"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-elsewhere"
-                                   data-reason="I found another provider"
-                                   data-target="#reason-3-info">I found another provider</a>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-4"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-existing"
-                                   data-reason="Already covered"
-                                   data-target="#reason-4-info">Already covered</a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-5"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-undesired"
-                                   data-reason="I don't want insurance"
-                                   data-target="#reason-5-info">I don't want insurance</a>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-6"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-technical"
-                                   data-reason="Technical difficulties"
-                                   data-target="#reason-6-info">Technical difficulties</a>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-7"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-pic-sure"
-                                   data-reason="pic-sure is annoying"
-                                   data-target="#reason-7-info">pic-sure is annoying</a>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <a href="#"
-                                   id="reason-8"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
-                                   data-event="click-cancel-other"
-                                   data-reason="other"
-                                   data-target="#reason-8-info">Other...</a>
-                            </div>
-                        </div>
+                    <div id="reason_2" class="reason">
+                        <p>You might have found a company offering ever so slightly cheaper cover than us, and we get that. We charge a little more because we offer a premium service to our customers. With us:</p>
+                        <ul class="mb-4">
+                            <li>24-72 hour replace or repair</li>
+                            <li>Low excess from just &pound;50</li>
+                            <li>Up to 80% money back</li>
+                            <li>New, secondhand &amp; refurbished phones</li>
+                        </ul>
+                    </div>
+                    <div id="reason_3" class="reason">
+                        <p>There are lots of insurance providers out there all promising the world, some may even be cheaper than us. We do charge a little extra, but that's because we give our customers the best service, an exceptional level of cover, and we give our customers up to 80% of their money back when they don't make a claim, see about our reward pot for more details - <a href="{{ path('social_insurance')}}" target="_blank" rel="noopener noreferrer">here</a>.</p>
+                        <p>We recommend taking a good look at the terms and conditions before you switch and make sure the provider can offer 24-72 hour replacement once your claim is approved and covers you instantly for:</p>
+                        <ul class="mb-4">
+                            <li>Loss</li>
+                            <li>Theft</li>
+                            <li>Accidental damage</li>
+                            <li>Breakdown out of warranty</li>
+                            <li>Unauthorised Network Charges up to &pound;1000</li>
+                            <li>Accessories up to &pound;100</li>
+                            <li>And all of this includes worldwide travel cover</li>
+                        </ul>
+                    </div>
+                    <div id="reason_4" class="reason">
+                        <p class="mb-4">If you've discovered you're already covered by your bank, credit card or contents insurance make sure you've checked the details of the policy. We know that there's often fine-print that you may not be aware of.</p>
+                    </div>
+                    <div id="reason_5" class="reason">
+                        <p>No problem, if in the future you decide to re-cover your phone, we will be happy to have you back!</p>
+                        <p class="mb-4">Just a friendly reminder that should something happen to your phone especially if you have a new iPhone or Samsung device, the cost to replace your phone could be over &pound;1000.  A years piece of mind will cost you less than 25p a day.</p>
+                    </div>
+                    <div id="reason_6" class="reason">
+                        <p class="mb-4">If you are having any technical difficulties with the app please either contact us <a href="mailto:support@wearesosure.com" class="open-intercom">via intercom here</a> or email us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> and we’ll get back to you shortly.</p>
+                    </div>
+                    <div id="reason_7" class="reason">
+                        <p class="mb-4">We're sorry you're having problems with pic-sure, lets see if we can help with these easy steps <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure" target="_blank" rel="noopener noreferrer">here</a>.</p>
+                    </div>
+                    <div id="reason_8" class="reason">
+                        <p>We appreciate that sometimes people have a change of heart. To help us improve, we'd love to know why you'd like to cancel.</p>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(cancel_form.othertxt, {'attr': {'class': 'form-control hideme', 'placeholder': 'Add your message...'}}) }}
+                    </div>
+                    <div class="form-group mt-4">
+                        <a href="{{ path('homepage')}}" class="btn btn-primary btn-square mr-2">🥳 I want to stay</a>
+                        {{ form_widget(cancel_form.cancel,  {
+                            'label': '😔 Cancel',
+                            'attr': {
+                                'class': 'btn btn-white text-muted btn-square',
+                                'data-event': ''
+                        }}) }}
                     </div>
                 </div>
-                <div class="controls">
-                    <p>Please select your reason for cancelling above</p>
-                    <a href="#"
-                       id="btn-next-step"
-                       data-info=""
-                       class="btn btn-green-hollow btn-block btn-pad disabled">Next step</a>
-                </div>
-            </div>
-
-            <div id="reason-1-info" class="information">
-                <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" width="220px" class="img-center" alt="Broken phone logo" />
-                <h1>Already Broken or Damaged?</h1>
-                <p class="lead">We understand mistakes happen, so if your phone is already damaged (the screen is cracked or the phone does not work) you now have to cancel your policy. If your phone has cosmetic damage, like a few scratches, you can keep your policy and remain covered.</p>
-                <p>Please keep in mind that we take fraud seriously and do prosecute. If you purchased a policy knowing that your phone is damaged this is fraud. We can exercise our right to cancel a policy at anytime and report any instance of fraud to the police.</p>
-                <div class="information--controls clearfix">
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-back pull-left">NO, ITS FINE
-                    </a>
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-damaged"
-                       data-reason="damaged">YES MY PHONE IS DAMAGED
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-2-info" class="information">
-                <p class="h4">You might have found a company offering ever so slightly cheaper cover than us, and we get that. We charge a little more because we offer a premium service to our customers. With us:</p>
-                <ul>
-                    <li>You're immediately covered - if something should happen today, we get you a 24-72 hour replacement or repair with an accredited repairer once your claim is approved.</li>
-                    <li>You'll have a low excess - from only &pound;50 when validated with pic-sure.</li>
-                    <li>When you connect with your friends we give you money back at the end of the year when you and your friends don't claim. We believe in rewarding. Find out more about our reward pot <a href="{{ path('homepage')}}#reward-pot" target="_blank" rel="noopener noreferrer">here</a>.</li>
-                    <li>We put you first. It's the reason our customers love us. Don't take our word for it , here are some of our fab reviews:</li>
-                </ul>
-                <p><em>"The service was brilliant and got me phone call answered straight away and the arrangement completely phone up within a couple of hours so I was delighted with the service" - Natalie Davies, London</em></p>
-                <p><em>"I've had insurance for over a year now and i just got 70 quid back because me and the mrs didn't claim! Nice one so-sure, will be keeping my insurance another year!" - Marek Kuzian, Glasgow</em></p>
-                <p><em>"Superb service with my first use of so-sure. I couldn’t be happier with the way my claim was handled and I got my phone the next day." - Ben Allsopp, Manchester</em></p>
-                <div class="information--controls clearfix">
-                    <h4>Still want to cancel your policy?</h4>
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}#reward-pot"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    {# TODO: Link this to feedback form??? #}
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-cost"
-                       data-reason="cost">I'll cancel
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-3-info" class="information">
-                <p>There are lots of insurance providers out there all promising the world, some may even be cheaper than us. We do charge a little extra, but that's because we give our customers the best service, an exceptional level of cover, and we give our customers up to 80% of their money back when they don't make a claim (see our reward pot for more details - <a href="{{ path('homepage')}}#reward-pot" target="_blank" rel="noopener noreferrer">here</a>).</p>
-                <p>We recommend taking a good look at the terms and conditions before you switch and make sure the provider can offer 24-72 hour replacement once your claim is approved and covers you instantly for:</p>
-                <ul>
-                    <li>Loss</li>
-                    <li>Theft</li>
-                    <li>Accidental damage</li>
-                    <li>Breakdown out of warranty</li>
-                    <li>Unauthorised Network Charges up to &pound;100</li>
-                    <li>Accessories up to &pound;100</li>
-                    <li>And all of this includes worldwide travel cover!</li>
-                </ul>
-                <div class="information--controls clearfix">
-                    <h4>Still want to cancel your policy?</h4>
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-elsewhere"
-                       data-reason="elsewhere">I'll cancel
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-4-info" class="information">
-                <h1>Already covered</h1>
-                <p class="lead">If you've discovered you're already covered by your bank, credit card or contents insurance make sure you've checked the details of the policy.  We know that there's often fine-print that you may not be aware of.</p>
-                <p>Here’s a handy comparison checklist:</p>
-                <div class="table-responsive">
-                    <table width="100%">
-                        <thead>
-                            <tr>
-                                <td width="30%" class="contrast h4"></td>
-                                <td width="35%"><img src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg" width="120px" alt="so-sure"></td>
-                                <td width="35%" class="contrast h4">Contents/Bank Insurance</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="contrast h4">Excess</td>
-                                <td>Low excess of just &pound;50 with pic-sure, our anti-fraud technology</td>
-                                <td class="contrast">Excess ranges from &pound;150-&pound;500</td>
-                            </tr>
-                            <tr>
-                                <td class="contrast h4">Cover period</td>
-                                <td>Instant</td>
-                                <td class="contrast">14 days</td>
-                            </tr>
-                            <tr>
-                                <td class="contrast h4">Replacement Period</td>
-                                <td>24-72 hours once your claim is approved</td>
-                                <td class="contrast">7-14 days (Eeeek! How will you survive)</td>
-                            </tr>
-                            <tr>
-                                <td class="contrast h4">Claims Process</td>
-                                <td>Simple and hassle free. Our Net Promoter Score for handling claims is a whopping 73! No idea what that means? Trust us, it's unheard of in insurance</td>
-                                <td class="contrast">*cough*</td>
-                            </tr>
-                            <tr>
-                                <td class="contrast h4">Terms</td>
-                                <td>Plain english, we cover you for every eventuality</td>
-                                <td class="contrast">Got a law degree? Make sure you’ve got the facts.</td>
-                            </tr>
-                            <tr>
-                                <td class="contrast h4">Phone age</td>
-                                <td>Phones up to 3 years old (including refurbished) with no proof of purchase required</td>
-                                <td class="contrast">Only new phones up to 30 days old are covered with proof of purchase required</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="information--controls clearfix">
-                    <h4>Still want to cancel your policy?</h4>
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-existing"
-                       data-reason="existing">I'll cancel
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-5-info" class="information">
-                <h1>I changed my mind, I don't want insurance</h1>
-                <p class="lead">No problem, if in the future you decide to re-cover your phone, we will be happy to have you back!</p>
-                <p>Just a friendly reminder that should something happen to your phone (especially if you have a new iPhone or Samsung), the cost to replace your phone is &pound;700-&pound;1000.  A years piece of mind will cost you less than 25p a day.</p>
-                <div class="information--controls clearfix">
-                    <h4>Still want to cancel your policy?</h4>
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-undesired"
-                       data-reason="undesired">I'll cancel
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-6-info" class="information">
-                <h1>Technical Difficulties</h1>
-                <p>If you are having any technical difficulties with the app please either contact us <a href="mailto:support@wearesosure.com" class="open-intercom">via intercom here</a> or email us at <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> and we’ll get back to you shortly.</p>
-                <div class="information--controls clearfix">
-                    <h4>Still want to cancel your policy?</h4>
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-technical"
-                       data-reason="technical">I'll cancel
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-7-info" class="information">
-                <h1>pic-sure is annoying</h1>
-                <p class="lead">We're sorry you're having problems with pic-sure, lets see if we can help with these easy steps:</p>
-                <ol>
-                    <li>When facing the mirror with the QR code gently move the phone forwards and backwards so the front camera can see the QR code.</li>
-                    <li>Tilt the phone forward slightly so the phone is held at 45 degrees angle.</li>
-                    <li>When the phone detects the QR code you will feel a vibration, the screen will then go white (as the device is taking a picture) and you will feel a second vibration.</li>
-                </ol>
-                <p>If you are still having problems please click <a href="{{ path('faq') }}#what-is-pic-sure" target="_blank" rel="noopener noreferrer">here</a> or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a>.</p>
-                <div class="information--controls clearfix">
-                    <h4>Still want to cancel your policy?</h4>
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-pic-sure"
-                       data-reason="pic-sure">I'll cancel
-                    </a>
-                </div>
-            </div>
-
-            <div id="reason-8-info" class="information">
-                <h1>We’d be sad to see you go...</h1>
-                <p>We appreciate that sometimes people have a change of heart. To help us improve, we'd love to know why you'd like to cancel.</p>
-                <div class="form-group">
-                    <input id="other-reason" type="text" class="form-control" placeholder="Please enter your reason here..." required />
-                </div>
-                <div class="information--controls clearfix">
-                    <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
-                    <a href="{{ path('homepage')}}"
-                       class="btn btn-green btn-pad">Ok, I'll stay
-                    </a>
-                    <a href="#"
-                       id="btn-cancel-policy-other"
-                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                       data-event="cancel-unknown"
-                       data-reason="unknown">Cancel my policy
-                    </a>
-                </div>
-            </div>
-
+            {{ form_end(cancel_form) }}
         </div>
     </section>
 
-    <div class="hidden">
-        {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
-        {{ form_widget(cancel_form.reason) }}
-        {{ form_widget(cancel_form.othertxt) }}
-        {{ form_widget(cancel_form.cancel) }}
-        {{ form_end(cancel_form) }}
-    </div>
+    {# Page Modal #}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    '@AppBundle/Resources/public/js/Purchase/cancel.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-cancel.js') }}"></script>
 {% endblock %}
