@@ -408,6 +408,13 @@ class AdminController extends BaseController
             ->getForm();
         // process the form.
         if ($request->getMethod() === 'POST') {
+            if (!in_array($policy->getStatus(), [$policy::STATUS_ACTIVE, $policy::STATUS_UNPAID])) {
+                $this->addFlash(
+                    'error',
+                    "Cannot schedule payments for an inactive policy"
+                );
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
+            }
             if ($request->request->has('create_scheduled_payment_form')) {
                 $createScheduledPaymentForm->handleRequest($request);
                 $monthlyPremium = null;
