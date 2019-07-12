@@ -6,6 +6,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Exception\GeoRestrictedException;
 use AppBundle\Exception\InvalidUserDetailsException;
 use AppBundle\Exception\DuplicateImeiException;
@@ -38,6 +39,7 @@ use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 use Gedmo\Loggable\Document\LogEntry;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @group functional-nonet
@@ -5861,6 +5863,127 @@ class PolicyServiceTest extends WebTestCase
             );
         } catch (\Exception $e) {
             return;
+        }
+    }
+
+    public function testPolicyCreationOnBacsSchedulesPaymentCorrectly()
+    {
+        $weekends = [];
+        $today = new \DateTime();
+        $endDate = new \DateTime();
+        $endDate->add(new \DateInterval("P1Y"));
+
+        $period = new \DatePeriod($today, new \DateInterval("P1D"), $endDate);
+
+        foreach ($period as $day) {
+            if (in_array($day->format('N'), [6, 7])) {
+                $weekends[] = $day->format('Ymd');
+            }
+        }
+        $bankHolidays = [];
+        foreach (static::getBankHolidays() as $bankHoliday) {
+            if (!$bankHoliday instanceof \DateTime) {
+                $bankHoliday = new \DateTime($bankHoliday);
+            }
+            $bankHolidays[] = $bankHoliday->format('Ymd');
+        }
+        $disallowedDates = array_merge($weekends, $bankHolidays);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail(
+                "testPolicyCreationOnBacsSchedulesPaymentCorrectly",
+                $this,
+                true
+            ),
+            "foo"
+        );
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            self::getRandomPhone(self::$dm),
+            null,
+            false,
+            true
+        );
+
+        $policy->setPaymentMethod(new BacsPaymentMethod());
+        $policy->setPremiumInstallments(12);
+        $policy->setBilling($today);
+        self::$dm->flush();
+        self::$policyService->generateScheduledPayments($policy);
+        $scheduledPayments = $policy->getScheduledPayments();
+        foreach ($scheduledPayments as $scheduledPayment) {
+            $checkDate = $scheduledPayment->getScheduled()->format('Ymd');
+            $this->assertFalse(in_array($checkDate, $disallowedDates));
+        }
+    }
+
+    public function testPolicyCreationOnBacsSchedulesPaymentCorrectlyWithBankHoliday()
+    {
+        $weekends = [];
+        $today = new \DateTime();
+        $endDate = new \DateTime();
+        $endDate->add(new \DateInterval("P1Y"));
+
+        $nextBankHoliday = null;
+        $period = new \DatePeriod($today, new \DateInterval("P1D"), $endDate);
+
+        foreach ($period as $day) {
+            if (in_array($day->format('N'), [6, 7])) {
+                $weekends[] = $day->format('Ymd');
+            }
+        }
+        $bankHolidays = [];
+        foreach (static::getBankHolidays() as $bankHoliday) {
+            if (!$bankHoliday instanceof \DateTime) {
+                $bankHoliday = new \DateTime($bankHoliday);
+            }
+            if (!$nextBankHoliday && $bankHoliday > $today) {
+                $nextBankHoliday = $bankHoliday;
+            }
+            $bankHolidays[] = $bankHoliday->format('Ymd');
+        }
+        $disallowedDates = array_merge($weekends, $bankHolidays);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail(
+                "testPolicyCreationOnBacsSchedulesPaymentCorrectlyWithBankHoliday",
+                $this,
+                true
+            ),
+            "foo"
+        );
+
+        $dateFromNextBankHoliday = new \DateTime(sprintf(
+            "%s%s%s",
+            $today->format('Y'),
+            $today->format('m'),
+            $nextBankHoliday->format('d')
+        ));
+
+        $policy = self::initPolicy(
+            $user,
+            self::$dm,
+            self::getRandomPhone(self::$dm),
+            $today,
+            false,
+            true,
+            true,
+            null,
+            $dateFromNextBankHoliday
+        );
+
+        $policy->setPaymentMethod(new BacsPaymentMethod());
+        $policy->setPremiumInstallments(12);
+        self::$dm->flush();
+        self::$policyService->generateScheduledPayments($policy);
+        $scheduledPayments = $policy->getScheduledPayments();
+        foreach ($scheduledPayments as $scheduledPayment) {
+            $checkDate = $scheduledPayment->getScheduled()->format('Ymd');
+            $this->assertFalse(in_array($checkDate, $disallowedDates));
         }
     }
 }
