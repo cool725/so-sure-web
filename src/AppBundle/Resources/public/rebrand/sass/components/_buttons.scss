@@ -11,6 +11,10 @@
     }
 }
 
+.btn.disabled {
+    cursor: not-allowed;
+}
+
 // Remove box-shadow on outline buttons
 a[class*="btn-outline-"],
 .btn-circle,

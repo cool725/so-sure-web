@@ -1,4 +1,4 @@
-// faq.js
+// user.js
 
 require('../../../sass/pages/user/user.scss');
 

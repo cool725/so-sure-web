@@ -1,57 +1,55 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
+{% set body_class = 'user' %}
+{# {% set user_mode = true %} #}
 
-{% block title %}so-sure - Better Phone Insurance{% endblock %}
+{% block title %}so-sure - Cancellation damage{% endblock %}
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
+    <meta name="robots" content="noindex">
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/cancel.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-cancel.css') }}">
 {% endblock %}
 
 {% block body %}
-    <section class="section--pad">
+
+    <section class="hero">
         <div class="container">
-
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" width="220px" class="img-center" alt="Broken phone logo" />
-            <h1 class="text-center">Already Broken or Damaged?</h1>
-            <p class="lead">We understand mistakes happen, so if your phone is already damaged (the screen is cracked or the phone does not work) you now have to cancel your policy. If your phone has cosmetic damage, like a few scratches, you can keep your policy and remain covered.</p>
-            <p>Please keep in mind that we take fraud seriously and do prosecute. If you purchased a policy knowing that your phone is damaged this is fraud. We can exercise our right to cancel a policy at anytime and report any instance of fraud to the police.</p>
-            <p class="text-center">
-                <a href="{{ path('user_welcome_policy_id', {'id': policy.id}) }}"
-                   class="btn btn-grey btn-pad">NO, ITS FINE
-                </a>
-                <a href="#"
-                   class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
-                   data-event="cancel-damaged"
-                   data-reason="damaged">YES MY PHONE IS DAMAGED
-                </a>
-            </p>
-
+            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" class="img-center" alt="Broken phone logo" width="160px" />
+            <h1 class="h2 mb-4">Already Broken/Damaged?</h1>
+            {{ form_start(cancel_form, {'attr': {
+                'data-toggle': 'validator',
+                'class': 'validate-form',
+                'data-client-validation': form_client_validation
+            }}) }}
+                <div class="cancel-text">
+                    <p class="text-left">We understand mistakes happen, so if your phone is already damaged - the screen is cracked or the phone does not work you now have to cancel your policy. If your phone has cosmetic damage, like a few scratches, you can keep your policy and remain covered.</p>
+                    <p class="mb-4 text-left">Please keep in mind that we take fraud seriously and do prosecute. If you purchased a policy knowing that your phone is damaged this is fraud. We can exercise our right to cancel a policy at anytime and report any instance of fraud to the police.</p>
+                </div>
+                <div class="hideme">
+                    {{ form_widget(cancel_form.reason) }}
+                    {{ form_widget(cancel_form.othertxt) }}
+                </div>
+                <div class="form-group mt-4">
+                    <a href="{{ path('user_welcome_policy_id', {'id': policy.id}) }}" class="btn btn-primary btn-square mr-2">🥳 No, it's fine</a>
+                    {{ form_widget(cancel_form.cancel,  {
+                        'label': '😔 Cancel it\'s damaged',
+                        'attr': {
+                            'class': 'btn btn-white text-muted btn-square',
+                            'data-event': ''
+                    }}) }}
+                </div>
+            {{ form_end(cancel_form) }}
         </div>
     </section>
 
-    <div class="hidden">
-        {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
-        {{ form_widget(cancel_form.reason) }}
-        {{ form_widget(cancel_form.othertxt) }}
-        {{ form_widget(cancel_form.cancel) }}
-        {{ form_end(cancel_form) }}
-    </div>
+    {# Page Modal #}
 
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    '@AppBundle/Resources/public/js/Purchase/cancel.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-cancel.js') }}"></script>
 {% endblock %}
