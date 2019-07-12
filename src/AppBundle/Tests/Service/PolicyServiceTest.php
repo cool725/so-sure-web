@@ -5918,6 +5918,7 @@ class PolicyServiceTest extends WebTestCase
             $checkDate = $scheduledPayment->getScheduled()->format('Ymd');
             $this->assertFalse(in_array($checkDate, $disallowedDates));
         }
+        $this->assertEquals(12, count($scheduledPayments));
     }
 
     public function testPolicyCreationOnBacsSchedulesPaymentCorrectlyWithBankHoliday()
@@ -5985,5 +5986,6 @@ class PolicyServiceTest extends WebTestCase
             $checkDate = $scheduledPayment->getScheduled()->format('Ymd');
             $this->assertFalse(in_array($checkDate, $disallowedDates));
         }
+        $this->assertEquals(12, count($scheduledPayments));
     }
 }
