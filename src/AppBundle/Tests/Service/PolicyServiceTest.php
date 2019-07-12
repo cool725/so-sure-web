@@ -5868,27 +5868,6 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCreationOnBacsSchedulesPaymentCorrectly()
     {
-        $weekends = [];
-        $today = new \DateTime();
-        $endDate = new \DateTime();
-        $endDate->add(new \DateInterval("P1Y"));
-
-        $period = new \DatePeriod($today, new \DateInterval("P1D"), $endDate);
-
-        foreach ($period as $day) {
-            if (in_array($day->format('N'), [6, 7])) {
-                $weekends[] = $day->format('Ymd');
-            }
-        }
-        $bankHolidays = [];
-        foreach (static::getBankHolidays() as $bankHoliday) {
-            if (!$bankHoliday instanceof \DateTime) {
-                $bankHoliday = new \DateTime($bankHoliday);
-            }
-            $bankHolidays[] = $bankHoliday->format('Ymd');
-        }
-        $disallowedDates = array_merge($weekends, $bankHolidays);
-
         $user = self::createUser(
             self::$userManager,
             self::generateEmail(
@@ -5910,44 +5889,19 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setPaymentMethod(new BacsPaymentMethod());
         $policy->setPremiumInstallments(12);
-        $policy->setBilling($today);
         self::$dm->flush();
         self::$policyService->generateScheduledPayments($policy);
         $scheduledPayments = $policy->getScheduledPayments();
         foreach ($scheduledPayments as $scheduledPayment) {
             $checkDate = $scheduledPayment->getScheduled()->format('Ymd');
-            $this->assertFalse(in_array($checkDate, $disallowedDates));
+            $this->assertFalse(in_array($checkDate, $this->getNonWorkingDays()));
         }
         $this->assertEquals(12, count($scheduledPayments));
     }
 
     public function testPolicyCreationOnBacsSchedulesPaymentCorrectlyWithBankHoliday()
     {
-        $weekends = [];
         $today = new \DateTime();
-        $endDate = new \DateTime();
-        $endDate->add(new \DateInterval("P1Y"));
-
-        $nextBankHoliday = null;
-        $period = new \DatePeriod($today, new \DateInterval("P1D"), $endDate);
-
-        foreach ($period as $day) {
-            if (in_array($day->format('N'), [6, 7])) {
-                $weekends[] = $day->format('Ymd');
-            }
-        }
-        $bankHolidays = [];
-        foreach (static::getBankHolidays() as $bankHoliday) {
-            if (!$bankHoliday instanceof \DateTime) {
-                $bankHoliday = new \DateTime($bankHoliday);
-            }
-            if (!$nextBankHoliday && $bankHoliday > $today) {
-                $nextBankHoliday = $bankHoliday;
-            }
-            $bankHolidays[] = $bankHoliday->format('Ymd');
-        }
-        $disallowedDates = array_merge($weekends, $bankHolidays);
-
         $user = self::createUser(
             self::$userManager,
             self::generateEmail(
@@ -5962,7 +5916,7 @@ class PolicyServiceTest extends WebTestCase
             "%s%s%s",
             $today->format('Y'),
             $today->format('m'),
-            $nextBankHoliday->format('d')
+            $this->getNextBankHolidayAfterDate()->format('d')
         ));
 
         $policy = self::initPolicy(
@@ -5984,8 +5938,57 @@ class PolicyServiceTest extends WebTestCase
         $scheduledPayments = $policy->getScheduledPayments();
         foreach ($scheduledPayments as $scheduledPayment) {
             $checkDate = $scheduledPayment->getScheduled()->format('Ymd');
-            $this->assertFalse(in_array($checkDate, $disallowedDates));
+            $this->assertFalse(in_array($checkDate, $this->getNonWorkingDays()));
         }
         $this->assertEquals(12, count($scheduledPayments));
+    }
+
+    private function getFormattedWeekendsForOneYear($fromDate = null)
+    {
+        if (!$fromDate) {
+            $fromDate = new \DateTime();
+        }
+        $weekends = [];
+        $endDate = new \DateTime();
+        $endDate->add(new \DateInterval("P1Y"));
+
+        $period = new \DatePeriod($fromDate, new \DateInterval("P1D"), $endDate);
+
+        foreach ($period as $day) {
+            if (in_array($day->format('N'), [6, 7])) {
+                $weekends[] = $day->format('Ymd');
+            }
+        }
+        return $weekends;
+    }
+
+    private function getFormattedBankHolidays()
+    {
+        $bankHolidays = [];
+        foreach (static::getBankHolidays() as $bankHoliday) {
+            if (!$bankHoliday instanceof \DateTime) {
+                $bankHoliday = new \DateTime($bankHoliday);
+            }
+            $bankHolidays[] = $bankHoliday->format('Ymd');
+        }
+        return $bankHolidays;
+    }
+
+    private function getNonWorkingDays()
+    {
+        return array_merge($this->getFormattedWeekendsForOneYear(), $this->getFormattedBankHolidays());
+    }
+
+    private function getNextBankHolidayAfterDate($fromDate = null)
+    {
+        if (!$fromDate) {
+            $fromDate = new \DateTime();
+        }
+        foreach (static::getBankHolidays() as $bankHoliday) {
+            if ($bankHoliday > $fromDate) {
+                return $bankHoliday;
+            }
+        }
+        return "No bank holidays known after date";
     }
 }
