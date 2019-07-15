@@ -662,6 +662,14 @@ redirect_seo_iphone_se:
         path: /phone-insurance/apple+iphone+se
         permanent: true
 
+# Update to the latest model or most popular
+redirect_seo_iphone_generic:
+    path: /mobile-insurance/iphone
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple+iphone+x
+        permanent: true
+
 redirect_seo_iphone_x:
     path: /mobile-insurance/iphone-x
     defaults:
@@ -731,6 +739,14 @@ redirect_seo_pixel_3:
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /phone-insurance/google+pixel+3
+        permanent: true
+
+# Update to the latest model or most popular
+redirect_seo_samsung_generic:
+    path: /mobile-insurance/samsung
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung+galaxy+s9
         permanent: true
 
 redirect_seo_galaxy_j3_2016:
