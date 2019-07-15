@@ -78,15 +78,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $users = $this->newUsers($manager, 550);
+        $users = $this->newUsers($manager, 100);
         $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
-        $iosPreExpireUsers = $this->newUsers($manager, 40);
-        $androidPreExpireUsers = $this->newUsers($manager, 40);
-        $preExpireUsers = $this->newUsers($manager, 40);
-        $preExpireYearlyUsers = $this->newUsers($manager, 40, true);
-        $expiredUsers = $this->newUsers($manager, 40);
-        $fullyExpiredUsers = $this->newUsers($manager, 40);
+        $iosPreExpireUsers = $this->newUsers($manager, 10);
+        $androidPreExpireUsers = $this->newUsers($manager, 10);
+        $preExpireUsers = $this->newUsers($manager, 10);
+        $preExpireYearlyUsers = $this->newUsers($manager, 10, true);
+        $expiredUsers = $this->newUsers($manager, 10);
+        $fullyExpiredUsers = $this->newUsers($manager, 10);
         $manager->flush();
 
         $count = 0;

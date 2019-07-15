@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Exception\ScheduledPaymentException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -364,6 +365,13 @@ class ScheduledPayment
 
     public function hasCorrectBillingDay()
     {
+        /**
+         * If the billing day has not been set, then the scheduled payments will be against the
+         * policy start date. So we don't need to do anything if billing day is null.
+         */
+        if (!$this->policy->getBillingDay()) {
+            return true;
+        }
         if ($this->getType() == self::TYPE_RESCHEDULED || !$this->getScheduled()) {
             return null;
         }
@@ -381,6 +389,18 @@ class ScheduledPayment
         $diff = $this->getScheduled()->diff($adjustedBilling);
         if ($diff->d == 0 && $diff->h <= 1) {
             return true;
+        }
+
+        /**
+         * BACs cannot be scheduled on the weekend or a bank holiday, so we would expect
+         * there to be a difference between the scheduled day and the billing day.
+         * At two points in the year, this difference can be 4 days, so as long as the
+         * difference is 4 or less, but still in the same month we are good to go.
+         */
+        if ($this->policy->getPaymentMethod() instanceof BacsPaymentMethod) {
+            if ($diff->d <= 4 && $diff->m === 0) {
+                return true;
+            }
         }
 
         return false;
