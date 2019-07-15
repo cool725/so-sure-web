@@ -15,16 +15,19 @@ use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Form\CardRefund;
+use AppBundle\Document\Form\CreateScheduledPayment;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Sequence;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\PolicyPhonePriceException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\CardRefundType;
 use AppBundle\Form\Type\CheckoutFileType;
+use AppBundle\Form\Type\CreateScheduledPaymentType;
 use AppBundle\Form\Type\PolicyStatusType;
 use AppBundle\Form\Type\SalvaRequeueType;
 use AppBundle\Form\Type\SalvaStatusType;
@@ -126,6 +129,7 @@ use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\BarclaysStatementFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
+use AppBundle\Helpers\PolicyPhonePriceHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -373,6 +377,109 @@ class AdminController extends BaseController
 
         return [
             'checkout_refund_form' => $checkoutRefundForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/create-scheduled-payment/{id}", name="create_scheduled_payment_form")
+     * @Template
+     */
+    public function createScheduledPaymentFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+        // Make sure the person making the request has the right permission.
+        // Create the form.
+        $createScheduledPayment = new CreateScheduledPayment(self::getBankHolidays(), $policy->getScheduledPayments());
+        $createScheduledPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder(
+                'create_scheduled_payment_form',
+                CreateScheduledPaymentType::class,
+                $createScheduledPayment
+            )
+            ->setAction($this->generateUrl('create_scheduled_payment_form', ['id' => $policy->getId()]))
+            ->getForm();
+        // process the form.
+        if ($request->getMethod() === 'POST') {
+            if (!in_array($policy->getStatus(), [$policy::STATUS_ACTIVE, $policy::STATUS_UNPAID])) {
+                $this->addFlash(
+                    'error',
+                    "Cannot schedule payments for an inactive policy"
+                );
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
+            }
+            if ($request->request->has('create_scheduled_payment_form')) {
+                $createScheduledPaymentForm->handleRequest($request);
+                $monthlyPremium = null;
+                try {
+                    $policyPhonePrice = new PolicyPhonePriceHelper($policy);
+                    $monthlyPremium = $policyPhonePrice->getMonthlyPremiumPrice();
+                } catch (PolicyPhonePriceException $e) {
+                    $this->get('logger')->error(
+                        $e->getMessage() . " " . $e->getCode()
+                    );
+                }
+                if ($createScheduledPaymentForm->isValid()) {
+                    $date = new \DateTime($createScheduledPayment->getDate());
+                    if ($policy->hasScheduledPaymentOnDate($date)) {
+                        $this->addFlash(
+                            'error',
+                            sprintf(
+                                'Payment already scheduled for %s, please use date picker to choose available date',
+                                $date->format('l jS F Y')
+                            )
+                        );
+                    } else {
+                        $scheduledPayment = new ScheduledPayment();
+                        $scheduledPayment->setScheduled($date);
+                        $scheduledPayment->setNotes($createScheduledPayment->getNotes());
+                        $scheduledPayment->setAmount($monthlyPremium);
+                        $scheduledPayment->setPolicy($policy);
+                        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+
+                        $addPolicyNote = true;
+
+                        try {
+                            $policy->addScheduledPayment($scheduledPayment);
+                            $dm->flush();
+                            $this->addFlash('success', "Payment scheduled successfully.");
+                        } catch (\Exception $e) {
+                            $this->addFlash(
+                                'error',
+                                sprintf("Could not scheduled payment: %s", $e->getMessage())
+                            );
+                            $addPolicyNote = false;
+                        }
+                        /**
+                         * We also want to add the notes to the policy notes if the scheduled
+                         * payment was successfully added.
+                         */
+                        if ($addPolicyNote) {
+                            $policy->addNoteDetails(
+                                sprintf(
+                                    "Manually scheduled payment for %s. Justification: %s",
+                                    $date->format('l jS F Y'),
+                                    $createScheduledPayment->getNotes()
+                                ),
+                                $this->getUser()
+                            );
+                        }
+                    }
+                    $dm->flush();
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'create_scheduled_payment_form' => $createScheduledPaymentForm->createView(),
             'policy' => $policy,
         ];
     }

@@ -1,0 +1,30 @@
+{% block body %}
+
+    {% set now = "now"|date("m/d/Y") %}
+
+    {{ form_start(create_scheduled_payment_form) }}
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-xs-12 form-group">
+                <label>Payment Date</label>
+                {{ form_widget(create_scheduled_payment_form.date, {
+                    'attr': {
+                        'class': 'input-group datetimepickercreatescheduledpayment'
+                    }
+                }) }}
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>Justification</label>
+            {{ form_widget(create_scheduled_payment_form.notes, {'attr': {'class': 'form_note form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(create_scheduled_payment_form.add, {'label': 'Save Payment', 'attr': {'class': 'btn btn-danger'}}) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(create_scheduled_payment_form) }}
+
+{% endblock %}
