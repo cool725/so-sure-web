@@ -2760,6 +2760,10 @@ abstract class Policy
         $this->setIssueDate($issueDate);
 
         if ($billing) {
+            $diff = $this->getStart()->diff($billing);
+            if ($billing->format('d') > $this->getStart()->format('d') && $diff->d > 7) {
+                $billing->sub(new \DateInterval('P1M'));
+            }
             $this->setBilling($billing);
         } else {
             $this->setBilling($this->getStartForBilling());

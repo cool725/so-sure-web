@@ -30,8 +30,6 @@ class ImeiTraitTest extends \PHPUnit\Framework\TestCase
      */
     public function testRandomImeiCollision()
     {
-        $a = $this->generateRandomImei();
-        $b = $this->generateRandomImei();
-        $this->assertTrue($a !== $b);
+        $this->assertNotEquals($this->generateRandomImei(), $this->generateRandomImei());
     }
 }
