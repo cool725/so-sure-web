@@ -400,7 +400,6 @@ class DefaultController extends BaseController
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'reward-gateway',
                 'affiliate_company' => 'Reward Gateway',
-                'affiliate_company_logo' => 'so-sure_reward_gateway_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'END',
                 'competitor3' => 'SS',
