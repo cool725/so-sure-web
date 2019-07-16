@@ -159,15 +159,15 @@ $(function(){
         return true;
     }, 'Sorry, only persons over the age of 18 can be covered');
 
-    jQuery.validator.addMethod("isOverFive", function (value, element) {
-        if (value == 'less than 5') {
+    jQuery.validator.addMethod("isOverTen", function (value, element) {
+        if (value == 'less than 10') {
             $('.other-inputs').prop('disabled', true);
             return false;
         } else {
              $('.other-inputs').prop('disabled', false);
             return true;
         }
-    }, 'Sorry, we require at least 5 company phones to generate a custom quote. You can purchase policies directly via our site in other cases.');
+    }, 'Sorry, we require at least 10 company phones to generate a custom quote. You can purchase policies directly via our site in other cases.');
 
     jQuery.validator.addMethod('time', function(value, element, param) {
         return value == '' || value.match(/^([01][0-9]|2[0-3]):[0-5][0-9]$/);

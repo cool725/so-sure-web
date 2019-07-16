@@ -68,7 +68,7 @@ $(function() {
                 },
                 "lead_form[phones]": {
                     required: true,
-                    isOverFive: true
+                    isOverTen: true
                 },
                 "lead_form[timeframe]": {
                     required: true,

@@ -27,9 +27,9 @@ class CompanyLeadType extends AbstractType
                 'required' => true,
                 'placeholder' => 'No. of phones to insure...',
                 'choices' => [
-                    'less than 5' => 'less than 5',
-                    '5-10' => '5-10',
-                    '10-50' => '10-50',
+                    'less than 10' => 'less than 10',
+                    '10-20' => '10-20',
+                    '20-50' => '20-50',
                     'more than 50' => 'more than 50',
                     'uncertain' => 'uncertain'
                 ],
