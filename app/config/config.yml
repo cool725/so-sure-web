@@ -475,6 +475,11 @@ nelmio_security:
                 - https://www.intercom-reporting.com
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
+                - https://*.criteo.net
+                - https://*.criteo.com
+                - https://gum.criteo.com
+                - https://dis.eu.criteo.com
+                - https://static.criteo.net
                 - 'data:'
             connect-src:
                 - 'self'
