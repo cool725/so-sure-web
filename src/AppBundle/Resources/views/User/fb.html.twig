@@ -1,44 +1,19 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_rebrand.html.twig' %}
 
 {% block body %}
 
-<section class="user-homepage--content section--pad">
-<div class="container">
+<h1>Who do you trust?</h1>
 
-    <div class="row">
+<ul class="list-unstyled">
+    {% for friend in friends %}
+        <li>
+            <img class="trust-photo" alt="{{ friend['name'] }}" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" />
+            {{ friend['name'] }} <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer"><span class="fa fa-search"></span></a>
+            <a href="{{ path('user_post', {id: friend['id']}) }}" class="btn btn-success btn-square btn-sm">Trust this friend</a>
+        </li>
+    {% endfor %}
+</ul>
 
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Who do you trust?</h1>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12">
-
-                {% for friend in friends %}
-                    <div class="col-xs-12 col-md-3">
-                        <div class="trust">
-                        <p>{{ friend['name'] }} <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer"><span class="fa fa-search"></span></a></p>
-                        <p><img class="trust-photo" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" /></p>
-                        <p><a href="{{ path('user_post', {id: friend['id']}) }}" class="btn btn-success">Trust this friend</a></p>
-                        </div>
-                    </div>
-                {% endfor %}
-
-            </div>
-        </div>
-    </div>
-</div>
-</section>
-
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
 
 

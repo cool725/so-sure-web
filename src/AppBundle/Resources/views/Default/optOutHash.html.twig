@@ -6,6 +6,9 @@
 {% set body_class = 'opt-out' %}
 
 {% block title %}so-sure - Communication Preferences{% endblock %}
+{% block meta %}
+    <meta name="robots" content="noindex">
+{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/opt-out.css') }}">

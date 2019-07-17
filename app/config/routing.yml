@@ -166,6 +166,36 @@ redirect_quote_make_model:
         route: quote_make_model
         permanent: true
 
+redirect_learn_more:
+    path: /phone-insurance/{id}/learn-more
+    requirements:
+        id: "[0-9a-f]{24,24}"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: faq
+        permanent: true
+
+redirect_learn_more_make_model:
+    path: /phone-insurance/{make}+{model}/learn-more
+    requirements:
+        make: "[a-zA-Z]+"
+        model: "[+-.a-zA-Z0-9() ]+"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: quote_make_model
+        permanent: true
+
+redirect_learn_more_make_model_memory:
+    path: /phone-insurance/{make}+{model}+{memory}GB/learn-more
+    requirements:
+        make: "[a-zA-Z]+"
+        model: "[+-.a-zA-Z0-9() ]+"
+        memory: "[0-9]+"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: quote_make_model_memory
+        permanent: true
+
 redirect_jobs:
     path: /jobs
     defaults:

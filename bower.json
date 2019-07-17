@@ -17,7 +17,6 @@
   "dependencies": {
     "jquery": "~2.2.4",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
-    "ouibounce": "^0.0.12",
     "datatables.net": "^1.10.16",
     "datatables.net-bs": "^1.10.16",
     "clipboard": "^1.7.1",
@@ -48,9 +47,6 @@
       "eonasdan-bootstrap-datetimepicker": [
         "bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
         "bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css"
-      ],
-      "ouibounce": [
-        "bower_components/ouibounce/build/ouibounce.min.js"
       ],
       "datatables.net": [
         "bower_components/datatables.net/js/jquery.dataTables.min.js"

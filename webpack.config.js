@@ -46,6 +46,7 @@ Encore
     .addEntry('landing-youtube', './src/AppBundle/Resources/public/rebrand/js/pages/landing-youtube.js')
     .addEntry('invite', './src/AppBundle/Resources/public/rebrand/js/pages/invite.js')
     .addEntry('company-phones', './src/AppBundle/Resources/public/rebrand/js/pages/company-phones.js')
+    .addEntry('usa', './src/AppBundle/Resources/public/rebrand/js/pages/usa.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
@@ -90,6 +91,7 @@ Encore
 
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
+    .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')
 
     // .enableSingleRuntimeChunk()
 

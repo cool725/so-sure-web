@@ -1,13 +1,7 @@
-{% extends 'base.html.twig' %}
-
 {% block body %}
     <h2>JS Error triggered</h2>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Ops/rollbarJsError.js'
-    %}
-        <script src="{{ asset_url }}"></script>{% endjavascripts %}
+    <script src="{{ asset('css-js/rollbar-js-error.js') }}"></script>
 {% endblock %}
