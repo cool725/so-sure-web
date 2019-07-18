@@ -2941,10 +2941,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $user->setEmail($this->getDataString($rewardForm->getData(), 'email'));
                         $user->setFirstName($this->getDataString($rewardForm->getData(), 'firstName'));
                         $user->setLastName($this->getDataString($rewardForm->getData(), 'lastName'));
+                        $dm->persist($user);
+                        $dm->flush();
                         $reward = new Reward();
                         $reward->setUser($user);
                         $reward->setDefaultValue($this->getDataString($rewardForm->getData(), 'defaultValue'));
-                        $dm->persist($user);
                         $dm->persist($reward);
 
                         $code = $this->getDataString($rewardForm->getData(), 'code');
