@@ -907,6 +907,7 @@ class PolicyService
     ) {
         $policy->cancelScheduledPayments();
         $this->generateScheduledPayments($policy, $date, $numPayments, $billingOffset);
+        $this->dm->flush();
     }
 
     public function generateScheduledPayments(
