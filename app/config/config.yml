@@ -467,6 +467,10 @@ nelmio_security:
                 - https://*.google.com/ # necessary?
                 - https://*.google.ie # necessary?
                 - https://*.google.ie # necessary?
+                - http://*.googleadservices.com
+                - https://*.googleadservices.com
+                - https://*.googlesyndication.com
+                - https://www.googleadservices.com # necessary?
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
                 - https://angel.co
@@ -814,7 +818,6 @@ nelmio_security:
                 - https://ajax.googleapis.com
                 - https://www.google-analytics.com
                 - http://www.google-analytics.com
-                - https://www.googletagmanager.com
                 - https://www.googletagmanager.com
                 - http://www.googletagmanager.com
                 - https://tagmanager.google.com
