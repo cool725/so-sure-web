@@ -506,12 +506,6 @@ class IntercomService
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
         }
-        if ($user->getFirstPolicy() && $user->getFirstPolicy()->getPhone()) {
-            $data['custom_attributes']['First Policy Learn More'] =
-                $this->router->generateUrl('learn_more_phone', [
-                    'id' => $user->getFirstPolicy()->getPhone()->getId()
-                ]);
-        }
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
             if ($user->getIdentityLog() && $user->getIdentityLog()->getIp()) {
