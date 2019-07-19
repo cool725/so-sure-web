@@ -1,8 +1,6 @@
 <?php
 
-
 namespace AppBundle\Command;
-
 
 use AppBundle\Document\Policy;
 use AppBundle\Service\BacsService;
@@ -13,7 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BacRegenerateSchedulesCommand extends ContainerAwareCommand
+class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
 {
     /**
      * @var DocumentManager
