@@ -52,6 +52,7 @@
     "js-yaml": "^3.13.1",
     "js.cookie": "^0.0.4",
     "jssocials": "git://github.com/so-sure/jssocials.git#master",
+    "lodash": "^4.17.15",
     "lozad": "^1.8.0",
     "mem": "^5.1.1",
     "moment": "^2.24.0",
