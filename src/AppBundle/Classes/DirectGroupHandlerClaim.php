@@ -85,7 +85,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
 
     public static $errorEmailAddresses = [
         'Robert.Hodson@directgroup.co.uk',
-        'patrick@so-sure.com',
+        'julien@so-sure.com',
         'dylan@so-sure.com',
         'Sally.Hancock@directgroup.co.uk',
         'Sharon.Nolan@directgroup.co.uk',

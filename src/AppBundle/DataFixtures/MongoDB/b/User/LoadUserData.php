@@ -38,14 +38,12 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', [User::ROLE_EMPLOYEE]);
         $this->newUser('customer-services@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'CustomerServices', [User::ROLE_CUSTOMER_SERVICES]);
 
-        $this->newUser('kit@so-sure.com', self::DEFAULT_PASSWORD, 'Kit', 'Barclay', [User::ROLE_ADMIN]);
         $this->newUser('dylan@so-sure.com', self::DEFAULT_PASSWORD, 'Dylan', 'Bourguignon', [User::ROLE_ADMIN]);
         $this->newUser('julien@so-sure.com', self::DEFAULT_PASSWORD, 'Julien', 'Champagne', [User::ROLE_ADMIN]);
         $this->newUser('nick@so-sure.com', self::DEFAULT_PASSWORD, 'Nick', 'Waller', [User::ROLE_ADMIN]);
         $this->newUser('olly@so-sure.com', self::DEFAULT_PASSWORD, 'Olly', 'Mandling', [User::ROLE_ADMIN]);
         $this->newUser('kitti@so-sure.com', self::DEFAULT_PASSWORD, 'Kitti', 'Varga', [User::ROLE_CUSTOMER_SERVICES]);
         $this->newUser('daly@so-sure.com', self::DEFAULT_PASSWORD, 'Daly', 'Barron', [User::ROLE_ADMIN]);
-        $this->newUser('diogo@so-sure.com', self::DEFAULT_PASSWORD, 'Diogo', 'Lino', [User::ROLE_ADMIN]);
         $this->newUser('blake@so-sure.com', self::DEFAULT_PASSWORD, 'Blake', 'Payne', [User::ROLE_ADMIN]);
         $this->newUser('charles@so-sure.com', self::DEFAULT_PASSWORD, 'Charles', 'Roels', [User::ROLE_ADMIN]);
         $manager->flush();
@@ -61,8 +59,8 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         /** @var User $user */
-        $user = $repo->findOneBy(['email' => 'patrick@so-sure.com']);
-        $user->setFirstName('patrick');
+        $user = $repo->findOneBy(['email' => 'julien@so-sure.com']);
+        $user->setFirstName('julien');
         $manager->flush();
     }
 
