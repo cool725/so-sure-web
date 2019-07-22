@@ -1009,7 +1009,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $policy->getStart()) {
+            if ($scheduledDate >= $policy->getStart() && $scheduledDate <= $policy->getStaticEnd()) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->notice('Attempted to set scheduled payment for before policy start.');

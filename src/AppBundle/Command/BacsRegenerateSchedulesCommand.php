@@ -80,6 +80,7 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
             }
         }
         $policies = $qb->getQuery()->execute();
+        $today = new \DateTime();
         /** @var Policy $policy */
         foreach ($policies as $policy) {
             if ($dryRun) {
@@ -93,7 +94,7 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
                     "Regenerating Scheduled Payments for policy %s",
                     $policy->getId()
                 ));
-                $this->policyService->regenerateScheduledPayments($policy);
+                $this->policyService->regenerateScheduledPayments($policy, $today);
             }
         }
     }
