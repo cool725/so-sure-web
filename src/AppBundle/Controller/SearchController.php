@@ -45,11 +45,6 @@ class SearchController extends BaseController
 
             // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_phone');
-        } elseif ($phone && in_array($type, ['learn-more'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
         }
 
         return [

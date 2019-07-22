@@ -849,13 +849,6 @@ redirect_seo_galaxy_s8:
         path: /phone-insurance/samsung+galaxy+s8
         permanent: true
 
-redirect_seo_galaxy_s8:
-    path: /mobile-insurance/samsung-galaxy-s8
-    defaults:
-        _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /phone-insurance/samsung+galaxy+s8
-        permanent: true
-
 redirect_seo_galaxy_s8_plus:
     path: /mobile-insurance/samsung-galaxy-s8-plus
     defaults:
