@@ -226,8 +226,10 @@
             {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
 
             <div class="end-cta end-cta__mobile d-md-none">
-                <h4 class="mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
-                <a href="#" class="btn btn-success btn-block-xs get-a-quote">Let's start!</a>
+                <h4 class="mb-4"><span class="sub">Join {% if invitation.inviter is defined %}{{ invitation.inviter.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
+                <a href="#"
+                   class="btn btn-success btn-block-xs track-data get-a-quote"
+                   data-event="email-invite-bottom-lets-start-btn">Let's start!</a>
             </div>
             <div class="end-cta end-cta__desktop d-none d-md-block">
                 <div class="cardbox cardbox-100">
@@ -238,16 +240,10 @@
                              width="180px"
                              class="lozad">
                         <div class="ml-5">
-                            <h4 class="mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
+                            <h4 class="mb-4"><span class="sub">Join {% if invitation.inviter is defined %}{{ invitation.inviter.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
                             <a href="#"
                                class="btn btn-success btn-block-xs track-data get-a-quote"
-                               data-event="
-                                {% if scode is defined and scode and scode.policy %}
-                                    scode-bottom-quote-btn-{{ user_code }}
-                                {% else %}
-                                    scode-bottom-quote-btn
-                                {% endif %}
-                               ">Let's start!</a>
+                               data-event="email-invite-bottom-lets-start-btn">Let's start!</a>
                         </div>
                     </div>
                 </div>
