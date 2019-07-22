@@ -59,23 +59,15 @@ class DaviesHandlerClaim extends HandlerClaim
     public $transactionFees;
 
     public static $breakdownEmailAddresses = [
-        'laura.harvey@davies-group.com',
+        'julien@so-sure.com',
     ];
 
     public static $invoiceEmailAddresses = [
-        'accounts.payable@davies-group.com',
-        'laura.harvey@davies-group.com',
         'julien@so-sure.com',
         'dylan@so-sure.com',
     ];
 
     public static $errorEmailAddresses = [
-        'laura.harvey@davies-group.com',
-        'Samantha.adams@davies-group.com',
-        'Simon.Harvey@davies-group.com',
-        'Owen.Pugh@davies-group.com',
-        'Katie.Molyneux@davies-group.com',
-        'Thomas.Gibbs@davies-group.com',
         'julien@so-sure.com',
         'dylan@so-sure.com',
         'kitti@so-sure.com'
