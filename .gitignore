@@ -41,5 +41,3 @@ deploy/*
 yarn-error.log
 .scannerwork
 *.swp
-composer.phar
-vagrantfile/
