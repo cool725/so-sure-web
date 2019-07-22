@@ -54,6 +54,12 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
                 'd',
                 InputOption::VALUE_NONE,
                 "See output without saving"
+            )
+            ->addOption(
+                'policy-id',
+                'p',
+                InputOption::VALUE_REQUIRED,
+                'If you have a specific policy to regenerate, give the long ID'
             );
     }
 
@@ -61,6 +67,7 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
     {
         $status = $input->getOption('status');
         $dryRun = $input->getOption('dry-run');
+        $policyId = $input->getOption('policy-id');
 
         $qb = $this->dm->createQueryBuilder(Policy::class)
             ->field('paymentMethod.type')->equals('bacs');
@@ -79,10 +86,17 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
                     break;
             }
         }
+        if ($policyId) {
+            $qb->field('_id')->equals(new \MongoId($policyId));
+        }
         $policies = $qb->getQuery()->execute();
-        $today = new \DateTime();
+        $dateToUse = new \DateTime();
         /** @var Policy $policy */
         foreach ($policies as $policy) {
+            $billing = $policy->getBilling();
+            if ($billing) {
+                $dateToUse = $billing;
+            }
             if ($dryRun) {
                 $output->writeln(sprintf(
                     "Policy %s would be regenerated and status is %s",
@@ -94,7 +108,7 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
                     "Regenerating Scheduled Payments for policy %s",
                     $policy->getId()
                 ));
-                $this->policyService->regenerateScheduledPayments($policy, $today);
+                $this->policyService->regenerateScheduledPayments($policy, $dateToUse);
             }
         }
     }
