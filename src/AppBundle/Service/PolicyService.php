@@ -907,6 +907,7 @@ class PolicyService
     ) {
         $policy->cancelScheduledPayments();
         $this->generateScheduledPayments($policy, $date, $numPayments, $billingOffset);
+        $this->dm->flush();
     }
 
     public function generateScheduledPayments(
@@ -1008,7 +1009,10 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $policy->getStart()) {
+            if ($scheduledDate >= $policy->getStart() &&
+                $scheduledDate <= $policy->getStaticEnd() &&
+                $scheduledDate > new \DateTime()
+            ) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->notice('Attempted to set scheduled payment for before policy start.');
