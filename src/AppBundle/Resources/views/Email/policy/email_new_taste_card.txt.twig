@@ -17,7 +17,5 @@ If you have any problems or questions then do not hesitate to contact us at supp
 
 Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
 
-{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
-
 Our mailing address is:
-so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
+so-sure, {{ business_address|replace({'\n':','}) }}
