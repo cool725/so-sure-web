@@ -266,6 +266,14 @@ class DefaultController extends BaseController
         return $this->render('AppBundle:Default:indexYoutube.html.twig', $data);
     }
 
+    /**
+     * @Route("/terms-test", name="terms_test")
+     */
+    public function termsTest()
+    {
+        return $this->render('AppBundle:Pdf:policyTermsV13.html.twig');
+    }
+
     private function competitorsData()
     {
         $competitor = [
