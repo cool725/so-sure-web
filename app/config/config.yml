@@ -1057,6 +1057,8 @@ nelmio_security:
                 - https://outbrain.com
                 - https://*.outbrain.com
                 - https://amplify.outbrain.com
+                - https://smct.co
+                - http://smct.co
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1334,6 +1336,8 @@ nelmio_security:
                 - https://outbrain.com
                 - https://*.outbrain.com
                 - https://adserver.adtech.de
+                - https://smct.co
+                - http://smct.co
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
