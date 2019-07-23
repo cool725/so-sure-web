@@ -1,51 +1,63 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-**
-------------------------------------------------------------
-Welcome to the so-sure family!
 
-You've made a very smart decision. Never again will you have to worry about dropping your phone and seeing that cracked screen, or it being stolen by some pesky thief!
+Welcome to so-sure 🎉
 
-Starting now, you can also be on your way to receive 80% of your money back at the end of your policy year when you connect with friends or family and none of you claim.
+Nice to have you on board {{ policy.user.firstName }} 🥳
 
-You can start by sharing this unique URL to your friends.  Simply copy it, and send it via What's App, Email or even your favourite social channels.  What you waiting for?
+Your phone is now covered and the policy details are below.
 
-{{ url('scode', {code: policy.getStandardSCode.code}) }}
+Now for the fun bits 😀 share the love and earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback if you don't claim.
 
-Now enough about us, here's your policy details:
+Head to your dashboard to share now: {{ branch_policy_url }}
 
-Your policy is for a {{ policy.phone }} and runs from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+Katie Booth so-sure customer 😎
+"This insurance is your peace of mind when you spend so much on technology these days it’s better to insure them"
 
-Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel
+Important boring bits:
 
-Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us.
+- Your policy is for a {{ policy.phone }}
+- Policy starts: {{ policy.start | date('d M Y', 'Europe/London') }}
+- Policy ends: {{ policy.end | date('d M Y H:i', 'Europe/London') }}
+
+{% if policy.phone.newHighDemand %}
+Note: As you have a shiny new model, we wanted to let you know your next day replacement or repair may be an older model, just for a few days until we get the new model to you - this is an unusual occurrence that's out of our control and due to market shortages.
+{% endif %}
+
+Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel 😍.
+
+Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions please don't hesitate to contact us.
 
 {% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
-Your excess is currently £{{ policy.premium.excess.damage }}, however, you can easily reduce this amount to £{{ policy.premium.picSureExcess.damage }} (£{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
-{% if policy.phone.isITunes %}
-Download our iOS App, login, and complete the validation process.
-{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}
-
-{% elseif policy.phone.isGooglePlay %}
-Download our Android App</a>, login, and complete the validation process.
-{{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}
-
-{% else %}
-Just email a picture of your phone's screen in the mirror to support@wearesosure.com and we'll get started on that process.
-
+    Your excess is currently &pound;{{ policy.premium.excess.damage }} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss), you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
+    {% if policy.phone.isITunes %}
+    Download our iOS App, login, and complete the validation process.
+    {{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}
+    {% elseif policy.phone.isGooglePlay %}
+    Download our Android App</a>, login, and complete the validation process.
+    {{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}
+    {% else %}
+    Just email a picture of your phone's screen in the mirror to support@wearesosure.com and we'll get started on that process.
+    {% endif %}
 {% endif %}
-{% endif %}
-{% if policy.phone.newHighDemand %}
-As you have a shiny new model, we wanted to let you know your next day replacement or repair may be an older model just for a few days until we get the new model to you (this is an unusual occurrence that's out of our control and due to market shortages).
 
-{% endif %}
-Cancel your policy now if your phone already has a cracked screen.
+If your phone is already broken 👮
+On a serious note, if your phone was already damaged before you purchased this policy, you should cancel it now or risk prosecution.
 
-We take fraud very seriously and do prosecute. When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen. If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.
+Find out why this is no joke: {{ url('faq') }}
 
-If you think you might have purchased your policy by mistake, please go to the following url today to cancel your policy and receive a full refund of your premium.
-
-{{ url('purchase_cancel', {'id': policy.id }) }}
+Cancel: {{ url('purchase_cancel', {'id': policy.id }) }}
 
 If you are in any doubt, please email us at info@wearesosure.com.
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
