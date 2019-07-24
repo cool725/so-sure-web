@@ -332,10 +332,36 @@ class UserController extends BaseController
                             $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                         );
                 }
+                if ($scode->isReward() && !$scode->isActive()) {
+                    if ($user->hasPolicy() && !count($user->getAllPolicies()) > 1) {
+                        $start = $policy->getStart();
+                        $now = new \DateTime();
+                        $diff = $now->diff($start);
+                        if ($diff->d > 6) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("Sorry, this promo code %s cannot be applied", $code)
+                            );
+
+                            return new RedirectResponse(
+                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                            );
+                        }
+                    } else {
+                        $this->addFlash(
+                            'warning',
+                            sprintf("Sorry, this promo code %s cannot be applied", $code)
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
 
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                    if ($invitation) {
+                    if ($invitation && !$scode->isReward()) {
                         $message = sprintf(
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
