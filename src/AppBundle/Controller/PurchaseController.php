@@ -145,24 +145,12 @@ class PurchaseController extends BaseController
             $purchase->setEmail($session->get('email'));
         }
 
-        // DOB Test
-        // $dobExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_DOB,
-        //     ['single', 'dropdowns']
-        // );
+        // CTA From Quote Test - Proceed
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
-        // DOB Sixpack Test
-        /** @var Form $purchaseForm */
-        // if ($dobExp == 'dropdowns') {
-        //     $purchaseForm = $this->get('form.factory')
-        //         ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressDropdownType::class, $purchase)
-        //         ->getForm();
-        // } else {
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
-        // }
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {

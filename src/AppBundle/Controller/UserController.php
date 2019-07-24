@@ -1244,6 +1244,9 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
+        // CTA From Quote Test - Purchase
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
+
         $smsExperiment = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_APP_LINK_SMS,
