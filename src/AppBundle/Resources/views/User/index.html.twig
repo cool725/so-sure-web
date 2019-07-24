@@ -59,7 +59,7 @@
                             <div class="d-md-flex flex-wrap align-self-center justify-content-start">
                                 {% for connection in policy.connections %}
                                     <span>
-                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
+                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
                                              alt="{{ connection.linkedUser.name }}"
                                              width="50px"
                                              data-toggle="tooltip"
