@@ -332,7 +332,7 @@ class UserController extends BaseController
                             $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                         );
                 }
-                if ($scode->isReward() && !$scode->isActive()) {
+                if ($scode->isReward() && $scode->isActive()) {
                     if ($user->hasPolicy() && !count($user->getAllPolicies()) > 1) {
                         $start = $policy->getStart();
                         $now = new \DateTime();
