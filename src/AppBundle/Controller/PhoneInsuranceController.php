@@ -275,6 +275,12 @@ class PhoneInsuranceController extends BaseController
         $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
         $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
 
+        $ctaText = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_QUOTE_PAGE_CTA,
+            ['cta-original', 'cta-yes-please']
+        );
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
                 try {
@@ -583,6 +589,7 @@ class PhoneInsuranceController extends BaseController
             'web_base_url'     => $this->getParameter('web_base_url'),
             'img_url'          => $modelHyph,
             'available_images' => $availableImages,
+            'cta_exp'          => $ctaText,
         );
 
         return $this->render($template, $data);
