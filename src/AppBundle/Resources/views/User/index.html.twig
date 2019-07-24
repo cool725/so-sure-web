@@ -138,14 +138,14 @@
                             <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
                             {# TODO: Rework icons #}
                             <div id="onboarding_btn_share"
-                                 data-share-link="{{ policy.standardSCode.shareLink }}"
+                                 data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
                                  data-share-text="Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out:">
                             </div>
                         </div>
                         <h5 class="text-zaffre">🔗 Share this link</h5>
                         <div class="custom-input-with-btn mb-4">
-                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ policy.standardSCode.shareLink }}</div>
+                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
                             <button class="btn btn-primary btn-copy btn-square btn-sm track-data"
                                 data-clipboard-target="#scode_share"
                                 data-toggle="tooltip"
