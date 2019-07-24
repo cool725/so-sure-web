@@ -114,6 +114,12 @@ class Phone
     protected $initialPrice;
 
     /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="float")
+     */
+    protected $currentRetailPrice;
+
+    /**
      * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      */
@@ -124,6 +130,18 @@ class Phone
      * @MongoDB\Field(type="string")
      */
     protected $initialPriceUrl;
+
+    /**
+     * @Assert\Url(protocols = {"http", "https"})
+     * @MongoDB\Field(type="string")
+     */
+    protected $currentRetailPriceUrl;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     */
+    protected $currentRetailPriceDate;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -608,6 +626,39 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
+    public function getCurrentRetailPrice()
+    {
+        return $this->currentRetailPrice();
+    }
+
+    /**
+     * Sets the current retail price for the phone.
+     * @param float     $price is the current retail price.
+     * @param string    $url   is the url of proof of this price.
+     * @param \DateTime $date  is the date at which this is set. Since each current retail price is written over the
+     *                         top of the last, dates cannot be used to find old retail prices, but it can tell you if
+     *                         your current value is getting old and could do with updating.
+     */
+    public function setRetailPrice($price, $url, \DateTime $date)
+    {
+        $this->currentRetailPrice = $price;
+        $this->currentRetailPriceUrl = $url;
+        $this->currentRetailPriceDate = $date;
+    }
+
+    /**
+     * Gives you either the current retail price if there is one or the initial price.
+     * @return float the most up to date retail price stored.
+     */
+    public function getRetailPrice()
+    {
+        if ($this->currentRetailPrice) {
+            return $this->currentRetailPrice();
+        } else {
+            return $this->initialPrice;
+        }
+    }
+
     public function getReplacementPriceOrSuggestedReplacementPrice()
     {
         return $this->getReplacementPrice() ?
@@ -746,44 +797,37 @@ class Phone
 
     public function getSalvaBinderMonthlyPremium(\DateTime $date = null)
     {
-        // Initial binder
         $binder2016 = new \DateTime('2016-09-01 00:00:00', SoSure::getSoSureTimezone());
-
-        // 2018 binder - prices static, but additional bands £1250 & £1500
         $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
-
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
-
         if ($date >= Salva::getSalvaBinderEndDate()) {
             throw new \Exception('No binder available');
         }
-
-        if ($this->getInitialPrice() <= 150) {
+        $price = $this->getRetailPrice();
+        if ($price <= 150) {
             return 3.99 + 1.5; // 5.49
-        } elseif ($this->getInitialPrice() <= 250) {
+        } elseif ($price <= 250) {
             return 4.99 + 1.5; // 6.49
-        } elseif ($this->getInitialPrice() <= 400) {
+        } elseif ($price <= 400) {
             return 5.49 + 1.5; // 6.99
-        } elseif ($this->getInitialPrice() <= 500) {
+        } elseif ($price <= 500) {
             return 5.99 + 1.5; // 7.49
-        } elseif ($this->getInitialPrice() <= 600) {
+        } elseif ($price <= 600) {
             return 6.99 + 1.5; // 8.49
-        } elseif ($this->getInitialPrice() <= 750) {
+        } elseif ($price <= 750) {
             return 7.99 + 1.5; // 9.49
-        } elseif ($this->getInitialPrice() <= 1000) {
+        } elseif ($price <= 1000) {
             return 8.99 + 1.5; // 10.49
         }
-
         if ($date >= $binder2018) {
-            if ($this->getInitialPrice() <= 1250) {
+            if ($price <= 1250) {
                 return 9.99 + 1.5; // 11.49
-            } elseif ($this->getInitialPrice() <= 1500) {
+            } elseif ($price <= 1500) {
                 return 10.99 + 1.5; // 12.49
             }
         }
-
         return null;
     }
 

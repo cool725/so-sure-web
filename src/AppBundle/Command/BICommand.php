@@ -224,6 +224,7 @@ class BICommand extends ContainerAwareCommand
             '"Memory"',
             '"Current Monthly Cost"',
             '"Original Retail Price"',
+            '"Current Retail Price"'
         ]);
         foreach ($phones as $phone) {
             /** @var Phone $phone */
@@ -233,6 +234,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $phone->getMemory()),
                 sprintf('"%0.2f"', $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
+                sprintf('"%0.2f"', $phone->getRetailPrice())
             ]);
         }
         if (!$skipS3) {
