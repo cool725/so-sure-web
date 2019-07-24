@@ -554,7 +554,7 @@ class PhoneInsuranceController extends BaseController
 
             // Check if template exists
             if (!$this->get('templating')->exists($template)) {
-                throw new NotFoundHttpException();
+                return $this->redirectToRoute('phone_insurance');
             }
         }
 
