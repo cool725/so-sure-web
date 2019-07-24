@@ -81,14 +81,14 @@
                             {% if scode and scode.standard %}
                                 {{ scode.policy.user }} has invited you!
                             {% else %}
-                                Already received an invite?
+                                Already received an invite or promocode?
                             {% endif %}
                         </h5>
-                        <p>Enter the unique 8-digit code below to connect.</p>
+                        <p>Enter the unique 8-digit code below.</p>
                         {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
                             <div class="custom-input-with-btn mb-4">
                                 {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
                             </div>
                         {{ form_end(scode_form) }}
                     {% endif %}
