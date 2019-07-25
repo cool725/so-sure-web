@@ -59,7 +59,7 @@
                             <div class="d-md-flex flex-wrap align-self-center justify-content-start">
                                 {% for connection in policy.connections %}
                                     <span>
-                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
+                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
                                              alt="{{ connection.linkedUser.name }}"
                                              width="50px"
                                              data-toggle="tooltip"
@@ -81,14 +81,14 @@
                             {% if scode and scode.standard %}
                                 {{ scode.policy.user }} has invited you!
                             {% else %}
-                                Already received an invite?
+                                Already received an invite or promocode?
                             {% endif %}
                         </h5>
-                        <p>Enter the unique 8-digit code below to connect.</p>
+                        <p>Enter the unique 8-digit code below.</p>
                         {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
                             <div class="custom-input-with-btn mb-4">
                                 {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
                             </div>
                         {{ form_end(scode_form) }}
                     {% endif %}
@@ -138,14 +138,14 @@
                             <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
                             {# TODO: Rework icons #}
                             <div id="onboarding_btn_share"
-                                 data-share-link="{{ policy.standardSCode.shareLink }}"
+                                 data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
                                  data-share-text="Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out:">
                             </div>
                         </div>
                         <h5 class="text-zaffre">🔗 Share this link</h5>
                         <div class="custom-input-with-btn mb-4">
-                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ policy.standardSCode.shareLink }}</div>
+                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
                             <button class="btn btn-primary btn-copy btn-square btn-sm track-data"
                                 data-clipboard-target="#scode_share"
                                 data-toggle="tooltip"

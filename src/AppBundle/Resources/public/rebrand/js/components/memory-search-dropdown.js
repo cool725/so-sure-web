@@ -39,14 +39,11 @@ $(function() {
 
             // If only one option for size auto select
             // Note: The placeholder value means a length of 2
-            if (memory.find('option').length == 2) {
-                memory.find('option:eq(1)').prop('selected', true).resizeselect();
-                button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow').addClass('animated heartBeat');
-                sizeTxt.toggleText('for exact price', 'get covered today');
-                // button.prop('disabled', 'disabled');
-            }
-
-             memory.resizeselect();
+            // if (memory.find('option').length == 2)
+            memory.find('option:eq(1)').prop('selected', true).resizeselect();
+            button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow').addClass('animated heartBeat');
+            sizeTxt.toggleText('for exact price', 'get covered today');
+            memory.resizeselect();
         }
 
         updateModels();

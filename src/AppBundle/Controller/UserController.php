@@ -9,6 +9,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -332,10 +333,36 @@ class UserController extends BaseController
                             $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                         );
                 }
+                if ($scode->isReward() && $scode->isActive()) {
+                    if ($user->hasPolicy() && count($user->getAllPolicies()) <= 1) {
+                        $start = $policy->getStart();
+                        $now = new \DateTime();
+                        $diff = $now->diff($start);
+                        if ($diff->d > 6 || ($diff->m > 0 || $diff->y > 0)) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("Sorry, this promo code %s cannot be applied", $code)
+                            );
+
+                            return new RedirectResponse(
+                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                            );
+                        }
+                    } else {
+                        $this->addFlash(
+                            'warning',
+                            sprintf("Sorry, this promo code %s cannot be applied", $code)
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
 
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                    if ($invitation) {
+                    if ($invitation && !$scode->isReward()) {
                         $message = sprintf(
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
@@ -355,18 +382,26 @@ class UserController extends BaseController
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 } catch (DuplicateInvitationException $e) {
+                    $message = sprintf("SCode %s has already been used by you", $code);
+                    if ($scode->isReward()) {
+                        $message = sprintf("Promo Code %s has already been applied", $code);
+                    }
                     $this->addFlash(
                         'warning',
-                        sprintf("SCode %s has already been used by you", $code)
+                        $message
                     );
 
                     return new RedirectResponse(
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 } catch (ConnectedInvitationException $e) {
+                    $message = sprintf("You're already connected");
+                    if ($scode->isReward()) {
+                        $message = sprintf("Promo Code %s has already been applied", $code);
+                    }
                     $this->addFlash(
                         'warning',
-                        sprintf("You're already connected")
+                        $message
                     );
 
                     return new RedirectResponse(
@@ -412,6 +447,15 @@ class UserController extends BaseController
                     $this->addFlash(
                         'warning',
                         sprintf("You or your friend has a claim.")
+                    );
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
+                } catch (CannotApplyRewardException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("Cannot apply Promo Code to policy.")
                     );
 
                     return new RedirectResponse(
@@ -1217,6 +1261,9 @@ class UserController extends BaseController
             $query = parse_url($url, PHP_URL_QUERY);
             parse_str($query, $oauth2FlowParams);
         }
+
+        // CTA From Quote Test - Purchase
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
         $smsExperiment = $this->sixpack(
             $request,
