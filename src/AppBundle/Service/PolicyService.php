@@ -956,7 +956,7 @@ class PolicyService
         if ($billingOffset) {
             $paid += $billingOffset;
         }
-        $numPaidPayments = $policy->getPremium()->getNumberOfMonthlyPayments($paid);
+        $numPaidPayments = count($policy->getPayments());
         if (!$numPaidPayments) {
             if ($paid > 0) {
                 // There were some payments applied to the policy, but amounts don't split
@@ -977,7 +977,7 @@ class PolicyService
              * If this is the initial payment and it is bacs, it should be 7 days from today
              * regardless of the billing date the customer has set.
              */
-            if ($numPaidPayments === 0 && $isBacs && $i === 1) {
+            if ($numPaidPayments < 1 && $isBacs && $i === 1) {
                 $scheduledDate = new \DateTime();
                 $scheduledDate->add(new \DateInterval('P7D'));
             } else {

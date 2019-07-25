@@ -38,9 +38,9 @@
             data-phone="{{ phone.toDetailsArray()|json_encode }}">
         <i class="far fa-pencil fa-fw"></i></button>
     {# Highlight Device #}
-    <button title="{% if phone.highlight %}Highlight Phone{% else %}Un-highlight Phone{% endif %} "
+    <button title="{% if phone.highlight %}Unset - FNOL remainder 1st month{% else %}Set - FNOL remainder 1st month{% endif %} "
             type="button"
-            class="btn btn-square btn-sm mb-2 mr-2 {% if phone.highlight %}btn-primary{% else %}btn-warning{% endif %} phone-highlight"
+            class="btn btn-square btn-sm mb-2 mr-2 {% if phone.highlight %}btn-success{% else %}btn-secondary{% endif %} phone-highlight"
             data-token="{{ csrf_token('default') }}"
             data-highlight="{{ path('admin_phone_highlight', {'id': phone.id}) }}">
         <i class="fas fa-highlighter fa-fw"></i></button>
@@ -53,7 +53,7 @@
     {# Deactivate Phone #}
     <button title="Deactive Phone"
             type="button"
-            class="btn btn-warning btn-square btn-sm mb-2 mr-2 phone-active"
+            class="btn btn-danger btn-square btn-sm mb-2 mr-2 phone-active"
             data-token="{{ csrf_token('default') }}"
             data-active="{{ path('admin_phone_active', {'id': phone.id}) }}">
         <i class="far fa-power-off fa-fw"></i></button>
