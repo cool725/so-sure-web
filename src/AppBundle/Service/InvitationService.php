@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
+use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\FacebookInvitationRepository;
@@ -526,6 +527,14 @@ class InvitationService
         }
 
         if ($scode->isReward()) {
+            if (!$this->runRewardValidation($policy, $scode)) {
+                throw new CannotApplyRewardException(
+                    sprintf(
+                        "Promo Code %s could not be applied",
+                        $scode->getCode()
+                    )
+                );
+            }
             $this->addReward($policy, $scode->getReward());
         }
 
@@ -1270,5 +1279,30 @@ class InvitationService
         $this->dm->flush();
 
         return $connection;
+    }
+
+    public function runRewardValidation(Policy $policy, SCode $scode)
+    {
+        /**
+         * TODO: make this run from the scodes validation rules
+         * for now, this will include the rules for the SOJULY19 scode only
+         */
+        if ($scode->getCode() !== "SOJULY19") {
+            return true;
+        }
+        $user = $policy->getUser();
+        if (!$user->hasPolicy()) {
+            return false;
+        }
+        if (count($user->getAllPolicies()) > 1) {
+            return false;
+        }
+        $start = $policy->getStart();
+        $now = new \DateTime();
+        $diff = $now->diff($start);
+        if ($diff->d > 6 || ($diff->m > 0 || $diff->y > 0)) {
+            return false;
+        }
+        return true;
     }
 }
