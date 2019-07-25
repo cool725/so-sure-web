@@ -462,10 +462,38 @@
     </div>
 
     {# Retail modal #}
-    <div class="modal fade modal-fullscreen" id="retail_modal" tabindex="-1" role="dialog" aria-labelledby="phone_modal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade"
+         id="retail_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="retail_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <p>Hello you mother FRICKERAS</p>
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Current Retail Price</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="retail_update_form" method="post">
+                        <div class="form-group">
+                            <label>Retail Price</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-pound-sign"></i></span></div>
+                                <input type="text" class="form-control" id="retail_price" name="price"></input>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Link to proof of price</label>
+                            <input type="text" class="form-control" id="retail_url" name="url"></input>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -189,6 +189,19 @@ $(function(){
         }
     });
 
+    // Retail Modal
+    $('#retail_modal').on('show.bs.modal', function (e) {
+        let button = $(e.relatedTarget);
+        let update = button.data('update');
+        let phone = button.data('phone');
+        let modal = $(this);
+        modal.find('#retail_update_form').attr('action', update);
+        if (phone) {
+            modal.find('#retail_price').val(phone.currentRetailPrice);
+            modal.find('#retail_url').val(phone.currentRetailPriceUrl);
+        }
+    });
+
     // Active/deactivate device
     $('.phone-active').on('click', function(e) {
         e.preventDefault();
