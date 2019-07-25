@@ -628,13 +628,13 @@ class Phone
 
     public function getCurrentRetailPrice()
     {
-        return $this->currentRetailPrice();
+        return $this->currentRetailPrice;
     }
 
     /**
      * Sets the current retail price for the phone.
-     * @param float     $price is the current retail price.
-     * @param string    $url   is the url of proof of this price.
+     * @param float  $price is the current retail price.
+     * @param string $url   is the url of proof of this price.
      */
     public function setRetailPrice($price, $url)
     {

@@ -48,6 +48,7 @@ use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
