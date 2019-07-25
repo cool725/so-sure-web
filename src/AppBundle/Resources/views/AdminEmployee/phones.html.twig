@@ -57,6 +57,16 @@
             data-token="{{ csrf_token('default') }}"
             data-active="{{ path('admin_phone_active', {'id': phone.id}) }}">
         <i class="far fa-power-off fa-fw"></i></button>
+    {# Update Retail Price #}
+    <button title="Update Retail Price"
+            type="button"
+            class="btn btn-square btn-sm mb-2 mr-2 btn-primary"
+            data-toggle="modal"
+            data-target="#retail_modal"
+            data-update="{{ path('admin_phone_retail', {'id': phone.id}) }}"
+            data-current="{{ phone.retailPrice }}">
+        <i class="far fa-crow fa-fw"></i>
+    </button>
 {% endmacro phoneActions %}
 
 {% import _self as this %}
@@ -247,7 +257,7 @@
                                           <td>-</td>
                                           <td>-</td>
                                         {% endif %}
-                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                        <td width="20%">{{ this.phoneActions(phone) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -291,7 +301,7 @@
                                         <td>{{ phone.screenResolution }}</td>
                                         <td>{{ phone.camera }} MP</td>
                                         <td>{% if phone.lte %}Yes{% else %}No{% endif %}</td>
-                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                        <td width="20%">{{ this.phoneActions(phone) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -447,6 +457,15 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {# Retail modal #}
+    <div class="modal fade modal-fullscreen" id="retail_modal" tabindex="-1" role="dialog" aria-labelledby="phone_modal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <p>Hello you mother FRICKERAS</p>
             </div>
         </div>
     </div>

@@ -635,15 +635,11 @@ class Phone
      * Sets the current retail price for the phone.
      * @param float     $price is the current retail price.
      * @param string    $url   is the url of proof of this price.
-     * @param \DateTime $date  is the date at which this is set. Since each current retail price is written over the
-     *                         top of the last, dates cannot be used to find old retail prices, but it can tell you if
-     *                         your current value is getting old and could do with updating.
      */
-    public function setRetailPrice($price, $url, \DateTime $date)
+    public function setRetailPrice($price, $url)
     {
         $this->currentRetailPrice = $price;
         $this->currentRetailPriceUrl = $url;
-        $this->currentRetailPriceDate = $date;
     }
 
     /**
@@ -653,7 +649,7 @@ class Phone
     public function getRetailPrice()
     {
         if ($this->currentRetailPrice) {
-            return $this->currentRetailPrice();
+            return $this->currentRetailPrice;
         } else {
             return $this->initialPrice;
         }
@@ -1335,7 +1331,7 @@ class Phone
         if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',
-                $price->getMonthlyPremiumPrice($from),
+                $price->getMonthlyPremiumPrice(null, $from),
                 $this->getSalvaMiniumumBinderMonthlyPremium()
             ));
         }

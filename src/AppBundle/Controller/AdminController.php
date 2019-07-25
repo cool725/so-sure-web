@@ -580,16 +580,10 @@ class AdminController extends BaseController
                 );
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-
                 return new RedirectResponse($this->generateUrl('admin_phones'));
             }
-
             $dm->flush();
-            $this->addFlash(
-                'success',
-                'Your changes were saved!'
-            );
-
+            $this->addFlash('success', 'Your changes were saved!');
             /** @var MailerService $mailer */
             $mailer = $this->get('app.mailer');
             $mailer->send(
@@ -608,7 +602,6 @@ class AdminController extends BaseController
                 'tech@so-sure.com'
             );
         }
-
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 
@@ -641,6 +634,16 @@ class AdminController extends BaseController
         }
 
         return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
+     * Receives a request to update the retail price of a phone and acitons it.
+     * @Route("/phone/{id}/retail", name="admin_phone_retail")
+     * @Method({"POST"})
+     */
+    public function phoneUpdateRetailAction(Request $request, $id)
+    {
+        // TODO: this.
     }
 
     /**
