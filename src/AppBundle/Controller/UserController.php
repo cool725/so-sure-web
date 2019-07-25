@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
@@ -41,6 +42,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
+use AppBundle\Form\Type\UserCancelType;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolDamage;
@@ -116,6 +118,7 @@ class UserController extends BaseController
 {
     use DateTrait;
     use CurrencyTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="user_home")
