@@ -977,11 +977,23 @@ class PolicyService
              * If this is the initial payment and it is bacs, it should be 7 days from today
              * regardless of the billing date the customer has set.
              */
+            $pendingPayments = $policy->getAllScheduledPayments('pending');
+            $pendingDates = [];
+            /** @var ScheduledPayment $pendingPayment */
+            foreach ($pendingPayments as $pendingPayment) {
+                $pendingDates[] = $pendingPayment->getScheduled();
+            }
             if ($numPaidPayments < 1 && $isBacs && $i === 1) {
                 $scheduledDate = new \DateTime();
+                if (in_array($scheduledDate, $pendingDates)) {
+                    continue;
+                }
                 $scheduledDate->add(new \DateInterval('P7D'));
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
+                if (in_array($scheduledDate, $pendingDates)) {
+                    continue;
+                }
                 // initial purchase should start at 1 month from initial purchase
                 $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
             }
