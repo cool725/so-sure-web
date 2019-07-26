@@ -705,7 +705,7 @@ class PolicyService
             $policy->getPolicyTerms()->getVersionNumber()
         );
 
-        $this->snappyPdf->setOption('orientation', 'Landscape');
+        $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('lowquality', false);
         $this->snappyPdf->setOption('footer-center', sprintf(
             '%s (Page [page] of [topage])',
@@ -715,9 +715,9 @@ class PolicyService
         $this->snappyPdf->setOption('footer-font-size', 8);
 
         $this->snappyPdf->setOption('page-size', 'A4');
-        $this->snappyPdf->setOption('margin-top', '0');
-        $this->snappyPdf->setOption('margin-bottom', '5');
-        $this->snappyPdf->setOption('zoom', '1.25');
+        // $this->snappyPdf->setOption('margin-top', '20mm');
+        // $this->snappyPdf->setOption('margin-bottom', '10');
+        // $this->snappyPdf->setOption('zoom', '1.25');
         //$this->snappyPdf->setOption('dpi', '300');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render($template, [
@@ -762,7 +762,7 @@ class PolicyService
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
-        $this->snappyPdf->setOption('margin-top', '0mm');
+        // $this->snappyPdf->setOption('margin-top', '20mm');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render($template, ['policy' => $policy]),
             $tmpFile

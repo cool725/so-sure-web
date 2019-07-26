@@ -6,6 +6,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\ValidatorTrait;
+use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Exception\DirectDebitBankException;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\BacsService;
@@ -1109,6 +1110,12 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVITATION_POLICY_HAS_CLAIM,
                     'User has previously claimed',
+                    422
+                );
+            } catch (CannotApplyRewardException $e) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_PROMO_NOT_APPLIED,
+                    'Cannot apply this reward to this policy',
                     422
                 );
             } catch (NotFoundHttpException $e) {
