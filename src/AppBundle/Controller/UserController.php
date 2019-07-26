@@ -2075,7 +2075,7 @@ class UserController extends BaseController
 
     /**
      * @Route("/cancel/{id}", name="purchase_cancel")
-     * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
+     * @Route("/cancel/damaged/{id}", name="user_cancel_damaged")
      * @Template
      */
     public function cancelAction(Request $request, $id)
@@ -2183,7 +2183,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
+     * @Route("/cancel/{id}/requested", name="user_cancel_requested")
      * @Template
      */
     public function cancelRequestedAction($id)

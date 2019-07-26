@@ -1282,6 +1282,31 @@ class PurchaseController extends BaseController
     }
 
     /**
+     * Deprecated route redirecting to authenticated version under user controller.
+     * @Route("/cancel/{id}", name="purchase_cancel")
+     * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
+     */
+    public function cancelAction(Request $request, $id)
+    {
+        $route = $request->getRoute();
+        if ($route == 'purchase_cancel') {
+            return $this->redirectToRoute('user_cancel');
+        } elseif ($route == 'purchase_cancel_damaged') {
+            return $this->redirectToRoute('user_cancel_damaged');
+        }
+        throw new \Exception("non route");
+    }
+
+    /**
+     * Deprecated route, but still in old emails.
+     * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
+     */
+    public function cancelRequestedAction($id)
+    {
+        return $this->redirectToRoute('user_cancel_requested');
+    }
+
+    /**
      * @Route("/checkout/{id}", name="purchase_checkout")
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
