@@ -4,11 +4,15 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Stats;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Document\Note\StandardNote;
+use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -40,6 +44,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
+use AppBundle\Form\Type\UserCancelType;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolDamage;
@@ -115,6 +120,7 @@ class UserController extends BaseController
 {
     use DateTrait;
     use CurrencyTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="user_home")
@@ -332,10 +338,36 @@ class UserController extends BaseController
                             $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                         );
                 }
+                if ($scode->isReward() && $scode->isActive()) {
+                    if ($user->hasPolicy() && count($user->getAllPolicies()) <= 1) {
+                        $start = $policy->getStart();
+                        $now = new \DateTime();
+                        $diff = $now->diff($start);
+                        if ($diff->d > 6 || ($diff->m > 0 || $diff->y > 0)) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("Sorry, this promo code %s cannot be applied", $code)
+                            );
+
+                            return new RedirectResponse(
+                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                            );
+                        }
+                    } else {
+                        $this->addFlash(
+                            'warning',
+                            sprintf("Sorry, this promo code %s cannot be applied", $code)
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
 
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                    if ($invitation) {
+                    if ($invitation && !$scode->isReward()) {
                         $message = sprintf(
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
@@ -355,18 +387,26 @@ class UserController extends BaseController
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 } catch (DuplicateInvitationException $e) {
+                    $message = sprintf("SCode %s has already been used by you", $code);
+                    if ($scode->isReward()) {
+                        $message = sprintf("Promo Code %s has already been applied", $code);
+                    }
                     $this->addFlash(
                         'warning',
-                        sprintf("SCode %s has already been used by you", $code)
+                        $message
                     );
 
                     return new RedirectResponse(
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 } catch (ConnectedInvitationException $e) {
+                    $message = sprintf("You're already connected");
+                    if ($scode->isReward()) {
+                        $message = sprintf("Promo Code %s has already been applied", $code);
+                    }
                     $this->addFlash(
                         'warning',
-                        sprintf("You're already connected")
+                        $message
                     );
 
                     return new RedirectResponse(
@@ -412,6 +452,15 @@ class UserController extends BaseController
                     $this->addFlash(
                         'warning',
                         sprintf("You or your friend has a claim.")
+                    );
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
+                } catch (CannotApplyRewardException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("Cannot apply Promo Code to policy.")
                     );
 
                     return new RedirectResponse(
@@ -1218,6 +1267,9 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
+        // CTA From Quote Test - Purchase
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
+
         $smsExperiment = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_APP_LINK_SMS,
@@ -2018,6 +2070,134 @@ class UserController extends BaseController
             'amount' => $amount,
             'policy' => $policy,
             'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
+        ];
+    }
+
+    /**
+     * @Route("/cancel/{id}", name="user_cancel")
+     * @Route("/cancel/damaged/{id}", name="user_cancel_damaged")
+     * @Template
+     */
+    public function cancelAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        if (!$policy->hasViewedCancellationPage()) {
+            $policy->setViewedCancellationPage(\DateTime::createFromFormat('U', time()));
+            $dm->flush();
+        }
+        $cancelForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_form', UserCancelType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cancel_form')) {
+                $cancelForm->handleRequest($request);
+                if ($cancelForm->isValid()) {
+                    $reason = $cancelForm->getData()['reason'];
+                    $other = $this->conformAlphanumericSpaceDot($cancelForm->getData()['othertxt'], 256);
+                    $flash = null;
+                    $canCancelCooloff = $policy->canCancel(Policy::CANCELLED_COOLOFF, null, false, false);
+                    if ($canCancelCooloff) {
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
+                        $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
+                        $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
+                        $note = new StandardNote();
+                        $note->setDate(new \DateTime());
+                        $note->setUser($policy->getUser());
+                        $note->setNotes("Policy auto cancelled in cooloff.");
+                        $policy->addNotesList($note);
+                        $dm->flush();
+                        $flash = "You should receive an email confirming that your policy is now cancelled.";
+                        $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
+                    } elseif (!$policy->hasRequestedCancellation()) {
+                        // @codingStandardsIgnoreStart
+                        $flash = "We have passed your request to our policy team. You should receive a cancellation ".
+                           "email once that is processed.";
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a ".
+                            "cancellation via the site. %s was given as the reason. so-sure support team: Please ".
+                            "contact the policy holder to get their reason(s) for cancelling before action. ".
+                            "Additional comments: %s";
+                        // @codingStandardsIgnoreEnd
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
+                        $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
+                        $dm->flush();
+                        $intercom = $this->get('app.intercom');
+                        $intercom->queueMessage(
+                            $policy->getUser()->getEmail(),
+                            sprintf(
+                                $message,
+                                $this->generateUrl(
+                                    'admin_policy',
+                                    ['id' => $policy->getId()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                                $policy->getPolicyNumber(),
+                                $policy->getId(),
+                                $reason,
+                                $other
+                            )
+                        );
+                    } else {
+                        $this->addFlash(
+                            "warning",
+                            "Cancellation has already been requested and is currently processing."
+                        );
+                    }
+                    if ($flash) {
+                        $this->addFlash("success", $flash);
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
+                            [
+                                'Policy Id' => $policy->getId(),
+                                'Reason' => $reason,
+                                'Auto Approved' => $canCancelCooloff
+                            ]
+                        );
+                    }
+                    return $this->redirectToRoute('user_cancel_requested', ['id' => $id]);
+                }
+            }
+        } else {
+            $this->get('app.mixpanel')->queueTrack(
+                MixpanelService::EVENT_CANCEL_POLICY_PAGE,
+                ['Policy Id' => $policy->getId()]
+            );
+        }
+        if ($request->get('_route') == "user_cancel_damaged") {
+            $template = 'AppBundle:User:cancelDamaged.html.twig';
+        } else {
+            $template = 'AppBundle:User:cancel.html.twig';
+        }
+        $data = ['policy' => $policy, 'cancel_form' => $cancelForm->createView()];
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/cancel/{id}/requested", name="user_cancel_requested")
+     * @Template
+     */
+    public function cancelRequestedAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        return [
+            'policy' => $policy,
         ];
     }
 

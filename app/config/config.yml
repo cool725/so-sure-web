@@ -484,6 +484,9 @@ nelmio_security:
                 - https://gum.criteo.com
                 - https://dis.eu.criteo.com
                 - https://static.criteo.net
+                - https://smct.co
+                - http://smct.co
+                - https://cdn.smct.co
                 - 'data:'
             connect-src:
                 - 'self'
@@ -536,6 +539,8 @@ nelmio_security:
                 - https://angel.co
                 - https://www.bing.com
                 - https://tr.snapchat.com
+                - https://smct.co
+                - http://smct.co
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -781,6 +786,8 @@ nelmio_security:
                 - https://gum.criteo.com
                 - https://dis.eu.criteo.com
                 - https://static.criteo.net
+                - https://smct.co
+                - http://smct.co
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -859,6 +866,9 @@ nelmio_security:
                 - https://outbrain.com
                 - https://*.outbrain.com
                 - https://amplify.outbrain.com
+                - https://smct.co
+                - http://smct.co
+                - https://cdn.smct.co
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1136,6 +1146,9 @@ nelmio_security:
                 - https://outbrain.com
                 - https://*.outbrain.com
                 - https://adserver.adtech.de
+                - https://smct.co
+                - http://smct.co
+                - https://cdn.smct.co
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

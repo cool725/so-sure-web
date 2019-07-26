@@ -25,7 +25,7 @@ abstract class Opt
 
     const OPTIN_CAT_MARKETING = 'marketing';
 
-    const OPT_LOCATION_PREFERNCES = 'preferences';
+    const OPT_LOCATION_PREFERENCES = 'preferences';
     const OPT_LOCATION_ADMIN = 'admin';
     const OPT_LOCATION_INTERCOM = 'intercom';
     const OPT_LOCATION_POS = 'pos';
@@ -146,6 +146,29 @@ abstract class Opt
             $this->setUpdated(\DateTime::createFromFormat('U', time()));
         }
     }
+
+    /**
+     * Tells you if the opt has a given category set.
+     * @param string $category is the category to look for.
+     */
+    public function hasCategory($category)
+    {
+        return in_array($category, $this->categories);
+    }
+    
+    /**
+     * Removes a category if it is there, or just does nothing.
+     * @param string $category is the category to remove.
+     */
+    public function removeCategory($category)
+    {
+        $index = array_search($category, $this->categories);
+        if ($index !== false) {
+            array_splice($this->categories, $index, 1);
+            $this->setUpdated(new \DateTime());
+        }
+    }
+            
 
     public function getNotes()
     {

@@ -7,6 +7,10 @@
 {# Set vars #}
 {% set body_class = 'quote' %}
 {% set quote_mode = true %}
+{% set cta_txt = 'Get Started' %}
+{% if cta_exp == 'cta-yes-please' %}
+    {% set cta_txt = 'Yes Please!' %}
+{% endif %}
 
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - Welcome to Social Insurance{% endblock %}
 {% block meta %}
@@ -71,9 +75,7 @@
                     </div>
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
-                            'label': 'Get Started',
-                            'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                            'right': true,
+                            'label': cta_txt,
                             'attr': {
                                 'class': 'btn btn-success btn-green-gradient btn-block-xs mr-sm-2'
                         }}) }}
@@ -99,9 +101,7 @@
                             </div>
                             {{ form_start(buy_form_banner_two) }}
                                 {{ form_widget(buy_form_banner_two.buy, {
-                                    'label': 'Get Started',
-                                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                                    'right': true,
+                                    'label': cta_txt,
                                     'attr': {
                                         'class': 'btn btn-success btn-green-gradient btn-block-xs mt-4 mt-lg-0'
                                 }}) }}
@@ -208,9 +208,7 @@
                     <div class="mt-5 d-none d-lg-block">
                         {{ form_start(buy_form_banner_three) }}
                             {{ form_widget(buy_form_banner_three.buy, {
-                                'label': 'Get Started',
-                                'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                                'right': true,
+                                'label': cta_txt,
                                 'attr': {
                                     'class': 'btn btn-success btn-green-gradient btn-block-xs mt-4 mt-lg-0'
                             }}) }}
@@ -244,8 +242,6 @@
             {{ form_start(buy_form_banner_four) }}
                 {{ form_widget(buy_form_banner_four.buy, {
                     'label': 'Insure your ' ~ phone.make ~ ' phone',
-                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                    'right': true,
                     'attr': {
                         'class': 'btn btn-success btn-green-gradient'
                 }}) }}
