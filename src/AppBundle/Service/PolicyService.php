@@ -985,13 +985,13 @@ class PolicyService
             }
             if ($numPaidPayments < 1 && $isBacs && $i === 1) {
                 $scheduledDate = new \DateTime();
-                if (in_array($scheduledDate->format('ymd'), $pendingDates)) {
+                if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
                 }
                 $scheduledDate->add(new \DateInterval('P7D'));
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
-                if (in_array($scheduledDate, $pendingDates)) {
+                if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
                 }
                 // initial purchase should start at 1 month from initial purchase
