@@ -2074,7 +2074,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/cancel/{id}", name="purchase_cancel")
+     * @Route("/cancel/{id}", name="user_cancel")
      * @Route("/cancel/damaged/{id}", name="user_cancel_damaged")
      * @Template
      */
@@ -2086,6 +2086,7 @@ class UserController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Unable to see policy');
         }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         if (!$policy->hasViewedCancellationPage()) {
             $policy->setViewedCancellationPage(\DateTime::createFromFormat('U', time()));
             $dm->flush();
@@ -2164,7 +2165,7 @@ class UserController extends BaseController
                             ]
                         );
                     }
-                    return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
+                    return $this->redirectToRoute('user_cancel_requested', ['id' => $id]);
                 }
             }
         } else {
@@ -2173,10 +2174,10 @@ class UserController extends BaseController
                 ['Policy Id' => $policy->getId()]
             );
         }
-        if ($request->get('_route') == "purchase_cancel_damaged") {
-            $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
+        if ($request->get('_route') == "user_cancel_damaged") {
+            $template = 'AppBundle:User:cancelDamaged.html.twig';
         } else {
-            $template = 'AppBundle:Purchase:cancel.html.twig';
+            $template = 'AppBundle:User:cancel.html.twig';
         }
         $data = ['policy' => $policy, 'cancel_form' => $cancelForm->createView()];
         return $this->render($template, $data);
@@ -2194,6 +2195,7 @@ class UserController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Unable to see policy');
         }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         return [
             'policy' => $policy,
         ];

@@ -1288,11 +1288,11 @@ class PurchaseController extends BaseController
      */
     public function cancelAction(Request $request, $id)
     {
-        $route = $request->getRoute();
+        $route = $request->get('_route');
         if ($route == 'purchase_cancel') {
-            return $this->redirectToRoute('user_cancel');
+            return $this->redirectToRoute('user_cancel', ['id' => $id]);
         } elseif ($route == 'purchase_cancel_damaged') {
-            return $this->redirectToRoute('user_cancel_damaged');
+            return $this->redirectToRoute('user_cancel_damaged', ['id' => $id]);
         }
         throw new \Exception("non route");
     }
@@ -1303,7 +1303,7 @@ class PurchaseController extends BaseController
      */
     public function cancelRequestedAction($id)
     {
-        return $this->redirectToRoute('user_cancel_requested');
+        return $this->redirectToRoute('user_cancel_requested', ['id' => $id]);
     }
 
     /**
