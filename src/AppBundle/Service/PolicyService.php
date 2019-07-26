@@ -981,11 +981,11 @@ class PolicyService
             $pendingDates = [];
             /** @var ScheduledPayment $pendingPayment */
             foreach ($pendingPayments as $pendingPayment) {
-                $pendingDates[] = $pendingPayment->getScheduled();
+                $pendingDates[] = $pendingPayment->getScheduled()->format('Ymd');
             }
             if ($numPaidPayments < 1 && $isBacs && $i === 1) {
                 $scheduledDate = new \DateTime();
-                if (in_array($scheduledDate, $pendingDates)) {
+                if (in_array($scheduledDate->format('ymd'), $pendingDates)) {
                     continue;
                 }
                 $scheduledDate->add(new \DateInterval('P7D'));
