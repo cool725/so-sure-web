@@ -3398,7 +3398,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $dm->flush();
             $mailer = $this->get('app.mailer');
             $mailer->sendTemplateToUser(
-                'pic-sure is successfully validated',
+                'Phone validation successful ✅',
                 $policy->getUser(),
                 'AppBundle:Email:picsure/accepted.html.twig',
                 ['policy' => $policy],
@@ -3410,7 +3410,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Your pic-sure image has been approved and your phone is now validated.'
+                    'Your phone is now successfully validated.'
                 ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
@@ -3433,7 +3433,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $dm->flush();
             $mailer = $this->get('app.mailer');
             $mailer->sendTemplateToUser(
-                'pic-sure failed to validate your phone',
+                'Phone validation failed ❌',
                 $policy->getUser(),
                 'AppBundle:Email:picsure/rejected.html.twig',
                 ['policy' => $policy],
@@ -3457,7 +3457,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Your pic-sure image has been rejected. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
+                    'Your phone did not pass validation. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
                 ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
@@ -3480,7 +3480,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $dm->flush();
             $mailer = $this->get('app.mailer');
             $mailer->sendTemplateToUser(
-                'Sorry, we need another pic-sure',
+                'Sorry, please attempt to validate again ⚠️',
                 $policy->getUser(),
                 'AppBundle:Email:picsure/invalid.html.twig',
                 ['policy' => $policy, 'additional_message' => $request->get('message')],
@@ -3491,7 +3491,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Sorry, but we were not able to see your phone clearly enough to determine if the phone is undamaged. Please try uploading your pic-sure photo again making sure that the phone is clearly visible in the photo.'
+                    'Sorry, your phone validation was not successful: %s',
+                    $request->get('message')
                 ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {

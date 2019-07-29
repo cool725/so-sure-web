@@ -9,23 +9,16 @@
 
     <div class="form-step">
 
-        <div class="form-group {% if form_errors(purchase_form.firstName) or form_errors(purchase_form.lastName) or form_errors(purchase_form.name) %}has-error{% endif %}">
-            {# TODO: Add icon trigger to label? #}
-            {{ form_label(purchase_form.name, 'Policy Holder\'s Full Name', { 'label_attr': {'class': 'sr-only'} }) }}
-            <label for="">
-                Policy Holder's Full Name:
-                <span class="ml-2 text-dodger-blue">
-                    <a href="#"
-                       data-toggle="modal"
-                       data-target="#policy_name"
-                       data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
-                       role="button">
-                        <i class="fal fa-info-circle"></i>
-                    </a>
-                </span>
-            </label>
-            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Enter full name', 'data-hj-suppress' : ''}}) }}
-            <div class="with-errors">{{ form_errors(purchase_form.name) }}</div>
+        <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
+            {{ form_label(purchase_form.firstName, 'First Name', { 'label_attr': {'class': ''} }) }}
+            {{ form_widget(purchase_form.firstName, {'attr':{'class':'form-control', 'placeholder': 'Enter your first name', 'data-hj-suppress' : ''}}) }}
+            <div class="with-errors">{{ form_errors(purchase_form.firstName) }}</div>
+        </div>
+
+        <div class="form-group {% if form_errors(purchase_form.lastName) %}has-error{% endif %}">
+            {{ form_label(purchase_form.lastName, 'Last Name', { 'label_attr': {'class': ''} }) }}
+            {{ form_widget(purchase_form.lastName, {'attr':{'class':'form-control', 'placeholder': 'Enter your last name', 'data-hj-suppress' : ''}}) }}
+            <div class="with-errors">{{ form_errors(purchase_form.lastName) }}</div>
         </div>
 
         <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">

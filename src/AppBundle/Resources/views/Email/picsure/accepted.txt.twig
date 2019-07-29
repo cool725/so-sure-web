@@ -1,15 +1,39 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Phone validation successful ✅
 
-**
-------------------------------------------------------------
-Your {{ policy.phone }} is now successfully validated
+Congratulations {{ policy.user.firstName }},
+
+Your {{ policy.phone }} is now successfully validated and your excess has dropped by a whopping &pound;100!
+
+😎 How cool is that?
 
 Your excess for policy {{ policy.policyNumber }} is now:
-• Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
-• Breakdown: £{{ policy.premium.picSureExcess.warranty }}
-• Theft: £{{ policy.premium.picSureExcess.theft }}
-• Loss: £{{ policy.premium.picSureExcess.loss }}
 
-{% endblock body %}
+- Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
+
+- Breakdown: £{{ policy.premium.picSureExcess.warranty }}
+
+- Theft: £{{ policy.premium.picSureExcess.theft }}
+
+- Loss: £{{ policy.premium.picSureExcess.loss }}
+
+😀 Share the love and earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback if you don't claim.
+
+Head to your dashboard to share now: {{ url('user_home', {'id': policy.id }) }}
+
+Have a question or issue? Contact us: {{ contact_us_url }}
+
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
