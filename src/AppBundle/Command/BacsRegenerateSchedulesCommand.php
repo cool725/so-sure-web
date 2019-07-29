@@ -107,7 +107,9 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
         foreach ($policies as $policy) {
             $billing = $policy->getBilling();
             if ($billing) {
-                $dateToUse = $billing;
+                $yearMonth = $dateToUse->format('m-Y');
+                $day = $billing->format('d-');
+                $dateToUse = new \DateTime($day . $yearMonth);
             }
             if ($dryRun) {
                 $output->writeln(sprintf(
@@ -198,7 +200,7 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
                 $count++;
             }
             $fullFormat = $scheduledPayment->getScheduled()->format('dmY');
-            if ($fullFormat === '30072019') {
+            if ($fullFormat === '31072019') {
                 $toDelete = $scheduledPayment;
             }
         }
@@ -239,7 +241,7 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
         } elseif ($count > 1) {
             $output->writeln(
                 sprintf(
-                    "Policy %s has %u payments in July, but one is not the 30th. Manual check required.",
+                    "Policy %s has %u payments in July, but one is not the 30th/31st. Manual check required.",
                     $policy->getId(),
                     $count
                 )
