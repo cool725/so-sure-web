@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
@@ -45,6 +46,8 @@ class ClaimFnolConfirmType extends AbstractType
             ->add('type', HiddenType::class, ['required' => true])
             ->add('network', HiddenType::class, ['required' => true])
             ->add('message', HiddenType::class, ['required' => true])
+            ->add('checkTruthful', CheckboxType::class, ['required' => true])
+            ->add('checkPermanent', CheckboxType::class, ['required' => true])
             ->add('submit', SubmitType::class)
         ;
 

@@ -3,9 +3,11 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Claim;
+use AppBundle\Document\Phone;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Tests\UserClassTrait;

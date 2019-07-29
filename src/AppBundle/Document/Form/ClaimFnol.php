@@ -84,6 +84,19 @@ class ClaimFnol
      */
     protected $where;
 
+    /**
+     * Represents that the user has ticked the box confirming they are telling the truth.
+     * @Assert\Type("bool")
+     */
+    protected $checkTruthful;
+
+    /**
+     * Represents that the user has ticked the box confirming they know after submitting the FNOL the information can
+     * not be changed.
+     * @Assert\Type("bool")
+     */
+    protected $checkPermanent;
+
     public function getEmail()
     {
         return $this->email;
@@ -221,6 +234,42 @@ class ClaimFnol
     public function setWhere($where)
     {
         $this->where = $where;
+    }
+
+    /**
+     * Gets the value of the truthful check box.
+     * @return boolean|null the value of checkTruthful in the fnol. Will only be null if it has not been set.
+     */
+    public function getCheckTruthful()
+    {
+        return $this->checkTruthful;
+    }
+
+    /**
+     * Sets the value of the fnol's truthful check box.
+     * @param boolean $checkTruthful is the value of the truthful check.
+     */
+    public function setCheckTruthful($checkTruthful)
+    {
+        $this->checkTruthful = $checkTruthful;
+    }
+
+    /**
+     * Gets the value of the fnol's awareness of permanence check box.
+     * @return boolean|null the value of checkPermanent in the fnol. Will only be null if it has not been set.
+     */
+    public function getCheckPermanent()
+    {
+        return $this->checkPermanent;
+    }
+
+    /**
+     * Sets the value of the fnol's permanent check box.
+     * @param boolean $checkPermanent is the value of the truthful check.
+     */
+    public function setCheckPermanent($checkPermanent)
+    {
+        $this->checkPermanent = $checkPermanent;
     }
 
     public function getTypeString()

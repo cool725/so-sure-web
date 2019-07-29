@@ -1544,13 +1544,12 @@ class UserController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
-
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
-
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             throw $this->createNotFoundException('No active policy found');
         }
-
+        // If the user has an open claim on all of their policies then they can't make a claim right now so send them to
+        // one of their open claims.
         if (count($user->getValidPoliciesWithoutOpenedClaim(true)) == 0) {
             $policies = $user->getValidPolicies();
             foreach ($policies as $policy) {
@@ -1564,89 +1563,136 @@ class UserController extends BaseController
             }
             throw $this->createNotFoundException('No active claimable policy found');
         }
-
+        // check if there is a cached fnol object for this user.
+        $dm = $this->getManager();
+        /** @var ClaimsService $claimsService */
+        $claimsService = $this->get("app.claims");
+        /** @var PolicyRepository $policyRepository */
+        $policyRepo = $dm->getRepository(Policy::class);
         $policy = null;
-        $claimFnol = new ClaimFnol();
-        $claimFnolConfirm = new ClaimFnol();
-
-        $claimFnol->setUser($user);
-
+        $fnol = $claimsService->findCachedFnol($user);
+        $cachedFnol = true;
+        if (!$fnol) {
+            $cachedFnol = false;
+            $fnol = new ClaimFnol();
+            $fnol->setUser($user);
+        } else {
+            $policy = $policyRepo->find($fnol->getPolicyNumber());
+        }
+        $fnolConfirm = clone $fnol;
         $claimForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
+            ->createNamedBuilder('claim_form', ClaimFnolType::class, $fnol)
             ->getForm();
         $claimConfirmForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
+            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $fnolConfirm)
             ->getForm();
-
+        // Process forms if they have been submitted.
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
-                    $dm = $this->getManager();
-                    $policyRepo = $dm->getRepository(Policy::class);
-                    /** @var Policy $policy */
-                    $policy = $policyRepo->find($claimFnol->getPolicyNumber());
+                    /** @var PhonePolicy $policy */
+                    $policy = $policyRepo->find($fnol->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-                    if (in_array($claimFnol->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
+                    if (in_array($fnol->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
                         !$policy->isAdditionalClaimLostTheftApprovedAllowed()) {
                         // @codingStandardsIgnoreStart
                         $this->addFlash(
                             'error',
-                            'Sorry, but we are unable to accept an additional claim on your policy for loss or theft as you already have had 2 successful claims'
+                            'Sorry, but we are unable to accept an additional claim on your policy for loss or theft '.
+                            'as you already have had 2 successful claims'
                         );
                         // @codingStandardsIgnoreEnd
                     } else {
-                        $claimFnolConfirm = clone $claimFnol;
-                        $claimConfirmForm = $this->get('form.factory')
-                            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
-                            ->getForm();
+                        // create and cache fnol object, then see where we need to go next.
+                        $claimsService->cacheFnol($fnol);
+                        if ($policy->fullPremiumToBePaidForClaim(new \DateTime(), $fnol->getType())) {
+                            // if the full premium is required then we send them to the payent page.
+                            return $this->redirectToRoute('user_claim_pay', ["policyId" => $policy->getId()]);
+                        } else {
+                            // if the full premium is not required then we run the request again with the fnol cached.
+                            $cachedFnol = true;
+                            $fnolConfirm = $claimsService->findCachedFnol($policy->getUser());
+                            $claimConfirmForm = $this->get('form.factory')
+                                ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $fnolConfirm)
+                                ->getForm();
+                        }
                     }
                 }
             } elseif ($request->request->has('claim_confirm_form')) {
                 $claimConfirmForm->handleRequest($request);
                 if ($claimConfirmForm->isValid()) {
-                    $dm = $this->getManager();
-                    $policyRepo = $dm->getRepository(Policy::class);
-                    $policy = $policyRepo->find($claimFnolConfirm->getPolicyNumber());
+                    /** @var PhonePolicy $policy */
+                    $policy = $policyRepo->find($fnol->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
+                    $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
                     $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-                    /** @var ClaimsService $claimsService */
-                    $claimsService = $this->get('app.claims');
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
                     $claim->setPolicy($policy);
                     $policy->addClaim($claim);
                     $claimsService->notifyFnolSubmission($claim);
                     $dm->flush();
-
+                    $claimsService->uncacheFnol($user);
                     return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
-
-        /** @var PhonePolicy $phonePolicy */
-        $phonePolicy = $policy;
-        $data = [
-            'username' => $user->getName(),
-            'phone' => $phonePolicy ? sprintf(
-                "%s %s (IMEI %s)",
-                $phonePolicy->getPhone()->getMake(),
-                $phonePolicy->getPhone()->getModel(),
-                $phonePolicy->getImei()
-            ) : '',
-            'claim_type' => $claimFnol->getTypeString(),
-            'policy_date' => $policy ? $policy->getStart() : '',
-            'claim_form' => $claimForm->createView(),
-            'claim_confirm_form' => $claimConfirmForm->createView(),
-            'current' => empty($claimFnolConfirm->getEmail()) ? 'claim' : 'claim-confirm',
-        ];
-
+        // Render one of the two tabs.
+        $data = [];
+        if ($cachedFnol) {
+            if ($policy->fullPremiumToBePaidForClaim(new \DateTime(), $fnol->getType())) {
+                return $this->redirectToRoute('user_claim_pay', ['policyId' => $policy->getId()]);
+            }
+            $phoneRecord = $policy->getPhone();
+            $phone = sprintf("%s %s (IMEI %s)", $phoneRecord->getMake(), $phoneRecord->getModel(), $policy->getImei());
+            $data = [
+                'current' => 'claim-confirm',
+                'username' => $user->getName(),
+                'phone' => $phone,
+                'claim_type' => $fnol->getTypeString(),
+                'policy_date' => $policy->getStart(),
+                'claim_form' => $claimForm->createView(),
+                'claim_confirm_form' => $claimConfirmForm->createView(),
+                'warn_pay' => $policy->fullPremiumToBePaidForClaim(new \DateTime(), Claim::TYPE_THEFT)
+            ];
+        } else {
+            $data = [
+                'current' => 'claim',
+                'username' => $user->getName(),
+                'claim_form' => $claimForm->createView(),
+                'warn_pay' => $user->hasPolicyForFullPaymentClaim(new \DateTime())
+            ];
+        }
         return $this->render('AppBundle:User:claim.html.twig', $data);
+    }
+
+    /**
+     * @Route("/claim-pay/{policyId}", name="user_claim_pay")
+     * @Template
+     */
+    public function claimPayAction($policyId)
+    {
+        $policyRepo = $this->getManager()->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unknown policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        $amount = $policy->getRemainderOfPolicyPrice();
+        if ($amount <= 0) {
+            return $this->redirectToRoute("user_claim");
+        }
+        return [
+            'phone' => $policy->getPhone(),
+            'amount' => $amount,
+            'policy' => $policy,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
+        ];
     }
 
     /**
@@ -1751,7 +1797,8 @@ class UserController extends BaseController
                 // @codingStandardsIgnoreStart
                 $this->addFlash(
                     'warning-raw',
-                    'This appears to be an older claim that was never resolved. Please contact <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
+                    'This appears to be an older claim that was never resolved. Please contact '.
+                    '<a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
                 );
                 // @codingStandardsIgnoreEnd
             }
@@ -2069,7 +2116,7 @@ class UserController extends BaseController
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,
             'policy' => $policy,
-            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
         ];
     }
 

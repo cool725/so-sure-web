@@ -1193,6 +1193,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return count($this->getPartialPolicies()) > 0;
     }
 
+    /**
+     * Tells you if any of this user's policies would be required to pay up their yearly premium if they were to try
+     * and make a theft / loss claim at the given date.
+     * @param \DateTime $date is the date we are checking on.
+     * @return boolean true if it has a policy that would have to pay, and false if not.
+     */
+    public function hasPolicyForFullPaymentClaim(\DateTime $date)
+    {
+        foreach ($this->policies as $policy) {
+            if ($policy->fullPremiumToBePaidForClaim($date, Claim::TYPE_THEFT)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getPartialPolicies()
     {
         $policies = [];
