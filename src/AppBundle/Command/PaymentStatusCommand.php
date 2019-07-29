@@ -44,20 +44,22 @@ class PaymentStatusCommand extends ContainerAwareCommand
             while (($row = fgetcsv($handle, 1000)) !== false) {
                 if (!$header) {
                     $header = $row;
-                    $output->writeln('policyId, amountOwed, paymentStatus');
+                    $output->writeln('policyId, amountOwed, amountScheduled, paymentStatus');
                 } else {
                     $line = array_combine($header, $row);
                     $policy = $policyRepository->findOneBy(['_id' => $line['id']]);
                     if (!$policy) {
                         $output->writeln(sprintf(
-                            '%s, %s, %s',
+                            '%s, %s, %s, %s',
                             $line['id'],
+                            0,
                             0,
                             'not found'
                         ));
                         continue;
                     }
                     $owed = $policy->getOutstandingPremiumToDate(null, true);
+                    $scheduled = $policy->getOutstandingScheduledPaymentsAmount();
                     $owedString = '';
                     if ($owed > 0) {
                         $owedString = 'underpaid';
@@ -67,9 +69,10 @@ class PaymentStatusCommand extends ContainerAwareCommand
                         $owedString = 'paid';
                     }
                     $output->writeln(sprintf(
-                        '%s, %s, %s',
+                        '%s, %s, %s, %s',
                         $policy->getId(),
                         $owed,
+                        $scheduled,
                         $owedString
                     ));
                 }
