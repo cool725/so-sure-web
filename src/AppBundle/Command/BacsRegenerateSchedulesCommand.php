@@ -107,7 +107,9 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
         foreach ($policies as $policy) {
             $billing = $policy->getBilling();
             if ($billing) {
-                $dateToUse = $billing;
+                $yearMonth = $dateToUse->format('m-Y');
+                $day = $billing->format('d-');
+                $dateToUse = new \DateTime($day . $yearMonth);
             }
             if ($dryRun) {
                 $output->writeln(sprintf(
