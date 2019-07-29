@@ -19,6 +19,14 @@ class SCode
     const TYPE_AFFILIATE = 'affiliate';
     const TYPE_REWARD = 'reward';
 
+    const RULE_AQUISITION = 'aquisition';
+    const RULE_PREVIOUSLY_LOST = 'previously-lost';
+
+    const RULES = [
+        self::RULE_AQUISITION,
+        self::RULE_PREVIOUSLY_LOST
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -65,6 +73,15 @@ class SCode
      * @Gedmo\Versioned
      */
     protected $reward;
+
+    /**
+     * If this is a reward scode, this field represents the type of rules that this scode has in which users it will
+     * allow to claim it.
+     * @Assert\Choice(RULES, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $rule;
 
     /**
      * @Assert\Type("bool")
@@ -245,6 +262,24 @@ class SCode
         $this->reward = $reward;
     }
 
+    /**
+     * Gives you the scode's reward rule.
+     * @return string the scode's reward rule.
+     */
+    public function getRule()
+    {
+        return $this->rule;
+    }
+
+    /**
+     * Sets the scode's reward rule.
+     * @param string $rule is the rule to set it to.
+     */
+    public function setRule($rule)
+    {
+        $this->rule = $rule;
+    }
+
     public function isActive()
     {
         return $this->active;
@@ -301,6 +336,40 @@ class SCode
     {
         return $this->getType() == self::TYPE_MULTIPAY;
     }
+
+    /**
+     * Tells us if this scode can be applied as a reward code to the given user.
+     * Takes into account the scode's application rules value to set what business logic to apply.
+     * @param User $user is the user to which we are checking if we can apply it.
+     * @return boolean true if we can apply it and false if not.
+     * @throws \Exception if the scode is a reward but does not have a rule.
+     */
+    public function canApplyReward(User $user)
+    {
+        if ($this->type != self::TYPE_REWARD || !$this->active) {
+            return false;
+        }
+        if ($this->rule == self::RULE_AQUISITION) {
+            if (count($user->getAllPolicies()) == 1) {
+                $policy =
+            }
+            return false;
+        } elseif ($this->rule == self::RULE_PREVIOUSLY_LOST) {
+            // TODO: business logic.
+        } elseif (!$this->rule) {
+            throw new \Exception(sprintf(
+                "Scode '%s' has attempted to be applied, but does not have an application rule.",
+                $this->getCode()
+            ));
+        } else {
+            throw new \Exception(sprintf(
+                "Scode '%s' has attempted to be applied, but has unknown application rule '%s'",
+                $this->getCode(),
+                $this->rule
+            ));
+        }
+    }
+
 
     public function toApiArray()
     {
