@@ -73,7 +73,7 @@ class PaymentStatusCommand extends ContainerAwareCommand
                         ));
                         continue;
                     }
-                    $owed = $policy->getOutstandingPremiumToDate(null, true);
+                    $owed = $policy->getOutstandingPremiumToDate(null, true) - $policy->getPendingBacsPaymentsTotal();
                     $scheduled = $policy->getOutstandingScheduledPaymentsAmount();
                     $owedString = '';
                     if ($owed > 0) {
