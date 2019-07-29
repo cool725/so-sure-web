@@ -265,8 +265,6 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
-
-
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,

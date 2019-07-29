@@ -38,13 +38,11 @@ class PurchaseStepPersonalAddress
      */
     protected $lastName;
 
-    /**
-     * @var string
-     * @AppAssert\FullName()
-     * @Assert\Length(min="1", max="100")
-     * @Assert\NotBlank(message="This value is required.")
-     */
-    protected $name;
+    // *
+    //  * @var string
+    //  * @AppAssert\FullName()
+
+    // protected $name;
 
     /**
      * @var string
@@ -128,21 +126,6 @@ class PurchaseStepPersonalAddress
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function setName($name)
-    {
-        $this->name = trim($name);
-        $parts = explode(" ", trim($name));
-        if (count($parts) == 2) {
-            $this->setFirstName(ucfirst(mb_strtolower($parts[0])));
-            $this->setLastName(ucfirst(mb_strtolower($parts[1])));
-        }
     }
 
     public function getBirthday()
@@ -270,7 +253,6 @@ class PurchaseStepPersonalAddress
         $this->setEmail($user->getEmail());
         $this->setFirstName($user->getFirstName());
         $this->setLastName($user->getLastName());
-        $this->setName(trim(sprintf('%s %s', $user->getFirstName(), $user->getLastName())));
         $this->setMobileNumber($user->getMobileNumber());
         $this->setBirthday($user->getBirthday());
         $this->setAddress($user->getBillingAddress());
