@@ -50,7 +50,7 @@ sosure.purchaseStepAddress = (function() {
             debug: false,
             // When to validate
             validClass: 'is-valid-ss',
-            // errorClass: 'is-invalid',
+            errorClass: 'is-invalid',
             onfocusout: false,
             onkeyup: false,
             onclick: false,
@@ -58,9 +58,13 @@ sosure.purchaseStepAddress = (function() {
                 birthday: 'purchase_form_birthday_day purchase_form_birthday_month purchase_form_birthday_year',
             },
             rules: {
-                "purchase_form[name]" : {
+                "purchase_form[firstName]" : {
                     required: true,
-                    fullName: true
+                    validFirstName: true
+                },
+                "purchase_form[lastName]" : {
+                    required: true,
+                    validLastName: true
                 },
                 "purchase_form[email]" : {
                     required: {
@@ -127,9 +131,13 @@ sosure.purchaseStepAddress = (function() {
                 }
             },
             messages: {
-                "purchase_form[name]": {
-                    required: 'Please enter your full name e.g "John Smith"',
-                    fullName: 'Please enter your first and last name  e.g "John Smith"'
+                "purchase_form[firstName]": {
+                    required: 'Please enter your first name',
+                    validFirstName: 'Please enter a valid first name',
+                },
+                "purchase_form[lastName]": {
+                    required: 'Please enter your last name',
+                    validLastName: 'Please enter a valid last name',
                 },
                 "purchase_form[email]" : {
                     required: 'Please enter a valid email address.'
@@ -164,10 +172,11 @@ sosure.purchaseStepAddress = (function() {
             showErrors: function(errorMap, errorList) {
                 this.defaultShowErrors();
                 let vals = [];
-                for (let err in errorMap) {
-                    let val = $('body').find('input[name="' + err + '"]').val()
+                for (var err in errorMap) {
+                    var val = $('body').find('input[name="' + err + '"]').val()
                     vals.push({'name': err, 'value': val, 'message': errorMap[err]});
                 }
+                console.log(vals);
                 $.ajax({
                   method: "POST",
                   url: "/ops/validation",
@@ -188,7 +197,7 @@ sosure.purchaseStepAddress = (function() {
     }
 
     self.step_one_continue = () => {
-        if ($('#purchase_form_name').valid() == true && $('#purchase_form_email').valid() == true) {
+        if ($('#purchase_form_firstName').valid() == true && $('#purchase_form_lastName').valid() == true && $('#purchase_form_email').valid() == true) {
             $('.step--hide').show();
             $('#step--one-controls').hide();
 
@@ -197,7 +206,7 @@ sosure.purchaseStepAddress = (function() {
                 self.name_email_changed = false;
                 self.delayTimer = setTimeout(function() {
                     let data = {
-                        name: $('#purchase_form_name').val(),
+                        name: $('#purchase_form_lastName').val(),
                         email: $('#purchase_form_email').val(),
                         csrf: $('#step--validate').data('csrf')
                     };
