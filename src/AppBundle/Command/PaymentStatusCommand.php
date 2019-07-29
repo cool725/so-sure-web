@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\Policy;
+use AppBundle\Repository\PolicyRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -10,17 +11,27 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Allows the generation of a report on whether a given set of policies are underpaid, overpaid, or paid to date.
+ */
 class PaymentStatusCommand extends ContainerAwareCommand
 {
     /** @var DocumentManager $dm */
     protected $dm;
 
+    /**
+     * Injects the command's dependencies.
+     * @param DocumentManager $dm is the document manager used to get access to policies.
+     */
     public function __construct(DocumentManager $dm)
     {
         parent::__construct();
         $this->dm = $dm;
     }
 
+    /**
+     * @Override
+     */
     protected function configure()
     {
         $this
@@ -34,6 +45,9 @@ class PaymentStatusCommand extends ContainerAwareCommand
             );
     }
 
+    /**
+     * @Override
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var PolicyRepository $policyRepository */
@@ -47,6 +61,7 @@ class PaymentStatusCommand extends ContainerAwareCommand
                     $output->writeln('policyId, amountOwed, amountScheduled, paymentStatus');
                 } else {
                     $line = array_combine($header, $row);
+                    /** @var Policy $policy */
                     $policy = $policyRepository->findOneBy(['_id' => $line['id']]);
                     if (!$policy) {
                         $output->writeln(sprintf(
