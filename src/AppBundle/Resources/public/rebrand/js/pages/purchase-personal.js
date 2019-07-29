@@ -13,6 +13,7 @@ require('jquery-mask-plugin');
 require('fuse.js');
 require('jquery-validation');
 require('../common/validationMethods.js');
+let textFit = require('textfit');
 
 const sosure = sosure || {};
 
@@ -385,6 +386,8 @@ sosure.purchaseStepAddress = (function() {
 })();
 
 $(function(){
+
+    textFit($('.fit')[0], {detectMultiLine: false});
 
     sosure.purchaseStepAddress.init();
 
