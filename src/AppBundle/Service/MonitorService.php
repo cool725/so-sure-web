@@ -801,12 +801,14 @@ class MonitorService
         }
     }
 
+    /**
+     * Checks for submitted claims that have not been processed within two business days.
+     */
     public function outstandingSubmittedClaims(array $tooOldSubmittedClaims = null)
     {
         if ($tooOldSubmittedClaims === null) {
             $tooOldSubmittedClaims = $this->findOldClaimsByStatus([Claim::STATUS_SUBMITTED], 2);
         }
-
         if (count($tooOldSubmittedClaims) > 0) {
             $ids = [];
             foreach ($tooOldSubmittedClaims as $claim) {
@@ -868,6 +870,9 @@ class MonitorService
         }
     }
 
+    /**
+     * Alerts on policies that got a new status more than ten minutes ago and do not have a current salva status yet.
+     */
     public function salvaStatus()
     {
         $repo = $this->dm->getRepository(Policy::class);
@@ -880,16 +885,16 @@ class MonitorService
             ],
             'statusUpdated' => ['$lt' => (new \DateTime())->sub(new \DateInterval("PT10M"))]
         ]);
-
-        if (count($policies) > 0) {
-            foreach ($policies as $policy) {
-                throw new MonitorException(
-                    "Policy {$policy->getPolicyNumber()} is pending review"
-                );
-            }
+        foreach ($policies as $policy) {
+            throw new MonitorException(
+                "Policy {$policy->getPolicyNumber()} is pending review"
+            );
         }
     }
 
+    /**
+     * Alerts when a policy was updated more than ten minutes ago and does not have any policy files.
+     */
     public function policyFiles()
     {
         $repo = $this->dm->getRepository(Policy::class);
@@ -901,13 +906,10 @@ class MonitorService
             ],
             'statusUpdated' => ['$lt' => (new \DateTime())->sub(new \DateInterval("PT10M"))]
         ]);
-
-        if (count($policyFiles) > 0) {
-            foreach ($policyFiles as $policy) {
-                throw new MonitorException(
-                    "Policy {$policy->getPolicyNumber()} has no files"
-                );
-            }
+        foreach ($policyFiles as $policy) {
+            throw new MonitorException(
+                "Policy {$policy->getPolicyNumber()} has no files"
+            );
         }
     }
 
