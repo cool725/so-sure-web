@@ -350,12 +350,11 @@ class SCode
             return false;
         }
         $age = $policy->age();
-        if ($age > 6 || $age < 0 || !$age) {
-            return false;
-        }
         if ($this->getRule() == self::RULE_AQUISITION) {
             if (count($user->getAllPolicies()) == 1) {
-                return true
+                if ($age < 6 && $age >= 0 && $age !== null) {
+                    return true;
+                }
             }
         } elseif ($this->getRule() == self::RULE_PREVIOUSLY_LOST) {
             $cancelledAfterStart = $user->policyReduce(0, function ($current, $policy) {
@@ -364,7 +363,8 @@ class SCode
                 }
                 return $current;
             });
-            if ($user->hasCancelledPolicy() && $cancelledAfterStart == 0 && $user->getAvgPolicyClaims() == 0) {
+            if ($user->hasCancelledPolicy() && $cancelledAfterStart == 0 && $user->getAvgPolicyClaims() == 0 && 
+                $age >= 0 && $age < 10 && $age !== null) {
                 return true;
             }
         }
