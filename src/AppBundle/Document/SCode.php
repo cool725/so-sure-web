@@ -358,13 +358,13 @@ class SCode
             }
         } elseif ($this->getRule() == self::RULE_PREVIOUSLY_LOST) {
             $cancelledAfterStart = $user->policyReduce(0, function ($current, $policy) {
-                if ($policy->getStatus() == Policy::STATUS_CANCELLED && 
+                if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
                     $policy->getEnd() > new \DateTime('30/07/2019')) {
                     $current++;
                 }
                 return $current;
             });
-            if ($user->hasCancelledPolicy() && $cancelledAfterStart == 0 && $user->getAvgPolicyClaims() == 0 && 
+            if ($user->hasCancelledPolicy() && $cancelledAfterStart == 0 && $user->getAvgPolicyClaims() == 0 &&
                 $age >= 0 && $age < 10 && $age !== null) {
                 return true;
             }
