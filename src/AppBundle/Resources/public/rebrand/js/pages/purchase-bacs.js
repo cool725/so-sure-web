@@ -10,6 +10,7 @@ require('jquery-validation');
 require('jquery-mask-plugin');
 require('../common/validationMethods.js');
 require('../common/checkout.js');
+let textFit = require('textfit');
 
 const sosure = sosure || {};
 
@@ -111,6 +112,9 @@ sosure.purchaseStepBacs = (function() {
 })();
 
 $(function() {
+
+    textFit($('.fit')[0], {detectMultiLine: false});
+
     sosure.purchaseStepBacs.init();
     sosure.purchaseStepBacs.webPayBtn.on('click', function() {
         sosure.purchaseStepBacs.loader.show();
