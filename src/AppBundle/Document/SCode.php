@@ -77,7 +77,7 @@ class SCode
     /**
      * If this is a reward scode, this field represents the type of rules that this scode has in which users it will
      * allow to claim it.
-     * @Assert\Choice(RULES, strict=true)
+     * @Assert\Choice(choices=SCode::RULES, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -345,11 +345,11 @@ class SCode
      */
     public function canApplyReward(Policy $policy)
     {
-        if ($this->type != self::TYPE_REWARD || !$this->active || !$policy->isCurrent()) {
+        $user = $policy->getUser();
+        if ($this->getType() != self::TYPE_REWARD || !$this->isActive() || !$policy->isActive() || !$user) {
             return false;
         }
-        $user = $policy->getUser();
-        if ($this->rule == self::RULE_AQUISITION) {
+        if ($this->getRule() == self::RULE_AQUISITION) {
             if (count($user->getAllPolicies()) == 1) {
                 $start = $policy->getStart();
                 $diff = (new \DateTime())->diff($start);
@@ -357,8 +357,8 @@ class SCode
                     return true;
                 }
             }
-        } elseif ($this->rule == self::RULE_PREVIOUSLY_LOST) {
-            if ($user->hasCancelledPolicy() && $user->getAvgClaims() == 0) {
+        } elseif ($this->getRule() == self::RULE_PREVIOUSLY_LOST) {
+            if ($user->hasCancelledPolicy() && $user->getAvgPolicyClaims() == 0) {
                 return true;
             }
         }
