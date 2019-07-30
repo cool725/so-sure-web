@@ -60,11 +60,21 @@ sosure.purchaseStepAddress = (function() {
             },
             rules: {
                 "purchase_form[firstName]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     validFirstName: true
                 },
                 "purchase_form[lastName]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     validLastName: true
                 },
                 "purchase_form[email]" : {
