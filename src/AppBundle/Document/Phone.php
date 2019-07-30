@@ -114,7 +114,7 @@ class Phone
     protected $initialPrice;
 
     /**
-     * @Assert\Range(min=0,max=200)
+     * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      */
     protected $currentRetailPrice;
