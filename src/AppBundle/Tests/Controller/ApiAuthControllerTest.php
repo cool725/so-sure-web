@@ -128,7 +128,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     // address
 
     /**
-     *
+     * @group user
      */
     public function testAddress()
     {
@@ -151,6 +151,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals("BX1 1LT", $data['postcode']);
     }
 
+    /**
+     * @group user
+     */
     public function testLookupAddress()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -163,6 +166,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals("BX1 1LT", $data['postcode']);
     }
 
+    /**
+     * @group user
+     */
     public function testAddressValidation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -171,6 +177,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    /**
+     * @group user
+     */
     public function testLookupAddressValidation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -179,6 +188,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    /**
+     * @group user
+     */
     public function testAddressQuote()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -197,6 +209,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals("WR5 3DA", $data['postcode']);
     }
 
+    /**
+     * @group user
+     */
     public function testLookupAddressQuote()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -215,6 +230,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals("WR5 3DA", $data['postcode']);
     }
 
+    /**
+     * @group user
+     */
     public function testAddressRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -228,6 +246,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
+    /**
+     * @group user
+     */
     public function testLookupAddressRateLimited()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -241,24 +262,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_TOO_MANY_REQUESTS);
     }
 
-    /* TODO: Consider moving to a different type of test.
-     * Note that once we're out of test mode mid-apr 2016,
-     * then it should be possible to use this test
-    public function testAddress()
-    {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/api/v1/auth/address?postcode=WR53DA');
-        $data = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode(), json_encode($data));
-        $this->assertEquals("Lock Keepers Cottage", $data['line1']);
-        $this->assertEquals("Basin Road", $data['line2']);
-        $this->assertEquals("Worcester", $data['city']);
-        $this->assertEquals("WR5 3DA", $data['postcode']);
-    }
-    */
-
     /**
-     *
+     * @group user
      */
     public function testAddressReqParam()
     {
@@ -268,6 +273,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400);
     }
 
+    /**
+     * @group user
+     */
     public function testLookupAddressReqParam()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
@@ -276,11 +284,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400);
     }
 
-    // GET /policy/{id}/lookup/bacs
-
-    /**
-     *
-     */
     public function testLookupPolicyBacs()
     {
         /** @var User $user */
@@ -2860,622 +2863,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         // print_r($policyData);
     }
 
-    public function testNewPolicyJudopayInvalidUserDetails()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-invalid-user', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(User::class);
-        /** @var User $updatedUser */
-        $updatedUser = $repo->find($user->getId());
-        $updatedUser->setMobileNumber(null);
-        $dm->flush();
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_USER_DETAILS);
-    }
-
-    public function testNewPoliciesJudopayDuplicateReceiptNotAllowed()
-    {
-        $userB = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-dupB', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($userB);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $userB);
-        $dataB = $this->verifyResponse(200);
-
-        $userA = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-dupA', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($userA);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $userA);
-        $dataA = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $userA,
-            $dataA['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $dataA['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-
-        $cognitoIdentityId = $this->getAuthUser($userB);
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $dataB['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
-    }
-
-    public function testNewPolicyJudopayDeclined()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-declined', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            '4221 6900 0000 4963',
-            '12/20',
-            '125'
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => null,
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($data['id']);
-
-        // ensure status is reset to null to avoid trigger monitoring alerts
-        $this->assertNull($policy->getStatus());
-    }
-
-    public function testExistingPolicyJudopayDeclined()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testExistingPolicyJudopayDeclined', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-
-//        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($data['id']);
-
-        $receiptId = $judopay->testPay(
-            $user,
-            sprintf('%sA', $data['id']),
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            '4221 6900 0000 4963',
-            '12/20',
-            '125'
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => null,
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($data['id']);
-        // Policy was active - should not be chaging state if so
-        $this->assertNotNull($policy->getStatus());
-    }
-
-    public function testNewPolicyJudopayInvalidPremium()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-invalidpremium', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '1.01',
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT);
-    }
-
-    public function testNewPolicyJudopayDuplicate()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-dup', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
-
-        // Ensure that policy creation didn't run twice
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        $this->assertEquals(11, count($policy->getScheduledPayments()));
-    }
-
-    public function testNewPolicyJudopayUnpaidRepayOk()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-judopay-repay', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200001',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-
-        // Ensure that policy creation didn't run twice
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        //\Doctrine\Common\Util\Debug::dump($policy->getSuccessfulPayments());
-        $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(7.15, $policy->getTotalSuccessfulPayments());
-
-        // Now assume an unpaid payment
-        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
-        $dm->flush();
-
-        $receiptId = $judopay->testPay(
-            $user,
-            sprintf("%s%d", $data['id'], rand(1, 999999)),
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200001',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertEquals(7.15 * 2, $policy->getTotalSuccessfulPayments());
-
-        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
-        $this->assertEquals('monthly', $policyData['premium_plan']);
-        $environment = $this->getContainer(true)->getParameter('kernel.environment');
-        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect());
-        $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
-    }
-
-    public function testNewPolicyJudopayUnpaidRepayBacsOk()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testNewPolicyJudopayUnpaidRepayBacsOk', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200001',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-        $this->assertEquals(7.15, $policyData['premium_payments']['scheduled'][0]['amount']);
-
-        // Ensure that policy creation didn't run twice
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        //\Doctrine\Common\Util\Debug::dump($policy->getSuccessfulPayments());
-        $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(7.15, $policy->getTotalSuccessfulPayments());
-
-        // Now assume an unpaid payment
-        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
-        $dm->flush();
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
-            'sort_code' => PCAService::TEST_SORT_CODE,
-            'account_number' => PCAService::TEST_ACCOUNT_NUMBER_OK,
-            'account_name' => 'foo bar',
-            'mandate' => self::generateRandomImei(),
-            'initial_amount' => $policy->getPremium()->getMonthlyPremiumPrice(),
-            'recurring_amount' => $policy->getPremium()->getMonthlyPremiumPrice(),
-        ]]);
-        $data = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $data['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-        $this->assertEquals(Policy::STATUS_ACTIVE, $data['status']);
-        $this->assertEquals('BX1 1LT', $data['bank_account']['bank_address']['postcode']);
-        $this->assertEquals('pending-init', $data['bank_account']['mandate_status']);
-        $this->assertGreaterThan(5, mb_strlen($data['bank_account']['mandate']));
-        $this->assertGreaterThan(8, mb_strlen($data['bank_account']['initial_notification_date']));
-        $this->assertGreaterThan(0, $data['bank_account']['standard_notification_day']);
-        $this->assertTrue($data['has_time_bacs_payment']);
-
-        $dm = $this->getDocumentManager(true);
-        $repo = $dm->getRepository(SalvaPhonePolicy::class);
-        /** @var SalvaPhonePolicy $policy */
-        $policy = $repo->find($policyData['id']);
-        $this->assertEquals(11, count($policy->getScheduledPayments()));
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        // bacs is pending, so still only 1 payment received
-        $this->assertEquals(7.15 * 1, $policy->getTotalSuccessfulPayments());
-
-        $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
-        $this->assertEquals('monthly', $policyData['premium_plan']);
-        $environment = $this->getContainer(true)->getParameter('kernel.environment');
-        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect());
-    }
-
-    public function testNewPolicyJudopayMissingReceipt()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testNewPolicyJudopayMissingReceipt', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '',
-            'card_token' => '',
-            'receipt_id' => '',
-        ]]);
-        $policyData = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-    }
-
-    public function testNewMulitplePolicyJudopayOk()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testNewMulitplePolicyJudopayOk', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $details = $judopay->testPayDetails(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => $details['consumer']['consumerToken'],
-            'card_token' => $details['cardDetails']['cardToken'],
-            'receipt_id' => $details['receiptId'],
-        ]]);
-        $policyData11 = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData11['status']);
-        $this->assertEquals($data['id'], $policyData11['id']);
-
-        $updatedPolicy = $this->assertPolicyByIdExists($this->getContainer(true), $policyData11['id']);
-        $this->assertNotNull($updatedPolicy->getStatus());
-        $this->assertTrue($updatedPolicy->hasPolicyOrUserValidPaymentMethod());
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
-            'amount' => '7.15'
-        ]]);
-        $policyData12 = $this->verifyResponse(200);
-        $this->assertEquals($data['id'], $policyData12['id']);
-
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['existing' => [
-            'amount' => '7.15'
-        ]]);
-        $policyData2 = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_REQUIRED);
-    }
-
-    public function testNewPolicyMultipayDeclinedJudopayOk()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testNewPolicyMultipayDeclinedJudopayOk', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        $repo = static::$dm->getRepository(PhonePolicy::class);
-        /** @var PhonePolicy $policy */
-        $policy = $repo->find($data['id']);
-        $policy->setStatus(PhonePolicy::STATUS_MULTIPAY_REJECTED);
-        static::$dm->flush();
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
-            $data['id'],
-            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
-            'card_token' => '55779911',
-            'receipt_id' => $receiptId,
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
-        $this->assertEquals($data['id'], $policyData['id']);
-    }
-
-    // policy/{id}/payment
-
-    /**
-     *
-     */
-    public function testUpdatePolicyPaymentJudopayOk()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testUpdatePolicyPaymentJudopayOk', $this),
-            'foo'
-        );
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        static::$dm->flush();
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $details = $judopay->testRegisterDetails(
-            $user,
-            rand(1, 999999),
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => $details['consumer']['consumerToken'],
-            'card_token' => $details['cardDetails']['cardToken'],
-            'receipt_id' => $details['receiptId'],
-        ]]);
-        $data = $this->verifyResponse(200);
-
-        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $updatedPolicy->getId());
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        $this->assertEquals(self::$JUDO_TEST_CARD_NAME, $data['payment_details']);
-        $this->assertEquals('judo', $data['payment_method']);
-        $this->assertEquals(self::$JUDO_TEST_CARD_EXP_DATE, $data['card_details']['end_date']);
-        $this->assertEquals(self::$JUDO_TEST_CARD_TYPE, $data['card_details']['type']);
-        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
-
-        $details = $judopay->testRegisterDetails(
-            $user,
-            rand(1, 999999),
-            self::$JUDO_TEST_CARD2_NUM,
-            self::$JUDO_TEST_CARD2_EXP,
-            self::$JUDO_TEST_CARD2_PIN
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => $details['consumer']['consumerToken'],
-            'card_token' => $details['cardDetails']['cardToken'],
-            'receipt_id' => $details['receiptId'],
-        ]]);
-        $data = $this->verifyResponse(200);
-
-        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $updatedPolicy->getId());
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        $this->assertEquals(self::$JUDO_TEST_CARD2_NAME, $data['payment_details']);
-        $this->assertEquals('judo', $data['payment_method']);
-        $this->assertEquals(self::$JUDO_TEST_CARD2_EXP_DATE, $data['card_details']['end_date']);
-        $this->assertEquals(self::$JUDO_TEST_CARD2_TYPE, $data['card_details']['type']);
-        $this->assertEquals(self::$JUDO_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
-    }
-
     public function testUpdatePolicyPaymentCheckoutOk()
     {
         $user = self::createUser(
@@ -3661,41 +3048,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_INVALID_MANDATE);
     }
 
-    public function testUpdatePolicyPaymentJudopayFail()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testUpdatePolicyPaymentJudopayFail', $this),
-            'foo'
-        );
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        static::$dm->flush();
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $details = $judopay->testRegisterDetails(
-            $user,
-            rand(1, 999999),
-            '4221 6900 0000 4963',
-            '12/20',
-            '125'
-        );
-
-        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => $details['consumer']['consumerToken'],
-            'card_token' => 'unknown',
-            'receipt_id' => $details['receiptId'],
-        ]]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
-    }
-
     public function testUpdatePolicyPaymentBacsInvalidSortCode()
     {
         $user = self::createUser(
@@ -3836,28 +3188,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_INVALID_AMOUNT);
     }
 
-    public function testUpdatePolicyPaymentJudopayNoData()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testUpdatePolicyPaymentJudopayNoData', $this),
-            'foo'
-        );
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        static::$dm->flush();
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
-        $data = $this->verifyResponse(200);
-        /** @var Policy $updatedPolicy */
-        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $data['id']);
-
-        $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-        ]]);
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-    }
-
     public function testUpdatePolicyPaymentCheckoutNoData()
     {
         $user = self::createUser(
@@ -3956,24 +3286,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'token' => $token->getId(),
         ]]);
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
-    }
-
-    public function testUpdatePolicyPaymentJudopayUnknownPolicy()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testUpdatePolicyPaymentJudopayUnknownPolicy', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-
-        $url = sprintf("/api/v1/auth/policy/%s/payment", 'foo');
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => 'foo',
-            'card_token' => 'foo',
-            'receipt_id' => 'foo',
-        ]]);
-        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
     public function testUpdatePolicyPaymentCheckoutUnknownPolicy()
