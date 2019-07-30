@@ -699,7 +699,6 @@ abstract class Policy
             $payment->calculateSplit();
         }
 
-        // For some reason, payment was being added twice for ::testNewPolicyJudopayUnpaidRepayOk
         // perhaps an issue with cascade persist
         // seems to have no ill effects and resolves the issue
         if ($this->payments->contains($payment)) {
