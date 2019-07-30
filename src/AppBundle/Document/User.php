@@ -943,6 +943,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     }
 
     /**
+     * Reduces the user policy list to some value via a callback.
+     * @param mixed    $init     is the first value to send to the callback as the accumulator.
+     * @param \Closure $callback is the callback to reduce with.
+     * @return mixed the result of the reduction.
+     */
+    public function policyReduce($init, $callback)
+    {
+        return array_reduce($this->getPolicies(), $callback, $init);
+    }
+
+    /**
      * Can purchase implies that user is allowed to purchase an additional policy
      * This is different than being allowed to renew an existing policy
      */

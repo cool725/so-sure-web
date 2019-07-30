@@ -349,16 +349,22 @@ class SCode
         if ($this->getType() != self::TYPE_REWARD || !$this->isActive() || !$policy->isActive() || !$user) {
             return false;
         }
+        $age = $policy->age();
+        if ($age > 6 || $age < 0 || !$age) {
+            return false;
+        }
         if ($this->getRule() == self::RULE_AQUISITION) {
             if (count($user->getAllPolicies()) == 1) {
-                $start = $policy->getStart();
-                $diff = (new \DateTime())->diff($start);
-                if ($diff->d <= 6 && $diff->m == 0 && $diff->y == 0) {
-                    return true;
-                }
+                return true
             }
         } elseif ($this->getRule() == self::RULE_PREVIOUSLY_LOST) {
-            if ($user->hasCancelledPolicy() && $user->getAvgPolicyClaims() == 0) {
+            $cancelledAfterStart = $user->policyReduce(0, function ($current, $policy) {
+                if ($policy->getStatus() == Policy::STATUS_CANCELLED && $policy->getEnd() > $this->getCreatedDate()) {
+                    $current++;
+                }
+                return $current;
+            });
+            if ($user->hasCancelledPolicy() && $cancelledAfterStart == 0 && $user->getAvgPolicyClaims() == 0) {
                 return true;
             }
         }
