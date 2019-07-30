@@ -338,36 +338,32 @@ class SCode
     }
 
     /**
-     * Tells us if this scode can be applied as a reward code to the given user.
+     * Tells us if this scode can be applied as a reward code to the given policy.
      * Takes into account the scode's application rules value to set what business logic to apply.
-     * @param User $user is the user to which we are checking if we can apply it.
+     * @param Policy $policy is the policy we are checking to be able to apply it to.
      * @return boolean true if we can apply it and false if not.
-     * @throws \Exception if the scode is a reward but does not have a rule.
      */
-    public function canApplyReward(User $user)
+    public function canApplyReward(Policy $policy)
     {
-        if ($this->type != self::TYPE_REWARD || !$this->active) {
+        if ($this->type != self::TYPE_REWARD || !$this->active || !$policy->isCurrent()) {
             return false;
         }
+        $user = $policy->getUser();
         if ($this->rule == self::RULE_AQUISITION) {
             if (count($user->getAllPolicies()) == 1) {
-                $policy =
+                $start = $policy->getStart();
+                $diff = (new \DateTime())->diff($start);
+                if ($diff->d <= 6 && $diff->m == 0 && $diff->y == 0) {
+                    return true;
+                }
             }
-            return false;
         } elseif ($this->rule == self::RULE_PREVIOUSLY_LOST) {
-            // TODO: business logic.
-        } elseif (!$this->rule) {
-            throw new \Exception(sprintf(
-                "Scode '%s' has attempted to be applied, but does not have an application rule.",
-                $this->getCode()
-            ));
-        } else {
-            throw new \Exception(sprintf(
-                "Scode '%s' has attempted to be applied, but has unknown application rule '%s'",
-                $this->getCode(),
-                $this->rule
-            ));
+            if ($user->hasCancelledPolicy() && $user->getAvgClaims() == 0) {
+                return true;
+            }
         }
+        // Should not really be trying to apply rewards that have no rule, but if it happens it is best to do nothing.
+        return false;
     }
 
 
