@@ -5609,8 +5609,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_INVALID_ADDRESS);
     }
 
-    // user/{id}/payment
-
     public function testUserQuote()
     {
         $user = self::createUser(
