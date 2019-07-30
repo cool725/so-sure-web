@@ -333,38 +333,16 @@ class UserController extends BaseController
                         'warning',
                         sprintf("SCode %s is missing or been withdrawn", $code)
                     );
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 }
-                if ($scode->isReward() && $scode->isActive()) {
-                    if ($user->hasPolicy() && count($user->getAllPolicies()) <= 1) {
-                        $start = $policy->getStart();
-                        $now = new \DateTime();
-                        $diff = $now->diff($start);
-                        if ($diff->d > 6 || ($diff->m > 0 || $diff->y > 0)) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Sorry, this promo code %s cannot be applied", $code)
-                            );
-
-                            return new RedirectResponse(
-                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                            );
-                        }
-                    } else {
-                        $this->addFlash(
-                            'warning',
-                            sprintf("Sorry, this promo code %s cannot be applied", $code)
-                        );
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
-                    }
+                if ($scode->isReward() && $scode->isActive() && !$scode->canApplyReward($policy)) {
+                    $this->addFlash('warning', sprintf('Sorry, promo code %s cannot be applied', $code));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 }
-
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
                     if ($invitation && !$scode->isReward()) {
@@ -377,9 +355,7 @@ class UserController extends BaseController
                             SixpackService::EXPERIMENT_APP_SHARE_METHOD
                         );
                     } else {
-                        $message = sprintf(
-                            'Your bonus has been added'
-                        );
+                        $message = 'Your bonus has been added';
                     }
                     $this->addFlash('success', $message);
 

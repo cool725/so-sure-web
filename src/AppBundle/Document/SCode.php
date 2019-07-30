@@ -19,6 +19,14 @@ class SCode
     const TYPE_AFFILIATE = 'affiliate';
     const TYPE_REWARD = 'reward';
 
+    const RULE_AQUISITION = 'aquisition';
+    const RULE_PREVIOUSLY_LOST = 'previously-lost';
+
+    const RULES = [
+        self::RULE_AQUISITION,
+        self::RULE_PREVIOUSLY_LOST
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -65,6 +73,15 @@ class SCode
      * @Gedmo\Versioned
      */
     protected $reward;
+
+    /**
+     * If this is a reward scode, this field represents the type of rules that this scode has in which users it will
+     * allow to claim it.
+     * @Assert\Choice(choices=SCode::RULES, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $rule;
 
     /**
      * @Assert\Type("bool")
@@ -245,6 +262,24 @@ class SCode
         $this->reward = $reward;
     }
 
+    /**
+     * Gives you the scode's reward rule.
+     * @return string the scode's reward rule.
+     */
+    public function getRule()
+    {
+        return $this->rule;
+    }
+
+    /**
+     * Sets the scode's reward rule.
+     * @param string $rule is the rule to set it to.
+     */
+    public function setRule($rule)
+    {
+        $this->rule = $rule;
+    }
+
     public function isActive()
     {
         return $this->active;
@@ -301,6 +336,43 @@ class SCode
     {
         return $this->getType() == self::TYPE_MULTIPAY;
     }
+
+    /**
+     * Tells us if this scode can be applied as a reward code to the given policy.
+     * Takes into account the scode's application rules value to set what business logic to apply.
+     * @param Policy $policy is the policy we are checking to be able to apply it to.
+     * @return boolean true if we can apply it and false if not.
+     */
+    public function canApplyReward(Policy $policy)
+    {
+        $user = $policy->getUser();
+        if ($this->getType() != self::TYPE_REWARD || !$this->isActive() || !$policy->isActive() || !$user) {
+            return false;
+        }
+        $age = $policy->age();
+        if ($this->getRule() == self::RULE_AQUISITION) {
+            if (count($user->getAllPolicies()) == 1) {
+                if ($age < 6 && $age >= 0 && $age !== null) {
+                    return true;
+                }
+            }
+        } elseif ($this->getRule() == self::RULE_PREVIOUSLY_LOST) {
+            $cancelledAfterStart = $user->policyReduce(0, function ($current, $policy) {
+                if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
+                    $policy->getEnd() > new \DateTime('30-07-2019')) {
+                    $current++;
+                }
+                return $current;
+            });
+            if ($user->hasCancelledPolicy() && $cancelledAfterStart == 0 && $user->getAvgPolicyClaims() == 0 &&
+                $age >= 0 && $age < 10 && $age !== null) {
+                return true;
+            }
+        }
+        // Should not really be trying to apply rewards that have no rule, but if it happens it is best to do nothing.
+        return false;
+    }
+
 
     public function toApiArray()
     {
