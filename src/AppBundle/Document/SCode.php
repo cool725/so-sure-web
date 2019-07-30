@@ -358,7 +358,8 @@ class SCode
             }
         } elseif ($this->getRule() == self::RULE_PREVIOUSLY_LOST) {
             $cancelledAfterStart = $user->policyReduce(0, function ($current, $policy) {
-                if ($policy->getStatus() == Policy::STATUS_CANCELLED && $policy->getEnd() > $this->getCreatedDate()) {
+                if ($policy->getStatus() == Policy::STATUS_CANCELLED && 
+                    $policy->getEnd() > new \DateTime('30/07/2019')) {
                     $current++;
                 }
                 return $current;
