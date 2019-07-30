@@ -1087,6 +1087,9 @@ nelmio_security:
                 - https://pro.fontawesome.com
                 - https://tagmanager.google.com
                 - https://fonts.googleapis.com
+                - https://smct.co
+                - http://smct.co
+                - https://cdn.smct.co
             img-src:
                 - 'self'
                 - https://wearesosure.com

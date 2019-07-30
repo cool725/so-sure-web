@@ -945,7 +945,7 @@ class PhonePolicy extends Policy
             return false;
         }
         $phone = $this->getPhone();
-        if (!$phone->isHighlight()) {
+        if (!$phone->isHighlight() || !$this->getStart()) {
             return false;
         }
         $wall = clone $this->getStart();
