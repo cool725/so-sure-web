@@ -8,6 +8,7 @@ require('bootstrap/js/dist/dropdown');
 // Require components
 require('jquery-validation');
 require('../common/validationMethods.js');
+let textFit = require('textfit');
 
 const sosure = sosure || {};
 
@@ -62,6 +63,8 @@ sosure.purchaseStepPayment = (function() {
 })();
 
 $(function(){
+
+    textFit($('.fit')[0], {detectMultiLine: false});
 
     sosure.purchaseStepPayment.init();
 

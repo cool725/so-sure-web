@@ -943,6 +943,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     }
 
     /**
+     * Reduces the user policy list to some value via a callback.
+     * @param mixed    $init     is the first value to send to the callback as the accumulator.
+     * @param \Closure $callback is the callback to reduce with.
+     * @return mixed the result of the reduction.
+     */
+    public function policyReduce($init, $callback)
+    {
+        return array_reduce($this->getPolicies()->toArray(), $callback, $init);
+    }
+
+    /**
      * Can purchase implies that user is allowed to purchase an additional policy
      * This is different than being allowed to renew an existing policy
      */
@@ -1191,6 +1202,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasPartialPolicy()
     {
         return count($this->getPartialPolicies()) > 0;
+    }
+
+    /**
+     * Tells you if any of this user's policies would be required to pay up their yearly premium if they were to try
+     * and make a theft / loss claim at the given date.
+     * @param \DateTime $date is the date we are checking on.
+     * @return boolean true if it has a policy that would have to pay, and false if not.
+     */
+    public function hasPolicyForFullPaymentClaim(\DateTime $date)
+    {
+        foreach ($this->getValidPolicies() as $policy) {
+            if ($policy->fullPremiumToBePaidForClaim($date, Claim::TYPE_THEFT)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getPartialPolicies()

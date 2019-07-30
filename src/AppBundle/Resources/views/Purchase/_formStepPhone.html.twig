@@ -15,8 +15,6 @@
                 <a href="#"
                    data-toggle="modal"
                    data-target="#policy_imei_number"
-                   {# data-title="Up to 80% cashback every year" #}
-                   {# data-body="asdasdasdasdasdasdasd" #}
                    data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
                    role="button">
                     <i class="fal fa-info-circle"></i>
@@ -24,9 +22,24 @@
             </span>
         </label>
         {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : '', 'data-make': phone.make}}) }}
-        <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
-        {% if phone.make == 'Samsung' %}
-            <small class="form-text samsung-imei">Numbers only please (no / required)</small>
+        {% if device_category() == 'Mobile' %}
+            {% if phone.make == 'Apple' %}
+                <small class="form-text">Copy this from your iPhone settings: General &gt; About</small>
+            {% else %}
+                <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
+                {% if phone.make == 'Samsung' %}
+                    <small class="form-text samsung-imei">Numbers only please (no / required)</small>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {% if phone.make == 'Apple' %}
+                <small class="form-text">Go to iTunes/iCloud: copy and paste</small>
+            {% else %}
+                <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
+                {% if phone.make == 'Samsung' %}
+                    <small class="form-text samsung-imei">Numbers only please (no / required)</small>
+                {% endif %}
+            {% endif %}
         {% endif %}
         <div class="with-errors">{{ form_errors(purchase_form.imei) }}</div>
     </div>
@@ -40,8 +53,6 @@
                     <a href="#"
                        data-toggle="modal"
                        data-target="#policy_serial_number"
-                       {# data-title="Up to 80% cashback every year" #}
-                       {# data-body="asdasdasdasdasdasdasd" #}
                        data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
                        role="button">
                         <i class="fal fa-info-circle"></i>
@@ -49,7 +60,11 @@
                 </span>
             </label>
             {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
-            <small class="form-text">To find your Serial Numbers open your phone Settings, navigate to General and view About</small>
+            {% if device_category() == 'Mobile' %}
+                <small class="form-text">Copy this from your iPhone settings: General &gt; About</small>
+            {% else %}
+                <small class="form-text">Go to iTunes/iCloud: copy and paste</small>
+            {% endif %}
             <div class="with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
         </div>
     {% endif %}

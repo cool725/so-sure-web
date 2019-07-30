@@ -162,6 +162,9 @@ class UserControllerTest extends BaseControllerTest
         $this->validateInviteAllowed($crawler, true);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimed()
     {
         $email = self::generateEmail('testUserClaimed', $this);
@@ -298,6 +301,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(422, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserInviteClaimed()
     {
         $email = self::generateEmail('testUserInviteClaimed', $this);
@@ -2420,6 +2426,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(404);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimWithNoActivePolicy()
     {
         $email = self::generateEmail('testUserClaimWithNoActivePolicy', $this);
@@ -2444,6 +2453,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(404);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimWithActivePolicyOpenedClaim()
     {
         $email = self::generateEmail('testUserClaimWithActivePolicyOpenedClaim', $this);
@@ -2473,10 +2485,13 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(404);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimFnol()
     {
         $email = self::generateEmail('testUserClaimFnol', $this);
-        $password = 'foo';
+        $password = 'bingBingWahoo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
             self::$userManager,
@@ -2490,11 +2505,34 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
         self::$dm->flush();
-
         $this->login($email, $password);
         $this->submitFnolForm($policy, $now, Claim::TYPE_DAMAGE);
     }
 
+    /**
+     * @group claim
+     */
+    public function testUserClaimFnolTheftPay()
+    {
+        $email = self::generateEmail('testUserClaimFnolTheftPay', $this);
+        $password = 'banognno';
+        $phone = self::getRandomPhone(self::$dm);
+        $highlighted = $phone->isHighlight();
+        $phone->setHighlight(true);
+        $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+        self::$dm->persist($phone);
+        self::$dm->flush();
+        $this->login($email, $password);
+        $this->submitFnolForm($policy, $now, Claim::TYPE_LOSS);
+    }
+
+    /**
+     * @group claim
+     */
     public function testUserClaimFnolNoAdditionalLoss()
     {
         $email = self::generateEmail('testUserClaimFnolNoAdditionalLoss', $this);
@@ -2520,6 +2558,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitFnolForm($policy, $now, Claim::TYPE_LOSS, true);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimDamage()
     {
         $email = self::generateEmail('testUserClaimDamage', $this);
@@ -2548,6 +2589,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitDamageForm($policy, $now, true, true, true, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimDamageNoPictureOfPhone()
     {
         $email = self::generateEmail('testUserClaimDamageNoPictureOfPhone', $this);
@@ -2579,6 +2623,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitDamageForm($policy, $now, true, false, false, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimDamageNoProofOfUsage()
     {
         $email = self::generateEmail('testUserClaimDamageNoProofOfUsage', $this);
@@ -2627,6 +2674,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitDamageForm($policy, $now, false, false, false, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimLoss()
     {
         $email = self::generateEmail('testUserClaimLoss', $this);
@@ -2654,6 +2704,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, true, true, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimLossNoProofOfPurchase()
     {
         $email = self::generateEmail('testUserClaimLossNoProofOfPurchase', $this);
@@ -2683,6 +2736,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, true, false, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimLossNoProofOfUsage()
     {
         $email = self::generateEmail('testUserClaimLossNoProofOfUsage', $this);
@@ -2726,6 +2782,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, false, false, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimTheft()
     {
         $email = self::generateEmail('testUserClaimTheft', $this);
@@ -2753,6 +2812,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, true, true, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimTheftNoProofOfPurchase()
     {
         $email = self::generateEmail('testUserClaimTheftNoProofOfPurchase', $this);
@@ -2782,6 +2844,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, true, false, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimTheftNoProofOfUsage()
     {
         $email = self::generateEmail('testUserClaimTheftNoProofOfUsage', $this);
@@ -2825,6 +2890,9 @@ class UserControllerTest extends BaseControllerTest
         $this->submitLossTheftForm($policy, $now, false, false, false, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimUpdateTheft()
     {
         $email = self::generateEmail('testUserClaimUpdateTheft', $this);
@@ -2854,6 +2922,9 @@ class UserControllerTest extends BaseControllerTest
         $this->updateLossTheftForm($policy, $now, true, true, 2);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimUpdateTheftNoProofOfUsage()
     {
         $email = self::generateEmail('testUserClaimUpdateTheftNoProofOfUsage', $this);
@@ -2899,6 +2970,9 @@ class UserControllerTest extends BaseControllerTest
         $this->updateLossTheftForm($policy, $now, false, false, 2);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimUpdateLoss()
     {
         $email = self::generateEmail('testUserClaimUpdateLoss', $this);
@@ -2928,6 +3002,9 @@ class UserControllerTest extends BaseControllerTest
         $this->updateLossTheftForm($policy, $now, true, true, 2);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimUpdateLossNoProofOfUsage()
     {
         $email = self::generateEmail('testUserClaimUpdateLossNoProofOfUsage', $this);
@@ -2973,6 +3050,9 @@ class UserControllerTest extends BaseControllerTest
         $this->updateLossTheftForm($policy, $now, false, false, 2);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimUpdateDamage()
     {
         $email = self::generateEmail('testUserClaimUpdateDamage', $this);
@@ -3002,6 +3082,9 @@ class UserControllerTest extends BaseControllerTest
         $this->updateDamageForm($policy, $now, true, true, true, 1);
     }
 
+    /**
+     * @group claim
+     */
     public function testUserClaimUpdateDamageNoProofOfUsage()
     {
         $email = self::generateEmail('testUserClaimUpdateDamageNoProofOfUsage', $this);
@@ -3067,7 +3150,7 @@ class UserControllerTest extends BaseControllerTest
         return $claim;
     }
 
-    private function submitFnolForm(Policy $policy, \DateTime $now, $type, $expectNoAdditionalClaimAllowed = false)
+    private function submitFnolForm(PhonePolicy $policy, \DateTime $now, $type, $expectNoAdditionalClaimAllowed = false)
     {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
         $mobileNumber = self::generateRandomMobile();
@@ -3095,7 +3178,12 @@ class UserControllerTest extends BaseControllerTest
         $form['claim_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
         $form['claim_form[policyNumber]'] = $policy->getId();
         $crawler = self::$client->submit($form);
-
+        if ($policy->fullPremiumToBePaidForClaim($now, $type)) {
+            self::verifyResponse(302);
+            $crawler = self::$client->followRedirect();
+            $this->assertContains('you must pay', $this->getClientResponseContent());
+            return;
+        }
         self::verifyResponse(200);
         if ($expectNoAdditionalClaimAllowed) {
             $this->assertNotContains(
@@ -3127,8 +3215,7 @@ class UserControllerTest extends BaseControllerTest
         $form['claim_confirm_form[signature]'] = 'foo bar';
         $form['claim_confirm_form[type]'] = $type;
         $form['claim_confirm_form[network]'] = Claim::NETWORK_O2;
-        // @codingStandardsIgnoreStart
-        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla blba bla bla';
         $form['claim_confirm_form[policyNumber]'] = $policy->getId();
         $crawler = self::$client->submit($form);
 
