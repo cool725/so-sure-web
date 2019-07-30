@@ -950,7 +950,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     public function policyReduce($init, $callback)
     {
-        return array_reduce($this->getPolicies(), $callback, $init);
+        return array_reduce($this->getPolicies()->toArray(), $callback, $init);
     }
 
     /**
