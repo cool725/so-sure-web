@@ -1201,7 +1201,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     public function hasPolicyForFullPaymentClaim(\DateTime $date)
     {
-        foreach ($this->policies as $policy) {
+        foreach ($this->getValidPolicies() as $policy) {
             if ($policy->fullPremiumToBePaidForClaim($date, Claim::TYPE_THEFT)) {
                 return true;
             }
