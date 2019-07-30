@@ -1019,7 +1019,11 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            $policy->addScheduledPayment($scheduledPayment);
+            if ($scheduledDate > $this->now()) {
+                $policy->addScheduledPayment($scheduledPayment);
+            } else {
+                $this->logger->notice('Attempted to set scheduled payment for before today.');
+            }
         }
         $this->dm->flush();
     }
