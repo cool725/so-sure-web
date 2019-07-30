@@ -738,11 +738,6 @@ class UserControllerTest extends BaseControllerTest
         $this->validateXPathCount($crawler, '//a[@id="user-homepage--nav-renew"]', $exists);
     }
 
-    private function validateJudoForm($crawler, $exists)
-    {
-        $this->validateXPathCount($crawler, '//form[@id="webpay-form"]', $exists);
-    }
-
     private function validateCheckoutForm($crawler, $exists)
     {
         $this->validateXPathCount($crawler, '//form[@class="payment-form"]', $exists);
@@ -1579,7 +1574,6 @@ class UserControllerTest extends BaseControllerTest
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->isCancelledAndPaymentOwed());
         $crawler = $this->login($email, $password, sprintf('purchase/remainder/%s', $policy->getId()));
-        $this->validateJudoForm($crawler, true);
         $this->validateCheckoutForm($crawler, false);
     }
 
