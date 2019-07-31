@@ -657,7 +657,7 @@ class Phone
      * @param \DateTime $date is the date by which to find which retail price is current.
      * @return float the most up to date retail price stored.
      */
-    public function getRetailPrice(\DateTime $date)
+    public function getCurrentRetailPrice(\DateTime $date)
     {
         $retailPrices = $this->getPastRetailPrices();
         if (count($retailPrices) == 0) {
