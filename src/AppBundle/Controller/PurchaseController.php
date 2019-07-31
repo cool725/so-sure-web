@@ -148,6 +148,9 @@ class PurchaseController extends BaseController
         // CTA From Quote Test - Proceed
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
+        // Burger vs Full Menu - Proceed
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();

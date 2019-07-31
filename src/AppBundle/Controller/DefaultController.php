@@ -89,18 +89,19 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:index.html.twig';
 
-        // A/B Homepage USPS test
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_HOMEPAGE_USPS,
-        //     ['homepage', 'homepage-usps']
-        // );
+        // A/B Menu Test
+        // To Test use url param ?force=menu-burger / ?force=menu-full
+        $menuExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_BURGER_MENU,
+            ['menu-burger', 'menu-full']
+        );
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            // 'exp'       => $exp,
+            'menu_exp' => $menuExp,
         );
 
         return $this->render($template, $data);

@@ -1246,6 +1246,9 @@ class UserController extends BaseController
         // CTA From Quote Test - Purchase
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
+        // Burger vs Full Menu - Purchase
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+
         $smsExperiment = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_APP_LINK_SMS,

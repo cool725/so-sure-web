@@ -275,11 +275,15 @@ class PhoneInsuranceController extends BaseController
         $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
         $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
 
+        // A/B CTA Test
         $ctaText = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_QUOTE_PAGE_CTA,
             ['cta-original', 'cta-yes-please']
         );
+
+        // Burger vs Full Menu - Proceed
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
@@ -450,9 +454,6 @@ class PhoneInsuranceController extends BaseController
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                 ]);
             }
-
-            // A/B Homepage USPS test
-            // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USPS);
         }
 
         // Hyphenate Model for images/template
