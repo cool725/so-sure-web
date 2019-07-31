@@ -549,7 +549,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/payment-details');
 
         $this->validateCheckoutForm($crawler, false);
-        $this->validateJudoForm($crawler, true);
     }
 
     public function testUserPaymentDetailsCheckout()
@@ -581,7 +580,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/payment-details');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
 
         $cardDetails = $crawler->filter('#payment_card');
         $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
@@ -650,7 +648,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/payment-details');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
 
         $cardDetails = $crawler->filter('#payment_card');
         $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
@@ -790,7 +787,6 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -828,7 +824,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -869,7 +865,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -884,7 +880,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -919,7 +915,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -959,7 +955,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -978,7 +974,7 @@ class UserControllerTest extends BaseControllerTest
         $this->logout();
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1003,6 +999,9 @@ class UserControllerTest extends BaseControllerTest
         }
     }
 
+    /**
+     * @group bongo
+     */
     public function testUserUnpaidPolicyBacsPaymentMissing()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentMissing', $this);
@@ -1036,7 +1035,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1060,7 +1059,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -1113,7 +1112,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1137,7 +1136,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -1200,7 +1199,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1267,7 +1265,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1327,7 +1324,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1389,7 +1385,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, true);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1604,7 +1599,6 @@ class UserControllerTest extends BaseControllerTest
         $remainderPath = sprintf('purchase/remainder/%s', $policy->getId());
         $crawler = $this->login($email, $password, $remainderPath);
 
-        $this->validateJudoForm($crawler, false);
         $this->validateCheckoutForm($crawler, true);
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
