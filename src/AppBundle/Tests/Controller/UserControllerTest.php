@@ -41,15 +41,30 @@ class UserControllerTest extends BaseControllerTest
     use CurrencyTrait;
     use DateTrait;
 
+    protected static $container;
+    protected static $dm;
+
     /** @var FeatureService */
     protected static $featureService;
 
     /** @var CheckoutService */
     protected static $checkoutService;
 
+    /** @var PolicyService $policyService */
+    protected static $policyService;
+
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+        // set up kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
+        self::$container = $kernel->getContainer();
+
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$userManager = self::$container->get('fos_user.user_manager');
+
+
         /** @var FeatureService $featureService */
         $featureService = self::$container->get('app.feature');
         self::$featureService = $featureService;
@@ -57,6 +72,10 @@ class UserControllerTest extends BaseControllerTest
         /** @var  CheckoutService $checkoutService */
         $checkoutService = self::$container->get('app.checkout');
         self::$checkoutService = $checkoutService;
+
+        /** @var PolicyService $policyService */
+        $policyService = self::$container->get('app.policy');
+        self::$policyService = $policyService;
     }
 
     public function setUp()
@@ -584,7 +603,7 @@ class UserControllerTest extends BaseControllerTest
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', '/user/payment-details');
 
-        $this->validateCheckoutForm($crawler, false);
+        $this->validateCheckoutForm($crawler, true);
     }
 
     /**
@@ -1606,8 +1625,8 @@ class UserControllerTest extends BaseControllerTest
         ]);
         $data = self::verifyResponse(200);
         $crawler = self::$client->request('GET', '/user/unpaid');
+        $crawler = self::$client->followRedirect();
         $this->expectFlashSuccess($crawler, 'successfully completed');
-        $this->assertContains('paid up to date', $crawler->html());
         self::$dm->flush();
         self::$dm->clear();
         // check that the scheduled payment has been cancelled.
@@ -1616,7 +1635,7 @@ class UserControllerTest extends BaseControllerTest
         /** @var ScheduledPayment */
         $cancelledPayment = $scheduledPaymentRepo->find($rescheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $cancelledPayment->getStatus());
-        $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
+        $this->assertEquals(". Cancelled rescheduled payment as web payment made", $cancelledPayment->getNotes());
         /** @var ScheduledPayment */
         $scheduledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
@@ -1671,8 +1690,8 @@ class UserControllerTest extends BaseControllerTest
         self::$dm->flush();
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->isCancelledAndPaymentOwed());
-        $crawler = $this->login($email, $password, sprintf('purchase/remainder/%s', $policy->getId()));
-        $this->validateCheckoutForm($crawler, false);
+        $crawler = $this->login($email, $password, sprintf('user/remainder/%s', $policy->getId()));
+        $this->validateCheckoutForm($crawler, true);
     }
 
     /**
@@ -1702,7 +1721,7 @@ class UserControllerTest extends BaseControllerTest
 
         self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
 
-        $remainderPath = sprintf('purchase/remainder/%s', $policy->getId());
+        $remainderPath = sprintf('user/remainder/%s', $policy->getId());
         $crawler = $this->login($email, $password, $remainderPath);
 
         $this->validateCheckoutForm($crawler, true);
