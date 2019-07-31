@@ -65,7 +65,7 @@
             data-target="#retail_modal"
             data-update="{{ path('admin_phone_retail', {'id': phone.id}) }}"
             data-current="{{ phone.retailPrice }}">
-        <i class="far fa-crow fa-fw"></i>
+        <i class="far fa-shopping-bag fa-fw"></i>
     </button>
 {% endmacro phoneActions %}
 
@@ -525,9 +525,6 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label>
-                                                <i class="far fa-exclamation-triangle fa-fw"
-                                                   title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."
-                                                   data-toggle="tooltip"></i>
                                                 From
                                             </label>
                                             <div class="input-group date-time-picker date"
@@ -546,6 +543,7 @@
                                                 </div>
                                             </div>
                                             <small class="form-text">Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later (1 business day)</small>
+                                            <small class="form-text">Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress.</small>
                                         </div>
                                         <div class="form-group">
                                             <label class="mr-2">To</label>
