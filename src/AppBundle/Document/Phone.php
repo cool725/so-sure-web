@@ -651,7 +651,7 @@ class Phone
         if (!is_array($retailPrices)) {
             $retailPrices = $retailPrices->toArray();
         }
-        return array_filter($this->getRetailPrices(), function ($price) use ($date) {
+        return array_filter($retailPrices, function ($price) use ($date) {
             return $price->getDate() <= $date;
         });
     }
