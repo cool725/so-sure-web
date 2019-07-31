@@ -820,7 +820,6 @@ class Phone
             throw new \Exception('No binder available');
         }
         $price = $this->getCurrentRetailPrice($date);
-        var_dump($price);
         if ($price <= 150) {
             return 3.99 + 1.5; // 5.49
         } elseif ($price <= 250) {
