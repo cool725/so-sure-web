@@ -647,7 +647,11 @@ class Phone
      */
     public function getPastRetailPrices($date)
     {
-        return array_filter($this->getRetailPrices()->toArray(), function ($price) use ($date) {
+        $retailPrices = $this->getRetailPrices();
+        if (!is_array($retailPrices)) {
+            $retailPrices = $retailPrices->toArray();
+        }
+        return array_filter($this->getRetailPrices(), function ($price) use ($date) {
             return $price->getDate() <= $date;
         });
     }
