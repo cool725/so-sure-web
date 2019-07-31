@@ -234,7 +234,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $phone->getMemory()),
                 sprintf('"%0.2f"', $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
-                sprintf('"%0.2f"', $phone->getRetailPrice())
+                sprintf('"%0.2f"', $phone->getCurrentRetailPrice()->getPrice())
             ]);
         }
         if (!$skipS3) {
