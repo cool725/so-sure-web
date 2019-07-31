@@ -481,12 +481,12 @@
                             <label>Retail Price</label>
                             <div class="input-group">
                                 <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-pound-sign"></i></span></div>
-                                <input type="text" class="form-control" id="retail_price" name="price"></input>
+                                <input type="text" class="form-control" id="retail_price" name="price" required></input>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Link to proof of price</label>
-                            <input type="text" class="form-control" id="retail_url" name="url"></input>
+                            <input type="text" class="form-control" id="retail_url" name="url" pattern="https?://.+" required></input>
                         </div>
                         <div class="form-group">
                             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
