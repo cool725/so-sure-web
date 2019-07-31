@@ -155,8 +155,6 @@ $(function(){
                 ]
             });
 
-            console.log(latest);
-
             modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
             modal.find('#phone_gwp').val(phone.gwp);
             modal.find('#phone_salva').html('£' + salva_standard + ' / £' + salva_min);
