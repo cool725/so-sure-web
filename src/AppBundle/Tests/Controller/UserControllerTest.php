@@ -2356,7 +2356,7 @@ class UserControllerTest extends BaseControllerTest
     public function testUserClaimFnol()
     {
         $email = self::generateEmail('testUserClaimFnol', $this);
-        $password = 'foo';
+        $password = 'bingBingWahoo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
             self::$userManager,
@@ -2370,9 +2370,29 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($now);
         self::$dm->flush();
-
         $this->login($email, $password);
         $this->submitFnolForm($policy, $now, Claim::TYPE_DAMAGE);
+    }
+
+    /**
+     * @group claim
+     */
+    public function testUserClaimFnolTheftPay()
+    {
+        $email = self::generateEmail('testUserClaimFnolTheftPay', $this);
+        $password = 'banognno';
+        $phone = self::getRandomPhone(self::$dm);
+        $highlighted = $phone->isHighlight();
+        $phone->setHighlight(true);
+        $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
+        $now = new \DateTime();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart($now);
+        self::$dm->persist($phone);
+        self::$dm->flush();
+        $this->login($email, $password);
+        $this->submitFnolForm($policy, $now, Claim::TYPE_LOSS);
     }
 
     /**
@@ -2995,7 +3015,7 @@ class UserControllerTest extends BaseControllerTest
         return $claim;
     }
 
-    private function submitFnolForm(Policy $policy, \DateTime $now, $type, $expectNoAdditionalClaimAllowed = false)
+    private function submitFnolForm(PhonePolicy $policy, \DateTime $now, $type, $expectNoAdditionalClaimAllowed = false)
     {
         $serializer = new Serializer(array(new DateTimeNormalizer()));
         $mobileNumber = self::generateRandomMobile();
@@ -3023,7 +3043,12 @@ class UserControllerTest extends BaseControllerTest
         $form['claim_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
         $form['claim_form[policyNumber]'] = $policy->getId();
         $crawler = self::$client->submit($form);
-
+        if ($policy->fullPremiumToBePaidForClaim($now, $type)) {
+            self::verifyResponse(302);
+            $crawler = self::$client->followRedirect();
+            $this->assertContains('you must pay', $this->getClientResponseContent());
+            return;
+        }
         self::verifyResponse(200);
         if ($expectNoAdditionalClaimAllowed) {
             $this->assertNotContains(
@@ -3055,8 +3080,7 @@ class UserControllerTest extends BaseControllerTest
         $form['claim_confirm_form[signature]'] = 'foo bar';
         $form['claim_confirm_form[type]'] = $type;
         $form['claim_confirm_form[network]'] = Claim::NETWORK_O2;
-        // @codingStandardsIgnoreStart
-        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla';
+        $form['claim_confirm_form[message]'] = 'bla bla bla bla bla bla bla bla bla bla bla bla bla bla blba bla bla';
         $form['claim_confirm_form[policyNumber]'] = $policy->getId();
         $crawler = self::$client->submit($form);
 

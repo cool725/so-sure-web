@@ -33,7 +33,7 @@ class SixpackService
     // Exp 1
     const EXPERIMENT_QUOTE_PAGE_CTA = 'cta-yes-please';
     // Exp 2
-    //
+    const EXPERIMENT_BURGER_MENU = 'burger-vs-full';
     // Exp 3
     //
     // Exp 4
@@ -128,7 +128,7 @@ class SixpackService
         // Exp 1.1
         self::EXPERIMENT_QUOTE_PAGE_CTA,
         // Exp 2
-        //
+        self::EXPERIMENT_BURGER_MENU,
         // Exp 3
         //
         // Exp 4
@@ -216,7 +216,7 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_QUOTE_PAGE_CTA,
         // Exp 2
-        //
+        self::EXPERIMENT_BURGER_MENU,
         // Exp 3
         //
         // Exp 4

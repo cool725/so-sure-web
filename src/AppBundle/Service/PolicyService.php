@@ -907,7 +907,6 @@ class PolicyService
     ) {
         $policy->cancelScheduledPayments();
         $this->generateScheduledPayments($policy, $date, $numPayments, $billingOffset);
-        $this->dm->flush();
     }
 
     public function generateScheduledPayments(
@@ -916,9 +915,6 @@ class PolicyService
         $numPayments = null,
         $billingOffset = null
     ) {
-        // initial purchase is payment received then create policy
-        // vs renewal which will have the number of payments requested
-        $isInitialPurchase = $numPayments === null;
         if (!$date) {
             if (!$policy->getBilling()) {
                 throw new \Exception('Unable to generate payments if policy does not have a start date');
@@ -977,11 +973,25 @@ class PolicyService
              * If this is the initial payment and it is bacs, it should be 7 days from today
              * regardless of the billing date the customer has set.
              */
+            $pendingPayments = $policy->getAllScheduledPayments('pending');
+            $pendingDates = [];
+            /** @var ScheduledPayment $pendingPayment */
+            foreach ($pendingPayments as $pendingPayment) {
+                if ($pendingPayment->getScheduled()) {
+                    $pendingDates[] = $pendingPayment->getScheduled()->format('Ymd');
+                }
+            }
             if ($numPaidPayments < 1 && $isBacs && $i === 1) {
                 $scheduledDate = new \DateTime();
+                if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
+                    continue;
+                }
                 $scheduledDate->add(new \DateInterval('P7D'));
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
+                if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
+                    continue;
+                }
                 // initial purchase should start at 1 month from initial purchase
                 $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
             }
@@ -1004,20 +1014,18 @@ class PolicyService
             $scheduledPayment->setScheduled($scheduledDate);
             if ($i == 1 && $numPayments == 1) {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
-            } elseif ($i <= 11) {
+            } elseif ($i < $numScheduledPayments) {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $policy->getStart() &&
-                $scheduledDate <= $policy->getStaticEnd() &&
-                $scheduledDate > new \DateTime()
-            ) {
+            if ($scheduledDate > $this->now()) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
-                $this->logger->notice('Attempted to set scheduled payment for before policy start.');
+                $this->logger->notice('Attempted to set scheduled payment for before today.');
             }
         }
+        $this->dm->flush();
     }
 
     /**
