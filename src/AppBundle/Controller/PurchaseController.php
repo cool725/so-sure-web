@@ -148,6 +148,9 @@ class PurchaseController extends BaseController
         // CTA From Quote Test - Proceed
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
+        // Burger vs Full Menu - Proceed
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
@@ -1309,6 +1312,7 @@ class PurchaseController extends BaseController
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
      * @Route("/checkout/{id}/unpaid", name="purchase_checkout_unpaid")
+     * @Route("/checkout/{id}/claim", name="purchase_checkout_claim")
      * @Method({"POST"})
      */
     public function checkoutAction(Request $request, $id)
@@ -1338,6 +1342,12 @@ class PurchaseController extends BaseController
             details are correct and try again or get in touch if you continue to have issues';
             $redirectSuccess = $this->generateUrl('user_unpaid_policy');
             $redirectFailure = $this->generateUrl('user_unpaid_policy');
+        } elseif ($request->get('_route') == 'purchase_checkout_claim') {
+            $successMessage = 'Success! Your payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('user_claim');
+            $redirectFailure = $this->generateUrl('user_claim_pay', ['policyId' => $id]);
         }
         $token = null;
         $pennies = null;

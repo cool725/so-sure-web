@@ -38,6 +38,8 @@ class ClaimsService
 
     const S3_CLAIMS_FOLDER = 'claim-documents';
     const LOGIN_LINK_TOKEN_EXPIRATION = 7200; // 2 hours
+    const PRE_FNOL_KEY_FORMAT = "claim:pre-fnol:%s";
+    const PRE_FNOL_EXPIRE_TIME = 15000;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -688,5 +690,45 @@ class ClaimsService
         }
 
         return null;
+    }
+
+    /**
+     * Caches a partially completed FNOL so that it can be returned to in a moment.
+     * It only saves it for a limited time (@see ClaimsService::PRE_FNOL_EXPIRE_TIME) so if the user gets lost along the
+     * way we are not storing junk for too long, and so if they come back at a later date they would presumably be
+     * wanting to start a fresh claim.
+     * If there was an existing one and this is called it overwrites it.
+     * The FNOL is cached against the user, not the policy.
+     * @param ClaimFnol $fnol is the FNOL to save.
+     */
+    public function cacheFnol(ClaimFnol $fnol)
+    {
+        $key = sprintf(ClaimsService::PRE_FNOL_KEY_FORMAT, $fnol->getUser()->getId());
+        $this->redis->setex($key, ClaimsService::PRE_FNOL_EXPIRE_TIME, serialize($fnol));
+    }
+
+    /**
+     * Finds a cached FNOL for a given user and returns it.
+     * @param User $user is the user for whom we are searching for a cached FNOL.
+     * @return ClaimFnol|null returns the found FNOL or null if there was not one found.
+     */
+    public function findCachedFnol(User $user)
+    {
+        $fnol = $this->redis->get(sprintf(ClaimsService::PRE_FNOL_KEY_FORMAT, $user->getId()));
+        if ($fnol) {
+            $fnol = unserialize($fnol);
+            $fnol->setUser($user);
+            return $fnol;
+        }
+        return null;
+    }
+
+    /**
+     * Removes a cached FNOL object.
+     * @param User $user is the user owning the fnol to remove.
+     */
+    public function uncacheFnol(User $user)
+    {
+        $this->redis->del(sprintf(ClaimsService::PRE_FNOL_KEY_FORMAT, $user->getId()));
     }
 }

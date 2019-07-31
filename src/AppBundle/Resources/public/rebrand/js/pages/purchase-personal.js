@@ -13,6 +13,7 @@ require('jquery-mask-plugin');
 require('fuse.js');
 require('jquery-validation');
 require('../common/validationMethods.js');
+let textFit = require('textfit');
 
 const sosure = sosure || {};
 
@@ -59,11 +60,21 @@ sosure.purchaseStepAddress = (function() {
             },
             rules: {
                 "purchase_form[firstName]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     validFirstName: true
                 },
                 "purchase_form[lastName]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     validLastName: true
                 },
                 "purchase_form[email]" : {
@@ -385,6 +396,8 @@ sosure.purchaseStepAddress = (function() {
 })();
 
 $(function(){
+
+    textFit($('.fit')[0], {detectMultiLine: false});
 
     sosure.purchaseStepAddress.init();
 

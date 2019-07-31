@@ -44,7 +44,7 @@
                             </ul>
                         </div>
                         <h1 class="text-white h1m mb-0">
-                            Insure your {{ phone.model }} <br class="d-none d-lg-inline"> <span id="price_rule">from just &pound;{{ phone_price.monthlyPremiumPrice }}</span> per month
+                            Insure your {{ phone.make }} {{ phone.model }} <br class="d-none d-lg-inline"> <span id="price_rule">from just &pound;{{ phone_price.monthlyPremiumPrice }}</span> per month
                         </h1>
                         {% if phone is defined and phone %}
                             {{ render(controller('AppBundle:Search:memorySearchDropdown', {
@@ -104,56 +104,59 @@
         </div>
     </section>
 
-
-    {# Why Insure #}
-    <section class="why-insure lozad py-lg-5">
-        <div class="container container-xtra py-5">
-            <div class="row">
-                <div class="col-lg-6">
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_{{ phone.make|lower }}-logo.png"
-                         alt="{{ phone.make }} - Phone Insurance"
-                         class="d-none d-lg-inline lozad">
+    {% if hide_section == false %}
+        {# Why Insure #}
+        <section class="why-insure lozad py-lg-5">
+            <div class="container container-xtra py-5">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_{{ phone.make|lower }}-logo.png"
+                             alt="{{ phone.make }} - Phone Insurance"
+                             class="d-none d-lg-inline lozad">
+                        {% if img_url in available_images %}
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                 data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hand-holding-{{ img_url }}.png"
+                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
+                                 class="img-fluid lozad mb-4 d-lg-none"
+                                 width="320px">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                 data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
+                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
+                                 class="img-fluid lozad mb-4 d-lg-none"
+                                 width="320px">
+                        {% endif %}
+                        <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {{ phone.model }}?</h2>
+                        {% block phone_why_insure_text %}{% endblock %}
+                        <a href="#" class="btn btn-primary btn-block-xs mx-auto mb-5 get-a-quote disabled">Get a Quote</a>
+                    </div>
+                </div>
+                <div class="why-insure__illustration-desktop d-none d-lg-block">
                     {% if img_url in available_images %}
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hand-holding-{{ img_url }}.png"
                              alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                             class="img-fluid lozad mb-4 d-lg-none"
-                             width="320px">
+                             class="img-fluid lozad mb-4">
                     {% else %}
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
                              alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                             class="img-fluid lozad mb-4 d-lg-none"
-                             width="320px">
+                             class="img-fluid lozad mb-4">
                     {% endif %}
-                    <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {{ phone.model }}?</h2>
-                    {% block phone_why_insure_text %}{% endblock %}
-                    <a href="#" class="btn btn-primary btn-block-xs mx-auto mb-5 get-a-quote disabled">Get a Quote</a>
                 </div>
             </div>
-            <div class="why-insure__illustration-desktop d-none d-lg-block">
-                {% if img_url in available_images %}
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hand-holding-{{ img_url }}.png"
-                         alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                         class="img-fluid lozad mb-4">
-                {% else %}
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
-                         alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                         class="img-fluid lozad mb-4">
-                {% endif %}
-            </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 
-    {# Extra Content #}
-    <section class="extra-content py-lg-5">
-        <div class="container container-xtra py-5">
-            {% block extra_content_one %}{% endblock %}
-        </div>
-    </section>
+    {% if hide_section == false %}
+        {# Extra Content #}
+        <section class="extra-content py-lg-5">
+            <div class="container container-xtra py-5">
+                {% block extra_content_one %}{% endblock %}
+            </div>
+        </section>
+    {% endif %}
 
     {# Cover #}
     <section class="cover py-lg-5">
@@ -347,12 +350,14 @@
     {# Comparison #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
 
-    {# Extra Content #}
-    <section class="extra-content py-lg-5">
-        <div class="container container-xtra py-5">
-            {% block extra_content_two %}{% endblock %}
-        </div>
-    </section>
+    {% if hide_section == false %}
+        {# Extra Content #}
+        <section class="extra-content py-lg-5">
+            <div class="container container-xtra py-5">
+                {% block extra_content_two %}{% endblock %}
+            </div>
+        </section>
+    {% endif %}
 
     {# Other phones #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_otherPhones.html.twig' %}

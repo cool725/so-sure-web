@@ -114,7 +114,11 @@
                     form_errors(purchase_form.postcode)|length > 0) %}
                     {% set display_error = true %}
                 {% endif %}
-                <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
+                <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">
+                    <ul>
+                        <li>Select an address from the dropdown after searching</li>
+                    </ul>
+                </div>
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
 {#
