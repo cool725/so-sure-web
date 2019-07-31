@@ -655,7 +655,7 @@ class AdminController extends BaseController
         $price = $request->get('price');
         $url = $request->get('url');
         if ($price > 0 && $url) {
-            $phone->setRetailPrice($price, $url);
+            $phone->addRetailPrice($price, $url, new \DateTime());
             $dm->persist($phone);
             $dm->flush();
             $this->addFlash('success', 'Successfully updated current retail price');

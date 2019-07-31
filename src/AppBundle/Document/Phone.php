@@ -104,20 +104,22 @@ class Phone
      */
     protected $memory;
 
-    /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice") */
-    protected $phonePrices = array();
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
+     */
+    protected $phonePrices = [];
+
+    /**
+     * List of the phone's retail prices over time. Not guaranteed to be in order.
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhoneRetailPrice")
+     */
+    protected $retailPrices = [];
 
     /**
      * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      */
     protected $initialPrice;
-
-    /**
-     * @Assert\Range(min=0,max=2000)
-     * @MongoDB\Field(type="float")
-     */
-    protected $currentRetailPrice;
 
     /**
      * @Assert\Range(min=0,max=2000)
@@ -130,18 +132,6 @@ class Phone
      * @MongoDB\Field(type="string")
      */
     protected $initialPriceUrl;
-
-    /**
-     * @Assert\Url(protocols = {"http", "https"})
-     * @MongoDB\Field(type="string")
-     */
-    protected $currentRetailPriceUrl;
-
-    /**
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
-     */
-    protected $currentRetailPriceDate;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -626,33 +616,56 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
-    public function getCurrentRetailPrice()
+    /**
+     * Adds a retail price to the phone's list of retail prices.
+     * @param float     $price is the actual price value.
+     * @param string    $url   is a link to proof of this price.
+     * @param \DateTime $date  is the date at which this becomes valid.
+     */
+    public function addRetailPrice($price, $url, $date)
     {
-        return $this->currentRetailPrice;
+        $retailPrice = new PhoneRetailPrice();
+        $retailPrice->setPrice($price);
+        $retailPrice->setUrl($url);
+        $retailPrice->setDate($date);
+        $this->retailPrices[] = $retailPrice;
     }
 
     /**
-     * Sets the current retail price for the phone.
-     * @param float  $price is the current retail price.
-     * @param string $url   is the url of proof of this price.
+     * Returns the list of the phone's retail prices in arbitrary order.
+     * @return array of all the phone retail prices.
      */
-    public function setRetailPrice($price, $url)
+    public function getRetailPrices()
     {
-        $this->currentRetailPrice = $price;
-        $this->currentRetailPriceUrl = $url;
+        return $this->retailPrices;
+    }
+
+    /**
+     * Gives you all of the phone's retail prices that are or have been in effect.
+     * @param \DateTime $date is the date to be considered as now.
+     * @return array of retail prices.
+     */
+    public function getPastRetailPrices($date)
+    {
+        return array_filter($this->getRetailPrices(), function($price) use $date {
+            return $price->getDate() <= $date;
+        });
     }
 
     /**
      * Gives you either the current retail price if there is one or the initial price.
+     * @param \DateTime $date is the date by which to find which retail price is current.
      * @return float the most up to date retail price stored.
      */
-    public function getRetailPrice()
+    public function getRetailPrice(\DateTime $date)
     {
-        if ($this->currentRetailPrice) {
-            return $this->currentRetailPrice;
-        } else {
-            return $this->initialPrice;
+        $retailPrices = $this->getPastRetailPrices();
+        if (count($retailPrices) == 0) {
+            return $this->getInitialRetailPrice();
         }
+        return usort($retailPrices, function ($a, $b) {
+            return $a->getDate() > $b->getDate();
+        })[0];
     }
 
     public function getReplacementPriceOrSuggestedReplacementPrice()
@@ -801,7 +814,7 @@ class Phone
         if ($date >= Salva::getSalvaBinderEndDate()) {
             throw new \Exception('No binder available');
         }
-        $price = $this->getRetailPrice();
+        $price = $this->getCurrentRetailPrice($date);
         if ($price <= 150) {
             return 3.99 + 1.5; // 5.49
         } elseif ($price <= 250) {
