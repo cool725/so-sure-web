@@ -647,25 +647,30 @@ class Phone
      */
     public function getPastRetailPrices($date)
     {
-        return array_filter($this->getRetailPrices(), function ($price) use ($date) {
+        return array_filter($this->getRetailPrices()->toArray(), function ($price) use ($date) {
             return $price->getDate() <= $date;
         });
     }
 
     /**
      * Gives you either the current retail price if there is one or the initial price.
-     * @param \DateTime $date is the date by which to find which retail price is current.
+     * @param \DateTime|null $date is the date by which to find which retail price is current. If null is given it will
+     *                             default to the current time and date.
      * @return float the most up to date retail price stored.
      */
-    public function getCurrentRetailPrice(\DateTime $date)
+    public function getCurrentRetailPrice(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime("now", new \DateTimeZone(SoSure::TIMEZONE));
+        }
         $retailPrices = $this->getPastRetailPrices($date);
         if (count($retailPrices) == 0) {
             return $this->getInitialPrice();
         }
-        return usort($retailPrices, function ($a, $b) {
-            return $a->getDate() > $b->getDate();
-        })[0];
+        usort($retailPrices, function ($a, $b) {
+            return ($a->getDate() < $b->getDate()) ? 1 : -1;
+        });
+        return $retailPrices[0]->getPrice();
     }
 
     public function getReplacementPriceOrSuggestedReplacementPrice()
@@ -815,6 +820,7 @@ class Phone
             throw new \Exception('No binder available');
         }
         $price = $this->getCurrentRetailPrice($date);
+        var_dump($price);
         if ($price <= 150) {
             return 3.99 + 1.5; // 5.49
         } elseif ($price <= 250) {

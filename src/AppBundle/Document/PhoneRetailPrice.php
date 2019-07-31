@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
@@ -15,6 +16,7 @@ class PhoneRetailPrice
     /**
      * Current retail price.
      * @Assert\Range(min=0,max=5000)
+     * @MongoDB\Field(type="float")
      */
     protected $price;
 
