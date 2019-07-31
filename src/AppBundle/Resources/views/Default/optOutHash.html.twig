@@ -1,5 +1,5 @@
 {% extends 'base_rebrand.html.twig' %}
-{% form_theme optin_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
+{% form_theme marketing_optout_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 {% form_theme optout_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
@@ -24,14 +24,14 @@
                     <div class="cardbox cardbox-100 mb-4">
                         <div class="cardbox__body">
                             <h5 class="mb-3">Marketing Communications:</h5>
-                            {{ form_start(optin_form, { 'attr': {'class': ''}}) }}
+                            {{ form_start(marketing_optout_form, { 'attr': {'class': ''}}) }}
                                 <div class="form-group mb-4">
-                                    {{ form_widget(optin_form.categories) }}
+                                    {{ form_widget(marketing_optout_form.categories) }}
                                 </div>
                                 <div class="form">
-                                    {{ form_widget(optin_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-square btn-block-xs'}}) }}
+                                    {{ form_widget(marketing_optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-square btn-block-xs'}}) }}
                                 </div>
-                            {{ form_end(optin_form) }}
+                            {{ form_end(marketing_optout_form) }}
                         </div>
                     </div>
                     <div class="cardbox cardbox-100">

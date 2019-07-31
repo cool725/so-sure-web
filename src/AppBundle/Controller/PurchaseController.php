@@ -148,6 +148,9 @@ class PurchaseController extends BaseController
         // CTA From Quote Test - Proceed
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
+        // Burger vs Full Menu - Proceed
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
@@ -264,8 +267,6 @@ class PurchaseController extends BaseController
 
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
-
-
 
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
@@ -1282,133 +1283,28 @@ class PurchaseController extends BaseController
     }
 
     /**
+     * Deprecated route redirecting to authenticated version under user controller.
      * @Route("/cancel/{id}", name="purchase_cancel")
      * @Route("/cancel/damaged/{id}", name="purchase_cancel_damaged")
-     * @Template
      */
     public function cancelAction(Request $request, $id)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($id);
-        if (!$policy) {
-            throw $this->createNotFoundException('Unable to see policy');
+        $route = $request->get('_route');
+        if ($route == 'purchase_cancel') {
+            return $this->redirectToRoute('user_cancel', ['id' => $id]);
+        } elseif ($route == 'purchase_cancel_damaged') {
+            return $this->redirectToRoute('user_cancel_damaged', ['id' => $id]);
         }
-
-        if (!$policy->hasViewedCancellationPage()) {
-            $policy->setViewedCancellationPage(\DateTime::createFromFormat('U', time()));
-            $dm->flush();
-        }
-        $cancelForm = $this->get('form.factory')
-            ->createNamedBuilder('cancel_form', UserCancelType::class)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('cancel_form')) {
-                $cancelForm->handleRequest($request);
-                if ($cancelForm->isValid()) {
-                    $reason = $cancelForm->getData()['reason'];
-                    $other = $this->conformAlphanumericSpaceDot($cancelForm->getData()['othertxt'], 256);
-                    $flash = null;
-                    $canCancelCooloff = $policy->canCancel(Policy::CANCELLED_COOLOFF, null, false, false);
-                    if ($canCancelCooloff) {
-                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
-                        $policy->setRequestedCancellationReason($reason);
-                        if ($other) {
-                            $policy->setRequestedCancellationReasonOther($other);
-                        }
-                        $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
-                        $note = new StandardNote();
-                        $note->setDate(new \DateTime());
-                        $note->setUser($policy->getUser());
-                        $note->setNotes("Policy auto cancelled in cooloff.");
-                        $policy->addNotesList($note);
-                        $dm->flush();
-                        $flash = "You should receive an email confirming that your policy is now cancelled.";
-                        $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
-                    } elseif (!$policy->hasRequestedCancellation()) {
-                        // @codingStandardsIgnoreStart
-                        $flash = "We have passed your request to our policy team. You should receive a cancellation email once that is processed.";
-                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site. %s was given as the reason. so-sure support team: Please contact the policy holder to get their reason(s) for cancelling before action. Additional comments: %s";
-                        // @codingStandardsIgnoreEnd
-                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
-                        $policy->setRequestedCancellationReason($reason);
-                        if ($other) {
-                            $policy->setRequestedCancellationReasonOther($other);
-                        }
-                        $dm->flush();
-                        $intercom = $this->get('app.intercom');
-                        $intercom->queueMessage(
-                            $policy->getUser()->getEmail(),
-                            sprintf(
-                                $message,
-                                $this->generateUrl(
-                                    'admin_policy',
-                                    ['id' => $policy->getId()],
-                                    UrlGeneratorInterface::ABSOLUTE_URL
-                                ),
-                                $policy->getPolicyNumber(),
-                                $policy->getId(),
-                                $reason,
-                                $other
-                            )
-                        );
-                    } else {
-                        $this->addFlash(
-                            "warning",
-                            "Cancellation has already been requested and is currently processing."
-                        );
-                    }
-                    if ($flash) {
-                        $this->addFlash("success", $flash);
-                        $this->get('app.mixpanel')->queueTrack(
-                            MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
-                            [
-                                'Policy Id' => $policy->getId(),
-                                'Reason' => $reason,
-                                'Auto Approved' => $canCancelCooloff
-                            ]
-                        );
-                    }
-                    return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
-                }
-            }
-        } else {
-            $this->get('app.mixpanel')->queueTrack(
-                MixpanelService::EVENT_CANCEL_POLICY_PAGE,
-                ['Policy Id' => $policy->getId()]
-            );
-        }
-
-        if ($request->get('_route') == "purchase_cancel_damaged") {
-            $template = 'AppBundle:Purchase:cancelDamaged.html.twig';
-        } else {
-            $template = 'AppBundle:Purchase:cancel.html.twig';
-        }
-        $data = [
-            'policy' => $policy,
-            'cancel_form' => $cancelForm->createView(),
-        ];
-
-        return $this->render($template, $data);
+        throw new \Exception("non route");
     }
 
     /**
+     * Deprecated route, but still in old emails.
      * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
-     * @Template
      */
     public function cancelRequestedAction($id)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policy = $repo->find($id);
-        if (!$policy) {
-            throw $this->createNotFoundException('Unable to see policy');
-        }
-
-        return [
-            'policy' => $policy,
-        ];
+        return $this->redirectToRoute('user_cancel_requested', ['id' => $id]);
     }
 
     /**
@@ -1416,6 +1312,7 @@ class PurchaseController extends BaseController
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
      * @Route("/checkout/{id}/unpaid", name="purchase_checkout_unpaid")
+     * @Route("/checkout/{id}/claim", name="purchase_checkout_claim")
      * @Method({"POST"})
      */
     public function checkoutAction(Request $request, $id)
@@ -1445,6 +1342,12 @@ class PurchaseController extends BaseController
             details are correct and try again or get in touch if you continue to have issues';
             $redirectSuccess = $this->generateUrl('user_unpaid_policy');
             $redirectFailure = $this->generateUrl('user_unpaid_policy');
+        } elseif ($request->get('_route') == 'purchase_checkout_claim') {
+            $successMessage = 'Success! Your payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('user_claim');
+            $redirectFailure = $this->generateUrl('user_claim_pay', ['policyId' => $id]);
         }
         $token = null;
         $pennies = null;

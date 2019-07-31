@@ -1,16 +1,33 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-Sorry, please attempt phone validation again ⚠️
 
-**
-------------------------------------------------------------
-Thanks for using our app to validate your phone. Unfortunately, the photo you sent in didn't quite give us enough information to validate your phone.
+Sorry, please attempt to validate again ⚠️
 
-Please re-launch the app and re-try the process making sure that the photo you upload has the full phone in the photo and that the image is non-blury and the lighting in enough to clearly see the screen.
+Hi {{ policy.user.firstName }},
+
+😔 Unfortunately, the photo you sent in didn't quite give us enough information to validate your phone. Please re-launch the app and re-try the process making sure that the photo you upload has the full phone in the photo.
 
 {% if additional_message|length > 0 %}
-Additionally, please keep the following in mind:
+🤔 Additionally, please keep the following in mind:
+
 {{ additional_message }}
 {% endif %}
 
-{% endblock body %}
+Have another go to reduce your excess by &pound;100! 😆
+
+Open the app: {{ branch_pot_url }}
+
+Have a question or issue? Contact us: {{ contact_us_url }}
+
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

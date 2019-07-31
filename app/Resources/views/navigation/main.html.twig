@@ -7,6 +7,14 @@
     {% set navbar_class = 'navbar-so-sure' %}
 {% endif %}
 
+{# Set menu exp #}
+{% set menu_breakpoint = 'd-xl-block' %}
+{% set menu_show = 'd-xl-none' %}
+{% if menu_exp is defined and menu_exp == 'menu-burger' %}
+    {% set menu_breakpoint = '' %}
+    {% set menu_show = '' %}
+{% endif %}
+
 <nav id="main-nav" class="navbar {{ navbar_class }} justify-content-between flex-nowrap flex-row pl-lg-5">
 
     {# Logo #}
@@ -28,7 +36,7 @@
         {% include '::navigation/company.html.twig' %}
     {% else %}
         <ul class="nav navbar-nav flex-row align-items-center">
-            <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
+            <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
                 <a href="#"
                    class="nav-link dropdown-toggle"
                    id="why_so_sure_nav"
@@ -55,7 +63,7 @@
                     </a>
                 </div>
             </li>
-            <li class="nav-item dropdown d-none d-xl-block pr-xl-5">
+            <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
                 <a href="#"
                    class="nav-link dropdown-toggle"
                    id="about_us_nav"
@@ -90,14 +98,14 @@
                     </a> #}
                 </div>
             </li>
-            <li class="nav-item d-none d-xl-block pr-xl-5">
+            <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
                 <a href="https://blog.wearesosure.com"
                    target="_blank"
                    rel="noopener noreferrer"
                    class="nav-link">Blog</a>
             </li>
             {% if hide_login is not defined %}
-                <li class="nav-item d-none d-xl-block pr-xl-5">
+                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
                     <a href="{{ path('claim') }}"
                        class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
                         Make a Claim
@@ -105,7 +113,7 @@
                 </li>
             {% endif %}
             {% if user_mode is not defined %}
-                <li class="nav-item d-none d-xl-block pr-xl-5">
+                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
                     <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
                 </li>
             {% endif %}
@@ -132,7 +140,7 @@
             {% endif %}
             {# End Mobile Login #}
             {% if app.user is not null and app.user %}
-                <li class="nav-item d-none d-xl-block pr-xl-5">
+                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
                     {% if is_granted('ROLE_ADMIN') %}
                         <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
                     {% elseif is_granted('ROLE_EMPLOYEE') %}
@@ -146,21 +154,26 @@
             {% endif %}
             {# Desktop Login #}
             {% if hide_login is not defined %}
-                <li class="nav-item d-none d-xl-block pr-xl-5">
+                <li class="nav-item d-none d-xl-block {% if menu_exp is defined and menu_exp == 'menu-burger' %}pr-xl-2{% else %}pr-xl-5{% endif %}">
                     {% if app.user is not null and app.user %}
                         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                             <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
                         {% else %}
-                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
+                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link {% if menu_exp is defined and menu_exp == 'menu-burger' %}show-in-nav{% endif %}">Log out</i></a>
                         {% endif %}
                     {% else %}
-                        <a href="{{ path('fos_user_security_login') }}"
-                           class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+                        {% if menu_exp is defined and menu_exp == 'menu-burger' %}
+                            <a href="{{ path('fos_user_security_login') }}"
+                               class="btn btn-outline-columbia-blue-f btn-sm show-in-nav">Customer login</a>
+                        {% else %}
+                            <a href="{{ path('fos_user_security_login') }}"
+                               class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+                        {% endif %}
                     {% endif %}
                 </li>
             {% endif %}
             {# End Desktop Login #}
-            <li class="nav-item d-xl-none">
+            <li class="nav-item {% if menu_exp is defined and menu_exp == 'menu-burger' %}pr-lg-5{% else %}d-xl-none{% endif %}">
                 <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse show-in-nav" type="button">
                     <span class="hamburger-box">
                         <span class="hamburger-inner"></span>

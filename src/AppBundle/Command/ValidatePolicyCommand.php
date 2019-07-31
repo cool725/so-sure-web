@@ -477,6 +477,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $lines[] = $this->failureScheduledPaymentsMessage($policy, $data['validateDate']);
                 }
             }
+            if ($policy->getDontCancelIfUnpaid() === true) {
+                $lines[] = sprintf(
+                    'WARNING!! policy %s has the dont cancel if unpaid flag on',
+                    $policy->getPolicyNumber()
+                );
+            }
 
             $allowedVariance = 0;
             // allow up to 1 month difference for non-active policies

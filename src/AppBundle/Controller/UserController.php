@@ -4,11 +4,15 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\ValidatorTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Stats;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Document\Note\StandardNote;
+use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -40,6 +44,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
+use AppBundle\Form\Type\UserCancelType;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolDamage;
@@ -115,6 +120,7 @@ class UserController extends BaseController
 {
     use DateTrait;
     use CurrencyTrait;
+    use ValidatorTrait;
 
     /**
      * @Route("", name="user_home")
@@ -327,15 +333,19 @@ class UserController extends BaseController
                         'warning',
                         sprintf("SCode %s is missing or been withdrawn", $code)
                     );
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
                 }
-
+                if ($scode->isReward() && $scode->isActive() && !$scode->canApplyReward($policy)) {
+                    $this->addFlash('warning', sprintf('Sorry, promo code %s cannot be applied', $code));
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
+                }
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                    if ($invitation) {
+                    if ($invitation && !$scode->isReward()) {
                         $message = sprintf(
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
@@ -345,9 +355,7 @@ class UserController extends BaseController
                             SixpackService::EXPERIMENT_APP_SHARE_METHOD
                         );
                     } else {
-                        $message = sprintf(
-                            'Your bonus has been added'
-                        );
+                        $message = 'Your bonus has been added';
                     }
                     $this->addFlash('success', $message);
 
@@ -355,18 +363,26 @@ class UserController extends BaseController
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 } catch (DuplicateInvitationException $e) {
+                    $message = sprintf("SCode %s has already been used by you", $code);
+                    if ($scode->isReward()) {
+                        $message = sprintf("Promo Code %s has already been applied", $code);
+                    }
                     $this->addFlash(
                         'warning',
-                        sprintf("SCode %s has already been used by you", $code)
+                        $message
                     );
 
                     return new RedirectResponse(
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 } catch (ConnectedInvitationException $e) {
+                    $message = sprintf("You're already connected");
+                    if ($scode->isReward()) {
+                        $message = sprintf("Promo Code %s has already been applied", $code);
+                    }
                     $this->addFlash(
                         'warning',
-                        sprintf("You're already connected")
+                        $message
                     );
 
                     return new RedirectResponse(
@@ -412,6 +428,15 @@ class UserController extends BaseController
                     $this->addFlash(
                         'warning',
                         sprintf("You or your friend has a claim.")
+                    );
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                    );
+                } catch (CannotApplyRewardException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("Cannot apply Promo Code to policy.")
                     );
 
                     return new RedirectResponse(
@@ -1221,6 +1246,9 @@ class UserController extends BaseController
         // CTA From Quote Test - Purchase
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
 
+        // Burger vs Full Menu - Purchase
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+
         $smsExperiment = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_APP_LINK_SMS,
@@ -1495,13 +1523,12 @@ class UserController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
-
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
-
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             throw $this->createNotFoundException('No active policy found');
         }
-
+        // If the user has an open claim on all of their policies then they can't make a claim right now so send them to
+        // one of their open claims.
         if (count($user->getValidPoliciesWithoutOpenedClaim(true)) == 0) {
             $policies = $user->getValidPolicies();
             foreach ($policies as $policy) {
@@ -1515,89 +1542,136 @@ class UserController extends BaseController
             }
             throw $this->createNotFoundException('No active claimable policy found');
         }
-
+        // check if there is a cached fnol object for this user.
+        $dm = $this->getManager();
+        /** @var ClaimsService $claimsService */
+        $claimsService = $this->get("app.claims");
+        /** @var PolicyRepository $policyRepository */
+        $policyRepo = $dm->getRepository(Policy::class);
         $policy = null;
-        $claimFnol = new ClaimFnol();
-        $claimFnolConfirm = new ClaimFnol();
-
-        $claimFnol->setUser($user);
-
+        $fnol = $claimsService->findCachedFnol($user);
+        $cachedFnol = true;
+        if (!$fnol) {
+            $cachedFnol = false;
+            $fnol = new ClaimFnol();
+            $fnol->setUser($user);
+        } else {
+            $policy = $policyRepo->find($fnol->getPolicyNumber());
+        }
+        $fnolConfirm = clone $fnol;
         $claimForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
+            ->createNamedBuilder('claim_form', ClaimFnolType::class, $fnol)
             ->getForm();
         $claimConfirmForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
+            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $fnolConfirm)
             ->getForm();
-
+        // Process forms if they have been submitted.
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
-                    $dm = $this->getManager();
-                    $policyRepo = $dm->getRepository(Policy::class);
-                    /** @var Policy $policy */
-                    $policy = $policyRepo->find($claimFnol->getPolicyNumber());
+                    /** @var PhonePolicy $policy */
+                    $policy = $policyRepo->find($fnol->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-                    if (in_array($claimFnol->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
+                    if (in_array($fnol->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
                         !$policy->isAdditionalClaimLostTheftApprovedAllowed()) {
                         // @codingStandardsIgnoreStart
                         $this->addFlash(
                             'error',
-                            'Sorry, but we are unable to accept an additional claim on your policy for loss or theft as you already have had 2 successful claims'
+                            'Sorry, but we are unable to accept an additional claim on your policy for loss or theft '.
+                            'as you already have had 2 successful claims'
                         );
                         // @codingStandardsIgnoreEnd
                     } else {
-                        $claimFnolConfirm = clone $claimFnol;
-                        $claimConfirmForm = $this->get('form.factory')
-                            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
-                            ->getForm();
+                        // create and cache fnol object, then see where we need to go next.
+                        $claimsService->cacheFnol($fnol);
+                        if ($policy->fullPremiumToBePaidForClaim(new \DateTime(), $fnol->getType())) {
+                            // if the full premium is required then we send them to the payent page.
+                            return $this->redirectToRoute('user_claim_pay', ["policyId" => $policy->getId()]);
+                        } else {
+                            // if the full premium is not required then we run the request again with the fnol cached.
+                            $cachedFnol = true;
+                            $fnolConfirm = $claimsService->findCachedFnol($policy->getUser());
+                            $claimConfirmForm = $this->get('form.factory')
+                                ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $fnolConfirm)
+                                ->getForm();
+                        }
                     }
                 }
             } elseif ($request->request->has('claim_confirm_form')) {
                 $claimConfirmForm->handleRequest($request);
                 if ($claimConfirmForm->isValid()) {
-                    $dm = $this->getManager();
-                    $policyRepo = $dm->getRepository(Policy::class);
-                    $policy = $policyRepo->find($claimFnolConfirm->getPolicyNumber());
+                    /** @var PhonePolicy $policy */
+                    $policy = $policyRepo->find($fnol->getPolicyNumber());
                     if (!$policy) {
                         throw $this->createNotFoundException('Policy not found');
                     }
+                    $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
                     $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-
-                    /** @var ClaimsService $claimsService */
-                    $claimsService = $this->get('app.claims');
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
                     $claim->setPolicy($policy);
                     $policy->addClaim($claim);
                     $claimsService->notifyFnolSubmission($claim);
                     $dm->flush();
-
+                    $claimsService->uncacheFnol($user);
                     return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
-
-        /** @var PhonePolicy $phonePolicy */
-        $phonePolicy = $policy;
-        $data = [
-            'username' => $user->getName(),
-            'phone' => $phonePolicy ? sprintf(
-                "%s %s (IMEI %s)",
-                $phonePolicy->getPhone()->getMake(),
-                $phonePolicy->getPhone()->getModel(),
-                $phonePolicy->getImei()
-            ) : '',
-            'claim_type' => $claimFnol->getTypeString(),
-            'policy_date' => $policy ? $policy->getStart() : '',
-            'claim_form' => $claimForm->createView(),
-            'claim_confirm_form' => $claimConfirmForm->createView(),
-            'current' => empty($claimFnolConfirm->getEmail()) ? 'claim' : 'claim-confirm',
-        ];
-
+        // Render one of the two tabs.
+        $data = [];
+        if ($cachedFnol) {
+            if ($policy->fullPremiumToBePaidForClaim(new \DateTime(), $fnol->getType())) {
+                return $this->redirectToRoute('user_claim_pay', ['policyId' => $policy->getId()]);
+            }
+            $phoneRecord = $policy->getPhone();
+            $phone = sprintf("%s %s (IMEI %s)", $phoneRecord->getMake(), $phoneRecord->getModel(), $policy->getImei());
+            $data = [
+                'current' => 'claim-confirm',
+                'username' => $user->getName(),
+                'phone' => $phone,
+                'claim_type' => $fnol->getTypeString(),
+                'policy_date' => $policy->getStart(),
+                'claim_form' => $claimForm->createView(),
+                'claim_confirm_form' => $claimConfirmForm->createView(),
+                'warn_pay' => $policy->fullPremiumToBePaidForClaim(new \DateTime(), Claim::TYPE_THEFT)
+            ];
+        } else {
+            $data = [
+                'current' => 'claim',
+                'username' => $user->getName(),
+                'claim_form' => $claimForm->createView(),
+                'warn_pay' => $user->hasPolicyForFullPaymentClaim(new \DateTime())
+            ];
+        }
         return $this->render('AppBundle:User:claim.html.twig', $data);
+    }
+
+    /**
+     * @Route("/claim-pay/{policyId}", name="user_claim_pay")
+     * @Template
+     */
+    public function claimPayAction($policyId)
+    {
+        $policyRepo = $this->getManager()->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unknown policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        $amount = $policy->getRemainderOfPolicyPrice();
+        if ($amount <= 0) {
+            return $this->redirectToRoute("user_claim");
+        }
+        return [
+            'phone' => $policy->getPhone(),
+            'amount' => $amount,
+            'policy' => $policy,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
+        ];
     }
 
     /**
@@ -1702,7 +1776,8 @@ class UserController extends BaseController
                 // @codingStandardsIgnoreStart
                 $this->addFlash(
                     'warning-raw',
-                    'This appears to be an older claim that was never resolved. Please contact <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
+                    'This appears to be an older claim that was never resolved. Please contact '.
+                    '<a href="mailto:support@wearesosure.com">support@wearesosure.com</a> for help'
                 );
                 // @codingStandardsIgnoreEnd
             }
@@ -2020,7 +2095,135 @@ class UserController extends BaseController
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,
             'policy' => $policy,
-            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
+        ];
+    }
+
+    /**
+     * @Route("/cancel/{id}", name="user_cancel")
+     * @Route("/cancel/damaged/{id}", name="user_cancel_damaged")
+     * @Template
+     */
+    public function cancelAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        if (!$policy->hasViewedCancellationPage()) {
+            $policy->setViewedCancellationPage(\DateTime::createFromFormat('U', time()));
+            $dm->flush();
+        }
+        $cancelForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_form', UserCancelType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cancel_form')) {
+                $cancelForm->handleRequest($request);
+                if ($cancelForm->isValid()) {
+                    $reason = $cancelForm->getData()['reason'];
+                    $other = $this->conformAlphanumericSpaceDot($cancelForm->getData()['othertxt'], 256);
+                    $flash = null;
+                    $canCancelCooloff = $policy->canCancel(Policy::CANCELLED_COOLOFF, null, false, false);
+                    if ($canCancelCooloff) {
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
+                        $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
+                        $this->get("app.policy")->cancel($policy, Policy::CANCELLED_COOLOFF);
+                        $note = new StandardNote();
+                        $note->setDate(new \DateTime());
+                        $note->setUser($policy->getUser());
+                        $note->setNotes("Policy auto cancelled in cooloff.");
+                        $policy->addNotesList($note);
+                        $dm->flush();
+                        $flash = "You should receive an email confirming that your policy is now cancelled.";
+                        $this->get("app.stats")->increment(Stats::AUTO_CANCEL_IN_COOLOFF);
+                    } elseif (!$policy->hasRequestedCancellation()) {
+                        // @codingStandardsIgnoreStart
+                        $flash = "We have passed your request to our policy team. You should receive a cancellation ".
+                           "email once that is processed.";
+                        $message = "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a ".
+                            "cancellation via the site. %s was given as the reason. so-sure support team: Please ".
+                            "contact the policy holder to get their reason(s) for cancelling before action. ".
+                            "Additional comments: %s";
+                        // @codingStandardsIgnoreEnd
+                        $policy->setRequestedCancellation(\DateTime::createFromFormat('U', time()));
+                        $policy->setRequestedCancellationReason($reason);
+                        if ($other) {
+                            $policy->setRequestedCancellationReasonOther($other);
+                        }
+                        $dm->flush();
+                        $intercom = $this->get('app.intercom');
+                        $intercom->queueMessage(
+                            $policy->getUser()->getEmail(),
+                            sprintf(
+                                $message,
+                                $this->generateUrl(
+                                    'admin_policy',
+                                    ['id' => $policy->getId()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                                $policy->getPolicyNumber(),
+                                $policy->getId(),
+                                $reason,
+                                $other
+                            )
+                        );
+                    } else {
+                        $this->addFlash(
+                            "warning",
+                            "Cancellation has already been requested and is currently processing."
+                        );
+                    }
+                    if ($flash) {
+                        $this->addFlash("success", $flash);
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
+                            [
+                                'Policy Id' => $policy->getId(),
+                                'Reason' => $reason,
+                                'Auto Approved' => $canCancelCooloff
+                            ]
+                        );
+                    }
+                    return $this->redirectToRoute('user_cancel_requested', ['id' => $id]);
+                }
+            }
+        } else {
+            $this->get('app.mixpanel')->queueTrack(
+                MixpanelService::EVENT_CANCEL_POLICY_PAGE,
+                ['Policy Id' => $policy->getId()]
+            );
+        }
+        if ($request->get('_route') == "user_cancel_damaged") {
+            $template = 'AppBundle:User:cancelDamaged.html.twig';
+        } else {
+            $template = 'AppBundle:User:cancel.html.twig';
+        }
+        $data = ['policy' => $policy, 'cancel_form' => $cancelForm->createView()];
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/cancel/{id}/requested", name="user_cancel_requested")
+     * @Template
+     */
+    public function cancelRequestedAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        return [
+            'policy' => $policy,
         ];
     }
 

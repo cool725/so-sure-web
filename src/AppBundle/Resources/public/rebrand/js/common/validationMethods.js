@@ -30,6 +30,24 @@ $(function(){
 
     }, 'Please enter your full name');
 
+    // validFirstName
+    jQuery.validator.addMethod('validFirstName', function(value, element) {
+
+        value = removeAccents(value);
+
+        return this.optional(element) || value.match(/^[A-Za-z]+$/);
+
+    }, 'Please enter a valid first name');
+
+    // validLastName
+    jQuery.validator.addMethod('validLastName', function(value, element) {
+
+        value = removeAccents(value);
+
+        return this.optional(element) || value.match(/^[-'a-zA-Z]+[-'a-zA-Z]+\s?$/);
+
+    }, 'Please enter a valid last name');
+
     // LastName
     jQuery.validator.addMethod('LastName', function(value, element, param) {
 

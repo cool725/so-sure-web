@@ -275,11 +275,15 @@ class PhoneInsuranceController extends BaseController
         $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
         $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
 
+        // A/B CTA Test
         $ctaText = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_QUOTE_PAGE_CTA,
             ['cta-original', 'cta-yes-please']
         );
+
+        // Burger vs Full Menu - Proceed
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
@@ -450,9 +454,6 @@ class PhoneInsuranceController extends BaseController
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                 ]);
             }
-
-            // A/B Homepage USPS test
-            // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USPS);
         }
 
         // Hyphenate Model for images/template
@@ -534,6 +535,7 @@ class PhoneInsuranceController extends BaseController
         ];
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        $hideSection = false;
 
         // SEO pages
         // TODO: Add check if file exists or redirect to 404
@@ -560,7 +562,8 @@ class PhoneInsuranceController extends BaseController
 
             // Check if template exists
             if (!$this->get('templating')->exists($template)) {
-                return $this->redirectToRoute('phone_insurance');
+                $hideSection = true;
+                $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
             }
         }
 
@@ -590,6 +593,7 @@ class PhoneInsuranceController extends BaseController
             'img_url'          => $modelHyph,
             'available_images' => $availableImages,
             'cta_exp'          => $ctaText,
+            'hide_section'     => $hideSection,
         );
 
         return $this->render($template, $data);

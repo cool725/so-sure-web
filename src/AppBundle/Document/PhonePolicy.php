@@ -8,6 +8,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\PolicyException;
 use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Annotation\DataChange;
@@ -927,6 +928,29 @@ class PhonePolicy extends Policy
         } else {
             return $phonePremium->getExcess();
         }
+    }
+
+    /**
+     * Tells us if the full premium needs to be paid before a claim can go ahead. Checks if the full premium has already
+     * been paid and if it has then it will say it does not still need to be paid.
+     * Business logic is that policy must be paid to date if the claim is within the first month and the phone is a
+     * highlighted model and the claim is for loss or theft.
+     * @param \DateTime $date      is the date at which this question is being asked.
+     * @param string    $claimType is the type of claim in question. Should be one of Claim::TYPE_*.
+     * @return boolean true if the full premium needs to be paid or false if no payment needs to be made.
+     */
+    public function fullPremiumToBePaidForClaim(\DateTime $date, $claimType)
+    {
+        if (!in_array($claimType, [Claim::TYPE_THEFT, Claim::TYPE_LOSS]) || $this->getOutstandingPremium() <= 0) {
+            return false;
+        }
+        $phone = $this->getPhone();
+        if (!$phone->isHighlight() || !$this->getStart()) {
+            return false;
+        }
+        $wall = clone $this->getStart();
+        $wall->add(new \DateInterval("P1M"));
+        return $date < $wall;
     }
 
     /**

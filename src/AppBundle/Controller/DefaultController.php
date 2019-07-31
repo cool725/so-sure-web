@@ -7,6 +7,7 @@ use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Form\Type\CompanyLeadType;
 use AppBundle\Form\Type\EmailOptInType;
 use AppBundle\Form\Type\EmailOptOutType;
+use AppBundle\Form\Type\MarketingEmailOptOutType;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
@@ -55,6 +56,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
@@ -87,18 +89,19 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:index.html.twig';
 
-        // A/B Homepage USPS test
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_HOMEPAGE_USPS,
-        //     ['homepage', 'homepage-usps']
-        // );
+        // A/B Menu Test
+        // To Test use url param ?force=menu-burger / ?force=menu-full
+        $menuExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_BURGER_MENU,
+            ['menu-burger', 'menu-full']
+        );
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            // 'exp'       => $exp,
+            'menu_exp' => $menuExp,
         );
 
         return $this->render($template, $data);
@@ -1083,23 +1086,13 @@ class DefaultController extends BaseController
             return new RedirectResponse($this->generateUrl('optout'));
         }
         $rateLimit = $this->get('app.ratelimit');
-        if (!$rateLimit->allowedByIp(
-            RateLimitService::DEVICE_TYPE_OPT,
-            $request->getClientIp()
-        )) {
-            $this->addFlash(
-                'error',
-                'Too many requests! Please try again later'
-            );
-
+        if (!$rateLimit->allowedByIp(RateLimitService::DEVICE_TYPE_OPT, $request->getClientIp())) {
+            $this->addFlash('error', 'Too many requests! Please try again later');
             return new RedirectResponse($this->generateUrl('homepage'));
         }
-
         $email = SoSure::decodeCommunicationsHash($hash);
-
         /** @var InvitationService $invitationService */
         $invitationService = $this->get('app.invitation');
-
         /** @var EmailOptOutRepository $optOutRepo */
         $optOutRepo = $this->getManager()->getRepository(EmailOptOut::class);
         /** @var EmailOptOut $optOut */
@@ -1108,80 +1101,52 @@ class DefaultController extends BaseController
             $optOut = new EmailOptOut();
             $optOut->setEmail($email);
         }
-
-        $optInRepo = $this->getManager()->getRepository(EmailOptIn::class);
-        $optIn = $optInRepo->findOneBy(['email' => mb_strtolower($email)]);
-        if (!$optIn) {
-            $optIn = new EmailOptIn();
-            $optIn->setEmail($email);
-        }
-
-        $optInForm = $this->get('form.factory')
-            ->createNamedBuilder('optin_form', EmailOptInType::class, $optIn)
+        $marketingOptOutForm = $this->get('form.factory')
+            ->createNamedBuilder(
+                'marketing_optout_form',
+                MarketingEmailOptOutType::class,
+                null,
+                ['checked' => $optOut->hasCategory(Opt::OPTOUT_CAT_MARKETING)]
+            )
             ->getForm();
-
         $optOutForm = $this->get('form.factory')
             ->createNamedBuilder('optout_form', EmailOptOutType::class, $optOut)
             ->getForm();
-
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('optout_form')) {
+            if ($request->request->has('marketing_optout_form')) {
+                $marketingOptOutForm->handleRequest($request);
+                $categories = $marketingOptOutForm->getData()['categories'];
+                if (in_array(Opt::OPTOUT_CAT_MARKETING, $categories)) {
+                    $optOut->addCategory(Opt::OPTOUT_CAT_MARKETING);
+                } else {
+                    $optOut->removeCategory(Opt::OPTOUT_CAT_MARKETING);
+                }
+            } elseif ($request->request->has('optout_form')) {
                 $optOutForm->handleRequest($request);
-                if ($optOutForm->isSubmitted() && $optOutForm->isValid()) {
-                    $optOut->setLocation(EmailOptOut::OPT_LOCATION_PREFERNCES);
-                    $optIn->setIdentityLog($this->getIdentityLogWeb($request));
-                    if (mb_strtolower($email) != $optOut->getEmail()) {
-                        throw new \Exception(sprintf(
-                            'Optout hacking attempt %s != %s',
-                            $email,
-                            $optOut->getEmail()
-                        ));
-                    }
-                    if (in_array(EmailOptOut::OPTOUT_CAT_INVITATIONS, $optOut->getCategories())) {
-                        $invitationService->rejectAllInvitations($email);
-                    }
-
-                    $this->getManager()->persist($optOut);
-                    $this->getManager()->flush();
-
-                    $this->addFlash(
-                        'success',
-                        'Your preferences have been updated.'
-                    );
-
-                    return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
-                } else {
-                    $this->addFlash(
-                        'danger',
-                        'Sorry, there was a problem submitting this form. Please contact us.'
-                    );
-                }
-            } elseif ($request->request->has('optin_form')) {
-                $optInForm->handleRequest($request);
-                if ($optInForm->isSubmitted() && $optInForm->isValid()) {
-                    $optIn->setLocation(EmailOptIn::OPT_LOCATION_PREFERNCES);
-                    $optIn->setIdentityLog($this->getIdentityLogWeb($request));
-
-                    $this->getManager()->persist($optIn);
-                    $this->getManager()->flush();
-
-                    $this->addFlash(
-                        'success',
-                        'Your preferences have been updated.'
-                    );
-                    return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
-                } else {
-                    $this->addFlash(
-                        'danger',
-                        'Sorry, there was a problem submitting this form. Please contact us.'
-                    );
-                }
+            } else {
+                throw new \Exception("no form submitted");
             }
+            $optOut->setLocation(Opt::OPT_LOCATION_PREFERENCES);
+            $optOut->setIdentityLog($this->getIdentityLogWeb($request));
+            if (mb_strtolower($email) != $optOut->getEmail()) {
+                throw new \Exception(sprintf(
+                    'Optout hacking attempt %s != %s',
+                    $email,
+                    $optOut->getEmail()
+                ));
+            }
+            if (in_array(EmailOptOut::OPTOUT_CAT_INVITATIONS, $optOut->getCategories())) {
+                $invitationService->rejectAllInvitations($email);
+            }
+            $dm = $this->getManager();
+            $dm->persist($optOut);
+            $dm->flush();
+            $this->addFlash('success', 'Your preferences have been updated');
+            return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
         }
-
         return array(
             'email' => $email,
-            'optin_form' => $optInForm->createView(),
+            'marketing_optout_form' => $marketingOptOutForm->createView(),
             'optout_form' => $optOutForm->createView(),
         );
     }
