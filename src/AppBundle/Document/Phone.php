@@ -647,7 +647,7 @@ class Phone
      */
     public function getPastRetailPrices($date)
     {
-        return array_filter($this->getRetailPrices(), function($price) use $date {
+        return array_filter($this->getRetailPrices(), function ($price) use ($date) {
             return $price->getDate() <= $date;
         });
     }
@@ -659,9 +659,9 @@ class Phone
      */
     public function getCurrentRetailPrice(\DateTime $date)
     {
-        $retailPrices = $this->getPastRetailPrices();
+        $retailPrices = $this->getPastRetailPrices($date);
         if (count($retailPrices) == 0) {
-            return $this->getInitialRetailPrice();
+            return $this->getInitialPrice();
         }
         return usort($retailPrices, function ($a, $b) {
             return $a->getDate() > $b->getDate();
