@@ -534,6 +534,7 @@ class PhoneInsuranceController extends BaseController
         ];
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        $hideSection = false;
 
         // SEO pages
         // TODO: Add check if file exists or redirect to 404
@@ -560,7 +561,8 @@ class PhoneInsuranceController extends BaseController
 
             // Check if template exists
             if (!$this->get('templating')->exists($template)) {
-                return $this->redirectToRoute('phone_insurance');
+                $hideSection = true;
+                $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
             }
         }
 
@@ -590,6 +592,7 @@ class PhoneInsuranceController extends BaseController
             'img_url'          => $modelHyph,
             'available_images' => $availableImages,
             'cta_exp'          => $ctaText,
+            'hide_section'     => $hideSection,
         );
 
         return $this->render($template, $data);
