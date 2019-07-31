@@ -57,6 +57,16 @@
             data-token="{{ csrf_token('default') }}"
             data-active="{{ path('admin_phone_active', {'id': phone.id}) }}">
         <i class="far fa-power-off fa-fw"></i></button>
+    {# Update Retail Price #}
+    <button title="Update Retail Price"
+            type="button"
+            class="btn btn-square btn-sm mb-2 mr-2 btn-primary"
+            data-toggle="modal"
+            data-target="#retail_modal"
+            data-update="{{ path('admin_phone_retail', {'id': phone.id}) }}"
+            data-current="{{ phone.currentRetailPrice }}">
+        <i class="far fa-shopping-bag fa-fw"></i>
+    </button>
 {% endmacro phoneActions %}
 
 {% import _self as this %}
@@ -247,7 +257,7 @@
                                           <td>-</td>
                                           <td>-</td>
                                         {% endif %}
-                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                        <td width="20%">{{ this.phoneActions(phone) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -291,7 +301,7 @@
                                         <td>{{ phone.screenResolution }}</td>
                                         <td>{{ phone.camera }} MP</td>
                                         <td>{% if phone.lte %}Yes{% else %}No{% endif %}</td>
-                                        <td width="18%">{{ this.phoneActions(phone) }}</td>
+                                        <td width="20%">{{ this.phoneActions(phone) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -451,6 +461,43 @@
         </div>
     </div>
 
+    {# Retail modal #}
+    <div class="modal fade"
+         id="retail_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="retail_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Current Retail Price</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="retail_update_form" method="post">
+                        <div class="form-group">
+                            <label>Retail Price</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text"><i class="far fa-pound-sign"></i></span></div>
+                                <input type="text" class="form-control" id="retail_price" name="price" required></input>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Link to proof of price</label>
+                            <input type="text" class="form-control" id="retail_url" name="url" pattern="https?://.+" required></input>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
+                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {# Phone Modal #}
     <div class="modal fade modal-fullscreen"
          id="phone_modal"
@@ -478,9 +525,6 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label>
-                                                <i class="far fa-exclamation-triangle fa-fw"
-                                                   title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."
-                                                   data-toggle="tooltip"></i>
                                                 From
                                             </label>
                                             <div class="input-group date-time-picker date"
@@ -499,6 +543,7 @@
                                                 </div>
                                             </div>
                                             <small class="form-text">Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later (1 business day)</small>
+                                            <small class="form-text">Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress.</small>
                                         </div>
                                         <div class="form-group">
                                             <label class="mr-2">To</label>

@@ -48,6 +48,7 @@ use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
@@ -580,16 +581,10 @@ class AdminController extends BaseController
                 );
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-
                 return new RedirectResponse($this->generateUrl('admin_phones'));
             }
-
             $dm->flush();
-            $this->addFlash(
-                'success',
-                'Your changes were saved!'
-            );
-
+            $this->addFlash('success', 'Your changes were saved!');
             /** @var MailerService $mailer */
             $mailer = $this->get('app.mailer');
             $mailer->send(
@@ -608,7 +603,6 @@ class AdminController extends BaseController
                 'tech@so-sure.com'
             );
         }
-
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 
@@ -640,6 +634,34 @@ class AdminController extends BaseController
             );
         }
 
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
+     * Receives a request to update the retail price of a phone and acitons it.
+     * @Route("/phone/{id}/retail", name="admin_phone_retail")
+     * @Method({"POST"})
+     */
+    public function phoneUpdateRetailAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid CSRF');
+        }
+        $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepository */
+        $phoneRepository = $dm->getRepository(Phone::class);
+        /** @var Phone */
+        $phone = $phoneRepository->find($id);
+        $price = $request->get('price');
+        $url = $request->get('url');
+        if ($price > 0 && $url) {
+            $phone->addRetailPrice($price, $url, new \DateTime());
+            $dm->persist($phone);
+            $dm->flush();
+            $this->addFlash('success', 'Successfully updated current retail price');
+        } else {
+            $this->addFlash('error', 'Could not update current retail price due to invalid parameters');
+        }
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 
