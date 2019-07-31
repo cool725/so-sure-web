@@ -774,7 +774,7 @@ class UserControllerTest extends BaseControllerTest
 
     private function validateRenewalAllowed($crawler, $exists)
     {
-        $this->validateXPathCount($crawler, '//a[@id="user-homepage--nav-renew"]', $exists);
+        $this->validateXPathCount($crawler, '//i[@class="fal fa-star-exclamation fa-fw"]', $exists);
     }
 
     private function validateCheckoutForm($crawler, $exists)
@@ -1778,15 +1778,8 @@ class UserControllerTest extends BaseControllerTest
         $email = self::generateEmail('testUserRenewSimple', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $date = \DateTime::createFromFormat('U', time());
-        $date = $date->sub(new \DateInterval('P350D'));
+        $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
+        $date = new \DateTime("-350 day"); 
         $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         static::$dm->flush();
