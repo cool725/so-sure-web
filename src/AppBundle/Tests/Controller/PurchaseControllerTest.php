@@ -1621,7 +1621,8 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertNotContains('no phone selected', $crawler->html());
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
-        $form['purchase_form[name]'] = $name;
+        $form['purchase_form[firstName]'] = $name;
+        $form['purchase_form[lastName]'] = $name;
         $form['purchase_form[birthday]'] = sprintf("%s", $birthday->format('d/m/Y'));
         $form['purchase_form[mobileNumber]'] = $mobile;
         $form['purchase_form[addressLine1]'] = '123 Foo St';
