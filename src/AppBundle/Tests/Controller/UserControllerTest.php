@@ -3007,18 +3007,95 @@ class UserControllerTest extends BaseControllerTest
         $this->updateDamageForm($policy, $now, false, false, false, 1);
     }
 
+    /**
+     * Tests to make sure that you can request cancellation of your policy, and that in cooloff it will automatically
+     * action it.
+     * @group general
+     */
+    public function testCancelPolicy()
+    {
+        $a = $this->createUserPolicy(true, new \DateTime("-5 months"));
+        $b = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
+        $c = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
+        $a->setStatus(Policy::STATUS_ACTIVE);
+        $b->setStatus(Policy::STATUS_ACTIVE);
+        $c->setStatus(Policy::STATUS_ACTIVE);
+        $a->getUser()->setEmail(self::generateEmailClass("aaa", "testCancelPolicy"));
+        $b->getUser()->setEmail(self::generateEmailClass("bbb", "testCancelPolicy"));
+        $c->getUser()->setEmail(self::generateEmailClass("ccc", "testCancelPolicy"));
+        self::$dm->persist($a);
+        self::$dm->persist($b);
+        self::$dm->persist($c);
+        self::$dm->persist($a->getUser());
+        self::$dm->persist($b->getUser());
+        self::$dm->persist($c->getUser());
+        self::$dm->persist($a->getPhone());
+        self::$dm->persist($b->getPhone());
+        self::$dm->persist($c->getPhone());
+        self::$dm->flush();
+        // Normal cancellation request.
+        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_EXISTING);
+        $this->expectFlashSuccess($crawler, "We have passed your request to our policy team.");
+        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
+        // Cooloff cancellation.
+        $crawler = $this->cancelForm($b, Policy::COOLOFF_REASON_PICSURE);
+        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
+        $this->assertEquals(Policy::COOLOFF_REASON_PICSURE, $b->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
+        $this->assertEquals(Policy::CANCELLED_COOLOFF, $b->getCancelledReason());
+        // Cooloff cancellation with custom reason.
+        $crawler = $this->cancelForm($c, Policy::COOLOFF_REASON_UNKNOWN, "my phone is cursed.");
+        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
+        $this->assertEquals(Policy::COOLOFF_REASON_UNKNOWN, $c->getRequestedCancellationReason());
+        $this->assertEquals("my phone is cursed.", $c->getRequestedCancellationReasonOther());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $c->getStatus());
+        $this->assertEquals(Policy::CANCELLED_COOLOFF, $c->getCancelledReason());
+        // Duplicate cancellation.
+        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_DAMAGED);
+        $this->expectFlashWarning($crawler, "Cancellation has already been requested and is currently processing.");
+        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
+    }
+
+    /**
+     * logs in opens the cancellation form and submits it with given parameters.
+     * @param Policy $policy is the policy that we are logging in for.
+     * @param string $reason is the reason under Policy::COOLOFF_REASON_*.
+     * @param string $other  is the explanation text if reason other is chosen.
+     * @return Crawler the web crawler for the page coming after cancellation occurs.
+     */
+    private function cancelForm($policy, $reason, $other = null)
+    {
+        $user = $policy->getUser();
+        $crawler = $this->login($user->getEmail(), 'foo');
+        fprintf(STDOUT, "%s", $crawler->html());
+        $crawler = self::$client->request('GET', '/user/cancel/'.$policy->getId());
+        $form = $crawler->selectButton('cancel_form[cancel]')->form();
+        $form['cancel_form[reason]'] = $reason;
+        if ($other) {
+            $form['cancel_form[othertxt]'] = $other;
+        }
+        self::$client->submit($form);
+        self::$dm->refresh($policy);
+        $this->verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->verifyResponse(200);
+        return $crawler;
+    }
+
     private function createClaim(Policy $policy, $type, \DateTime $date, $status = Claim::STATUS_FNOL)
     {
         $claim = new Claim();
         $claim->setIncidentDate($date);
         $claim->setIncidentTime('2 am');
-        $claim->setLocation('so-sure offices');
+        $claim->setLocation('camel farm');
         $claim->setTimeToReach('2 pm');
         $claim->setPhoneToReach(self::generateRandomMobile());
         $claim->setSignature('foo bar');
         $claim->setType($type);
         $claim->setNetwork(Claim::NETWORK_O2);
-        $claim->setDescription('bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla');
+        $claim->setDescription('I put my camera inside the mouth of the camel and then uhh... camera attach to phone');
         $claim->setStatus($status);
         $claim->setPolicy($policy);
         $policy->addClaim($claim);
