@@ -3014,24 +3014,21 @@ class UserControllerTest extends BaseControllerTest
      */
     public function testCancelPolicy()
     {
-        $a = $this->createUserPolicy(true, new \DateTime("-5 months"));
-        $b = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
-        $c = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
+        $userA = $this->createUser(self::$userManager, "a@gmail.com", "foo", null, self::$dm);
+        $userB = $this->createUser(self::$userManager, "b@gmail.com", "foo", null, self::$dm);
+        $userC = $this->createUser(self::$userManager, "c@gmail.com", "foo", null, self::$dm);
+        $phoneA = self::getRandomPhone(self::$dm);
+        $phoneB = self::getRandomPhone(self::$dm);
+        $phoneC = self::getRandomPhone(self::$dm);
+        $a = self::initPolicy($userA, self::$dm, $phoneA, new \DateTime("-5 months"), true, true);
+        $b = self::initPolicy($userB, self::$dm, $phoneB, new \DateTime("-1 weeks"), true, true);
+        $c = self::initPolicy($userC, self::$dm, $phoneC, new \DateTime("-1 weeks"), true, true);
         $a->setStatus(Policy::STATUS_ACTIVE);
         $b->setStatus(Policy::STATUS_ACTIVE);
         $c->setStatus(Policy::STATUS_ACTIVE);
-        $a->getUser()->setEmail(self::generateEmailClass("aaa", "testCancelPolicy"));
-        $b->getUser()->setEmail(self::generateEmailClass("bbb", "testCancelPolicy"));
-        $c->getUser()->setEmail(self::generateEmailClass("ccc", "testCancelPolicy"));
         self::$dm->persist($a);
         self::$dm->persist($b);
         self::$dm->persist($c);
-        self::$dm->persist($a->getUser());
-        self::$dm->persist($b->getUser());
-        self::$dm->persist($c->getUser());
-        self::$dm->persist($a->getPhone());
-        self::$dm->persist($b->getPhone());
-        self::$dm->persist($c->getPhone());
         self::$dm->flush();
         // Normal cancellation request.
         $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_EXISTING);
@@ -3069,7 +3066,6 @@ class UserControllerTest extends BaseControllerTest
     {
         $user = $policy->getUser();
         $crawler = $this->login($user->getEmail(), 'foo');
-        fprintf(STDOUT, "%s", $crawler->html());
         $crawler = self::$client->request('GET', '/user/cancel/'.$policy->getId());
         $form = $crawler->selectButton('cancel_form[cancel]')->form();
         $form['cancel_form[reason]'] = $reason;
