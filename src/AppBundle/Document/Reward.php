@@ -52,6 +52,50 @@ class Reward
      */
     protected $defaultValue;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $expiryDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $policyAgeMin;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $policyAgeMax;
+
+    /**
+     * @Assert\Range(min=0,max=2000)
+     * @MongoDB\Field(type="float")
+     */
+    protected $usageLimit;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $hasClaimed;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $hasRenewed;
+
+    /**
+     * @Assert\Length(min="50", max="1000")
+     */
+    protected $termsAndConditions;
+
     public function __construct()
     {
     }
@@ -114,6 +158,76 @@ class Reward
     public function setDefaultValue($defaultValue)
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    public function getExpiryDate()
+    {
+        return $this->expiryDate;
+    }
+
+    public function setExpiryDate($expiryDate)
+    {
+        $this->expiryDate = $expiryDate;
+    }
+
+    public function getPolicyAgeMin()
+    {
+        return $this->policyAgeMin;
+    }
+
+    public function setPolicyAgeMin($policyAgeMin)
+    {
+        $this->policyAgeMin = $policyAgeMin;
+    }
+
+    public function getPolicyAgeMax()
+    {
+        return $this->policyAgeMax;
+    }
+
+    public function setPolicyAgeMax($policyAgeMax)
+    {
+        $this->policyAgeMax = $policyAgeMax;
+    }
+
+    public function getUsageLimit()
+    {
+        return $this->usageLimit;
+    }
+
+    public function setUsageLimit($usageLimit)
+    {
+        $this->usageLimit = $usageLimit;
+    }
+
+    public function getHasClaimed()
+    {
+        return $this->hasClaimed;
+    }
+
+    public function setHasClaimed($hasClaimed)
+    {
+        $this->hasClaimed = $hasClaimed;
+    }
+
+    public function getHasRenewed()
+    {
+        return $this->hasRenewed;
+    }
+
+    public function setHasRenewed($hasRenewed)
+    {
+        $this->hasRenewed = $hasRenewed;
+    }
+
+    public function getTermsAndConditions()
+    {
+        return $this->termsAndConditions;
+    }
+
+    public function setTermsAndConditions($termsAndConditions)
+    {
+        $this->termsAndConditions = $termsAndConditions;
     }
 
     public function updatePotValue()

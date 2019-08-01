@@ -32,6 +32,7 @@ use AppBundle\Form\Type\SerialNumberType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PromotionType;
+use AppBundle\Form\Type\RewardType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -150,9 +151,11 @@ use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -2883,14 +2886,30 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('next', SubmitType::class)
             ->getForm();
 
+        // $rewardForm = $this->get('form.factory')
+        //     ->createNamedBuilder('rewardForm')
+        //     ->add('firstName', TextType::class)
+        //     ->add('lastName', TextType::class)
+        //     ->add('code', TextType::class)
+        //     ->add('email', EmailType::class)
+        //     ->add('defaultValue', TextType::class)
+        //     ->add('expiryDate', DateType::class, [
+        //           'format'   => 'dd/MM/yyyy',
+        //           'widget' => 'single_text',
+        //           'placeholder' => array(
+        //               'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
+        //           ),
+        //     ])
+        //     ->add('policyAgeMin', TextType::class)
+        //     ->add('policyAgeMax', TextType::class)
+        //     ->add('usageLimit', TextType::class)
+        //     ->add('hasClaimed', CheckboxType::class)
+        //     ->add('hasRenewed', CheckboxType::class)
+        //     ->add('termsAndConditions', TextareaType::class)
+        //     ->add('next', SubmitType::class)
+        //     ->getForm();
         $rewardForm = $this->get('form.factory')
-            ->createNamedBuilder('rewardForm')
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('code', TextType::class)
-            ->add('email', EmailType::class)
-            ->add('defaultValue', TextType::class)
-            ->add('next', SubmitType::class)
+            ->createNamedBuilder('claim_form', RewardType::class)
             ->getForm();
 
         $dm = $this->getManager();

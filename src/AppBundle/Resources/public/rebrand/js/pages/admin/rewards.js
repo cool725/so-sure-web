@@ -6,6 +6,8 @@
 // e.g. require('bootstrap/js/dist/carousel');
 
 // Require components
+require('tempusdominus-bootstrap-4');
+require('moment');
 // e.g. require('../components/banner.js');
 
 $(function(){
@@ -20,6 +22,11 @@ $(function(){
             modal.find('.modal-title').text('Add reward bonus (bonus type: ' + userName + ')');
             modal.find('#connectForm_rewardId').val(rewardId);
         }
+    });
+
+    $('.date-picker').datetimepicker({
+        useCurrent: false,
+        format: 'DD/MM/YYYY',
     });
 
 });

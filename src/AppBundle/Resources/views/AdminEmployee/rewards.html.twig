@@ -1,4 +1,5 @@
 {% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme rewardForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
 {% set body_class = 'admin-rewards' %}
@@ -72,7 +73,7 @@
          role="dialog"
          aria-labelledby="reward_modal"
          aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add reward bonus type</h5>
@@ -82,33 +83,93 @@
                 </div>
                 <div class="modal-body">
                     {{ form_start(rewardForm) }}
-                        <div class="form-group">
-                            {{ form_label(rewardForm.firstName, 'First Name') }}
-                            {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.lastName, 'Last Name') }}
-                            {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.email, 'Email') }}
-                            {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.email) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.code, 'SCode') }}
-                            {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_label(rewardForm.defaultValue, 'Default Value') }}
-                            {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control'}}) }}
-                            <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.firstName, 'First Name') }}
+                                    {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.lastName, 'Last Name') }}
+                                    {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.email, 'Email') }}
+                                    {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.email) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.code, 'SCode') }}
+                                    {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.defaultValue, 'Default Value') }}
+                                    {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.policyAgeMin, 'Policy Age Min') }}
+                                    {{ form_widget(rewardForm.policyAgeMin, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.policyAgeMin) }}</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.policyAgeMax, 'Policy Age Max') }}
+                                    {{ form_widget(rewardForm.policyAgeMax, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.policyAgeMax) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.usageLimit, 'Usage Limit') }}
+                                    {{ form_widget(rewardForm.usageLimit, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.usageLimit) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.expiryDate, 'Expiry Date') }}
+                                    <div class="input-group date-picker"
+                                         data-target-input="nearest">
+                                        {{ form_widget(rewardForm.expiryDate, { 'attr': {
+                                            'class': 'form-control datetimepicker-input error-after',
+                                            'data-target': '#date_picker_one',
+                                        }}) }}
+                                        <div class="input-group-append"
+                                             data-target="#date_picker_one"
+                                             data-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fal fa-clock fa-fw"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="with-errors">{{ form_errors(rewardForm.expiryDate) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(rewardForm.termsAndConditions, 'Terms & Conditions') }}
+                                    {{ form_widget(rewardForm.termsAndConditions, { 'attr': {
+                                        'class': 'form-control',
+                                        'rows': '5',
+                                        'placeholder': 'Enter terms....'
+                                    }}) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.termsAndConditions) }}</div>
+                                </div>
+                                <div class="form-group d-flex">
+                                    <div class="mr-2">
+                                        {{ form_widget(rewardForm.hasClaimed, {
+                                            'label': 'Allow Claims',
+                                            'attr': {'class':'custom-control-input'}}
+                                        ) }}
+                                    </div>
+                                    {{ form_widget(rewardForm.hasRenewed, {
+                                        'label': 'Allow Renewals',
+                                        'attr': {'class':'custom-control-input'}}
+                                    ) }}
+                                    <div class="with-errors">{{ form_errors(rewardForm.hasClaimed) }}</div>
+                                    <div class="with-errors">{{ form_errors(rewardForm.hasRenewed) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                </div>
+                            </div>
                         </div>
                     {{ form_end(rewardForm) }}
                 </div>

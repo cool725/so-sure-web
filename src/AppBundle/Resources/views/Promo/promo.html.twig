@@ -24,10 +24,18 @@
 
     <section class="hero">
         <div class="container container-xtra">
-            <ul>
-                <li>{{ scode.code }}</li>
-                <li>{{ scode.user }}</li>
-            </ul>
+            {% if scode is defined and scode and scode.user %}
+                <h1>CODE FOUND!</h1>
+                <ul>
+                    <li>{{ scode.code }}</li>
+                    <li>{{ scode.user.firstName }}</li>
+                    <li>{{ scode.user.lastName }}</li>
+                    <li>{{ scode.user }}</li>
+                    <li>&pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }}</li>
+                </ul>
+            {% else %}
+                <h1>CODE NOT FOUND!</h1>
+            {% endif %}
         </div>
     </section>
 
