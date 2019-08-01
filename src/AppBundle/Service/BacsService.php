@@ -2310,7 +2310,7 @@ class BacsService
                     'Unable to find policy for payment %s',
                     $payment->getId()
                 ));
-                continue;                
+                continue;
             }
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
 
