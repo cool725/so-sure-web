@@ -29,34 +29,34 @@ class PromoController extends BaseController
     public function promoAction(Request $request, $code)
     {
         $dm = $this->getManager();
-        $repo = $dm->getRepository(Reward::class);
+        $repo = $dm->getRepository(Scode::class);
         $phoneRepo = $dm->getRepository(Phone::class);
 
-        $reward = null;
+        $scode = null;
 
         try {
-            if ($reward = $repo->findOneBy(['code' => $code])) {
-                if (in_array($reward->getType(), [SCode::TYPE_REWARD])) {
-                    if (!$reward->getReward() || !$reward->getReward()->getUser()) {
+            if ($scode = $repo->findOneBy(['code' => $code])) {
+                if (in_array($scode->getType(), [SCode::TYPE_REWARD])) {
+                    if (!$scode->getReward() || !$scode->getReward()->getUser()) {
                         throw new \Exception('Unknown promo code');
                     }
                 }
             }
         } catch (\Exception $e) {
-            $reward = null;
+            $scode = null;
         }
 
         $session = $this->get('session');
         $session->set('reward', $code);
 
-        if ($reward && $request->getMethod() === "GET") {
+        if ($scode && $request->getMethod() === "GET") {
             $this->get('app.mixpanel')->queuePersonProperties([
-                'Attribution Invitation Method' => 'promo',
+                'Attribution Invitation Method' => 'reward',
             ], true);
         }
 
         return [
-            'promo'    => $reward,
+            'scode'    => $scode,
             'use_code' => $code,
         ];
     }
