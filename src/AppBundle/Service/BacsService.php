@@ -2305,7 +2305,14 @@ class BacsService
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
-            $bankAccount = $payment->getPolicy()->getPolicyOrUserBacsBankAccount();
+            if (!$policy) {
+                $this->logger->warning(sprintf(
+                    'Unable to find policy for payment %s',
+                    $payment->getId()
+                ));
+                continue;                
+            }
+            $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
 
             // we're unable to process for the current date, so ensure its at least tomorrow
             $processingDate = $payment->getDate();
