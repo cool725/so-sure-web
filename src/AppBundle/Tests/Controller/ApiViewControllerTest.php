@@ -161,6 +161,8 @@ class ApiViewControllerTest extends BaseApiControllerTest
         // delete extra spaces, and chunk into 200 chars to make comparision easier
         $data = trim(preg_replace('/\s+/', ' ', $data));
         $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
+        $pdf = str_replace('body { font-family: "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; font-size: 8pt; } ', '', $pdf);
+        var_dump($pdf);
         $data = sprintf('%s%s', $data, $versionName);
         $pdf = sprintf('%s%s', $pdf, $versionName);
         $data = chunk_split($data, 200);

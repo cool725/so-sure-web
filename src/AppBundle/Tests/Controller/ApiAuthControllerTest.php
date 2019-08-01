@@ -2720,7 +2720,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $dm = $this->getDocumentManager(true);
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('policy-judopay-different-amount', $this),
+            self::generateEmail('policy-checkout-different-amount', $this),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
@@ -2749,20 +2749,20 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $dm->flush();
 
-        /** @var JudopayService $judopay */
-        $judopay = $this->getContainer(true)->get('app.judopay');
-        $receiptId = $judopay->testPay(
-            $user,
+        /** @var CheckoutService $checkout */
+        $checkout = $this->getContainer(true)->get('app.checkout');
+        $receiptId = $checkout->testPay(
+            $policy,
             $data['id'],
             $price->getMonthlyPremiumPrice(),
-            self::$JUDO_TEST_CARD_NUM,
-            self::$JUDO_TEST_CARD_EXP,
-            self::$JUDO_TEST_CARD_PIN
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
         );
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-            'consumer_token' => '200000',
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
+            'token' => '200000',
             'card_token' => '55779911',
             'receipt_id' => $receiptId,
         ]]);
