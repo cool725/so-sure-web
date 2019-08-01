@@ -10,14 +10,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\SCode;
-use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
-use AppBundle\Service\MailerService;
-use AppBundle\Form\Type\LeadEmailType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -43,14 +39,14 @@ class PromoController extends BaseController
                     throw new \Exception('Unknown promo code');
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $reward = null;
         }
 
         $session = $this->get('session');
         $session->set('reward', $code);
 
-        if ($reward && $request->getMethod === "GET") {
+        if ($reward && $request->getMethod() === "GET") {
             $this->get('app.mixpanel')->queuePersonProperties([
                 'Attribution Invitation Method' => 'promo',
             ], true);
@@ -61,6 +57,4 @@ class PromoController extends BaseController
             'use_code' => $code,
         ];
     }
-
-
 }
