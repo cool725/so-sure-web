@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SCode;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Service\MixpanelService;
@@ -35,8 +36,10 @@ class PromoController extends BaseController
 
         try {
             if ($reward = $repo->findOneBy(['code' => $code])) {
-                if (!$reward->getReward() || !$reward->getReward()->getUser()) {
-                    throw new \Exception('Unknown promo code');
+                if (in_array($reward->getType(), [SCode::TYPE_REWARD])) {
+                    if (!$reward->getReward() || !$reward->getReward()->getUser()) {
+                        throw new \Exception('Unknown promo code');
+                    }
                 }
             }
         } catch (\Exception $e) {
