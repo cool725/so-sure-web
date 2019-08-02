@@ -398,7 +398,10 @@ class AdminController extends BaseController
         }
         // Make sure the person making the request has the right permission.
         // Create the form.
-        $createScheduledPayment = new CreateScheduledPayment(self::getBankHolidays(), $policy->getScheduledPayments());
+        $createScheduledPayment = new CreateScheduledPayment(
+            self::getBankHolidays(),
+            $policy->getActiveScheduledPayments()
+        );
         $createScheduledPaymentForm = $this->get('form.factory')
             ->createNamedBuilder(
                 'create_scheduled_payment_form',
