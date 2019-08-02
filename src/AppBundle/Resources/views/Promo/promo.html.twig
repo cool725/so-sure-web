@@ -3,7 +3,13 @@
 {# Set vars #}
 {% set body_class = 'promo' %}
 
-{% block title %}so-sure - {{ use_code }}{% endblock %}
+{% block title %}
+    {% if scode is defined and scode and scode.user %}
+        so-sure - Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot
+    {% else %}
+        so-sure - Promo code {{ use_code }} not found!
+    {% endif %}
+{% endblock %}
 
 {# Set Meta #}
 {% block meta %}
@@ -18,26 +24,76 @@
     <link rel="stylesheet" href="{{ asset('css-js/promo.css') }}">
 {% endblock %}
 
-{% block nav %}{% endblock %}
-
 {% block body %}
 
     <section class="hero">
         <div class="container container-xtra">
-            {% if scode is defined and scode and scode.user %}
-                <h1>CODE FOUND!</h1>
-                <ul>
-                    <li>{{ scode.code }}</li>
-                    <li>{{ scode.user.firstName }}</li>
-                    <li>{{ scode.user.lastName }}</li>
-                    <li>{{ scode.user }}</li>
-                    <li>&pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }}</li>
-                </ul>
-            {% else %}
-                <h1>CODE NOT FOUND!</h1>
-            {% endif %}
+            <div class="row">
+                <div class="col-lg-7">
+                    {% if scode is defined and scode and scode.reward %}
+                        <div class="hero__intro">
+                            <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-columbia-blue-e">with &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cashback if you don't claim</span></h1>
+                            <div class="hero__step mb-4">
+                                <div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div>
+                                <div class="h4 text-white">Get an instant quote</div>
+                            </div>
+                            <div class="hero__step mb-4">
+                                <div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">2</div>
+                                <div class="h4 text-white">Get covered in minutes</div>
+                            </div>
+                            <div class="hero__step mb-5">
+                                <div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div>
+                                <div class="h4 text-white">Enter the code <span class="promo-code">{{ scode.code }}</span></div>
+                            </div>
+                        </div>
+                        <div class="hero__controls mb-5">
+                            <p><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get an instant quote</a></p>
+                            <p><small><a href="#terms_and_conditions" class="terms-link text-white"><u>Term &amp; Conditions</u></a></small></p>
+                        </div>
+                    {% else %}
+                        <h1 class="my-5 text-white fit">Promotion not found 😕 <br><span class="sub text-columbia-blue-e">however still want excellent cover?</span></h1>
+                        <ul class="list-unstyled icn-fa-list mb-5">
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                24-72 hour replace or repair
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                Low excess from just &pound;50
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                Up to 80% money back
+                            </li>
+                            <li class="h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                New, secondhand &amp; refurbished phones
+                            </li>
+                        </ul>
+                        <p><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a></p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="hero__illustration-mobile d-block d-lg-none text-center">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
+            </div>
+        </div>
+        <div class="hero__illustration-desktop d-none d-lg-block">
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
         </div>
     </section>
+
+    {% if scode is defined and scode and scode.reward %}
+        <div id="terms_and_conditions" class="terms py-lg-5">
+            <div class="container container-xtra py-5">
+                <h2 class="h3">Terms &amp; Conditions</h2>
+                <p>{{ scode.reward.termsAndConditions }}</p>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
 {% endblock %}
 

@@ -2909,7 +2909,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         //     ->add('next', SubmitType::class)
         //     ->getForm();
         $rewardForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_form', RewardType::class)
+            ->createNamedBuilder('rewardForm', RewardType::class)
             ->getForm();
 
         $dm = $this->getManager();

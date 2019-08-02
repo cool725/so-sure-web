@@ -8,7 +8,108 @@
 @import "../abstracts/variables";
 @import "../base/fonts";
 
-body {
-    background-color: $selago;
+.hero {
+    position: relative;
+    padding-top: 6rem;
+    overflow: hidden;
+
+    @include blue-gradient;
+
+    .container {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__intro {
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 4rem;
+            // padding-bottom: 4rem;
+        }
+
+        @include media-breakpoint-up(xl) {
+            // padding-top: rem;
+        }
+
+    }
+
+    &__step {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    &__number {
+        width: 45px; height: 45px;
+        background-color: $white;
+        margin-bottom: 0;
+
+        @include border-radius(50%);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+
+        // @include media-breakpoint-up(sm) {
+        //     position: absolute;
+        //     top: 20%; left: -20px;
+        // }
+    }
+
+    &__illustration-desktop {
+        width: 655px;
+        position: absolute;
+        z-index: 2;
+        bottom: 0; right: -150px;
+
+        @include media-breakpoint-up(fl) {
+            right: 100px;
+        }
+
+        @include media-breakpoint-up(fk) {
+            right: 400px;
+        }
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+    }
+
+    @include media-breakpoint-up(lg) {
+        padding-bottom: 4rem;
+
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+        }
+    }
+
 }
 
+.cred {
+    text-align: center;
+    background-color: $ultramarine;
+    position: relative;
+    z-index: 5;
+
+    img {
+        width: 100px;
+        margin: 0.5rem;
+        // opacity: 0.3;
+
+        @include media-breakpoint-up(lg) {
+            width: 120px;
+            margin: 0;
+        }
+    }
+}
+
+.promo-code {
+    text-decoration: underline;
+    // background-color: $selago;
+    // color: $crayon-blue;
+}

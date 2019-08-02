@@ -7,7 +7,6 @@
 
 // Require components
 require('tempusdominus-bootstrap-4');
-require('moment');
 // e.g. require('../components/banner.js');
 
 $(function(){
@@ -24,6 +23,7 @@ $(function(){
         }
     });
 
+    // Init datepicker
     $('.date-picker').datetimepicker({
         useCurrent: false,
         format: 'DD/MM/YYYY',
