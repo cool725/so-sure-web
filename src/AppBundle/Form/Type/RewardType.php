@@ -22,8 +22,7 @@ class RewardType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('firstName', TextType::class)
+        $builder->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
             ->add('code', TextType::class)
             ->add('email', EmailType::class)
@@ -31,24 +30,22 @@ class RewardType extends AbstractType
             ->add('expiryDate', DateType::class, [
                   'format'   => 'dd/MM/yyyy',
                   'widget' => 'single_text',
-                  'placeholder' => array(
-                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
-                  ),
+                  'placeholder' => ['year' => 'YYYY', 'month' => 'MM', 'day' => 'DD'],
             ])
             ->add('policyAgeMin', TextType::class)
             ->add('policyAgeMax', TextType::class)
             ->add('usageLimit', TextType::class)
-            ->add('hasClaimed', CheckboxType::class)
+            ->add('hasNotClaimed', CheckboxType::class)
             ->add('hasRenewed', CheckboxType::class)
+            ->add('hasCancelled', CheckboxType::class)
             ->add('termsAndConditions', TextareaType::class)
-            ->add('next', SubmitType::class)
-        ;
+            ->add('next', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Reward',
+            'data_class' => 'AppBundle\Document\Form\CreateReward',
         ));
     }
 }

@@ -35,11 +35,10 @@ class PromoController extends BaseController
         $scode = null;
 
         try {
-            if ($scode = $repo->findOneBy(['code' => $code])) {
-                if (in_array($scode->getType(), [SCode::TYPE_REWARD])) {
-                    if (!$scode->getReward() || !$scode->getReward()->getUser()) {
-                        throw new \Exception('Unknown promo code');
-                    }
+            if ($scode = $repo->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {
+                $reward = $scode->getReward();
+                if (!$reward || !$reward->getUser() || !$reward->isOpen(new \DateTime())) {
+                    throw new \Exception('Unknown promo code');
                 }
             }
         } catch (\Exception $e) {

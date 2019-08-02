@@ -114,6 +114,7 @@ use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\Imei;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Document\Form\Chargebacks;
+use AppBundle\Document\Form\CreateReward;
 use AppBundle\Form\Type\AddressType;
 use AppBundle\Form\Type\ManualAffiliateFileType;
 use AppBundle\Form\Type\BillingDayType;
@@ -2878,6 +2879,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function rewardsAction(Request $request)
     {
+        $createReward = new CreateReward();
         $connectForm = $this->get('form.factory')
             ->createNamedBuilder('connectForm')
             ->add('email', EmailType::class)
@@ -2885,38 +2887,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('rewardId', HiddenType::class)
             ->add('next', SubmitType::class)
             ->getForm();
-
-        // $rewardForm = $this->get('form.factory')
-        //     ->createNamedBuilder('rewardForm')
-        //     ->add('firstName', TextType::class)
-        //     ->add('lastName', TextType::class)
-        //     ->add('code', TextType::class)
-        //     ->add('email', EmailType::class)
-        //     ->add('defaultValue', TextType::class)
-        //     ->add('expiryDate', DateType::class, [
-        //           'format'   => 'dd/MM/yyyy',
-        //           'widget' => 'single_text',
-        //           'placeholder' => array(
-        //               'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
-        //           ),
-        //     ])
-        //     ->add('policyAgeMin', TextType::class)
-        //     ->add('policyAgeMax', TextType::class)
-        //     ->add('usageLimit', TextType::class)
-        //     ->add('hasClaimed', CheckboxType::class)
-        //     ->add('hasRenewed', CheckboxType::class)
-        //     ->add('termsAndConditions', TextareaType::class)
-        //     ->add('next', SubmitType::class)
-        //     ->getForm();
         $rewardForm = $this->get('form.factory')
-            ->createNamedBuilder('rewardForm', RewardType::class)
+            ->createNamedBuilder('rewardForm', RewardType::class, $createReward)
             ->getForm();
-
         $dm = $this->getManager();
         $rewardRepo = $dm->getRepository(Reward::class);
         $userRepo = $dm->getRepository(User::class);
         $rewards = $rewardRepo->findAll();
-
         try {
             if ('POST' === $request->getMethod()) {
                 if ($request->request->has('connectForm')) {
@@ -2957,17 +2934,24 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $userManager = $this->get('fos_user.user_manager');
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
-                        $user->setEmail($this->getDataString($rewardForm->getData(), 'email'));
-                        $user->setFirstName($this->getDataString($rewardForm->getData(), 'firstName'));
-                        $user->setLastName($this->getDataString($rewardForm->getData(), 'lastName'));
+                        $user->setEmail($createReward->getEmail());
+                        $user->setFirstName($createReward->getFirstName());
+                        $user->setLastName($createReward->getLastName());
                         $dm->persist($user);
                         $dm->flush();
                         $reward = new Reward();
                         $reward->setUser($user);
-                        $reward->setDefaultValue($this->getDataString($rewardForm->getData(), 'defaultValue'));
+                        $reward->setDefaultValue($createReward->getDefaultValue());
+                        $reward->setExpiryDate($createReward->getExpiryDate());
+                        $reward->setPolicyAgeMin($createReward->getPolicyAgeMin());
+                        $reward->setPolicyAgeMax($createReward->getPolicyAgeMax());
+                        $reward->setUsageLimit($createReward->getUsageLimit());
+                        $reward->setHasNotClaimed($createReward->getHasNotClaimed());
+                        $reward->setHasRenewed($createReward->getHasRenewed());
+                        $reward->setHasCancelled($createReward->getHasCancelled());
+                        $reward->setTermsAndConditions($createReward->getTermsAndConditions());
                         $dm->persist($reward);
-
-                        $code = $this->getDataString($rewardForm->getData(), 'code');
+                        $code = $createReward->getCode();
                         if (mb_strlen($code) > 0) {
                             $scode = new SCode();
                             $scode->setCode($code);

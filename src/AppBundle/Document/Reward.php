@@ -60,15 +60,13 @@ class Reward
     protected $expiryDate;
 
     /**
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
+     * @MongoDB\Field(type="int")
      * @Gedmo\Versioned
      */
     protected $policyAgeMin;
 
     /**
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
+     * @MongoDB\Field(type="int")
      * @Gedmo\Versioned
      */
     protected $policyAgeMax;
@@ -83,22 +81,24 @@ class Reward
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      */
-    protected $hasClaimed;
+    protected $hasNotClaimed;
 
     /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      */
     protected $hasRenewed;
+    
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $hasCancelled;
 
     /**
      * @Assert\Length(min="50", max="1000")
      */
     protected $termsAndConditions;
-
-    public function __construct()
-    {
-    }
 
     public function getId()
     {
@@ -200,14 +200,14 @@ class Reward
         $this->usageLimit = $usageLimit;
     }
 
-    public function getHasClaimed()
+    public function getHasNotClaimed()
     {
-        return $this->hasClaimed;
+        return $this->hasNotClaimed;
     }
 
-    public function setHasClaimed($hasClaimed)
+    public function setHasNotClaimed($hasNotClaimed)
     {
-        $this->hasClaimed = $hasClaimed;
+        $this->hasNotClaimed = $hasNotClaimed;
     }
 
     public function getHasRenewed()
@@ -218,6 +218,16 @@ class Reward
     public function setHasRenewed($hasRenewed)
     {
         $this->hasRenewed = $hasRenewed;
+    }
+
+    public function getHasCancelled()
+    {
+        return $this->hasCancelled;
+    }
+
+    public function setHasCancelled($hasCancelled)
+    {
+        $this->hasCancelled = $hasCancelled;
     }
 
     public function getTermsAndConditions()
@@ -249,4 +259,44 @@ class Reward
 
         return $potValue;
     }
+
+    /**
+     * Tells if this reward is still going. It can stop either because the date has gone past the reward's expiry date,
+     * or because it has hit the maximum number of users it can have.
+     * @param \DateTime $date is the date at which we are checking.
+     */
+    public function isOpen(\DateTime $date)
+    {
+        return (!$this->getExpirationDate() || $this->getExpirationDate() > $date) &&
+            count($this->getConnections()) < $this->getUsageLimit();
+    }
+
+    /**
+     * Tells you if a policy can get this reward.
+     * @param Policy    $policy is the policy to check about.
+     * @param \DateTime $date   is the date of potential application.
+     * @return boolean true if the reward could be applied, and false if not.
+     */
+    public function canApply($policy, \DateTime $date)
+    {
+        if (!$this->isOpen($date)) {
+            return false;
+        }
+        $age = $policy->age();
+        if ($age < $this->getPolicyAgeMin() || $age > $this->getPolicyAgeMax()) {
+            return false;
+        }
+        $user = $policy->getUser();
+        if (!$user) {
+            return false;
+        }
+        $notClaimed = $user->getAvgClaims() == 0; // TODO: two decimal places
+        $renewed = $user->getRenewed();
+        $cancelled = $user->hasCancelled();
+        if (($this->getHasNotClaimed() && !$notClaimed) || ($this->getHasRenewed() && !$renewed) ||
+            ($this->getHasCancelled() && !$cancelled)) {
+            return false;
+        }
+        return true;
+    } 
 }

@@ -160,7 +160,7 @@
                                 </div>
                                 <div class="form-group d-flex">
                                     <div class="mr-2">
-                                        {{ form_widget(rewardForm.hasClaimed, {
+                                        {{ form_widget(rewardForm.hasNotClaimed, {
                                             'label': 'Allow Claims',
                                             'attr': {'class':'custom-control-input'}}
                                         ) }}
@@ -169,7 +169,7 @@
                                         'label': 'Allow Renewals',
                                         'attr': {'class':'custom-control-input'}}
                                     ) }}
-                                    <div class="with-errors">{{ form_errors(rewardForm.hasClaimed) }}</div>
+                                    <div class="with-errors">{{ form_errors(rewardForm.hasNotClaimed) }}</div>
                                     <div class="with-errors">{{ form_errors(rewardForm.hasRenewed) }}</div>
                                 </div>
                                 <div class="form-group text-right">
