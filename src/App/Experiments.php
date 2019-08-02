@@ -7,10 +7,8 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        // SixpackService::EXPERIMENT_SOCIAL_AD_LANDING => ['ad-landing-quotepage-homepage', 'ad-landing-quotepage'],
-        // SixpackService::EXPERIMENT_SCODE_LANDING_TEXT => ['scode-landing-text-a', 'scode-landing-text-b'],
-        // SixpackService::EXPERIMENT_EMAIL_LANDING_TEXT => ['email-landing-text-a', 'email-landing-text-b'],
-        // SixpackService::EXPERIMENT_HOMEPAGE_USPS => ['homepage', 'homepage-usps'],
+        SixpackService::EXPERIMENT_QUOTE_PAGE_CTA => ['cta-original', 'cta-yes-please'],
+        SixpackService::EXPERIMENT_BURGER_MENU => ['menu-burger', 'menu-full'],
     ];
 
     private static $authExperiments = [];
