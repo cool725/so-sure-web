@@ -402,6 +402,7 @@ class AdminController extends BaseController
             self::getBankHolidays(),
             $policy->getActiveScheduledPayments()
         );
+        $createScheduledPayment->setAmount($policy->getPremiumInstallmentPrice());
         $createScheduledPaymentForm = $this->get('form.factory')
             ->createNamedBuilder(
                 'create_scheduled_payment_form',
@@ -422,14 +423,6 @@ class AdminController extends BaseController
             if ($request->request->has('create_scheduled_payment_form')) {
                 $createScheduledPaymentForm->handleRequest($request);
                 $monthlyPremium = null;
-                try {
-                    $policyPhonePrice = new PolicyPhonePriceHelper($policy);
-                    $monthlyPremium = $policyPhonePrice->getMonthlyPremiumPrice();
-                } catch (PolicyPhonePriceException $e) {
-                    $this->get('logger')->error(
-                        $e->getMessage() . " " . $e->getCode()
-                    );
-                }
                 if ($createScheduledPaymentForm->isValid()) {
                     $date = new \DateTime($createScheduledPayment->getDate());
                     if ($policy->hasScheduledPaymentOnDate($date)) {
@@ -441,10 +434,11 @@ class AdminController extends BaseController
                             )
                         );
                     } else {
+                        $amount = $createScheduledPayment->getAmount();
                         $scheduledPayment = new ScheduledPayment();
                         $scheduledPayment->setScheduled($date);
                         $scheduledPayment->setNotes($createScheduledPayment->getNotes());
-                        $scheduledPayment->setAmount($monthlyPremium);
+                        $scheduledPayment->setAmount($amount);
                         $scheduledPayment->setPolicy($policy);
                         $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
 
