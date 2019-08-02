@@ -3088,6 +3088,50 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/cancel-scheduled-payment-form/{id}/{scheduledPaymentId}", name="cancel_scheduled_payment_form")
+     * @Template
+     */
+    public function cancelScheduledPaymentFormAction(Request $request, $id, $scheduledPaymentId)
+    {
+        $dm = $this->getManager();
+        $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment $scheduledPayment */
+        $scheduledPayment = $scheduledPaymentRepo->find($scheduledPaymentId);
+        if (!$scheduledPayment) {
+            $this->addFlash(
+                "error",
+                "Attempted to cancel nonexistent scheduled payment with id '{$scheduledPaymentId}'."
+            );
+            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+        }
+        $cancelScheduledPaymentForm = $this->get("form.factory")
+            ->createNamedBuilder("cancel_scheduled_payment_form")
+            ->add("notes", TextType::class, ["data" => $scheduledPayment->getNotes()])
+            ->add("submit", SubmitType::class)
+            ->setAction(
+                $this->generateUrl(
+                    "cancel_scheduled_payment_form",
+                    ["id" => $id, "scheduledPaymentId" => $scheduledPaymentId]
+                )
+            )
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            // TODO: permissions
+            if ($request->request->has("cancel_scheduled_payment_form")) {
+                $cancelScheduledPaymentForm->handleRequest($request);
+                if ($cancelScheduledPaymentForm->isValid()) {
+                    $notes = $cancelScheduledPaymentForm->get("notes")->getData();
+                    $scheduledPayment->cancel($notes);
+                    $dm->flush();
+                    $this->addFlash("success", "Scheduled Payment Cancelled.");
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+        return ["form" => $cancelScheduledPaymentForm->createView()];
+    }
+
+    /**
      * @Route("/company", name="admin_company")
      * @Template
      */
