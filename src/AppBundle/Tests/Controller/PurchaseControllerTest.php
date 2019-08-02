@@ -6,6 +6,7 @@ use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\PolicyService;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
@@ -825,8 +826,11 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() == 0);
         $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() > 0);
     }
-     */
+    */
 
+    /**
+     * Gets policy from payment url
+     */
     private function getPolicyFromPaymentUrl()
     {
         $urlData = explode('/', self::$client->getHistory()->current()->getUri());

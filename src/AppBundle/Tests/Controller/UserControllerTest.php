@@ -15,6 +15,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
+use AppBundle\Service\PolicyService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Tests\Service\CheckoutServiceTest;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -1798,7 +1799,7 @@ class UserControllerTest extends BaseControllerTest
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
-        $date = new \DateTime("-350 day"); 
+        $date = new \DateTime("-350 day");
         $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         static::$dm->flush();

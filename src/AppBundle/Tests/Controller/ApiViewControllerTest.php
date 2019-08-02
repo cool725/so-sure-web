@@ -141,6 +141,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
         $data = strip_tags($data);
         $pdf = strip_tags($pdf);
         // adjust for differences in files
+        // @codingStandardsIgnoreStart
         $data = trim(preg_replace('/\s+/', ' ', $data));
         $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
         $pdf = str_replace('p {display: block;}', '', $pdf);
@@ -171,7 +172,6 @@ class ApiViewControllerTest extends BaseApiControllerTest
 
         // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
         $pdf = sprintf('so-sure Policy Document %s', $pdf);
-        // @codingStandardsIgnoreStart
         if ($version >= 11) {
             $pdf = sprintf('%s Contact details Address: so-sure Limited, 5 Martin Lane, London EC4R 0DP Email: support@wearesosure.com', $pdf);
         } else {
