@@ -276,10 +276,11 @@ class PhoneInsuranceController extends BaseController
         $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
 
         // A/B CTA Test
+        // To Test use url param ?force=cta-original / ?force=cta-buy-now
         $ctaText = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_QUOTE_PAGE_CTA,
-            ['cta-original', 'cta-yes-please']
+            SixpackService::EXPERIMENT_QUOTE_CTA,
+            ['cta-original', 'cta-buy-now']
         );
 
         // Burger vs Full Menu - Proceed

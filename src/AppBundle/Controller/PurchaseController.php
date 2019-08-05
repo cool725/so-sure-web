@@ -146,7 +146,7 @@ class PurchaseController extends BaseController
         }
 
         // CTA From Quote Test - Proceed
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_PAGE_CTA);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_CTA);
 
         // Burger vs Full Menu - Proceed
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);

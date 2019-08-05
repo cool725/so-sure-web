@@ -31,11 +31,11 @@ class SixpackService
     // const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
-    const EXPERIMENT_QUOTE_PAGE_CTA = 'cta-yes-please';
+    // const EXPERIMENT_QUOTE_PAGE_CTA = 'cta-yes-please';
     // Exp 2
     const EXPERIMENT_BURGER_MENU = 'burger-vs-full';
     // Exp 3
-    //
+    const EXPERIMENT_QUOTE_CTA = 'cta-buy-now';
     // Exp 4
     //
     // Exp 5
@@ -122,15 +122,16 @@ class SixpackService
         'scode-landing-text',
         'email-landing-text',
         'ad-landing-quotepage',
+        'cta-yes-please',
     ];
 
     public static $unauthExperiments = [
         // Exp 1.1
-        self::EXPERIMENT_QUOTE_PAGE_CTA,
+        // self::EXPERIMENT_QUOTE_PAGE_CTA,
         // Exp 2
         self::EXPERIMENT_BURGER_MENU,
         // Exp 3
-        //
+        self::EXPERIMENT_QUOTE_CTA,
         // Exp 4
         //
         // Exp 5
@@ -214,11 +215,11 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_QUOTE_PAGE_CTA,
+        // self::EXPERIMENT_QUOTE_PAGE_CTA,
         // Exp 2
         self::EXPERIMENT_BURGER_MENU,
         // Exp 3
-        //
+        self::EXPERIMENT_QUOTE_CTA,
         // Exp 4
         //
         // Exp 5
