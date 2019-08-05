@@ -88,7 +88,7 @@ class Reward
      * @MongoDB\Field(type="boolean")
      */
     protected $hasRenewed;
-    
+
     /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")

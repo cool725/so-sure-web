@@ -19,13 +19,13 @@ $(function() {
 
     textFit($('.fit')[0], {detectMultiLine: false});
 
-    $('.terms-link').on('click', function(e) {
-        e.preventDefault();
+    // $('.terms-link').on('click', function(e) {
+    //     e.preventDefault();
 
-        $('html, body').animate({
-            scrollTop: $('#terms_and_conditions').offset().top
-        }, 500);
-    });
+    //     $('html, body').animate({
+    //         scrollTop: $('#terms_and_conditions').offset().top
+    //     }, 500);
+    // });
 
 
 });
