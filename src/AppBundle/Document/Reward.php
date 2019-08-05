@@ -290,7 +290,7 @@ class Reward
         if (!$user) {
             return false;
         }
-        $notClaimed = $user->getAvgClaims() == 0; // TODO: two decimal places
+        $notClaimed = $this->toTwoDp($user->getAvgPolicyClaims()) == 0;
         $renewed = $user->getRenewed();
         $cancelled = $user->hasCancelled();
         if (($this->getHasNotClaimed() && !$notClaimed) || ($this->getHasRenewed() && !$renewed) ||

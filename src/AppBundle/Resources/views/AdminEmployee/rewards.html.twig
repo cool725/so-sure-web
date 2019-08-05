@@ -52,7 +52,7 @@
                                 <td>{{ reward.connections|length }}</td>
                                 <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
                                 <td>{% if reward.usageLimit %}{{ reward.usageLimit }}{% else %}n/a{% endif %}</td>
-                                <td>{% if reward.expiryDate %}{{ reward.expiryDate }}{% else %}n/a{% endif %}</td>
+                                <td>{% if reward.expiryDate %}{{ reward.expiryDate|date('d-m-T H:i') }}{% else %}n/a{% endif %}</td>
                                 <td>
                                     <a href="#"
                                        class="btn btn-primary btn-square btn-sm"

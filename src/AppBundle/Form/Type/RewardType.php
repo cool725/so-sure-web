@@ -18,30 +18,40 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
+/**
+ * Makes a form which lets you make a reward.
+ */
 class RewardType extends AbstractType
 {
+    /**
+     * @Override
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('code', TextType::class)
-            ->add('email', EmailType::class)
-            ->add('defaultValue', TextType::class)
+        $builder->add('firstName', TextType::class, ['required' => true])
+            ->add('lastName', TextType::class, ['required' => true])
+            ->add('code', TextType::class, ['required' => true])
+            ->add('email', EmailType::class, ['required' => true])
+            ->add('defaultValue', TextType::class, ['required' => true])
             ->add('expiryDate', DateType::class, [
                   'format'   => 'dd/MM/yyyy',
                   'widget' => 'single_text',
                   'placeholder' => ['year' => 'YYYY', 'month' => 'MM', 'day' => 'DD'],
+                  'required' => true
             ])
-            ->add('policyAgeMin', TextType::class)
-            ->add('policyAgeMax', TextType::class)
-            ->add('usageLimit', TextType::class)
-            ->add('hasNotClaimed', CheckboxType::class)
-            ->add('hasRenewed', CheckboxType::class)
-            ->add('hasCancelled', CheckboxType::class)
-            ->add('termsAndConditions', TextareaType::class)
+            ->add('policyAgeMin', TextType::class, ['required' => false])
+            ->add('policyAgeMax', TextType::class, ['required' => false])
+            ->add('usageLimit', TextType::class, ['required' => false])
+            ->add('hasNotClaimed', CheckboxType::class, ['required' => false])
+            ->add('hasRenewed', CheckboxType::class, ['required' => false])
+            ->add('hasCancelled', CheckboxType::class, ['required' => false])
+            ->add('termsAndConditions', TextareaType::class, ['required' => false])
             ->add('next', SubmitType::class);
     }
 
+    /**
+     * @Override
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
