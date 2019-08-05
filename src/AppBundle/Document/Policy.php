@@ -5168,7 +5168,7 @@ abstract class Policy
             throw new \InvalidArgumentException("A date must be provided to look up scheduled payment by date");
         }
 
-        $scheduledPayments = $this->getScheduledPayments();
+        $scheduledPayments = $this->getActiveScheduledPayments();
         foreach ($scheduledPayments as $scheduledPayment) {
             if ($scheduledPayment->getScheduled()->format('Ymd') === $date->format('Ymd')) {
                 return true;
