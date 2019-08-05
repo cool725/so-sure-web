@@ -277,6 +277,28 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setCommission(true);
     }
 
+    public function testFinalCommissionHigher()
+    {
+        $payments = [];
+        $policy = $this->createEligiblePolicy(new \DateTime("2019-01-01"), 5, 6, 1);
+        $policy->setPremiumInstallments(12);
+        for ($i = 1; $i <= $policy->getPremiumInstallmentCount(); $i++) {
+            $payment = new CheckoutPayment();
+            $payment->setDate(new \DateTime("2019-$i-01"));
+            $payment->setAmount($policy->getPremiumInstallmentPrice());
+            $policy->addPayment($payment);
+            // Make sure that the fractional commission is correct.
+            // Should be equal to pro rata commission due.
+            $payment->setCommission(true);
+            $payment->setSuccess(true);
+            $payments[$i] = $payment;
+        }
+        $eleventhPaymentCommission = $payments[11]->getTotalCommission();
+        $finalPaymentCommission = $payments[12]->getTotalCommission();
+        $difference = $finalPaymentCommission - $eleventhPaymentCommission;
+        self::assertEquals(0.04, $difference);
+    }
+
     /**
      * Creates a policy that is set up enough that it can calculate pro rata commission.
      * @param \DateTime $startDate is the date at which the policy starts.

@@ -575,7 +575,12 @@ abstract class Payment
         } elseif ($premium->isEvenlyDivisible($this->getAmount()) ||
             $premium->isEvenlyDivisible($this->getAmount(), true)) {
             // payment should already be credited at this point
-            $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
+            $fullPaid = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
+            $lastPayment = $this->areEqualToTwoDp(
+                $policy->getPremiumInstallmentPrice(),
+                $policy->getOutstandingPremium()
+            );
+            $includeFinal = $fullPaid || $lastPayment;
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
