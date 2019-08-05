@@ -53,27 +53,26 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         $inExpiry = (new \DateTime())->sub(new \DateInterval("P5D"));
         $outExpiry = (new \DateTime())->add(new \DateInterval("P5D"));
         return [
-            // I forget
+            // success without limits
             [true, $date, rand(1, 50)],
-            // I forget
+            // success with usage limit
             [true, $date, 50, null, 60],
-            // I forget
+            // failure with usage limit
             [false, $date, 50, null, 40],
-            // I forget
+            // success with date limit
             [true, $inExpiry, rand(1, 50), $date],
-            // I forget
+            // success with date limit and usage limit
             [true, $inExpiry, 40, $date, 50],
-            // I forget
+            // failure with date limit and usage limit due to usage limit
             [false, $inExpiry, 50, $date, 40],
-            // I forget
+            // failure with date limit and usage limit due to date limit
             [false, $outExpiry, 50, $date],
-            // I forget
+            // failure due to usage with both
             [false, $outExpiry, 50, $date, 60],
-            // I forget
+            // failure due to both at the same time
             [false, $outExpiry, 50, $date, 40],
         ];
     }
-
 
     /**
      * Tests that a reward can not be applied when it is not open.
