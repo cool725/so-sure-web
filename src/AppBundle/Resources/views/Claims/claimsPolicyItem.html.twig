@@ -1667,6 +1667,10 @@
                                 <button title="Edit Scheduled Payment" type="button" class="btn btn-danger" data-toggle="modal" data-target="#scheduledPaymentForm{{scheduledPayment.id}}">
                                     <i class="fa fa-edit"></i> Edit
                                 </button>
+                                <button title="Cancel Scheduled Payment" type="button" class="btn btn-outline-danger"
+                                        data-toggle="modal" data-target="#cancelScheduledPaymentForm{{scheduledPayment.id}}">
+                                    <i class="fa fa-remove"></i> Cancel
+                                </button>
                             {% endif %}
                             {# run button #}
                             {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
@@ -2012,6 +2016,10 @@
             {%
                 include 'AppBundle::Admin/adminConfirmModal.html.twig' with
                 {'route': 'AppBundle:AdminEmployee:scheduledPaymentForm', 'params': {'id': policy.id, 'scheduledPaymentId': scheduledPayment.id}, 'id': 'scheduledPaymentForm' ~ scheduledPayment.id, 'title': 'Edit Scheduled Payment'}
+            %}
+            {%
+                include 'AppBundle::Admin/adminConfirmModal.html.twig' with
+                {'route': 'AppBundle:AdminEmployee:cancelScheduledPaymentForm', 'params': {'id': policy.id, 'scheduledPaymentId': scheduledPayment.id}, 'id': 'cancelScheduledPaymentForm' ~ scheduledPayment.id, 'title': 'Cancel Scheduled Payment'}
             %}
         {% endfor %}
 
