@@ -74,6 +74,19 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+
+    /**
+     * Tests that a reward can not be applied when it is not open.
+     */
+    public function testCanApplyNotOpen()
+    {
+        $user = new User();
+        $policy = $this->addPolicyToUser($user, new \DateTime());
+        $reward = new Reward();
+        $reward->setExpiryDate((new \DateTime())->sub(new \DateInterval("P3D")));
+        $this->assertFalse($reward->canApply($policy, new \DateTime()));
+    }
+
     /**
      * Tests that Reward::canApply behaves correctly.
      * If the reward is not open then it will not apply, if there are age limits then it will enforce them, if there
@@ -178,13 +191,6 @@ class RewardTest extends \PHPUnit\Framework\TestCase
             // no claim and cancel and renew failure due to age.
             [false, false, true, true, $date, 2, 20, true, true, true]
         ];
-    }
-
-    /**
-     * Tests that a reward can not be applied when it is not open.
-     */
-    public function testCanApplyNotOpen()
-    {
     }
 
     /**
