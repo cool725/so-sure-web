@@ -104,8 +104,16 @@ class Phone
      */
     protected $memory;
 
-    /** @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice") */
-    protected $phonePrices = array();
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
+     */
+    protected $phonePrices = [];
+
+    /**
+     * List of the phone's retail prices over time. Not guaranteed to be in order.
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhoneRetailPrice")
+     */
+    protected $retailPrices = [];
 
     /**
      * @Assert\Range(min=0,max=2000)
@@ -608,6 +616,67 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
+    /**
+     * Adds a retail price to the phone's list of retail prices.
+     * @param float     $price is the actual price value.
+     * @param string    $url   is a link to proof of this price.
+     * @param \DateTime $date  is the date at which this becomes valid.
+     */
+    public function addRetailPrice($price, $url, $date)
+    {
+        $retailPrice = new PhoneRetailPrice();
+        $retailPrice->setPrice($price);
+        $retailPrice->setUrl($url);
+        $retailPrice->setDate($date);
+        $this->retailPrices[] = $retailPrice;
+    }
+
+    /**
+     * Returns the list of the phone's retail prices in arbitrary order.
+     * @return array of all the phone retail prices.
+     */
+    public function getRetailPrices()
+    {
+        return $this->retailPrices;
+    }
+
+    /**
+     * Gives you all of the phone's retail prices that are or have been in effect.
+     * @param \DateTime $date is the date to be considered as now.
+     * @return array of retail prices.
+     */
+    public function getPastRetailPrices($date)
+    {
+        $retailPrices = $this->getRetailPrices();
+        if (!is_array($retailPrices)) {
+            $retailPrices = $retailPrices->toArray();
+        }
+        return array_filter($retailPrices, function ($price) use ($date) {
+            return $price->getDate() <= $date;
+        });
+    }
+
+    /**
+     * Gives you either the current retail price if there is one or the initial price.
+     * @param \DateTime|null $date is the date by which to find which retail price is current. If null is given it will
+     *                             default to the current time and date.
+     * @return float the most up to date retail price stored.
+     */
+    public function getCurrentRetailPrice(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime("now", new \DateTimeZone(SoSure::TIMEZONE));
+        }
+        $retailPrices = $this->getPastRetailPrices($date);
+        if (count($retailPrices) == 0) {
+            return $this->getInitialPrice();
+        }
+        usort($retailPrices, function ($a, $b) {
+            return ($a->getDate() < $b->getDate()) ? 1 : -1;
+        });
+        return $retailPrices[0]->getPrice();
+    }
+
     public function getReplacementPriceOrSuggestedReplacementPrice()
     {
         return $this->getReplacementPrice() ?
@@ -746,44 +815,37 @@ class Phone
 
     public function getSalvaBinderMonthlyPremium(\DateTime $date = null)
     {
-        // Initial binder
         $binder2016 = new \DateTime('2016-09-01 00:00:00', SoSure::getSoSureTimezone());
-
-        // 2018 binder - prices static, but additional bands £1250 & £1500
         $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
-
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
-
         if ($date >= Salva::getSalvaBinderEndDate()) {
             throw new \Exception('No binder available');
         }
-
-        if ($this->getInitialPrice() <= 150) {
+        $price = $this->getCurrentRetailPrice($date);
+        if ($price <= 150) {
             return 3.99 + 1.5; // 5.49
-        } elseif ($this->getInitialPrice() <= 250) {
+        } elseif ($price <= 250) {
             return 4.99 + 1.5; // 6.49
-        } elseif ($this->getInitialPrice() <= 400) {
+        } elseif ($price <= 400) {
             return 5.49 + 1.5; // 6.99
-        } elseif ($this->getInitialPrice() <= 500) {
+        } elseif ($price <= 500) {
             return 5.99 + 1.5; // 7.49
-        } elseif ($this->getInitialPrice() <= 600) {
+        } elseif ($price <= 600) {
             return 6.99 + 1.5; // 8.49
-        } elseif ($this->getInitialPrice() <= 750) {
+        } elseif ($price <= 750) {
             return 7.99 + 1.5; // 9.49
-        } elseif ($this->getInitialPrice() <= 1000) {
+        } elseif ($price <= 1000) {
             return 8.99 + 1.5; // 10.49
         }
-
         if ($date >= $binder2018) {
-            if ($this->getInitialPrice() <= 1250) {
+            if ($price <= 1250) {
                 return 9.99 + 1.5; // 11.49
-            } elseif ($this->getInitialPrice() <= 1500) {
+            } elseif ($price <= 1500) {
                 return 10.99 + 1.5; // 12.49
             }
         }
-
         return null;
     }
 
@@ -1291,7 +1353,7 @@ class Phone
         if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',
-                $price->getMonthlyPremiumPrice($from),
+                $price->getMonthlyPremiumPrice(null, $from),
                 $this->getSalvaMiniumumBinderMonthlyPremium()
             ));
         }

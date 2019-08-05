@@ -24,6 +24,7 @@ class CreateScheduledPaymentType extends AbstractType
     {
         $builder
             ->add('disabledDatesJson', HiddenType::class)
+            ->add('amount', TextType::class)
             ->add('date', TextType::class, [
                 'attr' => ['autocomplete' => 'off']
             ])

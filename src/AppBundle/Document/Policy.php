@@ -2072,6 +2072,18 @@ abstract class Policy
         return $this->scheduledPayments;
     }
 
+    public function getActiveScheduledPayments()
+    {
+        $payments = $this->getScheduledPayments();
+        $active = [];
+        foreach ($payments as $payment) {
+            if ($payment->getStatus() != ScheduledPayment::STATUS_CANCELLED) {
+                $active[] = $payment;
+            }
+        }
+        return $active;
+    }
+
     /**
      * Gets all scheduled refunds in the future.
      * @return array containing all of these refunds.
