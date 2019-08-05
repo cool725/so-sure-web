@@ -577,7 +577,7 @@ abstract class Payment
             // payment should already be credited at this point
             $fullPaid = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
             $lastPayment = $this->areEqualToTwoDp(
-                $policy->getPremiumInstallmentPrice(),
+                $this->getAmount(),
                 $policy->getOutstandingPremium()
             );
             $includeFinal = $fullPaid || $lastPayment;
