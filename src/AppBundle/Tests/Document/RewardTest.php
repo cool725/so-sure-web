@@ -46,6 +46,7 @@ class RewardTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Covers all cases for Reward::isOpen
+     * @return array containing the test cases.
      */
     public static function isOpenProvider()
     {
@@ -149,6 +150,7 @@ class RewardTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Covers all cases for Reward::canApply except for ones relating to whether or not the reward is open.
+     * @return array containing the test cases.
      */
     public static function canApplyProvider()
     {
@@ -194,7 +196,7 @@ class RewardTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Creates a new policy and adds it to the given user.
-     * @param User $user is the user to add the policy to.
+     * @param User      $user        is the user to add the policy to.
      * @param \DateTime $policyStart is the date at which the policy starts.
      * @return Policy the created policy.
      */
@@ -205,6 +207,4 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         $user->addPolicy($policy);
         return $policy;
     }
-
 }
-

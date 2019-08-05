@@ -97,6 +97,7 @@ class Reward
 
     /**
      * @Assert\Length(min="50", max="1000")
+     * @MongoDB\Field(type="string")
      */
     protected $termsAndConditions;
 
@@ -302,5 +303,5 @@ class Reward
             return false;
         }
         return true;
-    } 
+    }
 }
