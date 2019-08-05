@@ -32,23 +32,24 @@
                 <div class="col-lg-7">
                     {% if scode is defined and scode and scode.reward %}
                         <div class="hero__intro">
-                            <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-columbia-blue-e">with &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cashback if you don't claim</span></h1>
+                            <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-columbia-blue-e">Get money back if I don't claim? Yes Please!</span></h1>
                             <div class="hero__step mb-4">
                                 <div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div>
-                                <div class="h4 text-white">Get an instant quote</div>
+                                <div class="h4 text-white">Instant quote</div>
                             </div>
                             <div class="hero__step mb-4">
                                 <div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">2</div>
-                                <div class="h4 text-white">Get covered in minutes</div>
+                                <div class="h4 text-white">Covered in minutes</div>
                             </div>
                             <div class="hero__step mb-5">
                                 <div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div>
-                                <div class="h4 text-white">Enter the code <span class="promo-code">{{ scode.code }}</span></div>
+                                <div class="h4 text-white">Get an extra &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cash back with the code <span class="promo-code">{{ scode.code }}</span></div>
                             </div>
                         </div>
                         <div class="hero__controls mb-5">
                             <p><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get an instant quote</a></p>
-                            <p><small><a href="#terms_and_conditions" class="terms-link text-white"><u>Term &amp; Conditions</u></a></small></p>
+                            <p><small><a href="#terms_and_conditions" data-toggle="modal"
+                                   data-target="#page_terms" class="terms-link text-white"><u>Term &amp; Conditions</u></a></small></p>
                         </div>
                     {% else %}
                         <h1 class="my-5 text-white fit">Promotion not found 😕 <br><span class="sub text-columbia-blue-e">however still want excellent cover?</span></h1>
@@ -83,17 +84,34 @@
         </div>
     </section>
 
-    {% if scode is defined and scode and scode.reward %}
-        <div id="terms_and_conditions" class="terms py-lg-5">
-            <div class="container container-xtra py-5">
-                <h2 class="h3">Terms &amp; Conditions</h2>
-                <p>{{ scode.reward.termsAndConditions }}</p>
-            </div>
-        </div>
-    {% endif %}
-
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="page_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Terms &amp; Conditions
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if scode is defined and scode and scode.reward %}
+                        <p>{{ scode.reward.termsAndConditions }}</p>
+                        <p>Code expires: {{ scode.reward.expiryDate|date("m/d/Y") }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
