@@ -267,8 +267,8 @@ class Reward
      */
     public function isOpen(\DateTime $date)
     {
-        return (!$this->getExpirationDate() || $this->getExpirationDate() > $date) &&
-            count($this->getConnections()) < $this->getUsageLimit();
+        return (!$this->getExpiryDate() || $this->getExpiryDate() > $date) &&
+            (!$this->getUsageLimit() || count($this->getConnections()) < $this->getUsageLimit());
     }
 
     /**
@@ -282,17 +282,21 @@ class Reward
         if (!$this->isOpen($date)) {
             return false;
         }
+        $min = $this->getPolicyAgeMin();
+        $max = $this->getPolicyAgeMax();
         $age = $policy->age();
-        if ($age < $this->getPolicyAgeMin() || $age > $this->getPolicyAgeMax()) {
+        if (($min && $age < $min) || ($max && $age > $max)) {
             return false;
         }
         $user = $policy->getUser();
         if (!$user) {
             return false;
         }
-        $notClaimed = $this->toTwoDp($user->getAvgPolicyClaims()) == 0;
-        $renewed = $user->getRenewed();
-        $cancelled = $user->hasCancelled();
+        $notClaimed = $user->policyReduce(true, function ($current, $policy) {
+            return $current && count($policy->getClaims()) == 0;
+        });
+        $renewed = $user->hasRenewalPolicy();
+        $cancelled = $user->hasCancelledPolicy();
         if (($this->getHasNotClaimed() && !$notClaimed) || ($this->getHasRenewed() && !$renewed) ||
             ($this->getHasCancelled() && !$cancelled)) {
             return false;
