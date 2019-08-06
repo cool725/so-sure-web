@@ -80,6 +80,11 @@ class CreateReward
     /**
      * @var boolean
      */
+    protected $isFirst;
+
+    /**
+     * @var boolean
+     */
     protected $termsAndConditions;
 
     public function getFirstName()
@@ -200,6 +205,16 @@ class CreateReward
     public function setHasCancelled($hasCancelled)
     {
         $this->hasCancelled = $hasCancelled;
+    }
+
+    public function getIsFirst()
+    {
+        return $this->isFirst;
+    }
+
+    public function setIsFirst($isFirst)
+    {
+        $this->isFirst = $isFirst;
     }
 
     public function getTermsAndConditions()

@@ -2949,6 +2949,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $reward->setHasNotClaimed($createReward->getHasNotClaimed());
                         $reward->setHasRenewed($createReward->getHasRenewed());
                         $reward->setHasCancelled($createReward->getHasCancelled());
+                        $reward->setIsFirst($createReward->getIsFirst());
                         $reward->setTermsAndConditions($createReward->getTermsAndConditions());
                         $dm->persist($reward);
                         $code = $createReward->getCode();
