@@ -24,12 +24,4 @@ class ImeiTraitTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals('00', mb_substr($imei, 0, 2));
         }
     }
-
-    /**
-     * Make sure that the random imei generator is not generating the same values.
-     */
-    public function testRandomImeiCollision()
-    {
-        $this->assertNotEquals($this->generateRandomImei(), $this->generateRandomImei());
-    }
 }

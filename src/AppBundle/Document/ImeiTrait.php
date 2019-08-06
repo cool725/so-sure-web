@@ -25,7 +25,7 @@ trait ImeiTrait
     {
         // First two digits are 0, which means the IMEI isn't registered by any real organisation.
         $imei = [0, 0];
-        $time = (int) (floor(microtime(true)) * 1000) + random_int(0, 1000);
+        $time = (int) (floor(microtime(true)) * 10);
         for ($i = 0; $i < 12; $i++) {
             $imei[] = $time % 10;
             $time /= 10;

@@ -284,6 +284,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupPolicyBacs()
     {
         /** @var User $user */
@@ -322,6 +325,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupBacsWithMandate()
     {
         /** @var User $user */
@@ -361,6 +367,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertGreaterThan(0, mb_strlen($data['standard_notification_day']));
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupBacsInvalidSortCode()
     {
         /** @var User $user */
@@ -388,6 +397,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_INVALID_SORTCODE);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupBacsInvalidAccountNumber()
     {
         /** @var User $user */
@@ -415,6 +427,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_INVALID_NUMBER);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupBacsNoDD()
     {
         /** @var User $user */
@@ -442,6 +457,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_BANK_DIRECT_DEBIT_UNAVAILABLE);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupBacsCancelledPolicy()
     {
         /** @var User $user */
@@ -472,6 +490,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_UNABLE_TO_UDPATE);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupBacsReqParam()
     {
         /** @var User $user */
@@ -513,6 +534,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupPolicyBacsInvalidPolicy()
     {
         /** @var User $user */
@@ -544,6 +568,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
 
+    /**
+     * @group bacs
+     */
     public function testLookupPolicyBacsNoAccessPolicy()
     {
         /** @var User $user */
@@ -576,7 +603,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
     // POST /detected-imei
 
     /**
-     *
+     * @group imei
      */
     public function testDetectedImeiMissing()
     {
@@ -617,6 +644,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->verifyResponse(400);
     }
 
+    /**
+     * @group imei
+     */
     public function testDetectedImeiWait()
     {
         $this->clearRateLimit();
@@ -636,6 +666,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->verifyResponse(422, ApiErrorCode::ERROR_DETECTED_IMEI_MANUAL_PROCESSING);
     }
 
+    /**
+     * @group imei
+     */
     public function testDetectedImeiSuggested()
     {
         $user = self::createUser(
@@ -658,6 +691,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('foo', $policy['phone_policy']['detected_imei']);
     }
 
+    /**
+     * @group imei
+     */
     public function testDetectedImeiNonUser()
     {
         $userA = self::createUser(
@@ -685,6 +721,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policy = $this->verifyResponse(403);
     }
 
+    /**
+     * @group imei
+     */
     public function testDetectedImeiExpired()
     {
         $user = self::createUser(
@@ -723,10 +762,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals($policyDataB['id'], $policy['id']);
     }
 
-    // invitation/{id}
-
     /**
-     *
+     * @group invitation
      */
     public function testInvitationCancel()
     {
@@ -753,6 +790,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    /**
+     * @group invitation
+     */
     public function testInvitationUnknown()
     {
         $user = self::createUser(
@@ -778,6 +818,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    /**
+     * @group invitation
+     */
     public function testInvitationMissingActionAction()
     {
         $user = self::createUser(
@@ -803,6 +846,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
+    /**
+     * @group invitation
+     */
     public function testInvitationReinviteLimitedAction()
     {
         $user = self::createUser(
