@@ -105,8 +105,8 @@
                 </div>
                 <div class="modal-body">
                     {% if scode is defined and scode and scode.reward %}
-                        <p>{{ scode.reward.termsAndConditions }}</p>
-                        <p>Code expires: {{ scode.reward.expiryDate|date("m/d/Y") }}</p>
+                        <p>{{ scode.reward.termsAndConditions|raw }}</p>
+                        <p>Code expires: <strong>{{ scode.reward.expiryDate|date("m/d/Y") }}</strong></p>
                     {% endif %}
                 </div>
             </div>

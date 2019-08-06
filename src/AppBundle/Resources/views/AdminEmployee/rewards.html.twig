@@ -92,12 +92,12 @@
                             <div class="col">
                                 <div class="form-group">
                                     {{ form_label(rewardForm.firstName, 'First Name *') }}
-                                    {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Connection first name i.e. so'}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.lastName, 'Last Name *') }}
-                                    {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Connection last name i.e. sure'}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
                                 </div>
                                 <div class="form-group">
@@ -117,14 +117,14 @@
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.policyAgeMin, 'Policy Age Min') }}
-                                    {{ form_widget(rewardForm.policyAgeMin, {'attr': {'class': 'form-control', 'placeholder': 'Min policy age'}}) }}
+                                    {{ form_widget(rewardForm.policyAgeMin, {'attr': {'class': 'form-control', 'placeholder': 'Min policy age i.e. if you don\'t want new users to use it' }}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.policyAgeMin) }}</div>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     {{ form_label(rewardForm.policyAgeMax, 'Policy Age Max') }}
-                                    {{ form_widget(rewardForm.policyAgeMax, {'attr': {'class': 'form-control', 'placeholder': 'Max policy age'}}) }}
+                                    {{ form_widget(rewardForm.policyAgeMax, {'attr': {'class': 'form-control', 'placeholder': 'Max policy age i.e. 7 to allow new users a week to use'}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.policyAgeMax) }}</div>
                                 </div>
                                 <div class="form-group">
@@ -154,26 +154,28 @@
                                     {{ form_widget(rewardForm.termsAndConditions, { 'attr': {
                                         'class': 'form-control',
                                         'rows': '5',
-                                        'placeholder': 'Enter terms....'
+                                        'placeholder': 'Enter terms here where you can use html i.e. <p></p> tags - expiry date will be shown below this'
                                     }}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.termsAndConditions) }}</div>
                                 </div>
                                 <div class="form-group d-flex">
                                     <div class="mr-2">
                                         {{ form_widget(rewardForm.hasNotClaimed, {
-                                            'label': 'Require No Claims',
+                                            'label': 'Has No Claims',
                                             'attr': {'class':'custom-control-input'}}
                                         ) }}
                                     </div>
                                     <div class="mr-2">
                                         {{ form_widget(rewardForm.hasRenewed, {
-                                            'label': 'Require Renewed Policy',
+                                            'label': 'Has Renewed Policy',
                                             'attr': {'class':'custom-control-input'}}
                                         ) }}
                                     </div>
+                                </div>
+                                <div class="form-group d-flex">
                                     <div class="mr-2">
                                         {{ form_widget(rewardForm.hasCancelled, {
-                                            'label': 'Require Cancelled Policy',
+                                            'label': 'Previous Cancelled Policy',
                                             'attr': {'class': 'custom-control-input'}}
                                         ) }}
                                     </div>
@@ -183,6 +185,9 @@
                                             'attr': {'class': 'custom-control-input'}}
                                         ) }}
                                     </div>
+                                </div>
+                                <div class="form-group">
+                                    {# Errors for above #}
                                     <div class="with-errors">{{ form_errors(rewardForm.hasNotClaimed) }}</div>
                                     <div class="with-errors">{{ form_errors(rewardForm.hasRenewed) }}</div>
                                     <div class="with-errors">{{ form_errors(rewardForm.hasCancelled) }}</div>
