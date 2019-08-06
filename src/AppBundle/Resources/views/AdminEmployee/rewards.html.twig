@@ -177,9 +177,16 @@
                                             'attr': {'class': 'custom-control-input'}}
                                         ) }}
                                     </div>
+                                    <div class="mr-2">
+                                        {{ form_widget(rewardForm.isFirst, {
+                                            'label': 'Must Be First Policy',
+                                            'attr': {'class': 'custom-control-input'}}
+                                        ) }}
+                                    </div>
                                     <div class="with-errors">{{ form_errors(rewardForm.hasNotClaimed) }}</div>
                                     <div class="with-errors">{{ form_errors(rewardForm.hasRenewed) }}</div>
                                     <div class="with-errors">{{ form_errors(rewardForm.hasCancelled) }}</div>
+                                    <div class="with-errors">{{ form_errors(rewardForm.isFirst) }}</div>
                                 </div>
                                 <div class="form-group text-right">
                                     {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
