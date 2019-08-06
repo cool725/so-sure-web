@@ -15,11 +15,11 @@ import lozad from 'lozad';
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();
 
-let textFit = require('textfit');
+// let textFit = require('textfit');
 
 $(function() {
 
-    textFit($('.fit')[0], {detectMultiLine: false});
+    // textFit($('.fit')[0], {detectMul tiLine: false});
 
     // $('.terms-link').on('click', function(e) {
     //     e.preventDefault();
