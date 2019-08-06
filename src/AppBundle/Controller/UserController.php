@@ -181,6 +181,7 @@ class UserController extends BaseController
         }
 
         $scode = null;
+
         if ($session = $this->get('session')) {
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
         }
@@ -461,7 +462,7 @@ class UserController extends BaseController
                 $this->addFlash(
                     'success-raw',
                     sprintf(
-                        '%s has invited you to connect. <a href="#" id="scode-link">Connect here!</a>',
+                        '%s has invited you to connect. Connect below',
                         $scode->getUser()->getName()
                     )
                 );
@@ -469,7 +470,7 @@ class UserController extends BaseController
                 $this->addFlash(
                     'success-raw',
                     sprintf(
-                        'Get your £%0.2f reward bonus from %s. <a href="#" id="scode-link">Connect here!</a>',
+                        'Get your £%0.2f reward bonus from %s. Apply below',
                         $scode->getReward()->getDefaultValue(),
                         $scode->getUser()->getName()
                     )

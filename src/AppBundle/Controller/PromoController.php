@@ -46,7 +46,7 @@ class PromoController extends BaseController
         }
 
         $session = $this->get('session');
-        $session->set('reward', $code);
+        $session->set('scode', $code);
 
         if ($scode && $request->getMethod() === "GET") {
             $this->get('app.mixpanel')->queuePersonProperties([
