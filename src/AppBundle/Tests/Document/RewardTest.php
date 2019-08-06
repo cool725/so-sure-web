@@ -8,7 +8,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\Connection;
-use AppBundle\Document\DateTrait;
 
 /**
  * Proves the behaviour of the reward document.
@@ -16,8 +15,6 @@ use AppBundle\Document\DateTrait;
  */
 class RewardTest extends \PHPUnit\Framework\TestCase
 {
-    use DateTrait;
-
     /**
      * Tests that Reward::isOpen behaves correctly.
      * If a reward has a usage limit and that limit has been hit it should be closed, also, when it has an expiration
@@ -54,24 +51,15 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         $inExpiry = (new \DateTime())->sub(new \DateInterval("P5D"));
         $outExpiry = (new \DateTime())->add(new \DateInterval("P5D"));
         return [
-            // success without limits
-            [true, $date, rand(1, 50)],
-            // success with usage limit
-            [true, $date, 50, null, 60],
-            // failure with usage limit
-            [false, $date, 50, null, 40],
-            // success with date limit
-            [true, $inExpiry, rand(1, 50), $date],
-            // success with date limit and usage limit
-            [true, $inExpiry, 40, $date, 50],
-            // failure with date limit and usage limit due to usage limit
-            [false, $inExpiry, 50, $date, 40],
-            // failure with date limit and usage limit due to date limit
-            [false, $outExpiry, 50, $date],
-            // failure due to usage with both
-            [false, $outExpiry, 50, $date, 60],
-            // failure due to both at the same time
-            [false, $outExpiry, 50, $date, 40],
+            "success without limits" => [true, $date, rand(1, 50)],
+            "success with usage limit" => [true, $date, 50, null, 60],
+            "failure with usage limit" => [false, $date, 50, null, 40],
+            "success with date limit" => [true, $inExpiry, rand(1, 50), $date],
+            "success with date limit and usage limit" => [true, $inExpiry, 40, $date, 50],
+            "failure with date limit and usage limit due to usage limit" => [false, $inExpiry, 50, $date, 40],
+            "failure with date limit and usage limit due to date limit" =>[false, $outExpiry, 50, $date],
+            "failure due to usage with both" => [false, $outExpiry, 50, $date, 60],
+            "failure due to both at the same time" => [false, $outExpiry, 50, $date, 40]
         ];
     }
 
@@ -101,6 +89,7 @@ class RewardTest extends \PHPUnit\Framework\TestCase
      * @param boolean   $notClaimed    is whether or not a user can claim and then use the reward.
      * @param boolean   $renewed       is whether a user can use the reward without a renewed policy.
      * @param boolean   $cancelled     is whether a user can use the reward without a cancelled policy.
+     * @param boolean   $first         is whether a user needs the policy to be their first in order to use the reward.
      * @dataProvider canApplyProvider
      */
     public function testCanApply(
@@ -113,7 +102,8 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         $maxAge = null,
         $notClaimed = null,
         $renewed = null,
-        $cancelled = null
+        $cancelled = null,
+        $first = null
     ) {
         $user = new User();
         $policy = $this->addPolicyToUser($user, $policyStart);
@@ -145,6 +135,9 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         if ($cancelled) {
             $reward->setHasCancelled($cancelled);
         }
+        if ($first) {
+            $reward->setIsFirst($first);
+        }
         $this->assertEquals($result, $reward->canApply($policy, new \DateTime()));
     }
 
@@ -157,40 +150,26 @@ class RewardTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime();
         $old = (new \DateTime())->sub(new \DateInterval("P50D"));
         return [
-            // too young failure
-            [false, false, false, false, $date, 1],
-            // too old failure
-            [false, false, false, false, $old, null, 30],
-            // no claims failure
-            [false, true, false, false, $date, null, null, true],
-            // renew failure
-            [false, false, false, false, $date, null, null, false, true],
-            // cancel failure
-            [false, false, false, false, $date, null, null, false, false, true],
-            // age success
-            [true, false, false, false, $old, 40, 60],
-            // no claim success
-            [true, false, false, false, $date, null, null, true, false, false],
-            // renew success
-            [true, false, true, false, $date, null, null, false, true, false],
-            // cancel success
-            [true, false, false, true, $date, null, null, false, false, true],
-            // no conditions success
-            [true, true, false, false, $date, null, null, false, false, false],
-            // no claim and renew success
-            [true, false, true, false, $date, null, null, true, true, false],
-            // no claim and renew and cancel success
-            [true, false, true, true, $date, null, null, true, true, true],
-            // renew and cancel success
-            [true, true, true, true, $date, null, null, false, true, true],
-            // no claim and cancel success
-            [true, false, false, true, $date, null, null, true, false, true],
-            // no claim and cancel failure due to claim
-            [false, true, false, true, $date, null, null, true, false, true],
-            // no claim and cancel and renew failure due to no cancel
-            [false, false, true, false, $date, null, null, true, true, true],
-            // no claim and cancel and renew failure due to age.
-            [false, false, true, true, $date, 2, 20, true, true, true]
+            "too young failure" => [false, false, false, false, $date, 1],
+            "too old failure" => [false, false, false, false, $old, null, 30],
+            "no claims failure" => [false, true, false, false, $date, null, null, true],
+            "renew failure" => [false, false, false, false, $date, null, null, false, true],
+            "cancel failure" => [false, false, false, false, $date, null, null, false, false, true],
+            "age success" => [true, false, false, false, $old, 40, 60],
+            "no claim success" => [true, false, false, false, $date, null, null, true],
+            "renew success" => [true, false, true, false, $date, null, null, false, true, false],
+            "cancel success" => [true, false, false, true, $date, null, null, false, false, true],
+            "no conditions success" => [true, true, false, false, $date],
+            "noclaim, renew success" => [true, false, true, false, $date, null, null, true, true, false],
+            "noclaim, renew, cancel success" => [true, false, true, true, $date, null, null, true, true, true],
+            "renew, cancel success" => [true, true, true, true, $date, null, null, false, true, true],
+            "noclaim cancel success" => [true, false, false, true, $date, null, null, true, false, true],
+            "noclaim cancel fail due to claim" => [false, true, false, true, $date, null, null, true, false, true],
+            "noclaim cancel renew fail not cancel" => [false, false, true, false, $date, null, null, true, true, true],
+            "noclaim cancel renew fail bad age" => [false, false, true, true, $date, 2, 20, true, true, true, true],
+            "cancel isnew fail cancelled" => [false, false, false, true, $date, null, null, false, false, true, true],
+            "cancel isnew fail no cancel" => [false, false, false, false, $date, null, null, false, false, true, true],
+            "isnew success" => [true, false, false, false, $date, null, null, false, false, false, true]
         ];
     }
 

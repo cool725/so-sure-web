@@ -96,6 +96,12 @@ class Reward
     protected $hasCancelled;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $isFirst;
+
+    /**
      * @Assert\Length(min="50", max="1000")
      * @MongoDB\Field(type="string")
      */
@@ -231,6 +237,16 @@ class Reward
         $this->hasCancelled = $hasCancelled;
     }
 
+    public function getIsFirst()
+    {
+        return $this->isFirst;
+    }
+
+    public function setIsFirst($isFirst)
+    {
+        $this->isFirst = $isFirst;
+    }
+
     public function getTermsAndConditions()
     {
         return $this->termsAndConditions;
@@ -293,13 +309,16 @@ class Reward
         if (!$user) {
             return false;
         }
-        $notClaimed = $user->policyReduce(true, function ($current, $policy) {
-            return $current && count($policy->getClaims()) == 0;
+        $notClaimed = $user->policyReduce(true, function ($current, $next) {
+            return $current && count($next->getClaims()) == 0;
         });
         $renewed = $user->hasRenewalPolicy();
         $cancelled = $user->hasCancelledPolicy();
+        $first = $user->policyReduce(true, function ($current, $next) use ($policy) {
+            return $current && $policy->getStart() <= $next->getStart();
+        });
         if (($this->getHasNotClaimed() && !$notClaimed) || ($this->getHasRenewed() && !$renewed) ||
-            ($this->getHasCancelled() && !$cancelled)) {
+            ($this->getHasCancelled() && !$cancelled) || ($this->getIsFirst() && !$first)) {
             return false;
         }
         return true;
