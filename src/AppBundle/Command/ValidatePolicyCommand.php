@@ -478,10 +478,17 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
             if ($policy->getDontCancelIfUnpaid() === true) {
-                $lines[] = sprintf(
-                    'WARNING!! policy %s has the dont cancel if unpaid flag on',
-                    $policy->getPolicyNumber()
-                );
+                if ($policy->getStatus() === Policy::STATUS_UNPAID) {
+                    $lines[] = sprintf(
+                        'WARNING!! policy %s has the dont cancel if unpaid flag on',
+                        $policy->getPolicyNumber()
+                    );
+                } else {
+                    $lines[] = sprintf(
+                        'WARNING!! policy %s has the dont cancel if unpaid flag on but the policy status is not unpaid',
+                        $policy->getPolicyNumber()
+                    );
+                }
             }
 
             $allowedVariance = 0;
