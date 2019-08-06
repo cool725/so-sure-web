@@ -29,4 +29,12 @@ $(function(){
         format: 'DD/MM/YYYY',
     });
 
+    $('#rewardForm_next').on('click', function(e) {
+        e.preventDefault();
+
+        if (confirm('Make sure you double check all details are correct!')) {
+             $('#reward_form').submit();
+        }
+    });
+
 });
