@@ -36,8 +36,7 @@
     &__step {
         display: flex;
         justify-content: flex-start;
-        // flex-direction: column;
-        // align-self: center;
+        align-items: center;
     }
 
     &__number {
