@@ -92,27 +92,27 @@
                             <div class="col">
                                 <div class="form-group">
                                     {{ form_label(rewardForm.firstName, 'First Name *') }}
-                                    {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Connection first name i.e. so'}}) }}
+                                    {{ form_widget(rewardForm.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Connection first name i.e. so', 'required': ''}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.firstName) }}</div>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.lastName, 'Last Name *') }}
-                                    {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Connection last name i.e. sure'}}) }}
+                                    {{ form_widget(rewardForm.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Connection last name i.e. sure', 'required': ''}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.lastName) }}</div>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.email, 'Email *') }}
-                                    {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control'}}) }}
+                                    {{ form_widget(rewardForm.email, {'attr': {'placeholder':'Suggested @so-sure.net', 'class': 'form-control','required': ''}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.email) }}</div>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.code, 'SCode *') }}
-                                    {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
+                                    {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control','required': ''}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.defaultValue, 'Default Value *') }}
-                                    {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control'}}) }}
+                                    {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Default amount to add', 'class': 'form-control','required': ''}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
                                 </div>
                                 <div class="form-group">
@@ -140,7 +140,8 @@
                                         {{ form_widget(rewardForm.expiryDate, { 'attr': {
                                             'class': 'form-control datetimepicker-input date_mask',
                                             'data-target': '#date_picker_one',
-                                            'placeholder': 'When code expires'
+                                            'placeholder': 'When code expires',
+                                            'required': ''
                                         }}) }}
                                         <div class="input-group-append"
                                              data-target="#date_picker_one"
@@ -151,11 +152,15 @@
                                     <div class="with-errors">{{ form_errors(rewardForm.expiryDate) }}</div>
                                 </div>
                                 <div class="form-group">
-                                    {{ form_label(rewardForm.termsAndConditions, 'Terms & Conditions') }}
+                                    {{ form_label(rewardForm.termsAndConditions, 'Terms & Conditions *') }}
                                     {{ form_widget(rewardForm.termsAndConditions, { 'attr': {
                                         'class': 'form-control',
                                         'rows': '5',
-                                        'placeholder': 'Enter terms here where you can use html i.e. <p></p> tags - expiry date will be shown below this'
+                                        'placeholder': 'Enter terms here where you can use html i.e. <p></p> tags - expiry date will be shown below this',
+                                        'required': '',
+                                        'minlength': 50,
+                                        'maxlength': 1000
+
                                     }}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.termsAndConditions) }}</div>
                                 </div>
