@@ -67,6 +67,9 @@ class GenderizeService
     
     public function query($name, $threshold = 0.8)
     {
+        if (mb_strtolower($name) == "mohammed") {
+            return "male";
+        }
         $url = sprintf('https://api.genderize.io/?%s', http_build_query(['name' => $name]));
         $client = new Client();
         $res = $client->request('GET', $url);

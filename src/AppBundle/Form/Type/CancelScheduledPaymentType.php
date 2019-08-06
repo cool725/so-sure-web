@@ -18,17 +18,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CreateScheduledPaymentType extends AbstractType
+class CancelScheduledPaymentType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('disabledDatesJson', HiddenType::class)
-            ->add('amount', TextType::class)
-            ->add('date', TextType::class, [
-                'attr' => ['autocomplete' => 'off']
-            ])
             ->add('notes', TextareaType::class)
-            ->add('add', SubmitType::class);
+            ->add('delete', SubmitType::class);
     }
 }

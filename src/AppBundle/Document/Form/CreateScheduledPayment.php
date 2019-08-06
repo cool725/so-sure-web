@@ -13,6 +13,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CreateScheduledPayment
 {
     /**
+     * @var float
+     */
+    protected $amount;
+
+    /**
      * @var \DateTime
      * @Assert\NotNull(message="Date must be set")
      */
@@ -28,6 +33,24 @@ class CreateScheduledPayment
      * @var array
      */
     protected $disabledDates;
+
+    /**
+     * @return float
+     */
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+
+    /**
+     * @param float $amount
+     * @return CreateScheduledPayment
+     */
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+        return $this;
+    }
 
     public function getDate()
     {

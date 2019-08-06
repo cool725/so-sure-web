@@ -48,6 +48,7 @@ use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\BarclaysService;
@@ -397,7 +398,11 @@ class AdminController extends BaseController
         }
         // Make sure the person making the request has the right permission.
         // Create the form.
-        $createScheduledPayment = new CreateScheduledPayment(self::getBankHolidays(), $policy->getScheduledPayments());
+        $createScheduledPayment = new CreateScheduledPayment(
+            self::getBankHolidays(),
+            $policy->getActiveScheduledPayments()
+        );
+        $createScheduledPayment->setAmount($policy->getPremiumInstallmentPrice());
         $createScheduledPaymentForm = $this->get('form.factory')
             ->createNamedBuilder(
                 'create_scheduled_payment_form',
@@ -418,14 +423,6 @@ class AdminController extends BaseController
             if ($request->request->has('create_scheduled_payment_form')) {
                 $createScheduledPaymentForm->handleRequest($request);
                 $monthlyPremium = null;
-                try {
-                    $policyPhonePrice = new PolicyPhonePriceHelper($policy);
-                    $monthlyPremium = $policyPhonePrice->getMonthlyPremiumPrice();
-                } catch (PolicyPhonePriceException $e) {
-                    $this->get('logger')->error(
-                        $e->getMessage() . " " . $e->getCode()
-                    );
-                }
                 if ($createScheduledPaymentForm->isValid()) {
                     $date = new \DateTime($createScheduledPayment->getDate());
                     if ($policy->hasScheduledPaymentOnDate($date)) {
@@ -437,10 +434,11 @@ class AdminController extends BaseController
                             )
                         );
                     } else {
+                        $amount = $createScheduledPayment->getAmount();
                         $scheduledPayment = new ScheduledPayment();
                         $scheduledPayment->setScheduled($date);
                         $scheduledPayment->setNotes($createScheduledPayment->getNotes());
-                        $scheduledPayment->setAmount($monthlyPremium);
+                        $scheduledPayment->setAmount($amount);
                         $scheduledPayment->setPolicy($policy);
                         $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
 
@@ -580,16 +578,10 @@ class AdminController extends BaseController
                 );
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-
                 return new RedirectResponse($this->generateUrl('admin_phones'));
             }
-
             $dm->flush();
-            $this->addFlash(
-                'success',
-                'Your changes were saved!'
-            );
-
+            $this->addFlash('success', 'Your changes were saved!');
             /** @var MailerService $mailer */
             $mailer = $this->get('app.mailer');
             $mailer->send(
@@ -608,7 +600,6 @@ class AdminController extends BaseController
                 'tech@so-sure.com'
             );
         }
-
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 
@@ -640,6 +631,34 @@ class AdminController extends BaseController
             );
         }
 
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
+     * Receives a request to update the retail price of a phone and acitons it.
+     * @Route("/phone/{id}/retail", name="admin_phone_retail")
+     * @Method({"POST"})
+     */
+    public function phoneUpdateRetailAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid CSRF');
+        }
+        $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepository */
+        $phoneRepository = $dm->getRepository(Phone::class);
+        /** @var Phone */
+        $phone = $phoneRepository->find($id);
+        $price = $request->get('price');
+        $url = $request->get('url');
+        if ($price > 0 && $url) {
+            $phone->addRetailPrice($price, $url, new \DateTime());
+            $dm->persist($phone);
+            $dm->flush();
+            $this->addFlash('success', 'Successfully updated current retail price');
+        } else {
+            $this->addFlash('error', 'Could not update current retail price due to invalid parameters');
+        }
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
 

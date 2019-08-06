@@ -130,6 +130,7 @@ $(function(){
             ipt_rate = 1 + button.data('ipt-rate'),
             salva_standard = button.data('salva-standard'),
             salva_min = button.data('salva-min'),
+            latest = phone.prices.slice(-1)[0];
             modal = $(this);
 
         modal.find('#phone_update_form').attr('action', update);
@@ -153,10 +154,25 @@ $(function(){
                     { title: 'Notes', data: 'notes' }
                 ]
             });
+
             modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
             modal.find('#phone_gwp').val(phone.gwp);
             modal.find('#phone_salva').html('£' + salva_standard + ' / £' + salva_min);
             modal.find('#phone_desired_premium').val('');
+
+            // Add excess to fields as defaults overwrite
+            modal.find('#damage_excess').val(latest.excess.damage);
+            modal.find('#warranty_excess').val(latest.excess.warranty);
+            modal.find('#extended_warranty_excess').val(latest.excess.extendedWarranty);
+            modal.find('#loss_excess').val(latest.excess.loss);
+            modal.find('#theft_excess').val(latest.excess.theft);
+
+            // Add pic-sure excess
+            modal.find('#picsure_loss_excess').val(latest.picsure_excess[0].amount);
+            modal.find('#picsure_theft_excess').val(latest.picsure_excess[1].amount);
+            modal.find('#picsure_damage_excess').val(latest.picsure_excess[2].amount);
+            modal.find('#picsure_warranty_excess').val(latest.picsure_excess[3].amount);
+            modal.find('#picsure_extended_warranty_excess').val(latest.picsure_excess[3].amount);
 
             modal.find('#phone_gwp').keyup(function() {
                 monthly = (modal.find('#phone_gwp').val() * ipt_rate).toFixed(2);
@@ -186,6 +202,19 @@ $(function(){
             modal.find('#details_description').val(phone.description);
             modal.find('#details_fun_facts').val(phone.funFacts);
             modal.find('#details_canonical_path').val(phone.canonicalPath);
+        }
+    });
+
+    // Retail Modal
+    $('#retail_modal').on('show.bs.modal', function (e) {
+        let button = $(e.relatedTarget);
+        let update = button.data('update');
+        let phone = button.data('phone');
+        let modal = $(this);
+        modal.find('#retail_update_form').attr('action', update);
+        if (phone) {
+            modal.find('#retail_price').val(phone.currentRetailPrice);
+            modal.find('#retail_url').val(phone.currentRetailPriceUrl);
         }
     });
 
