@@ -888,7 +888,7 @@ abstract class Policy
         }
 
         $invoiceDates = [];
-        $invoiceDate = clone $this->start;
+        $invoiceDate = clone $this->billing;
         for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
             if ($invoiceDate <= $this->getEnd()) {
                 $invoiceDates[] = clone $invoiceDate;
