@@ -6,6 +6,7 @@
 // e.g. require('bootstrap/js/dist/carousel');
 
 // Require components
+require('tempusdominus-bootstrap-4');
 // e.g. require('../components/banner.js');
 
 $(function(){
@@ -19,6 +20,20 @@ $(function(){
         if (rewardId) {
             modal.find('.modal-title').text('Add reward bonus (bonus type: ' + userName + ')');
             modal.find('#connectForm_rewardId').val(rewardId);
+        }
+    });
+
+    // Init datepicker
+    $('.date-picker').datetimepicker({
+        useCurrent: false,
+        format: 'DD/MM/YYYY',
+    });
+
+    $('#rewardForm_next').on('click', function(e) {
+        e.preventDefault();
+
+        if (confirm('Make sure you double check all details are correct!')) {
+             $('#reward_form').submit();
         }
     });
 
