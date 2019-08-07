@@ -596,6 +596,11 @@ abstract class Payment
             $this->setTotalCommission($commission);
         } elseif ($allowFraction && $amount >= 0) {
             $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
+        } elseif ($amount < 0) {
+            /**
+             * This must be a refund. We should allow the commission to be set pro-rated every time for refunds.
+             */
+            $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
         } else {
             throw new CommissionException(sprintf(
                 'Failed to set correct commission for %f (policy %s)',
