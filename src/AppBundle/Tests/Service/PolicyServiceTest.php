@@ -422,13 +422,8 @@ class PolicyServiceTest extends WebTestCase
                     null,
                     static::$dm
                 );
-                $date = new \DateTime(sprintf('2016-%d-%d 22:59', $month, $actualDay));
+                $date = (new \DateTime())->add(new \DateInterval(sprintf('P%dM%dD', $month, $actualDay)));
                 $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
-                /*
-                print 'I1----------' . PHP_EOL;
-                print_r($date);
-                print 'I2----------' . PHP_EOL;
-                */
                 $phone = $policy->getPhone();
 
                 $payment = new BacsPayment();
@@ -480,7 +475,7 @@ class PolicyServiceTest extends WebTestCase
                     null,
                     static::$dm
                 );
-                $date = new \DateTime(sprintf('2016-%d-%d 23:59', $month, $actualDay));
+                $date = (new \DateTime())->add(new \DateInterval(sprintf('P%dM%dD', $month, $actualDay)));
                 $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
                 /*
                 print 'I1----------' . PHP_EOL;
@@ -624,6 +619,34 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
         static::$policyService->create($policy);
+    }
+
+    /**
+     * Tests that when a policy is created with no other payments, a full 12 payments are added rather than the
+     * customary 11.
+     * @group schedule
+     */
+    public function testGenerateScheduledPaymentsNoInitial()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            self::generateEmail('scheduled-monthly-renewal', $this, true),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        $policy->setPremiumInstallments(12);
+        static::$policyService->create(
+            $policy,
+            (new \DateTime())->add(new \DateInterval("P10D")),
+            true,
+            null,
+            null,
+            (new \DateTime())->add(new \DateInterval("P11D"))
+        );
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(12, count($updatedPolicy->getScheduledPayments()));
     }
 
     public function testSalvaCancelSimple()
