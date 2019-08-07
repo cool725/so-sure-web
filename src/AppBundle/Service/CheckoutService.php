@@ -1166,6 +1166,10 @@ class CheckoutService
             throw new PaymentDeclinedException();
         }
 
+        if (!$payment->getPolicy()) {
+            $payment->setPolicy($policy);
+        }
+
         try {
             $this->setCommission($payment, true);
         } catch (CommissionException $e) {

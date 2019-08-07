@@ -52,9 +52,60 @@ class Reward
      */
     protected $defaultValue;
 
-    public function __construct()
-    {
-    }
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $expiryDate;
+
+    /**
+     * @MongoDB\Field(type="int")
+     * @Gedmo\Versioned
+     */
+    protected $policyAgeMin;
+
+    /**
+     * @MongoDB\Field(type="int")
+     * @Gedmo\Versioned
+     */
+    protected $policyAgeMax;
+
+    /**
+     * @Assert\Range(min=0,max=2000)
+     * @MongoDB\Field(type="float")
+     */
+    protected $usageLimit;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $hasNotClaimed;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $hasRenewed;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $hasCancelled;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $isFirst;
+
+    /**
+     * @Assert\Length(min="50", max="1000")
+     * @MongoDB\Field(type="string")
+     */
+    protected $termsAndConditions;
 
     public function getId()
     {
@@ -116,6 +167,96 @@ class Reward
         $this->defaultValue = $defaultValue;
     }
 
+    public function getExpiryDate()
+    {
+        return $this->expiryDate;
+    }
+
+    public function setExpiryDate($expiryDate)
+    {
+        $this->expiryDate = $expiryDate;
+    }
+
+    public function getPolicyAgeMin()
+    {
+        return $this->policyAgeMin;
+    }
+
+    public function setPolicyAgeMin($policyAgeMin)
+    {
+        $this->policyAgeMin = $policyAgeMin;
+    }
+
+    public function getPolicyAgeMax()
+    {
+        return $this->policyAgeMax;
+    }
+
+    public function setPolicyAgeMax($policyAgeMax)
+    {
+        $this->policyAgeMax = $policyAgeMax;
+    }
+
+    public function getUsageLimit()
+    {
+        return $this->usageLimit;
+    }
+
+    public function setUsageLimit($usageLimit)
+    {
+        $this->usageLimit = $usageLimit;
+    }
+
+    public function getHasNotClaimed()
+    {
+        return $this->hasNotClaimed;
+    }
+
+    public function setHasNotClaimed($hasNotClaimed)
+    {
+        $this->hasNotClaimed = $hasNotClaimed;
+    }
+
+    public function getHasRenewed()
+    {
+        return $this->hasRenewed;
+    }
+
+    public function setHasRenewed($hasRenewed)
+    {
+        $this->hasRenewed = $hasRenewed;
+    }
+
+    public function getHasCancelled()
+    {
+        return $this->hasCancelled;
+    }
+
+    public function setHasCancelled($hasCancelled)
+    {
+        $this->hasCancelled = $hasCancelled;
+    }
+
+    public function getIsFirst()
+    {
+        return $this->isFirst;
+    }
+
+    public function setIsFirst($isFirst)
+    {
+        $this->isFirst = $isFirst;
+    }
+
+    public function getTermsAndConditions()
+    {
+        return $this->termsAndConditions;
+    }
+
+    public function setTermsAndConditions($termsAndConditions)
+    {
+        $this->termsAndConditions = $termsAndConditions;
+    }
+
     public function updatePotValue()
     {
         $this->setPotValue($this->calculatePotValue());
@@ -134,5 +275,52 @@ class Reward
         }
 
         return $potValue;
+    }
+
+    /**
+     * Tells if this reward is still going. It can stop either because the date has gone past the reward's expiry date,
+     * or because it has hit the maximum number of users it can have.
+     * @param \DateTime $date is the date at which we are checking.
+     */
+    public function isOpen(\DateTime $date)
+    {
+        return (!$this->getExpiryDate() || $this->getExpiryDate() > $date) &&
+            (!$this->getUsageLimit() || count($this->getConnections()) < $this->getUsageLimit());
+    }
+
+    /**
+     * Tells you if a policy can get this reward.
+     * @param Policy    $policy is the policy to check about.
+     * @param \DateTime $date   is the date of potential application.
+     * @return boolean true if the reward could be applied, and false if not.
+     */
+    public function canApply($policy, \DateTime $date)
+    {
+        if (!$this->isOpen($date)) {
+            return false;
+        }
+        $min = $this->getPolicyAgeMin();
+        $max = $this->getPolicyAgeMax();
+        $age = $policy->age();
+        if (($min && $age < $min) || ($max && $age > $max)) {
+            return false;
+        }
+        $user = $policy->getUser();
+        if (!$user) {
+            return false;
+        }
+        $notClaimed = $user->policyReduce(true, function ($current, $next) {
+            return $current && count($next->getClaims()) == 0;
+        });
+        $renewed = $user->hasRenewalPolicy();
+        $cancelled = $user->hasCancelledPolicy();
+        $first = $user->policyReduce(true, function ($current, $next) use ($policy) {
+            return $current && $policy->getStart() <= $next->getStart();
+        });
+        if (($this->getHasNotClaimed() && !$notClaimed) || ($this->getHasRenewed() && !$renewed) ||
+            ($this->getHasCancelled() && !$cancelled) || ($this->getIsFirst() && !$first)) {
+            return false;
+        }
+        return true;
     }
 }
