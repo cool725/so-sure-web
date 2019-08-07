@@ -1019,7 +1019,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $this->subBusinessDays(new \DateTime(), 1)) {
+            if ($scheduledDate >= $this->subDays(new \DateTime(), 2)) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->error(sprintf(
