@@ -119,8 +119,9 @@ class DoctrineUserListenerTest extends WebTestCase
 
         $listener = $this->createUserEventListener(
             $user,
-            $this->exactly(2),
+            $this->exactly(3),
             UserEvent::EVENT_NAME_UPDATED,
+            UserEvent::EVENT_UPDATED_HUBSPOT,
             UserEvent::EVENT_UPDATED_INTERCOM
         );
 
@@ -136,8 +137,9 @@ class DoctrineUserListenerTest extends WebTestCase
 
         $listener = $this->createUserEventListener(
             $user,
-            $this->exactly(2),
+            $this->exactly(3),
             UserEvent::EVENT_NAME_UPDATED,
+            UserEvent::EVENT_UPDATED_HUBSPOT,
             UserEvent::EVENT_UPDATED_INTERCOM
         );
 
