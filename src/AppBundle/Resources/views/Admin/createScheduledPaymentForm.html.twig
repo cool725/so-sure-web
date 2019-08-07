@@ -13,8 +13,15 @@
                     }
                 }) }}
             </div>
+            <div class="col-xs-12 form-group">
+                <label>Payment Amount</label>
+                {{ form_widget(create_scheduled_payment_form.amount, {
+                    'attr': {
+                        'class': 'input-group'
+                    }
+                }) }}
+            </div>
         </div>
-
         <div class="form-row">
             <label>Justification</label>
             {{ form_widget(create_scheduled_payment_form.notes, {'attr': {'class': 'form_note form-control'}}) }}

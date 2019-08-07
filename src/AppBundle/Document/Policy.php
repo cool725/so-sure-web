@@ -2073,6 +2073,18 @@ abstract class Policy
         return $this->scheduledPayments;
     }
 
+    public function getActiveScheduledPayments()
+    {
+        $payments = $this->getScheduledPayments();
+        $active = [];
+        foreach ($payments as $payment) {
+            if ($payment->getStatus() != ScheduledPayment::STATUS_CANCELLED) {
+                $active[] = $payment;
+            }
+        }
+        return $active;
+    }
+
     /**
      * Gets all scheduled refunds in the future.
      * @return array containing all of these refunds.
@@ -5156,7 +5168,7 @@ abstract class Policy
             throw new \InvalidArgumentException("A date must be provided to look up scheduled payment by date");
         }
 
-        $scheduledPayments = $this->getScheduledPayments();
+        $scheduledPayments = $this->getActiveScheduledPayments();
         foreach ($scheduledPayments as $scheduledPayment) {
             if ($scheduledPayment->getScheduled()->format('Ymd') === $date->format('Ymd')) {
                 return true;
