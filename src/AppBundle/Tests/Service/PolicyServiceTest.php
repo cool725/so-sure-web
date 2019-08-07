@@ -357,6 +357,7 @@ class PolicyServiceTest extends WebTestCase
 
     /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
+     * @group schedule
      */
     public function testGenerateScheduledPaymentsInvalidAmount()
     {
@@ -375,6 +376,9 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy);
     }
 
+    /**
+     * @group schedule
+     */
     public function testGenerateScheduledPaymentsMonthlyPayments()
     {
         $user = static::createUser(
@@ -398,6 +402,9 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(11, count($updatedPolicy->getScheduledPayments()));
     }
 
+    /**
+     * @group schedule
+     */
     public function testGenerateScheduledPaymentsMonthlyPaymentsDates()
     {
         $dates = [
@@ -453,6 +460,9 @@ class PolicyServiceTest extends WebTestCase
         }
     }
 
+    /**
+     * @group schedule
+     */
     public function testGenerateScheduledPaymentsMonthlyPaymentsDatesTimezone()
     {
         $dates = [
@@ -508,6 +518,9 @@ class PolicyServiceTest extends WebTestCase
         }
     }
 
+    /**
+     * @group schedule
+     */
     public function testAreScheduledPaymentsCorrectBacs()
     {
         $date = new \DateTime();
@@ -551,6 +564,7 @@ class PolicyServiceTest extends WebTestCase
 
     /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
+     * @group schedule
      */
     public function testGenerateScheduledPaymentsFailedMonthlyPayments()
     {
@@ -571,6 +585,9 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy);
     }
 
+    /**
+     * @group schedule
+     */
     public function testGenerateScheduledPaymentsYearlyPayment()
     {
         $user = static::createUser(
@@ -595,6 +612,7 @@ class PolicyServiceTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     * @group schedule
      */
     public function testGenerateScheduledPaymentsMissingPayment()
     {
