@@ -77,14 +77,12 @@
                         </div>
                     {% endif %}
                     {% if policy.canInvite %}
-                        <h5 class="mt-4">
-                            {% if scode and scode.standard %}
-                                {{ scode.policy.user }} has invited you!
-                            {% else %}
-                                Already received an invite or promocode?
-                            {% endif %}
-                        </h5>
-                        <p>Enter the unique 8-digit code below.</p>
+                        {% if scode and scode %}
+                            <h5 class="mt-4">Apply code</h5>
+                        {% else %}
+                            <h5 class="mt-4">Already received an invite or promocode?</h5>
+                            <p>Enter the unique 8-digit code below.</p>
+                        {% endif %}
                         {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
                             <div class="custom-input-with-btn mb-4">
                                 {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}

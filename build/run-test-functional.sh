@@ -15,9 +15,10 @@ SKIP_DB=0
 SKIP_PHING=0
 SKIP_FLUSH_REDIS=0
 COVER=0
+GROUP=""
 FUNCTIONAL_TEST="test:functional"
 DEBUG=""
-while getopts ":snpdDhcClr" opt; do
+while getopts ":snpdDhcClrg:" opt; do
   case $opt in
     s)
       SKIP_POLICY=0
@@ -42,6 +43,9 @@ while getopts ":snpdDhcClr" opt; do
       FUNCTIONAL_TEST="test:functional:nonet:cover"
       COVER=1
       ;;
+    g)
+      GROUP="$OPTARG"
+      ;;
     n)
       FUNCTIONAL_TEST="test:functional:nonet"
       ;;
@@ -52,7 +56,7 @@ while getopts ":snpdDhcClr" opt; do
       FUNCTIONAL_TEST="test:functional:picsureml"
       ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-D debug] [-s populate sample policy data] [-n no network test | -p run paid test | -m picsure ml test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-D debug] [-g=group test group to run] [-s populate sample policy data] [-n no network test | -p run paid test | -m picsure ml test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
       exit 1
       ;;
   esac
@@ -113,7 +117,11 @@ if [ "$RUN_FILTER" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
-  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php
+  if [ "$GROUP" == "" ]; then
+    ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php
+  else
+    ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php --group "$GROUP"
+  fi
 fi
 if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
   echo "Flushing redis"
