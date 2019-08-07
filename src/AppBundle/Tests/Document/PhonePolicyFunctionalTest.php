@@ -664,7 +664,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $phone->init('foo', 'bar', 5, $oldTerms);
 
         $policy = new SalvaPhonePolicy();
-        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->init($user, self::getPolicyTermsVersion(static::$dm, 'Version 12 February 2019'));
         $policy->setPhone($phone);
     }
 
@@ -2918,7 +2918,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
             $monthlyPolicy->getProrataMultiplier(new \DateTime('2016-02-10'));
         $paid = Salva::MONTHLY_TOTAL_COMMISSION;
         $this->assertEquals(
-            $this->toTwoDp($paid - $used),
+            $this->toTwoDp($used - $paid),
             $monthlyPolicy->getProratedCommissionRefund(new \DateTime('2016-02-10'))
         );
 
@@ -2931,7 +2931,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
             $yearlyPolicy->getProrataMultiplier(new \DateTime('2016-02-10'));
         $paid = Salva::YEARLY_TOTAL_COMMISSION;
         $this->assertEquals(
-            $this->toTwoDp($paid - $used),
+            $this->toTwoDp($used - $paid),
             $yearlyPolicy->getProratedCommissionRefund(new \DateTime('2016-02-10'))
         );
     }

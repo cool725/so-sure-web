@@ -61,6 +61,7 @@ Encore
     .addEntry('phone', './src/AppBundle/Resources/public/rebrand/js/pages/admin/phone.js')
     .addEntry('kpi', './src/AppBundle/Resources/public/rebrand/js/pages/admin/kpi.js')
     .addEntry('bacs', './src/AppBundle/Resources/public/rebrand/js/pages/admin/bacs.js')
+    .addEntry('policy-validations', './src/AppBundle/Resources/public/rebrand/js/pages/admin/policy-validations.js')
 
     // Admin Extras
     .addEntry('datepicker-month', './src/AppBundle/Resources/public/rebrand/js/pages/admin/datepicker-month.js')

@@ -13,6 +13,15 @@
                     Policy Validation - {{ validation|length }}
                 </h1>
             </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="toggle_flags">
+                        <label class="custom-control-label" for="toggle_flags">Hide flagged <span id="flag_count"></span></label>
+                    </div>
+                </div>
+            </div>
             <div class="table-responsive-sm">
                 <table class="table table-striped">
                     <thead class="thead-light">
@@ -25,11 +34,11 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for item in validation %}
-                        {% set validate = unserialise(item) %}
+                        {% for item in validation %}
+                            {% set validate = unserialise(item) %}
                             <tr>
                                 <td>
-                                    {% if validate.id in flags %}<i class="fas fa-flag text-danger"></i>{% endif %}
+                                    {% if validate.id in flags %}<i class="fas fa-flag text-danger flagged"></i>{% endif %}
                                 </td>
                                 <td>
                                     <a class="mr-auto align-self-center"
@@ -68,4 +77,8 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/policy-validations.js') }}"></script>
 {% endblock %}

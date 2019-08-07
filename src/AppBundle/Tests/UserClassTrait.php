@@ -663,6 +663,18 @@ trait UserClassTrait
     }
 
     /**
+     * Gets the policy terms with the given version number.
+     * @param DocumentManager $dm      is the document manager to get them with.
+     * @param string          $version is the name of the version to get.
+     * @return PolicyTerms|null the policy terms or null if there are not any.
+     */
+    public static function getPolicyTermsVersion($dm, $version)
+    {
+        $policyTermsRepository = $dm->getRepository(PolicyTerms::class);
+        return $policyTermsRepository->findOneBy(['version' => $version]);
+    }
+
+    /**
      * @param DocumentManager $dm
      * @return PolicyTerms
      */
