@@ -16,13 +16,13 @@
     <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 
-{% if scode is defined and scode and scode.user %}
+{% if scode is defined and scode and scode.user and scode.reward %}
     {% set og_title = 'Sign up and save' %}
-    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a code to get XXXX cashback if you dont\'t claim' %}
+    {% set og_description = 'Hey, insure your mobile phone with so-sure.Here\'s a code to get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you dont\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% else %}
     {% set og_title = 'Sign up and save' %}
-    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a code to get XXXX cashback if you dont\'t claim' %}
+    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a code to get cash back if you dont\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% endif %}
 
