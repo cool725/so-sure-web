@@ -18,7 +18,7 @@
 
 {% if scode is defined and scode and scode.user and scode.reward %}
     {% set og_title = 'Sign up and save' %}
-    {% set og_description = 'Hey, insure your mobile phone with so-sure.Here\'s a code to get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you dont\'t claim' %}
+    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a code to get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you don\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% else %}
     {% set og_title = 'Sign up and save' %}
