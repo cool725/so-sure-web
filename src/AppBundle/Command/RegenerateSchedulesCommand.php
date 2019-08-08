@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
+class RegenerateSchedulesCommand extends ContainerAwareCommand
 {
     /**
      * @var DocumentManager
@@ -43,8 +43,8 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
 
     protected function configure()
     {
-        $this->setName('sosure:bacs:regenerate:schedules')
-            ->setDescription("Regenerate Scheduled Payments for BACs policies.")
+        $this->setName('sosure:regenerate:schedules')
+            ->setDescription("Regenerate Scheduled Payments for policies.")
             ->addOption(
                 'status',
                 's',
@@ -68,6 +68,12 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
                 'f',
                 InputOption::VALUE_NONE,
                 "A more selective run of the policy data"
+            )
+            ->addOption(
+                'pay-method',
+                'P',
+                InputOption::VALUE_REQUIRED,
+                "bacs or checkout to limit the search to one payment method"
             );
     }
 
@@ -77,12 +83,15 @@ class BacsRegenerateSchedulesCommand extends ContainerAwareCommand
         $dryRun = $input->getOption('dry-run');
         $policyId = $input->getOption('policy-id');
         $fix = $input->getOption('fix');
+        $payMethod = $input->getOption('pay-method');
         if ($fix) {
             return $this->runFixAndRegen($output, $status, $dryRun, $policyId);
         }
 
-        $qb = $this->dm->createQueryBuilder(Policy::class)
-            ->field('paymentMethod.type')->equals('bacs');
+        $qb = $this->dm->createQueryBuilder(Policy::class);
+        if ($payMethod) {
+            $qb->field('paymentMethod.type')->equals($payMethod);
+        }
         if ($status) {
             switch ($status) {
                 case 'CURRENT':
