@@ -922,7 +922,7 @@ class PolicyService
             $date = clone $policy->getBilling();
         }
 
-        $date->setTime(4,0);
+        $date->setTime(4, 0);
 
         // To determine any payments made
         $initialDate = clone $date;
