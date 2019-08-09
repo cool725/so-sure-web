@@ -312,7 +312,11 @@ class BacsPayment extends Payment
 
         // Usually commission would not be set, however, if we may have needed to manully set the commission
         if ($setCommission && !$this->getTotalCommission()) {
-            $this->setCommission(true);
+            try {
+                $this->setCommission(true);
+            } catch (CommissionException $e) {
+                // nothing to be done.
+            }
         }
 
         if ($this->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {
