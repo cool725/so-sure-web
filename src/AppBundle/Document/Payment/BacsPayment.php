@@ -6,6 +6,8 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Classes\NoOp;
+use AppBundle\Exception\CommissionException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -315,7 +317,7 @@ class BacsPayment extends Payment
             try {
                 $this->setCommission(true);
             } catch (CommissionException $e) {
-                // nothing to be done.
+                NoOp::ignore($e);
             }
         }
 
