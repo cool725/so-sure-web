@@ -1338,8 +1338,6 @@ class AdminController extends BaseController
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
         $dm = $this->getManager();
-        /** @var BarclaysStatementFileRepository $barclaysStatementFileRepo */
-        $barclaysStatementFileRepo = $dm->getRepository(BarclaysStatementFile::class);
         /** @var BacsReportInputFileRepository $inputRepo */
         $inputRepo = $dm->getRepository(BacsReportInputFile::class);
         /** @var BacsReportAruddFileRepository $aruddRepo */
@@ -1359,25 +1357,9 @@ class AdminController extends BaseController
 
         $sosure = $bankingService->getSoSureBanking($date);
 
-        $judoFile = new JudoFile();
-        $judoForm = $this->get('form.factory')
-            ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
-            ->getForm();
         $checkoutFile = new CheckoutFile();
         $checkoutForm = $this->get('form.factory')
             ->createNamedBuilder('checkout', CheckoutFileType::class, $checkoutFile)
-            ->getForm();
-        $barclaysFile = new BarclaysFile();
-        $barclaysForm = $this->get('form.factory')
-            ->createNamedBuilder('barclays', BarclaysFileType::class, $barclaysFile)
-            ->getForm();
-        $barclaysStatementFile = new BarclaysStatementFile();
-        $barclaysStatementForm = $this->get('form.factory')
-            ->createNamedBuilder('barclays_statement', BarclaysStatementFileType::class, $barclaysStatementFile)
-            ->getForm();
-        $cashflowsFile = new CashflowsFile();
-        $cashflowsForm = $this->get('form.factory')
-            ->createNamedBuilder('cashflows', CashflowsFileType::class, $cashflowsFile)
             ->getForm();
         $lloydsFile = new LloydsFile();
         $lloydsForm = $this->get('form.factory')
@@ -1390,25 +1372,7 @@ class AdminController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('judo')) {
-                $judoForm->handleRequest($request);
-                if ($judoForm->isSubmitted() && $judoForm->isValid()) {
-                    $dm = $this->getManager();
-                    $judoFile->setBucket(SoSure::S3_BUCKET_ADMIN);
-                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                    $judoService = $this->get('app.judopay');
-                    $data = $judoService->processCsv($judoFile);
-
-                    $dm->persist($judoFile);
-                    $dm->flush();
-
-                    return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $date->format('Y'),
-                        'month' => $date->format('n'),
-                    ]);
-                }
-            } elseif ($request->request->has('checkout')) {
+            if ($request->request->has('checkout')) {
                 $checkoutForm->handleRequest($request);
                 if ($checkoutForm->isSubmitted() && $checkoutForm->isValid()) {
                     $dm = $this->getManager();
@@ -1419,62 +1383,6 @@ class AdminController extends BaseController
                     $data = $checkoutService->processCsv($checkoutFile);
 
                     $dm->persist($checkoutFile);
-                    $dm->flush();
-
-                    return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $date->format('Y'),
-                        'month' => $date->format('n'),
-                    ]);
-                }
-            } elseif ($request->request->has('barclays')) {
-                $barclaysForm->handleRequest($request);
-                if ($barclaysForm->isSubmitted() && $barclaysForm->isValid()) {
-                    $dm = $this->getManager();
-                    $barclaysFile->setBucket(SoSure::S3_BUCKET_ADMIN);
-                    $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                    /** @var BarclaysService $barclaysService */
-                    $barclaysService = $this->get('app.barclays');
-                    $data = $barclaysService->processCsv($barclaysFile);
-
-                    $dm->persist($barclaysFile);
-                    $dm->flush();
-
-                    return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $date->format('Y'),
-                        'month' => $date->format('n'),
-                    ]);
-                }
-            } elseif ($request->request->has('barclays_statement')) {
-                $barclaysStatementForm->handleRequest($request);
-                if ($barclaysStatementForm->isSubmitted() && $barclaysStatementForm->isValid()) {
-                    $dm = $this->getManager();
-                    $barclaysStatementFile->setBucket(SoSure::S3_BUCKET_ADMIN);
-                    $barclaysStatementFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                    $barclaysService = $this->get('app.barclays');
-                    $data = $barclaysService->processStatementNewCsv($barclaysStatementFile);
-
-                    $dm->persist($barclaysStatementFile);
-                    $dm->flush();
-
-                    return $this->redirectToRoute('admin_banking_date', [
-                        'year' => $date->format('Y'),
-                        'month' => $date->format('n'),
-                    ]);
-                }
-            } elseif ($request->request->has('cashflows')) {
-                $cashflowsForm->handleRequest($request);
-                if ($cashflowsForm->isSubmitted() && $cashflowsForm->isValid()) {
-                    $dm = $this->getManager();
-                    $cashflowsFile->setBucket(SoSure::S3_BUCKET_ADMIN);
-                    $cashflowsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                    /** @var CashflowsService $cashflowsService */
-                    $cashflowsService = $this->get('app.cashflows');
-                    $data = $cashflowsService->processCsv($cashflowsFile);
-
-                    $dm->persist($cashflowsFile);
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
@@ -1519,39 +1427,27 @@ class AdminController extends BaseController
                 }
             }
         }
-
         $data = [
-            'judoForm' => $judoForm->createView(),
             'checkoutForm' => $checkoutForm->createView(),
-            'barclaysForm' => $barclaysForm->createView(),
-            'barclaysStatementForm' => $barclaysStatementForm->createView(),
             'lloydsForm' => $lloydsForm->createView(),
             'reconciliationForm' => $reconciliationForm->createView(),
-            'cashflowsForm' => $cashflowsForm->createView(),
             'dates' => $this->getYMD($year, $month),
             'salva' => $bankingService->getSalvaBanking($date, $year, $month),
             'sosure' => $sosure,
             'reconciliation' => $bankingService->getReconcilationBanking($date),
-            'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
             'year' => $date->format('Y'),
             'month' => $date->format('n'),
         ];
-
         if ($request->get('_route') == 'admin_banking_card_date') {
-            $data['judo'] = $bankingService->getJudoBanking($date, $year, $month);
             $data['checkout'] = $bankingService->getCheckoutBanking($date, $year, $month);
         } elseif ($request->get('_route') == 'admin_banking_merchant_date') {
             $data['cashflows'] = $bankingService->getCashflowsBanking($date, $year, $month);
-            $data['barclays'] = $bankingService->getBarclaysBanking($date, $year, $month);
-            $data['lloyds'] = $bankingService->getLloydsBanking($date, $year, $month);
         } elseif ($request->get('_route') == 'admin_banking_bacs_date') {
-            $data['lloyds'] = $bankingService->getLloydsBanking($date, $year, $month);
             $data['bacsInputFiles'] = $inputRepo->getMonthlyFiles($date);
             $data['bacsAruddFiles'] = $aruddRepo->getMonthlyFiles($date);
             $data['bacsDdicFiles'] = $ddicRepo->getMonthlyFiles($date);
             $data['manualBacsPayments'] = Payment::sumPayments($manualBacsPayments, false);
         }
-
         return $data;
     }
 

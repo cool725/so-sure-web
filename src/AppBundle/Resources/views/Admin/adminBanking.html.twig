@@ -1,11 +1,7 @@
 {% extends 'admin_claims_base_rebrand.html.twig' %}
 {% form_theme reconciliationForm with 'AppBundle:Form:fields.html.twig' %}
 {% form_theme lloydsForm with 'AppBundle:Form:fields.html.twig' %}
-{% form_theme cashflowsForm with 'AppBundle:Form:fields.html.twig' %}
-{% form_theme barclaysStatementForm with 'AppBundle:Form:fields.html.twig' %}
 {% form_theme checkoutForm with 'AppBundle:Form:fields.html.twig' %}
-{% form_theme barclaysForm with 'AppBundle:Form:fields.html.twig' %}
-{% form_theme judoForm with 'AppBundle:Form:fields.html.twig' %}
 
 {# Set vars #}
 {% set body_class = 'admin-banking' %}
@@ -67,23 +63,7 @@
                                     <a class="dropdown-item"
                                        href="#"
                                        data-toggle="modal"
-                                       data-target="#judo_modal">Judo</a>
-                                    <a class="dropdown-item"
-                                       href="#"
-                                       data-toggle="modal"
                                        data-target="#checkout_modal">Checkout</a>
-                                    <a class="dropdown-item"
-                                       href="#"
-                                       data-toggle="modal"
-                                       data-target="#barclays_modal">Barclays</a>
-                                    <a class="dropdown-item"
-                                       href="#"
-                                       data-toggle="modal"
-                                       data-target="#barclays_statement_modal">Barclays Statement</a>
-                                    <a class="dropdown-item"
-                                       href="#"
-                                       data-toggle="modal"
-                                       data-target="#cashflows_modal">Cashflows</a>
                                     <a class="dropdown-item"
                                        href="#"
                                        data-toggle="modal"
@@ -138,15 +118,6 @@
                        aria-controls="salva_content"
                        aria-selected="true">Salva <i class="fa fa-check"></i> </a>
                 </li>
-                <li class="nav-item {% if judo is defined %}active{% endif %}">
-                    <a class="nav-link"
-                       id="judo_tab"
-                       data-toggle="tab"
-                       href="#judo_content"
-                       role="tab"
-                       aria-controls="judo_content"
-                       aria-selected="false">Judo {% if judo is defined %}<i class="fa fa-check"></i>{% endif %}</a>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link"
                        id="checkout_tab"
@@ -155,15 +126,6 @@
                        role="tab"
                        aria-controls="checkout_content"
                        aria-selected="false">Checkout {% if checkout is defined %}<i class="fa fa-check"></i>{% endif %}</a>
-                </li>
-                <li class="nav-item {% if barclays is defined %}active{% endif %}">
-                    <a class="nav-link"
-                       id="barclays_tab"
-                       data-toggle="tab"
-                       href="#barclays_content"
-                       role="tab"
-                       aria-controls="barclays_content"
-                       aria-selected="false">Barclays {% if barclays is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -192,17 +154,7 @@
                        aria-controls="bacs_files_content"
                        aria-selected="false">Bacs Files {% if bacsInputFiles is defined %}<i class="fa fa-check"></i>{% endif %}</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       id="lloyds_tab"
-                       data-toggle="tab"
-                       href="#lloyds_content"
-                       role="tab"
-                       aria-controls="lloyds_content"
-                       aria-selected="false">Lloyds {% if lloyds is defined and barclays is defined%}<i class="fa fa-check"></i>{% endif %}</a>
-                </li>
             </ul>
-
             <div class="tab-content" id="banking_tabs_content">
                 <div class="tab-pane fade show active"
                      id="salva_content"
@@ -211,22 +163,10 @@
                     {% include 'AppBundle::Admin/adminBanking/salva.html.twig' %}
                 </div>
                 <div class="tab-pane fade"
-                     id="judo_content"
-                     role="tabpanel"
-                     aria-labelledby="judo_tab">
-                    {% include 'AppBundle::Admin/adminBanking/judo.html.twig' %}
-                </div>
-                <div class="tab-pane fade"
                      id="checkout_content"
                      role="tabpanel"
                      aria-labelledby="checkout_tab">
                     {% include 'AppBundle::Admin/adminBanking/checkout.html.twig' %}
-                </div>
-                <div class="tab-pane fade"
-                     id="barclays_content"
-                     role="tabpanel"
-                     aria-labelledby="barclays_tab">
-                    {% include 'AppBundle::Admin/adminBanking/barclays.html.twig' %}
                 </div>
                 <div class="tab-pane fade"
                      id="cashflows_content"
@@ -246,79 +186,11 @@
                      aria-labelledby="bacs_files_tab">
                     {% include 'AppBundle::Admin/adminBanking/bacsFiles.html.twig' %}
                 </div>
-                <div class="tab-pane fade"
-                     id="lloyds_content"
-                     role="tabpanel"
-                     aria-labelledby="lloyds_tab">
-                    {% include 'AppBundle::Admin/adminBanking/lloyds.html.twig' %}
-                </div>
             </div>
         </div>
     </section>
 
     {# Page Modals #}
-    <div class="modal fade"
-         id="judo_modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="judo_modal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Judo Upload</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(judoForm) }}
-                        <div class="form-group">
-                            {{ form_label(judoForm.file, 'File') }}
-                            {{ form_widget(judoForm.file) }}
-                            <div class="with-errors">{{ form_errors(judoForm.file) }}</div>
-                        </div>
-                        <div class="form-group mb-0">
-                            {{ form_widget(judoForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
-                        </div>
-                    {{ form_end(judoForm) }}
-                    <hr>
-                    {% if judo is defined %}
-                        <h2>Files</h2>
-                        {% if judo.files|length == 0 %}
-                            <p>No Files</p>
-                        {% else %}
-                            <table class="table table-striped">
-                                {% for judoFile in judo.files %}
-                                    <tr>
-                                        <td>
-                                            <a href="{{ s3DownloadLink(judoFile.bucket, judoFile.key) }}">{{ judoFile.fileName }}</a>
-                                        </td>
-                                        <td>
-                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                            {{ judoFile.created|date() }}
-                                            <br>
-                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ judoFile.date|date() }}
-                                        </td>
-                                        <td>
-                                            {# TODO: Move into tab??? #}
-                                            {{ judoFile.metadata|json_encode }}
-                                        </td>
-                                        <td>
-                                            <button class="delete-file btn btn-danger btn-square"
-                                                    data-delete-url="{{ path('admin_file_delete', {'id': judoFile.id }) }}">
-                                                <i class="fal fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="modal fade"
          id="checkout_modal"
@@ -370,193 +242,6 @@
                                         <td>
                                             <button class="delete-file btn btn-danger btn-square"
                                                     data-delete-url="{{ path('admin_file_delete', {'id': checkoutFile.id }) }}">
-                                                <i class="fal fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="barclays_modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="barclays_modal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Barclays Upload</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(barclaysForm) }}
-                        <div class="form-group">
-                            {{ form_label(barclaysForm.file, 'File') }}
-                            {{ form_widget(barclaysForm.file) }}
-                            <div class="with-errors">{{ form_errors(barclaysForm.file) }}</div>
-                        </div>
-                        <div class="form-group mb-0">
-                            {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
-                        </div>
-                    {{ form_end(barclaysForm) }}
-                    <hr>
-                    {% if barclays is defined %}
-                        <h2>Files</h2>
-                        {% if barclays.files|length == 0 %}
-                            <p>No Files</p>
-                        {% else %}
-                            <table class="table table-striped">
-                                {% for barclaysFile in barclays.files %}
-                                    <tr>
-                                        <td>
-                                            <a href="{{ s3DownloadLink(barclaysFile.bucket, barclaysFile.key) }}">{{ barclaysFile.fileName }}</a>
-                                        </td>
-                                        <td>
-                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                            {{ barclaysFile.created|date() }}
-                                            <br>
-                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ barclaysFile.date|date() }}
-                                        </td>
-                                        <td>
-                                            {# TODO: Move into tab??? #}
-                                            {{ barclaysFile.metadata|json_encode }}
-                                        </td>
-                                        <td>
-                                            <button class="delete-file btn btn-danger btn-square"
-                                                    data-delete-url="{{ path('admin_file_delete', {'id': barclaysFile.id }) }}">
-                                                <i class="fal fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="barclays_statement_modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="barclays_statement_modal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Barclays Statement Upload</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ form_start(barclaysStatementForm) }}
-                        <div class="form-group">
-                            {{ form_label(barclaysStatementForm.file, 'File') }}
-                            {{ form_widget(barclaysStatementForm.file) }}
-                            <div class="with-errors">{{ form_errors(barclaysStatementForm.file) }}</div>
-                        </div>
-                        <div class="form-group mb-0">
-                            {{ form_widget(barclaysStatementForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
-                        </div>
-                    {{ form_end(barclaysStatementForm) }}
-                    <hr>
-                    <h2>Files</h2>
-                    {% if barclaysStatementFiles|length == 0 %}
-                        <p>No Files</p>
-                    {% else %}
-                        <table class="table table-striped">
-                            {% for barclaysStatementFile in barclaysStatementFiles %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ s3DownloadLink(barclaysStatementFile.bucket, barclaysStatementFile.key) }}">{{ barclaysStatementFile.fileName }}</a>
-                                    </td>
-                                    <td>
-                                        <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                        {{ barclaysStatementFile.created|date() }}
-                                        <br>
-                                        <i class="fal fa-calendar fa-fw" title="Date"></i> {{ barclaysStatementFile.date|date() }}
-                                    </td>
-                                    <td>
-                                        {# TODO: Move into tab??? #}
-                                        {{ barclaysStatementFile.metadata|json_encode }}
-                                    </td>
-                                    <td>
-                                        <button class="delete-file btn btn-danger btn-square"
-                                                data-delete-url="{{ path('admin_file_delete', {'id': barclaysStatementFile.id }) }}">
-                                            <i class="fal fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="cashflows_modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="cashflows_modal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cashflow Upload</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                   {{ form_start(cashflowsForm) }}
-                        <div class="form-group">
-                            {{ form_label(cashflowsForm.file, 'File') }}
-                            {{ form_widget(cashflowsForm.file) }}
-                            <div class="with-errors">{{ form_errors(cashflowsForm.file) }}</div>
-                        </div>
-                        <div class="form-group mb-0">
-                            {{ form_widget(cashflowsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
-                        </div>
-                    {{ form_end(cashflowsForm) }}
-                    <hr>
-                    {% if cashflows is defined %}
-                        <h2>Files</h2>
-                        {% if cashflows.files|length == 0 %}
-                            <p>No Files</p>
-                        {% else %}
-                            <table class="table table-striped">
-                                {% for cashflowsFile in cashflows.files %}
-                                    <tr>
-                                        <td>
-                                            <a href="{{ s3DownloadLink(cashflowsFile.bucket, cashflowsFile.key) }}">{{ cashflowsFile.fileName }}</a>
-                                        </td>
-                                        <td>
-                                            <i class="fal fa-plus-circle fa-fw" title="Created"></i>
-                                            {{ cashflowsFile.created|date() }}
-                                            <br>
-                                            <i class="fal fa-calendar fa-fw" title="Date"></i> {{ cashflowsFile.date|date() }}
-                                        </td>
-                                        <td>
-                                            {# TODO: Move into tab??? #}
-                                            {{ cashflowsFile.metadata|json_encode }}
-                                        </td>
-                                        <td>
-                                            <button class="delete-file btn btn-danger btn-square"
-                                                    data-delete-url="{{ path('admin_file_delete', {'id': cashflowsFile.id }) }}">
                                                 <i class="fal fa-trash-alt"></i>
                                             </button>
                                         </td>
