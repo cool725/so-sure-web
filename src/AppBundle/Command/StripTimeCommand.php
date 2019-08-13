@@ -6,8 +6,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Service\BacsService;
-use AppBundle\Service\PolicyService;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -64,7 +63,7 @@ class StripTimeCommand extends ContainerAwareCommand
         /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
         $scheduledPaymentRepository = $this->dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepository->findAllScheduled()->toArray();
-        $scheduledPayments = array_filter($scheduledPayments, function($scheduledPayment) {
+        $scheduledPayments = array_filter($scheduledPayments, function ($scheduledPayment) {
             return $scheduledPayment->getScheduled()->format("H:i") != "03:00";
         });
         if ($count) {

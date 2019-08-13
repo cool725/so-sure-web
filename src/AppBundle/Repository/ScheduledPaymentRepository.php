@@ -7,6 +7,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class ScheduledPaymentRepository extends BaseDocumentRepository
 {
@@ -50,7 +51,7 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
 
     /**
      * Gets all scheduled payments that still have status scheduled and do not have a payment associated yet.
-     * @return array of the scheduled payments.
+     * @return Cursor pointing to the returned set of scheduled payments.
      */
     public function findAllScheduled()
     {
