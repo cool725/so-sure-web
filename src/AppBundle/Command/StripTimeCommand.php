@@ -68,6 +68,12 @@ class StripTimeCommand extends ContainerAwareCommand
                 $date->format("d-m-Y H:i")
             ));
             if ($wet) {
+                $scheduledPayment->setNotes(sprintf(
+                    "%s. Rescheduled from %s to %s",
+                    $scheduledPayment->getNotes(),
+                    $scheduledPayment->getScheduled()->format("d-m-Y H:i"),
+                    $date->format("d-m-Y H:i")
+                ));
                 $scheduledPayment->setScheduled($date);
                 $this->dm->persist($scheduledPayment);
             }
