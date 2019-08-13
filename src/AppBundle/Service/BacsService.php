@@ -862,7 +862,9 @@ class BacsService
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true, false);
-                    $submittedPayment->getScheduledPayment()->reschedule();
+                    $rescheduled = $submittedPayment->getScheduledPayment()->reschedule();
+                    $policy->addScheduledPayment($rescheduled);
+
                     // Cancel scheduled payment.
                     $scheduledPayment = $submittedPayment->getScheduledPayment();
                     if ($scheduledPayment) {
