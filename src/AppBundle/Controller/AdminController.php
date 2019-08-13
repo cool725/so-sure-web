@@ -1442,7 +1442,9 @@ class AdminController extends BaseController
             $data['checkout'] = $bankingService->getCheckoutBanking($date, $year, $month);
         } elseif ($request->get('_route') == 'admin_banking_merchant_date') {
             $data['cashflows'] = $bankingService->getCashflowsBanking($date, $year, $month);
+            $data['lloyds'] = $bankingService->getLloydsBanking($date, $year, $month);
         } elseif ($request->get('_route') == 'admin_banking_bacs_date') {
+            $data['lloyds'] = $bankingService->getLloydsBanking($date, $year, $month);
             $data['bacsInputFiles'] = $inputRepo->getMonthlyFiles($date);
             $data['bacsAruddFiles'] = $aruddRepo->getMonthlyFiles($date);
             $data['bacsDdicFiles'] = $ddicRepo->getMonthlyFiles($date);
