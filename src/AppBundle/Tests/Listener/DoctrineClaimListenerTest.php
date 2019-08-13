@@ -153,13 +153,13 @@ class DoctrineClaimListenerTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy->addClaim($claim);
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($claim);
         static::$dm->flush();
 
         // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
         $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), '', 0);
         // $this->assertNull($claim->getUnderwriterLastUpdated());
 
@@ -209,13 +209,13 @@ class DoctrineClaimListenerTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy->addClaim($claim);
+        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($claim);
         static::$dm->flush();
 
         // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
         $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), 'initial', 0);
         // $this->assertNull($claim->getUnderwriterLastUpdated());
 
