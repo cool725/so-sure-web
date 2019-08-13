@@ -945,7 +945,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * Reduces the user policy list to some value via a callback.
      * @param mixed    $init     is the first value to send to the callback as the accumulator.
-     * @param \Closure $callback is the callback to reduce with.
+     * @param \Closure $callback is the callback to reduce with. Called with the current total and then the next policy
+     *                           as arguments.
      * @return mixed the result of the reduction.
      */
     public function policyReduce($init, $callback)
@@ -1301,6 +1302,23 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return false;
+    }
+
+    /**
+     * Tells if the user has a renewed policy.
+     * @return boolean true if so and false otherwise.
+     */
+    public function hasRenewalPolicy()
+    {
+        // NOTE: Patrick had wanted to make the next and previous fields represent more than just renewal, if this was
+        // ever to eventuate, we would need to change the logic for this method. We would also need to migrate this
+        // information as it is now as it is the only record of renewals as far as I know.
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getNextPolicy() || $policy->getPreviousPolicy()) {
+                return true;
+            }
+            return false;
+        }
     }
 
     public function hasPolicyCancelledAndPaymentOwed()

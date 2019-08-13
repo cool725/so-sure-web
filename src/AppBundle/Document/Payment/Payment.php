@@ -6,6 +6,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Exception\InvalidPaymentException;
 use AppBundle\Exception\CommissionException;
@@ -575,16 +576,30 @@ abstract class Payment
         } elseif ($premium->isEvenlyDivisible($this->getAmount()) ||
             $premium->isEvenlyDivisible($this->getAmount(), true)) {
             // payment should already be credited at this point
-            $fullPaid = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
-            $lastPayment = $this->areEqualToTwoDp(
-                $this->getAmount(),
-                $policy->getOutstandingPremium()
-            );
+            $fullPaid = false;
+            $lastPayment = false;
+            /**
+             * If the policy is BACs we need to add the final commission after the final payment.
+             * Otherwise we need to add it before the final payment.
+             */
+            if ($policy->hasBacsPaymentMethod()) {
+                $fullPaid = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
+            } else {
+                $lastPayment = $this->areEqualToTwoDp(
+                    $this->getAmount(),
+                    $policy->getOutstandingPremium()
+                );
+            }
             $includeFinal = $fullPaid || $lastPayment;
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
         } elseif ($allowFraction && $amount >= 0) {
+            $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
+        } elseif ($amount < 0) {
+            /**
+             * This must be a refund. We should allow the commission to be set pro-rated every time for refunds.
+             */
             $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
         } else {
             throw new CommissionException(sprintf(

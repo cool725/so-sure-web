@@ -181,6 +181,7 @@ class UserController extends BaseController
         }
 
         $scode = null;
+
         if ($session = $this->get('session')) {
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
         }
@@ -337,11 +338,14 @@ class UserController extends BaseController
                         $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
                     );
                 }
-                if ($scode->isReward() && $scode->isActive() && !$scode->canApplyReward($policy)) {
-                    $this->addFlash('warning', sprintf('Sorry, promo code %s cannot be applied', $code));
-                    return new RedirectResponse(
-                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                    );
+                if ($scode->isReward() && $scode->isActive()) {
+                    $reward = $scode->getReward();
+                    if (!$reward || !$reward->canApply($policy, new \DateTime())) {
+                        $this->addFlash('warning', sprintf('Sorry, promo code %s cannot be applied', $code));
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
                 }
                 try {
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
@@ -458,7 +462,7 @@ class UserController extends BaseController
                 $this->addFlash(
                     'success-raw',
                     sprintf(
-                        '%s has invited you to connect. <a href="#" id="scode-link">Connect here!</a>',
+                        '%s has invited you to connect. Connect below',
                         $scode->getUser()->getName()
                     )
                 );
@@ -466,7 +470,7 @@ class UserController extends BaseController
                 $this->addFlash(
                     'success-raw',
                     sprintf(
-                        'Get your £%0.2f reward bonus from %s. <a href="#" id="scode-link">Connect here!</a>',
+                        'Get your £%0.2f reward bonus from %s. Apply below',
                         $scode->getReward()->getDefaultValue(),
                         $scode->getUser()->getName()
                     )

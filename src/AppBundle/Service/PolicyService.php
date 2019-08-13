@@ -922,6 +922,8 @@ class PolicyService
             $date = clone $policy->getBilling();
         }
 
+        $date->setTime(4, 0);
+
         // To determine any payments made
         $initialDate = clone $date;
 
@@ -1019,10 +1021,13 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate > $this->now()) {
+            if ($scheduledDate >= $this->subDays(new \DateTime(), 2)) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
-                $this->logger->notice('Attempted to set scheduled payment for before today.');
+                $this->logger->error(sprintf(
+                    'Attempted to set scheduled payment for before today for policy \'%s\'.',
+                    $policy->getId()
+                ));
             }
         }
         $this->dm->flush();
