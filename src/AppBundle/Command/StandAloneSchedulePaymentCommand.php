@@ -87,13 +87,15 @@ class StandAloneSchedulePaymentCommand extends ContainerAwareCommand
                     $billingDay
                 ));
             }
-            $sameYear = $now->format('Y') === $end->format('Y');
-            $nextPaymentDate = new \DateTime(sprintf(
-               "%s-%s-%s",
-               $now->format('Y'),
-               $now->format('m'),
-               $billingDay
-            ), SoSure::getSoSureTimezone());
+            $nextPaymentDate = new \DateTime(
+                sprintf(
+                    "%s-%s-%s",
+                    $now->format('Y'),
+                    $now->format('m'),
+                    $billingDay
+                ),
+                SoSure::getSoSureTimezone()
+            );
             $nextPaymentDate->setTime(3, 0);
             $oneMonth = new \DateInterval("P1M");
             if ($nextPaymentDate < $now) {
@@ -111,7 +113,7 @@ class StandAloneSchedulePaymentCommand extends ContainerAwareCommand
                 $payment->setNotes("Regenerating intentionally");
                 $output->writeln(sprintf(
                     "Generated payment on policy for %s",
-                    $payment->getScheduled()->format('Y-m-d H:i:s')
+                    $useDate->format('Y-m-d H:i:s')
                 ));
                 if (!$dryRun) {
                     $policy->addScheduledPayment($payment);
