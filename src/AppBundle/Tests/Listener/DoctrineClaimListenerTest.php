@@ -153,14 +153,14 @@ class DoctrineClaimListenerTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy->addClaim($claim);
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $expectedUpdated = \DateTime::createFromFormat('U', time());
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($claim);
         static::$dm->flush();
 
         // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
-        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), '', 0);
+        $this->within($expectedUpdated->getTimestamp(), $claim->getUnderwriterLastUpdated()->getTimestamp(), 3);
         // $this->assertNull($claim->getUnderwriterLastUpdated());
 
         $dg = new DirectGroupHandlerClaim();
@@ -176,7 +176,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $expectedUpdated = \DateTime::createFromFormat('U', time());
 
         static::$container->get('logger')->debug('--- Changed field ---');
         static::$container->get('logger')->debug('--- for compare ---');
@@ -192,7 +192,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertNotEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+        $this->within($expectedUpdated->getTimestamp(), $claim->getUnderwriterLastUpdated()->getTimestamp(), 3);
     }
 
     public function testClaimsListenerActualDGSame()
@@ -209,15 +209,14 @@ class DoctrineClaimListenerTest extends WebTestCase
         $claim->setNumber(rand(1, 999999));
         $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         $policy->addClaim($claim);
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $expectedUpdated = \DateTime::createFromFormat('U', time());
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($claim);
         static::$dm->flush();
 
         // Change inside the Claim::setPolicy does a doctrine update as well, which triggers the last updated
-        $this->assertEquals($expectedUnderwriterUpdated, $claim->getUnderwriterLastUpdated(), 'initial', 0);
-        // $this->assertNull($claim->getUnderwriterLastUpdated());
+        $this->within($expectedUpdated->getTimestamp(), $claim->getUnderwriterLastUpdated()->getTimestamp(), 3);
 
         $dg = new DirectGroupHandlerClaim();
         $dg->insuredName = $policy->getUser()->getName();
@@ -232,7 +231,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$directGroupService->saveClaim($dg, true);
         $this->assertTrue($save);
 
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $expectedUpdated = \DateTime::createFromFormat('U', time());
 
         static::$container->get('logger')->debug('--- Changed field ---');
         static::$container->get('logger')->debug('--- for compare ---');
@@ -248,7 +247,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), 'final', 0);
+        $this->within($expectedUpdated->getTimestamp(), $claim->getUnderwriterLastUpdated()->getTimestamp(), 3);
     }
 
     public function testClaimsListenerActualDaviesDiff()
@@ -286,7 +285,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$daviesService->saveClaim($davies, true);
         $this->assertTrue($save);
 
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $expectedUpdated = \DateTime::createFromFormat('U', time());
 
         static::$container->get('logger')->debug('--- Changed field ---');
         static::$container->get('logger')->debug('--- for compare ---');
@@ -302,7 +301,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertNotEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+        $this->assertNotEquals($expectedUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
     }
 
     public function testClaimsListenerActualDaviesSame()
@@ -340,7 +339,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $save = self::$daviesService->saveClaim($davies, true);
         $this->assertTrue($save);
 
-        $expectedUnderwriterUpdated = \DateTime::createFromFormat('U', time());
+        $expectedUpdated = \DateTime::createFromFormat('U', time());
 
         static::$container->get('logger')->debug('--- Changed field ---');
         static::$container->get('logger')->debug('--- for compare ---');
@@ -355,7 +354,7 @@ class DoctrineClaimListenerTest extends WebTestCase
         $updatedClaim = $this->loadClaim($claim);
         $this->assertNotNull($updatedClaim->getUnderwriterLastUpdated());
 
-        $this->assertEquals($expectedUnderwriterUpdated, $updatedClaim->getUnderwriterLastUpdated(), '', 0);
+        $this->within($expectedUpdated->getTimestamp(), $claim->getUnderwriterLastUpdated()->getTimestamp(), 3);
     }
 
     /**
@@ -398,5 +397,16 @@ class DoctrineClaimListenerTest extends WebTestCase
         $listener->setReader($reader);
 
         return $listener;
+    }
+
+    /**
+     * Checks that two values are within a range of one another.
+     * @param number $a     is the first value.
+     * @param number $b     is the second value.
+     * @param number $range is how close they must be or closer.
+     */
+    private function within($a, $b, $range)
+    {
+        $this->assertLessThanOrEqual($range, abs($a - $b));
     }
 }
