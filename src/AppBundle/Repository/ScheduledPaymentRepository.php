@@ -7,6 +7,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class ScheduledPaymentRepository extends BaseDocumentRepository
 {
@@ -46,6 +47,19 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * Gets all scheduled payments that still have status scheduled and do not have a payment associated yet.
+     * @return Cursor pointing to the returned set of scheduled payments.
+     */
+    public function findAllScheduled()
+    {
+        return $this->createQueryBuilder()
+                ->field('payment')->equals(null)
+                ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+                ->getQuery()
+                ->execute();
     }
 
     public function findMonthlyScheduled(\DateTime $date = null)
