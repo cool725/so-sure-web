@@ -7,6 +7,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Classes\SoSure;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -75,6 +76,7 @@ class StripTimeCommand extends ContainerAwareCommand
             $output->writeln($wet ? "Wet Run, changes will be saved" : "Dry Run, no changes will be saved");
             foreach ($scheduledPayments as $scheduledPayment) {
                 $date = clone $scheduledPayment->getScheduled();
+                $date->setTimeZone(SoSure::getSoSureTimezone());
                 $date->setTime(3, 0);
                 $output->writeln(sprintf(
                     "%s: %s -> %s",
