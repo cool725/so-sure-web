@@ -48,6 +48,19 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    /**
+     * Gets all scheduled payments that still have status scheduled and do not have a payment associated yet.
+     * @return array of the scheduled payments.
+     */
+    public function findAllScheduled()
+    {
+        return $this->createQueryBuilder()
+                ->field('payment')->equals(null)
+                ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+                ->getQuery()
+                ->execute();
+    }
+
     public function findMonthlyScheduled(\DateTime $date = null)
     {
         if (!$date) {
