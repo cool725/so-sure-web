@@ -41,8 +41,14 @@ class StripTimeCommand extends ContainerAwareCommand
         $this->setName("sosure:schedule:strip")
             ->setDescription("Schedule all future scheduled payments for 3AM.")
             ->addOption(
+                "count",
+                "c",
+                InputOption::VALUE_NONE,
+                "When this option is present it gives the number of eligible scheduled payments and closes"
+            )
+            ->addOption(
                 "wet",
-                "w",
+                null,
                 InputOption::VALUE_NONE,
                 "If not present, potential modifications are reported but not actioned"
             );
@@ -54,32 +60,43 @@ class StripTimeCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $wet = $input->getOption("wet");
-        $output->writeln($wet ? "Wet Run, changes will be saved" : "Dry Run, no changes will be saved");
+        $count = $input->getOption("count");
         /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
         $scheduledPaymentRepository = $this->dm->getRepository(ScheduledPayment::class);
-        $scheduledPayments = $scheduledPaymentRepository->findAllScheduled();
-        foreach ($scheduledPayments as $scheduledPayment) {
-            $date = clone $scheduledPayment->getScheduled();
-            $date->setTime(3, 0);
+        $scheduledPayments = $scheduledPaymentRepository->findAllScheduled()->toArray();
+        $scheduledPayments = array_filter($scheduledPayments, function($scheduledPayment) {
+            return $scheduledPayment->getScheduled()->format("H:i") != "03:00";
+        });
+        if ($count) {
             $output->writeln(sprintf(
-                "%s: %s -> %s",
-                $scheduledPayment->getId(),
-                $scheduledPayment->getScheduled()->format("d-m-Y H:i"),
-                $date->format("d-m-Y H:i")
+                "%d scheduled payments to be actioned.",
+                count($scheduledPayments)
             ));
-            if ($wet) {
-                $scheduledPayment->setNotes(sprintf(
-                    "%s. Rescheduled from %s to %s",
-                    $scheduledPayment->getNotes(),
+        } else {
+            $output->writeln($wet ? "Wet Run, changes will be saved" : "Dry Run, no changes will be saved");
+            foreach ($scheduledPayments as $scheduledPayment) {
+                $date = clone $scheduledPayment->getScheduled();
+                $date->setTime(3, 0);
+                $output->writeln(sprintf(
+                    "%s: %s -> %s",
+                    $scheduledPayment->getId(),
                     $scheduledPayment->getScheduled()->format("d-m-Y H:i"),
                     $date->format("d-m-Y H:i")
                 ));
-                $scheduledPayment->setScheduled($date);
-                $this->dm->persist($scheduledPayment);
+                if ($wet) {
+                    $scheduledPayment->setNotes(sprintf(
+                        "%s. Rescheduled from %s to %s",
+                        $scheduledPayment->getNotes(),
+                        $scheduledPayment->getScheduled()->format("d-m-Y H:i"),
+                        $date->format("d-m-Y H:i")
+                    ));
+                    $scheduledPayment->setScheduled($date);
+                    $this->dm->persist($scheduledPayment);
+                }
             }
-        }
-        if ($wet) {
-            $this->dm->flush();
+            if ($wet) {
+                $this->dm->flush();
+            }
         }
     }
 }
