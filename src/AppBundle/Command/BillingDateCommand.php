@@ -119,9 +119,6 @@ class BillingDateCommand extends ContainerAwareCommand
             $billing = $policy->getBilling();
             $billing->setTimezone(SoSure::getSoSureTimezone());
             if ($billing) {
-                if ($billing->format("H:i") == "03:00") {
-                    continue;
-                }
                 $newBilling = clone $billing;
                 $newBilling->setTime(3, 0);
                 $output->writeln(sprintf(
@@ -131,7 +128,7 @@ class BillingDateCommand extends ContainerAwareCommand
                     $newBilling->format("d-m-Y H:i")
                 ));
                 if ($wet) {
-                    $policy->setBilling($newBilling);
+                    $policy->setBillingForce($newBilling);
                     $this->dm->persist($policy);
                 }
             }
