@@ -1800,11 +1800,11 @@ class CheckoutService
                     $lines[] = $line;
                     $transactionDate = \DateTime::createFromFormat(
                         'Y-m-d H:i:s',
-                        $line['Action Date'],
+                        $line['Action Date Europe/London'],
                         SoSure::getSoSureTimezone()
                     );
                     if (!$transactionDate) {
-                        throw new \Exception(sprintf('Unable to parse date %s', $line['Action Date']));
+                        throw new \Exception(sprintf('Unable to parse date %s', $line['Action Date Europe/London']));
                     }
                     $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone('UTC'));
 
