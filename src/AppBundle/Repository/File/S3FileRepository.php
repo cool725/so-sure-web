@@ -2,9 +2,10 @@
 
 namespace AppBundle\Repository\File;
 
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\DateTrait;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class S3FileRepository extends DocumentRepository
 {
@@ -41,6 +42,22 @@ class S3FileRepository extends DocumentRepository
         return $this->createQueryBuilder()
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextNextMonth)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Gives all the files that have been processed this month.
+     * @param \DateTime $date is a date within the month of interest.
+     * @return Cursor over all the files.
+     */
+    public function getMonthlyProcessedFiles(\DateTime $date)
+    {
+        $start = $this->startOfMonth($date);
+        $end = $this->endOfMonth($date);
+        return $this->createQueryBuilder()
+            ->field("metadata.processing-date")->gte($start)
+            ->field("metadata.processing-date")->lt($end)
             ->getQuery()
             ->execute();
     }
