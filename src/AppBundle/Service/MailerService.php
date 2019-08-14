@@ -15,7 +15,7 @@ class MailerService
 {
     use RouterTrait;
 
-    const TRUSTPILOT_PURCHASE = '529c0abfefb96008b894ad02';
+    const TRUSTPILOT_PURCHASE = '5d528c380ad3270001214675';
 
     const EMAIL_WEEKLY = 'weekly';
 
