@@ -788,7 +788,7 @@ class BacsService
             $returnDescription = $this->getNodeValue($element, 'returnDescription');
             $amount = $this->getNodeValue($element, 'valueOf');
             $results['value'] += $amount;
-            if (array_has_key($reference, $results['amounts'])) {
+            if (array_key_exists($reference, $results['amounts'])) {
                 $results['amounts'][$reference] += $amount;
             } else {
                 $results['amounts'][$reference] = $amount;
