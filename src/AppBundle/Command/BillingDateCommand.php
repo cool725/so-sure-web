@@ -23,8 +23,7 @@ class BillingDateCommand extends ContainerAwareCommand
     const HELP = "Provides manual functionality around billing dates. <info>action</info> argument is used to select ".
         "which functionality to use.\nNo modification to data is made unless the <info>wet</info> option is set.\n".
         "<info>mass-update</info> action is used to update the billing date on all active policies to their own ".
-        "billing date but at 3am, or their start date but at 3am if they lack a billing date. Requires ".
-        "<info>time</info> option.";
+        "billing date but at 3am, or their start date but at 3am if they lack a billing date.";
 
     /** @var DocumentManager */
     private $dm;
@@ -99,11 +98,7 @@ class BillingDateCommand extends ContainerAwareCommand
         }
         // Perform actions.
         if ($action == "mass-update") {
-            if (!$time) {
-                $output->writeln("<error>\"time\" option required.</error>");
-                return;
-            }
-            $this->massUpdate($hour, $minute, $output, $wet);
+            $this->massUpdate($output, $wet);
         } else {
             $output->writeln("<error>No such action as {$action}</error>");
         }
@@ -111,25 +106,23 @@ class BillingDateCommand extends ContainerAwareCommand
 
     /**
      * Performs mass-update action.
-     * @param string          $hour   is the "H" representation of the desired billing hour.
-     * @param string          $minute is the "i" representation of the desired billing minute.
      * @param OutputInterface $output is used to output info as it goes to the user.
      * @param boolean         $wet    is whether to persist the changes or just pretend to.
      */
-    private function massUpdate($hour, $minute, $output, $wet)
+    private function massUpdate($output, $wet)
     {
         /** @var PolicyRepository $policyRepository */
         $policyRepository = $this->dm->getRepository(Policy::class);
         $policies = $policyRepository->findCurrentPolicies();
         foreach ($policies as $policy) {
             $billing = $policy->getBilling();
+            $billing->setTimezone(SoSure::getSoSureTimezone());
             if ($billing) {
-                if ($billing->format("H:i") == "{$hour}:{$minute}") {
+                if ($billing->format("H:i") == "03:00") {
                     continue;
                 }
                 $newBilling = clone $billing;
-                $newBilling->setTimezone(SoSure::getSoSureTimezone());
-                $newBilling->setTime($hour, $minute);
+                $newBilling->setTime(3, 0);
                 $output->writeln(sprintf(
                     "%s %s -> %s",
                     $policy->getId(),
