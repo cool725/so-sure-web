@@ -1377,7 +1377,8 @@ abstract class Policy
     public function setBilling(\DateTime $billing, \DateTime $changeDate = null)
     {
         // Only if changing billing date - allow the initial setting if unpaid
-        if ($this->billing && $this->billing != $billing && !$this->isPolicyPaidToDate($changeDate)) {
+        if ($this->billing && !$this->isPolicyPaidToDate($changeDate) &&
+            $this->billing->format("d-m-Y") != $billing->format("d-m-Y")) {
             throw new \Exception('Unable to changing billing date unless policy is paid to date');
         }
         $this->billing = $billing;

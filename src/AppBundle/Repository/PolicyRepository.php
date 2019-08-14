@@ -43,6 +43,21 @@ class PolicyRepository extends BaseDocumentRepository
             ->count();
     }
 
+    /**
+     * Gives you all policies that are "current" in the sense that they are in either the status active or unpaid.
+     * @return Cursor with the full set of results.
+     */
+    public function findCurrentPolicies()
+    {
+        return $this->createQueryBuilder()
+             ->field("status")->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID
+            ])
+            ->getQuery()
+            ->execute();
+    }
+
     public function findPoliciesForPendingCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
     {
         if (!$date) {
