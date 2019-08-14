@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\CallNote;
@@ -1381,6 +1382,11 @@ abstract class Policy
             $this->billing->format("d-m-Y") != $billing->format("d-m-Y")) {
             throw new \Exception('Unable to changing billing date unless policy is paid to date');
         }
+        /**
+         * Billing should always be at 3am now, so when we set it we need to ensure that it is.
+         */
+        $billing->setTimezone(SoSure::getSoSureTimezone());
+        $billing->setTime(3, 0);
         $this->billing = $billing;
     }
 
