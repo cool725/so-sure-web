@@ -114,6 +114,7 @@ class BillingDateCommand extends ContainerAwareCommand
         /** @var PolicyRepository $policyRepository */
         $policyRepository = $this->dm->getRepository(Policy::class);
         $policies = $policyRepository->findCurrentPolicies();
+        /** @var Policy $policy */
         foreach ($policies as $policy) {
             $billing = $policy->getBilling();
             $billing->setTimezone(SoSure::getSoSureTimezone());

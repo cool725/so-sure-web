@@ -5,11 +5,12 @@ namespace AppBundle\Repository;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class PolicyRepository extends BaseDocumentRepository
 {
@@ -50,7 +51,7 @@ class PolicyRepository extends BaseDocumentRepository
     public function findCurrentPolicies()
     {
         return $this->createQueryBuilder()
-             ->field("status")->in([
+            ->field("status")->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID
             ])
