@@ -83,25 +83,6 @@
                                     <i class="fal fa-clock fa-fw"></i>
                                 {% endif %}</button>
                         </div>
-                        <div class="form-group">
-                            <div class="dropdown">
-                                <a class="btn btn-primary btn-square dropdown-toggle"
-                                   href="#" role="button"
-                                   id="tabs_dropdown"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false"> Tabs</a>
-                                <div class="dropdown-menu"
-                                     aria-labelledby="tabs_dropdown">
-                                        <a class="dropdown-item" href="{{ path('admin_banking_card_date', {'year': year, 'month': month}) }}"
-                                        >Card Details</a>
-                                        <a class="dropdown-item" href="{{ path('admin_banking_merchant_date', {'year': year, 'month': month}) }}"
-                                        >Merchant Details</a>
-                                        <a class="dropdown-item" href="{{ path('admin_banking_bacs_date', {'year': year, 'month': month}) }}"
-                                        >Bacs Details</a>
-                                </div>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -116,7 +97,7 @@
                        href="#salva_content"
                        role="tab"
                        aria-controls="salva_content"
-                       aria-selected="true">Salva <i class="fa fa-check"></i> </a>
+                       aria-selected="true">Salva</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -125,7 +106,7 @@
                        href="#checkout_content"
                        role="tab"
                        aria-controls="checkout_content"
-                       aria-selected="false">Checkout {% if checkout is defined %}<i class="fa fa-check"></i>{% endif %}</a>
+                       aria-selected="false">Checkout</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -134,7 +115,7 @@
                        href="#cashflows_content"
                        role="tab"
                        aria-controls="cashflows_content"
-                       aria-selected="true">Cashflows {% if cashflow is defined %}<i class="fa fa-check"></i>{% endif %}</a>
+                       aria-selected="true">Cashflows</a>
                 </li>
                 <li class="nav-item {% if bacsInputFiles is defined %}active{% endif %}">
                     <a class="nav-link"
@@ -143,7 +124,7 @@
                        href="#bacs_content"
                        role="tab"
                        aria-controls="bacs_content"
-                       aria-selected="false">Bacs {% if bacsInputFiles is defined %}<i class="fa fa-check"></i>{% endif %}</a>
+                       aria-selected="false">Bacs</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
@@ -152,7 +133,7 @@
                        href="#bacs_files_content"
                        role="tab"
                        aria-controls="bacs_files_content"
-                       aria-selected="false">Bacs Files {% if bacsInputFiles is defined %}<i class="fa fa-check"></i>{% endif %}</a>
+                       aria-selected="false">Bacs Files</a>
                 </li>
             </ul>
             <div class="tab-content" id="banking_tabs_content">

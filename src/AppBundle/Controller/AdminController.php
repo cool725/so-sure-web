@@ -1437,19 +1437,14 @@ class AdminController extends BaseController
             'reconciliation' => $bankingService->getReconcilationBanking($date),
             'year' => $date->format('Y'),
             'month' => $date->format('n'),
+            'checkout' => $bankingService->getCheckoutBanking($date, $year, $month),
+            'cashflows' => $bankingService->getCashflowsBanking($date, $year, $month),
+            'lloyds' => $bankingService->getLloydsBanking($date, $year, $month),
+            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
+            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
+            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
+            'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false)
         ];
-        if ($request->get('_route') == 'admin_banking_card_date') {
-            $data['checkout'] = $bankingService->getCheckoutBanking($date, $year, $month);
-        } elseif ($request->get('_route') == 'admin_banking_merchant_date') {
-            $data['cashflows'] = $bankingService->getCashflowsBanking($date, $year, $month);
-            $data['lloyds'] = $bankingService->getLloydsBanking($date, $year, $month);
-        } elseif ($request->get('_route') == 'admin_banking_bacs_date') {
-            $data['lloyds'] = $bankingService->getLloydsBanking($date, $year, $month);
-            $data['bacsInputFiles'] = $inputRepo->getMonthlyFiles($date);
-            $data['bacsAruddFiles'] = $aruddRepo->getMonthlyFiles($date);
-            $data['bacsDdicFiles'] = $ddicRepo->getMonthlyFiles($date);
-            $data['manualBacsPayments'] = Payment::sumPayments($manualBacsPayments, false);
-        }
         return $data;
     }
 
