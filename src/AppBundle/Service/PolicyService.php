@@ -922,7 +922,8 @@ class PolicyService
             $date = clone $policy->getBilling();
         }
 
-        $date->setTime(4, 0);
+        $date->setTimezone(SoSure::getSoSureTimezone());
+        $date->setTime(3, 0);
 
         // To determine any payments made
         $initialDate = clone $date;

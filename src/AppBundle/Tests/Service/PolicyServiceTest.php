@@ -355,6 +355,50 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
     }
 
+    public function testCreatePolicyWithoutBillingSetBillingAt3am()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('no-billing-3am', $this, true),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true,
+            true
+        );
+        $this->assertEquals("03:00:00", $policy->getBilling()->format("H:i:s"));
+    }
+
+    public function testCreatePolicyBillingSetBillingAt3am()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('billing-3am', $this, true),
+            'bar',
+            null,
+            static::$dm
+        );
+        $billing = date_add(new \DateTime(), new \DateInterval("P9D"));
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true,
+            true,
+            true,
+            null,
+            $billing
+        );
+        $this->assertEquals("03:00:00", $policy->getBilling()->format("H:i:s"));
+    }
+
     /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
      * @group schedule
