@@ -1389,6 +1389,15 @@ abstract class Policy
         $this->billing = $billing;
     }
 
+    /**
+     * Sets billing without validation.
+     * @param \DateTime $billing is the billing date to set.
+     */
+    public function setBillingForce(\DateTime $billing)
+    {
+        $this->billing = $billing;
+    }
+
     public function getEnd()
     {
         if ($this->end) {

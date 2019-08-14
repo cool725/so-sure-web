@@ -131,7 +131,7 @@ class BillingDateCommand extends ContainerAwareCommand
                     $newBilling->format("d-m-Y H:i")
                 ));
                 if ($wet) {
-                    $policy->setBilling($newBilling);
+                    $policy->setBillingForce($newBilling);
                     $this->dm->persist($policy);
                 }
             }
