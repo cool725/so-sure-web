@@ -108,15 +108,6 @@
                        aria-controls="checkout_content"
                        aria-selected="false">Checkout</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link"
-                       id="cashflows_tab"
-                       data-toggle="tab"
-                       href="#cashflows_content"
-                       role="tab"
-                       aria-controls="cashflows_content"
-                       aria-selected="true">Cashflows</a>
-                </li>
                 <li class="nav-item {% if bacsInputFiles is defined %}active{% endif %}">
                     <a class="nav-link"
                        id="bacs_tab"
@@ -148,12 +139,6 @@
                      role="tabpanel"
                      aria-labelledby="checkout_tab">
                     {% include 'AppBundle::Admin/adminBanking/checkout.html.twig' %}
-                </div>
-                <div class="tab-pane fade"
-                     id="cashflows_content"
-                     role="tabpanel"
-                     aria-labelledby="cashflows_tab">
-                    {% include 'AppBundle::Admin/adminBanking/cashflows.html.twig' %}
                 </div>
                 <div class="tab-pane fade"
                      id="bacs_content"
