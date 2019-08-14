@@ -5,11 +5,12 @@ namespace AppBundle\Repository;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class PolicyRepository extends BaseDocumentRepository
 {
@@ -41,6 +42,21 @@ class PolicyRepository extends BaseDocumentRepository
             ->getQuery()
             ->execute()
             ->count();
+    }
+
+    /**
+     * Gives you all policies that are "current" in the sense that they are in either the status active or unpaid.
+     * @return Cursor with the full set of results.
+     */
+    public function findCurrentPolicies()
+    {
+        return $this->createQueryBuilder()
+            ->field("status")->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID
+            ])
+            ->getQuery()
+            ->execute();
     }
 
     public function findPoliciesForPendingCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
