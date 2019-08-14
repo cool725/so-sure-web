@@ -147,7 +147,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-04-04')));
         $this->assertEquals(
-            new \DateTime('2018-04-05 00:00', SoSure::getSoSureTimezone()),
+            new \DateTime('2018-04-05 03:00', SoSure::getSoSureTimezone()),
             $policy->getNextBillingDate(new \DateTime('2018-04-04'))
         );
 
