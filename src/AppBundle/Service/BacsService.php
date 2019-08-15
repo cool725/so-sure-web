@@ -748,6 +748,7 @@ class BacsService
             'failed-payments' => 0,
             'failed-value' => 0,
             'details' => [],
+            'amounts' => []
         ];
 
         /** @var UserRepository $repo */
