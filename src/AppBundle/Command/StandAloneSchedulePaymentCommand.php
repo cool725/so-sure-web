@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Service\BacsService;
@@ -104,8 +105,10 @@ class StandAloneSchedulePaymentCommand extends ContainerAwareCommand
             while ($nextPaymentDate < $end) {
                 $useDate = clone $nextPaymentDate;
                 $payment = new ScheduledPayment();
-                $useDate = $this->getCurrentOrNextBusinessDay($useDate);
                 $useDate = $payment->adjustDayForBilling($useDate);
+                if ($policy->getBacsPaymentMethod() !== null) {
+                    $useDate = $this->getCurrentOrNextBusinessDay($useDate);
+                }
                 $payment->setStatus($payment::STATUS_SCHEDULED);
                 $payment->setScheduled($useDate);
                 $payment->setAmount($policy->getPremiumInstallmentPrice());
