@@ -1786,7 +1786,8 @@ class CheckoutService
         $maxDate = null;
         if (($handle = fopen($filename, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000)) !== false) {
-                // appears to be quite a few unused additional columns. Go to row BA (Card Wallet Type)
+                // Remove empty columns appearing in header.
+                $row = array_slice($row, 0, 55);
                 if (count($row) == 0) {
                     continue;
                 } elseif (!$header) {
