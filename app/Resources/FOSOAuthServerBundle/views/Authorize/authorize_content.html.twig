@@ -31,11 +31,11 @@
                     }) }}
                         <p class="lead">{{ form.vars.value.scope|oauth2ScopeDescription }}</p>
                         <div class="login__divider__solid"></div>
-                        <input class="btn btn-success btn-square"
+                        <input class="btn btn-success"
                                type="submit"
                                name="accepted"
                                value="{{ 'authorize.accept'|trans({}, 'FOSOAuthServerBundle') }}" />
-                        <input class="btn btn-outline-primary btn-square"
+                        <input class="btn btn-outline-primary"
                                type="submit"
                                name="rejected"
                                value="{{ 'authorize.reject'|trans({}, 'FOSOAuthServerBundle') }}" />

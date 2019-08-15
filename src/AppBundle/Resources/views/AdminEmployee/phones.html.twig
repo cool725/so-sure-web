@@ -9,7 +9,7 @@
     {# Alernative #}
     <button title="Alternatives"
             type="button"
-            class="btn btn-primary btn-square btn-sm mb-2 mr-2 {% if phone.replacementPrice > 0 %}disabled{% endif %}"
+            class="btn btn-primary btn-sm mb-2 mr-2 {% if phone.replacementPrice > 0 %}disabled{% endif %}"
             data-toggle="modal"
             data-target="#alternative_modal"
             data-query="{% if is_granted('ROLE_EMPLOYEE') %}{{ path('admin_phone_alternatives', {'id': phone.id}) }}{% else %}{{ path('claims_phone_alternatives', {'id': phone.id}) }}{% endif %}"
@@ -19,7 +19,7 @@
     {# Pricing #}
     <button title="Add Pricing"
             type="button"
-            class="btn btn-primary btn-square btn-sm mb-2 mr-2 "
+            class="btn btn-primary btn-sm mb-2 mr-2 "
             data-toggle="modal"
             data-target="#phone_modal"
             data-update="{{ path('admin_phone_price', {'id': phone.id}) }}"
@@ -31,7 +31,7 @@
     {# Edit Phone Details #}
     <button title="Edit Phone Details"
             type="button"
-            class="btn btn-primary btn-square btn-sm mb-2 mr-2"
+            class="btn btn-primary btn-sm mb-2 mr-2"
             data-toggle="modal"
             data-target="#details_modal"
             data-update="{{ path('admin_phone_details', {'id': phone.id}) }}"
@@ -40,27 +40,27 @@
     {# Highlight Device #}
     <button title="{% if phone.highlight %}Unset - FNOL remainder 1st month{% else %}Set - FNOL remainder 1st month{% endif %} "
             type="button"
-            class="btn btn-square btn-sm mb-2 mr-2 {% if phone.highlight %}btn-success{% else %}btn-secondary{% endif %} phone-highlight"
+            class="btn btn-sm mb-2 mr-2 {% if phone.highlight %}btn-success{% else %}btn-secondary{% endif %} phone-highlight"
             data-token="{{ csrf_token('default') }}"
             data-highlight="{{ path('admin_phone_highlight', {'id': phone.id}) }}">
         <i class="fas fa-highlighter fa-fw"></i></button>
     <button title="Notify users there will be a delay with claims due to the phone being new and in high demand"
             type="button"
-            class="btn btn-square btn-sm mb-2 mr-2 {% if phone.isNewHighDemand %}btn-warning{% else %}btn-primary{% endif %} phone-newhighdemand"
+            class="btn btn-sm mb-2 mr-2 {% if phone.isNewHighDemand %}btn-warning{% else %}btn-primary{% endif %} phone-newhighdemand"
             data-token="{{ csrf_token('default') }}"
             data-newhighdemand="{{ path('admin_phone_newhighdemand', {'id': phone.id}) }}">
         <i class="far fa-chart-line fa-fw"></i></button>
     {# Deactivate Phone #}
     <button title="Deactive Phone"
             type="button"
-            class="btn btn-danger btn-square btn-sm mb-2 mr-2 phone-active"
+            class="btn btn-danger btn-sm mb-2 mr-2 phone-active"
             data-token="{{ csrf_token('default') }}"
             data-active="{{ path('admin_phone_active', {'id': phone.id}) }}">
         <i class="far fa-power-off fa-fw"></i></button>
     {# Update Retail Price #}
     <button title="Update Retail Price"
             type="button"
-            class="btn btn-square btn-sm mb-2 mr-2 btn-primary"
+            class="btn btn-sm mb-2 mr-2 btn-primary"
             data-toggle="modal"
             data-target="#retail_modal"
             data-update="{{ path('admin_phone_retail', {'id': phone.id}) }}"
@@ -90,21 +90,21 @@
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
                     <div class="mb-2">
-                        <button class="btn btn-primary btn-square mr-2 mb-2"
+                        <button class="btn btn-primary mr-2 mb-2"
                                 data-toggle="modal"
                                 data-target="#new_phone_modal">
                             <i class="fal fa-bullhorn fa-fw"></i> Upcoming phone</button>
-                        <button class="btn btn-primary btn-square mr-2 mb-2"
+                        <button class="btn btn-primary mr-2 mb-2"
                                 data-toggle="modal"
                                 data-target="#check_price_modal">
                             <i class="fal fa-calculator fa-fw"></i> Premium</button>
                         <a href="{{ path('admin_phones_download') }}"
                            target="_blank"
                            rel="noopener noreferrer"
-                           class="btn btn-primary btn-square mr-2 mb-2">
+                           class="btn btn-primary mr-2 mb-2">
                             <i class="fal fa-link fa-fw"></i> Phone Links</a>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <button class="btn btn-primary btn-square mr-2 mb-2"
+                            <button class="btn btn-primary mr-2 mb-2"
                                     data-toggle="modal"
                                     data-target="#additional_phones_modal">
                                 <i class="fal fa-file-import fa-fw"></i> Import phones</button>
@@ -148,7 +148,7 @@
                                         'fa': 'far fa-search fa-fw',
                                         'left': true,
                                         'attr': {
-                                            'class': 'btn btn-success btn-square'
+                                            'class': 'btn btn-success'
                                     }}) }}
                                 </div>
                             </div>
@@ -490,7 +490,7 @@
                         </div>
                         <div class="form-group">
                             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                            <button type="submit" class="btn btn-success">Save</button>
                         </div>
                     </form>
                 </div>
@@ -516,7 +516,7 @@
                     <form id="phone_update_form" method="post">
                         <div class="mb-5 d-md-flex align-items-md-center justify-content-md-between">
                             <h4>Update pricing</h4>
-                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                            <button type="submit" class="btn btn-success">Save</button>
                         </div>
                         <div class="row mt-5">
                             <div class="col-lg">
@@ -590,7 +590,7 @@
                                                      class="form-control"
                                                      name="desired-premium">
                                                 <div class="input-group-append">
-                                                    <button class="btn btn-success btn-square"
+                                                    <button class="btn btn-success"
                                                             type="button"
                                                             id="phone_desired_premium_btn">Calc GWP
                                                     </button>
@@ -829,7 +829,7 @@
                         </div>
                         <div class="form-group">
                             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
-                            <button type="submit" class="btn btn-success btn-square">Save</button>
+                            <button type="submit" class="btn btn-success">Save</button>
                         </div>
                     </form>
                 </div>
@@ -870,7 +870,7 @@
                                    readonly/>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn btn-success btn-square" data-token="{{ csrf_token('default') }}" id="check_premium_button">Calculate</button>
+                            <button type="button" class="btn btn-success" data-token="{{ csrf_token('default') }}" id="check_premium_button">Calculate</button>
                         </div>
                     </form>
                 </div>
@@ -916,7 +916,7 @@
                         </div>
                         <div class="form-group">
                             <p>Remember to set <strong>active</strong> afterwards!</p>
-                            {{ form_widget(new_phone.add, {'attr':{'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(new_phone.add, {'attr':{'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(new_phone) }}
                 </div>
@@ -948,7 +948,7 @@
                                 <small class="form-text">Please select the file of additional phones to load into the database</small>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(additional_phones.load, {'attr':{'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(additional_phones.load, {'attr':{'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(additional_phones) }}
                     </div>

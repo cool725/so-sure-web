@@ -124,13 +124,13 @@
                 {# Login with #}
                 <div class="row">
                     <div class="col">
-                        <a href="#" id="swap-login" class="btn btn-primary btn-square btn-sm btn-block btn-shadow"><i class="fas fa-envelope fa-lg"></i> <br> <span class="mt-1">Email</span></a>
+                        <a href="#" id="swap-login" class="btn btn-primary btn-no-shadow btn-login btn-sm btn-block btn-shadow"><i class="fas fa-envelope fa-lg"></i> <br> <span class="mt-1">Email</span></a>
                     </div>
                     <div class="col">
-                        <a href="#" id="fb-login" class="btn btn-facebook btn-block btn-square btn-sm"><i class="fab fa-facebook fa-lg"></i> <br> <span class="mt-1">Facebook</span></a>
+                        <a href="#" id="fb-login" class="btn btn-facebook btn-no-shadow btn-login btn-block btn-sm"><i class="fab fa-facebook fa-lg"></i> <br> <span class="mt-1">Facebook</span></a>
                     </div>
                     <div class="col">
-                        <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}" class="btn btn-google btn-block btn-square btn-sm"><i class="fab fa-google fa-lg"></i> <br> <span class="mt-1">Google</span></a>
+                        <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}" class="btn btn-google btn-no-shadow btn-login btn-block btn-sm"><i class="fab fa-google fa-lg"></i> <br> <span class="mt-1">Google</span></a>
                     </div>
                 </div>
 
@@ -138,7 +138,7 @@
                 {% if feature_enabled('starling') %}
                      <div class="row mt-4">
                         <div class="col">
-                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}" class="btn btn-starling btn-block btn-square"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp; <span>Starling</span></a>
+                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'starling'}) }}" class="btn btn-starling btn-block"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp; <span>Starling</span></a>
                         </div>
                      </div>
                 {% endif %}

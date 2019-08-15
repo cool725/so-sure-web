@@ -50,6 +50,10 @@
             border-radius: 100%;
             background-color: $pattens-blue;
             line-height: 32px;
+
+            &:hover {
+                background-color: darken($pattens-blue, 20%);
+            }
         }
 
         &-line {

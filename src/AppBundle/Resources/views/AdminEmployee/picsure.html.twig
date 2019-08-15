@@ -25,7 +25,7 @@
                     {{ form_start(picsure_search_form, {'attr': {'class': 'form-inline'}}) }}
                         <label class="mr-md-2">Type: </label>
                         {{ form_widget(picsure_search_form.status, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_widget(picsure_search_form.search, {'attr':{'class':'btn btn-success btn-square btn-block-xs mt-2 mt-md-0 ml-md-2'}}) }}
+                        {{ form_widget(picsure_search_form.search, {'attr':{'class':'btn btn-success btn-block-xs mt-2 mt-md-0 ml-md-2'}}) }}
                     {{ form_end(picsure_search_form) }}
                 </div>
             </div>
@@ -90,13 +90,13 @@
                                     <td width="30%">
                                         {% if policy.picSureStatus == 'manual' %}
                                             <a href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"
-                                               class="btn btn-success btn-square btn-sm mb-1 mr-md-2"
+                                               class="btn btn-success btn-sm mb-1 mr-md-2"
                                                title="Approve pic-sure"
                                                >
                                                <i class="far fa-check fa-lg fa-fw"></i>
                                                <span class="sr-only">Approve</span></a>
                                             <a href="#"
-                                               class="btn btn-warning btn-square btn-sm mb-1 mr-md-2"
+                                               class="btn btn-warning btn-sm mb-1 mr-md-2"
                                                title="Invalidate pic-sure"
                                                data-toggle="modal"
                                                data-target="#invalid_modal"
@@ -105,7 +105,7 @@
                                                <i class="far fa-exclamation-triangle fa-lg fa-fw"></i>
                                                <span class="sr-only">Invalid</span></a>
                                             <a href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"
-                                               class="btn btn-danger btn-square btn-sm mb-1 mr-md-2"
+                                               class="btn btn-danger btn-sm mb-1 mr-md-2"
                                                title="Reject Damaged pic-sure"
                                                >
                                                <i class="far fa-times fa-lg fa-fw"></i>
@@ -116,7 +116,7 @@
                                         {% for file in policy.getPolicyPicSureFiles %}
                                             {% if 'picsure-ml-score' in file.getMetadata()|keys %}
                                                 {# TODO: Re-run should only appear for latest pic-sure submitted #}
-                                                {# <a class="btn btn-outline-primary btn-square mb-1 btn-sm" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run ml</span></a> #}
+                                                {# <a class="btn btn-outline-primary mb-1 btn-sm" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run ml</span></a> #}
                                             {% endif %}
                                         {% endfor %}
                                     </td>
@@ -172,7 +172,7 @@
                                       name="message"></textarea>
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-success btn-square">Invalidate pic-sure</button>
+                            <button type="submit" class="btn btn-success">Invalidate pic-sure</button>
                         </div>
                     </form>
                 </div>
