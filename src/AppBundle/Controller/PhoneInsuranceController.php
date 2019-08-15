@@ -474,92 +474,14 @@ class PhoneInsuranceController extends BaseController
             'pixel-3-xl',
         ];
 
-        // BlackBerry Generic
-        $blackberry = [
-            'dekt50'
-        ];
-
-        // HTC One Generic
-        $htcOne = [
-            'one-a9',
-            'one-m8s',
-            'one-m9',
-            'one-x9',
-        ];
-
-        $huaweiP9 = [
-            'p9',
-            'p9-plus',
-            'p9-lite'
-        ];
-
-        $motorolaMoto = [
-            'moto-g4-play',
-            'moto-g',
-            'moto-g5s-plus',
-            'moto-e4-plus',
-            'moto-g5',
-            'moto-g5s',
-            'moto-g6',
-            'moto-e3',
-            'moto-g-(3rd-gen)'
-        ];
-
-        $galaxyS5 = [
-            'galaxy-s5-neo',
-            'galaxy-s5-mini'
-        ];
-
-        $sonyXperia = [
-            'xperia-e4g',
-            'xperia-e4',
-            'xperia-xz1',
-            'xperia-e5',
-            'xperia-zx',
-            'xperia-z5-premium',
-            'xperia-z5-compact',
-            'xperia-z5',
-            'xperia-m4-aqua',
-            'xperia-xz3',
-            'xperia-xz2-compact',
-            'xperia-xz2',
-            'xperia-z3-plus',
-            'xperia-xz-premium',
-            'xperia-xa2-ultra',
-            'xperia-xa2',
-            'xperia-xa1-ultra',
-            'xperia-xa1',
-            'xperia-xa-ultra',
-            'xperia-xa',
-            'xperia-x',
-            'xperia-m5',
-        ];
-
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
         $hideSection = false;
 
         // SEO pages
-        // TODO: Add check if file exists or redirect to 404
-
         if ($request->get('_route') == 'quote_make_model') {
             // Model template
             $templateModel = $modelHyph.'.html.twig';
             $template = 'AppBundle:PhoneInsurance/Phones:'.$templateModel;
-
-            // If certain models share the same template - check
-            if (in_array($modelHyph, $blackberry)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:blackberry.html.twig';
-            } elseif (in_array($modelHyph, $htcOne)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:htc-one.html.twig';
-            } elseif (in_array($modelHyph, $huaweiP9)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:huawei-p9.html.twig';
-            } elseif (in_array($modelHyph, $motorolaMoto)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:motorola-moto.html.twig';
-            } elseif (in_array($modelHyph, $galaxyS5)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:galaxy-s5.html.twig';
-            } elseif (in_array($modelHyph, $sonyXperia)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:sony-xperia.html.twig';
-            }
 
             // Check if template exists
             if (!$this->get('templating')->exists($template)) {

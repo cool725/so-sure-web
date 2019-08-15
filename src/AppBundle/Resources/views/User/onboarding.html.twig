@@ -505,6 +505,11 @@
         </div>
     </section>
 
+    {# Page Modal #}
+    {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
+        {% include 'AppBundle::User/_starlingModal.html.twig' %}
+    {% endif %}
+
 {% endblock %}
 
 {% block footer %}
