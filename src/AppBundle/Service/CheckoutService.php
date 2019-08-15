@@ -1787,7 +1787,6 @@ class CheckoutService
         if (($handle = fopen($filename, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000)) !== false) {
                 // appears to be quite a few unused additional columns. Go to row BA (Card Wallet Type)
-                $row = array_slice($row, 0, 53);
                 if (count($row) == 0) {
                     continue;
                 } elseif (!$header) {
