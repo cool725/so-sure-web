@@ -162,7 +162,7 @@ class SCode
     {
         // TODO: Consider adding additional scodes to users and gradually phase out old ones
         // should be able one day to remove the uppercase a-z validation here
-        return preg_match("/^[-a-zA-Z0-9\/+]{8,8}$/", $scode) === 1;
+        return preg_match("/^[-a-zA-Z0-9\/+]{6,8}$/", $scode) === 1;
     }
 
     public function deactivate()
