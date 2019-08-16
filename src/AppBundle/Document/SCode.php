@@ -39,7 +39,7 @@ class SCode
     protected $updatedDate;
 
     /**
-     * @Assert\Length(min="2", max="50")
+     * @Assert\Length(min="6", max="8")
      * @AppAssert\Alphanumeric()
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
