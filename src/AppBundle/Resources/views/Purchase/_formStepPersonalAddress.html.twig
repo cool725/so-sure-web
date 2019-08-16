@@ -41,13 +41,13 @@
             <div class="form-group">
                 <a href="#"
                    formnovalidate="formnovalidate"
-                   class="btn btn-facebook btn-square facebook_login"
+                   class="btn btn-facebook facebook_login"
                    {% if app.user %}disabled{% endif %}>
                     <i class="fab fa-facebook fa-lg"></i>
                     <span class="sr-only">Facebook</span>
                 </a>
                 <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
-                   class="btn btn-google btn-square"
+                   class="btn btn-google"
                    formnovalidate="formnovalidate"
                    {% if app.user %}disabled{% endif %}>
                     <i class="fab fa-google fa-lg"></i>
@@ -55,7 +55,7 @@
                 </a>
                 {% if feature_enabled('starling') and starling %}
                 <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
-                   class="btn btn-starling btn-square"
+                   class="btn btn-starling"
                    formnovalidate="formnovalidate"
                    {% if app.user %}disabled{% endif %}>
                     <img src="{{ cdn_url }}/images/StarlingMarkIcon.png" class="mx-1" height="15px">
@@ -65,25 +65,14 @@
             </div>
 
 
-            <div class="form-group mt-5">
-                <div class="form-row">
-                    <div class="col-3 text-left">
-                        <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                            <span class="sr-only">back</span>
-                            <i class="far fa-arrow-left"></i>
-                        </a>
-                    </div>
-                    <div class="col-9 text-right">
-                        <a href="#"
-                           id="step--validate"
-                           class="btn btn-success btn-green-gradient btn-block-xs"
-                           data-csrf="{{ lead_csrf }}"
-                           data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
-                           Continue <i class="far fa-long-arrow-right fa-lg ml-2"></i>
-                        </a>
-                    </div>
-                </div>
+            <div class="form-group text-md-right mt-5">
+                <a href="#"
+                   id="step--validate"
+                   class="btn btn-success btn-green-gradient btn-block-xs"
+                   data-csrf="{{ lead_csrf }}"
+                   data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
+                   Continue <i class="far fa-long-arrow-right fa-lg ml-2"></i>
+                </a>
             </div>
         </div>
 
@@ -130,25 +119,14 @@
                 {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
             </div> #}
 
-            <div class="form-group mt-5">
-                <div class="form-row">
-                    <div class="col text-left">
-                        <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                            <span class="sr-only">back</span>
-                            <i class="far fa-arrow-left"></i>
-                        </a>
-                    </div>
-                    <div class="col-9 text-right">
-                        {{ form_widget(purchase_form.next, {
-                            'label': 'Continue',
-                            'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                            'right': true,
-                            'attr': {
-                                'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                        }}) }}
-                    </div>
-                </div>
+            <div class="form-group text-md-right mt-5">
+                {{ form_widget(purchase_form.next, {
+                    'label': 'Continue',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
+                    'attr': {
+                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                }}) }}
             </div>
         </div>
 
@@ -191,25 +169,14 @@
                     <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                 {% endif %}
             </div>
-            <div class="form-group mt-5">
-                <div class="form-row">
-                    <div class="col text-left">
-                        <a href="{{ path('quote_make_model_memory', {'make': phone.make, 'model': phone.model, 'memory': phone.memory}) }}"
-                           class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                            <span class="sr-only">back</span>
-                            <i class="far fa-arrow-left"></i>
-                        </a>
-                    </div>
-                    <div class="col-9 text-right">
-                        {{ form_widget(purchase_form.manual_next, {
-                            'label': 'Continue',
-                            'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                            'right': true,
-                            'attr': {
-                                'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                        }}) }}
-                    </div>
-                </div>
+            <div class="form-group text-md-right mt-5">
+                {{ form_widget(purchase_form.manual_next, {
+                    'label': 'Continue',
+                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                    'right': true,
+                    'attr': {
+                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                }}) }}
             </div>
         </div>
     </div>

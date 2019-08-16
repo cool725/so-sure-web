@@ -24,12 +24,12 @@
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
                     <a href="#"
-                       class="btn btn-primary btn-square mr-md-2"
+                       class="btn btn-primary mr-md-2"
                        data-toggle="modal"
                        data-target="#add_email_modal">
                        <i class="fal fa-envelope fa-fw"></i> Add email</a>
                     <a href="#"
-                       class="btn btn-primary btn-square mr-md-2"
+                       class="btn btn-primary mr-md-2"
                        data-toggle="modal"
                        data-target="#add_sms_modal">
                        <i class="fal fa-phone fa-fw"></i> Add SMS</a>
@@ -101,7 +101,7 @@
                             <div class="with-errors">{{ form_errors(email_form.notes) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(email_form.update, {'label': 'Add', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(email_form.update, {'label': 'Add', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(email_form) }}
                 </div>
@@ -142,7 +142,7 @@
                             <div class="with-errors">{{ form_errors(sms_form.notes) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(sms_form.update, {'label': 'Add', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(sms_form.update, {'label': 'Add', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(sms_form) }}
                 </div>

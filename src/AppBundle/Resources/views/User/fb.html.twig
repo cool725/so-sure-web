@@ -9,7 +9,7 @@
         <li>
             <img class="trust-photo" alt="{{ friend['name'] }}" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" />
             {{ friend['name'] }} <a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer"><span class="fa fa-search"></span></a>
-            <a href="{{ path('user_post', {id: friend['id']}) }}" class="btn btn-success btn-square btn-sm">Trust this friend</a>
+            <a href="{{ path('user_post', {id: friend['id']}) }}" class="btn btn-success btn-sm">Trust this friend</a>
         </li>
     {% endfor %}
 </ul>

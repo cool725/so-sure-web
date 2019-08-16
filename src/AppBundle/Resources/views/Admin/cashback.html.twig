@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-success btn-square mr-2">
+                            <button class="btn btn-success mr-2">
                                 <i class="fa fa-arrow-right fa-fw"></i>
                             </button>
                         </div>
@@ -55,7 +55,7 @@
                             {{ form_widget(cashback_search_form.status) }}
                         </div>
                         <div class="form-group">
-                            {{ form_widget(cashback_search_form.search, {'attr':{'class':'btn btn-primary btn-square'}}) }}
+                            {{ form_widget(cashback_search_form.search, {'attr':{'class':'btn btn-primary'}}) }}
                         </div>
                     {{ form_end(cashback_search_form) }}
                 </div>
@@ -94,7 +94,7 @@
                                             <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
                                             <input type="hidden" name="status" value="paid">
                                             <input type="hidden" name="return_url" value="{{ app.request.uri }}">
-                                            <input type="submit" class="btn btn-danger btn-square" value="Set as paid">
+                                            <input type="submit" class="btn btn-danger" value="Set as paid">
                                         </form>
                                     {% elseif cashback_item.status == 'paid' %}
                                         <form method="POST"
@@ -102,7 +102,7 @@
                                             <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
                                             <input type="hidden" name="status" value="failed">
                                             <input type="hidden" name="return_url" value="{{ app.request.uri }}">
-                                            <input type="submit" class="btn btn-danger btn-square" value="Set as failed">
+                                            <input type="submit" class="btn btn-danger" value="Set as failed">
                                         </form>
                                     {% endif %}
                                 </td>
