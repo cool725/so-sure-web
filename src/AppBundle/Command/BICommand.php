@@ -285,11 +285,16 @@ class BICommand extends ContainerAwareCommand
             '"Total cost of claim"',
             '"Claim Closed Date"',
             "'Risk Rating'",
-            "'Network'"
+            "'Network'",
+            "'Phone Make/Model/Memory'"
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
             $policy = $claim->getPolicy();
+            $phonePolicy = null;
+            if ($policy instanceof PhonePolicy) {
+                $phonePolicy = $policy;
+            }
             // mainly for dev use
             if (!$policy) {
                 $this->logger->error(sprintf('Missing policy for claim %s', $claim->getId()));
@@ -342,7 +347,8 @@ class BICommand extends ContainerAwareCommand
                     '"%s"',
                     $claim->getFnolRisk() ? $claim->getFnolRisk() : null
                 ),
-                sprintf('"%s"', $claim->getNetwork())
+                sprintf('"%s"', $claim->getNetwork()),
+                sprintf('"%s"', $phonePolicy ? $phonePolicy->getPhone()->__toString()) : ''
             ]);
         }
         if (!$skipS3) {
