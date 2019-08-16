@@ -348,7 +348,7 @@ class BICommand extends ContainerAwareCommand
                     $claim->getFnolRisk() ? $claim->getFnolRisk() : null
                 ),
                 sprintf('"%s"', $claim->getNetwork()),
-                sprintf('"%s"', $phonePolicy ? $phonePolicy->getPhone()->__toString()) : ''
+                sprintf('"%s"', $phonePolicy ? $phonePolicy->getPhone()->__toString() : '')
             ]);
         }
         if (!$skipS3) {
