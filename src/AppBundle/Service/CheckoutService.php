@@ -1786,8 +1786,8 @@ class CheckoutService
         $maxDate = null;
         if (($handle = fopen($filename, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000)) !== false) {
-                // appears to be quite a few unused additional columns. Go to row BA (Card Wallet Type)
-                $row = array_slice($row, 0, 53);
+                // Remove empty columns appearing in header.
+                $row = array_slice($row, 0, 55);
                 if (count($row) == 0) {
                     continue;
                 } elseif (!$header) {
@@ -1800,11 +1800,11 @@ class CheckoutService
                     $lines[] = $line;
                     $transactionDate = \DateTime::createFromFormat(
                         'Y-m-d H:i:s',
-                        $line['Action Date'],
+                        $line['Action Date Europe/London'],
                         SoSure::getSoSureTimezone()
                     );
                     if (!$transactionDate) {
-                        throw new \Exception(sprintf('Unable to parse date %s', $line['Action Date']));
+                        throw new \Exception(sprintf('Unable to parse date %s', $line['Action Date Europe/London']));
                     }
                     $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone('UTC'));
 
