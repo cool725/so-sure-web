@@ -1427,7 +1427,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['devices'][] = $policy->getPhone()->__toString();
                 $data['maxPot'] += $policy->getMaxPot();
             }
-            if ($policy->getStatus() == Policy::STATUS_UNPAID) {
+            if ($policy->getStatus() == Policy::STATUS_UNPAID || $policy->isCancelledAndPaymentOwed()) {
                 $data['accountPaidToDate'] = false;
             }
         }
