@@ -254,6 +254,24 @@ $(function(){
         }
     });
 
+    // Make top device/remove top device
+    $('.phone-topphone').on('click', function(e) {
+        e.preventDefault();
+
+        if (confirm('Are you sure you want to set/unset this as a top phone?')) {
+            let url = $(this).data('topphone'),
+                token = $(this).data('token');
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: { token: token },
+                success: function(result) {
+                    window.location.reload(false);
+                }
+            });
+        }
+    });
+
     // High demand phones
     $('.phone-newhighdemand').on('click', function(e) {
         e.preventDefault();

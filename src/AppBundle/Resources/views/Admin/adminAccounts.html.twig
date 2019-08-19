@@ -44,15 +44,15 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-success btn-square mr-md-2">
+                            <button class="btn btn-success mr-md-2">
                                 <i class="fa fa-arrow-right fa-fw"></i>
                             </button>
                         </div>
                         <div class="form-group">
                             {{ form_start(salvaForm) }}
-                                <a class="btn btn-info btn-square mr-md-2" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
+                                <a class="btn btn-info mr-md-2" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
                                     <i class="fa fa-print fa-fw"></i></a>
-                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': 'btn btn-warning salva-export btn-square'}}) }}
+                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': 'btn btn-warning salva-export'}}) }}
                             {{ form_end(salvaForm) }}
                         </div>
                     </form>

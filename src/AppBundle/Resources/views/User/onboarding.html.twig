@@ -369,7 +369,7 @@
                                 <div class="custom-input-with-btn mb-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
                                     <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
-                                    <button class="btn btn-primary btn-copy btn-square btn-sm track-data"
+                                    <button class="btn btn-primary btn-copy btn-sm track-data"
                                         data-clipboard-target="#scode_share"
                                         data-toggle="tooltip"
                                         data-placement="top"
@@ -381,7 +381,7 @@
                                     <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
                                     <div class="custom-input-with-btn mb-4  ml-lg-4">
                                         <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                        <button class="btn btn-success btn-square btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                        <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
                                             Invite</button>
                                     </div>
                                 </form>
@@ -506,9 +506,9 @@
     </section>
 
     {# Page Modal #}
-    {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
+    {# {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %} #}
         {% include 'AppBundle::User/_starlingModal.html.twig' %}
-    {% endif %}
+    {# {% endif %} #}
 
 {% endblock %}
 

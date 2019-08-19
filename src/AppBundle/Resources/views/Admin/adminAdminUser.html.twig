@@ -20,7 +20,7 @@
             {# Controls area #}
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
-                    <a href="{{ path('admin_admin_users') }}" class="btn btn-success btn-square">Back to users</a>
+                    <a href="{{ path('admin_admin_users') }}" class="btn btn-success">Back to users</a>
                 </div>
             </div>
             {# Content area #}
@@ -46,11 +46,11 @@
                         <td>
                             {% if user.googleAuthenticatorSecret | length > 0 %}
                                 {{ form_start(disable_mfa_form) }}
-                                {{ form_widget(disable_mfa_form.disable, {'label': 'Disable MFA', 'attr': {'class': 'btn btn-danger btn-square btn-sm'}}) }}
+                                {{ form_widget(disable_mfa_form.disable, {'label': 'Disable MFA', 'attr': {'class': 'btn btn-danger btn-sm'}}) }}
                                 {{ form_end(disable_mfa_form) }}
                             {% else %}
                                 {{ form_start(enable_mfa_form) }}
-                                {{ form_widget(enable_mfa_form.enable, {'label': 'Enable MFA', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                {{ form_widget(enable_mfa_form.enable, {'label': 'Enable MFA', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
                                 {{ form_end(enable_mfa_form) }}
                             {% endif %}
                         </td>

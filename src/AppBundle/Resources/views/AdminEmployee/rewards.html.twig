@@ -23,7 +23,7 @@
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
                     <a href="#"
-                       class="btn btn-primary btn-square"
+                       class="btn btn-primary"
                        data-toggle="modal"
                        data-target="#reward_modal"><i class="fal fa-plus fa-fw"></i> New Bonus Type </a>
                 </div>
@@ -61,7 +61,7 @@
                                 <td>{% if reward.expiryDate %}{{ reward.expiryDate|date('d-m-T H:i') }}{% else %}n/a{% endif %}</td>
                                 <td>
                                     <a href="#"
-                                       class="btn btn-primary btn-square btn-sm"
+                                       class="btn btn-primary btn-sm"
                                        data-user-name="{{ reward.user }}"
                                        data-reward-id="{{ reward.id }}"
                                        data-toggle="modal"
@@ -209,7 +209,7 @@
                                     <div class="with-errors">{{ form_errors(rewardForm.isFirst) }}</div>
                                 </div>
                                 <div class="form-group text-right">
-                                    {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                    {{ form_widget(rewardForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
                                 </div>
                             </div>
                         </div>
@@ -248,7 +248,7 @@
                         </div>
                         <div class="form-group">
                             {{ form_widget(connectForm.rewardId) }}
-                            {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(connectForm) }}
                 </div>

@@ -61,21 +61,6 @@
     }
 
 }
-
-.cred {
-    text-align: center;
-    background-color: darken($pattens-blue, 5%);
-
-    img {
-        width: 100px;
-        opacity: 0.3;
-
-        @include media-breakpoint-up(lg) {
-            width: 120px;
-        }
-    }
-}
-
 .intro {
     text-align: center;
     background-color: $pattens-blue;

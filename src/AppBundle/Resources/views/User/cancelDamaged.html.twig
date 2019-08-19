@@ -34,11 +34,11 @@
                     {{ form_widget(cancel_form.othertxt) }}
                 </div>
                 <div class="form-group mt-4">
-                    <a href="{{ path('user_welcome_policy_id', {'id': policy.id}) }}" class="btn btn-primary btn-square mr-2">🥳 No, it's fine</a>
+                    <a href="{{ path('user_welcome_policy_id', {'id': policy.id}) }}" class="btn btn-primary mr-2">🥳 No, it's fine</a>
                     {{ form_widget(cancel_form.cancel,  {
                         'label': '😔 Cancel it\'s damaged',
                         'attr': {
-                            'class': 'btn btn-white text-muted btn-square',
+                            'class': 'btn btn-white text-muted',
                             'data-event': ''
                     }}) }}
                 </div>

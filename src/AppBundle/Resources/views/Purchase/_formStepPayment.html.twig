@@ -40,33 +40,17 @@
         <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
     </div>
 
-    <div class="form-group mt-5">
-        <div class="form-row">
-            <div class="col-3">
-                <a href="{{ path('purchase_step_pledge_id', {'id': policy.id}) }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i>
-                </a>
-            </div>
-            <div class="col-9 text-right">
-                {{ form_widget(purchase_form.next, {
-                    'label': 'Continue',
-                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                    'right': true,
-                    'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                }}) }}
-            </div>
-        </div>
+    <div class="form-group text-md-right mt-5">
+        {{ form_widget(purchase_form.next, {
+            'label': 'Continue',
+            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+            'right': true,
+            'attr': {
+                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+        }}) }}
     </div>
 
-{#     {% if payment_provider == 'judo' %}
-        <div class="form-group text-center mt-5">
-            <small class="text-grey">Payments powered by</small><br>
-            <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="80px" class="mt-2">
-        </div>
-    {% elseif payment_provider == 'bacs' %}
+{#     {% if payment_provider == 'bacs' %}
         <div class="form-group text-center mt-5">
             <small class="text-grey">Payments via</small><br>
             <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_direct-debit-logo.svg" alt="Direct Debit" width="100px" class="mt-2">

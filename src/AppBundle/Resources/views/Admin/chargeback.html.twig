@@ -50,13 +50,13 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-success btn-square mr-2">
+                            <button class="btn btn-success mr-2">
                                 <i class="fa fa-arrow-right fa-fw"></i>
                             </button>
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2"
+                                    class="btn btn-primary mr-2"
                                     data-toggle="modal"
                                     data-target="#new_chargeback_modal">
                                 <i class="fal fa-plus fa-fw"></i> Add chargeback</button>
@@ -70,7 +70,7 @@
                         </div>
                         <div class="form-group">
                             <input type="hidden" name="SearchQueryType" value="1">
-                            <button type="submit" class="btn btn-success btn-square">Query Judo</button>
+                            <button type="submit" class="btn btn-success">Query Judo</button>
                         </div>
                     </form>
                 </div>
@@ -145,7 +145,7 @@
                             <div class="with-errors">{{ form_errors(chargeback_form.date) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(chargeback_form.add, {'attr':{'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(chargeback_form.add, {'attr':{'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(chargeback_form) }}
                 </div>

@@ -19,7 +19,7 @@ $(function() {
 
     // Starling
     if ($('#starling_modal').length) {
-        $(this).modal('show');
+        $('#starling_modal').modal('show');
     }
 
     // Send app link via SMS

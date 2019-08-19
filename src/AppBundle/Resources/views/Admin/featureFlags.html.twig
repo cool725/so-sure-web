@@ -39,7 +39,7 @@
                                     <td>
                                         <button title="Deactive Feature"
                                                 type="button"
-                                                class="btn {% if feature.enabled %}btn-success{% else %}btn-danger{% endif %} btn-square btn-sm feature"
+                                                class="btn {% if feature.enabled %}btn-success{% else %}btn-danger{% endif %} btn-sm feature"
                                                 data-token="{{ csrf_token('default') }}"
                                                 data-active="{{ path('admin_feature_flags_active', {'id': feature.id}) }}"
                                                 data-feature="{{ feature.name }}">

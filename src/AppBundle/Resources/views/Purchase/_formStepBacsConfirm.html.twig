@@ -68,10 +68,9 @@
         <small class="form-text">I confirm that the above details are correct and payment to so-sure Limited will be <u>first collected on {{ bacs.getFirstPaymentDateForPolicy(policy)|date('d F','Europe/London') }}</u>. You will receive confirmation of this direct debit along with any future notices via <strong>email</strong>.</small>
     </div>
 
-    <div class="form-group my-5">
-        <div class="form-row">
+    <div class="form-group text-md-right my-5">
+{#         <div class="form-row">
             <div class="col-3">
-                {# TODO: Get fa icons working in submit types #}
                 <button type="submit" id="bacs_confirm_form_back" name="bacs_confirm_form[back]" class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
                     <span class="sr-only">back</span>
                     <i class="far fa-arrow-left"></i>
@@ -87,7 +86,14 @@
                         'class': 'btn btn-success btn-green-gradient btn-block-xs'
                 }}) }}
             </div>
-        </div>
+        </div> #}
+        {{ form_widget(bacs_confirm_form.save, {
+            'label': 'Confirm',
+            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+            'right': true,
+            'attr': {
+                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+        }}) }}
     </div>
 
     <div class="form-group d-flex align-items-center">
