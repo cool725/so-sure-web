@@ -81,12 +81,11 @@
                             <h5 class="mt-4">Apply code</h5>
                         {% else %}
                             <h5 class="mt-4">Already received an invite or promocode?</h5>
-                            <p>Enter the unique 8-digit code below.</p>
                         {% endif %}
                         {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
                             <div class="custom-input-with-btn mb-4">
                                 {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
                             </div>
                         {{ form_end(scode_form) }}
                     {% endif %}
@@ -144,7 +143,7 @@
                         <div class="custom-input-with-btn mb-4">
                             <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
                             <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
-                            <button class="btn btn-primary btn-copy btn-square btn-sm track-data"
+                            <button class="btn btn-primary btn-copy btn-sm track-data"
                                 data-clipboard-target="#scode_share"
                                 data-toggle="tooltip"
                                 data-placement="top"
@@ -156,7 +155,7 @@
                             <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
                             <div class="custom-input-with-btn mb-4">
                                 <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                <button class="btn btn-success btn-square btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
                                     Invite</button>
                             </div>
                         </form>

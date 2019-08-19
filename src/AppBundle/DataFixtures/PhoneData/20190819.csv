@@ -1,0 +1,5 @@
+Make,Model,Details,Storage,Device,Monthly Policy Price,Replacement Price,Release Price,Release Price url,Os,InitialVersion,MaxVersion,Processor,Cores,Memory,SSD,Physical Screen,Resolution,Camera,4G,Frequency,Release Date,Picture,Urls,Replacement Make,Replacement Model,Replacement Memory
+Samsung,Galaxy Note10,Samsung Galaxy Note10,256,"'d1','d1q'",8.99,,£869 ,https://www.techradar.com/uk/reviews/samsung-galaxy-note-10-plus,Android,9.0,,2840,8,8192,Y,151,1080 x 2280,12,Y,,8/19,,,,,
+Samsung,Galaxy Note10+,Samsung Galaxy Note10+,256,"'d2q','d2s'",8.99,,£999 ,https://www.techradar.com/uk/reviews/samsung-galaxy-note-10-plus,Android,9.0,,2840,8,12288,Y,162.3,1440 x 3040,12,Y,,8/19,,,,,
+Samsung,Galaxy Note10+ 5G,Samsung Galaxy Note10+ 5G,256,"'d2x','d2xq'",9.99,,"£1099 ",https://www.techradar.com/uk/reviews/samsung-galaxy-note-10-plus,Android,9.0,,2840,8,12288,Y,162.3,1440 x 3040,12,Y,,8/19,,,,,
+Samsung,Galaxy Note10+ 5G,Samsung Galaxy Note10+ 5G,512,"'d2x','d2xq'",9.99,,"£1199 ",https://www.techradar.com/uk/reviews/samsung-galaxy-note-10-plus,Android,9.0,,2840,8,12288,,162.3,1440 x 3040,12,Y,,8/19,,,,,

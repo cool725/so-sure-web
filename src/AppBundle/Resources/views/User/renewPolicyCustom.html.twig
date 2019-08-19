@@ -71,7 +71,7 @@
             {% if policy.potValue > 0 %}
                 <h4 class="mb-4">Would you like to use your pot to renew?</h4>
                 <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-                    <label class="btn btn-outline-primary btn-square active"
+                    <label class="btn btn-outline-primary active"
                            id="renew_reward_btn">
                         <input type="radio"
                                name="options"
@@ -83,7 +83,7 @@
                                autocomplete="off"
                                checked> 💰 Yes use reward pot
                     </label>
-                    <label class="btn btn-outline-primary btn-square"
+                    <label class="btn btn-outline-primary"
                            id="renew_cashback_btn">
                         <input type="radio"
                                name="options"
@@ -105,7 +105,7 @@
             <div id="renew_without_reward_btns">
                 {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
                     <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-                        <label class="btn btn-outline-primary btn-square payment-btn"
+                        <label class="btn btn-outline-primary payment-btn"
                                id="renew_adjusted_monthly_btn">
                             <input type="radio"
                                    name="options"
@@ -113,7 +113,7 @@
                                    autocomplete="off"
                                    checked> &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} a month
                         </label>
-                        <label class="btn btn-outline-primary btn-square payment-btn"
+                        <label class="btn btn-outline-primary payment-btn"
                                id="renew_adjusted_yearly_btn">
                             <input type="radio"
                                    name="options"
@@ -124,7 +124,7 @@
                 {% else %}
                     <button type="button"
                             id="renew_adjusted_yearly_only_btn"
-                            class="btn btn-outline-primary btn-square payment-btn mb-4"
+                            class="btn btn-outline-primary payment-btn mb-4"
                             data-toggle="button"
                             data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
                             aria-pressed="false"
@@ -138,7 +138,7 @@
                 <div id="renew_with_reward_btns" style="display: none;">
                     {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
                         <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-                            <label class="btn btn-outline-primary btn-square payment-btn"
+                            <label class="btn btn-outline-primary payment-btn"
                                    id="renew_monthly_btn">
                                 <input type="radio"
                                        name="options"
@@ -146,7 +146,7 @@
                                        autocomplete="off"
                                        checked> &pound;{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
                             </label>
-                            <label class="btn btn-outline-primary btn-square payment-btn">
+                            <label class="btn btn-outline-primary payment-btn">
                                 <input type="radio"
                                        name="options"
                                        data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
@@ -157,7 +157,7 @@
                     {% else %}
                         <button type="button"
                                 id="renew_adjusted_yearly_only_btn"
-                                class="btn btn-outline-primary btn-square payment-btn mb-4"
+                                class="btn btn-outline-primary payment-btn mb-4"
                                 data-toggle="button"
                                 data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
                                 aria-pressed="false"
@@ -221,7 +221,7 @@
                             <li>I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v13.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
                         </ol>
                         <div class="form-group">
-                            {{ form_widget(renew_form.renew, {'label': 'Renew', 'attr': {'class': 'btn btn-success btn-square btn-block-xs'}}) }}
+                            {{ form_widget(renew_form.renew, {'label': 'Renew', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(renew_form) }}
                 </div>
@@ -270,7 +270,7 @@
                             <div class="with-errors">{{ form_errors(renew_cashback_form.accountNumber) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(renew_cashback_form.renew, {'label': 'Renew and get cashback', 'attr': {'class': 'btn btn-success btn-square btn-block-xs'}}) }}
+                            {{ form_widget(renew_cashback_form.renew, {'label': 'Renew and get cashback', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(renew_cashback_form) }}
                 </div>
@@ -318,7 +318,7 @@
                             <div class="with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(cashback_form.cashback, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-square btn-block-xs'}}) }}
+                            {{ form_widget(cashback_form.cashback, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block-xs'}}) }}
                         </div>
                     {{ form_end(cashback_form) }}
                 </div>
@@ -347,7 +347,7 @@
                     </ul>
                     {{ form_start(decline_form) }}
                         <div class="form-group">
-                            {{ form_widget(decline_form.decline, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-square btn-block-xs'}}) }}
+                            {{ form_widget(decline_form.decline, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block-xs'}}) }}
                         </div>
                     {{ form_end(decline_form) }}
                 </div>

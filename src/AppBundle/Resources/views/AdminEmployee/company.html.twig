@@ -22,7 +22,7 @@
             <div class="card card-page-filter mb-5">
                 <div class="card-body">
                     <a href="#"
-                       class="btn btn-primary btn-square"
+                       class="btn btn-primary"
                        data-toggle="modal"
                        data-target="#company_modal"><i class="fal fa-plus fa-fw"></i> New Company </a>
                 </div>
@@ -59,7 +59,7 @@
                             </td>
                             <td width="10%">
                                 <a href="#"
-                                   class="btn btn-primary btn-square btn-sm"
+                                   class="btn btn-primary btn-sm"
                                    data-company-name="{{ company.name }}"
                                    data-company-id="{{ company.id }}"
                                    data-toggle="modal"
@@ -143,7 +143,7 @@
                             <div class="with-errors">{{ form_errors(companyForm.postcode) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(companyForm.next, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(companyForm) }}
                 </div>
@@ -174,7 +174,7 @@
                         </div>
                         <div class="form-group">
                             {{ form_widget(belongForm.companyId) }}
-                            {{ form_widget(belongForm.next, {'label': 'Add', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(belongForm.next, {'label': 'Add', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(belongForm) }}
                 </div>

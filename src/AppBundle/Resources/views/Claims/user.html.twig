@@ -56,11 +56,11 @@
                                         'fa': 'fal fa-paper-plane fa-fw',
                                         'left': true,
                                         'attr': {
-                                            'class': 'btn btn-danger btn-square btn-sm mb-1 mr-md-2'
+                                            'class': 'btn btn-danger btn-sm mb-1 mr-md-2'
                                     }}) }}
                                 {{ form_end(reset_form) }}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2" data-toggle="modal"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2" data-toggle="modal"
                                             data-target="#user_email_modal"
                                     ><i class="fal fa-edit fa-fw"></i> Edit email</button>
                                 {% endif %}
@@ -102,7 +102,7 @@
                             <td>
                                 {% if user_detail_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#user_detail_modal">
                                             <i class="fal fa-edit fa-fw"></i> Edit user details</button>
@@ -132,7 +132,7 @@
                             <td>
                                 {% if user_detail_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#user_detail_modal">
                                             <i class="fal fa-edit fa-fw"></i> Edit user details</button>
@@ -145,7 +145,7 @@
                             <td>
                                 {% if user_detail_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#user_detail_modal">
                                             <i class="fal fa-edit fa-fw"></i> Edit user details</button>
@@ -179,7 +179,7 @@
                             <td>
                                 {% if user_address_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#user_address_modal">
                                             <i class="fal fa-edit fa-fw"></i> Edit user address</button>
@@ -198,7 +198,7 @@
                             <td>
                                 {% if user_permission_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#user_permission_modal">
                                             <i class="fal fa-edit fa-fw"></i> Edit user permissions</button>
@@ -217,7 +217,7 @@
                             <td>
                                 {% if user_high_risk_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#user_high_risk_modal">
                                             <i class="fal fa-edit fa-fw"></i> Edit users risk</button>
@@ -246,7 +246,7 @@
                             <td>
                                 {% if policy_form is defined %}
                                     <button type="button"
-                                            class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                            class="btn btn-primary btn-sm mb-1 mr-md-2"
                                             data-toggle="modal"
                                             data-target="#new_policy_modal">
                                             <i class="fal fa-plus fa-fw"></i> Add partial policy</button>
@@ -273,7 +273,7 @@
                                              <div class="with-errors">{{ form_errors(makemodel_form.serialNumber) }}</div>
                                         </div>
                                         <div class="form-group">
-                                            {{ form_widget(makemodel_form.check, {'label': 'Run Check', 'attr': {'class': 'btn btn-primary btn-square btn-sm mb-1 mx-md-2'}})}}
+                                            {{ form_widget(makemodel_form.check, {'label': 'Run Check', 'attr': {'class': 'btn btn-primary btn-sm mb-1 mx-md-2'}})}}
                                             <div class="with-errors">{{ form_errors(makemodel_form) }}</div>
                                         </div>
                                     {{ form_end(makemodel_form)}}
@@ -316,7 +316,7 @@
                                 <td>
                                     {% if sanctions_form is defined %}
                                         {{ form_start(sanctions_form)}}
-                                            {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-warning btn-square btn-sm mb-1 mr-md-2'}})}}
+                                            {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-warning btn-sm mb-1 mr-md-2'}})}}
                                         {{ form_end(sanctions_form)}}
                                     {% endif %}
                                 </td>
@@ -331,7 +331,7 @@
                                 <td>
                                     {% if is_granted('ROLE_ADMIN') %}
                                         <button type="button"
-                                                class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                                class="btn btn-primary btn-sm mb-1 mr-md-2"
                                                 data-toggle="modal"
                                                 data-target="#new_role_modal">
                                                 <i class="fal fa-edit fa-fw"></i> Edit roles</button>
@@ -351,7 +351,7 @@
                                     <td>
                                         {% if is_granted('ROLE_ADMIN') %}
                                             <button type="button"
-                                                    class="btn btn-primary btn-square btn-sm mb-1 mr-md-2"
+                                                    class="btn btn-primary btn-sm mb-1 mr-md-2"
                                                     data-toggle="modal"
                                                     data-target="#handling_team_modal">
                                                     <i class="fal fa-edit fa-fw"></i> Edit handling team</button>
@@ -386,7 +386,7 @@
                                                 'fa': 'fal fa-trash-alt fa-fw',
                                                 'left': true,
                                                 'attr': {
-                                                    'class': 'btn btn-danger btn-square btn-sm mb-1 confirm-delete-user'
+                                                    'class': 'btn btn-danger btn-sm mb-1 confirm-delete-user'
                                                 }}) }}
                                             {{ form_end(delete_form) }}
                                     {% else %}
@@ -444,7 +444,7 @@
                                 <div class="with-errors">{{ form_errors(policy_form.serialNumber) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(policy_form.add, {'label': 'Create', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(policy_form.add, {'label': 'Create', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(policy_form) }}
                     </div>
@@ -494,7 +494,7 @@
                                 <div class="with-errors">{{ form_errors(user_detail_form.mobileNumber) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(user_detail_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(user_detail_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(user_detail_form )}}
                     </div>
@@ -526,7 +526,7 @@
                                 <div class="with-errors">{{ form_errors(user_email_form.email) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(user_email_form.update, {'label': 'Change', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(user_email_form.update, {'label': 'Change', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(user_email_form )}}
                     </div>
@@ -578,7 +578,7 @@
                                 <div class="with-errors">{{ form_errors(user_address_form.postcode) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(user_address_form.next, {'label': 'Change', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(user_address_form.next, {'label': 'Change', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(user_address_form )}}
                     </div>
@@ -617,7 +617,7 @@
                                 <div class="with-errors">{{ form_errors(user_permission_form.locked) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(user_permission_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(user_permission_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(user_permission_form )}}
                     </div>
@@ -650,7 +650,7 @@
                                 <div class="with-errors">{{ form_errors(user_high_risk_form.highRisk) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(user_high_risk_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(user_high_risk_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(user_high_risk_form )}}
                     </div>
@@ -681,7 +681,7 @@
                                 <div class="with-erros">{{ form_errors(role_form) }}</div>
                             </div>
                             <div class="form-group">
-                                {{ form_widget(role_form.save, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                {{ form_widget(role_form.save, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(role_form) }}
                     </div>
@@ -712,7 +712,7 @@
                                 <div class="with-errors">{{ form_errors(handling_team_form) }}</div>
                             </div>
                             <div class="form-group">
-                                 {{ form_widget(handling_team_form.save, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                                 {{ form_widget(handling_team_form.save, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
                             </div>
                         {{ form_end(handling_team_form) }}
                     </div>

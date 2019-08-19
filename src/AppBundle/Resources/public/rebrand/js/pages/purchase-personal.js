@@ -187,7 +187,6 @@ sosure.purchaseStepAddress = (function() {
                     var val = $('body').find('input[name="' + err + '"]').val()
                     vals.push({'name': err, 'value': val, 'message': errorMap[err]});
                 }
-                console.log(vals);
                 $.ajax({
                   method: "POST",
                   url: "/ops/validation",

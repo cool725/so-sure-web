@@ -204,3 +204,21 @@
         }
     }
 }
+
+.cred {
+    text-align: center;
+    background-color: $white;
+    position: relative;
+    z-index: 5;
+
+    img {
+        width: 120px;
+        margin: 0.5rem;
+        // opacity: 0.3;
+
+        @include media-breakpoint-up(lg) {
+            width: 160px;
+            margin: 0;
+        }
+    }
+}

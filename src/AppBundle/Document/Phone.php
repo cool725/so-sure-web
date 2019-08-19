@@ -254,6 +254,12 @@ class Phone
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      */
+    protected $topPhone;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
     protected $newHighDemand;
 
     /**
@@ -763,6 +769,20 @@ class Phone
     public function setHighlight($highlight)
     {
         $this->highlight = $highlight;
+    }
+
+    public function isTopPhone()
+    {
+        if (null === $this->topPhone) {
+            $this->topPhone = false;
+        }
+
+        return $this->topPhone;
+    }
+
+    public function setTopPhone($topPhone)
+    {
+        $this->topPhone = $topPhone;
     }
 
     public function isNewHighDemand()

@@ -47,12 +47,12 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-success btn-square mr-2 mb-2">
+                            <button class="btn btn-success mr-2 mb-2">
                                 <i class="fa fa-arrow-right fa-fw"></i>
                             </button>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-warning btn-square bacs-serial-edit mr-2 mb-2"
+                            <button class="btn btn-warning bacs-serial-edit mr-2 mb-2"
                                     type="button"
                                     title="Current Sequence File"
                                     data-toggle="modal"
@@ -61,7 +61,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    class="btn btn-primary mr-2 mb-2"
                                     title="Actionable Mandates"
                                     data-toggle="modal"
                                     data-target="#mandates_modal">
@@ -69,7 +69,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    class="btn btn-primary mr-2 mb-2"
                                     title="Bacs Credit"
                                     data-toggle="modal"
                                     data-target="#upload_credit_modal">
@@ -77,7 +77,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    class="btn btn-primary mr-2 mb-2"
                                     title="Bacs Debit"
                                     data-toggle="modal"
                                     data-target="#upload_debit_modal">
@@ -85,7 +85,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    class="btn btn-primary mr-2 mb-2"
                                     title="Bacs Debit"
                                     data-toggle="modal"
                                     data-target="#approve_payments_modal">
@@ -93,7 +93,7 @@
                         </div>
                         <div class="form-group">
                             <button type="button"
-                                    class="btn btn-primary btn-square mr-2 mb-2"
+                                    class="btn btn-primary mr-2 mb-2"
                                     title="Upload Report"
                                     data-toggle="modal"
                                     data-target="#upload_modal">
@@ -246,7 +246,7 @@
                             <div class="with-errors">{{ form_errors(mandatesForm.serialNumber) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(mandatesForm.approve, {'label': 'Approve', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(mandatesForm.approve, {'label': 'Approve', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(mandatesForm) }}
                 </div>
@@ -273,7 +273,7 @@
                             {{ form_widget(sequenceForm.seq, {'attr':{'class':'form-control'}}) }}
                         </div>
                         <div class="form-group">
-                            {{ form_widget(sequenceForm.update, {'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(sequenceForm.update, {'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(sequenceForm) }}
                 </div>
@@ -302,7 +302,7 @@
                             <div class="with-errors">{{ form_errors(uploadCreditForm.file) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(uploadCreditForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger btn-square'}}) }}
+                            {{ form_widget(uploadCreditForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
                         </div>
                     {{ form_end(uploadCreditForm) }}
                 </div>
@@ -331,7 +331,7 @@
                             <div class="with-errors">{{ form_errors(uploadCreditForm.file) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(uploadDebitForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger btn-square'}}) }}
+                            {{ form_widget(uploadDebitForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
                         </div>
                     {{ form_end(uploadDebitForm) }}
                 </div>
@@ -360,7 +360,7 @@
                                 'attr': {'class':'custom-control-input'}}) }}
                         </div>
                         <div class="form-group">
-                            {{ form_widget(approvePaymentsForm.approve, {'label': 'Approve All Payments', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(approvePaymentsForm.approve, {'label': 'Approve All Payments', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(approvePaymentsForm) }}
                 </div>
@@ -389,7 +389,7 @@
                             <div class="with-errors">{{ form_errors(uploadForm.file) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_widget(uploadForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success btn-square'}}) }}
+                            {{ form_widget(uploadForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                         </div>
                     {{ form_end(uploadForm) }}
                 </div>
@@ -435,7 +435,7 @@
                             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
                         </div>
                         <div class="form-group">
-                            <button type="submit" class="btn btn-success btn-square">Update Serial Number</button>
+                            <button type="submit" class="btn btn-success">Update Serial Number</button>
                         </div>
                     </form>
                 </div>

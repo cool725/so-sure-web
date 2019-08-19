@@ -3337,6 +3337,37 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/phone/{id}/topphone", name="admin_phone_topphone")
+     * @Method({"POST"})
+     */
+    public function phoneTopPhoneAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if ($phone) {
+            if ($phone->isTopPhone()) {
+                $phone->setTopPhone(false);
+                $message = 'Phone is no longer a top phone';
+            } else {
+                $phone->setTopPhone(true);
+                $message = 'Phone is now a top phone';
+            }
+            $dm->flush();
+            $this->addFlash(
+                'success',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
      * @Route("/phone/{id}/newhighdemand", name="admin_phone_newhighdemand")
      * @Method({"POST"})
      */

@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Service\BacsService;
@@ -80,13 +81,11 @@ class StandAloneSchedulePaymentCommand extends ContainerAwareCommand
                 $billingStart = $start;
             }
             $billingDay = $billingStart->format('d');
-            if ($dryRun) {
-                $output->writeln(sprintf(
-                    "Policy %s has billing day %s",
-                    $policy->getId(),
-                    $billingDay
-                ));
-            }
+            $output->writeln(sprintf(
+                "Policy %s has billing day %s",
+                $policy->getId(),
+                $billingDay
+            ));
             $nextPaymentDate = new \DateTime(
                 sprintf(
                     "%s-%s-%s",
@@ -103,23 +102,30 @@ class StandAloneSchedulePaymentCommand extends ContainerAwareCommand
             }
             while ($nextPaymentDate < $end) {
                 $useDate = clone $nextPaymentDate;
+                $nextPaymentDate->add($oneMonth);
                 $payment = new ScheduledPayment();
-                $useDate = $this->getCurrentOrNextBusinessDay($useDate);
                 $useDate = $payment->adjustDayForBilling($useDate);
+                if ($policy->getBacsPaymentMethod() !== null) {
+                    $useDate = $this->getCurrentOrNextBusinessDay($useDate);
+                }
                 $payment->setStatus($payment::STATUS_SCHEDULED);
                 $payment->setScheduled($useDate);
-                $payment->setAmount($policy->getPremiumInstallmentPrice());
+                if ($nextPaymentDate > $end) {
+                    $payment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
+                } else {
+                    $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+                }
                 $payment->setPolicy($policy);
                 $payment->setNotes("Regenerating intentionally");
                 $output->writeln(sprintf(
-                    "Generated payment on policy for %s",
-                    $useDate->format('Y-m-d H:i:s')
+                    "Generated payment on policy for %s. Amount: £%s",
+                    $useDate->format('Y-m-d H:i:s'),
+                    $payment->getAmount()
                 ));
                 if (!$dryRun) {
                     $policy->addScheduledPayment($payment);
                 }
                 $this->dm->flush();
-                $nextPaymentDate->add($oneMonth);
             }
         }
     }
