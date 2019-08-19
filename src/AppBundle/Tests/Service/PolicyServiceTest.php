@@ -6028,6 +6028,73 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(12, count($scheduledPayments));
     }
 
+    public function testPolicyRenewBillingDateMigrates()
+    {
+        $yesterday = new \DateTime();
+        $yesterday->sub(new \DateInterval("P1D"));
+        $start = new \DateTime();
+        $start->sub(new \DateInterval("P1Y1D"));
+        $billing = clone $start;
+        $billing->add(new \DateInterval("P14D"));
+        $renewalStart = new \DateTime();
+        $renewalStart->sub(new \DateInterval("P14D"));
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyRenewBillingDateMigrates', $this, true),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $start
+        );
+
+        $policy->setPaymentMethod(new BacsPaymentMethod());
+        $policy->getBacsPaymentMethod()->setBankAccount(new BankAccount());
+        $policy->setPremiumInstallments(12);
+        self::$dm->flush();
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create(
+            $policy,
+            $start,
+            true,
+            12,
+            null,
+            $billing
+        );
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            $renewalStart
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->renew(
+            $policy,
+            12,
+            null,
+            false,
+            $renewalStart
+        );
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        self::$policyService->expire($policy, $yesterday);
+        self::$policyService->activate($renewalPolicy, $yesterday);
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
+
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
+
+        $this->assertEquals($policy->getBilling()->add(new \DateInterval("P1Y")), $renewalPolicy->getBilling());
+    }
+
     private function getFormattedWeekendsForOneYear($fromDate = null)
     {
         if (!$fromDate) {
