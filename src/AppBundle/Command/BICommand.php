@@ -421,7 +421,8 @@ class BICommand extends ContainerAwareCommand
             '"Bacs Mandate Cancelled Reason"',
             '"Premium Installments"',
             '"Inviter"',
-            '"Latest Payment failed without reschedule"'
+            '"Latest Payment failed without reschedule"',
+            '"Originating Scode"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -437,6 +438,10 @@ class BICommand extends ContainerAwareCommand
             $reschedule = null;
             if ($lastReverted) {
                 $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
+            }
+            $originatingScode = "";
+            if ($policy->getLeadSource() == Policy::LEAD_SOURCE_SCODE) {
+                $originatingScode = $policy->getScodes()[0];
             }
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
@@ -505,7 +510,8 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf('"%s"', $policy->getPremiumInstallments()),
                 sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : ''),
-                sprintf('"%s"', ($lastReverted && !$reschedule) ? "yes" : "no")
+                sprintf('"%s"', ($lastReverted && !$reschedule) ? "yes" : "no"),
+                sprintf('"%s"', $originatingScode)
             ]);
         }
         if (!$skipS3) {
