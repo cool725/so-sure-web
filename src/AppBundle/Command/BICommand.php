@@ -12,6 +12,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Lead;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
@@ -440,7 +441,7 @@ class BICommand extends ContainerAwareCommand
                 $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
             }
             $originatingScode = "";
-            if ($policy->getLeadSource() == Policy::LEAD_SOURCE_SCODE) {
+            if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE) {
                 $originatingScode = $policy->getScodes()[0];
             }
             $lines[] = implode(',', [
