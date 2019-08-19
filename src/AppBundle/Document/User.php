@@ -938,7 +938,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasCancelledPolicyWithPaymentOwed()
     {
         return $this->policyReduce(false, function ($current, $policy) {
-            return $policy->isCancelledPolicyWithPaymentOwed() || $current;
+            return $policy->isCancelledAndPaymentOwed() || $current;
         });
     }
 
