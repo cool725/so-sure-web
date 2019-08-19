@@ -931,6 +931,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
+    /**
+     * Tells you if this has a cancelled policy with payment owed on it.
+     * @return boolean true if the user has a cancelled policy with payment owed and false otherwise.
+     */
+    public function hasCancelledPolicyWithPaymentOwed()
+    {
+        return $this->policyReduce(false, function ($current, $policy) {
+            return $policy->isCancelledPolicyWithPaymentOwed() || $current;
+        });
+    }
+
     public function hasSuspectedFraudulentClaim()
     {
         foreach ($this->getAllPolicies() as $policy) {
@@ -1427,9 +1438,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['devices'][] = $policy->getPhone()->__toString();
                 $data['maxPot'] += $policy->getMaxPot();
             }
-            if ($policy->getStatus() == Policy::STATUS_UNPAID || $policy->isCancelledAndPaymentOwed()) {
+            if ($policy->getStatus() == Policy::STATUS_UNPAID) {
                 $data['accountPaidToDate'] = false;
             }
+        }
+
+        if ($this->hasCancelledPolicyWithPaymentOwed()) {
+            $data['accountPaidToDate'] = false;
         }
 
         foreach ($this->getPendingRenewalPolicies() as $policy) {
