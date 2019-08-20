@@ -574,8 +574,8 @@ abstract class Payment
         if ($this->areEqualToFourDp($this->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
             $commission = $salva->sumBrokerFee(12, true);
             $this->setTotalCommission($commission);
-        } elseif ($premium->isEvenlyDivisible($this->getAmount()) ||
-            $premium->isEvenlyDivisible($this->getAmount(), true)) {
+        } elseif ($amount >= 0 && ($premium->isEvenlyDivisible($this->getAmount()) ||
+            $premium->isEvenlyDivisible($this->getAmount(), true))) {
             // payment should already be credited at this point
             $fullPaid = false;
             $lastPayment = false;
