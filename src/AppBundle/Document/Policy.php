@@ -3264,6 +3264,9 @@ abstract class Policy
         return $this->toTwoDp($totalCommission);
     }
 
+    /**
+     * NOTE: it actually returns the total commission paid not the coverholder commission.
+     */
     public function getCoverholderCommissionPaid($payments = null)
     {
         $coverholderCommission = 0;

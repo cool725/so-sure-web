@@ -223,20 +223,20 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     public function setCommissionFractionalRefundData()
     {
         return [
-            "Fozia Akhtar" => [94, -12.35, -0.05, -0.7],
-            "very less small refund" => [70, 0.3, 0.021, 0.09]
+            "Mr F. A." => [95, 4, -12.35, -0.7, -0.05]
         ];
     }
 
     /**
      * Tests setting the commission for a fractional refund.
      * @param int $age is the age of the policy in days.
+     * @param int $nPayments is the number of valid payments to add to the policy.
      * @param float $amount is the value of the refund to check.
      * @param float $coverHolderCommission is the amount of coverholder commission to expect.
      * @param float $brokerCommission      is the amount of broker commission to expect.
      * @dataProvider setCommissionFractionalRefundData
      */
-    public function testSetCommissionFractionalRefund($age, $amount, $coverholderCommission, $brokerCommission)
+    public function testSetCommissionFractionalRefund($age, $nPayments, $amount, $coverholderCommission, $brokerCommission)
     {
         $policy = new PhonePolicy();
         $premium = new PhonePremium();
@@ -250,14 +250,18 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd($policyEnd);
         $policy->setStaticEnd($policyEnd);
-        while ($date < $end) {
-            $date = (clone $date)->add(new \DateInterval("P1M"));
+        for ($i = 0; $i < $nPayments; $i++) {
+            $payment = new BacsPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $payment->setSuccess(true);
+            $policy->addPayment($payment);
+            $payment->setCommission(true);
         }
         $payment = new BacsPayment();
         $payment->setAmount($amount);
         $payment->setDate($end);
         $policy->addPayment($payment);
-        $payment->setCommission(true);
+        $payment->setCommission(true, $end);
         // Perform the check.
         $this->assertEquals($coverholderCommission, $payment->getCoverholderCommission());
         $this->assertEquals($brokerCommission, $payment->getBrokerCommission());

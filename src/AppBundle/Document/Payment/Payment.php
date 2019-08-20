@@ -555,8 +555,9 @@ abstract class Payment
     /**
      * Sets the commission for this payment.
      * @param boolean $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
+     * @param \DateTime $date is the date and time pro rata values should be calculated for.
      */
-    public function setCommission($allowFraction = false)
+    public function setCommission($allowFraction = false, $date = null)
     {
         $policy = $this->getPolicy();
         if (!$this->getPolicy()) {
@@ -597,10 +598,15 @@ abstract class Payment
         } elseif ($allowFraction && $amount >= 0) {
             $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
         } elseif ($amount < 0) {
-            /**
-             * This must be a refund. We should allow the commission to be set pro-rated every time for refunds.
-             */
-            $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
+            if ($date === null) {
+                $date = new \DateTime();
+            }
+            $brokerCommission = $policy->getBrokerCommissionPaid();
+            $coverholderCommission = $policy->getCoverholderCommissionPaid() - $brokerCommission;
+            $dueBrokerCommission = $policy->getProratedBrokerCommission($date);
+            $dueCoverholderCommission = $policy->getProratedCoverholderCommission($date);
+            $this->brokerCommission = $dueBrokerCommission - $brokerCommission;
+            $this->coverholderCommission = $dueCoverholderCommission - $coverholderCommission;
         } else {
             throw new CommissionException(sprintf(
                 'Failed to set correct commission for %f (policy %s)',
