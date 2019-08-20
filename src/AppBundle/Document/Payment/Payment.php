@@ -602,7 +602,7 @@ abstract class Payment
                 $date = new \DateTime();
             }
             $brokerCommission = $policy->getBrokerCommissionPaid();
-            $coverholderCommission = $policy->getCoverholderCommissionPaid() - $brokerCommission;
+            $coverholderCommission = $policy->getCoverholderCommissionPaid();
             $dueBrokerCommission = $policy->getProratedBrokerCommission($date);
             $dueCoverholderCommission = $policy->getProratedCoverholderCommission($date);
             $this->brokerCommission = $dueBrokerCommission - $brokerCommission;

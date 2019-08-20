@@ -3265,7 +3265,9 @@ abstract class Policy
     }
 
     /**
-     * NOTE: it actually returns the total commission paid not the coverholder commission.
+     * Returns the total of coverholder commission in the policy's successful payments.
+     * @param Array $payments is an optional subset of payments to use.
+     * @return float the totalled coverholder commission.
      */
     public function getCoverholderCommissionPaid($payments = null)
     {
@@ -3276,13 +3278,11 @@ abstract class Policy
         if ($payments === null) {
             $payments = $this->getPayments();
         }
-
         foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
-                $coverholderCommission += $payment->getTotalCommission();
+                $coverholderCommission += $payment->getCoverholderCommission();
             }
         }
-
         return $this->toTwoDp($coverholderCommission);
     }
 
