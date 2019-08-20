@@ -554,13 +554,15 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
                 ($refundMismatch ||$refundCommissionMismatch )) {
-                $lines[] = sprintf(
-                    'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
-                    $refund,
-                    $pendingBacsTotal,
-                    $refundCommission,
-                    $pendingBacsTotalCommission
-                );
+                if (abs($refund) !== abs($pendingBacsTotal)) {
+                    $lines[] = sprintf(
+                        'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
+                        $refund,
+                        $pendingBacsTotal,
+                        $refundCommission,
+                        $pendingBacsTotalCommission
+                    );
+                }
             }
 
             // bacs checks are only necessary on active policies
