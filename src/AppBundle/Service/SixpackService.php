@@ -34,7 +34,7 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_BURGER_MENU = 'burger-vs-full';
     // Exp 3
-    const EXPERIMENT_QUOTE_CTA = 'cta-buy-now';
+    // const EXPERIMENT_QUOTE_CTA = 'cta-buy-now';
     // Exp 4
     //
     // Exp 5
@@ -120,7 +120,8 @@ class SixpackService
         'email-landing-text',
         'ad-landing-quotepage',
         'cta-yes-please',
-        'app-share-method'
+        'app-share-method',
+        'cta-buy-now'
     ];
 
     public static $unauthExperiments = [
@@ -129,7 +130,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_BURGER_MENU,
         // Exp 3
-        self::EXPERIMENT_QUOTE_CTA,
+        // self::EXPERIMENT_QUOTE_CTA,
         // Exp 4
         //
         // Exp 5
@@ -212,7 +213,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_BURGER_MENU,
         // Exp 3
-        self::EXPERIMENT_QUOTE_CTA,
+        // self::EXPERIMENT_QUOTE_CTA,
         // Exp 4
         //
         // Exp 5
