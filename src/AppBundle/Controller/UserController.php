@@ -1243,9 +1243,6 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        // CTA From Quote Test - Purchase
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_CTA);
-
         // Burger vs Full Menu - Purchase
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
 
