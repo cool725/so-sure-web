@@ -554,8 +554,8 @@ abstract class Payment
 
     /**
      * Sets the commission for this payment.
-     * @param boolean $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
-     * @param \DateTime $date is the date and time pro rata values should be calculated for.
+     * @param boolean   $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
+     * @param \DateTime $date          is the date and time pro rata values should be calculated for.
      */
     public function setCommission($allowFraction = false, $date = null)
     {

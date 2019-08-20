@@ -229,15 +229,20 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Tests setting the commission for a fractional refund.
-     * @param int $age is the age of the policy in days.
-     * @param int $nPayments is the number of valid payments to add to the policy.
-     * @param float $amount is the value of the refund to check.
-     * @param float $coverHolderCommission is the amount of coverholder commission to expect.
+     * @param int   $age                   is the age of the policy in days.
+     * @param int   $nPayments             is the number of valid payments to add to the policy.
+     * @param float $amount                is the value of the refund to check.
+     * @param float $coverholderCommission is the amount of coverholder commission to expect.
      * @param float $brokerCommission      is the amount of broker commission to expect.
      * @dataProvider setCommissionFractionalRefundData
      */
-    public function testSetCommissionFractionalRefund($age, $nPayments, $amount, $coverholderCommission, $brokerCommission)
-    {
+    public function testSetCommissionFractionalRefund(
+        $age,
+        $nPayments,
+        $amount,
+        $coverholderCommission,
+        $brokerCommission
+    ) {
         $policy = new PhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(1);
