@@ -217,6 +217,54 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * Generates testing conditions for testSetCommissionFractionalRefundData.
+     * @return array of sets of arguments to the test.
+     */
+    public function setCommissionFractionalRefundData()
+    {
+        return [
+            "Fozia Akhtar" => [94, -12.35, -0.05, -0.7],
+            "very less small refund" => [70, 0.3, 0.021, 0.09]
+        ];
+    }
+
+    /**
+     * Tests setting the commission for a fractional refund.
+     * @param int $age is the age of the policy in days.
+     * @param float $amount is the value of the refund to check.
+     * @param float $coverHolderCommission is the amount of coverholder commission to expect.
+     * @param float $brokerCommission      is the amount of broker commission to expect.
+     * @dataProvider setCommissionFractionalRefundData
+     */
+    public function testSetCommissionFractionalRefund($age, $amount, $coverholderCommission, $brokerCommission)
+    {
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(1);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+        $date = new \DateTime();
+        $end = $this->addDays($date, $age);
+        $policyEnd = (clone $date)->add(new \DateInterval("P1Y"));
+        $policy->setStart($date);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setEnd($policyEnd);
+        $policy->setStaticEnd($policyEnd);
+        while ($date < $end) {
+            $date = (clone $date)->add(new \DateInterval("P1M"));
+        }
+        $payment = new BacsPayment();
+        $payment->setAmount($amount);
+        $payment->setDate($end);
+        $policy->addPayment($payment);
+        $payment->setCommission(true);
+        // Perform the check.
+        $this->assertEquals($coverholderCommission, $payment->getCoverholderCommission());
+        $this->assertEquals($brokerCommission, $payment->getBrokerCommission());
+    }
+
+
+    /**
      * @expectedException \AppBundle\Exception\CommissionException
      */
     public function testSetCommissionRemainderFailsWithFalse()
