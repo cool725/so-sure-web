@@ -3266,7 +3266,7 @@ abstract class Policy
 
     /**
      * Returns the total of coverholder commission in the policy's successful payments.
-     * @param Array $payments is an optional subset of payments to use.
+     * @param array|null $payments is an optional subset of payments to use.
      * @return float the totalled coverholder commission.
      */
     public function getCoverholderCommissionPaid($payments = null)
