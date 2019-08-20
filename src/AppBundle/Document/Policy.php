@@ -4451,7 +4451,14 @@ abstract class Policy
         $tooLate = clone $this->getStart();
         $tooLate = $tooLate->add(new \DateInterval('P7D'));
         if ($date < $this->getStart() || $date > $tooLate) {
-            throw new \Exception('Unable to activate a policy if not between policy dates');
+            throw new \Exception(
+                sprintf(
+                    'Unable to activate policy %s if not between policy dates. Must be after %s and before %s',
+                    $this->getId(),
+                    $this->getStart(),
+                    $tooLate
+                )
+            );
         }
 
         $this->setStatus(Policy::STATUS_ACTIVE);
