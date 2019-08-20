@@ -3264,6 +3264,11 @@ abstract class Policy
         return $this->toTwoDp($totalCommission);
     }
 
+    /**
+     * Returns the total of coverholder commission in the policy's successful payments.
+     * @param array|null $payments is an optional subset of payments to use.
+     * @return float the totalled coverholder commission.
+     */
     public function getCoverholderCommissionPaid($payments = null)
     {
         $coverholderCommission = 0;
@@ -3273,13 +3278,11 @@ abstract class Policy
         if ($payments === null) {
             $payments = $this->getPayments();
         }
-
         foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
-                $coverholderCommission += $payment->getTotalCommission();
+                $coverholderCommission += $payment->getCoverholderCommission();
             }
         }
-
         return $this->toTwoDp($coverholderCommission);
     }
 
@@ -4451,7 +4454,14 @@ abstract class Policy
         $tooLate = clone $this->getStart();
         $tooLate = $tooLate->add(new \DateInterval('P7D'));
         if ($date < $this->getStart() || $date > $tooLate) {
-            throw new \Exception('Unable to activate a policy if not between policy dates');
+            throw new \Exception(
+                sprintf(
+                    'Unable to activate policy %s if not between policy dates. Must be after %s and before %s',
+                    $this->getId(),
+                    $this->getStart(),
+                    $tooLate
+                )
+            );
         }
 
         $this->setStatus(Policy::STATUS_ACTIVE);
