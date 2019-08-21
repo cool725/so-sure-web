@@ -441,8 +441,9 @@ class BICommand extends ContainerAwareCommand
                 $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
             }
             $originatingScode = "";
-            if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE) {
-                $originatingScode = $policy->getScodes()[0];
+            $scodes = $policy->getScodes();
+            if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE && array_key_exists(0, $scodes)) {
+                $originatingScode = $scodes[0]->getCode();
             }
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
