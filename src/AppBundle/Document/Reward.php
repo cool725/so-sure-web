@@ -102,6 +102,12 @@ class Reward
     protected $isFirst;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $isSignUpBonus;
+
+    /**
      * @Assert\Length(min="50", max="1000")
      * @MongoDB\Field(type="string")
      */
@@ -245,6 +251,24 @@ class Reward
     public function setIsFirst($isFirst)
     {
         $this->isFirst = $isFirst;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsSignUpBonus()
+    {
+        return $this->isSignUpBonus;
+    }
+
+    /**
+     * @param mixed $isSignUpBonus
+     * @return Reward
+     */
+    public function setIsSignUpBonus($isSignUpBonus)
+    {
+        $this->isSignUpBonus = $isSignUpBonus;
+        return $this;
     }
 
     public function getTermsAndConditions()

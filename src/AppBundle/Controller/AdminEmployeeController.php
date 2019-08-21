@@ -2950,15 +2950,18 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $reward->setHasRenewed($createReward->getHasRenewed());
                         $reward->setHasCancelled($createReward->getHasCancelled());
                         $reward->setIsFirst($createReward->getIsFirst());
+                        $reward->setIsSignUpBonus($createReward->getIsSignUpBonus());
                         $reward->setTermsAndConditions($createReward->getTermsAndConditions());
                         $dm->persist($reward);
-                        $code = $createReward->getCode();
-                        if (mb_strlen($code) > 0) {
-                            $scode = new SCode();
-                            $scode->setCode($code);
-                            $scode->setReward($reward);
-                            $scode->setType(SCode::TYPE_REWARD);
-                            $dm->persist($scode);
+                        if ($createReward->getCode()) {
+                            $code = $createReward->getCode();
+                            if (mb_strlen($code) > 0) {
+                                $scode = new SCode();
+                                $scode->setCode($code);
+                                $scode->setReward($reward);
+                                $scode->setType(SCode::TYPE_REWARD);
+                                $dm->persist($scode);
+                            }
                         }
                         $dm->flush();
                         $this->addFlash('success', sprintf(
