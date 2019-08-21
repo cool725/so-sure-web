@@ -303,7 +303,7 @@ class CheckoutService
         try {
             $charge = $this->capturePaymentMethod($policy, $token, $amount);
         } catch (\Exception $e) {
-            $this->logger->error(sprintf("Policy %s failed to make initial checkout payment", $policy->getId()));
+            $this->logger->error(sprintf("Policy %s failed to make initial checkout payment.", $policy->getId()));
         }
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
@@ -1658,7 +1658,7 @@ class CheckoutService
             $payment->setResult($tokenPaymentDetails->getStatus());
             $payment->setMessage($tokenPaymentDetails->getResponseMessage());
             $payment->setInfo($tokenPaymentDetails->getResponseAdvancedInfo());
-            $payment->setHttpCode($tokenPaymentDetails->getHttpResponseCode());
+            $payment->setHttpCode($tokenPaymentDetails->getHttpStatus());
             $payment->setRiskScore($tokenPaymentDetails->getRiskCheck());
         } else {
             $this->logger->info(sprintf(
