@@ -300,7 +300,11 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        $charge = $this->capturePaymentMethod($policy, $token, $amount);
+        try {
+            $charge = $this->capturePaymentMethod($policy, $token, $amount);
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf("Policy %s failed to make initial checkout payment", $policy->getId()));
+        }
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
 
@@ -914,6 +918,8 @@ class CheckoutService
                 $payment->setAmount($this->convertFromPennies($details->getValue()));
                 $payment->setResult($details->getStatus());
                 $payment->setMessage($details->getResponseMessage());
+                $payment->setInfo($details->getResponseAdvancedInfo());
+                $payment->setHttpCode($details->getHttpStatus());
                 $payment->setRiskScore($details->getRiskCheck());
                 try {
                     $this->setCommission($payment, true);
@@ -968,6 +974,8 @@ class CheckoutService
                     $payment->setAmount($this->convertFromPennies($details->getValue()));
                     $payment->setResult($details->getStatus());
                     $payment->setMessage($details->getResponseMessage());
+                    $payment->setInfo($details->getResponseAdvancedInfo());
+                    $payment->setHttpCode($details->getHttpStatus());
                     $payment->setRiskScore($details->getRiskCheck());
                     // Make sure upcoming rescheduled scheduled payments are now cancelled.
                     $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
@@ -1123,6 +1131,8 @@ class CheckoutService
         $payment->setReceipt($transactionDetails->getId());
         $payment->setResult($transactionDetails->getStatus());
         $payment->setMessage($transactionDetails->getResponseMessage());
+        $payment->setInfo($transaction->getResponseAdvancedInfo());
+        $payment->setHttpCode($transaction->getHttpStatus());
         $payment->setRiskScore($transactionDetails->getRiskCheck());
         $payment->setSource($source);
 
@@ -1647,6 +1657,8 @@ class CheckoutService
             $payment->setAmount($this->convertFromPennies($tokenPaymentDetails->getValue()));
             $payment->setResult($tokenPaymentDetails->getStatus());
             $payment->setMessage($tokenPaymentDetails->getResponseMessage());
+            $payment->setInfo($tokenPaymentDetails->getResponseAdvancedInfo());
+            $payment->setHttpCode($tokenPaymentDetails->getHttpResponseCode());
             $payment->setRiskScore($tokenPaymentDetails->getRiskCheck());
         } else {
             $this->logger->info(sprintf(
@@ -1756,6 +1768,8 @@ class CheckoutService
         $refund->setReceipt($receiptId);
         $refund->setResult($refundDetails->getStatus());
         $refund->setMessage($refundDetails->getResponseMessage());
+        $refund->setInfo($refundDetails->getResponseAdvancedInfo());
+        $refund->setHttpCode($refundDetails->getHttpStatus());
         $refund->setRiskScore($refundDetails->getRiskCheck());
 
         $refundAmount = $this->convertFromPennies($refundDetails->getValue());
