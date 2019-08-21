@@ -94,8 +94,7 @@ class DefaultController extends BaseController
         $menuExp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_BURGER_MENU,
-            ['menu-burger', 'menu-full'],
-            SixpackService::LOG_MIXPANEL_ALL,
+            ['menu-burger', 'menu-full']
         );
 
         $data = array(
