@@ -914,6 +914,7 @@ class PolicyService
         \DateTime $date = null,
         $numPayments = null,
         $billingOffset = null,
+        $renewal = false,
         $isFixtures = false
     ) {
         if (!$date) {
@@ -973,10 +974,6 @@ class PolicyService
         $numScheduledPayments = $numPayments - $numPaidPayments;
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
-            /**
-             * If this is the initial payment and it is bacs, it should be 7 days from today
-             * regardless of the billing date the customer has set.
-             */
             $pendingPayments = $policy->getAllScheduledPayments('pending');
             $pendingDates = [];
             /** @var ScheduledPayment $pendingPayment */
@@ -985,7 +982,12 @@ class PolicyService
                     $pendingDates[] = $pendingPayment->getScheduled()->format('Ymd');
                 }
             }
-            if ($numPaidPayments < 1 && $isBacs && $i === 1) {
+            /**
+             * If this is the initial payment and it is bacs, it should be 7 days from today
+             * regardless of the billing date the customer has set.
+             * Unless it is a renewal policy
+             */
+            if ($numPaidPayments < 1 && $isBacs && $i === 1 && !$renewal) {
                 $scheduledDate = new \DateTime();
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
@@ -2363,12 +2365,45 @@ class PolicyService
         if ($payer = $policy->getPayer()) {
             $payer->addPayerPolicy($newPolicy);
         }
-        $this->create($newPolicy, $startDate, false, $numPayments);
+
+        $billing = $startDate;
+        if ($policy->getBilling()) {
+            $billing = new \DateTime(
+                sprintf(
+                    "%s-%s-%s",
+                    $startDate->format("Y"),
+                    $policy->getBilling()->format("m"),
+                    $policy->getBilling()->format("d")
+                )
+            );
+        }
+        $this->create(
+            $newPolicy,
+            $startDate,
+            false,
+            $numPayments,
+            $policy->getIdentityLog(),
+            $billing
+        );
         if (!$newPolicy->renew($discount, $autoRenew, $date)) {
             return null;
         }
 
-        $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
+        /**
+         * For scheduling, there have been times when the renewal scheduled payments
+         * are incorrect, and part of that is due to not using the billing date,
+         * and part of it is because the payment method is not always set.
+         * Right here we will check if the payment method exists, and if not
+         * we will set it using the payment method on the previous policy.
+         * We cannot do this any earlier in the renewal in case the payment
+         * method changes.
+         */
+        if (!$newPolicy->hasPaymentMethod()) {
+            $newPolicy->setPaymentMethod(clone $policy->getPaymentMethod());
+        }
+
+        $this->generateScheduledPayments($newPolicy, $billing, $numPayments, null, true);
+
         $policy->addMetric(Policy::METRIC_RENEWAL);
 
         $this->dm->flush();
