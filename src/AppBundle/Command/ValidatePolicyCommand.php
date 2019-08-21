@@ -562,6 +562,14 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $refundCommission,
                         $pendingBacsTotalCommission
                     );
+                } elseif ($refund === 0 && $refundCommission !== 0) {
+                    if  ($refundCommission !== $pendingBacsTotalCommission) {
+                        $lines[] = $this->failureRefundCommissionMessage(
+                            $policy,
+                            $refundCommission,
+                            $pendingBacsTotalCommission
+                        );
+                    }
                 }
             }
 
@@ -653,6 +661,16 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $policy->getTotalCommissionPaid(),
             $policy->getExpectedCommission($date)
+        );
+    }
+
+    private function failureRefundCommissionMessage(Policy $policy, $expected, $actual)
+    {
+        return sprintf(
+            'Incorrect commission on refund for policy %s (Paid: %0.2f Expected: %0.2f)',
+            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+            $actual,
+            $expected
         );
     }
 
