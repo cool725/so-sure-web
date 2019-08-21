@@ -123,14 +123,7 @@ class ApiPartialController extends BaseController
             );
         } elseif (in_array($name, array_keys(SixpackService::$appExperiments))) {
             $clientId = null;
-            if ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
-                $scode = $user->getStandardSCode();
-                if (!$scode) {
-                    $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
-                    throw new NotFoundHttpException();
-                }
-                $clientId = $scode->getCode();
-            } elseif (in_array($name, SixpackService::getAppParticipationByClientId())) {
+            if (in_array($name, SixpackService::getAppParticipationByClientId())) {
                 $clientId = $user->getId();
             }
 

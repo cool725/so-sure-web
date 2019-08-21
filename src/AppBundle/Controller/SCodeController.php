@@ -74,10 +74,6 @@ class SCodeController extends BaseController
             $this->get('app.mixpanel')->queuePersonProperties([
                 'Attribution Invitation Method' => 'scode',
             ], true);
-            $this->get('app.sixpack')->convertByClientId(
-                $code,
-                SixpackService::EXPERIMENT_APP_SHARE_METHOD
-            );
         }
 
         $lead = new Lead();

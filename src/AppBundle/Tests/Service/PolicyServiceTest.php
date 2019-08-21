@@ -681,13 +681,14 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
         $policy->setPremiumInstallments(12);
+        $date = new \DateTime();
         static::$policyService->create(
             $policy,
-            (new \DateTime())->add(new \DateInterval("P10D")),
+            $date,
             true,
             null,
             null,
-            (new \DateTime())->add(new \DateInterval("P11D"))
+            $date
         );
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(12, count($updatedPolicy->getScheduledPayments()));

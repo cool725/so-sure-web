@@ -145,9 +145,6 @@ class PurchaseController extends BaseController
             $purchase->setEmail($session->get('email'));
         }
 
-        // CTA From Quote Test - Proceed
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_CTA);
-
         // Burger vs Full Menu - Proceed
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
 

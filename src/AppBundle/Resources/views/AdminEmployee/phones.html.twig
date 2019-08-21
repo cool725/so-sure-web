@@ -65,8 +65,13 @@
             data-target="#retail_modal"
             data-update="{{ path('admin_phone_retail', {'id': phone.id}) }}"
             data-current="{{ phone.currentRetailPrice }}">
-        <i class="far fa-shopping-bag fa-fw"></i>
-    </button>
+        <i class="far fa-shopping-bag fa-fw"></i></button>
+    <button title="{% if phone.topPhone %}Remove as top device{% else %}Set as top device{% endif %} "
+            type="button"
+            class="btn btn-sm mb-2 mr-2 {% if phone.topPhone %}btn-success{% else %}btn-secondary{% endif %} phone-topphone"
+            data-token="{{ csrf_token('default') }}"
+            data-topphone="{{ path('admin_phone_topphone', {'id': phone.id}) }}">
+        <i class="fas fa-trophy-alt fa-fw"></i></button>
 {% endmacro phoneActions %}
 
 {% import _self as this %}

@@ -354,10 +354,6 @@ class UserController extends BaseController
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
                         );
-                        $this->get('app.sixpack')->convertByClientId(
-                            $code,
-                            SixpackService::EXPERIMENT_APP_SHARE_METHOD
-                        );
                     } else {
                         $message = 'Your bonus has been added';
                     }
@@ -1246,9 +1242,6 @@ class UserController extends BaseController
             $query = parse_url($url, PHP_URL_QUERY);
             parse_str($query, $oauth2FlowParams);
         }
-
-        // CTA From Quote Test - Purchase
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_CTA);
 
         // Burger vs Full Menu - Purchase
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);

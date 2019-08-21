@@ -914,7 +914,8 @@ class PolicyService
         \DateTime $date = null,
         $numPayments = null,
         $billingOffset = null,
-        $renewal = false
+        $renewal = false,
+        $isFixtures = false
     ) {
         if (!$date) {
             if (!$policy->getBilling()) {
@@ -1024,7 +1025,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $this->subDays(new \DateTime(), 2)) {
+            if ($scheduledDate >= $this->subDays(new \DateTime(), 2) || $isFixtures) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->error(sprintf(

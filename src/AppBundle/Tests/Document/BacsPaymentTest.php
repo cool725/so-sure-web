@@ -250,6 +250,5 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
         $bacs->submit(new \DateTime('2018-03-10'));
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $bacs->getPolicy()->getStatus());
-
     }
 }
