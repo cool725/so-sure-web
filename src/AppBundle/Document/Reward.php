@@ -10,7 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\Connection;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\RewardRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Reward

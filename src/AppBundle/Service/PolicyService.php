@@ -5,6 +5,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
 use AppBundle\Document\Feature;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
@@ -569,6 +570,30 @@ class PolicyService
             $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
         }
+
+        /**
+         * Finally, before we leave the create method, we should check if
+         * there is a sign-up bonus available to automatically apply to
+         * the policy as it is not a renewal here.
+         */
+        $featureService = new FeatureService($this->dm, $this->logger);
+        if ($featureService->isEnabled(Feature::FEATURE_APPLY_SIGN_UP_BONUS)) {
+            $rewardService = new RewardService($this->dm, $this->logger);
+            /** @var Reward $reward */
+            $reward = $rewardService->getSignUpBonus();
+            if (null != $reward) {
+                $connection = new Connection();
+                $policy->addConnection($connection);
+                $connection->setLinkedUser($reward->getUser());
+                $connection->setPromoValue($reward->getDefaultValue());
+                $reward->addConnection($connection);
+                $reward->updatePotValue();
+                $policy->updatePotValue();
+                $this->dm->persist($connection);
+                $this->dm->flush();
+            }
+        }
+
         $this->statsd->endTiming("policy.create");
 
         return true;
