@@ -32,7 +32,6 @@ class CreateReward
 
     /**
      * @var string
-     * @Assert\NotNull(message="Must provide Scode for reward")
      */
     protected $code;
 
@@ -81,6 +80,11 @@ class CreateReward
      * @var boolean
      */
     protected $isFirst;
+
+    /**
+     * @var boolean
+     */
+    protected $isSignUpBonus;
 
     /**
      * @var boolean
@@ -216,6 +220,25 @@ class CreateReward
     {
         $this->isFirst = $isFirst;
     }
+
+    /**
+     * @return bool
+     */
+    public function getIsSignUpBonus()
+    {
+        return $this->isSignUpBonus;
+    }
+
+    /**
+     * @param bool $isSignUpBonus
+     * @return CreateReward
+     */
+    public function setIsSignUpBonus(bool $isSignUpBonus): CreateReward
+    {
+        $this->isSignUpBonus = $isSignUpBonus;
+        return $this;
+    }
+
 
     public function getTermsAndConditions()
     {

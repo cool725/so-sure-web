@@ -10,7 +10,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\Connection;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\RewardRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Reward
@@ -100,6 +100,12 @@ class Reward
      * @MongoDB\Field(type="boolean")
      */
     protected $isFirst;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $isSignUpBonus;
 
     /**
      * @Assert\Length(min="50", max="1000")
@@ -245,6 +251,24 @@ class Reward
     public function setIsFirst($isFirst)
     {
         $this->isFirst = $isFirst;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsSignUpBonus()
+    {
+        return $this->isSignUpBonus;
+    }
+
+    /**
+     * @param mixed $isSignUpBonus
+     * @return Reward
+     */
+    public function setIsSignUpBonus($isSignUpBonus)
+    {
+        $this->isSignUpBonus = $isSignUpBonus;
+        return $this;
     }
 
     public function getTermsAndConditions()
