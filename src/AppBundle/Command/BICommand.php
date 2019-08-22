@@ -423,7 +423,8 @@ class BICommand extends ContainerAwareCommand
             '"Premium Installments"',
             '"Inviter"',
             '"Latest Payment failed without reschedule"',
-            '"Originating Scode"'
+            '"Scode Type"',
+            '"Scode"'
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -440,10 +441,12 @@ class BICommand extends ContainerAwareCommand
             if ($lastReverted) {
                 $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
             }
-            $originatingScode = "";
+            $scode = "";
+            $scodeType = "";
             $scodes = $policy->getScodes();
             if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE && array_key_exists(0, $scodes)) {
-                $originatingScode = $scodes[0]->getCode();
+                $scode = $scodes[0]->getCode();
+                $scodeType = $scodes[0]->getType();
             }
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
@@ -513,7 +516,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $policy->getPremiumInstallments()),
                 sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : ''),
                 sprintf('"%s"', ($lastReverted && !$reschedule) ? "yes" : "no"),
-                sprintf('"%s"', $originatingScode)
+                sprintf('"%s"', $scodeType),
+                sprintf('"%s"', $scode)
             ]);
         }
         if (!$skipS3) {
