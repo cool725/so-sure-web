@@ -18,6 +18,10 @@ a,
 strong {
     font-family: $g-medium;
 
+    &:hover {
+        cursor: pointer;
+    }
+
     &.no-style {
         &:hover {
             text-decoration: none;
