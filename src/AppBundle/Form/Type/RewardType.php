@@ -30,7 +30,7 @@ class RewardType extends AbstractType
     {
         $builder->add('firstName', TextType::class, ['required' => true])
             ->add('lastName', TextType::class, ['required' => true])
-            ->add('code', TextType::class, ['required' => true])
+            ->add('code', TextType::class, ['required' => false])
             ->add('email', EmailType::class, ['required' => true])
             ->add('defaultValue', TextType::class, ['required' => true])
             ->add('expiryDate', DateType::class, [
@@ -46,6 +46,7 @@ class RewardType extends AbstractType
             ->add('hasRenewed', CheckboxType::class, ['required' => false])
             ->add('hasCancelled', CheckboxType::class, ['required' => false])
             ->add('isFirst', CheckboxType::class, ['required' => false])
+            ->add('isSignUpBonus', CheckboxType::class, ['required' => false])
             ->add('termsAndConditions', TextareaType::class, ['required' => false])
             ->add('next', SubmitType::class);
     }
