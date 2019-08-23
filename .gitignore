@@ -41,3 +41,4 @@ deploy/*
 yarn-error.log
 .scannerwork
 *.swp
+.vimrc
