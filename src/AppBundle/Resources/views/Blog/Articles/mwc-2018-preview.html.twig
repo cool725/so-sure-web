@@ -1,0 +1,117 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}so-sure - Mobile World Congress{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="blog">
+        <div class="d-lg-flex">
+
+            {# Main Content #}
+            <div class="blog__main__container">
+                <div class="blog__main px-4 px-lg-5">
+                    <article>
+                        <header class="mb-5">
+                            <hgroup>
+                                <div class="breadcrumbs">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <i class="fal fa-angle-right"></i>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            Mobile World Congress
+                                        </li>
+                                    </ul>
+                                </div>
+                                <h1 class="text-primary mb-4">Mobile World Congress</h1>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        <div rel="author">Fiona</div>
+                                    </li>
+                                    <li class="list-inline-item">|</li>
+                                    <li class="list-inline-item">
+                                        <time>Jun 29, 2018</time>
+                                    </li>
+                                </ul>
+                            </hgroup>
+                        </header>
+                        <p>Hallelujah! It’s that time of year again. <a href="https://www.mobileworldcongress.com/" target="_blank" rel="noopener noreferrer">Mobile World Congress</a> is the biggest mobile phone event of the year and is popping off next Monday in the beautiful city of Barcelona. The event is pretty much Christmas for people like us (we love mobile phones!).</p>
+                        <h2>#Samsung</h2>
+                        <p>Can Samsung recover from their Note 7 fiasco?</p>
+                        <p>The South Korean tech giant is usually the big story at each MWC. However, the fact that they aren’t going to be the big story, kind of is the big story…</p>
+                        <p>We’re all well versed in the <a href="http://bgr.com/2017/01/02/galaxy-note-7-explosion-investigation/" target="_blank" rel="noopener noreferrer">story behind the disastrous Note 7</a> and how building a new phone that is prone to setting itself on fire isn’t really a great business strategy.</p>
+                        <p>One of the big reasons for the Note 7 fiasco was that Samsung tried to push the tech behind the phone to the absolute limit. They were rushing engineers into delivering a battery that would outperform their rivals. However, the problem was that while the battery charged faster and lasted for longer, it was also really flammable.</p>
+                        <p>This year, Samsung have decided to take their time while building the Galaxy S8 as releasing another faulty phone would be fairly disastrous. Hence why they aren’t rushing to put out a new phone in time for #MWC</p>
+                        <h2>Can LG steal the headlines?</h2>
+                        <p>Now that Samsung have essentially abstained from their regular MWC throne, these guys are now in pole position to make a big splash at the upcoming conference. The company have decided to quit on their dreams of making the first popular modular phone and are expected to go back to their roots with the G6.</p>
+                        <h2>#An iPhone killer?</h2>
+                        <p>The lackluster iPhone 7 provides a real opportunity for Android.</p>
+                        <p>As Apple prefer not to get involved in the MWC madness, the usual question that people ask before the show is “Will there be an iPhone killer?”. With the latest iPhone offering not exactly setting the world on fire (headphone jacks are good), the whole Android community is completely aware that this year is a massive opportunity to finally win the battle for hearts and minds in the phone war.</p>
+                        <h2>It's back!</h2>
+                        <p>Unbelievably, the Nokia 3310 is making a comeback. Arguably the most iconic phone of all time, this seemingly indestructible beauty is set to make a splash at MWC.</p>
+                        <p>Nokia have had some hard times as of late and were more affected than anyone by the iPhones endless dominance. However, they do still have a reputation as a very innovative, thoughtful company and they have started to put themselves back in the picture by manufacturing new versions of their classic phones. The 3310 is being marketed as a nearly indestructible phone with a never ending battery life.</p>
+                        <p>There are a lot of phones out there which can’t do either of those things so it’ll be really fascinating to see whether the MWC audience takes to it or not.</p>
+                        <footer></footer>
+                    </article>
+                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
+                </div>
+            </div>
+
+            {# Sub Content #}
+            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
+                {# Curve Desktop #}
+                <div class="blog__curve">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
+                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
+                    <div class="blog__nav">
+{#                         <div id="blog-nav" class="list-group mb-5">
+                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
+                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
+                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
+                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
+                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
+                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
+                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
+                        </div> #}
+                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/blog.js') }}"></script>
+{% endblock %}
