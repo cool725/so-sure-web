@@ -2172,8 +2172,7 @@ class BacsService
                 'Cancelling (scheduled) payment %s policy is not valid',
                 $id
             );
-            $this->logger->warning($msg);
-
+            $this->warnings[] = $msg;
             return self::VALIDATE_CANCEL;
         }
 
@@ -2182,8 +2181,7 @@ class BacsService
                 'Skipping (scheduled) payment %s as unable to determine payment method or missing bank account',
                 $id
             );
-            $this->logger->warning($msg);
-
+            $this->warnings[] = $msg;
             return self::VALIDATE_SKIP;
         }
 
