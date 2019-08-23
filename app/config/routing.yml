@@ -338,6 +338,14 @@ redirect_discount_vouchers:
 #         path: https://blog.wearesosure.com/
 #         permanent: false # not convinced we may need to add additional redirects, so keep temp for now
 
+redirect_blog:
+    path: https://blog.wearesosure.com/
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        route: blog_index
+        permanent: true
+
+
 redirect_change_password:
     path: /change-password
     defaults:
