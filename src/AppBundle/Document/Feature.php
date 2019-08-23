@@ -36,6 +36,7 @@ class Feature
     const FEATURE_JUDO_RECURRING = 'judo-recurring';
     const FEATURE_USER_PAYMENT_HISTORY = 'user-payment-history';
     const FEATURE_CHECKOUT = 'checkout';
+    const FEATURE_APPLY_SIGN_UP_BONUS = 'apply-sign-up-bonus';
 
     // All Features should be here
     public static $features = [
@@ -58,7 +59,8 @@ class Feature
         self::FEATURE_JUDO_RECURRING,
         self::FEATURE_CARD_SWAP_FROM_BACS,
         self::FEATURE_USER_PAYMENT_HISTORY,
-        self::FEATURE_CHECKOUT
+        self::FEATURE_CHECKOUT,
+        self::FEATURE_APPLY_SIGN_UP_BONUS
     ];
 
     // @codingStandardsIgnoreStart
@@ -82,7 +84,8 @@ class Feature
         self::FEATURE_PAYMENTS_BCC => 'Bcc payment failure emails (and related) to bcc@so-sure.com',
         self::FEATURE_JUDO_RECURRING => 'Perform Judopay token payments with the \'recurring\' flag set.',
         self::FEATURE_USER_PAYMENT_HISTORY => 'Allow users to view their payment history',
-        self::FEATURE_CHECKOUT => 'Use Checkout instead of Judo for payments'
+        self::FEATURE_CHECKOUT => 'Use Checkout instead of Judo for payments',
+        self::FEATURE_APPLY_SIGN_UP_BONUS => 'Automatically apply any active sign-up bonuses to new users first policy'
     ];
     // @codingStandardsIgnoreEnd
 
