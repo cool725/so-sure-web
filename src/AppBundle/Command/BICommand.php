@@ -453,6 +453,7 @@ class BICommand extends ContainerAwareCommand
             $lines[] = $this->makeLine(
                 $policy->getPolicyNumber(),
                 $user->getId(),
+                $user->getAge(),
                 $user->getBillingAddress()->getPostcode(),
                 $census ? $census->getSubgrp() : '',
                 $user->getGender() ?: '',
