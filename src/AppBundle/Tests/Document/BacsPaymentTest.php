@@ -276,7 +276,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
             $bacs = new BacsPayment();
             $bacs->setAmount(6);
-            $dateString = sprintf("2018-%s-01", substr("0$i", -2));
+            $dateString = sprintf("2018-%s-01", mb_substr("0$i", -2));
             $bacs->submit(new \DateTime($dateString));
             $bacs->setStatus(BacsPayment::STATUS_GENERATED);
             $bacs->setScheduledPayment($scheduledPayment);
@@ -289,7 +289,9 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
             $this->assertTrue($bacs->isSuccess());
             $this->assertNotNull($bacs->getScheduledPayment());
-            $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+            if ($bacs->getScheduledPayment()) {
+                $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+            }
             self::assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
         }
 
@@ -311,7 +313,9 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
         $this->assertTrue($bacs->isSuccess());
         $this->assertNotNull($bacs->getScheduledPayment());
-        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+        if ($bacs->getScheduledPayment()) {
+            $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+        }
         self::assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
 
         $now = \DateTime::createFromFormat('U', time());
