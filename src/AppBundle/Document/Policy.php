@@ -5344,13 +5344,13 @@ abstract class Policy
             )) {
                 return true;
             } elseif ($this->areEqualToTwoDp(
-                    $outstandingPremium,
-                    $standardTotal - $this->getScheduledPaymentRefundAmount()
+                $outstandingPremium,
+                $standardTotal - $this->getScheduledPaymentRefundAmount()
             )) {
                 return true;
             } elseif ($this->areEqualToTwoDp(
-                    $outstandingPremium,
-                    $finalTotal - $this->getScheduledPaymentRefundAmount()
+                $outstandingPremium,
+                $finalTotal - $this->getScheduledPaymentRefundAmount()
             )) {
                 return true;
             }
