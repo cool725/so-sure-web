@@ -370,11 +370,11 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var InvitationRepository */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
-        /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
+        /** @var ScheduledPaymentRepository */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
-        /** @var PhonePolicyRepository $repo */
-        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $policyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
+        /** @var PhonePolicyRepository */
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = $this->makeLine(
             'Policy Number',
@@ -456,9 +456,9 @@ class BICommand extends ContainerAwareCommand
                 $user->getBillingAddress()->getPostcode(),
                 $census ? $census->getSubgrp() : '',
                 $user->getGender() ?: '',
-                $income ? sprintf('0.0f', $income->getTotal()->getIncome()) : '',
+                $income ? sprintf('%0.0f', $income->getTotal()->getIncome()) : '',
                 $phone->getMake(),
-                sprintf('%s $s', $phone->getMake(), $phone->getModel()),
+                sprintf('%s %s', $phone->getMake(), $phone->getModel()),
                 $phone,
                 $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d'),
                 $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d'),
@@ -467,7 +467,7 @@ class BICommand extends ContainerAwareCommand
                 $previous ? $previous->getPolicyNumber() : '',
                 $policy->getGeneration(),
                 $policy->getStatus(),
-                $policy->getStatus() == Policy::STATUS_UNPAID ? 
+                $policy->getStatus() == Policy::STATUS_UNPAID ?
                     $this->timezoneFormat($policy->getPolicyExpirationDate(), $timezone, 'Y-m-d') : '',
                 $policy->getStatus() == Policy::STATUS_CANCELLED ? $policy->getCancelledReason() : '',
                 $policy->hasRequestedCancellation() ? 'yes' : 'no',
@@ -492,7 +492,7 @@ class BICommand extends ContainerAwareCommand
                 $policy->getPurchaseSdk(),
                 $policy->getUsedPaymentType(),
                 ($bankAccount && $policy->isActive(true)) ? $bankAccount->getMandateStatus() : '',
-                ($bankAccount && $policy->isActive(true) && 
+                ($bankAccount && $policy->isActive(true) &&
                     $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
                     $bankAccount->getMandateCancelledExplanation() : '',
                 count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no',
@@ -857,10 +857,10 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Makes a line of the csv with quotes around the items and commas between them.
-     * @param varargs $item is the list of items of which there can be any number.
+     * @param mixed ...$item are all of the string items to concatenate of variable number.
      */
-    private function makeLine(...$items)
+    private function makeLine(...$item)
     {
-       return '"'.implode('","', func_get_args()).'"';
+        return '"'.implode('","', func_get_args()).'"';
     }
 }
