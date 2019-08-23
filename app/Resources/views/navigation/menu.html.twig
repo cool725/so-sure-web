@@ -36,12 +36,12 @@
                 Make a Claim 😢
             </a>
         </li>
-{#         <li>
-            <a href="https://blog.wearesosure.com" class="h5">
-                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_reviews.png" alt="so-sure - Blog" width="50px" class="mr-4 d-md-none">
+        <li>
+            <a href="{{ path('blog_index') }}" class="h5">
+                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_reviews.png" alt="so-sure - Blog" width="50px" class="mr-4 d-md-none"> #}
                 Blog 📚
             </a>
-        </li> #}
+        </li>
     </ul>
     <div class="px-5 py-4 text-md-center align-self-stretch menu__buttons">
         {% if app.user is not null and app.user %}

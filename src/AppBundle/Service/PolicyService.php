@@ -5,6 +5,7 @@ use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
 use AppBundle\Document\Feature;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
@@ -569,6 +570,30 @@ class PolicyService
             $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
         }
+
+        /**
+         * Finally, before we leave the create method, we should check if
+         * there is a sign-up bonus available to automatically apply to
+         * the policy as it is not a renewal here.
+         */
+        $featureService = new FeatureService($this->dm, $this->logger);
+        if ($featureService->isEnabled(Feature::FEATURE_APPLY_SIGN_UP_BONUS)) {
+            $rewardService = new RewardService($this->dm, $this->logger);
+            /** @var Reward $reward */
+            $reward = $rewardService->getSignUpBonus();
+            if (null != $reward) {
+                $connection = new Connection();
+                $policy->addConnection($connection);
+                $connection->setLinkedUser($reward->getUser());
+                $connection->setPromoValue($reward->getDefaultValue());
+                $reward->addConnection($connection);
+                $reward->updatePotValue();
+                $policy->updatePotValue();
+                $this->dm->persist($connection);
+                $this->dm->flush();
+            }
+        }
+
         $this->statsd->endTiming("policy.create");
 
         return true;
@@ -913,7 +938,9 @@ class PolicyService
         Policy $policy,
         \DateTime $date = null,
         $numPayments = null,
-        $billingOffset = null
+        $billingOffset = null,
+        $renewal = false,
+        $isFixtures = false
     ) {
         if (!$date) {
             if (!$policy->getBilling()) {
@@ -972,10 +999,6 @@ class PolicyService
         $numScheduledPayments = $numPayments - $numPaidPayments;
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
-            /**
-             * If this is the initial payment and it is bacs, it should be 7 days from today
-             * regardless of the billing date the customer has set.
-             */
             $pendingPayments = $policy->getAllScheduledPayments('pending');
             $pendingDates = [];
             /** @var ScheduledPayment $pendingPayment */
@@ -984,7 +1007,12 @@ class PolicyService
                     $pendingDates[] = $pendingPayment->getScheduled()->format('Ymd');
                 }
             }
-            if ($numPaidPayments < 1 && $isBacs && $i === 1) {
+            /**
+             * If this is the initial payment and it is bacs, it should be 7 days from today
+             * regardless of the billing date the customer has set.
+             * Unless it is a renewal policy
+             */
+            if ($numPaidPayments < 1 && $isBacs && $i === 1 && !$renewal) {
                 $scheduledDate = new \DateTime();
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
@@ -1022,7 +1050,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $this->subDays(new \DateTime(), 2)) {
+            if ($scheduledDate >= $this->subDays(new \DateTime(), 2) || $isFixtures) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->error(sprintf(
@@ -2362,12 +2390,45 @@ class PolicyService
         if ($payer = $policy->getPayer()) {
             $payer->addPayerPolicy($newPolicy);
         }
-        $this->create($newPolicy, $startDate, false, $numPayments);
+
+        $billing = $startDate;
+        if ($policy->getBilling()) {
+            $billing = new \DateTime(
+                sprintf(
+                    "%s-%s-%s",
+                    $startDate->format("Y"),
+                    $policy->getBilling()->format("m"),
+                    $policy->getBilling()->format("d")
+                )
+            );
+        }
+        $this->create(
+            $newPolicy,
+            $startDate,
+            false,
+            $numPayments,
+            $policy->getIdentityLog(),
+            $billing
+        );
         if (!$newPolicy->renew($discount, $autoRenew, $date)) {
             return null;
         }
 
-        $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
+        /**
+         * For scheduling, there have been times when the renewal scheduled payments
+         * are incorrect, and part of that is due to not using the billing date,
+         * and part of it is because the payment method is not always set.
+         * Right here we will check if the payment method exists, and if not
+         * we will set it using the payment method on the previous policy.
+         * We cannot do this any earlier in the renewal in case the payment
+         * method changes.
+         */
+        if (!$newPolicy->hasPaymentMethod()) {
+            $newPolicy->setPaymentMethod(clone $policy->getPaymentMethod());
+        }
+
+        $this->generateScheduledPayments($newPolicy, $billing, $numPayments, null, true);
+
         $policy->addMetric(Policy::METRIC_RENEWAL);
 
         $this->dm->flush();
