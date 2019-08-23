@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\Premium;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\Form\Imei;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Bacs;
@@ -250,5 +251,70 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
         $bacs->submit(new \DateTime('2018-03-10'));
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $bacs->getPolicy()->getStatus());
+    }
+
+    public function testApproveSetsCorrectCommission()
+    {
+        $bankAccount = new BankAccount();
+        $bacsPaymentMethod = new BacsPaymentMethod();
+        $bacsPaymentMethod->setBankAccount($bankAccount);
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $policy->setPaymentMethod($bacsPaymentMethod);
+
+        for ($i = 0; $i < 11; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+
+            $bacs = new BacsPayment();
+            $bacs->setAmount(6);
+            $dateString = sprintf("2018-%s-01", substr("0$i", -2));
+            $bacs->submit(new \DateTime($dateString));
+            $bacs->setStatus(BacsPayment::STATUS_GENERATED);
+            $bacs->setScheduledPayment($scheduledPayment);
+            $scheduledPayment->setPayment($bacs);
+
+            $policy->addPayment($bacs);
+            self::assertNotEquals(Salva::MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
+            $bacs->approve();
+
+            $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
+            $this->assertTrue($bacs->isSuccess());
+            $this->assertNotNull($bacs->getScheduledPayment());
+            $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+            self::assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
+        }
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+
+        $bacs = new BacsPayment();
+        $bacs->setAmount(6);
+        $bacs->submit(new \DateTime('2018-12-01'));
+        $bacs->setStatus(BacsPayment::STATUS_GENERATED);
+        $bacs->setScheduledPayment($scheduledPayment);
+        $scheduledPayment->setPayment($bacs);
+
+        $policy->addPayment($bacs);
+        self::assertNotEquals(Salva::MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
+        self::assertNotEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
+        $bacs->approve();
+
+        $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
+        $this->assertTrue($bacs->isSuccess());
+        $this->assertNotNull($bacs->getScheduledPayment());
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $bacs->getScheduledPayment()->getStatus());
+        self::assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
+
+        $now = \DateTime::createFromFormat('U', time());
+        $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate(), '', 1);
     }
 }
