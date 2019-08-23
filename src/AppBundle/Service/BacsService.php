@@ -2206,46 +2206,16 @@ class BacsService
 
             return self::VALIDATE_CANCEL;
         } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
-            $msg = sprintf(
-                'Skipping (scheduled) payment %s as mandate is not enabled (%s)',
-                $id,
-                $bankAccount->getMandateStatus()
-            );
-            // for first payment, would expected that mandate may not yet be setup
             if ($bankAccount->isFirstPayment()) {
-                $this->logger->info($msg);
+                $this->logger->info("skipping first scheduled payment {$id} as mandate is not set up yet.");
+                return self::VALIDATE_SKIP;
             } else {
-                $this->warnings[] = $msg;
-            }
-
-            return self::VALIDATE_SKIP;
-        }
-
-        try {
-            if (!$bankAccount->allowedSubmission()) {
-                $msg = sprintf(
-                    'Skipping payment %s as submission is not yet allowed (must be at least %s) [Rescheduled]',
-                    $id,
-                    $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
-                );
-                $this->warnings[] = $msg;
-
+                $this->warnings[] = "Rescheduling scheduled payment {$id} as mandate is not set up yet.";
                 return self::VALIDATE_RESCHEDULE;
             }
-        } catch (\Exception $e) {
-            $msg = sprintf(
-                'Skipping payment %s. Error: %s',
-                $id,
-                $e->getMessage()
-            );
-            $this->warnings[] = $msg;
-
-            return self::VALIDATE_RESCHEDULE;
         }
 
-        $bacsPaymentForDateCalcs = new BacsPayment();
-        $bacsPaymentForDateCalcs->submit($scheduledDate);
-        if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
+        if ($policy->getPolicyExpirationDate() < $scheduledDate) {
             if (!$ignoreNotEnoughTime) {
                 $msg = sprintf(
                     'Cancelling (scheduled) payment %s as payment date is after expiration date',
@@ -2277,7 +2247,7 @@ class BacsService
                 }
                 // @codingStandardsIgnoreStart
                 $msg = sprintf(
-                    'Skipping (scheduled) payment %s on %s as processing day is too early/late (expected: %d max: %d initial: %s)',
+                    '(scheduled) payment %s on %s processing day is too early/late (expected: %d max: %d initial: %s) (running anyway)',
                     $id,
                     $scheduledDate->format('d/m/y'),
                     $bankAccount->getNotificationDay(),
@@ -2286,8 +2256,6 @@ class BacsService
                 );
                 // @codingStandardsIgnoreEnd
                 $this->warnings[] = $msg;
-
-                return self::VALIDATE_SKIP;
             }
         }
 
