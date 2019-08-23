@@ -4474,8 +4474,8 @@ abstract class Policy
                 sprintf(
                     'Unable to activate policy %s if not between policy dates. Must be after %s and before %s',
                     $this->getId(),
-                    $this->getStart(),
-                    $tooLate
+                    $this->getStart()->format('Y-m-d H:i:s'),
+                    $tooLate->format('Y-m-d H:i:s')
                 )
             );
         }
@@ -5347,14 +5347,26 @@ abstract class Policy
         if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
             return true;
         } elseif ($this->isUnpaidCloseToExpirationDate($date) || $this->isUnpaidBacs()) {
+            $standardTotal = $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+            $finalTotal = $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice();
             if ($this->areEqualToTwoDp(
                 $outstandingPremium,
-                $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+                $standardTotal
             )) {
                 return true;
             } elseif ($this->areEqualToTwoDp(
                 $outstandingPremium,
-                $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+                $finalTotal
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $standardTotal - $this->getScheduledPaymentRefundAmount()
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $finalTotal - $this->getScheduledPaymentRefundAmount()
             )) {
                 return true;
             }

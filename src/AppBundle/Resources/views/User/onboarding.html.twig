@@ -296,6 +296,9 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Get up to 80% money back 💰</h2>
                             {% if device_category() == 'Mobile' %}
+                                {% if feature_enabled('apply-sign-up-bonus') %}
+                                    <p>We've added <strong>&pound;5</strong> in your reward pot to get you started 🤑</p>
+                                {% endif %}
                                 <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, <strong>when you and your connections haven’t claimed</strong>, your Reward Pot is paid out to you. Simple!</p>
                                 <a href="#"
                                    class="btn btn-success btn-block-xs"
@@ -312,6 +315,9 @@
                                     How it works
                                 </a>
                             {% else %}
+                                {% if feature_enabled('apply-sign-up-bonus') %}
+                                    <p>We've added <strong>&pound;5</strong> in your reward pot to get you started 🤑</p>
+                                {% endif %}
                                 <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you, simple!
                                 <a href="#"
                                    class="watch-video"
@@ -469,7 +475,7 @@
                                    data-slide-to="2">
                                     <i class="far fa-arrow-left"></i>
                                     <span class="sr-only">Back</span></a>
-                                <a href="{{ path('fos_user_security_login') }}"
+                                <a href="{{ path('user_home') }}"
                                    class="btn btn-outline-primary ml-3"
                                    role="button">
                                    Customer login <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
@@ -497,7 +503,7 @@
                        id="onboarding-btn--right"
                        class="onboarding-controls__btn"
                        role="button"
-                       data-href="{{ path('fos_user_security_login') }}"
+                       data-href="{{ path('user_home') }}"
                        data-target="#onboarding_carousel">
                        NEXT</a>
                 </div>

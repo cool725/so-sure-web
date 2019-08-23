@@ -123,13 +123,6 @@
                     {% if policy.canInvite %}
                         {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
                             <h5>Earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback by inviting your friends to so-sure</h5>
-                            <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
-                            {% if policy.getCurrentConnectionValues %}
-                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
-                                    <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
-                                {% endif %}
-                                    <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
-                            {% endif %}
                         {% endif %}
                         <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
                             <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
@@ -159,6 +152,15 @@
                                     Invite</button>
                             </div>
                         </form>
+                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                            <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
+                            {% if policy.getCurrentConnectionValues %}
+                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
+                                    <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
+                                {% endif %}
+                                    <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                     {% if friends %}
                         <div class="card mb-4">

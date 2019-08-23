@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Address;
+use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
@@ -582,7 +583,7 @@ class PolicyService
             /** @var Reward $reward */
             $reward = $rewardService->getSignUpBonus();
             if (null != $reward) {
-                $connection = new Connection();
+                $connection = new RewardConnection();
                 $policy->addConnection($connection);
                 $connection->setLinkedUser($reward->getUser());
                 $connection->setPromoValue($reward->getDefaultValue());
