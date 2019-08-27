@@ -38,8 +38,9 @@ $(function() {
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
-            onfocusout: false,
+            focusCleanup: true,
             onkeyup: false,
+            onclick: false,
             rules: {
                 "lead_form[name]": {
                     required: true,

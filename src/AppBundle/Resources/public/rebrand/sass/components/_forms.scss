@@ -29,8 +29,8 @@ label {
 // Modify error styling - main styling done in _variables.scss
 .form-control {
 
-    &.is-valid-ss,
-    &.is-valid-ss:focus,
+    // &.is-valid-ss,
+    // &.is-valid-ss:focus,
     &:focus {
         border-color: $dodger-blue;
         background-color: rgba(37, 147, 243, 0.1);
