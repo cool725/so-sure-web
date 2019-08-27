@@ -3484,6 +3484,22 @@ abstract class Policy
         }
     }
 
+    /**
+     * Tells you what generation of renewals this policy is. If it is not a renewal it will return 1, if it is
+     * a renewal of a policy that is not a renewal it will return 2, etc.
+     * @return int the generation number that it is.
+     */
+    public function getGeneration()
+    {
+        $policy = $this;
+        $generation = 0;
+        while ($policy) {
+            $policy = $policy->getPreviousPolicy();
+            $generation++;
+        }
+        return $generation;
+    }
+
     public function isPolicyWithin21Days($date = null)
     {
         if (!$this->getStart()) {
