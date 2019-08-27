@@ -408,7 +408,7 @@ class BICommand extends ContainerAwareCommand
             'Policy Purchase Time',
             'Lead Source',
             'Scode Type',
-            'Scode',
+            'Scode Name',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
             'Latest referer (user)',
@@ -439,7 +439,7 @@ class BICommand extends ContainerAwareCommand
             $scode = '';
             $scodeType = '';
             if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE) {
-                $scodeObject = reset($policy->getScodes());
+                $scodeObject = $policy->getFirstScode();
                 if ($scodeObject) {
                     $scode = $scodeObject->getCode();
                     $scodeType = $scodeObject->getType();
