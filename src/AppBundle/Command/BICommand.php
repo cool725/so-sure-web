@@ -439,10 +439,10 @@ class BICommand extends ContainerAwareCommand
             $scode = '';
             $scodeType = '';
             if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE) {
-                $scodes = $policy->getScodes();
-                if (array_key_exists(0, $scodes)) {
-                    $scode = $scodes[0]->getCode();
-                    $scodeType = $scodes[0]->getType();
+                $scodeObject = reset($policy->getScodes());
+                if ($scodeObject) {
+                    $scode = $scodeObject->getCode();
+                    $scodeType = $scodeObject->getType();
                 }
             }
             $reschedule = null;
