@@ -577,21 +577,18 @@ abstract class Payment
         } elseif ($amount >= 0 && ($premium->isEvenlyDivisible($this->getAmount()) ||
             $premium->isEvenlyDivisible($this->getAmount(), true))) {
             // payment should already be credited at this point
-            $fullPaid = false;
-            $lastPayment = false;
             /**
              * If the policy is BACs we need to add the final commission after the final payment.
              * Otherwise we need to add it before the final payment.
              */
             if ($policy->hasBacsPaymentMethod()) {
-                $fullPaid = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
+                $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
             } else {
-                $lastPayment = $this->areEqualToTwoDp(
+                $includeFinal = $this->areEqualToTwoDp(
                     $this->getAmount(),
                     $policy->getOutstandingPremium()
                 );
             }
-            $includeFinal = $fullPaid || $lastPayment;
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
