@@ -6278,6 +6278,7 @@ abstract class Policy
                 null,
             'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
             'card_details' => $cardDetails,
+            'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ? $this->getOutstandingPremiumToDate() : 0
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {
