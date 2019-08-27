@@ -2224,7 +2224,7 @@ abstract class Policy
 
     /**
      * Returns the first scode that the policy has.
-     * @return Scode|null the first scode or null if there are none.
+     * @return SCode|null the first scode or null if there are none.
      */
     public function getFirstScode()
     {
