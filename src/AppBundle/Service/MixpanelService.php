@@ -95,6 +95,7 @@ class MixpanelService
     const EVENT_ONBOARDING = 'Track Onboarding Interaction';
     const EVENT_POLICY_STATUS = 'Policy Status Change';
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
+    const EVENT_PROMO_PAGE = 'Promo Page';
 
     const EVENT_EMAIL = 'Email Sent';
     const EVENT_SMS = 'Sms Sent';
@@ -173,7 +174,8 @@ class MixpanelService
         self::EVENT_POLICY_STATUS,
         self::EVENT_PAYMENT_METHOD_CHANGED,
         self::EVENT_EMAIL,
-        self::EVENT_SMS
+        self::EVENT_SMS,
+        self::EVENT_PROMO_PAGE
     ];
 
     public static function getCampaignSources($event)
@@ -330,7 +332,7 @@ class MixpanelService
         if (!$user) {
             return;
         }
-        
+
         list($firstAttribution, $lastAttribution) = $this->findAttributionsForUser($user);
 
         if ($firstAttribution) {
