@@ -35,12 +35,16 @@
 {% block body %}
 
     <section class="hero">
+
+        {# Toasts #}
+        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %}
+
         <div class="container container-xtra">
             <div class="row">
                 <div class="col-lg-7">
                     {% if scode is defined and scode and scode.reward %}
                         <div class="hero__intro">
-                            <h1 class="mb-4 text-white">Mobile Insurance <br><span class="sub text-columbia-blue-e">Get money back if I don't claim? <br> Yes Please!</span></h1>
+                            <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-columbia-blue-e">Get money back if I don't claim? <br class="d-md-none"> Yes Please!</span></h1>
                             <div class="hero__step mb-4">
                                 <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div></span>
                                 <div class="h4 text-white">Instant quote</div>
