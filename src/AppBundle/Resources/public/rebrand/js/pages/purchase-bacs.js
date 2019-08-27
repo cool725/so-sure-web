@@ -45,9 +45,9 @@ sosure.purchaseStepBacs = (function() {
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
-            onfocusout: false,
+            focusCleanup: true,
             onkeyup: false,
-            // onclick: false,
+            onclick: false,
             rules: {
                 "bacs_form[accountName]": {
                     required: {
