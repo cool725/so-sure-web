@@ -2222,6 +2222,18 @@ abstract class Policy
         return $this->scodes;
     }
 
+    /**
+     * Returns the first scode that the policy has.
+     * @return SCode|null the first scode or null if there are none.
+     */
+    public function getFirstScode()
+    {
+        foreach ($this->scodes as $scode) {
+            return $scode;
+        }
+        return null;
+    }
+
     public function getActiveSCodes()
     {
         $scodes = [];
