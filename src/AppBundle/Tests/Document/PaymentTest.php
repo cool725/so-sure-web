@@ -198,8 +198,8 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $payment->setDate($date);
             $payment->setAmount($premium->getMonthlyPremiumPrice());
             $policy->addPayment($payment);
-            $payment->setCommission();
             $payment->setSuccess(true);
+            $payment->setCommission();
             $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
         }
         $this->assertEquals($premium->getMonthlyPremiumPrice(), $policy->getOutstandingPremium());
@@ -211,6 +211,33 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setSuccess(true);
         $payment->setCommission();
         $this->assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
+    }
+
+    /**
+     * Tests a scenario in which the commission is set on the final payment before it is set to successful and makes
+     * sure that it still calculates it correctly.
+     */
+    public function testSetLastCommissionNotYetSuccessful()
+    {
+        $date = new \DateTime();
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(12);
+        $premium->setIptRate(0.2);
+        $premium->setIpt(12 * 0.2);
+        $policy->setPremium($premium);
+        $policy->setStart($date);
+        for ($i = 0; $i < 12; $i++) {
+            $payment = new CheckoutPayment();
+            $date = (clone $date)->add(new \DateInterval("P1M"));
+            $payment->setDate($date);
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $policy->addPayment($payment);
+            $payment->setCommission();
+            $payment->setSuccess(true);
+            $comparison = $i == 11 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION;
+            $this->assertEquals($comparison, $payment->getTotalCommission());
+        }
     }
 
     public function testTimezone()
