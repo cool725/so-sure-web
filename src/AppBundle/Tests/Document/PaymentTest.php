@@ -156,8 +156,6 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
      */
     public function setLastCommissionRealisticProvider()
     {
-        // NOTE: ipt is gwp * iptRate. iptRate is always 0.095 so therefore we only need to pass gwp.
-        //
         return [
             "Mr. D. L." => ['2018-09-24', 6.52, 0.12, 7],
             "Ms. E. R". => ['2018-09-25', 7.58, 0.12, 7],
