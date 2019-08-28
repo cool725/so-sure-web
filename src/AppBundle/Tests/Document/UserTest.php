@@ -931,10 +931,19 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $premiumB = new PhonePremium();
         $premiumC = new PhonePremium();
         $premiumD = new PhonePremium();
+        $offerA = new Offer();
+        $offerB = new Offer();
         $premiumA->getGwp(1);
         $premiumB->getGwp(2;
         $premiumC->getGwp(3);
         $premiumD->getGwp(4);
+        $premiumE->getGwp(5);
+        $premiumF->getGwp(6);
+        $phoneA->s
+        $offerA->setEnd(new \DateTime('2019-08-28'));
+        $offerA->setPremium($premiumE);
+        $offerB->setEnd(new \DateTime('2019-08-28'));
+        $offerB->setPremium($premiumF);
 
     }
 }

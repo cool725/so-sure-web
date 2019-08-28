@@ -2248,8 +2248,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     public function getCurrentPremiumForPhone($phone, $date)
     {
-
-
+        $offer = $this->getOfferForPhone($phone, $date);
+        if ($offer) {
+            return $offer->getPremium();
+        } else {
+            return $phone->getCurrentPhonePrice($date);
+        }
     }
 
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
