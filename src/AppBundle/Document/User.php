@@ -470,6 +470,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $isBlacklisted = false;
 
+    /**
+     * Represents altered premiums that have been added to this user.
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Offer)
+     */
+    protected $offers = [];
+
     public function __construct()
     {
         parent::__construct();
@@ -1748,6 +1754,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this;
     }
 
+    public function getOffers()
+    {
+        return $this->offers;
+    }
+
+    public function addOffer($offer)
+    {
+        $this->offers[] = $offer;
+    }
+
     public function hasEmail()
     {
         return mb_strlen(trim($this->getEmail())) > 0;
@@ -2190,6 +2206,50 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getCreatedDay()
     {
         return $this->startOfDay($this->created);
+    }
+
+    /**
+     * Gives all of the premium offers made to the user in ascending order of end date.
+     * @return array containing the offers in order.
+     */
+    public function getOffersInOrder()
+    {
+        $offers = $this->getOffers();
+        if (!is_array($offers)) {
+            $offers = $offers->toArray();
+        }
+        usort($offers, function ($a, $b) {
+            return $a->getEnd() < $b->getEnd() ? -1 : 1;
+        });
+        return $offers;
+    }
+
+    /**
+     * Returns a current offer for the given phone if the user has one.
+     * @param Phone $phone is the phone that we are looking for an offer on.
+     * @param \DateTime $date is the date at which we are looking.
+     * @return Offer|null the offer found or null if no offer is found.
+     */
+    public function getOfferForPhone($phone, $date)
+    {
+        foreach ($this->getOffersInOrder() as $offer) {
+            if ($offer->getPhone()->getId() == $phone->getId() && $date < $offer->getEnd()) {
+                return $offer;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gives you the current premium that this user ought to pay for the given phone.
+     * @param Phone     $phone is the phone we are enquiring about.
+     * @param \DateTime $date  is the date at which we are checking.
+     * @return Premium the premium that the user should pay if they make a policy on this phone model now.
+     */
+    public function getCurrentPremiumForPhone($phone, $date)
+    {
+
+
     }
 
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)

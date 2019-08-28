@@ -8,6 +8,8 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Offer;
+use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
 use AppBundle\Document\Attribution;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -856,5 +858,83 @@ class UserTest extends \PHPUnit\Framework\TestCase
             User::DPA_VALIDATION_VALID,
             $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
         );
+    }
+
+    /**
+     * Makes sure that getOffersInOrder function gives all the user's offers in ascending order of end date.
+     */
+    public function testGetOffersInOrder()
+    {
+        $user = new User();
+        $offerA = new Offer();
+        $offerB = new Offer();
+        $offerC = new Offer();
+        $offerD = new Offer();
+        $offerA->setEnd(new \DateTime('2019-07-02'));
+        $offerB->setEnd(new \DateTime('2019-08-05'));
+        $offerC->setEnd(new \DateTime('2019-08-28'));
+        $offerD->setEnd(new \DateTime('2020-08-28'));
+        $user->addOffer($offerB);
+        $user->addOffer($offerC);
+        $user->addOffer($offerA);
+        $user->addOffer($offerD);
+        $ordered = $user->getOffersInOrder();
+        $this->assertEquals([$offerA, $offerB, $offerC, $offerD], $ordered);
+    }
+
+    /**
+     * Makes sure that getOfferForPhone gets the right offer if there is one for the right phone, and if there is no
+     * offer that is right it returns nothing.
+     */
+    public function testGetOfferForPhone()
+    {
+        $user = new User();
+        $phoneA = new Phone();
+        $phoneB = new Phone();
+        $phoneC = new Phone();
+        $offerA = new Offer();
+        $offerB = new Offer();
+        $offerC = new Offer();
+        $offerD = new Offer();
+        $phoneA->setId("bingBing");
+        $phoneB->setid("wahoo");
+        $phoneC->setid("reboijiore");
+        $offerA->setEnd(new \DateTime('2019-07-02'));
+        $offerB->setEnd(new \DateTime('2019-08-05'));
+        $offerC->setEnd(new \DateTime('2019-08-28'));
+        $offerD->setEnd(new \DateTime('2020-08-28'));
+        $offerA->setPhone($phoneA);
+        $offerB->setPhone($phoneB);
+        $offerC->setPhone($phoneA);
+        $offerD->setPhone($phoneB);
+        $user->addOffer($offerB);
+        $user->addOffer($offerC);
+        $user->addOffer($offerA);
+        $user->addOffer($offerD);
+        $this->assertEquals($offerC, $user->getOfferForPhone($phoneA, new \DateTime('2019-08-15')));
+        $this->assertEquals($offerA, $user->getOfferForPhone($phoneA, new \DateTime('2019-05-03')));
+        $this->assertEquals($offerD, $user->getOfferForPhone($phoneB, new \DateTime('2019-08-15')));
+        $this->assertEquals($offerB, $user->getOfferForPhone($phoneB, new \DateTime('2019-08-01')));
+        $this->assertEquals(null, $user->getOfferForPhone($phoneC, new \DateTime('2019-08-01')));
+    }
+
+    /**
+     * Tests that getCurrentPremiumForPhone gets the premium the user should use for the given phone whether they have
+     * an offer or multiple offers or just the normal premium on the phone.
+     */
+    public function testGetCurrentPremiumForPhone()
+    {
+        $user = new User();
+        $phoneA = new Phone();
+        $phoneB = new Phone();
+        $premiumA = new PhonePremium();
+        $premiumB = new PhonePremium();
+        $premiumC = new PhonePremium();
+        $premiumD = new PhonePremium();
+        $premiumA->getGwp(1);
+        $premiumB->getGwp(2;
+        $premiumC->getGwp(3);
+        $premiumD->getGwp(4);
+
     }
 }
