@@ -3,7 +3,6 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\Salva;
-use AppBundle\Document\Price;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -72,7 +71,7 @@ class Offer
 
     /**
      * Sets the price for this offer.
-     * @param PhonePrice the price.
+     * @param PhonePrice $price the price.
      */
     public function setPrice($price)
     {

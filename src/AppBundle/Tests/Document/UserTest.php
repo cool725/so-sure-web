@@ -878,15 +878,11 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $offerB = new Offer();
         $phoneA->setId("bing bing");
         $phoneB->setId("wahoo");
-        $priceA->getGwp(1);
         $priceA->setValidFrom(new \DateTime('2019-05-06'));
         $priceA->setValidTo(new \DateTime('2019-06-02'));
-        $priceB->getGwp(2);
         $priceB->setValidFrom(new \DateTime('2019-01-06'));
-        $priceC->getGwp(3);
         $priceC->setValidFrom(new \DateTime('2019-04-01'));
         $priceC->setValidTo(new \DateTime('2019-09-01'));
-        $priceD->getGwp(4);
         $priceD->setValidFrom(new \DateTime('2019-01-01'));
         $priceD->setValidTo(new \DateTime('2019-01-07'));
         $offerA->setPhone($phoneA);

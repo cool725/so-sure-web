@@ -2216,7 +2216,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * offers, and if there are not any it returns the current phone price.
      * @param Phone     $phone is the phone we are enquiring about.
      * @param \DateTime $date  is the date at which we are checking.
-     * @return Price the price that the user should pay if they make a policy on this phone model now.
+     * @return PhonePrice|null the price that the user should pay if they make a policy on this phone model now, or
+     *                         if there is no price for this phone at the current time.
      */
     public function getCurrentPriceForPhone($phone, $date)
     {
