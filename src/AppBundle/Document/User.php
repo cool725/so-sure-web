@@ -6,6 +6,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
+use AppBundle\Document\Offer;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
@@ -472,7 +473,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Represents altered premiums that have been added to this user.
-     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\Offer")
+     * @MongoDB\EmbedMany(
+     *  targetDocument="AppBundle\Document\Offer"
+     * )
      */
     protected $offers = [];
 
@@ -2218,8 +2221,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getCurrentPriceForPhone($phone, $date)
     {
         foreach ($this->getOffers() as $offer) {
-            if ($offer->getPhone()->getId() == $phone->getId() $offer->getPrice()->isValidAt($date)) {
-                return $offer;
+            if ($offer->getPhone()->getId() == $phone->getId() && $offer->getPrice()->isValidAt($date)) {
+                return $offer->getPrice();
             }
         }
         return $phone->getCurrentPhonePrice($date);

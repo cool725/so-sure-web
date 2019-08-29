@@ -183,7 +183,7 @@ abstract class Price
     public function isValidAt($date)
     {
         $validTo = $this->getValidTo();
-        return $date >= $this->getValidFrom() && ($date < $validTo || !$validTo));
+        return $date >= $this->getValidFrom() && (!$validTo || $date < $validTo);
     }
 
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
