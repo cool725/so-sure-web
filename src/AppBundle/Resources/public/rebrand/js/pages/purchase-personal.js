@@ -323,7 +323,7 @@ sosure.purchaseStepAddress = (function() {
             $('.postcode').val(addr.PostalCode);
             address = address + '<br>' + addr.PostalCode;
         }
-        $('#display-address').html(address);
+        $('#display_address').html('<small class="form-text">Please double check</small>' + address);
         $('.typeahead .with-errors').html('');
     }
 
