@@ -95,4 +95,4 @@ class Offer
     {
         $this->phone = $phone;
     }
-};
+}
