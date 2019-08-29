@@ -175,6 +175,17 @@ abstract class Price
         $this->excess = $excess;
     }
 
+    /**
+     * Tells you if this price is valid at the given date.
+     * @param \DateTime $date is the date we are checking at.
+     * @return boolean true if it is valid at this date, and false if not.
+     */
+    public function isValidAt($date)
+    {
+        $validTo = $this->getValidTo();
+        return $date >= $this->getValidFrom() && ($date < $validTo || !$validTo));
+    }
+
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
     protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)

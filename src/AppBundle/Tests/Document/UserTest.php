@@ -861,89 +861,44 @@ class UserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Makes sure that getOffersInOrder function gives all the user's offers in ascending order of end date.
-     */
-    public function testGetOffersInOrder()
-    {
-        $user = new User();
-        $offerA = new Offer();
-        $offerB = new Offer();
-        $offerC = new Offer();
-        $offerD = new Offer();
-        $offerA->setEnd(new \DateTime('2019-07-02'));
-        $offerB->setEnd(new \DateTime('2019-08-05'));
-        $offerC->setEnd(new \DateTime('2019-08-28'));
-        $offerD->setEnd(new \DateTime('2020-08-28'));
-        $user->addOffer($offerB);
-        $user->addOffer($offerC);
-        $user->addOffer($offerA);
-        $user->addOffer($offerD);
-        $ordered = $user->getOffersInOrder();
-        $this->assertEquals([$offerA, $offerB, $offerC, $offerD], $ordered);
-    }
-
-    /**
-     * Makes sure that getOfferForPhone gets the right offer if there is one for the right phone, and if there is no
-     * offer that is right it returns nothing.
-     */
-    public function testGetOfferForPhone()
-    {
-        $user = new User();
-        $phoneA = new Phone();
-        $phoneB = new Phone();
-        $phoneC = new Phone();
-        $offerA = new Offer();
-        $offerB = new Offer();
-        $offerC = new Offer();
-        $offerD = new Offer();
-        $phoneA->setId("bingBing");
-        $phoneB->setid("wahoo");
-        $phoneC->setid("reboijiore");
-        $offerA->setEnd(new \DateTime('2019-07-02'));
-        $offerB->setEnd(new \DateTime('2019-08-05'));
-        $offerC->setEnd(new \DateTime('2019-08-28'));
-        $offerD->setEnd(new \DateTime('2020-08-28'));
-        $offerA->setPhone($phoneA);
-        $offerB->setPhone($phoneB);
-        $offerC->setPhone($phoneA);
-        $offerD->setPhone($phoneB);
-        $user->addOffer($offerB);
-        $user->addOffer($offerC);
-        $user->addOffer($offerA);
-        $user->addOffer($offerD);
-        $this->assertEquals($offerC, $user->getOfferForPhone($phoneA, new \DateTime('2019-08-15')));
-        $this->assertEquals($offerA, $user->getOfferForPhone($phoneA, new \DateTime('2019-05-03')));
-        $this->assertEquals($offerD, $user->getOfferForPhone($phoneB, new \DateTime('2019-08-15')));
-        $this->assertEquals($offerB, $user->getOfferForPhone($phoneB, new \DateTime('2019-08-01')));
-        $this->assertEquals(null, $user->getOfferForPhone($phoneC, new \DateTime('2019-08-01')));
-    }
-
-    /**
      * Tests that getCurrentPremiumForPhone gets the premium the user should use for the given phone whether they have
      * an offer or multiple offers or just the normal premium on the phone.
      */
-    public function testGetCurrentPremiumForPhone()
+    public function testGetCurrentPriceForPhone()
     {
         $user = new User();
         $phoneA = new Phone();
         $phoneB = new Phone();
-        $premiumA = new PhonePremium();
-        $premiumB = new PhonePremium();
-        $premiumC = new PhonePremium();
-        $premiumD = new PhonePremium();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceD = new PhonePrice();
         $offerA = new Offer();
         $offerB = new Offer();
-        $premiumA->getGwp(1);
-        $premiumB->getGwp(2;
-        $premiumC->getGwp(3);
-        $premiumD->getGwp(4);
-        $premiumE->getGwp(5);
-        $premiumF->getGwp(6);
-        $phoneA->s
-        $offerA->setEnd(new \DateTime('2019-08-28'));
-        $offerA->setPremium($premiumE);
-        $offerB->setEnd(new \DateTime('2019-08-28'));
-        $offerB->setPremium($premiumF);
-
+        $priceA->getGwp(1);
+        $priceA->setValidFrom(new \DateTime('2019-05-06'));
+        $priceA->setValidTo(new \DateTime('2019-06-02'));
+        $priceA->getGwp(2);
+        $priceB->setValidFrom(new \DateTime('2019-05-06'));
+        $priceA->getGwp(3);
+        $priceC->setValidTo(new \DateTime('2019-06-02'));
+        $priceC->setValidFrom(new \DateTime('2019-05-06'));
+        $priceA->getGwp(4);
+        $priceD->setValidTo(new \DateTime('2019-01-07'));
+        $priceD->setValidFrom(new \DateTime('2019-01-01'));
+        $offerA->setPhone($phoneA);
+        $offerA->setPrice($priceA);
+        $offerB->setPhone($phoneB);
+        $offerB->setPrice($priceB);
+        $phoneA->addPrice($priceC);
+        $phoneB->addPrice($priceD);
+        // check that it returns the right things at the right dates.
+        $this->assertEquals($priceA, $user->getCurrentPriceForPhone($phoneA, new \DateTime('2019-05-19')));
+        $this->assertEquals($priceC, $user->getCurrentPriceForPhone($phoneA, new \DateTime('2019-05-01')));
+        $this->assertEquals($priceC, $user->getCurrentPriceForPhone($phoneA, new \DateTime('2019-06-29')));
+        $this->assertEquals($priceD, $user->getCurrentPriceForPhone($phoneB, new \DateTime('2019-01-03')));
+        $this->assertEquals($priceB, $user->getCurrentPriceForPhone($phoneB, new \DateTime('2019-05-19')));
+        $this->assertEquals($priceB, $user->getCurrentPriceForPhone($phoneB, new \DateTime('2050-01-01')));
+        $this->assertNull($user->getCurrentPriceForPhone($phoneB, new \DateTime('2019-02-04')));
     }
 }

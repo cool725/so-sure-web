@@ -3,7 +3,8 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\Salva;
-use AppBundle\Document\Premium;
+use AppBundle\Document\Price;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Form\PreloadedExtension;
@@ -24,23 +25,15 @@ class Offer
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
-    protected $start;
+    protected $created;
     
     /**
-     * Time at which the offer will stop working.
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
+     * The offered price which also stores the time period in which is it valid.
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PhonePrice")
      * @Gedmo\Versioned
+     * @var PhonePrice
      */
-    protected $end;
-
-    /**
-     * The offered premium.
-     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Premium")
-     * @Gedmo\Versioned
-     * @var Premium
-     */
-    protected $premium;
+    protected $price;
 
     /**
      * The phone model for which this offer is made.
@@ -50,41 +43,55 @@ class Offer
      */
     protected $phone;
 
-    public function getStart()
+    /**
+     * Gives the time at which the offer was created.
+     * @return \DateTime of creation.
+     */
+    public function getCreated()
     {
-        return $this->start;
+        return $this->created;
     }
 
-    public function setStart($start)
+    /**
+     * Sets the time at which this offer was created.
+     * @param \DateTime $created is the time at which it was created.
+     */
+    public function setCreated($created)
     {
-        $this->start = $start;
+        $this->created = $created;
     }
 
-    public function getEnd()
+    /**
+     * Gives the price that this offer pertains to.
+     * @return PhonePrice the price.
+     */
+    public function getPrice()
     {
-        return $this->end;
+        return $this->price;
     }
 
-    public function setEnd($end)
+    /**
+     * Sets the price for this offer.
+     * @param PhonePrice the price.
+     */
+    public function setPrice($price)
     {
-        $this->end = $end;
+        $this->price = $price;
     }
 
-    public function getPremium()
-    {
-        return $this->premium;
-    }
-
-    public function setPremium($premium)
-    {
-        $this->premium = $premium;
-    }
-
+    /**
+     * Gives the phone that this offer is about.
+     * @return Phone the phone.
+     */
     public function getPhone()
     {
         return $this->phone;
     }
 
+    /**
+     * Sets what phone model this offer is about.
+     * @param Phone $phone is the phone that the offer is about.
+     */
     public function setPhone($phone)
     {
         $this->phone = $phone;

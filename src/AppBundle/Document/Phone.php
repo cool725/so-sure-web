@@ -902,15 +902,12 @@ class Phone
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-
         foreach ($this->getPhonePrices() as $phonePrice) {
             /** @var PhonePrice $phonePrice */
-            if ($phonePrice->getValidFrom() <= $date &&
-                (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)) {
+            if ($phonePrice->isValidAt($date)) {
                 return $phonePrice;
             }
         }
-
         return null;
     }
 

@@ -2209,51 +2209,20 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     }
 
     /**
-     * Gives all of the premium offers made to the user in ascending order of end date.
-     * @return array containing the offers in order.
+     * Gives you the current price that this user ought to pay for the given phone. First it checks for any price
+     * offers, and if there are not any it returns the current phone price.
+     * @param Phone     $phone is the phone we are enquiring about.
+     * @param \DateTime $date  is the date at which we are checking.
+     * @return Price the price that the user should pay if they make a policy on this phone model now.
      */
-    public function getOffersInOrder()
+    public function getCurrentPriceForPhone($phone, $date)
     {
-        $offers = $this->getOffers();
-        if (!is_array($offers)) {
-            $offers = $offers->toArray();
-        }
-        usort($offers, function ($a, $b) {
-            return $a->getEnd() < $b->getEnd() ? -1 : 1;
-        });
-        return $offers;
-    }
-
-    /**
-     * Returns a current offer for the given phone if the user has one.
-     * @param Phone $phone is the phone that we are looking for an offer on.
-     * @param \DateTime $date is the date at which we are looking.
-     * @return Offer|null the offer found or null if no offer is found.
-     */
-    public function getOfferForPhone($phone, $date)
-    {
-        foreach ($this->getOffersInOrder() as $offer) {
-            if ($offer->getPhone()->getId() == $phone->getId() && $date < $offer->getEnd()) {
+        foreach ($this->getOffers() as $offer) {
+            if ($offer->getPhone()->getId() == $phone->getId() $offer->getPrice()->isValidAt($date)) {
                 return $offer;
             }
         }
-        return null;
-    }
-
-    /**
-     * Gives you the current premium that this user ought to pay for the given phone.
-     * @param Phone     $phone is the phone we are enquiring about.
-     * @param \DateTime $date  is the date at which we are checking.
-     * @return Premium the premium that the user should pay if they make a policy on this phone model now.
-     */
-    public function getCurrentPremiumForPhone($phone, $date)
-    {
-        $offer = $this->getOfferForPhone($phone, $date);
-        if ($offer) {
-            return $offer->getPremium();
-        } else {
-            return $phone->getCurrentPhonePrice($date);
-        }
+        return $phone->getCurrentPhonePrice($date);
     }
 
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
