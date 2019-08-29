@@ -165,6 +165,10 @@ class PhoneInsuranceController extends BaseController
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
+        // Skip to purchase
+        // TODO - Let's remove altogether
+        $skipToPurchase = $request->get('skip');
+
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             return new RedirectResponse($this->generateUrl('homepage'));
         }
@@ -177,7 +181,7 @@ class PhoneInsuranceController extends BaseController
         if ($id) {
             /** @var Phone $phone */
             $phone = $repo->find($id);
-            if ($phone->getMemory()) {
+            if ($phone->getMemory() && !$skipToPurchase) {
                 return $this->redirectToRoute('quote_make_model_memory', [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getEncodedModelCanonical(),
@@ -185,10 +189,12 @@ class PhoneInsuranceController extends BaseController
                 ], 301);
             }
 
-            return $this->redirectToRoute('quote_make_model', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical(),
-            ], 301);
+            if (!$skipToPurchase) {
+                return $this->redirectToRoute('quote_make_model', [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
+                ], 301);
+            }
         }
 
         if ($memory) {
@@ -206,7 +212,7 @@ class PhoneInsuranceController extends BaseController
                     'modelCanonical' => mb_strtolower($model),
                     'memory' => (int) $memory
                 ]);
-                if ($phone) {
+                if ($phone && !$skipToPurchase) {
                     return $this->redirectToRoute('quote_make_model_memory', [
                         'make' => $phone->getMakeCanonical(),
                         'model' => $phone->getEncodedModelCanonical(),
@@ -233,7 +239,7 @@ class PhoneInsuranceController extends BaseController
                     'makeCanonical' => mb_strtolower($make),
                     'modelCanonical' => mb_strtolower($model)
                 ]);
-                if ($phone) {
+                if ($phone && !$skipToPurchase) {
                     return $this->redirectToRoute('quote_make_model', [
                         'make' => $phone->getMakeCanonical(),
                         'model' => $phone->getEncodedModelCanonical()
@@ -251,7 +257,7 @@ class PhoneInsuranceController extends BaseController
             ));
 
             return new RedirectResponse($this->generateUrl('homepage'));
-        } elseif (!$phone->isSameMakeModelCanonical($make, $model)) {
+        } elseif (!$phone->isSameMakeModelCanonical($make, $model) && !$skipToPurchase) {
             return $this->redirectToRoute('quote_make_model_memory', [
                 'make' => $phone->getMakeCanonical(),
                 'model' => $phone->getEncodedModelCanonical(),
@@ -510,6 +516,9 @@ class PhoneInsuranceController extends BaseController
             'hide_section'     => $hideSection,
         );
 
+        if ($skipToPurchase) {
+            return $this->redirectToRoute('purchase');
+        }
         return $this->render($template, $data);
     }
 
