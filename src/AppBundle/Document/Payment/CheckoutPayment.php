@@ -56,6 +56,18 @@ class CheckoutPayment extends Payment
     protected $message;
 
     /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $info;
+
+    /**
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $responseCode;
+
+    /**
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="0", max="4")
      * @MongoDB\Field(type="string")
@@ -125,6 +137,26 @@ class CheckoutPayment extends Payment
     public function setMessage($message)
     {
         $this->message = $message;
+    }
+
+    public function getInfo()
+    {
+        return $this->info;
+    }
+
+    public function setInfo($info)
+    {
+        $this->info = $info;
+    }
+
+    public function getResponseCode()
+    {
+        return $this->responseCode;
+    }
+
+    public function setResponseCode($responseCode)
+    {
+        $this->responseCode = $responseCode;
     }
 
     public function getCardLastFour()
