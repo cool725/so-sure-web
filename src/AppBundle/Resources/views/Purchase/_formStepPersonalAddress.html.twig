@@ -110,14 +110,14 @@
                 </div>
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
-{#
-            <div id="display-address" style="margin-bottom: 20px" data-hj-suppress="">
+
+            <div id="display_address" style="margin-bottom: 20px" data-hj-suppress="">
                 {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
                 {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
                 {% if purchase_form.vars.data.addressLine3|length > 0 %}{{ purchase_form.vars.data.addressLine3 }}<br>{% endif %}
                 {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
                 {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
-            </div> #}
+            </div>
 
             <div class="form-group text-md-right mt-5">
                 {{ form_widget(purchase_form.next, {

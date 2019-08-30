@@ -91,31 +91,35 @@
                     {% endif %}
                 </div>
                 <div class="col-12 col-lg-7 offset-lg-1">
-                    <div class="d-md-flex mb-4">
-                        <h5 class="mb-4">Reward Pot</h5>
-                        <div id="reward_pot_chart"
-                             class="user-chart mb-4 mx-auto"
-                             data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
-                             data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
-                            <div class="user-chart__value">
-                                <span class="text-dodger-blue h4">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
-                                <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
+                    <div class="row">
+                        <div class="col-md">
+                            <h5 class="mb-4">Reward Pot</h5>
+                            <div id="reward_pot_chart"
+                                 class="user-chart mb-4"
+                                 data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
+                                 data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
+                                <div class="user-chart__value">
+                                    <span class="text-dodger-blue h4">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
+                                    <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
+                                </div>
                             </div>
                         </div>
                         {% if policy.getCurrentConnectionValues %}
-                            {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
-                            {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
-                            <h5 class="mb-4">Connection Bonus</h5>
-                            <div id="connection_bonus_chart"
-                                 class="user-chart mb-4 mx-auto"
-                                 data-bonus-days-total="{{ days_total }}"
-                                 data-bonus-days-remaining="{{ days_left }}">
-                                <div class="user-chart__value">
-                                    <span class="text-danger h4">{{ days_left }}</span>
-                                    <br><small class="opacity-50">DAYS</small>
-                                    {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
-                                        <small class="opacity-50">UNTIL BONUS <br> REDUCED</small>
-                                    {% endif %}
+                            <div class="col-md">
+                                {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
+                                {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
+                                <h5 class="mb-4">Connection Bonus</h5>
+                                <div id="connection_bonus_chart"
+                                     class="user-chart mb-4"
+                                     data-bonus-days-total="{{ days_total }}"
+                                     data-bonus-days-remaining="{{ days_left }}">
+                                    <div class="user-chart__value">
+                                        <span class="text-danger h4">{{ days_left }}</span>
+                                        <br><small class="opacity-50">DAYS</small>
+                                        {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
+                                            <small class="opacity-50">UNTIL BONUS <br> REDUCED</small>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         {% endif %}
