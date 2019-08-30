@@ -247,7 +247,7 @@ class CheckoutService
             if ($diff < 300) {
                 $data['skipped-too-soon']++;
             } elseif ($success) {
-                if (!$payment && abs($charge->getValue()) > 0) {
+                if (!$payment && $charge->getValue() != 0) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
                             'INVESTIGATE!! Missing db checkout payment for received payment. id %s on %s [%s]',
