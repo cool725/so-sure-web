@@ -65,7 +65,7 @@ class CheckoutPayment extends Payment
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
-    protected $httpCode;
+    protected $responseCode;
 
     /**
      * @AppAssert\Alphanumeric()
@@ -149,14 +149,14 @@ class CheckoutPayment extends Payment
         $this->info = $info;
     }
 
-    public function getHttpCode()
+    public function getResponseCode()
     {
-        return $this->httpCode;
+        return $this->responseCode;
     }
 
-    public function setHttpCode($httpCode)
+    public function setResponseCode($responseCode)
     {
-        $this->httpCode = $httpCode;
+        $this->responseCode = $responseCode;
     }
 
     public function getCardLastFour()

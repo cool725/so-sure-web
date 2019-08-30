@@ -797,7 +797,7 @@ class BICommand extends ContainerAwareCommand
             "Message",
             "Details",
             "Detailed Info",
-            "Http Code"
+            "Response Code"
         );
 
         /** @var CheckoutPayment $transaction */
@@ -814,7 +814,7 @@ class BICommand extends ContainerAwareCommand
                 $transaction->getMessage(),
                 $transaction->getDetails(),
                 $transaction->getInfo(),
-                $transaction->getHttpCode()
+                $transaction->getResponseCode()
             );
         }
         if (!$skipS3) {
