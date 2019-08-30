@@ -790,30 +790,34 @@ class BICommand extends ContainerAwareCommand
 
 
         $lines = [];
-        $lines[] = implode(',', [
+        $lines[] = $this->makeLine(
             "Date",
             "Payment ID",
             "Transaction ID",
             "Result",
             "Policy Number",
             "Message",
-            "Details"
-        ]);
+            "Details",
+            "Detailed Info",
+            "Response Code"
+        );
 
         /** @var CheckoutPayment $transaction */
         foreach ($transactions as $transaction) {
             /** @var Policy $policy */
             $policy = $transaction->getPolicy();
 
-            $lines[] = implode(',', [
+            $lines[] = $this->makeLine(
                 $transaction->getDate()->format('jS M Y H:i'),
                 $transaction->getId(),
                 $transaction->getReceipt(),
                 $transaction->getResult(),
                 $policy->getPolicyNumber(),
                 $transaction->getMessage(),
-                $transaction->getDetails()
-            ]);
+                $transaction->getDetails(),
+                $transaction->getInfo(),
+                $transaction->getResponseCode()
+            );
         }
         if (!$skipS3) {
             $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
