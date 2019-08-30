@@ -392,6 +392,7 @@ class BICommand extends ContainerAwareCommand
             'Premium Installments',
             'First Time Policy',
             'Policy Number # Prior Renewal',
+            'Policy Number # Renewal',
             'This Policy is the X renewal',
             'Policy Status',
             'Expected Unpaid Cancellation Date',
@@ -466,6 +467,7 @@ class BICommand extends ContainerAwareCommand
                 $policy->getPremiumInstallments(),
                 $policy->useForAttribution() ? 'yes' : 'no',
                 $previous ? $previous->getPolicyNumber() : '',
+                $next ? $next->getPolicyNumber() : '',
                 $policy->getGeneration(),
                 $policy->getStatus(),
                 $policy->getStatus() == Policy::STATUS_UNPAID ?
