@@ -894,39 +894,66 @@ class Phone
     }
 
     /**
-     * @param \DateTime|null $date
-     * @return PhonePrice|null
+     * Gives you all of the phone's prices in descending order of when they become valid.
+     * @return array of the prices.
+     */
+    public function getOrderedPhonePrices()
+    {
+        $prices = $this->getPhonePrices();
+        if (!is_array($prices)) {
+            $prices = $prices->toArray();
+        }
+        usort($prices, function ($a, $b) {
+            $aValid = $a->getValidFrom();
+            $bValid = $b->getValidFrom();
+            if ($aValid < $bValid) {
+                return 1;
+            } elseif ($aValid > $bValid) {
+                return -1;
+            }
+            return 0;
+        });
+        return $prices;
+    }
+
+    /**
+     * Returns the price that is current.
+     * @param \DateTime|null $date the date at which the price should be current. Null for now.
+     * @return PhonePrice|null the found price or null if there is no price current at that time.
      */
     public function getCurrentPhonePrice(\DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-
-        foreach ($this->getPhonePrices() as $phonePrice) {
-            /** @var PhonePrice $phonePrice */
-            if ($phonePrice->getValidFrom() <= $date &&
-                (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)) {
-                return $phonePrice;
+        foreach ($this->getOrderedPhonePrices() as $price) {
+            if ($price->getValidFrom() <= $date) {
+                return $price;
             }
         }
-
         return null;
     }
 
+    /**
+     * Gives a list of all phone prices that have been current in the past but are not any more. The list will be in
+     * order from newest to oldest.
+     * @param \DateTime|null $date is the date at which we are checking.
+     * @return array of matching phone prices.
+     */
     public function getPreviousPhonePrices(\DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
         $previous = [];
-
-        foreach ($this->getPhonePrices() as $phonePrice) {
-            if ($phonePrice->getValidTo() && $phonePrice->getValidTo() <= $date) {
-                $previous[] = $phonePrice;
+        $old = false;
+        foreach ($this->getOrderedPhonePrices() as $price) {
+            if ($old) {
+                $previous[] = $price;
+            } elseif ($price->getValidFrom() <= $date) {
+                $old = true;
             }
         }
-
         return $previous;
     }
 

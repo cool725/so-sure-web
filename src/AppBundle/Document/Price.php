@@ -195,7 +195,6 @@ abstract class Price
     {
         return [
             'valid_from' => $this->getValidFrom()->format(\DateTime::ATOM),
-            'valid_to' => $this->getValidTo() ? $this->getValidTo()->format(\DateTime::ATOM) : null,
             'gwp' => $this->getGwp(),
             'premium' => $this->getMonthlyPremiumPrice(null, $date),
             'notes' => $this->getNotes(),
@@ -206,7 +205,6 @@ abstract class Price
     {
         return array_merge($this->toApiArray($date), [
             'initial_premium' => $this->getMonthlyPremiumPrice(null, $this->getValidFrom()),
-            'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice(null, $this->getValidTo()) : null,
             'excess' => $this->getExcess() ? $this->getExcess()->toPriceArray() : null,
             'excess_detail' => $this->getExcess() ? $this->getExcess()->toPriceArray()['detail'] : '??',
         ]);
