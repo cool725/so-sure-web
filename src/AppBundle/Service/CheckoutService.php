@@ -300,11 +300,7 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        try {
-            $charge = $this->capturePaymentMethod($policy, $token, $amount);
-        } catch (\Exception $e) {
-            $this->logger->error(sprintf("Policy %s failed to make initial checkout payment.", $policy->getId()));
-        }
+        $charge = $this->capturePaymentMethod($policy, $token, $amount);
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
 
