@@ -247,7 +247,7 @@ class CheckoutService
             if ($diff < 300) {
                 $data['skipped-too-soon']++;
             } elseif ($success) {
-                if (!$payment) {
+                if (!$payment && $details->getValue() != 0) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
                             'INVESTIGATE!! Missing db checkout payment for received payment. id %s on %s [%s]',
@@ -257,7 +257,7 @@ class CheckoutService
                         ));
                     }
                     $data['missing'][$chargeId] = $transaction->getTrackId();
-                } elseif (!$payment->isSuccess()) {
+                } elseif ($payment && !$payment->isSuccess()) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
                             'INVESTIGATE!! Checkout payment status in db does not match checkout id %s on %s [%s]',
