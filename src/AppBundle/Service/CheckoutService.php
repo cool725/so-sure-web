@@ -1127,8 +1127,8 @@ class CheckoutService
         $payment->setReceipt($transactionDetails->getId());
         $payment->setResult($transactionDetails->getStatus());
         $payment->setMessage($transactionDetails->getResponseMessage());
-        $payment->setInfo($transaction->getResponseAdvancedInfo());
-        $payment->setResponseCode($transaction->getResponseStatus());
+        $payment->setInfo($transactionDetails->getResponseAdvancedInfo());
+        $payment->setResponseCode($transactionDetails->getResponseStatus());
         $payment->setRiskScore($transactionDetails->getRiskCheck());
         $payment->setSource($source);
 
@@ -1765,7 +1765,7 @@ class CheckoutService
         $refund->setResult($refundDetails->getStatus());
         $refund->setMessage($refundDetails->getResponseMessage());
         $refund->setInfo($refundDetails->getResponseAdvancedInfo());
-        $refund->setResponseCode($refundDetails->getResponseStatus());
+        $refund->setResponseCode($refundDetails->getResponseCode());
         $refund->setRiskScore($refundDetails->getRiskCheck());
 
         $refundAmount = $this->convertFromPennies($refundDetails->getValue());
