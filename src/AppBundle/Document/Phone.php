@@ -957,6 +957,44 @@ class Phone
         return $previous;
     }
 
+    /**
+     * Gives all phone prices that are yet in the future.
+     * @param \DateTime|null $date is the date which is to be considered the present.
+     * @return array containing the prices.
+     */
+    public function getFuturePhonePrices(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+        $future = [];
+        foreach ($this->getPhonePrices() as $price) {
+            if ($price->getValidFrom() > $date) {
+                $future[] = $price;
+            }
+        }
+        return $future;
+    }
+
+    /**
+     * Gives a list of all phone prices that have been valid since the given number of minutes from right now.
+     * @param int $minutes is the number of minutes deviance within which to find the prices.
+     * @return array with all the prices within it.
+     */
+    public function getRecentPhonePrices(int $minutes)
+    {
+        $date = new \DateTime();
+        $line = (clone $date)->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
+        $recent = [];
+        foreach ($this->getPhonePrices() as $phonePrice) {
+            $validFrom = $price ->getValidFrom();
+            if ($validFrom >= $line && $validFrom < $date) {
+                $recent[] = $phonePrice;
+            }
+        }
+        return $recent;
+    }
+
     public function getPreviousPhonePricesAsString(\DateTime $date = null)
     {
         return $this->getPhonePricesAsString($this->getPreviousPhonePrices($date));
@@ -972,48 +1010,12 @@ class Phone
         $lines = ['Assumes current IPT Rate!'];
         foreach ($prices as $price) {
             $lines[] = sprintf(
-                "%s - %s @ £%.2f",
+                "%s @ £%.2f",
                 $price->getValidFrom()->format(\DateTime::ATOM),
-                $price->getValidTo() ? $price->getValidTo()->format(\DateTime::ATOM) : '...',
                 $price->getMonthlyPremiumPrice()
             );
         }
-
         return implode(PHP_EOL, $lines);
-    }
-
-    public function getFuturePhonePrices(\DateTime $date = null)
-    {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
-        }
-        $future = [];
-
-        foreach ($this->getPhonePrices() as $phonePrice) {
-            if ($phonePrice->getValidFrom() >= $date) {
-                $future[] = $phonePrice;
-            }
-        }
-
-        return $future;
-    }
-
-    public function getRecentPhonePrices(int $minutes)
-    {
-        $date =  \DateTime::createFromFormat('U', time());
-        $date->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
-
-        $recent = [];
-
-        foreach ($this->getPhonePrices() as $phonePrice) {
-            if ($phonePrice->getValidFrom() >= $date ||
-                (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)
-            ) {
-                $recent[] = $phonePrice;
-            }
-        }
-
-        return $recent;
     }
 
     public function isSameMake($make)
@@ -1345,7 +1347,6 @@ class Phone
         \DateTime $from,
         PhoneExcess $excess,
         PhoneExcess $picSureExcess,
-        \DateTime $to = null,
         $notes = null,
         \DateTime $date = null
     ) {
@@ -1358,21 +1359,6 @@ class Phone
                 '%s must be after %s',
                 $from->format(\DateTime::ATOM),
                 $date->format(\DateTime::ATOM)
-            ));
-        }
-        if ($to && $to < $date) {
-            throw new \Exception(sprintf(
-                '%s must be after %s',
-                $to->format(\DateTime::ATOM),
-                $date->format(\DateTime::ATOM)
-            ));
-        }
-
-        if ($to && $to < $from) {
-            throw new \Exception(sprintf(
-                '%s must be after %s',
-                $from->format(\DateTime::ATOM),
-                $to->format(\DateTime::ATOM)
             ));
         }
         if (!$this->getSalvaMiniumumBinderMonthlyPremium()) {

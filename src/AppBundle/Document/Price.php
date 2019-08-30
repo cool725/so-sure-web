@@ -27,12 +27,6 @@ abstract class Price
     protected $validFrom;
 
     /**
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
-     */
-    protected $validTo;
-
-    /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      */
@@ -64,16 +58,6 @@ abstract class Price
     public function setValidFrom($validFrom)
     {
         $this->validFrom = $validFrom;
-    }
-
-    public function getValidTo()
-    {
-        return $this->validTo;
-    }
-
-    public function setValidTo($validTo)
-    {
-        $this->validTo = $validTo;
     }
 
     public function getGwp()
