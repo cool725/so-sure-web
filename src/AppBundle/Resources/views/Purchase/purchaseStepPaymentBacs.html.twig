@@ -49,6 +49,9 @@
                             see full details <i class="fas fa-caret-down ml-2"></i>
                         </a>
                     </div>
+                    {% if feature_enabled('apply-sign-up-bonus') %}
+                        <p class="text-white text-center text-lg-left mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
+                    {% endif %}
                     <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
                         <div class="purchase__footer__text">
                             <h4 class="text-columbia-blue-e">An amazing level of cover:</h4>

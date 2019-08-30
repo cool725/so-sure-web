@@ -70,6 +70,9 @@
                         <span class="sub">For only</span>
                         &pound;{{ phone_price.monthlyPremiumPrice }} a month
                     </div>
+                    {% if feature_enabled('apply-sign-up-bonus') %}
+                        <p class="text-white mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
+                    {% endif %}
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': cta_txt,

@@ -88,14 +88,14 @@
                             <small class="sub text-zaffre">We are always happy to talk</small>
                         </span>
                     </a>
-{#                     <a class="dropdown-item dropdown-item-nav h6 mb-0"
-                       href="https://blog.wearesosure.com" rel="noopener noreferrer" target="_blank">
+                    <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                       href="{{ path('blog_index') }}">
                         <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_reviews.png" alt="so-sure - Blog" width="50px" class="mr-4">
                         <span>
                             Blog 📚<br>
-                            <small class="sub text-zaffre">Fancy working with us?</small>
+                            <small class="sub text-zaffre">Insurance and bits</small>
                         </span>
-                    </a> #}
+                    </a>
                     <a class="dropdown-item dropdown-item-nav h6 mb-0"
                        href="{{ path('careers') }}">
                         <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_careers.png" alt="so-sure - Careers" width="50px" class="mr-4">
@@ -113,7 +113,7 @@
             </li>
             {% if hide_login is not defined %}
                 <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-                    <a href="{{ path('claim') }}"
+                    <a href="{{ path('user_claim') }}"
                        class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
                         Make a Claim
                     </a>

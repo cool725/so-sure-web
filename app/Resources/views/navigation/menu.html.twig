@@ -2,46 +2,39 @@
     <ul class="list-unstyled align-self-stretch text-md-center menu__links">
         <li>
             <a href="{{ path('phone_insurance') }}" class="h5">
-                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_low_excess.png" alt="so-sure - Phone insurance" width="50px" class="mr-4 d-md-none"> #}
                 Phone insurance 📱
             </a>
         </li>
         <li>
             <a href="{{ path('social_insurance') }}" class="h5">
-                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_social_insurance.png" alt="so-sure - Social insurance" width="50px" class="mr-4 d-md-none"> #}
                 Social insurance 🤔
             </a>
         </li>
         <li>
             <a href="{{ path('comparison') }}" class="h5">
-                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_compare_cover.png" alt="so-sure - Compare cover" width="50px" class="mr-4 d-md-none"> #}
                 Compare cover 😎
             </a>
         </li>
         <li>
             <a href="{{ path('faq') }}" class="h5">
-                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_faqs.png" alt="so-sure - FAQs" width="50px" class="mr-4 d-md-none"> #}
                 FAQs 🤓
             </a>
         </li>
         <li>
             <a href="{{ path('about_how_to_contact_so_sure') }}" class="h5">
-                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_contact_us.png" alt="so-sure - Contact us" width="50px" class="mr-4 d-md-none"> #}
                 Contact us 💬
             </a>
         </li>
         <li>
-            <a href="{{ path('claim') }}" class="h5">
-                {# <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_make_a_claim.png" alt="so-sure - Make a claim" width="50px" class="mr-4 d-md-none"> #}
+            <a href="{{ path('user_claim') }}" class="h5">
                 Make a Claim 😢
             </a>
         </li>
-{#         <li>
-            <a href="https://blog.wearesosure.com" class="h5">
-                <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_reviews.png" alt="so-sure - Blog" width="50px" class="mr-4 d-md-none">
+        <li>
+            <a href="{{ path('blog_index') }}" class="h5">
                 Blog 📚
             </a>
-        </li> #}
+        </li>
     </ul>
     <div class="px-5 py-4 text-md-center align-self-stretch menu__buttons">
         {% if app.user is not null and app.user %}

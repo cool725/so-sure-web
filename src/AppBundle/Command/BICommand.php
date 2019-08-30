@@ -12,6 +12,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Lead;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\Invitation;
@@ -369,152 +370,139 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var InvitationRepository */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
-        /** @var ScheduledPaymentRepository $scheduledPaymentRepository */
-        $scheduledPaymentRepository = $this->dm->getRepository(ScheduledPayment::class);
-        /** @var PhonePolicyRepository $repo */
-        $repo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
+        /** @var ScheduledPaymentRepository */
+        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+        /** @var PhonePolicyRepository */
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
-        $lines[] = implode(',', [
-            '"Policy Number"',
-            '"Age of Policy Holder"',
-            '"Postcode of Policy Holder"',
-            '"Policy Start Date"',
-            '"Policy End Date"',
-            '"Policy Status"',
-            '"Policy Holder Id"',
-            '"Policy Cancellation Reason"',
-            '"Requested Cancellation (Phone Damaged Prior To Policy)"',
-            '"Total Number of Claims"',
-            '"Number of Approved/Settled Claims"',
-            '"Number of Withdrawn/Declined Claims"',
-            '"Pen Portrait"',
-            '"Gender"',
-            '"Total Weekly Income"',
-            '"Latest Campaign Name"',
-            '"Latest Campaign Source"',
-            '"Requested Cancellation Reason (Phone Damaged Prior To Policy)"',
-            '"Policy Renewed"',
-            '"Latest Referer"',
-            '"First Campaign Name"',
-            '"First Campaign Source"',
-            '"First Referer"',
-            '"Make"',
-            '"Make/Model"',
-            '"Connections"',
-            '"Invitations"',
-            '"pic-sure Status"',
-            '"Lead Source"',
-            '"Purchase SDK"',
-            '"Make/Model/Memory"',
-            '"Reward Pot"',
-            '"Premium Paid"',
-            '"Yearly Premium"',
-            '"Premium Outstanding"',
-            '"Policy Purchase Time"',
-            '"Past Due Amount (Bad Debt Only)"',
-            '"Has previous policy"',
-            '"Payment Method"',
-            '"Expected Unpaid Cancellation Date"',
-            '"Bacs Mandate Status"',
-            '"First time policy"',
-            '"Successful Payment"',
-            '"Bacs Mandate Cancelled Reason"',
-            '"Premium Installments"',
-            '"Inviter"',
-            '"Latest Payment failed without reschedule"',
-            '"Originating Scode"'
-        ]);
+        $lines[] = $this->makeLine(
+            'Policy Number',
+            'Policy Holder Id',
+            'Age of Policy Holder',
+            'Postcode of Policy Holder',
+            'Pen Portrait',
+            'Gender',
+            'Total Weekly Income',
+            'Make',
+            'Make/Model',
+            'Make/Model/Memory',
+            'Policy Start Date',
+            'Policy End Date',
+            'Premium Installments',
+            'First Time Policy',
+            'Policy Number # Prior Renewal',
+            'This Policy is the X renewal',
+            'Policy Status',
+            'Expected Unpaid Cancellation Date',
+            'Policy Cancellation Reason',
+            'Requested Cancellation (Phone Damaged Prior to Policy)',
+            'Requested Cancellation Reason (Phone Damaged Prior to Policy)',
+            'Invitations',
+            'Connections',
+            'Reward Pot',
+            'Pic-Sure Status',
+            'Total Number of Claims',
+            'Number of Approved/Settled Claims',
+            'Number of Withdrawn/Declined Claims',
+            'Policy Purchase Time',
+            'Lead Source',
+            'Scode Type',
+            'Scode Name',
+            'Latest Campaign Source (user)',
+            'Latest Campaign Name (user)',
+            'Latest referer (user)',
+            'First Campaign Source (user)',
+            'First Campaign Name (user)',
+            'First referer (user)',
+            'Purchase SDK',
+            'Payment Method',
+            'Bacs Mandate Status',
+            'Bacs Mandate Cancelled Reason',
+            'Successful Payment',
+            'Latest Payment Failed Without Reschedule',
+            'Yearly Premium',
+            'Premium Paid',
+            'Premium Outstanding',
+            'Past Due Amount (Bad Debt Only)'
+        );
         foreach ($policies as $policy) {
-            /** @var Policy $policy */
             $user = $policy->getUser();
-            $inviter = null;
-            $invitation = $invitationRepo->getOwnInvitation($policy);
-            if ($invitation) {
-                $inviter = $invitation->getPolicy();
-            }
+            $previous = $policy->getPreviousPolicy();
+            $next = $policy->getNextPolicy();
+            $phone = $policy->getPhone();
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
-            $lastReverted = $policy->getLastRevertedScheduledPayment();
+            $attribution = $user->getAttribution();
+            $latestAttribution = $user->getLatestAttribution();
+            $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
+            $scode = '';
+            $scodeType = '';
+            if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE) {
+                $scodeObject = $policy->getFirstScode();
+                if ($scodeObject) {
+                    $scode = $scodeObject->getCode();
+                    $scodeType = $scodeObject->getType();
+                }
+            }
             $reschedule = null;
+            $lastReverted = $policy->getLastRevertedScheduledPayment();
             if ($lastReverted) {
-                $reschedule = $scheduledPaymentRepository->getRescheduledBy($lastReverted);
+                $reschedule = $scheduledPaymentRepo->getRescheduledBy($lastReverted);
             }
-            $originatingScode = "";
-            $scodes = $policy->getScodes();
-            if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE && array_key_exists(0, $scodes)) {
-                $originatingScode = $scodes[0]->getCode();
-            }
-            $lines[] = implode(',', [
-                sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%d"', $user->getAge()),
-                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
-                sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d')),
-                sprintf('"%s"', $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d')),
-                sprintf('"%s"', $policy->getStatus()),
-                sprintf('"%s"', $user->getId()),
-                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
-                sprintf('"%s"', $policy->hasRequestedCancellation() ? 'yes' : 'no'),
-                sprintf('"%s"', count($policy->getClaims())),
-                sprintf('"%s"', count($policy->getApprovedClaims(true))),
-                sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims())),
-                sprintf('"%s"', $census ? $census->getSubgrp() : ''),
-                sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
-                $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
-                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignName() : ''),
-                sprintf(
-                    '"%s"',
-                    $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''
-                ),
-                sprintf(
-                    '"%s"',
-                    $policy->getRequestedCancellationReason() ? $policy->getRequestedCancellationReason() : null
-                ),
-                sprintf('"%s"', $policy->isRenewed() ? 'yes' : 'no'),
-                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getReferer() : ''),
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
-                sprintf('"%s"', $policy->getPhone()->getMake()),
-                sprintf('"%s %s"', $policy->getPhone()->getMake(), $policy->getPhone()->getModel()),
-                sprintf('"%d"', count($policy->getStandardConnections())),
-                sprintf('"%d"', count($policy->getInvitations())),
-                sprintf('"%s"', $policy->getPicSureStatus() ? $policy->getPicSureStatus() : 'unstarted'),
-                sprintf('"%s"', $policy->getLeadSource()),
-                sprintf('"%s"', $policy->getPurchaseSdk()),
-                sprintf('"%s"', $policy->getPhone()->__toString()),
-                sprintf('"%0.2f"', $policy->getPotValue()),
-                sprintf('"%0.2f"', $policy->getPremiumPaid()),
-                sprintf('"%0.2f"', $policy->getPremium()->getYearlyPremiumPrice()),
-                sprintf('"%0.2f"', $policy->getUnderwritingOutstandingPremium()),
-                sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'H:i')),
-                sprintf('"%0.2f"', $policy->getBadDebtAmount()),
-                sprintf('"%s"', $policy->hasPreviousPolicy() ? 'yes' : 'no'),
-                sprintf('"%s"', $policy->getUsedPaymentType()),
-                sprintf(
-                    '"%s"',
-                    $policy->getStatus() == Policy::STATUS_UNPAID ?
-                        $this->timezoneFormat($policy->getPolicyExpirationDate(), $timezone, 'Y-m-d') :
-                        null
-                ),
-                sprintf(
-                    '"%s"',
-                    ($policy->getPolicyOrUserBacsBankAccount() && $policy->isActive(true)) ?
-                        $policy->getPolicyOrUserBacsBankAccount()->getMandateStatus() :
-                        null
-                ),
-                sprintf('"%s"', $policy->useForAttribution($prefix) ? 'yes' : 'no'),
-                sprintf('"%s"', count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
-                sprintf(
-                    '"%s"',
-                    ($policy->getPolicyOrUserBacsBankAccount() && $policy->isActive(true)) ?
-                        $policy->getPolicyOrUserBacsBankAccount()->getMandateCancelledExplanation() : ''
-                ),
-                sprintf('"%s"', $policy->getPremiumInstallments()),
-                sprintf('"%s"', $inviter ? $inviter->getPolicyNumber() : ''),
-                sprintf('"%s"', ($lastReverted && !$reschedule) ? "yes" : "no"),
-                sprintf('"%s"', $originatingScode)
-            ]);
+            $lines[] = $this->makeLine(
+                $policy->getPolicyNumber(),
+                $user->getId(),
+                $user->getAge(),
+                $user->getBillingAddress()->getPostcode(),
+                $census ? $census->getSubgrp() : '',
+                $user->getGender() ?: '',
+                $income ? sprintf('%0.0f', $income->getTotal()->getIncome()) : '',
+                $phone->getMake(),
+                sprintf('%s %s', $phone->getMake(), $phone->getModel()),
+                $phone,
+                $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d'),
+                $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d'),
+                $policy->getPremiumInstallments(),
+                $policy->useForAttribution() ? 'yes' : 'no',
+                $previous ? $previous->getPolicyNumber() : '',
+                $policy->getGeneration(),
+                $policy->getStatus(),
+                $policy->getStatus() == Policy::STATUS_UNPAID ?
+                    $this->timezoneFormat($policy->getPolicyExpirationDate(), $timezone, 'Y-m-d') : '',
+                $policy->getStatus() == Policy::STATUS_CANCELLED ? $policy->getCancelledReason() : '',
+                $policy->hasRequestedCancellation() ? 'yes' : 'no',
+                $policy->getRequestedCancellationReason() ?: '',
+                count($policy->getInvitations()),
+                count($policy->getStandardConnections()),
+                $policy->getPotValue(),
+                $policy->getPicsureStatus() ?: 'unstarted',
+                count($policy->getClaims()),
+                count($policy->getApprovedClaims()),
+                count($policy->getWithdrawnDeclinedClaims()),
+                $this->timezoneFormat($policy->getStart(), $timezone, 'H:i'),
+                $policy->getLeadSource(),
+                $scodeType,
+                $scode,
+                $latestAttribution ? $latestAttribution->getCampaignSource() : '',
+                $latestAttribution ? $latestAttribution->getCampaignName() : '',
+                $latestAttribution ? $latestAttribution->getReferer() : '',
+                $attribution ? $attribution->getCampaignSource() : '',
+                $attribution ? $attribution->getCampaignName() : '',
+                $attribution ? $attribution->getReferer() : '',
+                $policy->getPurchaseSdk(),
+                $policy->getUsedPaymentType(),
+                ($bankAccount && $policy->isActive(true)) ? $bankAccount->getMandateStatus() : '',
+                ($bankAccount && $policy->isActive(true) &&
+                    $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
+                    $bankAccount->getMandateCancelledExplanation() : '',
+                count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no',
+                ($lastReverted && !$reschedule) ? 'yes' : 'no',
+                $policy->getPremium()->getYearlyPremiumPrice(),
+                $policy->getPremiumPaid(),
+                $policy->getUnderwritingOutstandingPremium(),
+                $policy->getBadDebtAmount()
+            );
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
@@ -866,5 +854,14 @@ class BICommand extends ContainerAwareCommand
         ));
         unlink($tmpFile);
         return $s3Key;
+    }
+
+    /**
+     * Makes a line of the csv with quotes around the items and commas between them.
+     * @param mixed ...$item are all of the string items to concatenate of variable number.
+     */
+    private function makeLine(...$item)
+    {
+        return '"'.implode('","', func_get_args()).'"';
     }
 }

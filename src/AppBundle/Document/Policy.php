@@ -2222,6 +2222,18 @@ abstract class Policy
         return $this->scodes;
     }
 
+    /**
+     * Returns the first scode that the policy has.
+     * @return SCode|null the first scode or null if there are none.
+     */
+    public function getFirstScode()
+    {
+        foreach ($this->scodes as $scode) {
+            return $scode;
+        }
+        return null;
+    }
+
     public function getActiveSCodes()
     {
         $scodes = [];
@@ -3484,6 +3496,22 @@ abstract class Policy
         }
     }
 
+    /**
+     * Tells you what generation of renewals this policy is. If it is not a renewal it will return 1, if it is
+     * a renewal of a policy that is not a renewal it will return 2, etc.
+     * @return int the generation number that it is.
+     */
+    public function getGeneration()
+    {
+        $policy = $this;
+        $generation = 0;
+        while ($policy) {
+            $policy = $policy->getPreviousPolicy();
+            $generation++;
+        }
+        return $generation;
+    }
+
     public function isPolicyWithin21Days($date = null)
     {
         if (!$this->getStart()) {
@@ -4458,8 +4486,8 @@ abstract class Policy
                 sprintf(
                     'Unable to activate policy %s if not between policy dates. Must be after %s and before %s',
                     $this->getId(),
-                    $this->getStart(),
-                    $tooLate
+                    $this->getStart()->format('Y-m-d H:i:s'),
+                    $tooLate->format('Y-m-d H:i:s')
                 )
             );
         }
@@ -5331,14 +5359,26 @@ abstract class Policy
         if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
             return true;
         } elseif ($this->isUnpaidCloseToExpirationDate($date) || $this->isUnpaidBacs()) {
+            $standardTotal = $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+            $finalTotal = $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice();
             if ($this->areEqualToTwoDp(
                 $outstandingPremium,
-                $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+                $standardTotal
             )) {
                 return true;
             } elseif ($this->areEqualToTwoDp(
                 $outstandingPremium,
-                $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+                $finalTotal
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $standardTotal - $this->getScheduledPaymentRefundAmount()
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $finalTotal - $this->getScheduledPaymentRefundAmount()
             )) {
                 return true;
             }
@@ -6238,6 +6278,7 @@ abstract class Policy
                 null,
             'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
             'card_details' => $cardDetails,
+            'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ? $this->getOutstandingPremiumToDate() : 0
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

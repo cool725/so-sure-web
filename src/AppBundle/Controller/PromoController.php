@@ -49,6 +49,9 @@ class PromoController extends BaseController
         $session->set('scode', $code);
 
         if ($scode && $request->getMethod() === "GET") {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PROMO_PAGE, [
+                'Promo code' => $scode,
+            ]);
             $this->get('app.mixpanel')->queuePersonProperties([
                 'Attribution Invitation Method' => 'reward',
             ], true);

@@ -57,6 +57,7 @@
     "mem": "^5.1.1",
     "moment": "^2.24.0",
     "popper.js": "^1.15.0",
+    "set-value": "^2.0.1",
     "tempusdominus-bootstrap-4": "^5.1.2",
     "textfit": "^2.3.1",
     "viewerjs": "^1.2.0"

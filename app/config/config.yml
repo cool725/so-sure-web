@@ -487,6 +487,8 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - http://track.omguk.com
+                - https://track.omguk.com
                 - 'data:'
             connect-src:
                 - 'self'
@@ -789,6 +791,8 @@ nelmio_security:
                 - https://static.criteo.net
                 - https://smct.co
                 - http://smct.co
+                - http://track.omguk.com
+                - https://track.omguk.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
