@@ -915,7 +915,7 @@ class CheckoutService
                 $payment->setResult($details->getStatus());
                 $payment->setMessage($details->getResponseMessage());
                 $payment->setInfo($details->getResponseAdvancedInfo());
-                $payment->setHttpCode($details->getHttpStatus());
+                $payment->setHttpCode($details->getResponseCode());
                 $payment->setRiskScore($details->getRiskCheck());
                 try {
                     $this->setCommission($payment, true);
@@ -971,7 +971,7 @@ class CheckoutService
                     $payment->setResult($details->getStatus());
                     $payment->setMessage($details->getResponseMessage());
                     $payment->setInfo($details->getResponseAdvancedInfo());
-                    $payment->setHttpCode($details->getHttpStatus());
+                    $payment->setHttpCode($details->getResponseCode());
                     $payment->setRiskScore($details->getRiskCheck());
                     // Make sure upcoming rescheduled scheduled payments are now cancelled.
                     $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
