@@ -1128,7 +1128,7 @@ class CheckoutService
         $payment->setResult($transactionDetails->getStatus());
         $payment->setMessage($transactionDetails->getResponseMessage());
         $payment->setInfo($transactionDetails->getResponseAdvancedInfo());
-        $payment->setResponseCode($transactionDetails->getResponseStatus());
+        $payment->setResponseCode($transactionDetails->getResponseCode());
         $payment->setRiskScore($transactionDetails->getRiskCheck());
         $payment->setSource($source);
 
@@ -1654,7 +1654,7 @@ class CheckoutService
             $payment->setResult($tokenPaymentDetails->getStatus());
             $payment->setMessage($tokenPaymentDetails->getResponseMessage());
             $payment->setInfo($tokenPaymentDetails->getResponseAdvancedInfo());
-            $payment->setResponseCode($tokenPaymentDetails->getResponseStatus());
+            $payment->setResponseCode($tokenPaymentDetails->getResponseCode());
             $payment->setRiskScore($tokenPaymentDetails->getRiskCheck());
         } else {
             $this->logger->info(sprintf(
