@@ -884,7 +884,7 @@ abstract class Policy
 
     /**
      * Gives the set of dates that the policy's premium schedule should consist of.
-     * @return array of the dates.
+     * @return array|null of the dates, and null if there is simply no schedule at all because the policy is not valid.
      */
     public function getInvoiceSchedule()
     {
