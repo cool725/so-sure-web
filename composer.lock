@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b5ea54fc583a730b5d36c52326676f2",
+    "content-hash": "52474338beaa787c91c759017e774e45",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1753,16 +1753,16 @@
         },
         {
             "name": "facebook/php-business-sdk",
-            "version": "3.2.6",
+            "version": "3.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/facebook-php-business-sdk.git",
-                "reference": "0064bac15f069c89d5b9dcca8ec477379eb21a51"
+                "reference": "dca55a5dc1f99aa828a230860b2e5bd5610354b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/0064bac15f069c89d5b9dcca8ec477379eb21a51",
-                "reference": "0064bac15f069c89d5b9dcca8ec477379eb21a51",
+                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/dca55a5dc1f99aa828a230860b2e5bd5610354b6",
+                "reference": "dca55a5dc1f99aa828a230860b2e5bd5610354b6",
                 "shasum": ""
             },
             "require-dev": {
@@ -1786,7 +1786,7 @@
                 "page",
                 "sdk"
             ],
-            "time": "2019-01-15T23:19:09+00:00"
+            "time": "2019-07-26T19:05:24+00:00"
         },
         {
             "name": "fig/link-util",
@@ -9403,6 +9403,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-01-06T05:45:45+00:00"
         },
         {
