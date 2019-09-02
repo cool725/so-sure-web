@@ -1,5 +1,4 @@
 {% extends 'base_rebrand.html.twig' %}
-{% form_theme purchase_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 {# Set vars #}
 {% set quote_mode = true %}
 {% if phone %}
@@ -65,11 +64,13 @@
                         </div>
                         <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                             <span class="sub">For only</span>
-                            {% if not app.user or app.user.allowedMonthlyPayments %}
-                                &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
-                            {% else %}
-                                &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
-                            {% endif %}
+                            <span id="purchase_price">
+                                {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                                {% else %}
+                                    &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                {% endif %}
+                            </span>
                         </div>
                         {% if feature_enabled('apply-sign-up-bonus') %}
                             <p class="text-white text-center text-lg-left mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
@@ -146,6 +147,9 @@
         </div>
     </section>
 
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
+
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
@@ -154,8 +158,12 @@
 {% block footer %}
     {# TODO: Fix footer #}
 {% endblock %}
-
 {% block javascriptsPage %}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
     <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
 {% endblock %}

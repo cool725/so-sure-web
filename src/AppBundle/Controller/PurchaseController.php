@@ -552,7 +552,6 @@ class PurchaseController extends BaseController
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
-        $cardFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
         $cardProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
 
@@ -587,7 +586,7 @@ class PurchaseController extends BaseController
 
         /** @var Form $toCardForm */
         $toCardForm = null;
-        if ($cardFeature && $checkoutFeature) {
+        if ($checkoutFeature) {
             $toCardForm =  $this->get("form.factory")
                 ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
                 ->getForm();
@@ -867,7 +866,13 @@ class PurchaseController extends BaseController
         $paymentProvider = null;
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        // bacs overrides any type of card payment
+        /** @var Form $toCardForm */
+        $toCardForm = null;
+        if ($checkoutFeature) {
+            $toCardForm =  $this->get("form.factory")
+                ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
+                ->getForm();
+        }        // bacs overrides any type of card payment
         if ($bacsFeature) {
             $paymentProvider = SoSure::PAYMENT_PROVIDER_BACS;
         } elseif ($checkoutFeature) {
@@ -930,6 +935,11 @@ class PurchaseController extends BaseController
                         }
                     }
                 }
+            } elseif ($request->request->has('to_card_form')) {
+                if ($checkoutFeature) {
+                    // TODO
+                    NoOp::ignore([]);
+                }
             }
         }
 
@@ -957,6 +967,10 @@ class PurchaseController extends BaseController
             'payment_provider' => $paymentProvider,
         );
 
+        if ($toCardForm) {
+            $data['to_card_form'] = $toCardForm->createView();
+            $data['card_provider'] = $paymentProvider;
+        }
         return $this->render($template, $data);
     }
 
@@ -1361,6 +1375,16 @@ class PurchaseController extends BaseController
 
             $token = $request->get("token");
             $pennies = $request->get("pennies");
+            $freq = $request->get('premium');
+            if ($freq == Policy::PLAN_MONTHLY) {
+                $policy->setPremiumInstallments(12);
+                $this->getManager()->flush();
+            } elseif ($freq == Policy::PLAN_YEARLY) {
+                $policy->setPremiumInstallments(1);
+                $this->getManager()->flush();
+            } else {
+                throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+            }
             $csrf = $request->get("csrf");
             $publicKey = $request->get("cko-public-key");
             $cardToken = $request->get("cko-card-token");

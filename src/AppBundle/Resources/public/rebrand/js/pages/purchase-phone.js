@@ -112,10 +112,10 @@ $(function(){
         let timei = oimei.replace(/[\s\/]/g, '');
         $(this).val(timei);
         // If valid hide the warning
-        if (phone == 'Samsung') {
-            if ($(this).valid()) {
-                $('.samsung-imei').hide();
-            }
-        }
+        // if (phone == 'Samsung') {
+        //     if ($(this).valid()) {
+        //         $('.samsung-imei').hide();
+        //     }
+        // }
     });
 });
