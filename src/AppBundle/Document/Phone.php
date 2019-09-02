@@ -1148,11 +1148,7 @@ class Phone
         }
 
         // If there is an end date, then quote should be valid until then
-        $quoteValidTo = $currentPhonePrice->getValidTo();
-        if (!$quoteValidTo) {
-            $quoteValidTo = \DateTime::createFromFormat('U', time());
-            $quoteValidTo->add(new \DateInterval('P1D'));
-        }
+        $quoteValidTo = (new \DateTime())->add(new \DateInterval('P1D'));
 
         $promoAddition = 0;
         $isPromoLaunch = false;
