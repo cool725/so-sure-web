@@ -1889,12 +1889,21 @@ class AdminController extends BaseController
             }
 
             if ($request->request->has('flag-redis-policy')) {
-                $redis->sadd('policy:validation:flags', $policy->getId());
+                if ($request->get('flag-redis-policy') == 'remove') {
+                    $redis->srem('policy:validation:flags', $policy->getId());
 
-                $this->addFlash('success', sprintf(
-                    'Flagged policy %s',
-                    $policy->getPolicyNumber()
-                ));
+                    $this->addFlash('success', sprintf(
+                        'Unflagged policy %s',
+                        $policy->getPolicyNumber()
+                    ));
+                } else {
+                    $redis->sadd('policy:validation:flags', $policy->getId());
+
+                    $this->addFlash('success', sprintf(
+                        'Flagged policy %s',
+                        $policy->getPolicyNumber()
+                    ));
+                }
             }
 
             if ($request->request->has('delete-redis-policy')) {
