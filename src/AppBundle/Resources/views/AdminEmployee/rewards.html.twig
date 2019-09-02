@@ -45,7 +45,7 @@
                     </thead>
                     <tbody>
                         {% for reward in rewards %}
-                            <tr>
+                            <tr class="{% if reward.expiryDate %}{% if reward.expiryDate|date('d-m-T H:i') < "now"|date('d-m-T H:i') %}table-danger{% else %}table-success{% endif %}{% else %}table-info{% endif %}">
                                 <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
                                 <td>
                                     {% if reward.sCode %}
