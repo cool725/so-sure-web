@@ -818,8 +818,6 @@ class BICommand extends ContainerAwareCommand
         $policyRepo = $this->dm->getRepository(Policy::class);
         /** @var ConnectionRepository */
         $connectionRepo = $this->dm->getRepository(Connection::class);
-        /** @var RewardRepository */
-        $rewardRepo = $this->dm->getRepository(Reward::class);
         $policies = $policyRepo->findScodePolicies();
         $lines = [];
         $lines[] = $this->makeLine(
