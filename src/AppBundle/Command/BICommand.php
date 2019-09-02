@@ -9,7 +9,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Reward;
-use AppBundle\Document\Scode;
+use AppBundle\Document\SCode;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -22,6 +22,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -813,8 +814,11 @@ class BICommand extends ContainerAwareCommand
      */
     private function exportScodes($skipS3, \DateTimeZone $timezone)
     {
+        /** @var PolicyRepository */
         $policyRepo = $this->dm->getRepository(Policy::class);
+        /** @var ConnectionRepository */
         $connectionRepo = $this->dm->getRepository(Connection::class);
+        /** @var RewardRepository */
         $rewardRepo = $this->dm->getRepository(Reward::class);
         $policies = $policyRepo->findScodePolicies();
         $lines = [];
