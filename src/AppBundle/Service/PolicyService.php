@@ -1019,9 +1019,11 @@ class PolicyService
                     continue;
                 }
                 $scheduledDate->add(new \DateInterval('P7D'));
+            } elseif ($renewal && $i == 1) {
+                $scheduledDate = $this->adjustDayForBilling(new \DateTime(), true);
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
-                if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
+                if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {
                     continue;
                 }
                 // initial purchase should start at 1 month from initial purchase
@@ -1051,7 +1053,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $this->subDays(new \DateTime(), 2) || $isFixtures) {
+            if ($scheduledDate >= $this->subDays(new \DateTime(), 4) || $isFixtures) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->error(sprintf(
