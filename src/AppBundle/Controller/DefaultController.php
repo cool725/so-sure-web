@@ -147,6 +147,14 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/marlow", name="marlow")
+     */
+    public function marlowAction()
+    {
+        return $this->redirectToRoute('promo', ['code' => 'MARLOW15']);
+    }
+
+    /**
      * @Route("/valentines-day-free-phone-case", name="valentines_day_free_phone_case")
      */
     public function valentinesDayCase()
