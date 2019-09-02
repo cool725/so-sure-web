@@ -320,7 +320,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$priceC, $priceB, $priceA], $phone->getOrderedPhonePrices());
     }
 
-
+    /**
+     * Makes sure that getCurrentPhonePrice gets the phone price that is current so long as there is one, and uses no
+     * maximum dates.
+     */
     public function testGetCurrentPhonePrice()
     {
         $phone = new Phone();
@@ -338,6 +341,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($priceC, $phone->getCurrentPhonePrice(new \DateTime('2050-01-01')));
     }
 
+    /**
+     * Makes sure that getPreviousPhonePrices gets the list of all phone prices that are old and does not include the
+     * current phone price.
+     */
     public function testGetPreviousPhonePrices()
     {
         $phone = new Phone();
@@ -353,6 +360,50 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->addPhonePrice($priceC);
         $this->assertEquals([$priceA], $phone->getPreviousPhonePrices());
         $this->assertEquals([$priceB, $priceA], $phone->getPreviousPhonePrices(new \DateTime('2050-01-01')));
+    }
+
+    /**
+     * Makes sure that getFuturePhonePrices gets all phone prices that appear in the future not including the current
+     * price.
+     */
+    public function testGetFuturePhonePrices()
+    {
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2018-02-19'));
+        $priceB->setValidFrom(new \DateTime('2019-05-02'));
+        $priceC->setValidFrom(new \DateTime('2020-11-08'));
+        $this->assertEquals([], $phone->getFuturePhonePrices());
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceC);
+        $this->assertEquals([$priceC], $phone->getFuturePhonePrices());
+    }
+
+    /**
+     * Makes sure that getRecentPhonePrices gets all phone prices that have been going in the last few minutes
+     * including the current phone price.
+     */
+    public function testGetRecentPhonePrices()
+    {
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceD = new PhonePrice();
+        $date = new \DateTime();
+        $priceA->setValidFrom((clone $date)->sub(new \DateInterval("P1DT5M")));
+        $priceB->setValidFrom((clone $date)->sub(new \DateInterval("PT5M")));
+        $priceC->setValidFrom((clone $date)->add(new \DateInterval("PT5M")));
+        $priceD->setValidFrom((clone $date)->add(new \DateInterval("P1DT37M")));
+        $this->assertEquals([], $phone->getRecentPhonePrices(10));
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceC);
+        $phone->addPhonePrice($priceD);
+        $this->assertEquals([$priceB], $phone->getRecentPhonePrices(10));
     }
 
     private function getSamplePhoneA()

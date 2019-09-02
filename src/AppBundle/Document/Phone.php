@@ -986,10 +986,10 @@ class Phone
         $date = new \DateTime();
         $line = (clone $date)->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
         $recent = [];
-        foreach ($this->getPhonePrices() as $phonePrice) {
-            $validFrom = $price ->getValidFrom();
+        foreach ($this->getPhonePrices() as $price) {
+            $validFrom = $price->getValidFrom();
             if ($validFrom >= $line && $validFrom < $date) {
-                $recent[] = $phonePrice;
+                $recent[] = $price;
             }
         }
         return $recent;
@@ -1364,7 +1364,6 @@ class Phone
         if (!$this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf('Unable to determine min binder'));
         }
-
         $oneDay = $this->addBusinessDays($date, 1);
         $dateDiff = $oneDay->diff($from);
         if ($dateDiff->invert) {
@@ -1374,15 +1373,10 @@ class Phone
                 $oneDay->format(\DateTime::ATOM)
             ));
         }
-
         $price = new PhonePrice();
         $price->setGwp($gwp);
         $price->setValidFrom($from);
         $price->setNotes($notes);
-        if ($to) {
-            $price->setValidTo($to);
-        }
-
         if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',
@@ -1390,23 +1384,17 @@ class Phone
                 $this->getSalvaMiniumumBinderMonthlyPremium()
             ));
         }
-
         if ($this->getCurrentPhonePrice()) {
-            if (!$this->getCurrentPhonePrice()->getValidTo()) {
-                if ($this->getCurrentPhonePrice()->getValidFrom() > $from) {
-                    throw new \Exception(sprintf(
-                        '%s must be after current pricing start date %s',
-                        $from->format(\DateTime::ATOM),
-                        $this->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
-                    ));
-                }
-                $this->getCurrentPhonePrice()->setValidTo($from);
+            if ($this->getCurrentPhonePrice()->getValidFrom() > $from) {
+                throw new \Exception(sprintf(
+                    '%s must be after current pricing start date %s',
+                    $from->format(\DateTime::ATOM),
+                    $this->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
+                ));
             }
         }
-
         $price->setExcess($excess);
         $price->setPicSureExcess($picSureExcess);
-
         $this->addPhonePrice($price);
     }
 }
