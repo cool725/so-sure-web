@@ -8,6 +8,8 @@ use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Reward;
+use AppBundle\Document\Scode;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -96,7 +98,8 @@ class BICommand extends ContainerAwareCommand
             "phones",
             "unpaidCalls",
             "leadSource",
-            "checkoutTransactions"
+            "checkoutTransactions",
+            "scodes"
         ];
         $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
         $this
@@ -151,60 +154,40 @@ class BICommand extends ContainerAwareCommand
         $only = $input->getOption('only');
         $skipS3 = true === $input->getOption('skip-s3');
         $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
+        $lines = [];
         if (!$only || $only == 'policies') {
             $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'claims') {
             $lines = $this->exportClaims($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'users') {
             $lines = $this->exportUsers($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'invitations') {
             $lines = $this->exportInvitations($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'connections') {
             $lines = $this->exportConnections($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'phones') {
             $lines = $this->exportPhones($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'unpaidCalls') {
             $lines = $this->exportUnpaidCalls($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'leadSource') {
             $lines = $this->exportLeadSource($skipS3, $timezone);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
         }
         if (!$only || $only == 'checkoutTransactions') {
             $date = $input->getOption('date');
             $lines = $this->exportCheckoutTransactions($skipS3, $timezone, $date);
-            if ($debug) {
-                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
-            }
+        }
+        if (!$only || $only == 'scodes') {
+            $lines = $this->exportScodes($skipS3, $timezone);
+        }
+        if ($debug) {
+            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
         }
     }
 
@@ -819,11 +802,54 @@ class BICommand extends ContainerAwareCommand
                 $transaction->getResponseCode()
             );
         }
-        if (!$skipS3) {
-            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
-            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
-        }
 
+        return $lines;
+    }
+
+    /**
+     * Gives you a list of lines in a csv containing all scodes used by all users.
+     * @param boolean       $skipS3   tells you whether to skip uploading the file to s3.
+     * @param \DateTimeZone $timezone is the timezone we are getting dates in.
+     */
+    private function exportScodes($skipS3, \DateTimeZone $timezone)
+    {
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $connectionRepo = $this->dm->getRepository(Connection::class);
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+        $policies = $policyRepo->findScodePolicies();
+        $lines = [];
+        $lines[] = $this->makeLine(
+            "Scode",
+            "Scode Type",
+            "User Id",
+            "Policy Number",
+            "Date"
+        );
+        foreach ($policies as $policy) {
+            foreach ($policy->getScodes() as $scode) {
+                $type = $scode->getType();
+                $connection = null;
+                if ($type == Scode::TYPE_REWARD) {
+                    $rewardUser = $scode->getReward()->getUser();
+                    $connection = $connectionRepo->findByUser($rewardUser, $policy);
+                } elseif ($type == Scode::TYPE_STANDARD) {
+                    $other = $scode->getPolicy();
+                    $connection = $connectionRepo->connectedByPolicy($policy, $other);
+                }
+                if ($connection) {
+                    $lines[] = $this->makeLine(
+                        $scode->getCode(),
+                        $scode->getType(),
+                        $policy->getUser()->getId(),
+                        $policy->getPolicyNumber(),
+                        $connection->getDate()->format("Y-m-d H:i")
+                    );
+                }
+            }
+        }
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'scodes.csv');
+        }
         return $lines;
     }
 

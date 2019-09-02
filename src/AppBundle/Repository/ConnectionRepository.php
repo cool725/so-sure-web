@@ -94,6 +94,24 @@ class ConnectionRepository extends BaseDocumentRepository
         return $connectionLinks > 0;
     }
 
+    public function connectedByPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        return $this->createQueryBuilder()
+            ->field("sourcePolicy")->references($sourcePolicy)
+            ->field("linkedPolicy")->references($linkedPolicy)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
+    public function findByUser($user, $policy)
+    {
+        return $this->createQueryBuilder()
+            ->field("linkedUser")->references($user)
+            ->field("sourcePolicy")->references($policy)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
     public function count(\DateTime $start = null, \DateTime $end = null, $cancelled = false)
     {
         return $this->connectedByDate($start, $end, $cancelled)->count();
