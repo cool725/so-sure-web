@@ -67,11 +67,11 @@ class SCodeReportCommand extends ContainerAwareCommand
 
     /**
      * inserts the required dependencies into the command.
-     * @param S3Client $s3 is the amazon s3 client for uploading generated reports.
+     * @param S3Client        $s3 is the amazon s3 client for uploading generated reports.
      * @param DocumentManager $dm is the document manager for loading data.
-     * @param string $environment is the environment name used to upload to the right location in amazon s3.
+     * @param string          $environment is the environment name used to upload to the right location in amazon s3.
      * @param LoggerInterface $logger is used for logging.
-     * @param SearchService $searchService provides geographical information about users.
+     * @param SearchService   $searchService provides geographical information about users.
      */
     public function __construct(
         S3Client $s3,
@@ -79,8 +79,7 @@ class SCodeReportCommand extends ContainerAwareCommand
         $environment,
         LoggerInterface $logger,
         SearchService $searchService
-    )
-    {
+    ){
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
@@ -257,6 +256,6 @@ class SCodeReportCommand extends ContainerAwareCommand
      */
     private function makeLine(...$item)
     {
-        return '"'.implode('","', func_get_args()).'"';
+        return '"' . implode('","', func_get_args()) . '"';
     }
 }
