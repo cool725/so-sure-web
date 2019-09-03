@@ -249,6 +249,35 @@ class SCodeReportCommand extends ContainerAwareCommand
         return $retVal;
     }
 
+    private function uploadS3($data, $filename)
+    {
+        /**
+         * It is possible that the filename can be a path, but the permissions on prod do not
+         * allow for a subdir to be created but S3 does.
+         * This means that there can be instances where the cron will fail.
+         * Solution is that if a path is passed in, explode it and take the last part
+         * for the tmp filename, but still use the full filename with path for s3.
+         */
+        $tmpFilename = $filename;
+        if (mb_strpos($filename, '/') !== false) {
+            $parts = explode('/', $filename);
+            $tmpFilename = array_pop($parts);
+        }
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $tmpFilename);
+        $result = file_put_contents($tmpFile, $data);
+        if (!$result) {
+            throw new \Exception($filename . ' could not be processed into a tmp file.');
+        }
+        $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);
+        $result = $this->s3->putObject(array(
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
+            'Key'    => $s3Key,
+            'SourceFile' => $tmpFile,
+        ));
+        unlink($tmpFile);
+        return $s3Key;
+    }
+
     /**
      * Makes a line of the csv with quotes around the items and commas between them.
      * @param mixed ...$item are all of the string items to concatenate of variable number.
