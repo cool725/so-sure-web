@@ -40,12 +40,13 @@
                             <th>Total</th>
                             <th>Limit</th>
                             <th>Expires</th>
+                            <th>Active</th>
                             <th>Add manually</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for reward in rewards %}
-                            <tr>
+                            <tr class="{% if reward.expiryDate %}{% if date(reward.expiryDate) < date() %}table-danger{% else %}table-success{% endif %}{% else %}table-info{% endif %}">
                                 <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
                                 <td>
                                     {% if reward.sCode %}
@@ -59,6 +60,7 @@
                                 <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
                                 <td>{% if reward.usageLimit %}{{ reward.usageLimit }}{% else %}n/a{% endif %}</td>
                                 <td>{% if reward.expiryDate %}{{ reward.expiryDate|date('d-m-T H:i') }}{% else %}n/a{% endif %}</td>
+                                <td>{% if reward.expiryDate %}<i class="far {% if date(reward.expiryDate) < date() %}fa-times text-danger{% else %}fa-check text-success{% endif %} fa-lg fa-fw"></i>{% else %}n/a{% endif %}</td>
                                 <td>
                                     <a href="#"
                                        class="btn btn-primary btn-sm"
