@@ -79,7 +79,7 @@ class SCodeReportCommand extends ContainerAwareCommand
         $environment,
         LoggerInterface $logger,
         SearchService $searchService
-    ){
+    ) {
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
