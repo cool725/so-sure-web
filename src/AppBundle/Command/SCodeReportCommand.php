@@ -116,7 +116,7 @@ class SCodeReportCommand extends ContainerAwareCommand
             "Policy End Date",
             "Policy Status",
             "# of Previous Policy",
-            "Lead Sorce",
+            "Lead Source",
             "SCode Type",
             "SCode Name",
             "Latest Campaign Source",
@@ -187,7 +187,7 @@ class SCodeReportCommand extends ContainerAwareCommand
         if ($debug) {
             $output->write(json_encode($lines, JSON_PRETTY_PRINT));
         } else {
-            $this->uploadS3(implode(PHP_EOL, $lines), 'score_report.csv');
+            $this->uploadS3(implode(PHP_EOL, $lines), 'scode_report.csv');
         }
     }
 
