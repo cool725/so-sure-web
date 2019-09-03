@@ -67,10 +67,10 @@ class SCodeReportCommand extends ContainerAwareCommand
 
     /**
      * inserts the required dependencies into the command.
-     * @param S3Client        $s3 is the amazon s3 client for uploading generated reports.
-     * @param DocumentManager $dm is the document manager for loading data.
-     * @param string          $environment is the environment name used to upload to the right location in amazon s3.
-     * @param LoggerInterface $logger is used for logging.
+     * @param S3Client        $s3            is the amazon s3 client for uploading generated reports.
+     * @param DocumentManager $dm            is the document manager for loading data.
+     * @param string          $environment   is the environment name used to upload to the right location in amazon s3.
+     * @param LoggerInterface $logger        is used for logging.
      * @param SearchService   $searchService provides geographical information about users.
      */
     public function __construct(
