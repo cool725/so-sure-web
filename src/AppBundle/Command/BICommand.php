@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -23,6 +24,7 @@ use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\Invitation\InvitationRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -188,7 +190,9 @@ class BICommand extends ContainerAwareCommand
             $lines = $this->exportScodes($skipS3, $timezone);
         }
         if ($debug) {
-            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            foreach ($lines as $line) {
+                $output->writeln($line);
+            }
         }
     }
 
@@ -393,6 +397,8 @@ class BICommand extends ContainerAwareCommand
             'Policy Purchase Time',
             'Lead Source',
             'Scode Type',
+            'SCodes Used',
+            'Promo Codes',
             'Scode Name',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
@@ -411,6 +417,7 @@ class BICommand extends ContainerAwareCommand
             'Premium Outstanding',
             'Past Due Amount (Bad Debt Only)'
         );
+        /** @var Policy $policy */
         foreach ($policies as $policy) {
             $user = $policy->getUser();
             $previous = $policy->getPreviousPolicy();
@@ -421,15 +428,8 @@ class BICommand extends ContainerAwareCommand
             $attribution = $user->getAttribution();
             $latestAttribution = $user->getLatestAttribution();
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
-            $scode = '';
-            $scodeType = '';
-            if ($policy->getLeadSource() == Lead::LEAD_SOURCE_SCODE) {
-                $scodeObject = $policy->getFirstScode();
-                if ($scodeObject) {
-                    $scode = $scodeObject->getCode();
-                    $scodeType = $scodeObject->getType();
-                }
-            }
+            $scodeType = $this->getFirstSCodeUsedType($policy);
+            $scodeName = $this->getFirstSCodeUserName($policy);
             $reschedule = null;
             $lastReverted = $policy->getLastRevertedScheduledPayment();
             if ($lastReverted) {
@@ -469,7 +469,9 @@ class BICommand extends ContainerAwareCommand
                 $this->timezoneFormat($policy->getStart(), $timezone, 'H:i'),
                 $policy->getLeadSource(),
                 $scodeType,
-                $scode,
+                $this->getSCodesUsed($policy),
+                $this->getPromoCodesUsed($policy),
+                $scodeName,
                 $latestAttribution ? $latestAttribution->getCampaignSource() : '',
                 $latestAttribution ? $latestAttribution->getCampaignName() : '',
                 $latestAttribution ? $latestAttribution->getReferer() : '',
@@ -853,6 +855,101 @@ class BICommand extends ContainerAwareCommand
             $this->uploadS3(implode(PHP_EOL, $lines), 'scodes.csv');
         }
         return $lines;
+    }
+
+    private function getFirstSCodeUsedType(Policy $policy)
+    {
+        $connections = $policy->getConnections()->toArray();
+
+        /** @var Connection $connection */
+        $oldest = new \DateTime();
+        $firstConnection = new \stdClass();
+        foreach ($connections as $connection) {
+            if ($connection->getDate() < $oldest) {
+                $oldest = $connection->getDate();
+                $firstConnection = $connection;
+            }
+        }
+        $retVal = "";
+        $rewardRepo = $this->dm->getRepository(Reward::Class);
+        if ($firstConnection instanceof RewardConnection && !$this->isSignUpBonusSCode($rewardRepo, $firstConnection)) {
+            $retVal = "reward";
+        } elseif ($firstConnection instanceof StandardConnection) {
+            $retVal = "standard";
+        }
+        return $retVal;
+    }
+
+    private function getSCodesUsed(Policy $policy)
+    {
+        /** @var RewardRepository $rewardRepo */
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+        $connections = $policy->getConnections();
+        $retVal = "";
+        /** @var Connection $connection */
+        foreach ($connections as $connection) {
+            if (!$connection instanceof RewardConnection) {
+                if ($connection->getLinkedPolicy() instanceof Policy) {
+                    $retVal .= $connection->getLinkedPolicy()->getStandardSCode()->getCode() . ';';
+                }
+            }
+        }
+        return $retVal;
+    }
+
+    private function getPromoCodesUsed(Policy $policy)
+    {
+        /** @var RewardRepository $rewardRepo */
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+        $connections = $policy->getConnections();
+        $retVal = "";
+        /** @var Connection $connection */
+        foreach ($connections as $connection) {
+            if ($connection instanceof RewardConnection) {
+                /** @var Reward $reward */
+                $rewards = $rewardRepo->findBy(['user.id' => $connection->getLinkedUser()->getId()]);
+                foreach ($rewards as $reward) {
+                    if ($reward->getSCode()) {
+                        $retVal .= $reward->getSCode()->getCode() . ';';
+                    } else {
+                        $retVal .= "signupbonus;";
+                    }
+                }
+            }
+        }
+        return $retVal;
+    }
+
+    private function isSignUpBonusSCode(RewardRepository $rewardRepo, $connection)
+    {
+        $rewards = $rewardRepo->findBy(['user.id' => $connection->getLinkedUser()->getId()]);
+        /** @var Reward $reward */
+        foreach ($rewards as $reward) {
+            if ($reward->getSCode()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function getFirstSCodeUserName(Policy $policy)
+    {
+        $connections = $policy->getConnections()->toArray();
+
+        $oldest = new \DateTime();
+        $firstConnection = new \stdClass();
+        /** @var Connection $connection */
+        foreach ($connections as $connection) {
+            if ($connection->getDate() < $oldest) {
+                $oldest = $connection->getDate();
+                $firstConnection = $connection;
+            }
+        }
+        if ($firstConnection instanceof Connection) {
+            $sourceUser = $firstConnection->getSourceUser();
+            return $sourceUser->getFirstName() . " " . $sourceUser->getLastName();
+        }
+        return "";
     }
 
     /**
