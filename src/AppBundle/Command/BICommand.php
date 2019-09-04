@@ -417,7 +417,6 @@ class BICommand extends ContainerAwareCommand
             'Premium Outstanding',
             'Past Due Amount (Bad Debt Only)'
         );
-        /** @var Policy $policy */
         foreach ($policies as $policy) {
             $user = $policy->getUser();
             $previous = $policy->getPreviousPolicy();
@@ -871,6 +870,7 @@ class BICommand extends ContainerAwareCommand
             }
         }
         $retVal = "";
+        /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::Class);
         if ($firstConnection instanceof RewardConnection && !$this->isSignUpBonusSCode($rewardRepo, $firstConnection)) {
             $retVal = "reward";
