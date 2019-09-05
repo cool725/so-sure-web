@@ -901,11 +901,11 @@
                 <tr>
                     <td>Offers</td>
                     <td>
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#offersModal">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#viewOffers">
                             <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                             View Current Offers
                         </button>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#offersModal">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#createOfferForm">
                             <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                             Create Offer
                         </button>
@@ -2027,7 +2027,8 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:bacsPaymentRequestForm', 'policy': policy, 'id': 'bacsPaymentRequestForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:offerForm', 'policy': policy, 'id': 'offerForm', 'title': 'Create a new Offer'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:createOfferForm', 'policy': policy, 'id': 'createOfferForm', 'title': 'Create a new Offer'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:viewOffers', 'policy': policy, 'id': 'viewOffers', 'title': 'Current Offers'} %}
         {% for scheduledPayment in policy.scheduledPayments if scheduledPayment.status == 'scheduled' %}
             {%
                 include 'AppBundle::Admin/adminConfirmModal.html.twig' with

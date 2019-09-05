@@ -30,7 +30,7 @@ class Offer
      * The offered price which also stores the time period in which is it valid.
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PhonePrice")
      * @Gedmo\Versioned
-     * @var PhonePrice
+     * @var OfferPrice
      */
     protected $price;
 

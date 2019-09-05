@@ -7,6 +7,7 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
+use AppBundle\Document\Offer;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
@@ -26,6 +27,7 @@ use AppBundle\Form\Type\DetectedImeiType;
 use AppBundle\Form\Type\InvalidImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
+use AppBundle\Form\Type\OfferType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\PicSureStatusType;
 use AppBundle\Form\Type\SerialNumberType;
@@ -3940,6 +3942,29 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
         $promotionRepository = $dm->getRepository(Promotion::class);
         $promotion = $promotionRepository->find($id);
+
+
         return ["promotion" => $promotion];
+    }
+
+    /**
+     * @Route("/view-offers/{id}", name="admin_view_offers")
+     * @Template("AppBundle:AdminEmployee:offers.html.twig")
+     */
+    public function viewOffersAction($id)
+    {
+        $dm = $this->getManager();
+        $policyRepo =
+        $offerRepo = $dm->getRepository(Offer::class);
+        $offers = $offerRepo->getAllByPhone();
+    }
+
+    public function createOfferFormAction()
+    {
+        return new Response();
+//        $offerForm = $this->get('form.factory')
+//            ->createNamedBuilder('offer_form')
+//            ->getForm();
+//        return ['offer_form' => $offerForm];
     }
 }
