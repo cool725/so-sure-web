@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
@@ -356,8 +357,6 @@ class BICommand extends ContainerAwareCommand
      */
     private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
     {
-        /** @var InvitationRepository $invitationRepo */
-        $invitationRepo = $this->dm->getRepository(Invitation::class);
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         /** @var PhonePolicyRepository $phonePolicyRepo */
@@ -873,7 +872,12 @@ class BICommand extends ContainerAwareCommand
         $firstConnection = new \stdClass();
         /** @var Connection $connection */
         foreach ($connections as $connection) {
-            if (($connection->getDate() < $oldest) && !$this->isSignUpBonusSCode($rewardRepo, $connection)) {
+            $signUp = false;
+            if ($connection instanceof RewardConnection) {
+                $signUp = $this->isSignUpBonusSCode($rewardRepo, $connection);
+            }
+
+            if (($connection->getDate() < $oldest) && !$signUp) {
                 $oldest = $connection->getDate();
                 $firstConnection = $connection;
             }
@@ -883,6 +887,8 @@ class BICommand extends ContainerAwareCommand
             $retVal = "reward";
         } elseif ($firstConnection instanceof StandardConnection) {
             $retVal = "virality";
+        } elseif ($firstConnection instanceof RenewalConnection) {
+            $retVal = "renewal";
         }
         return $retVal;
     }
