@@ -946,8 +946,8 @@ class BICommand extends ContainerAwareCommand
             }
         }
         if ($firstConnection instanceof Connection) {
-            $sourceUser = $firstConnection->getSourceUser();
-            return $sourceUser->getFirstName() . " " . $sourceUser->getLastName();
+            $linkedUser = $firstConnection->getLinkedUser();
+            return $linkedUser->getFirstName() . " " . $linkedUser->getLastName();
         }
         return "";
     }
