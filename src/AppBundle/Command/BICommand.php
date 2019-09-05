@@ -422,7 +422,6 @@ class BICommand extends ContainerAwareCommand
             'Premium Outstanding',
             'Past Due Amount (Bad Debt Only)'
         );
-        /** @var PhonePolicy $policy */
         foreach ($policies as $policy) {
             if ($policy->getEnd() <= $policy->getStart()) {
                 continue;
