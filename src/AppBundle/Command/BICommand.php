@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
@@ -356,12 +357,13 @@ class BICommand extends ContainerAwareCommand
      */
     private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
     {
-        /** @var InvitationRepository */
-        $invitationRepo = $this->dm->getRepository(Invitation::class);
-        /** @var ScheduledPaymentRepository */
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
-        /** @var PhonePolicyRepository */
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        /** @var RewardRepository $rewardRepo */
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+
         $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = $this->makeLine(
@@ -379,8 +381,9 @@ class BICommand extends ContainerAwareCommand
             'Policy End Date',
             'Premium Installments',
             'First Time Policy',
-            'Policy Number # Prior Renewal',
-            'Policy Number # Renewal',
+            'Policy Number Prior Renewal',
+            'Policy Number Renewal',
+            'Upgrade Prior Policy Number',
             'This Policy is the X renewal',
             'Policy Status',
             'Expected Unpaid Cancellation Date',
@@ -396,10 +399,11 @@ class BICommand extends ContainerAwareCommand
             'Number of Withdrawn/Declined Claims',
             'Policy Purchase Time',
             'Lead Source',
-            'Scode Type',
-            'SCodes Used',
+            'First Scode Type',
+            'First Scode Name',
+            'All SCodes Used',
             'Promo Codes',
-            'Scode Name',
+            "Has Sign-up Bonus?",
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
             'Latest referer (user)',
@@ -418,6 +422,10 @@ class BICommand extends ContainerAwareCommand
             'Past Due Amount (Bad Debt Only)'
         );
         foreach ($policies as $policy) {
+            if ($policy->getEnd() <= $policy->getStart()) {
+                continue;
+            }
+            $connections = $policy->getConnections();
             $user = $policy->getUser();
             $previous = $policy->getPreviousPolicy();
             $next = $policy->getNextPolicy();
@@ -427,8 +435,8 @@ class BICommand extends ContainerAwareCommand
             $attribution = $user->getAttribution();
             $latestAttribution = $user->getLatestAttribution();
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
-            $scodeType = $this->getFirstSCodeUsedType($policy);
-            $scodeName = $this->getFirstSCodeUserName($policy);
+            $scodeType = $this->getFirstSCodeUsedType($rewardRepo, $connections);
+            $scodeName = $this->getFirstSCodeUsedCode($connections);
             $reschedule = null;
             $lastReverted = $policy->getLastRevertedScheduledPayment();
             if ($lastReverted) {
@@ -451,6 +459,7 @@ class BICommand extends ContainerAwareCommand
                 $policy->useForAttribution() ? 'yes' : 'no',
                 $previous ? $previous->getPolicyNumber() : '',
                 $next ? $next->getPolicyNumber() : '',
+                $this->getPreviousPolicyNumberIfUpgrade($policy),
                 $policy->getGeneration(),
                 $policy->getStatus(),
                 $policy->getStatus() == Policy::STATUS_UNPAID ?
@@ -468,9 +477,10 @@ class BICommand extends ContainerAwareCommand
                 $this->timezoneFormat($policy->getStart(), $timezone, 'H:i'),
                 $policy->getLeadSource(),
                 $scodeType,
-                $this->getSCodesUsed($policy),
-                $this->getPromoCodesUsed($policy),
                 $scodeName,
+                $this->getSCodesUsed($connections),
+                $this->getPromoCodesUsed($rewardRepo, $connections),
+                $this->policyHasSignUpBonus($rewardRepo, $connections) ? 'yes' : 'no',
                 $latestAttribution ? $latestAttribution->getCampaignSource() : '',
                 $latestAttribution ? $latestAttribution->getCampaignName() : '',
                 $latestAttribution ? $latestAttribution->getReferer() : '',
@@ -856,35 +866,35 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function getFirstSCodeUsedType(Policy $policy)
+    private function getFirstSCodeUsedType(RewardRepository $rewardRepo, $connections)
     {
-        $connections = $policy->getConnections()->toArray();
-
-        /** @var Connection $connection */
         $oldest = new \DateTime();
         $firstConnection = new \stdClass();
+        /** @var Connection $connection */
         foreach ($connections as $connection) {
-            if ($connection->getDate() < $oldest) {
+            $signUp = false;
+            if ($connection instanceof RewardConnection) {
+                $signUp = $this->isSignUpBonusSCode($rewardRepo, $connection);
+            }
+
+            if (($connection->getDate() < $oldest) && !$signUp) {
                 $oldest = $connection->getDate();
                 $firstConnection = $connection;
             }
         }
         $retVal = "";
-        /** @var RewardRepository $rewardRepo */
-        $rewardRepo = $this->dm->getRepository(Reward::Class);
-        if ($firstConnection instanceof RewardConnection && !$this->isSignUpBonusSCode($rewardRepo, $firstConnection)) {
+        if ($firstConnection instanceof RewardConnection) {
             $retVal = "reward";
         } elseif ($firstConnection instanceof StandardConnection) {
-            $retVal = "standard";
+            $retVal = "virality";
+        } elseif ($firstConnection instanceof RenewalConnection) {
+            $retVal = "renewal";
         }
         return $retVal;
     }
 
-    private function getSCodesUsed(Policy $policy)
+    private function getSCodesUsed($connections)
     {
-        /** @var RewardRepository $rewardRepo */
-        $rewardRepo = $this->dm->getRepository(Reward::class);
-        $connections = $policy->getConnections();
         $retVal = "";
         /** @var Connection $connection */
         foreach ($connections as $connection) {
@@ -897,22 +907,17 @@ class BICommand extends ContainerAwareCommand
         return $retVal;
     }
 
-    private function getPromoCodesUsed(Policy $policy)
+    private function getPromoCodesUsed(RewardRepository $rewardRepo, $connections)
     {
-        /** @var RewardRepository $rewardRepo */
-        $rewardRepo = $this->dm->getRepository(Reward::class);
-        $connections = $policy->getConnections();
         $retVal = "";
         /** @var Connection $connection */
         foreach ($connections as $connection) {
             if ($connection instanceof RewardConnection) {
-                /** @var Reward $reward */
                 $rewards = $rewardRepo->findBy(['user.id' => $connection->getLinkedUser()->getId()]);
+                /** @var Reward $reward */
                 foreach ($rewards as $reward) {
                     if ($reward->getSCode()) {
                         $retVal .= $reward->getSCode()->getCode() . ';';
-                    } else {
-                        $retVal .= "signupbonus;";
                     }
                 }
             }
@@ -932,10 +937,8 @@ class BICommand extends ContainerAwareCommand
         return true;
     }
 
-    private function getFirstSCodeUserName(Policy $policy)
+    private function getFirstSCodeUsedCode($connections)
     {
-        $connections = $policy->getConnections()->toArray();
-
         $oldest = new \DateTime();
         $firstConnection = new \stdClass();
         /** @var Connection $connection */
@@ -946,10 +949,37 @@ class BICommand extends ContainerAwareCommand
             }
         }
         if ($firstConnection instanceof Connection) {
-            $sourceUser = $firstConnection->getSourceUser();
-            return $sourceUser->getFirstName() . " " . $sourceUser->getLastName();
+            /** @var Policy $linkedPolicy */
+            $linkedPolicy = $firstConnection->getLinkedPolicy();
+            if ($linkedPolicy instanceof Policy) {
+                $scode = $linkedPolicy->getStandardSCode();
+                if ($scode instanceof SCode) {
+                    return $linkedPolicy->getStandardSCode()->getCode();
+                }
+            }
         }
         return "";
+    }
+
+    public function policyHasSignUpBonus(RewardRepository $rewardRepo, $connections)
+    {
+        foreach ($connections as $connection) {
+            if ($connection instanceof RewardConnection && $this->isSignUpBonusSCode($rewardRepo, $connection)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getPreviousPolicyNumberIfUpgrade(Policy $policy)
+    {
+        if ($policy->hasPreviousPolicy()) {
+            $previousPolicy = $policy->getPreviousPolicy();
+            if ($previousPolicy->isCancelled() && $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+                return $previousPolicy->getId();
+            }
+        }
+        return '';
     }
 
     /**
