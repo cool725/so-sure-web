@@ -424,7 +424,7 @@ class BICommand extends ContainerAwareCommand
         );
         /** @var PhonePolicy $policy */
         foreach ($policies as $policy) {
-            if ($policy->getEnd() < $policy->getStart()) {
+            if ($policy->getEnd() <= $policy->getStart()) {
                 continue;
             }
             $connections = $policy->getConnections();
