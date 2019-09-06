@@ -69,11 +69,6 @@
         </div>
     {% endif %}
 
-    <div class="d-none">
-        {{ form_widget(purchase_form.fileValid, {'attr': {'style':'display:none'}}) }}
-        {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
-    </div>
-
     <div class="form-group text-md-right mt-5">
         {{ form_widget(purchase_form.next, {
             'label': 'Continue',

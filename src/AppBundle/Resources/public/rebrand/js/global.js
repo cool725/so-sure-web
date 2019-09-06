@@ -22,7 +22,3 @@ require('./components/cardbox.js');
 require('./components/modalVideo.js');
 require('./components/get-quote.js');
 
-$(function() {
-
-
-});

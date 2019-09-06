@@ -1,18 +1,14 @@
-// purchase-payment.js
+// purchase-payment-b.js
 
 // Require BS component(s)
-// require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
 require('bootstrap/js/dist/dropdown');
 
 // Require components
 require('jquery-validation');
 require('../common/validationMethods.js');
-let textFit = require('textfit');
 
 $(function(){
-
-    textFit($('.fit')[0], {detectMultiLine: false});
 
     let validateForm = $('.validate-form'),
         isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g),

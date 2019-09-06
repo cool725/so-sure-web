@@ -1,0 +1,112 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form p-3 pt-4 p-lg-5',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off',
+}}) }}
+
+    {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}
+        {% set premium = 'monthly' %}
+    {% else %}
+        {% set premium = 'yearly' %}
+    {% endif %}
+
+    {# Title #}
+    {% if app.user.allowedMonthlyPayments %}
+        <div class="h2 text-center text-primary fit mb-4 mb-lg-1">How would you like to pay? 💳</div>
+        <p class="d-none d-lg-block text-center mb-4">Choose whether you'd like to pay yearly or monthly</p>
+    {% else %}
+        <div class="h2 text-center text-primary fit mb-4">Pay for your premium 💳</div>
+    {% endif %}
+
+    {# Contents #}
+    <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+            <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+                <div class="radio-btn-original">
+                    {{ form_label(purchase_form.amount, 'Payment options') }}
+                    {{ form_widget(purchase_form.amount) }}
+                </div>
+                <div class="radio-btn-group">
+                    <div class="row">
+                        {% if app.user.allowedMonthlyPayments %}
+                            <div class="col-6">
+                                <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}"
+                                    data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}"
+                                    data-premium-type="month"
+                                    data-premium-param="monthly">
+                                    <div class="radio-btn__content">
+                                        <h6 class="radio-btn__title mb-0">Monthly</h6>
+                                        <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if app.user.allowedYearlyPayments %}
+                            <div class="col-6">
+                                <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}"
+                                    data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}"
+                                    data-premium-type="year"
+                                    data-premium-param="yearly">
+                                    <div class="radio-btn__content">
+                                        <h6 class="radio-btn__title mb-0">Yearly</h6>
+                                        <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
+            </div>
+        </div>
+    </div>
+
+    {{ form_widget(purchase_form.next, {
+        'label': 'Continue',
+        'attr': {
+            'class': 'btn btn-success btn-green-gradient btn-block-xs',
+            'hidden': 'hidden'
+    }}) }}
+{{ form_end(purchase_form) }}
+
+<div class="mb-4">
+    <form class="payment-form"
+          method="POST"
+          data-public-key="{{ checkout_public_key }}"
+          data-customer-email="{{ app.user.email }}"
+          data-value="{{ convert_to_pennies(purchase_form.amount.vars.value) }}"
+          data-currency="GBP"
+          data-csrf="{{ csrf_token('checkout') }}"
+          data-payment-mode="cards"
+          data-card-form-mode="cardTokenisation"
+          data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+          data-url="{{ url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(purchase_form.amount.vars.value), 'premium': premium }) }}"
+          data-redirect-url="{{ path('user_welcome', {id: policy.id}) }}"
+          data-title="Pay now"
+          data-subtitle="Please enter your card details">
+    </form>
+
+    {% block to_card_form %}
+        {{ form_start(to_card_form, {'attr': {
+            'class': 'px-3 px-lg-5'
+        }}) }}
+            <div class="row">
+                <div class="col-sm-6 offset-sm-3">
+                    <div class="form-group mt-4 mb-0">
+                        {{ form_widget(to_card_form.submit, {
+                            'label': 'Pay Now',
+                            'attr': {
+                                'class': 'btn btn-success btn-block btn-card-pay'
+                        }}) }}
+                        <div class="text-center mt-4">
+                            <small class="text-grey">Payments powered by</small><br>
+                            <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_checkout-logo.png" alt="Checkout" title="Powered by - Checkout" width="125px" class="mt-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{ form_end(to_card_form) }}
+    {% endblock to_card_form %}
+
+</div>
