@@ -982,7 +982,7 @@ class BICommand extends ContainerAwareCommand
             if ($previousEndWithoutTime == $startWithoutTime) {
                 $cancelled = $previousPolicy->isCancelled();
                 $isUpgrade = $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE;
-                if ($cancelled && $isUpgrade``) {
+                if ($cancelled && $isUpgrade) {
                     return $previousPolicy->getPolicyNumber();
                 }
             }
