@@ -3954,7 +3954,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     public function viewOffersAction($id)
     {
         $dm = $this->getManager();
-        $policyRepo =
+        $policyRepo = $dm->getRepository(Policy::class);
         $offerRepo = $dm->getRepository(Offer::class);
         $offers = $offerRepo->getAllByPhone();
     }
