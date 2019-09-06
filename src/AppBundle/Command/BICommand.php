@@ -973,10 +973,18 @@ class BICommand extends ContainerAwareCommand
 
     public function getPreviousPolicyNumberIfUpgrade(Policy $policy)
     {
-        if ($policy->hasPreviousPolicy()) {
-            $previousPolicy = $policy->getPreviousPolicy();
-            if ($previousPolicy->isCancelled() && $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
-                return $previousPolicy->getId();
+        $user = $policy->getUser();
+        $previousPolicies = $user->getPolicies();
+        $startWithoutTime = $policy->getStart()->format('Ymd');
+        /** @var Policy $previousPolicy */
+        foreach ($previousPolicies as $previousPolicy) {
+            $previousEndWithoutTime = $previousPolicy->getEnd()->format('Ymd');
+            if ($previousEndWithoutTime == $startWithoutTime) {
+                $cancelled = $previousPolicy->isCancelled();
+                $isUpgrade = $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE;
+                if ($cancelled && $isUpgrade) {
+                    return $previousPolicy->getPolicyNumber();
+                }
             }
         }
         return '';
