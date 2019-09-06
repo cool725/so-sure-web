@@ -80,9 +80,6 @@ $(function() {
         // Make form visible - hides above
         form.css('visibility', 'visible');
 
-        // Focus the input
-        make.focus();
-
         // On Make change
         make.on('change', function(e) {
 
