@@ -975,10 +975,16 @@ class BICommand extends ContainerAwareCommand
     {
         $user = $policy->getUser();
         $previousPolicies = $user->getPolicies();
-        $startWithoutTime = $policy->getStart()->format('Ymd');
+        $startWithoutTime = '';
+        if ($policy->getStart()) {
+            $startWithoutTime = $policy->getStart()->format('Ymd');
+        }
         /** @var Policy $previousPolicy */
         foreach ($previousPolicies as $previousPolicy) {
-            $previousEndWithoutTime = $previousPolicy->getEnd()->format('Ymd');
+            $previousEndWithoutTime = '';
+            if ($previousPolicy->getEnd()) {
+                $previousEndWithoutTime = $previousPolicy->getEnd()->format('Ymd');
+            }
             if ($previousEndWithoutTime == $startWithoutTime) {
                 $cancelled = $previousPolicy->isCancelled();
                 $isUpgrade = $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE;
