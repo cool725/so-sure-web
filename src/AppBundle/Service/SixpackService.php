@@ -27,14 +27,14 @@ class SixpackService
 
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
-    // const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
+
     // Exp 1
-    // const EXPERIMENT_QUOTE_PAGE_CTA = 'cta-yes-please';
+    const EXPERIMENT_OLD_VS_NEW_FUNNEL = 'old-vs-new-funnel';
     // Exp 2
-    const EXPERIMENT_BURGER_MENU = 'burger-vs-full';
+    //
     // Exp 3
-    // const EXPERIMENT_QUOTE_CTA = 'cta-buy-now';
+    //
     // Exp 4
     //
     // Exp 5
@@ -121,16 +121,17 @@ class SixpackService
         'ad-landing-quotepage',
         'cta-yes-please',
         'app-share-method',
-        'cta-buy-now'
+        'cta-buy-now',
+        'burger-vs-full'
     ];
 
     public static $unauthExperiments = [
-        // Exp 1.1
-        // self::EXPERIMENT_QUOTE_PAGE_CTA,
+        // Exp 1
+        self::EXPERIMENT_OLD_VS_NEW_FUNNEL,
         // Exp 2
-        self::EXPERIMENT_BURGER_MENU,
+        //
         // Exp 3
-        // self::EXPERIMENT_QUOTE_CTA,
+        //
         // Exp 4
         //
         // Exp 5
@@ -178,11 +179,10 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        // self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-
+        //
         // Exp 2
-
+        //
         // Exp 3
         //
         // Exp 4
@@ -209,11 +209,11 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        // self::EXPERIMENT_QUOTE_PAGE_CTA,
+        self::EXPERIMENT_OLD_VS_NEW_FUNNEL,
         // Exp 2
-        self::EXPERIMENT_BURGER_MENU,
+        //
         // Exp 3
-        // self::EXPERIMENT_QUOTE_CTA,
+        //
         // Exp 4
         //
         // Exp 5

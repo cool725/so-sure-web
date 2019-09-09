@@ -1429,9 +1429,9 @@ class AdminController extends BaseController
             'checkout' => $bankingService->getCheckoutBanking($date, $year, $month),
             'cashflows' => $bankingService->getCashflowsBanking($date, $year, $month),
             'lloyds' => $bankingService->getLloydsBanking($date, $year, $month),
-            'bacsInputFiles' => $inputRepo->getMonthlyProcessedFiles($date),
-            'bacsAruddFiles' => $aruddRepo->getMonthlyProcessedFiles($date),
-            'bacsDdicFiles' => $ddicRepo->getMonthlyProcessedFiles($date),
+            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
+            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
+            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false)
         ];
         return $data;
@@ -1878,12 +1878,21 @@ class AdminController extends BaseController
             }
 
             if ($request->request->has('flag-redis-policy')) {
-                $redis->sadd('policy:validation:flags', $policy->getId());
+                if ($request->get('flag-redis-policy') == 'remove') {
+                    $redis->srem('policy:validation:flags', $policy->getId());
 
-                $this->addFlash('success', sprintf(
-                    'Flagged policy %s',
-                    $policy->getPolicyNumber()
-                ));
+                    $this->addFlash('success', sprintf(
+                        'Unflagged policy %s',
+                        $policy->getPolicyNumber()
+                    ));
+                } else {
+                    $redis->sadd('policy:validation:flags', $policy->getId());
+
+                    $this->addFlash('success', sprintf(
+                        'Flagged policy %s',
+                        $policy->getPolicyNumber()
+                    ));
+                }
             }
 
             if ($request->request->has('delete-redis-policy')) {

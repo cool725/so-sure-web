@@ -882,21 +882,24 @@ abstract class Policy
         });
     }
 
+    /**
+     * Gives the set of dates that the policy's premium schedule should consist of.
+     * @return array|null of the dates, and null if there is simply no schedule at all because the policy is not valid.
+     */
     public function getInvoiceSchedule()
     {
         if (!$this->isPolicy()) {
             return null;
         }
-
         $invoiceDates = [];
-        $invoiceDate = clone $this->start;
-        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
-            if ($invoiceDate <= $this->getEnd()) {
-                $invoiceDates[] = clone $invoiceDate;
-                $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+        $invoiceDates[] = clone $this->getStartForBilling();
+        $date = clone $this->getBilling();
+        for ($i = 1; $i < $this->getPremiumInstallments(); $i++) {
+            if ($date <= $this->getEnd()) {
+                $date->add(new \DateInterval('P1M'));
+                $invoiceDates[] = clone $date;
             }
         }
-
         return $invoiceDates;
     }
 

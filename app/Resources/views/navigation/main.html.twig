@@ -7,12 +7,12 @@
     {% set navbar_class = 'navbar-so-sure' %}
 {% endif %}
 
-{# Set menu exp #}
+{# Set menu vars and experiments #}
 {% set menu_breakpoint = 'd-xl-block' %}
 {% set menu_show = 'd-xl-none' %}
-{% if menu_exp is defined and menu_exp == 'menu-burger' %}
-    {% set menu_breakpoint = '' %}
-    {% set menu_show = '' %}
+{% set hide_quote_btn = '' %}
+{% if funnel_exp is defined and funnel_exp == 'new-funnel' %}
+    {% set hide_quote_btn = 'd-none' %}
 {% endif %}
 
 <nav id="main-nav" class="navbar {{ navbar_class }} justify-content-between flex-nowrap flex-row pl-lg-5">
@@ -120,7 +120,7 @@
                 </li>
             {% endif %}
             {% if user_mode is not defined %}
-                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+                <li class="nav-item pr-xl-5 {{ hide_quote_btn }}">
                     <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
                 </li>
             {% endif %}
@@ -161,26 +161,21 @@
             {% endif %}
             {# Desktop Login #}
             {% if hide_login is not defined %}
-                <li class="nav-item d-none d-xl-block {% if menu_exp is defined and menu_exp == 'menu-burger' %}pr-xl-2{% else %}pr-xl-5{% endif %}">
+                <li class="nav-item d-none d-xl-block pr-xl-5">
                     {% if app.user is not null and app.user %}
                         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                             <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
                         {% else %}
-                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link {% if menu_exp is defined and menu_exp == 'menu-burger' %}show-in-nav{% endif %}">Log out</i></a>
+                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
                         {% endif %}
                     {% else %}
-                        {% if menu_exp is defined and menu_exp == 'menu-burger' %}
-                            <a href="{{ path('fos_user_security_login') }}"
-                               class="btn btn-outline-columbia-blue-f btn-sm show-in-nav">Customer login</a>
-                        {% else %}
                             <a href="{{ path('fos_user_security_login') }}"
                                class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
-                        {% endif %}
                     {% endif %}
                 </li>
             {% endif %}
             {# End Desktop Login #}
-            <li class="nav-item {% if menu_exp is defined and menu_exp == 'menu-burger' %}pr-lg-5{% else %}d-xl-none{% endif %}">
+            <li class="nav-item d-xl-none">
                 <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse show-in-nav" type="button">
                     <span class="hamburger-box">
                         <span class="hamburger-inner"></span>

@@ -7,7 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        SixpackService::EXPERIMENT_BURGER_MENU => ['menu-burger', 'menu-full'],
+        SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL, ['regular-funnel', 'new-funnel'],
     ];
 
     private static $authExperiments = [];

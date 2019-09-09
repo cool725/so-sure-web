@@ -83,6 +83,14 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findScodePolicies()
+    {
+        return $this->createQueryBuilder()
+            ->field('scodes')->exists(true)
+            ->getQuery()
+            ->execute();
+    }
+
     public function findPoliciesForPendingRenewal($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {

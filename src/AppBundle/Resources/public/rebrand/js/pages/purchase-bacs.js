@@ -131,6 +131,8 @@ $(function() {
         Checkout.open();
     });
 
+    console.log($('#checkout-payment-form').data());
+
     Checkout.configure({
         publicKey: $('.payment-form').data('public-key'),
         customerEmail: $('.payment-form').data('customer-email'),

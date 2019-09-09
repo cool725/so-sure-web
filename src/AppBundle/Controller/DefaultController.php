@@ -85,24 +85,28 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
-
-        $template = 'AppBundle:Default:index.html.twig';
-
-        // A/B Menu Test
-        // To Test use url param ?force=menu-burger / ?force=menu-full
-        $menuExp = $this->sixpack(
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $homepageFunnelExp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_BURGER_MENU,
-            ['menu-burger', 'menu-full'],
+            SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
+            ['regular-funnel', 'new-funnel'],
             SixpackService::LOG_MIXPANEL_ALL
         );
+
+        if ($homepageFunnelExp == 'new-funnel') {
+            $template = 'AppBundle:Default:indexB.html.twig';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'new-funnel']);
+        } else {
+            $template = 'AppBundle:Default:index.html.twig';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        }
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'menu_exp' => $menuExp,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
@@ -144,6 +148,14 @@ class DefaultController extends BaseController
         $template = 'AppBundle:Default:indexPromotions.html.twig';
 
         return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/marlow", name="marlow")
+     */
+    public function marlowAction()
+    {
+        return $this->redirectToRoute('promo', ['code' => 'MARLOW15']);
     }
 
     /**
