@@ -55,11 +55,18 @@ class S3FileRepository extends DocumentRepository
     {
         $start = $this->startOfMonth($date);
         $end = $this->endOfMonth($date);
-        return $this->createQueryBuilder()
-            ->field("metadata.processing-date")->gte($start)
-            ->field("metadata.processing-date")->lt($end)
+        $files = $this->createQueryBuilder()
+            ->field("metadata.processing-date")->exists(true)
             ->getQuery()
             ->execute();
+        $inMonth = [];
+        foreach ($files as $file) {
+            $processingDate = new \DateTime($file->getMetadata()["processing-date"]);
+            if ($processingDate >= $start && $processingDate < $end) {
+                $inMonth[] = $file;
+            }
+        }
+        return $inMonth;
     }
 
     public function getAllFilesToDate(\DateTime $date = null, string $type = null)
