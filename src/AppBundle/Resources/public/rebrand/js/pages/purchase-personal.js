@@ -323,18 +323,8 @@ sosure.purchaseStepAddress = (function() {
             $('.postcode').val(addr.PostalCode);
             address = address + '<br>' + addr.PostalCode;
         }
-        $('#display-address').html(address);
+        $('#display_address').html('<small class="form-text">Please double check</small>' + address);
         $('.typeahead .with-errors').html('');
-    }
-
-    self.toggleSearch = () => {
-        if ($('#search_address_button').length > 0) {
-            if ($('#search_address_button').html().indexOf('fa-search') >= 0) {
-                $('#search_address_button').html('<i class="fa fa-spinner fa-spin"></i>');
-            } else {
-                $('#search_address_button').html('<i class="fa fa-search"></i>');
-            }
-        }
     }
 
     self.selectAddress = (suggestion) => {
@@ -342,7 +332,6 @@ sosure.purchaseStepAddress = (function() {
             $('#search_address_errors').show();
             $('#select_address_errors').show();
             $('.address-search').addClass('has-error');
-            self.toggleSearch();
 
             return self.clearAddress();
         }
@@ -378,7 +367,6 @@ sosure.purchaseStepAddress = (function() {
             $('#search_address_errors').hide();
             $('#select_address_errors').hide();
             $('.address-search').removeClass('has-error');
-            self.toggleSearch();
             let addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
             $.ajax({
@@ -404,11 +392,6 @@ $(function(){
         sosure.purchaseStepAddress.step_one_change();
     });
 
-    // Breaking validation setup
-    // $('#purchase_form_name').on('blur', function() {
-        // sosure.purchaseStepAddress.step_one_continue();
-    // });
-
     $('#purchase_form_email').on('change', function() {
         sosure.purchaseStepAddress.step_one_change();
     });
@@ -419,45 +402,6 @@ $(function(){
         if (was_hidden) {
             sosure.purchaseStepAddress.focusBirthday();
         }
-    });
-
-    $('#search_address_button').click(function(e) {
-        e.preventDefault();
-        let search_number = $('#search_address_number').val();
-        let search_postcode = $('#search_address_postcode').val();
-        let allow_search = search_number.length > 0 && search_postcode.length > 0;
-
-        if (!allow_search) {
-            return sosure.purchaseStepAddress.step_address_continue();
-        }
-
-        sosure.purchaseStepAddress.toggleSearch();
-
-        $.ajax({
-          method: "POST",
-          url: "/ops/postcode",
-          contentType:"application/json; charset=utf-8",
-          dataType:"json",
-          data: JSON.stringify({ 'postcode': search_postcode })
-        }).done(function (response) {
-            if (!response.postcode || response.postcode.length == 0) {
-                return sosure.purchaseStepAddress.step_address_continue();
-            }
-
-            let search = search_number + ", " + response.postcode;
-            sosure.purchaseStepAddress.bloodhound.search(search, function(sync) {}, function(async) {
-                if (async.length > 0) {
-                    sosure.purchaseStepAddress.selectAddress(async[0]);
-                } else {
-                    sosure.purchaseStepAddress.selectAddress(null);
-                }
-            });
-        }).fail(function (response) {
-            if (!response.postcode || response.postcode.length == 0) {
-                sosure.purchaseStepAddress.selectAddress(null);
-                return sosure.purchaseStepAddress.step_address_continue();
-            }
-        });
     });
 
     // Click check validate form?
@@ -473,22 +417,6 @@ $(function(){
         $('#address-select').removeAttr("required");
         if (!sosure.purchaseStepAddress.step_address_continue()) {
             $('#address-select').attr("required", true);
-
-            return false;
-        }
-
-        return true;
-    });
-
-    $('#search-address-manual').click(function(e) {
-        e.preventDefault();
-        $('#search_address_number').removeAttr("required");
-        $('#search_address_number').rules("remove");
-        $('#search_address_postcode').removeAttr("required");
-        $('#search_address_postcode').rules("remove");
-        if (!sosure.purchaseStepAddress.step_address_continue()) {
-            $('#search_address_number').attr("required", true);
-            $('#search_address_postcode').attr("required", true);
 
             return false;
         }

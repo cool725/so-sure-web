@@ -55,6 +55,18 @@ body {
         // This is nasty
         padding-bottom: 150px;
 
+        // IE
+        -ms-overflow-style: none;
+
+        // Webkit
+        &::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        // Firefox
+        scrollbar-width: none;
+
         @include media-breakpoint-up(lg) {
             width: 80%;
             display: flex;

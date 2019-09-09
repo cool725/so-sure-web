@@ -1243,8 +1243,9 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        // Burger vs Full Menu - Purchase
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
 
         $smsExperiment = $this->sixpack(
             $request,

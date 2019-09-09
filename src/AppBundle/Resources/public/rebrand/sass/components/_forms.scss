@@ -37,12 +37,12 @@ label {
         box-shadow: rgba(37, 147, 243, 0.1);
     }
 
-    &:disabled,
-    &[readonly] {
-        background-color: darken($white, 5%);
+    &[disabled]
+    &[readonly], {
+        background-color: darken($white, 10%) !important;
 
         &:focus {
-            background-color: darken($white, 5%);
+            background-color: darken($white, 10%);
         }
     }
 }

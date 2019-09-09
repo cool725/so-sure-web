@@ -197,7 +197,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $sixMonthsAgo, //feb feb > jan
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
-                null, // mar mar > jan feb > mar
                 null,
                 $sevenMonthsAgo // jan
             );

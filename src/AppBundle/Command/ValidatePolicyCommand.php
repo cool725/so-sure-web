@@ -262,6 +262,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'id' => $policy->getId(),
                         'policyNumber' => $policy->getPolicyNumber(),
                         'issues' => $validation,
+                        'countClaims' => count($policy->getClaims())
                     ]) => 0]);
                 }
             } else {
@@ -301,6 +302,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             'id' => $policy->getId(),
                             'policyNumber' => $policy->getPolicyNumber(),
                             'issues' => $validation,
+                            'countClaims' => count($policy->getClaims())
                         ]) => 0]);
                     }
                 }

@@ -27,12 +27,6 @@ abstract class Price
     protected $validFrom;
 
     /**
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
-     */
-    protected $validTo;
-
-    /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
      */
@@ -64,16 +58,6 @@ abstract class Price
     public function setValidFrom($validFrom)
     {
         $this->validFrom = $validFrom;
-    }
-
-    public function getValidTo()
-    {
-        return $this->validTo;
-    }
-
-    public function setValidTo($validTo)
-    {
-        $this->validTo = $validTo;
     }
 
     public function getGwp()
@@ -175,17 +159,6 @@ abstract class Price
         $this->excess = $excess;
     }
 
-    /**
-     * Tells you if this price is valid at the given date.
-     * @param \DateTime $date is the date we are checking at.
-     * @return boolean true if it is valid at this date, and false if not.
-     */
-    public function isValidAt($date)
-    {
-        $validTo = $this->getValidTo();
-        return $date >= $this->getValidFrom() && (!$validTo || $date < $validTo);
-    }
-
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
     protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)
@@ -206,7 +179,6 @@ abstract class Price
     {
         return [
             'valid_from' => $this->getValidFrom()->format(\DateTime::ATOM),
-            'valid_to' => $this->getValidTo() ? $this->getValidTo()->format(\DateTime::ATOM) : null,
             'gwp' => $this->getGwp(),
             'premium' => $this->getMonthlyPremiumPrice(null, $date),
             'notes' => $this->getNotes(),
@@ -217,7 +189,6 @@ abstract class Price
     {
         return array_merge($this->toApiArray($date), [
             'initial_premium' => $this->getMonthlyPremiumPrice(null, $this->getValidFrom()),
-            'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice(null, $this->getValidTo()) : null,
             'excess' => $this->getExcess() ? $this->getExcess()->toPriceArray() : null,
             'excess_detail' => $this->getExcess() ? $this->getExcess()->toPriceArray()['detail'] : '??',
         ]);

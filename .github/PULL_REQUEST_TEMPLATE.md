@@ -10,6 +10,6 @@
 
 > Do tests need updating?
 
-> PAYMENT REALATED??? Test the s&ast;&ast;t out of it
+> PAYMENT RELATED??? Test the s&ast;&ast;t out of it
 
-🖋 Add description for reviewer(s) here (replace this)
+🖋 Add a description for reviewer(s) here (replace this)

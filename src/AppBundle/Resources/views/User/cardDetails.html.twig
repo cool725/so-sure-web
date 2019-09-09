@@ -37,7 +37,7 @@
                     <a href="#"
                        data-tab-to="{% if policy.hasPolicyOrUserBacsPaymentMethod %}#payment_bacs_tab{% else %}#bacs_setup_tab{% endif %}"
                        class="btn {% if policy.hasCardPaymentMethod %}btn-success disabled{% else %}btn-outline-primary{% endif %} show-tab"
-                       >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}Switch to Direct Debit{% else %}Back to Direct Debit{% endif %}</a>
+                       >{% if not policy.hasPolicyOrUserBacsPaymentMethod %}<del>Switch to Direct Debit</del>{% else %}Back to Direct Debit{% endif %}</a>
                 </div>
             </div>
         </div>

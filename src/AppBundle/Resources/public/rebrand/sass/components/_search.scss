@@ -80,3 +80,57 @@
     }
 
 }
+
+.phone-search-dropdown-card {
+    visibility: hidden;
+
+    &__select  {
+
+        // Reset
+        appearance: none;
+        -webkit-appearance: none;
+        // -moz-appearance: none;
+        -o-appearance: none;
+
+        // Style;
+        border-radius: 3px;
+        background-size: 10px;
+        border-width: 1.2px;
+        border-color: $azureeradiance;
+        background: $azureeradiance-20 url('#{$cdn_url}/images/rebrand/icns/so-sure_select-arrow-normal.svg') no-repeat 95% 15px;
+        font-weight: bold;
+        outline: none;
+
+        &:focus {
+            background: $dodger-blue url('#{$cdn_url}/images/rebrand/icns/so-sure_select-arrow-focus.svg') no-repeat 95% 15px;
+            border-color: $dodger-blue;
+            color: $white;
+            box-shadow: none;
+            font-weight: normal;
+            outline: none;
+        }
+
+        &:-moz-focusring {
+            border: 0;
+        }
+
+        &:disabled {
+            border-color: $azureeradiance-20;
+            background: $blacksqueeze url('#{$cdn_url}/images/rebrand/icns/so-sure_select-arrow-disabled.svg') no-repeat 95% 15px;
+            color: $azureeradiance-50;
+            font-weight: normal;
+        }
+
+        &:hover {
+            cursor: pointer;
+            outline: none;
+        }
+
+        option {
+            // &:focus {
+                background-color: transparent;
+            // }
+        }
+
+    }
+}
