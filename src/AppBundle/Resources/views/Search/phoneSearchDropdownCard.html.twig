@@ -1,0 +1,53 @@
+<div class="cardbox cardbox-100 p-4 p-lg-5 🍆">
+    <h4 class="text-center mb-3">Select device and <br class="d-md-none"> <span class="text-primary">get your quote</span></h4>
+    <ul class="list-unstyled icn-fa-list mb-4">
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            24-72 hour replace or repair
+        </li>
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Low excess from just &pound;50
+        </li>
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Up to 80% money back
+        </li>
+{#         <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            New, secondhand &amp; refurbished phones
+        </li> #}
+    </ul>
+    {{ form_start(form_phone, { 'attr': {
+        'class': 'phone-search-dropdown-card',
+        'data-phones': phones|json_encode|raw,
+        'autocomplete': 'off'
+    }}) }}
+        <div class="form-group">
+            {{ form_widget(form_phone.make, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-make',
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.model, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-model',
+                'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.memory, {
+                'attr': {
+                    'class': 'form-control phone-search-dropdown-card__select  phone-search-option-memory',
+                    'disabled': 'disabled'
+            }}) }}
+        </div>
+        {{ form_widget(form_phone.next, {
+          'label': 'Get my quote',
+          'attr': {
+            'class': 'btn btn-secondary btn-block mt-4 phone-search-button',
+            'disabled': 'disabled'
+        }}) }}
+    {{ form_end(form_phone) }}
+</div>

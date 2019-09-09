@@ -1,7 +1,6 @@
-// purchase.js
+// purchase-personal-b.js
 
 // Require BS component(s)
-// require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
 require('bootstrap/js/dist/dropdown');
 
@@ -13,41 +12,26 @@ require('jquery-mask-plugin');
 require('fuse.js');
 require('jquery-validation');
 require('../common/validationMethods.js');
-let textFit = require('textfit');
 
-const sosure = sosure || {};
+$(function(){
 
-sosure.purchaseStepAddress = (function() {
-    let self = {};
-    self.form = null;
-    self.delayTimer = null;
-    self.focusTimer = null;
-    self.name_email_changed = null;
-    self.url = null;
-    self.bloodhound = null;
-    self.maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
-    self.key = null;
-    self.isIE = null;
+    let validateForm = $('.validate-form'),
+        isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g),
+        url = window.location.href,
+        key = $('#ss-root').data('pca-key'),
+        bloodhound = null,
+        // more than 50 causes the find api to returns an error 'unrecognised country code'
+        maxAddresses = 50,
+        leadSending = false,
+        addressToggle = $('#address_manual_btn'),
+        addressSelect = $('#address_select'),
+        addressSearch = $('#address_search'),
+        addressManual = $('#address_manual'),
+        addressButton = $('#address_manual_btn'),
+        addressSubmit = $('#address_submit_btn');
 
-   self.init = () => {
-        self.form = $('.validate-form');
-        self.dobMask();
-        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
-        if (self.form.data('client-validation') && !self.isIE) {
-            self.addValidation();
-        }
-        self.url = window.location.href;
-        self.key = $('#ss-root').data('pca-key');
-        self.init_bloodhound();
-    }
-
-    self.dobMask = () => {
-        // Mask date input and add picker
-        $('.dob').mask('00/00/0000');
-    }
-
-    self.addValidation = () => {
-        self.form.validate({
+    const addValidation = () => {
+        validateForm.validate({
             debug: false,
             // When to validate
             validClass: 'is-valid-ss',
@@ -173,7 +157,7 @@ sosure.purchaseStepAddress = (function() {
 
             errorPlacement: function(error, element) {
                 if (element.attr('name') == 'purchase_form[birthday][day]' || element.attr('name') == 'purchase_form[birthday][month]' || element.attr('name') == 'purchase_form[birthday][year]') {
-                    error.insertAfter('#dob-field');
+                    error.insertAfter('#dob_field');
                 } else {
                     error.insertAfter(element);
                 }
@@ -202,249 +186,200 @@ sosure.purchaseStepAddress = (function() {
         });
     }
 
-    self.step_one_change = () => {
-        self.name_email_changed = true;
-    }
-
-    self.step_one_continue = () => {
-        if ($('#purchase_form_firstName').valid() == true && $('#purchase_form_lastName').valid() == true && $('#purchase_form_email').valid() == true) {
-            $('.step--hide').show();
-            $('#step--one-controls').hide();
-
-            clearTimeout(self.delayTimer);
-            if (self.name_email_changed) {
-                self.name_email_changed = false;
-                self.delayTimer = setTimeout(function() {
-                    let data = {
-                        name: $('#purchase_form_lastName').val(),
-                        email: $('#purchase_form_email').val(),
-                        csrf: $('#step--validate').data('csrf')
+    // Initiate Bloodhound
+    const initBloodHound = () => {
+        bloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
+                prepare: function (query, settings) {
+                    if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
+                        showAddress();
+                        setAddress({
+                            'Line1': '123 test',
+                            'City': 'Unknown',
+                            'PostalCode': 'bx1 1lt'
+                        });
+                        $('.typeahead .with-errors').html('');
+                        addressButton.hide();
+                    }
+                    settings.type = 'POST';
+                    settings.data = {
+                        Key: key,
+                        SearchTerm: query,
+                        Country : 'GBR',
+                        MaxSuggestions: maxAddresses
                     };
-                    let url = $('#step--validate').data('lead');
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: JSON.stringify(data),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                    });
-                }, 5000);
+                    return settings;
+                },
+                transform: function (response) {
+                    if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
+                        $('#select_address_errors').html('Sorry, there\'s an error with our address lookup. Please type in manually below');
+                    }
+                    return response.Items;
+                }
             }
-
-            return true;
-        } else {
-            return false;
-        }
+        });
     }
 
-    self.step_address_continue = () => {
-        if (self.form.valid()) {
-            self.showAddress();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    self.showAddress = (err) => {
-        $('.address-search').hide();
-        $('.typeahead').removeAttr('required');
-        $('.address-show').show();
-        if (err) {
-            $('.address-show-error').show();
-            $('.address-show-error-text').text(err);
-        }
-    }
-
-    self.focusBirthday = () => {
-        clearTimeout(self.focusTimer);
-        self.focusTimer = setTimeout(function() {
-            $('#purchase_form_birthday').focus();
-        }, 300);
-    }
-
-    self.init_bloodhound = () => {
-      self.bloodhound = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-          url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
-          prepare: function (query, settings) {
-              if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
-                  sosure.purchaseStepAddress.showAddress();
-                  self.setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
-                  $('.typeahead .with-errors').html('');
-              }
-              settings.type = "POST";
-              settings.data = {
-                  Key: sosure.purchaseStepAddress.key,
-                  SearchTerm: query,
-                  Country : "GBR",
-                  MaxSuggestions: sosure.purchaseStepAddress.maxAddresses
-              };
-              return settings;
-          },
-          transform: function (response) {
-              if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
-                  sosure.purchaseStepAddress.showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
-              }
-              return response.Items;
-          }
-        }
-      });
-    }
-
-    self.clearAddress = () => {
-        self.setAddress({'Line1': '', 'Line2': '', 'Line3': '', 'City': '', 'Postcode': ''});
-    }
-
-    self.setAddress = (addr) => {
+    // Set address (forms hidden if using lookup so we need to set the values)
+    const setAddress = (addr) => {
         if (!addr) {
             return;
         }
         let address = '';
         if (addr.Line1) {
             $('.addressLine1').val(addr.Line1);
-            address = addr.Line1;
         }
         if (addr.Line2) {
             $('.addressLine2').val(addr.Line2);
-            address = address + '<br>' + addr.Line2;
         }
         if (addr.Line3) {
             $('.addressLine3').val(addr.Line3);
-            address = address + '<br>' + addr.Line3;
         }
         if (addr.City) {
             $('.city').val(addr.City);
-            address = address + '<br>' + addr.City;
         }
         if (addr.PostalCode) {
             $('.postcode').val(addr.PostalCode);
-            address = address + '<br>' + addr.PostalCode;
         }
-        $('#display_address').html('<small class="form-text">Please double check</small>' + address);
         $('.typeahead .with-errors').html('');
     }
 
-    self.selectAddress = (suggestion) => {
+    // Select the address
+    const selectAddress = (suggestion) => {
         if (!suggestion) {
-            $('#search_address_errors').show();
-            $('#select_address_errors').show();
-            $('.address-search').addClass('has-error');
-
-            return self.clearAddress();
+            console.log('No suggestion');
         }
-        if (suggestion.Next == "Retrieve") {
-            return self.selectAddressFinal(suggestion);
+        if (suggestion.Next == 'Retrieve') {
+            return selectAddressFinal(suggestion);
         }
         $.ajax({
-            method: "POST",
-            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
+            method: 'POST',
+            url: 'https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws',
             data: {
-                Key: sosure.purchaseStepAddress.key,
+                Key: key,
                 LastId: suggestion.Id,
                 SearchTerm: suggestion.Text,
-                Country : "GBR",
-                MaxSuggestions: sosure.purchaseStepAddress.maxAddresses
+                Country : 'GBR',
+                MaxSuggestions: maxAddresses
             }
         })
         .done(function( msg ) {
-            sosure.purchaseStepAddress.selectAddressFinal(msg.Items[0]);
+            selectAddressFinal(msg.Items[0]);
         });
     }
 
-    self.selectAddressFinal = (suggestion) => {
+    // Select the chosem address
+    const selectAddressFinal = (suggestion) => {
         $.ajax({
-            method: "POST",
-            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
+            method: 'POST',
+            url: 'https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws',
             data: {
-                Key: sosure.purchaseStepAddress.key,
+                Key: key,
                 Id: suggestion.Id,
             }
         })
-        .done(function( msg ) {
-            $('#search_address_errors').hide();
-            $('#select_address_errors').hide();
-            $('.address-search').removeClass('has-error');
+        .done(function(msg) {
             let addr = msg.Items[0];
-            sosure.purchaseStepAddress.setAddress(addr);
+            setAddress(addr);
             $.ajax({
-                method: "POST",
-                url: "/ops/postcode",
-                contentType:"application/json; charset=utf-8",
-                dataType:"json",
+                method: 'POST',
+                url: '/ops/postcode',
+                contentType:'application/json; charset=utf-8',
+                dataType:'json',
                 data: JSON.stringify({ 'postcode': addr.PostalCode })
             });
         });
     }
 
-    return self;
-})();
+    // If address manual chosen
+    const showAddress = () => {
+        addressToggle.data('manual', true).text('Search address');
+        addressSelect.removeAttr('required');
+        addressSelect.rules('remove');
+        addressManual.removeClass('hideme');
+        addressSubmit.addClass('hideme');
+        addressSearch.addClass('invisible');
+    }
 
-$(function(){
+    // Start Bloodhound
+    initBloodHound();
 
-    textFit($('.fit')[0], {detectMultiLine: false});
+    // Mask date input
+    $('.dob').mask('00/00/0000');
 
-    sosure.purchaseStepAddress.init();
+    // Add validation
+    if (validateForm.data('client-validation') && !isIE) {
+        addValidation();
+    }
 
-    $('#purchase_form_name').on('change', function() {
-        sosure.purchaseStepAddress.step_one_change();
-    });
-
-    $('#purchase_form_email').on('change', function() {
-        sosure.purchaseStepAddress.step_one_change();
-    });
-
+    // Lead - could be done better but we want to capture after entering not submitting
     $('#purchase_form_email').on('blur', function(e) {
-        let was_hidden = $('#step--one-controls').is(":visible");
-        sosure.purchaseStepAddress.step_one_continue();
-        if (was_hidden) {
-            sosure.purchaseStepAddress.focusBirthday();
+
+        if (!leadSending) {
+            if ($('#purchase_form_firstName').valid() == true &&
+                $('#purchase_form_lastName').valid() == true &&
+                $('#purchase_form_email').valid() == true) {
+
+                console.log('Lead Start');
+
+                // Take lead on post
+                let leadData = {
+                    name:  $('#purchase_form_firstName').val() + ' ' + $('#purchase_form_lastName').val(),
+                    email: $('#purchase_form_email').val(),
+                    csrf:  validateForm.data('csrf')
+                };
+
+                leadSending = true;
+
+                $.ajax({
+                    url: validateForm.data('lead'),
+                    type: 'POST',
+                    data: JSON.stringify(leadData),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                })
+                .fail(function() {
+                    leadSending = false;
+                })
+                .done(function() {
+                    console.log('Lead sent');
+                });
+            }
         }
     });
 
-    // Click check validate form?
-    // Case: user clicks continue before filling in any fields
-    $('#step--validate').on('click', function(e) {
+    // Enter manually?
+    addressButton.on('click', function(e) {
         e.preventDefault();
-        return sosure.purchaseStepAddress.step_one_continue();
-    });
-
-    $('#address-manual').click(function(e) {
-        e.preventDefault();
-        $('#address-select').rules("remove");
-        $('#address-select').removeAttr("required");
-        if (!sosure.purchaseStepAddress.step_address_continue()) {
-            $('#address-select').attr("required", true);
-
-            return false;
-        }
-
-        return true;
+        showAddress();
+        $(this).hide();
     });
 
     $('.typeahead').typeahead(null, {
         name: 'capture',
         display: 'Text',
-        source: sosure.purchaseStepAddress.bloodhound,
+        source: bloodhound,
         highlight: true,
         limit: 100, // below 100 typeahead stops showing results for less than 4 characters entered
         templates: {
             notFound: [
               '<div class="empty-message">',
-                'We couldn\x27t find that address. Make sure you have a space in the postcode (e.g SW1A 2AA). Or use manual entry.',
+                'We couldn\x27t find that address. Make sure you have a space in the postcode (e.g SW1A 2AA). Or enter manually.',
               '</div>'
             ].join('\n'),
             suggestion: doT.template('<div data-hj-suppress="">{{=it.Text}}</div>')
         }
     });
 
-    //Suppress hotjar on input
+    // Suppress hotjar on input
     $('.tt-input').data('data-hj-suppress', '');
 
+    // Bind suggestion to address function
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
-        sosure.purchaseStepAddress.selectAddress(suggestion);
+        selectAddress(suggestion);
     });
 
 });

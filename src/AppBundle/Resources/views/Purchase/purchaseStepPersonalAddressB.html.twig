@@ -1,0 +1,138 @@
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme purchase_form 'AppBundle:Form:submit.html.twig' %}
+
+{# Set vars #}
+{% set use_pca = true %}
+{% set quote_mode = true %}
+{% if phone %}
+    {% set body_class = 'purchase' %}
+{% endif %}
+
+{# Set title based off make a/an #}
+{% set atitle = 'a' %}
+{% if phone %}
+    {% if phone.make|first matches '/^[AEIOU]/' %}
+        {% set atitle = 'an' %}
+    {% endif %}
+{% endif %}
+
+{# Address if manual #}
+{% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
+
+{# Starling #}
+{% set starling = false %}
+{% if app is not null and app.session.isStarted and app.session.get('partner') == 'starling' %}
+    {% set starling = true %}
+{% endif %}
+
+{% block title %}
+    {% if phone %}
+        so-sure | {{ phone.make }} {{ phone.model }} Insurance
+    {% else %}
+        so-sure | Welcome to Social Insurance
+    {% endif %}
+{% endblock %}
+
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/purchase-b.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="purchase">
+        <div class="purchase-top px-4 py-5 p-lg-5">
+            {% if phone %}
+                <div class="row">
+                    <div class="col-xl-3">
+                        <div class="purchase-details">
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="Happy Phone" width="180px" class="lozad d-none d-lg-inline">
+                            <div class="text-white h5 mb-0"><span class="sub">You're insuring {{ atitle }}:</span></div>
+                            <h1 class="fit mb-4 pb-1">
+                                <a href="#mem_sizes"
+                                   class="text-white"
+                                   data-toggle="collapse"
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="mem_sizes"
+                                   title="Have a different storage size?">
+                                    {{ phone.make }} {{ phone.model }} ({{ phone.memory }}GB)
+                                </a>
+                            </h1>
+                            <div class="collapse mb-4" id="mem_sizes">
+                                {% if phones | length > 1 %}
+                                    <ul class="list-inline">
+                                        {% for phone_mem in phones %}
+                                            {% if phone_mem.id != phone.id  %}
+                                                <li class="list-inline-item">
+                                                    <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                <a class="text-white get-a-quote disabled" href="#">
+                                    <small>Not the phone you're looking for?</small>
+                                </a>
+                            </div>
+                            <div class="h1 mb-0 text-white">
+                                {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                {% else %}
+                                    &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
+                                {% endif %}
+                            </div>
+                            <div class="h5 text-deep-sky-blue-d mb-5">
+                                {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    <span class="sub">per month</span>
+                                {% else %}
+                                    <span class="sub">per year</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-none d-xl-block text-left">
+                                <hr class="hr-blue mb-5">
+                                <h5 class="text-white mb-4">Your cover includes:</h5>
+                                <ul class="list-unstyled icn-fa-list mb-4 mb-xl-0">
+                                    <li class="text-white mb-2">
+                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 hour replacement or repair
+                                    </li>
+                                    <li class="text-white mb-2">
+                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> Low excess from just &pound;50
+                                    </li>
+                                    <li class="text-white">
+                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% money back
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-8 offset-xl-1">
+                        <div class="cardbox cardbox-100 py-3 px-2">
+                            {% include 'AppBundle::Purchase/_purchaseSteps.html.twig' %}
+                            {% include 'AppBundle::Purchase/_formStepPersonalAddressB.html.twig' %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <h1 class="fit text-white mb-4 pb-1">Whoops, no phone selected... 😩</h1>
+                <a href="#"
+                   class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
+                   data-event="no-phone-in-session">
+                   Get a Quote</a>
+            {% endif %}
+        </div>
+        <div class="purchase-bottom">
+            {% include 'AppBundle::Purchase/_seeFullDetailsB.html.twig' %}
+        </div>
+    </div>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/purchase-b.js') }}"></script>
+    <script src="{{ asset('css-js/purchase-personal-b.js') }}"></script>
+{% endblock %}

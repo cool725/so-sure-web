@@ -37,4 +37,14 @@ $(function(){
         }
     });
 
+    $('#default_terms').on('click', function(e) {
+        e.preventDefault();
+
+        let textArea = $('#rewardForm_termsAndConditions'),
+            text = textArea.data('example');
+
+        // Clear the terms then apply
+        textArea.val(text);
+    });
+
 });
