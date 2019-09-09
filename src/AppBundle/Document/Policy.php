@@ -3895,6 +3895,11 @@ abstract class Policy
             ));
         }
 
+        // if it has a pending bacs payment it can stay for the time being.
+        if (count($this->getPendingBacsPayments(true)) > 0) {
+            return false;
+        }
+
         if ($date == null) {
             $date = \DateTime::createFromFormat('U', time());
         }
