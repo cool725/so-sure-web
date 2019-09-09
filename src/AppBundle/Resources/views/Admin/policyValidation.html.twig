@@ -57,8 +57,8 @@
                                     {% endfor %}
                                     </ul>
                                 </td>
-                                <td>
-                                    <i class="far {% if validate.countClaims > 0 %}fa-check text-danger{% else %}fa-times text-success{% endif %}">&nbsp;{{ validate.countClaims }}</i>
+                                <td class="h5 {% if validate.countClaims > 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <i class="far {% if validate.countClaims > 0 %}fa-check{% else %}fa-times{% endif %} fa-fw"></i> <span>{{ validate.countClaims }}</span>
                                 </td>
                                 <td class="inline-strict">
                                     <form method="POST">
