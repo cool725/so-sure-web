@@ -144,11 +144,9 @@ $(function(){
                 data: phone.prices,
                 columns: [
                     { title: 'Valid From', data: 'valid_from' },
-                    { title: 'Valid To', data: 'valid_to' },
                     { title: 'GWP', data: 'gwp' },
                     { title: 'Premium (current ipt rate)', data: 'premium' },
                     { title: 'Premium (ipt rate @ from date)', data: 'initial_premium' },
-                    { title: 'Premium (ipt rate @ to date)', data: 'final_premium' },
                     { title: 'Excess (Damage/Theft)', data: 'excess_detail' },
                     { title: 'picsure approved Excess (Damage/Theft)', data: 'picsure_excess_detail' },
                     { title: 'Notes', data: 'notes' }
