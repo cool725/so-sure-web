@@ -6,6 +6,7 @@ $lynch:     #687296;
 $dark:      #170B38;
 
 $white:                #ffffff; // < $white
+$athens-gray:          #f5f7f9;
 $link-water:           #c7d8f2;
 $selago:               #dee9fa;
 $lily-white:           #e5f4ff; // < $bb-1
@@ -35,10 +36,18 @@ $salomie:              #fde589;
 $turquoise:            #2cd8C7;
 $java:                 #1ac3b2;
 
+// New A/B Test colours
+$pictonblue:           #398ef0;
+$azureeradiance:       #0092ff;
+$azureeradiance-20:    rgba(0, 146, 255, 0.2);
+$azureeradiance-50:    rgba(0, 146, 255, 0.5);
+$malibu:               #8cc5f7;
+$blacksqueeze:         #f4f8fB;
+
 // Brands
 $facebook: #3B5998;
-$google:   #DF4A32;
-$starling: #593FA7;
+$google:   #df4A32;
+$starling: #593fa7;
 $twitter:  #00aced;
 
 // Extend Theme colours and overide primary BS colour
@@ -76,11 +85,12 @@ $theme-colors: (
     "salomie":              $salomie,
     "turquoise":            $turquoise,
     "java":                 $java,
+    "athens-gray":          $athens-gray,
 );
 
 // Bootstrap overides
 $primary:       $dodger-blue;
-$secondary:     $lynch;
+$secondary:     $ultramarine;
 $success:       $ufo-green;
 $info:          $columbia-blue-e;
 $warning:       $bright-yellow;
@@ -93,6 +103,10 @@ $dark:          $haiti;
 // TODO: Find cases where gradient is in css and remove apply gradient to it or extend
 @mixin blue-gradient {
     @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
+}
+
+@mixin blue-gradient-45 {
+    @include linear-gradient(45deg, $deep-sky-blue-b, $crayon-blue);
 }
 
 @mixin blue-gradient-90 {

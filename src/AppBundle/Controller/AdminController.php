@@ -529,10 +529,6 @@ class AdminController extends BaseController
         if ($phone) {
             $gwp = $request->get('gwp');
             $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
-            $to = null;
-            if ($request->get('to')) {
-                $to = new \DateTime($request->get('to'), SoSure::getSoSureTimezone());
-            }
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
@@ -568,14 +564,7 @@ class AdminController extends BaseController
                 if ($request->get('picsure-theft-excess')) {
                     $picsureExcess->setTheft($request->get('picsure-theft-excess'));
                 }
-                $phone->changePrice(
-                    $gwp,
-                    $from,
-                    $excess,
-                    $picsureExcess,
-                    $to,
-                    $notes
-                );
+                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
                 return new RedirectResponse($this->generateUrl('admin_phones'));
@@ -1440,9 +1429,9 @@ class AdminController extends BaseController
             'checkout' => $bankingService->getCheckoutBanking($date, $year, $month),
             'cashflows' => $bankingService->getCashflowsBanking($date, $year, $month),
             'lloyds' => $bankingService->getLloydsBanking($date, $year, $month),
-            'bacsInputFiles' => $inputRepo->getMonthlyProcessedFiles($date),
-            'bacsAruddFiles' => $aruddRepo->getMonthlyProcessedFiles($date),
-            'bacsDdicFiles' => $ddicRepo->getMonthlyProcessedFiles($date),
+            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
+            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
+            'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false)
         ];
         return $data;
@@ -1889,12 +1878,21 @@ class AdminController extends BaseController
             }
 
             if ($request->request->has('flag-redis-policy')) {
-                $redis->sadd('policy:validation:flags', $policy->getId());
+                if ($request->get('flag-redis-policy') == 'remove') {
+                    $redis->srem('policy:validation:flags', $policy->getId());
 
-                $this->addFlash('success', sprintf(
-                    'Flagged policy %s',
-                    $policy->getPolicyNumber()
-                ));
+                    $this->addFlash('success', sprintf(
+                        'Unflagged policy %s',
+                        $policy->getPolicyNumber()
+                    ));
+                } else {
+                    $redis->sadd('policy:validation:flags', $policy->getId());
+
+                    $this->addFlash('success', sprintf(
+                        'Flagged policy %s',
+                        $policy->getPolicyNumber()
+                    ));
+                }
             }
 
             if ($request->request->has('delete-redis-policy')) {

@@ -118,7 +118,7 @@ $(function(){
         url.searchParams.set('premium', type);
         let newUrl = url.href;
 
-        console.log(newUrl);
+        // console.log(newUrl);
 
         // Clear payment data
         paymentForm.removeData('value');
@@ -128,10 +128,10 @@ $(function(){
         paymentForm.attr('data-value', amount);
         paymentForm.attr('data-url', newUrl);
 
-        console.log(paymentForm.data());
+        // console.log(paymentForm.data());
     });
 
-    console.log(paymentForm.data());
+    // console.log(paymentForm.data());
 
     $('.btn-card-pay').on('click', function(e) {
         e.preventDefault();

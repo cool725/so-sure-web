@@ -550,24 +550,6 @@
                                             <small class="form-text">Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later (1 business day)</small>
                                             <small class="form-text">Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress.</small>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="mr-2">To</label>
-                                            <div class="input-group date-time-picker date"
-                                                 id="date_time_picker_to"
-                                                 data-target-input="nearest">
-                                                <input type="text"
-                                                       id="phone_to"
-                                                       name="to"
-                                                       required="required"
-                                                       class="form-control datetimepicker-input"
-                                                       data-target="#date_time_picker_to"/>
-                                                <div class="input-group-append"
-                                                     data-target="#date_time_picker_to"
-                                                     data-toggle="datetimepicker">
-                                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="card mb-5">
@@ -575,8 +557,7 @@
                                     <div class="card-body">
                                         <textarea class="form-control"
                                                   id="phone_notes"
-                                                  name="notes">
-                                        </textarea>
+                                                  name="notes"></textarea>
                                     </div>
                                 </div>
                             </div>
