@@ -404,6 +404,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->addPhonePrice($priceC);
         $phone->addPhonePrice($priceD);
         $this->assertEquals([$priceB], $phone->getRecentPhonePrices(10));
+        $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(100000));
     }
 
     private function getSamplePhoneA()
