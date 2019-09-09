@@ -49,7 +49,7 @@ class S3FileRepository extends DocumentRepository
     /**
      * Gives all the files that have been processed this month.
      * @param \DateTime $date is a date within the month of interest.
-     * @return Cursor over all the files.
+     * @return array of all the found files.
      */
     public function getMonthlyProcessedFiles(\DateTime $date)
     {
