@@ -383,7 +383,7 @@ class BICommand extends ContainerAwareCommand
             'First Time Policy',
             'Policy Number Prior Renewal',
             'Policy Number Renewal',
-            'Upgrade Prior Policy Number',
+            'Policy Result of Upgrade',
             'This Policy is the X renewal',
             'Policy Status',
             'Expected Unpaid Cancellation Date',
@@ -459,7 +459,7 @@ class BICommand extends ContainerAwareCommand
                 $policy->useForAttribution() ? 'yes' : 'no',
                 $previous ? $previous->getPolicyNumber() : '',
                 $next ? $next->getPolicyNumber() : '',
-                $this->getPreviousPolicyNumberIfUpgrade($policy),
+                $this->getPreviousPolicyIsUpgrade($policy),
                 $policy->getGeneration(),
                 $policy->getStatus(),
                 $policy->getStatus() == Policy::STATUS_UNPAID ?
@@ -971,7 +971,7 @@ class BICommand extends ContainerAwareCommand
         return false;
     }
 
-    public function getPreviousPolicyNumberIfUpgrade(Policy $policy)
+    public function getPreviousPolicyIsUpgrade(Policy $policy)
     {
         $user = $policy->getUser();
         $previousPolicies = $user->getPolicies();
@@ -989,11 +989,11 @@ class BICommand extends ContainerAwareCommand
                 $cancelled = $previousPolicy->isCancelled();
                 $isUpgrade = $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE;
                 if ($cancelled && $isUpgrade) {
-                    return $previousPolicy->getPolicyNumber();
+                    return 'Yes';
                 }
             }
         }
-        return '';
+        return 'No';
     }
 
     /**
