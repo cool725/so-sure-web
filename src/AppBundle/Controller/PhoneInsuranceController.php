@@ -267,7 +267,7 @@ class PhoneInsuranceController extends BaseController
 
         if ($skipToPurchase) {
             // A/B Funnel Test
-            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
+            // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
             return $this->redirectToRoute('purchase_step_phone');
         }
 

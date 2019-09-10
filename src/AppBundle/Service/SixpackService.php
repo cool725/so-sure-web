@@ -30,7 +30,7 @@ class SixpackService
     const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
 
     // Exp 1
-    const EXPERIMENT_OLD_VS_NEW_FUNNEL = 'old-vs-new-funnel';
+    // const EXPERIMENT_OLD_VS_NEW_FUNNEL = 'old-vs-new-funnel';
     // Exp 2
     //
     // Exp 3
@@ -122,12 +122,13 @@ class SixpackService
         'cta-yes-please',
         'app-share-method',
         'cta-buy-now',
-        'burger-vs-full'
+        'burger-vs-full',
+        'old-vs-new-funnel'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_OLD_VS_NEW_FUNNEL,
+        // self::EXPERIMENT_OLD_VS_NEW_FUNNEL,
         // Exp 2
         //
         // Exp 3
@@ -209,7 +210,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_OLD_VS_NEW_FUNNEL,
+        // self::EXPERIMENT_OLD_VS_NEW_FUNNEL,
         // Exp 2
         //
         // Exp 3

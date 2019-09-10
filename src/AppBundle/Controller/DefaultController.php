@@ -87,26 +87,21 @@ class DefaultController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        $homepageFunnelExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
-            ['regular-funnel', 'new-funnel'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        // $homepageFunnelExp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
+        //     ['regular-funnel', 'new-funnel'],
+        //     SixpackService::LOG_MIXPANEL_ALL
+        // );
 
-        if ($homepageFunnelExp == 'new-funnel') {
-            $template = 'AppBundle:Default:indexB.html.twig';
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'new-funnel']);
-        } else {
-            $template = 'AppBundle:Default:index.html.twig';
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
-        }
+        $template = 'AppBundle:Default:index.html.twig';
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'funnel_exp' => $homepageFunnelExp,
+            // 'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
