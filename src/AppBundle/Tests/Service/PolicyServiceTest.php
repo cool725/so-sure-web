@@ -694,6 +694,40 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(12, count($updatedPolicy->getScheduledPayments()));
     }
 
+    /**
+     * Tests that when a policy is created with no other payments, a full 12 payments are added rather than the
+     * customary 11, and make sure it works on the 31st.
+     * @group schedule
+     */
+    public function testGenerateScheduledPaymentsNoInitialThirtyFirst()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            self::generateEmail('scheduled-monthly-renewal-31st', $this, true),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
+        $policy->setPremiumInstallments(12);
+        $date = new \DateTime('2019-08-31');
+        $now = new \DateTime();
+        // We can only schedule payments in the future or within 4 days ago, so we make the date a future date.
+        while ($date < $now) {
+            $date->add(new \DateInterval("P1Y"));
+        }
+        static::$policyService->create(
+            $policy,
+            $date,
+            true,
+            null,
+            null,
+            $date
+        );
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        $this->assertEquals(12, count($updatedPolicy->getScheduledPayments()));
+    }
+
     public function testSalvaCancelSimple()
     {
         $user = static::createUser(
