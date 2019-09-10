@@ -1437,13 +1437,13 @@ class PurchaseController extends BaseController
             $token = $request->get("token");
             $pennies = $request->get("pennies");
             $freq = $request->get('premium');
-            if ($freq == Policy::PLAN_MONTHLY) {
+            if ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_MONTHLY) {
                 $policy->setPremiumInstallments(12);
                 $this->getManager()->flush();
-            } elseif ($freq == Policy::PLAN_YEARLY) {
+            } elseif ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_YEARLY) {
                 $policy->setPremiumInstallments(1);
                 $this->getManager()->flush();
-            } else {
+            } elseif ($request->get('_route') == 'purchase_checkout') {
                 throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
             }
             $csrf = $request->get("csrf");

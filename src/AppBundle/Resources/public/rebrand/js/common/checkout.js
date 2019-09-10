@@ -1,42 +1,39 @@
 // checkout.js
 
 $(function() {
-    $('.btn-card-pay').on('click', function(e) {
-        //console.log('click');
-        e.preventDefault();
-        Checkout.open();
-    });
+
+    let paymentForm = $('.payment-form');
 
     Checkout.configure({
-        publicKey: $('.payment-form').data('public-key'),
-        customerEmail: $('.payment-form').data('customer-email'),
-        value: $('.payment-form').data('value'),
-        currency: $('.payment-form').data('currency'),
-        debugMode: $('.payment-form').data('debug-mode'),
-        paymentMode: $('.payment-form').data('payment-mode'),
-        cardFormMode: $('.payment-form').data('card-form-mode'),
-        title: $('.payment-form').data('title'),
-        subtitle: $('.payment-form').data('subtitle'),
+        publicKey: paymentForm.data('public-key'),
+        customerEmail: paymentForm.data('customer-email'),
+        value: paymentForm.data('value'),
+        currency: paymentForm.data('currency'),
+        debugMode: paymentForm.data('debug-mode'),
+        paymentMode: paymentForm.data('payment-mode'),
+        cardFormMode: paymentForm.data('card-form-mode'),
+        title: paymentForm.data('title'),
+        subtitle: paymentForm.data('subtitle'),
         logoUrl: 'https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo_checkout.svg',
         themeColor: '#2593f3',
         forceMobileRedirect: true,
-        redirectUrl: $('.payment-form').data('url'),
+        redirectUrl: paymentForm.data('url'),
         cardTokenised: function(event) {
             $('html, body').animate({ scrollTop: 0 }, 'fast');
             // Show loading screen
             $('.loading-screen').fadeIn();
             // Scroll to top of page
             console.log(event.data.cardToken);
-            var url = $('.payment-form').data('url');
-            var csrf = $('.payment-form').data('csrf');
-            var pennies = $('.payment-form').data('value');
+            let url = paymentForm.data('url'),
+                csrf = paymentForm.data('csrf'),
+                pennies = paymentForm.data('value');
             console.log(url);
             $.post(url, {'csrf': csrf, 'token': event.data.cardToken, 'pennies': pennies}, function(resp) {
                 console.log(resp);
             }).fail(function() {
                 $('.loading-screen').fadeOut();
             }).always(function() {
-                let redirect = $('.payment-form').data('redirect-url');
+                let redirect = paymentForm.data('redirect-url');
                 if (redirect) {
                     window.location.href = redirect;
                 } else {
@@ -44,5 +41,11 @@ $(function() {
                 }
             });
         }
+    });
+
+    $('.btn-card-pay').on('click', function(e) {
+        //console.log('click');
+        e.preventDefault();
+        Checkout.open();
     });
 });
