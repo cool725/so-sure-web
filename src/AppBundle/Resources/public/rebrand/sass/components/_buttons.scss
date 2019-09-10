@@ -25,7 +25,8 @@ button[class*="btn-outline-"],
 input[type="submit"][class*="btn-outline-"],
 input[type="button"][class*="btn-outline-"],
 .btn-no-shadow,
-.btn-secondary {
+.btn-secondary,
+.btn-link {
     box-shadow: none;
 }
 

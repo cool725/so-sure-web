@@ -191,11 +191,11 @@
                                 {% endif %}
                             </li>
                             <li class="mb-2">
-                                {% if non_picsure_policy %}
+{#                                 {% if non_picsure_policy %}
                                     <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy List non-pic-sure policy</a> (auto impersonate {{ non_picsure_policy.user.email }})
                                 {% else %}
                                     No non-picsure policy
-                                {% endif %}
+                                {% endif %} #}
                             </li>
                         </ul>
                     </div>
