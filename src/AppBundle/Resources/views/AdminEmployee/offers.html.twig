@@ -9,12 +9,8 @@
         </tr>
         {% for offer in offers %}
             <tr>
-                <td>
-                    {{ offer.phone.make }} {{ offer.phone.model }} {{ offer.phone.memory }}GB
-                </td>
-                <td>
-                    £{{ offer.price.yearly }}p/y (£{{ offer.price.montly }}p/m)
-                </td>
+                <td>{{ offer.phone }}</td>
+                <td>£{{ offer.price.yearly }}p/y (£{{ offer.price.montly }}p/m)</td>
             </tr>
         {% endfor %}
         </tbody>

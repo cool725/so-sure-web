@@ -3948,15 +3948,19 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/view-offers/{id}", name="admin_view_offers")
+     * @Route("/user-offers", name="admin_user_offers")
      * @Template("AppBundle:AdminEmployee:offers.html.twig")
      */
-    public function viewOffersAction($id)
+    public function userOffersAction($id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
+        /** @var OfferRepository */
         $offerRepo = $dm->getRepository(Offer::class);
-        $offers = $offerRepo->getAllByPhone();
+        $offers = $offerRepo->find([]);
+        return [
+            "offers" => $offers
+        ];
     }
 
     public function createOfferFormAction()

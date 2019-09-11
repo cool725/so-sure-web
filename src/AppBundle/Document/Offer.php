@@ -13,11 +13,16 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Represents an offer to a user for a lowered premium on a given model of phone.
- * @MongoDB\EmbeddedDocument
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\OfferRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Offer
 {
+    /**
+     * @MongoDB\Id(strategy="auto")
+     */
+    protected $id;
+
     /**
      * Time at which the offer was created. Does not need to be used for any functionality but is kept for reference.
      * @Assert\DateTime()
@@ -25,12 +30,12 @@ class Offer
      * @Gedmo\Versioned
      */
     protected $created;
-    
+
     /**
      * The offered price which also stores the time period in which is it valid.
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PhonePrice")
      * @Gedmo\Versioned
-     * @var OfferPrice
+     * @var PhonePrice
      */
     protected $price;
 
@@ -41,6 +46,15 @@ class Offer
      * @var Phone
      */
     protected $phone;
+
+    /**
+     * The name of this offer. Not intended to be seen by users, just so admins can keep track of multiple offers on
+     * the same phone and such.
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="0", max="100")
+     * @MongoDB\Field(type="string")
+     */
+    protected $name;
 
     /**
      * Gives the time at which the offer was created.
@@ -94,5 +108,23 @@ class Offer
     public function setPhone($phone)
     {
         $this->phone = $phone;
+    }
+
+    /**
+     * Gives you the name of this offer.
+     * @return string the name.
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets the name of the offer.
+     * @param string $name is the new name to give.
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 }

@@ -28,6 +28,15 @@
             data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
             data-phone="{{ phone.toPriceArray()|json_encode }}">
         <i class="far fa-pound-sign fa-fw"></i></button>
+    <button title="Offer Pricing"
+            type="button"
+            class="btn btn-primary btn-sm mb-2 mr-2"
+            data-toggle="modal"
+            data-target="#offer_modal"
+            data-update="{{ path('admin_phone_offer', {'id': phone.id}) }}"
+            data-ipt-rate="{{ phone.currentIptRate }}"
+            data-phone="{{ phone.toPriceArray()|json_encode }}">
+        <i class="far fa-handshake fa-fw"></i></button>
     {# Edit Phone Details #}
     <button title="Edit Phone Details"
             type="button"
@@ -775,6 +784,44 @@
                                data-empty="No data">{# Prices Table #}</table>
                         <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Offer Modal #}
+    <div class="modal fade modal-fullscreen"
+         id="offer_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="phone_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-dialog" role="document">
+            <div class="modal-content modal-fullscreen-content">
+                <div class="modal-header modal-fullscreen-header">
+                    <h5 class="modal-title h3 text-zaffre">Offers</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times fa-lg fa-fw text-primary"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-fullscreen-body">
+                    <div class="row mt-5">
+                        <div class="col-lg">
+                            <div class="card">
+                                <div class="card-header h5">Existing Offers</div>
+                                <div class="card-body">
+                                    <p>Table</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg">
+                            <div class="card">
+                                <div class="card-header h5">New Offer</div>
+                                <div class="card-body">
+                                    <p>Form</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

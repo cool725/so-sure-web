@@ -403,4 +403,33 @@ class AdminControllerTest extends BaseControllerTest
         $form = $crawler->filter('form[id="delete-claim-form"]');
         $this->assertEquals(0, count($form));
     }
+
+    public function testPhoneOffersAction()
+    {
+        $phone = static::getRandomPhone(self::$dm);
+        $price = new PhonePrice();
+        $price->setGwp(100);
+        $price->setIpt(10);
+        $offerA = new Offer();
+        $offerB = new Offer();
+        $offerC = new Offer();
+        $offerA->setCreated(new \DateTime("2019-09-11"));
+        $offerB->setCreated(new \DateTime("2019-09-10"));
+        $offerC->setCreated(new \DateTime("2019-03-21"));
+        $offerA->setPrice($price);
+        $offerB->setPrice($price);
+        $offerC->setPrice($price);
+        $offerA->setPhone($phone);
+        $offerB->setPhone($phone);
+        $offerC->setPhone($phone);
+        $offerA->setName("Offer A");
+        $offerB->setName("B");
+        $offerC->setName("Final Offer");
+        self::$dm->persist($offerA);
+        self::$dm->persist($offerB);
+        self::$dm->persist($offerC);
+        self::$dm->flush();
+        // now we see if the endpoint tells us the same thing.
+        $this->login('admin@so-sure.com', LoadUserData::DEFAULT_PASSWORD);
+    }
 }

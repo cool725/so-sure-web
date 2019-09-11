@@ -677,6 +677,97 @@ class AdminController extends BaseController
     }
 
     /**
+     * Gives all offers for a given phone.
+     * @Route("/phone/{id}/offers", name="admin_phone_offers")
+     * @Method({"POST"})
+     */
+    public function phoneOffersAction(Request $request, $id)
+    {
+
+
+    }
+
+    /**
+     * Used to create a new offer for a given phone.
+     * @Route("/phone/{id}/offer", name="admin_phone_offer")
+     * @Method({"POST"})
+     */
+    public function phoneOfferAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        /** @var Phone $phone */
+        $phone = $repo->find($id);
+        if ($phone) {
+            $gwp = $request->get('gwp');
+            $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
+            $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
+            try {
+                $policyTerms = $this->getLatestPolicyTerms();
+                $excess = $policyTerms->getDefaultExcess();
+                $picsureExcess = $policyTerms->getDefaultPicSureExcess();
+                if ($request->get('damage-excess')) {
+                    $excess->setDamage($request->get('damage-excess'));
+                }
+                if ($request->get('warranty-excess')) {
+                    $excess->setWarranty($request->get('warranty-excess'));
+                }
+                if ($request->get('extended-warranty-excess')) {
+                    $excess->setExtendedWarranty($request->get('extended-warranty-excess'));
+                }
+                if ($request->get('loss-excess')) {
+                    $excess->setLoss($request->get('loss-excess'));
+                }
+                if ($request->get('theft-excess')) {
+                    $excess->setTheft($request->get('theft-excess'));
+                }
+                if ($request->get('picsure-damage-excess')) {
+                    $picsureExcess->setDamage($request->get('picsure-damage-excess'));
+                }
+                if ($request->get('picsure-warranty-excess')) {
+                    $picsureExcess->setWarranty($request->get('picsure-warranty-excess'));
+                }
+                if ($request->get('picsure-extended-warranty-excess')) {
+                    $picsureExcess->setExtendedWarranty($request->get('picsure-extended-warranty-excess'));
+                }
+                if ($request->get('picsure-loss-excess')) {
+                    $picsureExcess->setLoss($request->get('picsure-loss-excess'));
+                }
+                if ($request->get('picsure-theft-excess')) {
+                    $picsureExcess->setTheft($request->get('picsure-theft-excess'));
+                }
+                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes);
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return new RedirectResponse($this->generateUrl('admin_phones'));
+            }
+            $dm->flush();
+            $this->addFlash('success', 'Your changes were saved!');
+            /** @var MailerService $mailer */
+            $mailer = $this->get('app.mailer');
+            $mailer->send(
+                sprintf('Phone pricing update for %s', $phone),
+                'marketing@so-sure.com',
+                sprintf(
+                    'On %s, the price for %s will be updated to £%0.2f (£%0.2f GWP). Notes: %s',
+                    $from->format(\DateTime::ATOM),
+                    $phone,
+                    $this->withIpt($gwp),
+                    $gwp,
+                    $notes
+                ),
+                null,
+                null,
+                'tech@so-sure.com'
+            );
+        }
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
      * @Route("/admin-users", name="admin_admin_users")
      * @Template
      */

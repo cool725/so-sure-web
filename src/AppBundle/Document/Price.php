@@ -20,6 +20,20 @@ abstract class Price
 {
     use CurrencyTrait;
 
+    const SOURCE_STANDARD = "normal";
+    const SOURCE_OFFER = "offer";
+    const SOURCES = [
+        self::SOURCE_STANDARD,
+        self::SOURCE_OFFER
+    ];
+
+    const OFFER_METHOD_MANUAL = "manual";
+    const OFFER_METHOD_CAMPAIGN = "campaign";
+    const OFFER_METHODS = [
+        self::OFFER_METHOD_MANUAL,
+        self::OFFER_METHOD_CAMPAIGN
+    ];
+
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
@@ -45,6 +59,20 @@ abstract class Price
      * @var Excess|null
      */
     protected $excess;
+
+    /**
+     * @Assert\Choice(choices=Price::SOURCES, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $source;
+
+    /**
+     * @Assert\Choice(choices=Price::OFFER_METHODS, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $offerMethod;
 
     public function __construct()
     {
@@ -157,6 +185,26 @@ abstract class Price
     public function setExcess(Excess $excess)
     {
         $this->excess = $excess;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
+
+    public function getOfferMethod()
+    {
+        return $this->offerMethod;
+    }
+
+    public function setOfferMethod($offerMethod)
+    {
+        $this->offerMethod = $offerMethod;
     }
 
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
