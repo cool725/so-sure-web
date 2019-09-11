@@ -3191,6 +3191,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUpdatePolicyPaymentJudopayDiffUser()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $userA = self::createUser(
             self::$userManager,
             self::generateEmail('testUpdatePolicyPaymentJudopayDiffUser-A', $this),

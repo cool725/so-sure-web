@@ -89,6 +89,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoPaymentPolicyNoReload()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('testJudoPaymentPolicyNoReload', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
@@ -304,6 +305,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoReceiptPaymentDiff()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('judo-receipt-exception', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
@@ -364,6 +366,7 @@ class JudopayServiceTest extends WebTestCase
      */
     public function testJudoReceiptPaymentDeclinedException()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('judo-receipt-declined-exception', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
@@ -444,6 +447,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoAdditionalUnexpectedPayment()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('testJudoAdditionalUnexpectedPayment', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
@@ -592,6 +596,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoScheduledPayment()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('judo-scheduled', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -646,6 +651,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoScheduledPaymentDelayed()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentDelayed', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -700,6 +706,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoScheduledPaymentExpiredCard()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         /** @var User $user */
         $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentExpiredCard', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -752,6 +759,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoScheduledPaymentInvalidPaymentMethod()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('testJudoScheduledPaymentInvalidPaymentMethod', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -901,6 +909,7 @@ class JudopayServiceTest extends WebTestCase
      */
     public function testJudoMultipleSameDayPayments()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testMultipleSameDayPayments', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -963,6 +972,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testJudoPaymentFirstProblem()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testPaymentFirstProblem', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -1119,6 +1129,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testCheckoutRemainderPaymentCancelledPolicy()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $user = $this->createValidUser(static::generateEmail('testRemainderPaymentCancelledPolicy', $this));
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone);
@@ -1184,6 +1195,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testFailedProcessScheduledPaymentResult()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testFailedProcessScheduledPaymentResult', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -1347,6 +1359,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testFailedPaymentEmail()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testFailedPaymentEmail', $this, true));
         $phone = static::getRandomPhone(static::$dm);
@@ -1401,6 +1414,7 @@ class JudopayServiceTest extends WebTestCase
 
     public function testFailedPaymentEmailMissing()
     {
+        $this->markTestSkipped('JudoPay no longer used');
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testFailedPaymentEmail', $this, true));
         $phone = static::getRandomPhone(static::$dm);
