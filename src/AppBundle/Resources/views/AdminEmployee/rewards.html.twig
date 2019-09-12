@@ -196,7 +196,13 @@
                                     </div>
                                     <div class="mr-2">
                                         {{ form_widget(rewardForm.isSignUpBonus, {
-                                            'label': 'Sign up Bonus?',
+                                            'label': 'Sign up Bonus',
+                                            'attr': {'class': 'custom-control-input'}}
+                                        ) }}
+                                    </div>
+                                    <div class="mr-2">
+                                        {{ form_widget(rewardForm.isConnectionBonus, {
+                                            'label': 'Connection Bonus',
                                             'attr': {'class': 'custom-control-input'}}
                                         ) }}
                                     </div>
