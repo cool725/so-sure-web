@@ -35,5 +35,6 @@ class RewardRepository extends DocumentRepository
         $qb->addOr($qb->expr()->field("expiryDate")->gte($date));
         /** @var Reward|null $reward */
         $reward =  $qb->getQuery()->getSingleResult();
+        return $reward;
     }
 }
