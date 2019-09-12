@@ -270,9 +270,15 @@ class SlackCommand extends ContainerAwareCommand
             new \DateTime(SoSure::POLICY_START, SoSure::getSoSureTimezone()),
             $startOfDay
         );
-        $total = end($cumulativeReport)["close"];
-        $upgrades = $repo->countAllEndingPolicies(Policy::CANCELLED_UPGRADE, $yesterday);
-        $gross = $total - $repo->countAllActivePolicies($yesterday) - $upgrades;
+
+
+        $gross = 0;
+        $policies = $repo->findAllStartedPolicies(null, $yesterday, $startOfDay);
+        foreach ($policies as $policy) {
+            if (!$policy->hasPreviousPolicy() && !$policy->getUpdatedFrom()) {
+                $gross++;
+            }
+        }
         $cooloff = $repo->countAllEndingPolicies(Policy::CANCELLED_COOLOFF, $yesterday, $startOfDay);
         $cancellations = $repo->countEndingByStatus(Policy::STATUS_CANCELLED, $yesterday, $startOfDay);
         $weekStart = $repo->countAllActivePolicies($start);

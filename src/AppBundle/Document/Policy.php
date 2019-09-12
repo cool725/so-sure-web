@@ -2621,6 +2621,57 @@ abstract class Policy
     }
 
     /**
+     * Returns the policy that this policy is an upgrade of, if such a policy exists.
+     * Note that this method has to guess a bit because there is no direct information about this stored. If two
+     * policies are created after a policy is cancelled for upgrade, only one of those policies will say it is
+     * upgraded from that policy by this method, thus it is accurate for numerical reporting purposes, but historically
+     * the other one might actually have been the upgrade.
+     * @return Policy|null the previous policy if there is one.
+     */
+    public function getUpgradedFrom()
+    {
+        $user = $this->getUser();
+        if (!$user || $this->hasPreviousPolicy()) {
+            return null;
+        }
+        $policies = $user->getAllPolicyPolicies();
+        // Get all the users policies that were cancelled in ascending order of cancellation.
+        $cancelledUpgrade = [];
+        foreach ($policies as $policy) {
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
+                $policy->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+                $cancelledUpgrade[] = $policy;
+            }
+        }
+        usort($cancelledUpgrade, function ($a, $b) {
+            return ($a->getEnd() < $b->getEnd()) ? -1 : 1;
+        });
+        // Now match these to the oldest eligible created policy created within 24 hours.
+        usort($policies, function ($a, $b) {
+            return ($a->getStart() < $b->getStart()) ? -1 : 1;
+        });
+        $start = 0;
+        foreach ($cancelledUpgrade as $prior) {
+            $cancellationDate = $prior->getEnd()->getTimestamp();
+            var_dump($cancellationDate);
+            for ($i = $start; $i < count($policies); $i++) {
+                $startDate = $policies[$i]->getStart()->getTimestamp();
+                var_dump($startDate);
+                if ($startDate <= $cancellationDate) {
+                    $start++;
+                } elseif ($startDate < $cancellationDate + 60 * 60 * 24) {
+                    if ($policies[$i]->getId() == $this->getId()) {
+                        return $prior;
+                    }
+                    $start++;
+                    break;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return BankAccount|null
      */
     public function getBacsBankAccount()
