@@ -5,6 +5,7 @@ use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\FacebookInvitationRepository;
 use AppBundle\Repository\Invitation\SCodeInvitationRepository;

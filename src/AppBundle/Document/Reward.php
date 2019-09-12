@@ -283,7 +283,7 @@ class Reward
      */
     public function getIsConnectionBonus()
     {
-        return $this->isConnectionBonus();
+        return $this->isConnectionBonus;
     }
 
     /**

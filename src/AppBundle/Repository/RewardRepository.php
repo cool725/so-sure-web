@@ -33,6 +33,7 @@ class RewardRepository extends DocumentRepository
         $qb->addAnd($qb->expr()->field("isConnectionBonus")->equals(true));
         $qb->addOr($qb->expr()->field("expiryDate")->exists(false));
         $qb->addOr($qb->expr()->field("expiryDate")->gte($date));
-        return $qb->getQuery()->getSingleResult();
+        /** @var Reward|null $reward */
+        $reward =  $qb->getQuery()->getSingleResult();
     }
 }
