@@ -350,7 +350,7 @@ class Reward
         }
         // make sure they are not trying to get it multiple times.
         foreach ($policy->getConnections() as $connection) {
-            if ($connection->getId() == $this->getId()) {
+            if ($connection->getLinkedUser()->getId() == $this->getId()) {
                 return false;
             }
         }
