@@ -344,9 +344,17 @@ class Reward
      */
     public function canApply($policy, \DateTime $date)
     {
+        // make sure it's not an old reward
         if (!$this->isOpen($date)) {
             return false;
         }
+        // make sure they are not trying to get it multiple times.
+        foreach ($policy->getConnections() as $connection) {
+            if ($connection->getId() == $this->getId()) {
+                return false;
+            }
+        }
+        // other conditions
         $min = $this->getPolicyAgeMin();
         $max = $this->getPolicyAgeMax();
         $age = $policy->age();
