@@ -36,10 +36,10 @@
         <div class="purchase-top px-4 py-5 p-lg-5">
             {% if phone %}
                 <div class="row">
-                    <div class="col-xl-3">
-                        <div class="purchase-details">
-                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="Happy Phone" width="180px" class="lozad d-none d-lg-inline">
-                            <div class="text-white h5 mb-0"><span class="sub">You're insuring {{ atitle }}:</span></div>
+                    <div class="col-lg-4 col-xl-3">
+                        <div class="purchase-details pr-xl-2">
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="Happy Phone" width="140px" class="lozad d-none d-lg-inline">
+                            <div class="text-white h5 mb-0"><span class="sub">Here's your quote:</span></div>
                             <h1 class="fit mb-4 pb-1">
                                 <a href="#mem_sizes"
                                    class="text-white"
@@ -47,7 +47,7 @@
                                    role="button"
                                    aria-expanded="false"
                                    aria-controls="mem_sizes"
-                                   title="Have a different storage size?">
+                                   title="Not the phone you're looking for?">
                                     {{ phone.make }} {{ phone.model }} ({{ phone.memory }}GB)
                                 </a>
                             </h1>
@@ -74,16 +74,16 @@
                                     &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
                                 {% endif %}
                             </div>
-                            <div class="h5 text-deep-sky-blue-d mb-5">
+                            <div class="h5 text-deep-sky-blue-d mb-4">
                                 {% if not app.user or app.user.allowedMonthlyPayments %}
                                     <span class="sub">per month</span>
                                 {% else %}
                                     <span class="sub">per year</span>
                                 {% endif %}
                             </div>
-                            <div class="d-none d-xl-block text-left">
-                                <hr class="hr-blue mb-5">
-                                <h5 class="text-white mb-4">Your cover includes:</h5>
+                            <div class="d-none d-lg-block text-left">
+                                <hr class="hr-blue mb-4">
+                                <h5 class="text-white mb-4">An amazing level of cover:</h5>
                                 <ul class="list-unstyled icn-fa-list mb-4 mb-xl-0">
                                     <li class="text-white mb-2">
                                         <i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 hour replacement or repair
@@ -91,15 +91,18 @@
                                     <li class="text-white mb-2">
                                         <i class="far fa-check text-columbia-blue-e fa-lg"></i> Low excess from just &pound;50
                                     </li>
-                                    <li class="text-white">
+                                    <li class="text-white mb-2">
                                         <i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% money back
+                                    </li>
+                                    <li class="text-white">
+                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> New, secondhand &amp; refurbished phones
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-8 offset-xl-1">
-                        <div class="cardbox cardbox-100 py-3 px-2">
+                    <div class="col-lg-8 col-xl-9 d-flex flex-column">
+                        <div class="cardbox cardbox-100 purchase-card py-3 px-2">
                             {% include 'AppBundle::Purchase/_purchaseSteps.html.twig' %}
                             {% include 'AppBundle::Purchase/_formStepPhoneB.html.twig' %}
                         </div>
@@ -114,7 +117,9 @@
             {% endif %}
         </div>
         <div class="purchase-bottom">
-            {% include 'AppBundle::Purchase/_seeFullDetailsB.html.twig' %}
+            {% if phone %}
+                {% include 'AppBundle::Purchase/_seeFullDetailsB.html.twig' %}
+            {% endif %}
         </div>
     </div>
 

@@ -1245,7 +1245,7 @@ class UserController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
 
         $smsExperiment = $this->sixpack(
             $request,

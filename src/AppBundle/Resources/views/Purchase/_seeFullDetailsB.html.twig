@@ -4,111 +4,119 @@
     {% set device = policy.phone %}
 {% endif %}
 
-<div class="mx-4 mx-lg-5 py-5">
-    <div class="h1 mb-5">Full Cover Details</div>
-    <h4 class="mb-4">What's covered:</h4>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Loss &amp; Theft</li>
-        <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
-        <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> 90 days global travel</li>
-        <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Out of warranty breakdown</li>
-        <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
-        <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
-        <li class="mb-5"><i class="far fa-check text-success fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
-    </ul>
-    <h4 class="my-4">What's not covered:</h4>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="mb-3"><i class="far fa-times text-danger fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-        <li class="mb-5"><i class="far fa-times text-danger fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
-    </ul>
-    <h4 class="my-4">Insurance Product Information Document:</h4>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="mb-3"><i class="fal fa-info-circle fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
-        <li class="mb-5">
-            <i class="fal fa-file-download fa-lg"></i>
-            <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="track-data"
-               data-event="user-download-ipid"
-               data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
-        </li>
-    </ul>
-</div>
-<div class="mx-4 mx-lg-5 py-5">
-    <h4 class="mb-4 text-md-center">Here’s how we compare to other insurers:</h4>
-    <div class="d-xl-flex justify-content-lg-center">
-        <table class="table-list mx-auto mx-md-0 table-list__insurers mb-5">
-            <thead>
-                <tr>
-                    <th class="table-list__header text-white h4">Traditional Insurers</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn">4-18 days wait on average*</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn">Cover starts after 14 days</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn">Only phones purchased within 30 days are covered</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn">You'll need to have a law degree to understand the terms</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4 border-fix">
-                        <span class="table-list__icn">Unnecessarily expensive</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <table class="table-list mx-auto mx-md-0 table-list__so-sure">
-            <thead>
-                <tr>
-                    <th class="table-list__header h4 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" width="130px"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>24-72 hour replace/repair once claim approved</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>Immediate cover</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>Refurbished and second-hand devices up to 3 years old covered</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>Plain English Terms &amp; Conditions</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>We’re up to 40% cheaper</strong></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+<div class="container-fluid">
+    <div class="px-4 py-5 p-lg-5">
+        <div class="h1 mb-4">Full Cover Details</div>
+        <div class="row">
+            <div class="col-lg">
+                <h4 class="mb-4">What's covered:</h4>
+                <ul class="list-unstyled icn-fa-list mb-0">
+                    <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Loss &amp; Theft</li>
+                    <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+                    <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> 90 days global travel</li>
+                    <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Out of warranty breakdown</li>
+                    <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
+                    <li class="mb-3"><i class="far fa-check text-success fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
+                    <li class="mb-5"><i class="far fa-check text-success fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+                </ul>
+            </div>
+            <div class="col-lg">
+                <h4 class="mb-4">What's not covered:</h4>
+                <ul class="list-unstyled icn-fa-list mb-0">
+                    <li class="mb-3"><i class="far fa-times text-danger fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                    <li class="mb-5"><i class="far fa-times text-danger fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+                </ul>
+                <h4 class="my-4">Insurance Product Information Document:</h4>
+                <ul class="list-unstyled icn-fa-list mb-0">
+                    <li class="mb-3"><i class="fal fa-info-circle fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
+                    <li class="mb-5">
+                        <i class="fal fa-file-download fa-lg"></i>
+                        <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="track-data"
+                           data-event="user-download-ipid"
+                           data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <h4 class="my-4 text-md-center">Here’s how we compare to other insurers:</h4>
+        <div class="d-xl-flex justify-content-lg-center">
+            <table class="table-list mx-auto mx-md-0 table-list__insurers mb-5">
+                <thead>
+                    <tr>
+                        <th class="table-list__header text-white h4">Traditional Insurers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn">4-18 days wait on average*</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn">Cover starts after 14 days</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn">Only phones purchased within 30 days are covered</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn">You'll need to have a law degree to understand the terms</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4 border-fix">
+                            <span class="table-list__icn">Unnecessarily expensive</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table-list mx-auto mx-md-0 table-list__so-sure">
+                <thead>
+                    <tr>
+                        <th class="table-list__header h4 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" width="130px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn table-list__icn-happy"><strong>24-72 hour replace/repair once claim approved</strong></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn table-list__icn-happy"><strong>Immediate cover</strong></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn table-list__icn-happy"><strong>Refurbished and second-hand devices up to 3 years old covered</strong></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn table-list__icn-happy"><strong>Plain English Terms &amp; Conditions</strong></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-4">
+                            <span class="table-list__icn table-list__icn-happy"><strong>We’re up to 40% cheaper</strong></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="mb-0 mt-1 text-md-center"><small>*FCA report Dec 2015</small></p>
     </div>
-    <p class="mb-0 mt-1 text-md-center"><small>*FCA report Dec 2015</small></p>
 </div>
+
+
 <div class="mx-4 mx-lg-5 py-5 text-center text-lg-left">
     <div class="row">
         <div class="col-md-3">
@@ -117,32 +125,30 @@
         <div class="col-md-8">
             <h4 class="my-4">Excess</h4>
             <p class="mb-5">Prove your {{ device.make }} {{ device.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th width="20%">Damage</th>
-                            <th width="20%">Loss</th>
-                            <th width="20%">Theft</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Validated with app</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</td>
-                        </tr>
-                        <tr>
-                            <td>Not validated with app</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.damage }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.loss }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.theft }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table class="table table-borderless">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="text-zaffre h4" width="20%">Damage</th>
+                        <th class="text-zaffre h4" width="20%">Loss</th>
+                        <th class="text-zaffre h4" width="20%">Theft</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-zaffre h4">Validated with app</td>
+                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</td>
+                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</td>
+                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-zaffre h5">Not validated with app</td>
+                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.excess.damage }}</td>
+                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.excess.loss }}</td>
+                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.excess.theft }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -261,3 +267,4 @@
         </div>
     </div>
 </div>
+
