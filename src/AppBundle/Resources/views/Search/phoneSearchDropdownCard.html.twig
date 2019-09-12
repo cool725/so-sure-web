@@ -1,5 +1,5 @@
 <div class="cardbox cardbox-100 p-4 p-lg-5 🍆">
-    <h4 class="text-center mb-3">Select device and <br class="d-md-none"> <span class="text-primary">get your quote</span></h4>
+    <div class="text-center mb-3 h4 fit">Select device and <span class="text-primary">get your quote</span></div>
     <ul class="list-unstyled icn-fa-list mb-4">
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
@@ -43,11 +43,13 @@
                     'disabled': 'disabled'
             }}) }}
         </div>
-        {{ form_widget(form_phone.next, {
-          'label': 'Get my quote',
-          'attr': {
-            'class': 'btn btn-secondary btn-block mt-4 phone-search-button',
-            'disabled': 'disabled'
-        }}) }}
+        <div class="form-group mt-4">
+            {{ form_widget(form_phone.next, {
+              'label': 'Get my quote',
+              'attr': {
+                'class': 'btn btn-secondary btn-block mt-4 phone-search-button',
+                'disabled': 'disabled'
+            }}) }}
+        </div>
     {{ form_end(form_phone) }}
 </div>
