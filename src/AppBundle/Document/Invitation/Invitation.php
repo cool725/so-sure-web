@@ -121,11 +121,11 @@ abstract class Invitation
     abstract public function getChannelDetails();
 
     /**
-     * Gives the policy which is active in initiating the invitation process in a business sense.
+     * Gives the user which is active in initiating the invitation process in a business sense.
      * Basically just means that if it's an scode invite the invitee should be returned instead of the inviter.
-     * @return Policy|null the policy which shared the invite.
+     * @return User the user which shared the invite.
      */
-    abstract public function getSharerPolicy();
+    abstract public function getSharer();
 
     public function __construct()
     {

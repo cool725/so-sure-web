@@ -48,10 +48,10 @@ class SCodeInvitation extends EmailInvitation
     }
 
     /**
-     * @InheritDoc
+     * @inheritDoc
      */
-    public function getSharerPolicy()
+    public function getSharer()
     {
-        return $this->getInviteePolicy();
+        return $this->getInvitee();
     }
 }

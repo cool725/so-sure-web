@@ -1023,9 +1023,10 @@ class InvitationService
         $invitation->setAccepted($date);
 
         // add connection bonus if there is one.
-        $sharerPolicy = $invitation->getSharerPolicy();
+        $sharer = $invitation->getSharer();
         /** @var RewardRepository */
         $rewardRepo = $this->dm->getRepository(Reward::class);
+        $sharerPolicy = ($sharer->getId() == $inviterPolicy->getUser()->getId()) ? $inviterPolicy : $inviteePolicy;
         $connectionBonus = $rewardRepo->getConnectionBonus($date);
         if ($connectionBonus && $connectionBonus->canApply($sharerPolicy, $date)) {
             try {

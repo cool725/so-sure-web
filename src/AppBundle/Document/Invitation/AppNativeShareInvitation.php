@@ -40,10 +40,10 @@ class AppNativeShareInvitation extends Invitation
     }
 
     /**
-     * @InheritDoc
+     * @inheritDoc
      */
-    public function getSharerPolicy()
+    public function getSharer()
     {
-        return $this->getInviterPolicy();
+        return $this->getInviter();
     }
 }
