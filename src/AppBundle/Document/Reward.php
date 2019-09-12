@@ -108,6 +108,12 @@ class Reward
     protected $isSignUpBonus;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $isConnectionBonus;
+
+    /**
      * @Assert\Length(min="50", max="1000")
      * @MongoDB\Field(type="string")
      */
@@ -269,6 +275,24 @@ class Reward
     {
         $this->isSignUpBonus = $isSignUpBonus;
         return $this;
+    }
+    
+    /**
+     * Gives whether or not this reward is a connection bonus.
+     * @return boolean|null whether or not it's a connection bonus or null if unset.
+     */
+    public function getIsConnectionBonus()
+    {
+        return $this->isConnectionBonus();
+    }
+
+    /**
+     * Sets whether or not this is a connection bonus.
+     * @param boolean $isConnectionBonus is whether or not it is a connection bonus.
+     */
+    public function setIsConnectionBonus($isConnectionBonus)
+    {
+        $this->isConnectionBonus = $isConnectionBonus;
     }
 
     public function getTermsAndConditions()

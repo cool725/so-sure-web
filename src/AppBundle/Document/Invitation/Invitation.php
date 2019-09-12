@@ -120,6 +120,13 @@ abstract class Invitation
     abstract public function getInvitationDetail();
     abstract public function getChannelDetails();
 
+    /**
+     * Gives the policy which is active in initiating the invitation process in a business sense.
+     * Basically just means that if it's an scode invite the invitee should be returned instead of the inviter.
+     * @return Policy|null the policy which shared the invite.
+     */
+    abstract public function getSharerPolicy();
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());

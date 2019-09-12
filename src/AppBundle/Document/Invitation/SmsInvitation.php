@@ -54,4 +54,12 @@ class SmsInvitation extends Invitation
     {
         return null;
     }
+
+    /**
+     * @InheritDoc
+     */
+    public function getSharerPolicy()
+    {
+        return $this->getInviterPolicy();
+    }
 }
