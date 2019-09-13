@@ -62,13 +62,49 @@
 
 }
 
-.hero-ab {
-    padding-top: 6rem;
-}
-
 .intro {
     text-align: center;
     background-color: $pattens-blue;
+}
+
+.video {
+    position: relative;
+    overflow: hidden;
+    z-index: 3;
+
+    video {
+        width: 100%; height: auto;
+        z-index: -1;
+
+        @include media-breakpoint-up(lg) {
+            object-fit: cover;
+        }
+    }
+
+    &__play {
+        width: 120px; height: 120px;
+        display: block;
+        position: absolute;
+        left: 50%; top: 50%;
+        margin-left: -60px;
+        margin-top: -60px;
+        z-index: 100;
+
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    &__quote {
+        width: 300px;
+        position: absolute;
+        left: 50%; top: 50%;
+        margin-left: -150px;
+        z-index: 10;
+    }
 }
 
 .cover {
