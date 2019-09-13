@@ -57,6 +57,12 @@ class Offer
     protected $name;
 
     /**
+     * Whether the offer is currently enabled.
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $active;
+
+    /**
      * Gives the time at which the offer was created.
      * @return \DateTime of creation.
      */
@@ -126,5 +132,23 @@ class Offer
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * Tells you whether the offer is active.
+     * @return boolean whether it is active.
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * Sets the offer's activity status.
+     * @param boolean $active is the value to set it to.
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
     }
 }

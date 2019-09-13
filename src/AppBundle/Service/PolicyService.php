@@ -486,11 +486,7 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            if ($policy->getLastSuccessfulUserPaymentCredit()) {
-                $this->validatePremium($policy, $policy->getLastSuccessfulUserPaymentCredit()->getAmount());
-            } else {
-                $this->validatePremium($policy);
-            }
+            // TODO: Possibly sanity check premium.
 
             if ($numPayments === null) {
                 $dateToBill = $date;
