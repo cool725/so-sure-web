@@ -72,6 +72,7 @@ class DefaultController extends BaseController
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
+     * @Route("/mb", name="mb")
      */
     public function indexAction(Request $request)
     {
@@ -80,6 +81,14 @@ class DefaultController extends BaseController
             $session = $this->get('session');
             $session->set('referral', $referral);
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
+        }
+
+        // For Mobusi tracking
+        if ($request->get('_route') == 'mb') {
+            $clickid = $request->get('clickid');
+            $session = $this->get('session');
+            $session->set('mobusi', $clickid);
+            $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
         }
 
         /** @var RequestService $requestService */
