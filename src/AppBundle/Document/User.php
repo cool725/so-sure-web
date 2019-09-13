@@ -472,10 +472,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $isBlacklisted = false;
 
     /**
-     * Represents altered premiums that have been added to this user.
-     * @MongoDB\EmbedMany(
-     *  targetDocument="AppBundle\Document\Offer"
-     * )
+     * The offers that have been manually given to a user.
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\ManualOffer")
      */
     protected $offers = [];
 
