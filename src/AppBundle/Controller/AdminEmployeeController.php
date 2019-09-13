@@ -58,6 +58,7 @@ use Doctrine\ODM\MongoDB\Query\Builder;
 use Faker\Calculator\Luhn;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
+use mysql_xdevapi\Exception;
 use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -3956,20 +3957,26 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $postcodeForm = $this->get('form.factory')
             ->createNamedBuilder('postcodeForm', PostcodeType::class, null, ['method' => 'POST'])
             ->getForm();
-        $postcodeForm->handleRequest($request);
-        if ($postcodeForm->isSubmitted() && $postcodeForm->isValid()) {
-            $postcode = $postcodeForm->getData();
-            $postcode->setStart(new \DateTime());
-            $postcode->setActive(true);
-            $dm->persist($postcode);
-            $dm->flush();
-            $this->addFlash('success', 'Added Postcode');
-            return new RedirectResponse($this->generateUrl('admin_annual_postcodes'));
+        try {
+            $postcodeForm->handleRequest($request);
+            if ($postcodeForm->isSubmitted() && $postcodeForm->isValid()) {
+                $postcode = $postcodeForm->getData();
+                $postcode->setAdded(new \DateTime());
+                $dm->persist($postcode);
+                $dm->flush();
+                $this->addFlash('success', 'Added Postcode');
+                return new RedirectResponse($this->generateUrl('admin_annual_postcodes'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash(
+                'error',
+                $e->getMessage()
+            );
         }
         /** @var PostcodeRepository $postcodeRepository */
         $postcodeRepository = $dm->getRepository(Postcode::class);
-        $postcodes = $postcodeRepository->findBy(["type", Postcode::PostCode]);
-        $outCodes = $postcodeRepository->findBy(["type", Postcode::OutCode]);
+        $postcodes = $postcodeRepository->findBy(["type" => Postcode::PostCode]);
+        $outCodes = $postcodeRepository->findBy(["type" => Postcode::OutCode]);
         return ["postcodes" => $postcodes, "outcodes" => $outCodes, "postcodeForm" => $postcodeForm->createView()];
     }
 }

@@ -43,7 +43,7 @@
                     {% for outcode in outcodes %}
                         <tr>
                             <td>{{ outcode.postcodeCanonical }}</td>
-                            <td>{{ outcode.added }}</td>
+                            <td>{{ outcode.added|date('d-m-T H:i') }}</td>
                             <td>{{ outcode.notes }}</td>
                         </tr>
                     {% endfor %}
@@ -64,7 +64,7 @@
                     {% for postcode in postcodes %}
                         <tr>
                             <td>{{ postcode.postcodeCanonical }}</td>
-                            <td>{{ postcode.added }}</td>
+                            <td>{{ postcode.added|date('d-m-T H:i') }}</td>
                             <td>{{ postcode.notes }}</td>
                         </tr>
                     {% endfor %}
@@ -97,7 +97,7 @@
                             <div class="with-errors">{{ form_errors(postcodeForm.postcode) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_label(postcodeForm.notes, 'Period', {'label_attr': {'class': ''}}) }}
+                            {{ form_label(postcodeForm.notes, 'Notes', {'label_attr': {'class': ''}}) }}
                             {{ form_widget(postcodeForm.notes, {'attr': {'class': 'form-control'}}) }}
                             <div class="with-errors">{{ form_errors(postcodeForm.notes) }}</div>
                         </div>
