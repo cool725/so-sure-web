@@ -2608,60 +2608,6 @@ class PolicyService
         );
     }
 
-    public function validatePremium(Policy $policy, $amount = null, \DateTime $date = null)
-    {
-        $hasUpdatedPremium = false;
-        /** @var PhonePolicy $phonePolicy */
-        $phonePolicy = $policy;
-        if (!$date) {
-            $date =  \DateTime::createFromFormat('U', time());
-        }
-        if ((!$phonePolicy->getStatus() ||
-            in_array($phonePolicy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))
-        ) {
-            $policyPremium = $phonePolicy->getPremium();
-            if (!$amount) {
-                $currentPhonePrice = $phonePolicy->getPhone()->getCurrentPhonePrice($date);
-                if ($currentPhonePrice &&
-                    $currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
-                    $newPremium = $currentPhonePrice->createPremium();
-                    $phonePolicy->setPremium($newPremium);
-                    $this->dm->flush();
-                    $hasUpdatedPremium = true;
-                }
-            } else {
-                if ($phonePolicy->getPremiumPlan() == Policy::PLAN_YEARLY) {
-                    if ($amount != $policyPremium->getYearlyPremiumPrice()) {
-                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
-                        foreach ($phonePrices as $price) {
-                            if ($price->getYearlyPremiumPrice() == $amount) {
-                                $newPremium = $price->createPremium();
-                                $phonePolicy->setPremium($newPremium);
-                                $this->dm->flush();
-                                $hasUpdatedPremium = true;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    if ($amount != $policyPremium->getMonthlyPremiumPrice()) {
-                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
-                        foreach ($phonePrices as $price) {
-                            if ($price->getMonthlyPremiumPrice() == $amount) {
-                                $newPremium = $price->createPremium();
-                                $phonePolicy->setPremium($newPremium);
-                                $this->dm->flush();
-                                $hasUpdatedPremium = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $hasUpdatedPremium;
-    }
-
     /**
      * Enters a policy into a promotion if they are not already participating in it. If they are already participating
      * then it does nothing. It persists the new participation but it does not flush the database.
