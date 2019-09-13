@@ -902,7 +902,8 @@ class PurchaseController extends BaseController
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
             $price = $policy->getPhone()->getCurrentPhonePrice();
-            if ($price && $user->allowedMonthlyPayments()) {
+            $postcodeService = $this->get('app.postcode');
+            if ($price && $user->allowedMonthlyPayments($postcodeService)) {
                 $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
             } elseif ($price && $user->allowedYearlyPayments()) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));

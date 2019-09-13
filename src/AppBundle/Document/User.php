@@ -7,6 +7,7 @@ use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
+use AppBundle\Service\PostcodeService;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -2043,7 +2044,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
-    public function allowedMonthlyPayments()
+    public function allowedMonthlyPayments(PostcodeService $postcodeService)
     {
         // Billing address is required as necessary to determine postcode
         if (!$this->hasValidDetails() || !$this->getBillingAddress()) {
@@ -2054,11 +2055,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        $postcode = new Postcode($this->getBillingAddress()->getPostcode());
+        $postcode = $this->getBillingAddress()->getPostcode();
 
-        if (in_array(mb_strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes)) {
-            return false;
-        } elseif (in_array($postcode->normalise(), SoSure::$yearlyOnlyPostcodes)) {
+        if ($postcodeService->getIsAnnualOnlyPostCode($postcode)) {
             return false;
         }
 

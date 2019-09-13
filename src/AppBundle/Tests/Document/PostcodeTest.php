@@ -78,9 +78,9 @@ class PostcodeTest extends WebTestCase
         self::assertEquals($actual, $expected);
     }
 
-    public function testCanonicalisePostCode()
+    public function testCanonicalizePostCode()
     {
-        $actual = self::$postcode->canonicalisePostCode(self::$lowerCaseValidPostcode);
+        $actual = self::$postcode->canonicalizePostCode(self::$lowerCaseValidPostcode);
         self::assertEquals($actual, self::$validPostcode);
     }
 
@@ -100,7 +100,7 @@ class PostcodeTest extends WebTestCase
         /** @var PostcodeRepository $postcodeRepo */
         $postcodeRepo = $dm->getRepository(Postcode::class);
         $postcode = new Postcode();
-        $postcode->setPostcode(self::$validPostcode);
+        $postcode->setPostcode("DE14");
         $postcode->setAdded(new \DateTime());
         $postcode->setNotes("This is a test.");
         $dm->persist($postcode);

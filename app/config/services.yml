@@ -1721,3 +1721,12 @@ services:
     AppBundle\Service\SearchService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+
+    app.postcode:
+        alias: AppBundle\Service\PostcodeService
+        public: true
+
+    AppBundle\Service\PostcodeService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"

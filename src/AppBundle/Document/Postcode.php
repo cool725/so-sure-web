@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 /**
  * Class Postcode
  * @package AppBundle\Document
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\PostcodeRepository")
  */
 class Postcode
 {
@@ -21,13 +21,13 @@ class Postcode
     protected $id;
 
     /**
-     * @Assert\Length(min="1", max="7")
+     * @Assert\Length(min="1", max="10")
      * @MongoDB\Field(type="string")
      */
     protected $postcode;
 
     /**
-     * @Assert\Length(min="1", max="7")
+     * @Assert\Length(min="1", max="10")
      * @MongoDB\Field(type="string")
      */
     protected $postcodeCanonical;
@@ -70,7 +70,7 @@ class Postcode
     public function setPostcode($postcode)
     {
         $this->postcode = $postcode;
-        $canonical = $this->canonicalisePostCode($postcode);
+        $canonical = $this->canonicalizePostCode($postcode);
         if ($canonical === "invalid") {
             throw new \InvalidArgumentException(
                 "The postcode is not valid"
@@ -152,7 +152,7 @@ class Postcode
         return $this;
     }
 
-    public function canonicalisePostCode($postcode)
+    public function canonicalizePostCode($postcode)
     {
         $postcode = mb_strtoupper($postcode);
         $postcode = str_replace(" ", "", $postcode);
@@ -179,7 +179,7 @@ class Postcode
 
     public function getOutCode()
     {
-        $split = split(" ", $this->getPostcodeCanonical());
+        $split = explode(" ", $this->getPostcodeCanonical());
         return $split[0];
     }
 }

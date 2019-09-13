@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Document\Excess\PhoneExcess;
+use AppBundle\Service\PostcodeService;
 use AppBundle\Tests\Document\PhoneExcessTest;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
@@ -1126,7 +1127,7 @@ class Phone
         ];
     }
 
-    public function asQuoteApiArray(User $user = null)
+    public function asQuoteApiArray(PostcodeService $postcodeService, User $user = null)
     {
         $currentPhonePrice = $this->getCurrentPhonePrice();
         if (!$currentPhonePrice) {
@@ -1154,7 +1155,7 @@ class Phone
         $isPromoLaunch = false;
 
         $monthlyPremium = $currentPhonePrice->getMonthlyPremiumPrice();
-        if ($user && !$user->allowedMonthlyPayments()) {
+        if ($user && !$user->allowedMonthlyPayments($postcodeService)) {
             $monthlyPremium = null;
         }
         $yearlyPremium = $currentPhonePrice->getYearlyPremiumPrice();

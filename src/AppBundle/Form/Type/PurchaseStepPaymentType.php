@@ -64,7 +64,8 @@ class PurchaseStepPaymentType extends AbstractType
                 $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
                 $additionalPremium = $purchase->getUser()->getAdditionalPremium();
                 $choices = [];
-                if ($purchase->getUser()->allowedMonthlyPayments()) {
+                $postcodeService = $this->get('app.postcode');
+                if ($purchase->getUser()->allowedMonthlyPayments($postcodeService)) {
                     $choices[sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice($additionalPremium))] =
                             sprintf('%.2f', $price->getMonthlyPremiumPrice($additionalPremium));
                 }

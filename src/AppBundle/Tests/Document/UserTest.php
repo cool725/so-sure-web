@@ -14,12 +14,14 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Service\PostcodeService;
 use AppBundle\Tests\UserClassTrait;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @group unit
  */
-class UserTest extends \PHPUnit\Framework\TestCase
+class UserTest extends WebTestCase
 {
     use UserClassTrait;
 
@@ -61,9 +63,18 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
     public function testAllowedMonthlyPayments()
     {
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
+        //get the DI container
+        $container = $kernel->getContainer();
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        /** @var PostcodeService $postcodeService*/
+        $postcodeService = $container->get('app.postcode');
         $user = new User();
 
-        $this->assertFalse($user->allowedMonthlyPayments());
+        $this->assertFalse($user->allowedMonthlyPayments($postcodeService));
 
         $user->setFirstName('foo');
         $user->setLastName('bar');
@@ -78,20 +89,30 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $address->setPostcode('ec1v 1rx');
         $user->setBillingAddress($address);
 
-        $this->assertTrue($user->allowedMonthlyPayments());
+        $this->assertTrue($user->allowedMonthlyPayments($postcodeService));
 
         $address->setPostcode('de14 2sz');
-        $this->assertFalse($user->allowedMonthlyPayments());
+        $this->assertFalse($user->allowedMonthlyPayments($postcodeService));
 
         $address->setPostcode('TN15 7LY');
-        $this->assertFalse($user->allowedMonthlyPayments());
+        $this->assertFalse($user->allowedMonthlyPayments($postcodeService));
     }
 
     public function testAllowedYearlyPayments()
     {
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
+        //get the DI container
+        $container = $kernel->getContainer();
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        /** @var PostcodeService $postcodeService*/
+        $postcodeService = $container->get('app.postcode');
+
         $user = new User();
 
-        $this->assertFalse($user->allowedMonthlyPayments());
+        $this->assertFalse($user->allowedMonthlyPayments($postcodeService));
 
         $user->setFirstName('foo');
         $user->setLastName('bar');
