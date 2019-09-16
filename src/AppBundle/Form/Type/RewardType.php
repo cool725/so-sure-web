@@ -47,6 +47,7 @@ class RewardType extends AbstractType
             ->add('hasCancelled', CheckboxType::class, ['required' => false])
             ->add('isFirst', CheckboxType::class, ['required' => false])
             ->add('isSignUpBonus', CheckboxType::class, ['required' => false])
+            ->add('isConnectionBonus', CheckboxType::class, ['required' => false])
             ->add('termsAndConditions', TextareaType::class, ['required' => false])
             ->add('next', SubmitType::class);
     }

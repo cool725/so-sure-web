@@ -17,17 +17,14 @@
 
     <section class="hero">
         <div class="container container-xtra">
-            <h1 class="mb-4 text-white text-center fit">
-                Mobile Insurance <br class="d-md-none">
-                <span class="sub text-deep-sky-blue-d">that's Simply Better.</span>
-            </h1>
+            <h1 class="mb-4 text-white text-md-center fit">Mobile Insurance <br class="d-md-none"> <span class="sub text-columbia-blue-e">that's Simply Better</span></h1>
             <div class="row">
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
                     </div>
                 </div>
-                <div class="col-lg-5 offset-lg-1">
+                <div class="col-md-8 offset-md-2 col-lg-5 offset-lg-1">
                     {# Phone Search Card #}
                     {# TODO: Rework if phone in session #}
                     {% if phone is defined and phone %}
@@ -44,10 +41,12 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
-    <section class="intro py-lg-5">
+    {# TV Add #}
+    {% include 'AppBundle::Default/CommonSections/_skyTVAd.html.twig' %}
+
+{#     <section class="intro py-lg-5">
         <div class="container container-xtra py-5">
             <div class="row">
-                {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
                     <h5 class="text-primary">24-72 hour replace or repair</h5>
@@ -66,7 +65,7 @@
             </div>
             <a href="#" class="btn btn-primary btn-block-xs get-a-quote disabled mb-5">Insure your phone in minutes</a>
         </div>
-    </section>
+    </section> #}
 
     {# Cover #}
     {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}

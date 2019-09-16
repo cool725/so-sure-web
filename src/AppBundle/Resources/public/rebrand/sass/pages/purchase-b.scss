@@ -60,8 +60,12 @@ body {
         }
     }
 
+    &-card {
+        height: 100%;
+    }
+
     // Bottom Section - FAQ & info
     &-bottom {
-        background-color: $athens-gray;
+        background-color: $pattens-blue;
     }
 }

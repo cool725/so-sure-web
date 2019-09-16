@@ -50,14 +50,19 @@
 
         <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" class="position-absolute invisible" />
 
+        {% if app.session.get('mobusi') %}
+            <img src="https://pixel.leadzu.com/pixel.php?hash={{ app.session.get('mobusi') }}&service=4602&type=EVENT&transaction_id={{ policy.id }}&id_event=1&fc=1" alt="">
+        {% endif %}
+
         {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
             <img src='https://www.tagserve.com/saleServlet?MID=357&PID=513&CRID=&ORDERID={{ policy.id }}&ORDERAMNT=10&NUMOFITEMS=1&CUR=GBP' border="0" width="1" height="1" class="position-absolute invisible">
         {% endif %}
-
     {% endif %}
+
 {% endblock %}
 
 {% block body %}
+
     <section class="onboarding">
         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
             <div class="onboarding-nav__desktop d-flex">
@@ -131,33 +136,23 @@
                                        data-target="#onboarding_carousel"
                                        data-slide="next">Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
 
-                                    {% if sms_experiment == 'sms-download' %}
-                                        <div class="mt-4 onboarding__send-app-link">
-                                            <a href="#"
-                                               class="link-subtle btn-sms"
-                                               data-path="{{ path('json_app_sms') }}">
-                                              Send my app link</a>
-                                            <span class="hideme"><i class="fas fa-circle-notch fa-spin"></i></span>
-                                        </div>
-                                    {% else %}
-                                        <div class="mt-4 onboarding__download-app-link">
-                                            {% if policy.phone.iTunes %}
-                                                <a href="{{ apple_download('onboarding-desktop-one') }}"
-                                                   class="link-subtle ga-outbound-click"
-                                                   data-clicklabel="iTunes"
-                                                   target="_blank"
-                                                   rel="noopener noreferrer">
-                                                    Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
-                                            {% endif %}
-                                            {% if policy.phone.googlePlay %}
-                                                <a href="{{ google_download('onboarding-desktop-one') }}"  class="link-subtle ga-outbound-click"
-                                                   data-clicklabel="PlayStore"
-                                                   target="_blank"
-                                                   rel="noopener noreferrer">
-                                                    Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
-                                            {% endif %}
-                                        </div>
-                                    {% endif %}
+                                    <div class="mt-4 onboarding__download-app-link">
+                                        {% if policy.phone.iTunes %}
+                                            <a href="{{ apple_download('onboarding-desktop-one') }}"
+                                               class="link-subtle ga-outbound-click"
+                                               data-clicklabel="iTunes"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
+                                        {% endif %}
+                                        {% if policy.phone.googlePlay %}
+                                            <a href="{{ google_download('onboarding-desktop-one') }}"  class="link-subtle ga-outbound-click"
+                                               data-clicklabel="PlayStore"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
                         </div>
                     </div>
@@ -257,33 +252,23 @@
                                        data-slide="next">
                                        Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                                 </div>
-                                {% if sms_experiment == 'sms-download' %}
-                                    <div class="mt-4 onboarding__send-app-link">
-                                        <a href="#"
-                                           class="link-subtle btn-sms"
-                                           data-path="{{ path('json_app_sms') }}">
-                                          Send my app link</a>
-                                        <span class="hideme"><i class="fas fa-circle-notch fa-spin"></i></span>
-                                    </div>
-                                {% else %}
-                                    <div class="mt-4 onboarding__download-app-link">
-                                        {% if policy.phone.iTunes %}
-                                            <a href="{{ apple_download('onboarding-desktop-two') }}"
-                                               class="link-subtle ga-outbound-click"
-                                               data-clicklabel="iTunes"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
-                                        {% endif %}
-                                        {% if policy.phone.googlePlay %}
-                                            <a href="{{ google_download('onboarding-desktop-two') }}"  class="link-subtle ga-outbound-click"
-                                               data-clicklabel="PlayStore"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
+                                <div class="mt-4 onboarding__download-app-link">
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('onboarding-desktop-two') }}"
+                                           class="link-subtle ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('onboarding-desktop-two') }}"  class="link-subtle ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
+                                    {% endif %}
+                                </div>
                             {% endif %}
                         </div>
                     </div>

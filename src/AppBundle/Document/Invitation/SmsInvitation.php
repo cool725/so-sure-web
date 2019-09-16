@@ -54,4 +54,12 @@ class SmsInvitation extends Invitation
     {
         return null;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSharer()
+    {
+        return $this->getInviter();
+    }
 }
