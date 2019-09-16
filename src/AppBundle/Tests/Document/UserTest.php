@@ -61,7 +61,7 @@ class UserTest extends WebTestCase
         $this->assertFalse($user->hasValidDetails());
     }
 
-    /*
+    /**
      * These test work but don't pass CI/CD checks
     public function testAllowedMonthlyPayments()
     {
