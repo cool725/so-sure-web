@@ -69,7 +69,7 @@
                             </div>
                             <div class="h1 mb-0 text-white">
                                 <span id="purchase_price">
-                                    {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    {% if not app.user or app.user.allowedMonthly %}
                                         &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
                                     {% else %}
                                         &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
@@ -78,7 +78,7 @@
                             </div>
                             <div class="h5 text-deep-sky-blue-d mb-4">
                                 <span id="purchase_freq" class="sub">
-                                    {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    {% if not app.user or app.user.allowedMonthly %}
                                         per month
                                     {% else %}
                                         per year

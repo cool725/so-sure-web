@@ -68,14 +68,14 @@
                                 </a>
                             </div>
                             <div class="h1 mb-0 text-white">
-                                {% if not app.user or app.user.allowedMonthlyPayments %}
+                                {% if not app.user or app.user.allowedMonthly %}
                                     &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
                                 {% else %}
                                     &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
                                 {% endif %}
                             </div>
                             <div class="h5 text-deep-sky-blue-d mb-4">
-                                {% if not app.user or app.user.allowedMonthlyPayments %}
+                                {% if not app.user or app.user.allowedMonthly %}
                                     <span class="sub">per month</span>
                                 {% else %}
                                     <span class="sub">per year</span>
