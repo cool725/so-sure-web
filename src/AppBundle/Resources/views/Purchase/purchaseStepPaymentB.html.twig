@@ -35,95 +35,101 @@
     <div class="purchase">
         <div class="purchase-top px-4 py-5 p-lg-5">
             {% if phone %}
-                <div class="row">
-                    <div class="col-lg-4 col-xl-3">
-                        <div class="purchase-details pr-xl-2">
-                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="Happy Phone" width="140px" class="lozad d-none d-lg-inline">
-                            <div class="text-white h5 mb-0"><span class="sub">Enter your payment details:</span></div>
-                            <h1 class="fit mb-4 pb-1">
-                                <a href="#mem_sizes"
-                                   class="text-white"
-                                   data-toggle="collapse"
-                                   role="button"
-                                   aria-expanded="false"
-                                   aria-controls="mem_sizes"
-                                   title="Not the phone you're looking for?">
-                                    {{ phone.make }} {{ phone.model }} ({{ phone.memory }}GB)
-                                </a>
-                            </h1>
-                            <div class="collapse mb-4" id="mem_sizes">
-                                {% if phones | length > 1 %}
-                                    <ul class="list-inline">
-                                        {% for phone_mem in phones %}
-                                            {% if phone_mem.id != phone.id  %}
-                                                <li class="list-inline-item">
-                                                    <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
+                <div class="container-large">
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-3">
+                            <div class="purchase-details pr-xl-2">
+                                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="Happy Phone" width="140px" class="lozad d-none d-lg-inline">
+                                <div class="text-white h5 mb-0"><span class="sub">Enter your payment details:</span></div>
+                                <h1 class="fit mb-4 pb-1">
+                                    <a href="#mem_sizes"
+                                       class="text-white"
+                                       data-toggle="collapse"
+                                       role="button"
+                                       aria-expanded="false"
+                                       aria-controls="mem_sizes"
+                                       title="Not the phone you're looking for?">
+                                        {{ phone.make }} {{ phone.model }} ({{ phone.memory }}GB)
+                                    </a>
+                                </h1>
+                                <div class="collapse mb-4" id="mem_sizes">
+                                    {% if phones | length > 1 %}
+                                        <ul class="list-inline">
+                                            {% for phone_mem in phones %}
+                                                {% if phone_mem.id != phone.id  %}
+                                                    <li class="list-inline-item">
+                                                        <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                    <a class="text-white get-a-quote disabled" href="#">
+                                        <small>Not the phone you're looking for?</small>
+                                    </a>
+                                </div>
+                                <div class="h1 mb-0 text-white">
+                                    <span id="purchase_price">
+                                        {% if not app.user or app.user.allowedMonthlyPayments %}
+                                            &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="h5 text-deep-sky-blue-d mb-4">
+                                    <span id="purchase_freq" class="sub">
+                                        {% if not app.user or app.user.allowedMonthlyPayments %}
+                                            per month
+                                        {% else %}
+                                            per year
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="d-none d-lg-block text-left">
+                                    <hr class="hr-blue mb-4">
+                                    <h5 class="text-white mb-4">An amazing level of cover:</h5>
+                                    <ul class="list-unstyled icn-fa-list mb-4 mb-xl-0">
+                                        <li class="text-white mb-2">
+                                            <i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 hour replacement or repair
+                                        </li>
+                                        <li class="text-white mb-2">
+                                            <i class="far fa-check text-columbia-blue-e fa-lg"></i> Low excess from just &pound;50
+                                        </li>
+                                        <li class="text-white mb-2">
+                                            <i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% money back
+                                        </li>
+                                        <li class="text-white">
+                                            <i class="far fa-check text-columbia-blue-e fa-lg"></i> New, secondhand &amp; refurbished phones
+                                        </li>
                                     </ul>
-                                {% endif %}
-                                <a class="text-white get-a-quote disabled" href="#">
-                                    <small>Not the phone you're looking for?</small>
-                                </a>
-                            </div>
-                            <div class="h1 mb-0 text-white">
-                                <span id="purchase_price">
-                                    {% if not app.user or app.user.allowedMonthlyPayments %}
-                                        &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
-                                    {% else %}
-                                        &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="h5 text-deep-sky-blue-d mb-4">
-                                <span id="purchase_freq" class="sub">
-                                    {% if not app.user or app.user.allowedMonthlyPayments %}
-                                        per month
-                                    {% else %}
-                                        per year
-                                    {% endif %}
-                                </span>
-                            </div>
-                            <div class="d-none d-lg-block text-left">
-                                <hr class="hr-blue mb-4">
-                                <h5 class="text-white mb-4">An amazing level of cover:</h5>
-                                <ul class="list-unstyled icn-fa-list mb-4 mb-xl-0">
-                                    <li class="text-white mb-2">
-                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 hour replacement or repair
-                                    </li>
-                                    <li class="text-white mb-2">
-                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> Low excess from just &pound;50
-                                    </li>
-                                    <li class="text-white mb-2">
-                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% money back
-                                    </li>
-                                    <li class="text-white">
-                                        <i class="far fa-check text-columbia-blue-e fa-lg"></i> New, secondhand &amp; refurbished phones
-                                    </li>
-                                </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-8 col-xl-9 d-flex flex-column">
-                        <div class="cardbox cardbox-100 purchase-card py-3 px-2">
-                            {% include 'AppBundle::Purchase/_purchaseSteps.html.twig' %}
-                            {% include 'AppBundle::Purchase/_formStepPaymentB.html.twig' %}
+                        <div class="col-lg-8 col-xl-9 d-flex flex-column">
+                            <div class="cardbox cardbox-100 purchase-card py-3 px-2">
+                                {% include 'AppBundle::Purchase/_purchaseSteps.html.twig' %}
+                                {% include 'AppBundle::Purchase/_formStepPaymentB.html.twig' %}
+                            </div>
                         </div>
                     </div>
                 </div>
             {% else %}
-                <h1 class="fit text-white mb-4 pb-1">Whoops, no phone selected... 😩</h1>
-                <a href="#"
-                   class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
-                   data-event="no-phone-in-session">
-                   Get a Quote</a>
+                <div class="container-large">
+                    <h1 class="fit text-white mb-4 pb-1">Whoops, no phone selected... 😩</h1>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
+                       data-event="no-phone-in-session">
+                       Get a Quote</a>
+                </div>
             {% endif %}
         </div>
         <div class="purchase-bottom">
-            {% if phone %}
-                {% include 'AppBundle::Purchase/_seeFullDetailsB.html.twig' %}
-            {% endif %}
+            <div class="container-large">
+                {% if phone %}
+                    {% include 'AppBundle::Purchase/_seeFullDetailsB.html.twig' %}
+                {% endif %}
+            </div>
         </div>
     </div>
 

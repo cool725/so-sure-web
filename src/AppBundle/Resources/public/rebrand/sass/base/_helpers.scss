@@ -18,6 +18,16 @@
     }
 }
 
+.container-large {
+    width: 100%;
+    padding: 0 15px;
+    margin: 0 auto;
+
+    @include media-breakpoint-up(fl) {
+        max-width: 1200px;
+    }
+}
+
 // Hide on XXS mobile
 @media (max-width: 340px) {
 

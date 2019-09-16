@@ -3,6 +3,9 @@
 {% if quote_mode is defined and quote_mode == true %}
     {% set navbar_class = 'navbar-so-sure-quote fixed-top' %}
 {% endif %}
+{% if quote_mode is defined and quote_mode == true and funnel_exp is defined and funnel_exp == 'new-funnel' %}
+    {% set navbar_class = 'navbar-so-sure-quote navbar-so-sure-quote-test fixed-top' %}
+{% endif %}
 {% if onboarding_mode is defined and onboarding_mode == true %}
     {% set navbar_class = 'navbar-so-sure' %}
 {% endif %}
@@ -15,7 +18,7 @@
     {% set hide_quote_btn = 'd-none' %}
 {% endif %}
 
-<nav id="main-nav" class="navbar {{ navbar_class }} justify-content-between flex-nowrap flex-row pl-lg-5">
+<nav id="main-nav" class="navbar {{ navbar_class }} justify-content-between flex-nowrap flex-row pl-xl-5">
 
     {# Logo #}
     <a href="/" class="navbar-brand show-in-nav show-in-quote">
