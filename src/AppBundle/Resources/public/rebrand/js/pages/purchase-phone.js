@@ -45,7 +45,7 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[serialNumber]" : {
                     required: true,
-                    alphanumeric: true
+                    // alphanumeric: true
                 }
             },
             messages: {
@@ -57,7 +57,7 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[serialNumber]" : {
                     required: 'Please enter a valid serial number',
-                    alphanumeric: 'Please enter a valid serial number'
+                    // alphanumeric: 'Please enter a valid serial number'
                 }
             },
 
