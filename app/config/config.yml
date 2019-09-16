@@ -1095,6 +1095,7 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - https://fonts.smct.co
             img-src:
                 - 'self'
                 - https://wearesosure.com
