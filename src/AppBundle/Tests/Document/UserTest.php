@@ -61,7 +61,7 @@ class UserTest extends WebTestCase
         $this->assertFalse($user->hasValidDetails());
     }
 
-    /**
+    /*
      * These test work but don't pass CI/CD checks
     public function testAllowedMonthlyPayments()
     {
@@ -137,6 +137,9 @@ class UserTest extends WebTestCase
     }
     */
 
+    /**
+     * Need this because the comment above is causing the damn ci/cd checks to fail!
+     */
     public function testHasValidBillingDetails()
     {
         $user = new User();
