@@ -16,6 +16,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Tests\UserClassTrait;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -64,7 +65,7 @@ class UserTest extends WebTestCase
     public function testAllowedMonthlyPayments()
     {
         //start the symfony kernel
-        $kernel = static::createKernel();
+        $kernel = KernelTestCase::createKernel();
         $kernel->boot();
         //get the DI container
         $container = $kernel->getContainer();
@@ -101,7 +102,7 @@ class UserTest extends WebTestCase
     public function testAllowedYearlyPayments()
     {
         //start the symfony kernel
-        $kernel = static::createKernel();
+        $kernel = KernelTestCase::createKernel();
         $kernel->boot();
         //get the DI container
         $container = $kernel->getContainer();
