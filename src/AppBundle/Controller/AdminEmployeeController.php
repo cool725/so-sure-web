@@ -2954,6 +2954,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $reward->setHasCancelled($createReward->getHasCancelled());
                         $reward->setIsFirst($createReward->getIsFirst());
                         $reward->setIsSignUpBonus($createReward->getIsSignUpBonus());
+                        $reward->setIsConnectionBonus($createReward->getIsConnectionBonus());
                         $reward->setTermsAndConditions($createReward->getTermsAndConditions());
                         $dm->persist($reward);
                         if ($createReward->getCode()) {

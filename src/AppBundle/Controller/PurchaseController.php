@@ -119,16 +119,7 @@ class PurchaseController extends BaseController
     {
         $session = $request->getSession();
         $user = $this->getUser();
-        /* TODO: Consider if we want warning that you're purchasing additional policy
-        if ($user && $user->hasPolicy()) {
-            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
-        }
-        */
-        /*
-        if ($user->getFirstName() && $user->getLastName() && $user->getMobileNumber() && $user->getBirthday()) {
-            return $this->redirectToRoute('purchase_step_2');
-        }
-        */
+
         if ($user) {
             $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
         }
@@ -147,13 +138,13 @@ class PurchaseController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
-        //     ['regular-funnel', 'new-funnel'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL,
+            ['regular-funnel', 'new-funnel'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
@@ -180,7 +171,7 @@ class PurchaseController extends BaseController
                             $purchase->getEmail()
                         ));
                         // @codingStandardsIgnoreStart
-                        $err = 'It looks like you already have an account.  Please try logging in with your details';
+                        $err = 'It looks like you already have an account. Please try logging in with your details';
                         // @codingStandardsIgnoreEnd
                         $this->addFlash('error', $err);
 
@@ -253,13 +244,16 @@ class PurchaseController extends BaseController
                         $data['Facebook'] = true;
                     }
 
-                    // if ($homepageFunnelExp == 'new-funnel') {
-                    // $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data, [
-                    //         'page' => 'new-funnel'
-                    //     ]);
-                    // } else {
+                    if ($homepageFunnelExp == 'new-funnel') {
+                        // Track Test
+                        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS_B, $data);
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_TEST,
+                            ['Test Name' => 'New Funnel']
+                        );
+                    } else {
                         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
-                    // }
+                    }
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
@@ -279,9 +273,9 @@ class PurchaseController extends BaseController
 
         $template = 'AppBundle:Purchase:purchaseStepPersonalAddress.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPersonalAddressB.html.twig';
-        // }
+        if ($homepageFunnelExp == 'new-funnel') {
+            $template = 'AppBundle:Purchase:purchaseStepPersonalAddressB.html.twig';
+        }
 
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
@@ -295,7 +289,7 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
-            // 'funnel_exp' => $homepageFunnelExp,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
@@ -350,13 +344,13 @@ class PurchaseController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
-        //     ['regular-funnel', 'new-funnel'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL,
+            ['regular-funnel', 'new-funnel'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
@@ -504,13 +498,25 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-
                     if ($allowContinue) {
-                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
-                            'Device Insured' => $purchase->getPhone()->__toString(),
-                            'OS' => $purchase->getPhone()->getOs(),
-                            'Policy Id' => $policy->getId(),
-                        ]);
+                        if ($homepageFunnelExp == 'new-funnel') {
+                            // Track Test
+                            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY_B, [
+                                'Device Insured' => $purchase->getPhone()->__toString(),
+                                'OS' => $purchase->getPhone()->getOs(),
+                                'Policy Id' => $policy->getId(),
+                            ]);
+                            $this->get('app.mixpanel')->queueTrack(
+                                MixpanelService::EVENT_TEST,
+                                ['Test Name' => 'New Funnel']
+                            );
+                        } else {
+                            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
+                                'Device Insured' => $purchase->getPhone()->__toString(),
+                                'OS' => $purchase->getPhone()->getOs(),
+                                'Policy Id' => $policy->getId(),
+                            ]);
+                        }
 
                         return new RedirectResponse(
                             $this->generateUrl('purchase_step_pledge_id', [
@@ -519,7 +525,6 @@ class PurchaseController extends BaseController
                         );
                     }
                 } else {
-                    //$this->addFlash('error', sprintf('%s', $purchaseForm->getErrors()));
                     $this->addFlash('error', sprintf(
                         'Sorry, there seems to be an error. Please check below for further details.'
                     ));
@@ -531,9 +536,9 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPhoneB.html.twig';
-        // }
+        if ($homepageFunnelExp == 'new-funnel') {
+            $template = 'AppBundle:Purchase:purchaseStepPhoneB.html.twig';
+        }
 
         $data = array(
             'policy' => $policy,
@@ -546,7 +551,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
@@ -783,13 +788,13 @@ class PurchaseController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
-        //     ['regular-funnel', 'new-funnel'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL,
+            ['regular-funnel', 'new-funnel'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
@@ -800,12 +805,24 @@ class PurchaseController extends BaseController
                 $purchaseForm->handleRequest($request);
 
                 if ($purchaseForm->isValid() && $purchase->areAllAgreed()) {
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_COMPLETE_PLEDGE, [
-                        'Device Insured' => $phone ? $phone->__toString() : null,
-                        'OS' => $phone ? $phone->getOs() : null,
-                        'Policy Id' => $policy->getId(),
-                    ]);
-
+                    if ($homepageFunnelExp == 'new-funnel') {
+                        // Track Test
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_COMPLETE_PLEDGE_B, [
+                            'Device Insured' => $phone ? $phone->__toString() : null,
+                            'OS' => $phone ? $phone->getOs() : null,
+                            'Policy Id' => $policy->getId(),
+                        ]);
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_TEST,
+                            ['Test Name' => 'New Funnel']
+                        );
+                    } else {
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_COMPLETE_PLEDGE, [
+                            'Device Insured' => $phone ? $phone->__toString() : null,
+                            'OS' => $phone ? $phone->getOs() : null,
+                            'Policy Id' => $policy->getId(),
+                        ]);
+                    }
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
@@ -817,9 +834,9 @@ class PurchaseController extends BaseController
 
         $template = 'AppBundle:Purchase:purchaseStepPledge.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPledgeB.html.twig';
-        // }
+        if ($homepageFunnelExp == 'new-funnel') {
+            $template = 'AppBundle:Purchase:purchaseStepPledgeB.html.twig';
+        }
 
         $data = array(
             'policy' => $policy,
@@ -832,7 +849,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
@@ -891,13 +908,13 @@ class PurchaseController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL,
-        //     ['regular-funnel', 'new-funnel'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL,
+            ['regular-funnel', 'new-funnel'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
@@ -972,6 +989,12 @@ class PurchaseController extends BaseController
                                     ])
                                 );
                             } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_CHECKOUT) {
+                                if ($homepageFunnelExp == 'new-funnel') {
+                                    $this->get('app.mixpanel')->queueTrack(
+                                        MixpanelService::EVENT_TEST,
+                                        ['Test Name' => 'New Funnel']
+                                    );
+                                }
                                 // TODO
                                 NoOp::ignore([]);
                                 /*
@@ -1004,9 +1027,9 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPaymentB.html.twig';
-        // }
+        if ($homepageFunnelExp == 'new-funnel') {
+            $template = 'AppBundle:Purchase:purchaseStepPaymentB.html.twig';
+        }
 
         $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->adjustDayForBilling($now);
@@ -1026,7 +1049,7 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
-            // 'funnel_exp' => $homepageFunnelExp,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         if ($toCardForm) {

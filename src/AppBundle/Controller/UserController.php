@@ -1245,19 +1245,7 @@ class UserController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
-
-        $smsExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_APP_LINK_SMS,
-            [
-                SixpackService::ALTERNATIVES_NO_SMS_DOWNLOAD,
-                SixpackService::ALTERNATIVES_SMS_DOWNLOAD
-            ],
-            SixpackService::LOG_MIXPANEL_NONE,
-            $user->getId(),
-            1
-        );
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
 
         return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
@@ -1266,7 +1254,6 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
-            'sms_experiment' => $smsExperiment
         ]);
     }
 

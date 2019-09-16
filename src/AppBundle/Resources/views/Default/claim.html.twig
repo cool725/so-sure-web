@@ -19,32 +19,12 @@
                     <div class="hero__intro">
                         <h1 class="mb-4 text-white fit">Make a claim</h1>
                         <h4 class="text-columbia-blue-e">Firstly, is your phone lost or stolen?</h4>
-                        <p class="text-white mb-4">If you had your phone stolen or lost, please call your network to <strong>block your phone</strong> then request both <strong>proof of barring</strong> and <strong>proof of usage documents</strong>. Finally get a <strong>crime reference number</strong> from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap text-white" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
-                        <h5 class="text-columbia-blue-e">Ready to claim? We'll email you a link to get started</h5>
+                        <p class="text-white mb-4">To help speed up your claim if you've had your phone stolen or lost, please call your network to <strong>block your phone</strong> then request both <strong>proof of barring</strong> and <strong>proof of usage documents</strong>. Finally get a <strong>crime reference number</strong> from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap text-white" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
+                        <h5 class="text-columbia-blue-e">Ready to claim?</h5>
                     </div>
                     <div class="hero__controls pb-3">
-                        {{ form_start(claim_email_form, {
-                            'attr': {
-                                'data-toggle': 'validator',
-                                'class': 'validate-form form-inline',
-                                'data-client-validation': form_client_validation,
-                                'autocomplete': 'off'
-                        }}) }}
-                            <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
-                                {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control form-control-white mr-2', 'placeholder': 'Email address'}}) }}
-                                <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
-                            </div>
-                            <div class="form-group">
-                               {{ form_widget(claim_email_form.submit, {
-                                    'label': 'Send me the link',
-                                    'attr': {
-                                        'class': 'btn btn-success'
-                                }}) }}
-                            </div>
-                        {{ form_end(claim_email_form) }}
-                        <small class="form-text text-white">Only use the email associated with your so-sure policy</small>
+                        <a href="{{ path('user_claim') }}" class="btn btn-success btn-block-xs">Login to start your claim</a>
                     </div>
-                    <p class="mb-4 text-white">Need to check an existing claim? Please <a href="{{ url('claim_login') }}" class="text-nowrap text-white"><u>login here</u></a>.</p>
                 </div>
                 <div class="col-lg-4 d-none d-lg-block">
                     <div class="hero__illustration">
