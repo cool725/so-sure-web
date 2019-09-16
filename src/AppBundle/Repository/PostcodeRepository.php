@@ -14,12 +14,12 @@ class PostcodeRepository extends DocumentRepository
 
     public function getPostcodes()
     {
-        return $this->findBy(["type" => Postcode::PostCode]);
+        return $this->findBy(["type" => Postcode::POSTCODE]);
     }
 
     public function getOutCodes()
     {
-        return $this->findBy(["type" => Postcode::OutCode]);
+        return $this->findBy(["type" => Postcode::OUTCODE]);
     }
 
     public function getPostcodeIsAnnualOnly($postcode)

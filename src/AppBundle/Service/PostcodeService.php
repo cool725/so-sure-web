@@ -32,14 +32,14 @@ class PostcodeService
     {
         /** @var PostcodeRepository $postcodeRepository */
         $postcodeRepository = $this->dm->getRepository(Postcode::class);
-        return $postcodeRepository->findBy(["type" => Postcode::OutCode]);
+        return $postcodeRepository->findBy(["type" => Postcode::OUTCODE]);
     }
 
     public function getPostcodes()
     {
         /** @var PostcodeRepository $postcodeRepository */
         $postcodeRepository = $this->dm->getRepository(Postcode::class);
-        return $postcodeRepository->findBy(["type" => Postcode::PostCode]);
+        return $postcodeRepository->findBy(["type" => Postcode::POSTCODE]);
     }
 
     public function getIsAnnualOnlyPostCode($postcode)

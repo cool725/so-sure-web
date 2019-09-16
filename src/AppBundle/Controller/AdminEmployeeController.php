@@ -485,7 +485,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $end = $this->startOfWeek(null, 0 - $periodNumber + 1);
             $response->headers->set(
                 'Content-Disposition',
-                'attachment; filename="so-sure-connections-week-' . $start->format('W') . '-' . $start->format('Y') . '.csv"'
+                'attachment; filename="so-sure-connections-week-' .
+                $start->format('W') .
+                '-' .
+                $start->format('Y') .
+                '.csv"'
             );
         } elseif ($periodType == 'month') {
             $month = (new \DateTime())->sub(new \DateInterval("P{$periodNumber}M"));
@@ -645,7 +649,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } else {
                     $this->addFlash('error', sprintf(
                         'Unable to add optout. %s',
-                        (string)$emailForm->getErrors()
+                        (string) $emailForm->getErrors()
                     ));
                 }
             } elseif ($request->request->has('sms_form')) {
@@ -658,7 +662,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } else {
                     $this->addFlash('error', sprintf(
                         'Unable to add optout. %s',
-                        (string)$smsForm->getErrors()
+                        (string) $smsForm->getErrors()
                     ));
                 }
             }
@@ -1055,7 +1059,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 } else {
                     $this->addFlash(
                         'error',
-                        sprintf('Unable to update. Errror: %s', (string)$picsureForm->getErrors())
+                        sprintf('Unable to update. Errror: %s', (string) $picsureForm->getErrors())
                     );
                 }
 
@@ -2928,7 +2932,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add reward connection. %s',
-                            (string)$connectForm->getErrors()
+                            (string) $connectForm->getErrors()
                         ));
                     }
                 } elseif ($request->request->has('rewardForm')) {
@@ -2975,7 +2979,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add reward. %s',
-                            (string)$rewardForm->getErrors()
+                            (string) $rewardForm->getErrors()
                         ));
                     }
                 }
@@ -3207,7 +3211,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add user to company. %s',
-                            (string)$belongForm->getErrors()
+                            (string) $belongForm->getErrors()
                         ));
                     }
                 } elseif ($request->request->has('companyForm')) {
@@ -3232,7 +3236,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add company. %s',
-                            (string)$companyForm->getErrors()
+                            (string) $companyForm->getErrors()
                         ));
                     }
                 }
@@ -3729,7 +3733,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
                     $this->addFlash('success', 'Added affiliate');
                 } else {
-                    $this->addFlash('error', sprintf('Unable to add company. %s', (string)$companyForm->getErrors()));
+                    $this->addFlash(
+                        'error',
+                        sprintf('Unable to add company. %s', (string) $companyForm->getErrors())
+                    );
                 }
                 return new RedirectResponse($this->generateUrl('admin_affiliate'));
             }
@@ -3975,8 +3982,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         }
         /** @var PostcodeRepository $postcodeRepository */
         $postcodeRepository = $dm->getRepository(Postcode::class);
-        $postcodes = $postcodeRepository->findBy(["type" => Postcode::PostCode]);
-        $outCodes = $postcodeRepository->findBy(["type" => Postcode::OutCode]);
+        $postcodes = $postcodeRepository->findBy(["type" => Postcode::POSTCODE]);
+        $outCodes = $postcodeRepository->findBy(["type" => Postcode::OUTCODE]);
         return ["postcodes" => $postcodes, "outcodes" => $outCodes, "postcodeForm" => $postcodeForm->createView()];
     }
 }

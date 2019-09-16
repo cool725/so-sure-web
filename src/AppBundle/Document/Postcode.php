@@ -13,8 +13,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class Postcode
 {
-    const OutCode = 'outcode';
-    const PostCode = 'postcode';
+    const OUTCODE = 'outcode';
+    const POSTCODE = 'postcode';
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -160,13 +160,13 @@ class Postcode
         $regex = "(([^QVX][0-9]{1,2})|(([^QVX][^IJZ][0-9]{1,2})|(([^QVX][0-9][A-HJKSTUW])|([^QVX][^IJZ][0-9][ABEHMNPRVWXY]))))";
         // @codingStandardsIgnoreEnd
         if (mb_strlen($postcode) >= 6) {
-            $this->setType(self::PostCode);
+            $this->setType(self::POSTCODE);
             $outCode = mb_substr($postcode, 0, mb_strlen($postcode) -3);
             $inCode = mb_substr($postcode, -3);
             $postcode = $outCode . " " . $inCode;
             $regex = "(" . $regex . "\s?[0-9][^CIKMOV]{2})";
         } else {
-            $this->setType(self::OutCode);
+            $this->setType(self::OUTCODE);
             $outCode = $postcode;
         }
         $valid = preg_match($regex, $postcode);

@@ -61,7 +61,7 @@ class PostcodeTest extends WebTestCase
     public function testGetTypePostCode()
     {
         $actual = self::$postcode->getType();
-        $expected = self::$postcode::PostCode;
+        $expected = self::$postcode::POSTCODE;
         self::assertEquals($actual, $expected);
     }
 
@@ -74,7 +74,7 @@ class PostcodeTest extends WebTestCase
     public function testGetTypeOutCode()
     {
         $actual = self::$postcode->getType();
-        $expected = self::$postcode::OutCode;
+        $expected = self::$postcode::OUTCODE;
         self::assertEquals($actual, $expected);
     }
 
