@@ -59,6 +59,10 @@ $(function() {
     $('#watch_tv_advert').on('click', function(e) {
         e.preventDefault();
 
+        // Reset
+        quote.hide();
+        videoCont.css('filter', 'brightness(1)');
+
         let diff = 50;
 
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

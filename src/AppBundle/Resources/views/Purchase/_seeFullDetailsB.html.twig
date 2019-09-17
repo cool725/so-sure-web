@@ -4,8 +4,8 @@
     {% set device = policy.phone %}
 {% endif %}
 
-<div class="container-fluid">
-    <div class="px-4 py-5 p-lg-5">
+<div class="container-large">
+    <div class="pt-5 pb-2">
         <div class="h1 mb-4">Full Cover Details</div>
         <div class="row">
             <div class="col-lg">
@@ -41,9 +41,12 @@
                 </ul>
             </div>
         </div>
+    </div>
+{#     <hr class="hr-picton-blue">
+    <div class="py-2 py-lg-5">
         <h4 class="my-4 text-md-center">Here’s how we compare to other insurers:</h4>
-        <div class="d-xl-flex justify-content-lg-center">
-            <table class="table-list mx-auto mx-md-0 table-list__insurers mb-5">
+        <div class="d-xl-flex flex-xl-column justify-content-xl-center">
+            <table class="table-list mx-auto mx-xl-0 table-list__insurers mb-5">
                 <thead>
                     <tr>
                         <th class="table-list__header text-white h4">Traditional Insurers</th>
@@ -77,7 +80,7 @@
                     </tr>
                 </tbody>
             </table>
-            <table class="table-list mx-auto mx-md-0 table-list__so-sure">
+            <table class="table-list mx-auto mx-xl-0 table-list__so-sure">
                 <thead>
                     <tr>
                         <th class="table-list__header h4 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" width="130px"></th>
@@ -113,158 +116,134 @@
             </table>
         </div>
         <p class="mb-0 mt-1 text-md-center"><small>*FCA report Dec 2015</small></p>
-    </div>
-</div>
-
-
-<div class="mx-4 mx-lg-5 py-5 text-center text-lg-left">
-    <div class="row">
-        <div class="col-md-3">
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px">
-        </div>
-        <div class="col-md-8">
-            <h4 class="my-4">Excess</h4>
-            <p class="mb-5">Prove your {{ device.make }} {{ device.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
-            <table class="table table-borderless">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th class="text-zaffre h4" width="20%">Damage</th>
-                        <th class="text-zaffre h4" width="20%">Loss</th>
-                        <th class="text-zaffre h4" width="20%">Theft</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="text-zaffre h4">Validated with app</td>
-                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</td>
-                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</td>
-                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-zaffre h5">Not validated with app</td>
-                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.excess.damage }}</td>
-                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.excess.loss }}</td>
-                        <td class="text-primary h5">&pound;{{ phone.currentPhonePrice.excess.theft }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-<div class="mx-4 mx-lg-5 py-5 text-center text-lg-left">
-    <div class="row">
-        <div class="col-md-3">
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" class="mb-4" width="180px">
-        </div>
-        <div class="col-md-8">
-            <h4 class="my-4">Cashback and Social Insurance</h4>
-            <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
-                <h5>How?</h5>
-            <p class="mb-5">Connect to friends/family and each receive up to £10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
-            <a href="{{ path('social_insurance') }}" target="_blank" class="btn btn-outline-primary">Find out more</a>
-        </div>
-    </div>
-</div>
-<div class="mx-4 mx-lg-5 py-5">
-    <h4 class="mb-4">Top FAQ's</h4>
-    <div class="expanding-cardbox mb-4">
-        <div class="expanding-cardbox__body">
-            <h5 class="expanding-cardbox__title mb-0">
-                Why should I use you? <i class="far fa-chevron-down fa-lg"></i>
-            </h5>
-            <div class="expanding-cardbox__expand mt-4">
-                <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="text-white">money back</a>.</p>
-                <ul class="mb-0">
-                    <li>Instant cover from purchase</li>
-                    <li>24-72 hour replacement once your claim is approved</li>
-                    <li>Hassle-Free Claims</li>
-                    <li>Low excess from just &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</li>
-                    <li>Insure mobiles up to 3 years old</li>
-                    <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
-                    <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
+    </div> #}
+    <hr class="hr-picton-blue">
+    <div class="py-2">
+        <h4 class="my-4">Excess</h4>
+        <p class="mb-5">Prove your {{ device.make }} {{ device.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
+        <div class="row">
+            <div class="col-lg">
+                <h5  class="mb-4">Validated with app 😎</h5>
+                <ul class="list-unstyled">
+                    <li class="h6 mb-4"><span class="sub">Damage:</span> &pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</li>
+                    <li class="h6 mb-4"><span class="sub">Loss:</span> &pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</li>
+                    <li class="h6"><span class="sub">Theft:</span> &pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</li>
+                </ul>
+            </div>
+            <div class="col-lg">
+                <h5 class="mb-4">Not validated with app 😩</h5>
+                <ul class="list-unstyled">
+                    <li class="h6 mb-4"><span class="sub">Damage:</span> &pound;{{ phone.currentPhonePrice.excess.damage }}</li>
+                    <li class="h6 mb-4"><span class="sub">Loss:</span> &pound;{{ phone.currentPhonePrice.excess.loss }}</li>
+                    <li class="h6"><span class="sub">Theft:</span> &pound;{{ phone.currentPhonePrice.excess.theft }}</li>
                 </ul>
             </div>
         </div>
     </div>
-    <div class="expanding-cardbox mb-4">
-        <div class="expanding-cardbox__body">
-            <h5 class="expanding-cardbox__title mb-0">
-                I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down fa-lg"></i>
-            </h5>
-            <div class="expanding-cardbox__expand mt-4">
-                <p class="mb-0">Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.</p>
+    <hr class="hr-picton-blue">
+    <div class="py-2">
+        <h4 class="my-4">Cashback and Social Insurance</h4>
+        <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
+        <h5>How?</h5>
+        <p class="mb-5">Connect to friends/family and each receive up to £10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
+        <a href="{{ path('social_insurance') }}" target="_blank" class="btn btn-outline-primary">Find out more</a>
+    </div>
+    <hr class="hr-picton-blue">
+    <div class="py-2">
+        <h4 class="mb-4">Top FAQ's</h4>
+        <div class="expanding-cardbox mb-4">
+            <div class="expanding-cardbox__body">
+                <h5 class="expanding-cardbox__title mb-0">
+                    Why should I use you? <i class="far fa-chevron-down fa-lg"></i>
+                </h5>
+                <div class="expanding-cardbox__expand mt-4">
+                    <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="text-white">money back</a>.</p>
+                    <ul class="mb-0">
+                        <li>Instant cover from purchase</li>
+                        <li>24-72 hour replacement once your claim is approved</li>
+                        <li>Hassle-Free Claims</li>
+                        <li>Low excess from just &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</li>
+                        <li>Insure mobiles up to 3 years old</li>
+                        <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
+                        <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="expanding-cardbox mb-4">
+            <div class="expanding-cardbox__body">
+                <h5 class="expanding-cardbox__title mb-0">
+                    I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down fa-lg"></i>
+                </h5>
+                <div class="expanding-cardbox__expand mt-4">
+                    <p class="mb-0">Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.</p>
+                </div>
+            </div>
+        </div>
+        <div class="expanding-cardbox mb-4">
+            <div class="expanding-cardbox__body">
+                <h5 class="expanding-cardbox__title mb-0">
+                    Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down fa-lg"></i>
+                </h5>
+                <div class="expanding-cardbox__expand mt-4">
+                    <p>Yes, you can take out insurance on a second hand phone.</p>
+                    <p class="mb-0">The phone bought needs to have orginally been sold into the UK market prior your purchase (eg we don't insure models sold in China).</p>
+                </div>
+            </div>
+        </div>
+        <div class="expanding-cardbox mb-4">
+            <div class="expanding-cardbox__body">
+                <h5 class="expanding-cardbox__title mb-0">
+                    If I pay annually do I get a discount? <i class="far fa-chevron-down fa-lg"></i>
+                </h5>
+                <div class="expanding-cardbox__expand mt-4">
+                    <p class="mb-0">Our Reward Pot allow us to give you the best possible pricing, so sorry we do not provide annual discounts.</p>
+                </div>
+            </div>
+        </div>
+        <div class="expanding-cardbox mb-4">
+            <div class="expanding-cardbox__body">
+                <h5 class="expanding-cardbox__title mb-0">
+                    Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down fa-lg"></i>
+                </h5>
+                <div class="expanding-cardbox__expand mt-4">
+                    <p class="mb-0">The phone you want to insure must be <strong>less than 3 years old</strong> from when your policy begins.</p>
+                </div>
+            </div>
+        </div>
+        <div class="expanding-cardbox mb-4">
+            <div class="expanding-cardbox__body">
+                <h5 class="expanding-cardbox__title mb-0">
+                    What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down fa-lg"></i>
+                </h5>
+                <div class="expanding-cardbox__expand mt-4">
+                    <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
+                    <h4>For Android users:</h4>
+                    <p>The easiest way to find your phone’s IMEI number if you’re on an Android device is to simply dial <strong>*#06#</strong>.</p>
+                    <p>If you’re still having trouble, then you should be able to find it in <strong>Settings &gt; About phone &gt; Status &gt; IMEI information</strong>.</p>
+                    <p>Your serial number will be on the Status screen.</p>
+                    <p class="mb-0">If requested by support, you can take a screenshot on most Android phones by holding the volume down and the power buttons for 1-2 seconds. The screen should flash and the photo can be found in your photos app.</p>
+                    <h4>For iOS (Apple) users:</h4>
+                    <p>Unfortunately, as we need your serial number on iOS you can’t just dial a number (although dialing the same number as above will reveal your IMEI number).</p>
+                    <p>As such you can find both numbers by going to <strong>Settings &gt; General &gt; About</strong>.</p>
+                    <p>If you’re using our app (or if requested by support), you can take a screenshot by pressing the <strong>Sleep/Wake</strong> and <strong>Home</strong> buttons at the same time until you see the screen flash quickly.</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="expanding-cardbox mb-4">
-        <div class="expanding-cardbox__body">
-            <h5 class="expanding-cardbox__title mb-0">
-                Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down fa-lg"></i>
-            </h5>
-            <div class="expanding-cardbox__expand mt-4">
-                <p>Yes, you can take out insurance on a second hand phone.</p>
-                <p class="mb-0">The phone bought needs to have orginally been sold into the UK market prior your purchase (eg we don't insure models sold in China).</p>
-            </div>
-        </div>
-    </div>
-    <div class="expanding-cardbox mb-4">
-        <div class="expanding-cardbox__body">
-            <h5 class="expanding-cardbox__title mb-0">
-                If I pay annually do I get a discount? <i class="far fa-chevron-down fa-lg"></i>
-            </h5>
-            <div class="expanding-cardbox__expand mt-4">
-                <p class="mb-0">Our Reward Pot allow us to give you the best possible pricing, so sorry we do not provide annual discounts.</p>
-            </div>
-        </div>
-    </div>
-    <div class="expanding-cardbox mb-4">
-        <div class="expanding-cardbox__body">
-            <h5 class="expanding-cardbox__title mb-0">
-                Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down fa-lg"></i>
-            </h5>
-            <div class="expanding-cardbox__expand mt-4">
-                <p class="mb-0">The phone you want to insure must be <strong>less than 3 years old</strong> from when your policy begins.</p>
-            </div>
-        </div>
-    </div>
-    <div class="expanding-cardbox mb-4">
-        <div class="expanding-cardbox__body">
-            <h5 class="expanding-cardbox__title mb-0">
-                What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down fa-lg"></i>
-            </h5>
-            <div class="expanding-cardbox__expand mt-4">
-                <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
-                <h4>For Android users:</h4>
-                <p>The easiest way to find your phone’s IMEI number if you’re on an Android device is to simply dial <strong>*#06#</strong>.</p>
-                <p>If you’re still having trouble, then you should be able to find it in <strong>Settings &gt; About phone &gt; Status &gt; IMEI information</strong>.</p>
-                <p>Your serial number will be on the Status screen.</p>
-                <p class="mb-0">If requested by support, you can take a screenshot on most Android phones by holding the volume down and the power buttons for 1-2 seconds. The screen should flash and the photo can be found in your photos app.</p>
-                <h4>For iOS (Apple) users:</h4>
-                <p>Unfortunately, as we need your serial number on iOS you can’t just dial a number (although dialing the same number as above will reveal your IMEI number).</p>
-                <p>As such you can find both numbers by going to <strong>Settings &gt; General &gt; About</strong>.</p>
-                <p>If you’re using our app (or if requested by support), you can take a screenshot by pressing the <strong>Sleep/Wake</strong> and <strong>Home</strong> buttons at the same time until you see the screen flash quickly.</p>
-            </div>
-        </div>
+    <hr class="hr-picton-blue">
+    <div class="pb-5 pt-2">
+        <h4 class="my-4">About the {{ device.make }} {{ device.model }}</h4>
+        <ul class="list-inline mb-0">
+            <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ device.camera }} MP</li>
+            <li class="list-inline-item">|</li>
+            <li class="list-inline-item"><strong class="h5">Size</strong>: {{ device.getScreenPhysicalInch }}</li>
+            <li class="list-inline-item">|</li>
+            <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ device.getScreenResolution }}</li>
+            <li class="list-inline-item">|</li>
+            <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ device.getRamDisplay }}</li>
+        </ul>
     </div>
 </div>
-<div class="mx-4 mx-lg-5 py-5">
-    <div class="row text-center text-lg-left">
-        <div class="col-md-3">
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
-        </div>
-        <div class="col-md-8 ">
-            <h4 class="my-4">About the {{ device.make }} {{ device.model }}</h4>
-            <ul class="list-inline mb-0">
-                <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ device.camera }} MP</li>
-                <li class="list-inline-item">|</li>
-                <li class="list-inline-item"><strong class="h5">Size</strong>: {{ device.getScreenPhysicalInch }}</li>
-                <li class="list-inline-item">|</li>
-                <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ device.getScreenResolution }}</li>
-                <li class="list-inline-item">|</li>
-                <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ device.getRamDisplay }}</li>
-            </ul>
-        </div>
-    </div>
-</div>
+
 
