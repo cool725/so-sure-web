@@ -3,7 +3,7 @@
 
 {# Set vars #}
 {% set use_pca = true %}
-{% set quote_mode = true %}
+{% set funnel_mode = true %}
 {% if phone %}
     {% set body_class = 'purchase' %}
 {% endif %}
@@ -33,7 +33,7 @@
 {% block body %}
 
     <div class="purchase">
-        <div class="purchase-top px-4 py-5 p-lg-5">
+        <div class="purchase-top py-5">
             {% if phone %}
                 <div class="container-large">
                     <div class="row">

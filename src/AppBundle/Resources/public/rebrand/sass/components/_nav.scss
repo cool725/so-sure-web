@@ -1,5 +1,11 @@
 // nav.scss
 
+.navbar {
+    .container-large {
+        padding: 0;
+    }
+}
+
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
     @include blue-gradient;
@@ -76,7 +82,8 @@
 .make-a-claim,
 .invite,
 .promo,
-.company-phones {
+.company-phones,
+.purchase {
     .navbar-so-sure {
         background-image: none;
     }

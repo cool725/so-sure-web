@@ -15,7 +15,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container">
+        <div class="container-large">
             {% if app.user.canPurchasePolicy %}
                 {% if app.user.policies|length > 0 %}
                     <h1 class="h2 mb-4">You don't have any active polices.</h1>
