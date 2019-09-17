@@ -4,8 +4,10 @@
 {% set body_class = 'promo' %}
 
 {% block title %}
-    {% if scode is defined and scode and scode.user %}
+    {% if scode is defined and scode and scode.user and not custom %}
         so-sure - Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot
+    {% elseif scode is defined and scode and scode.user and custom %}
+        so-sure - Mobile Insurance that's simply better
     {% else %}
         so-sure - Promo code {{ use_code }} not found!
     {% endif %}
@@ -16,13 +18,17 @@
     <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 
-{% if scode is defined and scode and scode.user and scode.reward %}
-    {% set og_title = 'Sign up and save' %}
-    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a code to get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you don\'t claim' %}
+{% if scode is defined and scode and scode.user and scode.reward and not custom %}
+    {% set og_title = 'Get £' ~ scode.reward.defaultValue|number_format(0, '.', ',') ~ ' in your reward pot' %}
+    {% set og_description = 'Hey, use this special code to insure your mobile phone with so-sure. And get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you don\'t claim' %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% elseif scode is defined and scode and scode.user and scode.reward and custom %}
+    {% set og_title = 'Get £' ~ scode.reward.defaultValue|number_format(0, '.', ',') ~ ' in your reward pot' %}
+    {% set og_description = 'Hey, use this special code to insure your mobile phone with so-sure and grab yourself a free reward' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% else %}
     {% set og_title = 'Sign up and save' %}
-    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a code to get cash back if you dont\'t claim' %}
+    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a special code to get cash back if you dont\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% endif %}
 
