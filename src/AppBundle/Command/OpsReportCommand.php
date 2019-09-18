@@ -52,13 +52,18 @@ class OpsReportCommand extends ContainerAwareCommand
             $items[] = $item;
         }
 
-        $html = implode("\n<br/><br/>\n", $items);
-        if (!$html) {
-            $html = 'No csp violations';
+        $fileName = "/tmp/csp-".time().".txt";
+        $text = implode("\n\n", $items);
+        if(!$text) {
+            $text = 'No csp violations';
         }
-        $this->mailerService->send('CSP Report', 'tech+ops@so-sure.com', $html);
-        return count($items);
+        $cspReport = fopen($fileName, "w");
+        fwrite($cspReport, $text);
+        fclose($cspReport);
 
+        $this->mailerService->send('CSP Report', 'tech+ops@so-sure.com', "See attached txt file for CSP report", null, [$fileName]);
+        unset($fileName);
+        return count($items);
     }
 
     private function parseErrors($errors)
