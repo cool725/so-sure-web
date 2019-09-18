@@ -2805,7 +2805,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $price = new PhonePrice();
         if ($currentPrice) {
             $price->setGwp($currentPrice->getGwp() + 1);
-            $currentPrice->setValidTo($validFrom);
         }
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);

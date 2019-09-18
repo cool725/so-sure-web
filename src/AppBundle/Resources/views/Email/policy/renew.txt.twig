@@ -1,13 +1,38 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-Your policy is renewed.
 
-**
-------------------------------------------------------------
-Thank you for trusting so-sure to provide you with amazing cover for loss, theft, accidental damage, and breakdown.
 
-Your policy is for {{ policy.phone }} and runs from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+{# Set title based off make a/an #}
+{% set atitle = 'a' %}
+{% if policy.phone %}
+    {% if policy.phone|first matches '/^[AEIOU]/' %}
+        {% set atitle = 'an' %}
+    {% endif %}
+{% endif %}
 
-We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+Your policy is renewed 🥳
 
-{% endblock body %}
+Thank you for trusting so-sure to provide you with amazing cover for Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel 😍
+
+Your policy is for {{ atitle }} {{ policy.phone }} and runs from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+
+We've also attached a copy of all your key documents, including your policy terms for reference.
+
+Earn no claims cash back/reward pot by sharing your personal so-sure scode link with friends, colleagues and family. When you connect, you will both get £10.
+
+Share this link now: {{ url('scode', {'code': policy.standardSCode.code}) }}
+
+If you have any questions, please don't hesitate to contact us ☎️
+
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

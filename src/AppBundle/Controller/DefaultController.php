@@ -72,6 +72,7 @@ class DefaultController extends BaseController
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
+     * @Route("/mb", name="mb")
      */
     public function indexAction(Request $request)
     {
@@ -82,27 +83,47 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
+        // For Mobusi tracking
+        if ($request->get('_route') == 'mb') {
+            $clickid = $request->get('clickid');
+            $session = $this->get('session');
+            $session->set('mobusi', $clickid);
+            $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
+        }
+
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL,
+            ['regular-funnel', 'new-funnel'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         $template = 'AppBundle:Default:index.html.twig';
 
-        // A/B Menu Test
-        // To Test use url param ?force=menu-burger / ?force=menu-full
-        $menuExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_BURGER_MENU,
-            ['menu-burger', 'menu-full'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        if ($homepageFunnelExp == 'new-funnel') {
+            // Set Test Template
+            $template = 'AppBundle:Default:indexB.html.twig';
+            // Track Test
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE_B);
+            $this->get('app.mixpanel')->queueTrack(
+                MixpanelService::EVENT_TEST,
+                ['Test Name' => 'New Funnel']
+            );
+        } else {
+            // Track Normally
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        }
 
         $data = array(
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'menu_exp' => $menuExp,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);

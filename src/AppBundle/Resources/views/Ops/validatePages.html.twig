@@ -14,7 +14,7 @@
 {% block body %}
 
     <section class="main py-lg-5">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <h1 class="text-primary">Ops</h1>
             <h5 class="text-zaffre mb-4">Pages to manually verify when updating design</h5>
 
@@ -191,11 +191,11 @@
                                 {% endif %}
                             </li>
                             <li class="mb-2">
-                                {% if non_picsure_policy %}
+{#                                 {% if non_picsure_policy %}
                                     <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}"><i class="fal fa-link fa-fw"></i> User Policy List non-pic-sure policy</a> (auto impersonate {{ non_picsure_policy.user.email }})
                                 {% else %}
                                     No non-picsure policy
-                                {% endif %}
+                                {% endif %} #}
                             </li>
                         </ul>
                     </div>

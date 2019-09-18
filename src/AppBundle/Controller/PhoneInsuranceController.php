@@ -165,8 +165,6 @@ class PhoneInsuranceController extends BaseController
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
-        // Skip to purchase
-        // TODO - Let's remove altogether
         $skipToPurchase = $request->get('skip');
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
@@ -267,6 +265,12 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
+        if ($skipToPurchase) {
+            // A/B Funnel Test
+            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL);
+            return $this->redirectToRoute('purchase_step_personal');
+        }
+
         $user = new User();
 
         $lead = new Lead();
@@ -280,9 +284,6 @@ class PhoneInsuranceController extends BaseController
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
         $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
         $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
-
-        // Burger vs Full Menu - Proceed
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {

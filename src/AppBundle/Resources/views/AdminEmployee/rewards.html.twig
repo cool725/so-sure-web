@@ -3,6 +3,9 @@
 
 {# Set vars #}
 {% set body_class = 'admin-rewards' %}
+{% set terms_and_conditions_example = '<p>Terms and Conditions apply: Enter the code XXXXX into your customer dashboard within XX days once you have bought your policy and £XX will be added to your account reward pot. Cashback is redeemable at the end of your policy year term if you (and your connections if you have any) have not made any claim. This offer is only available to new so-sure customers.</p>
+<p>Promotion valid from DAY MONTH YEAR until DAY MONTH YEAR. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time. Promotion code cannot be used in conjunction with any other promotional offer.</p>
+<p>This offer is available to UK residents only. By redeeming the code provided, you agree to these terms and conditions.</p>' %}
 
 {% block title %}so-sure - Admin Rewards{% endblock %}
 {% block meta %}{% endblock %}
@@ -40,12 +43,13 @@
                             <th>Total</th>
                             <th>Limit</th>
                             <th>Expires</th>
+                            <th>Active</th>
                             <th>Add manually</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for reward in rewards %}
-                            <tr>
+                            <tr class="{% if reward.expiryDate %}{% if date(reward.expiryDate) < date() %}table-danger{% else %}table-success{% endif %}{% else %}table-info{% endif %}">
                                 <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
                                 <td>
                                     {% if reward.sCode %}
@@ -59,6 +63,7 @@
                                 <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
                                 <td>{% if reward.usageLimit %}{{ reward.usageLimit }}{% else %}n/a{% endif %}</td>
                                 <td>{% if reward.expiryDate %}{{ reward.expiryDate|date('d-m-T H:i') }}{% else %}n/a{% endif %}</td>
+                                <td>{% if reward.expiryDate %}<i class="far {% if date(reward.expiryDate) < date() %}fa-times text-danger{% else %}fa-check text-success{% endif %} fa-lg fa-fw"></i>{% else %}n/a{% endif %}</td>
                                 <td>
                                     <a href="#"
                                        class="btn btn-primary btn-sm"
@@ -161,11 +166,14 @@
                                     <div class="with-errors">{{ form_errors(rewardForm.expiryDate) }}</div>
                                 </div>
                                 <div class="form-group">
-                                    {{ form_label(rewardForm.termsAndConditions, 'Terms & Conditions *') }}
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        {{ form_label(rewardForm.termsAndConditions, 'Terms & Conditions *') }}
+                                        <small class="form-text mb-2"><a href="#" id="default_terms" class="btn btn-outline-primary btn-sm">Add default terms</a></small>
+                                    </div>
                                     {{ form_widget(rewardForm.termsAndConditions, { 'attr': {
                                         'class': 'form-control',
                                         'rows': '5',
-                                        'placeholder': 'Enter terms and conditions here, you can use html, place each paragraph between <p></p>',
+                                        'data-example': terms_and_conditions_example,
                                         'required': '',
                                         'minlength': 50,
                                         'maxlength': 1000
@@ -188,7 +196,13 @@
                                     </div>
                                     <div class="mr-2">
                                         {{ form_widget(rewardForm.isSignUpBonus, {
-                                            'label': 'Sign up Bonus?',
+                                            'label': 'Sign up Bonus',
+                                            'attr': {'class': 'custom-control-input'}}
+                                        ) }}
+                                    </div>
+                                    <div class="mr-2">
+                                        {{ form_widget(rewardForm.isConnectionBonus, {
+                                            'label': 'Connection Bonus',
                                             'attr': {'class': 'custom-control-input'}}
                                         ) }}
                                     </div>

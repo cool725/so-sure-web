@@ -79,6 +79,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->faker = Faker\Factory::create('en_GB');
 
         $users = $this->newUsers($manager, 100);
+        $manager->flush();
         $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 10);
@@ -101,69 +102,75 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $count++;
             }
         }
-
+        $manager->flush();
         foreach ($users as $user) {
             $this->addConnections($manager, $user, $users);
         }
-
+        $manager->flush();
         foreach ($unpaid as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, null, 1);
             $count++;
         }
-
+        $manager->flush();
         foreach ($unpaidDiscount as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, random_int(2, 50), 1);
             $count++;
         }
-
         foreach ($iosPreExpireUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, true, true);
             $count++;
         }
+        $manager->flush();
         foreach ($androidPreExpireUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, true, true);
             $count++;
         }
+        $manager->flush();
         foreach ($preExpireUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_RANDOM, null, null, null, null, true, 345);
             $user->setEnabled(true);
             $count++;
         }
+        $manager->flush();
         foreach ($preExpireYearlyUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_RANDOM, null, null, null, null, true, 345);
             $user->setEnabled(true);
             $count++;
         }
+        $manager->flush();
         foreach ($expiredUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, 366);
             $user->setEnabled(true);
             $count++;
         }
+        $manager->flush();
         foreach ($fullyExpiredUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, 396);
             $user->setEnabled(true);
             $count++;
         }
         $manager->flush();
-
         foreach ($preExpireUsers as $user) {
             $rand = random_int(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $preExpireUsers);
             }
         }
+        $manager->flush();
         foreach ($preExpireYearlyUsers as $user) {
             $rand = random_int(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $preExpireYearlyUsers);
             }
         }
+        $manager->flush();
         foreach ($fullyExpiredUsers as $user) {
             $rand = random_int(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $fullyExpiredUsers);
             }
         }
+        $manager->flush();
 
         $phones = [];
         foreach ($preExpireYearlyUsers as $user) {
@@ -197,11 +204,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $sixMonthsAgo, //feb feb > jan
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
-                null, // mar mar > jan feb > mar
                 null,
                 $sevenMonthsAgo // jan
             );
         }
+        $manager->flush();
 
         // Sample user for apple
         $user = $this->newUser('julien+apple@so-sure.com');
@@ -216,6 +223,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $networkUser->setEnabled(true);
         $manager->persist($networkUser);
         $this->newPolicy($manager, $networkUser, $count++, self::CLAIM_SETTLED_LOSS);
+        $manager->flush();
         //\Doctrine\Common\Util\Debug::dump($networkUser);
 
         $user = $this->newUser('user-claimed@so-sure.net');
@@ -266,6 +274,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, 'IOS-TEST', $iphoneUI, true);
 
         $this->invite($manager, $userInviter, $userInvitee, false);
+        $manager->flush();
 
         $user = $this->newUser('ios-testing+renew+pot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -280,6 +289,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
         }
+        $manager->flush();
 
         $user = $this->newUser('ios-testing+renew+nopot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -294,6 +304,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
         }
+        $manager->flush();
 
         $user = $this->newUser('ios-testing+cashback@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -308,6 +319,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
         }
+        $manager->flush();
 
         // Users for Android Testing
         $androidUI = $this->getAndroidUI($manager);
@@ -344,6 +356,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
         }
+        $manager->flush();
 
         $user = $this->newUser('android-testing+renew+nopot@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -358,6 +371,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
         }
+        $manager->flush();
 
         $user = $this->newUser('android-testing+cashback@so-sure.org', false, false);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -372,7 +386,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
         }
-
         $manager->flush();
 
         if (!$this->container) {

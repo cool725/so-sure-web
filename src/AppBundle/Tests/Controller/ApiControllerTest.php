@@ -485,9 +485,6 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals(true, $data['device_found']);
         $this->assertEquals(2, count($data['quotes']));
 
-        $validTo = new \DateTime($data['quotes'][0]['valid_to']);
-        $this->assertGreaterThanOrEqual($start, $validTo);
-        $this->assertLessThanOrEqual($end, $validTo);
         $this->assertEquals(0, $data['quotes'][0]['monthly_loss']);
         $this->assertEquals(0, $data['quotes'][0]['yearly_loss']);
 

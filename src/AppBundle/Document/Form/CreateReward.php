@@ -89,6 +89,11 @@ class CreateReward
     /**
      * @var boolean
      */
+    protected $isConnectionBonus;
+
+    /**
+     * @var boolean
+     */
     protected $termsAndConditions;
 
     public function getFirstName()
@@ -219,6 +224,16 @@ class CreateReward
     public function setIsFirst($isFirst)
     {
         $this->isFirst = $isFirst;
+    }
+
+    public function getIsConnectionBonus()
+    {
+        return $this->isConnectionBonus;
+    }
+
+    public function setIsConnectionBonus($isConnectionBonus)
+    {
+        $this->isConnectionBonus = $isConnectionBonus;
     }
 
     /**

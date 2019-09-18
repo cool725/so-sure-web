@@ -60,8 +60,11 @@ class MixpanelService
         self::QUEUE_FREEZE_ATTRIBUTION
     ];
 
+    // Homepage
     const EVENT_HOME_PAGE = 'Home Page';
+    const EVENT_HOME_PAGE_B = 'Home Page B';
     const EVENT_QUOTE_PAGE = 'Quote Page';
+    const EVENT_QUOTE_PAGE_PURCHASE = 'Quote Page Purchase Step';
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
 
@@ -71,14 +74,19 @@ class MixpanelService
     const EVENT_CPC_QUOTE_PAGE = 'CPC Quote Page';
     const EVENT_CPC_MANUFACTURER_PAGE = 'CPC Manufacturer Page';
     const EVENT_CPC_COMPETITOR_PAGE = 'CPC Competitor Page';
+
+    // Get details
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
+    const EVENT_RECEIVE_DETAILS_B = 'Receive Personal Details B';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
     const EVENT_PAYMENT = 'Payment';
     const EVENT_INVITE = 'Invite someone';
     const EVENT_CONNECTION_COMPLETE = 'Connection Complete';
     const EVENT_BUY_BUTTON_CLICKED = 'Click on the Buy Now Button';
     const EVENT_POLICY_READY = 'Policy Ready For Purchase';
+    const EVENT_POLICY_READY_B = 'Policy Ready For Purchase B';
     const EVENT_COMPLETE_PLEDGE = 'Completed Pledge';
+    const EVENT_COMPLETE_PLEDGE_B = 'Completed Pledge B';
     const EVENT_LOGIN = 'Login';
     const EVENT_APP_DOWNLOAD = 'App Download';
     const EVENT_TEST = 'Tracking Test Event';
@@ -117,10 +125,13 @@ class MixpanelService
     public static $events = [
         self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
         self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
+        self::EVENT_QUOTE_PAGE_PURCHASE => Stats::MIXPANEL_QUOTES_UK,
         self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
         self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
         self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
+        self::EVENT_RECEIVE_DETAILS_B => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
         self::EVENT_POLICY_READY => Stats::MIXPANEL_POLICY_READY,
+        self::EVENT_POLICY_READY_B => Stats::MIXPANEL_POLICY_READY,
         self::EVENT_PURCHASE_POLICY => Stats::MIXPANEL_PURCHASE_POLICY,
         self::EVENT_INVITE => Stats::MIXPANEL_INVITE_SOMEONE,
         self::CUSTOM_CPC_QUOTE_PAGE_UK => Stats::MIXPANEL_CPC_QUOTES_UK,
@@ -144,19 +155,23 @@ class MixpanelService
 
     public static $trackedEvents = [
         self::EVENT_HOME_PAGE,
+        self::EVENT_HOME_PAGE_B,
         self::EVENT_QUOTE_PAGE,
+        self::EVENT_QUOTE_PAGE_PURCHASE,
         self::EVENT_MANUFACTURER_PAGE,
         self::EVENT_LANDING_PAGE,
         self::EVENT_CPC_QUOTE_PAGE,
         self::EVENT_CPC_MANUFACTURER_PAGE,
         self::EVENT_CPC_COMPETITOR_PAGE,
         self::EVENT_RECEIVE_DETAILS,
+        self::EVENT_RECEIVE_DETAILS_B,
         self::EVENT_PURCHASE_POLICY,
         self::EVENT_PAYMENT,
         self::EVENT_INVITE,
         self::EVENT_CONNECTION_COMPLETE,
         self::EVENT_BUY_BUTTON_CLICKED,
         self::EVENT_POLICY_READY,
+        self::EVENT_POLICY_READY_B,
         self::EVENT_LOGIN,
         self::EVENT_APP_DOWNLOAD,
         self::EVENT_TEST ,
@@ -202,7 +217,9 @@ class MixpanelService
             self::getCampaignSources(self::CUSTOM_QUOTE_PAGE_UK),
             self::getCampaignSources(self::EVENT_BUY_BUTTON_CLICKED),
             self::getCampaignSources(self::EVENT_RECEIVE_DETAILS),
+            self::getCampaignSources(self::EVENT_RECEIVE_DETAILS_B),
             self::getCampaignSources(self::EVENT_POLICY_READY),
+            self::getCampaignSources(self::EVENT_POLICY_READY_B),
             self::getCampaignSources(self::EVENT_PURCHASE_POLICY)
         );
 

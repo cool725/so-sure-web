@@ -18,6 +18,20 @@
     }
 }
 
+.container-large {
+    width: 100%;
+    padding: 0 15px;
+    margin: 0 auto;
+
+    @include media-breakpoint-up(xl) {
+        max-width: 1140px;
+    }
+
+    @include media-breakpoint-up(fl) {
+        max-width: 1340px;
+    }
+}
+
 // Hide on XXS mobile
 @media (max-width: 340px) {
 
@@ -38,6 +52,9 @@
         width: 0;
         background: transparent;
     }
+
+    // Firefox
+    scrollbar-width: none;
 }
 
 .hideme {

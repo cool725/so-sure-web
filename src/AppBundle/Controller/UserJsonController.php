@@ -181,9 +181,6 @@ class UserJsonController extends BaseController
             Charge::TYPE_SMS_DOWNLOAD
         );
         if ($sent) {
-            $sixpack = $this->get('app.sixpack');
-            $sixpack->convertByClientId($user->getId(), $sixpack::EXPERIMENT_APP_LINK_SMS);
-
             /** @var MixpanelService $mixpanel */
             $mixpanel = $this->get('app.mixpanel');
             $mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_TEST, ['Test Name' => 'SMS Download Link']);

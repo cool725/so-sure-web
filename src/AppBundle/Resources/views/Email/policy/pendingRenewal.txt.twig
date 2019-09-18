@@ -1,36 +1,63 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-Your so-sure insurance renewal.
 
-**
-------------------------------------------------------------
-Dear {{ policy.user.name }},
+It’s time to renew with so-sure 📱
 
-Your SO-SURE policy {{ policy.policyNumber }} is due to expire on {{ policy.end | date('d M Y', 'Europe/London') }}. Please find your quotation for next year's cover below. We will automatically renew your policy unless you contact us before your renewal date.
+Dear Dear {{ policy.user.name }},
+
+We're just emailing to let you know that your so-sure policy {{ policy.policyNumber }} is due to expire on {{ policy.end | date('d M Y', 'Europe/London') }}.
 
 {% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
-We have great news! Your monthly premium has decreased from £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} to £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
 
-So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+The good news is that your new monthly premium will only be £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} 🎉
+
 {% elseif equal_to_two_dp(policy.nextPolicy.premium.monthlyPremiumPrice, policy.premium.monthlyPremiumPrice) %}
-We have great news! Your monthly premium has remained the same and is currently £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
 
-So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+The good news is that your monthly premium will remain at £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} 🎉
+
 {% else %}
-For only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+
+Your monthly premium has increased slightly over last year and will now be £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month 👍
 
 By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
-{% endif %}
-{% if policy.potValue > 0 %}
 
-Your Reward Pot is worth £{{ policy.potValue|number_format(2, '.', ',') }}. Provided that neither you nor your connections claim, you can either get this paid out to you or you can reduce your monthly payments for your premium to only £{{ policy.nextPolicy.premium.getAdjustedStandardMonthlyPremiumPrice(policy.potValue)|number_format(2, '.', ',') }} per month.
 {% endif %}
 
 {% if policy.potValue > 0 %}
-If you prefer a different arrangement (lump sum payment or policy termination) visit the link below. Otherwise, we will renew your policy and use your Reward Pot to reduce your premium for the coming year, starting on {{ start_date | date('d M Y', 'Europe/London') }}. Once your policy is renewed, we will send you a confirmation email along with your new policy documents.
-{% else %}
-If you prefer a different arrangement (lump sum payment or policy termination) visit the link below. Otherwise, we will renew your policy for the coming year, starting on {{ start_date | date('d M Y', 'Europe/London') }}. Once your policy is renewed, we will send you a confirmation email along with your new policy documents.
-{% endif %}
+
+We also see that you’ve been busily filling up your Reward Pot, which is now worth £{{ policy.potValue|number_format(2, '.', ',') }} 💰
+
+Provided that neither you nor your connections make a claim before the end of your current policy, your monthly premium will be reduced to £{{ policy.nextPolicy.premium.getAdjustedStandardMonthlyPremiumPrice(policy.potValue)|number_format(2, '.', ',') }}. If you’d prefer a different arrangement (such as a lump-sum payment or policy termination) click here:
 
 {{ renew_url }}
-{% endblock body %}
+
+If we don’t hear from you, we will automatically renew your policy and use your Reward Pot to reduce your premium for the coming year, starting on {{ start_date | date('d M Y', 'Europe/London') }}. Once renewed, we will send you a confirmation email that will include your new policy documents.
+
+{% else %}
+
+We noticed that you haven’t been filling up your Reward Pot, which would have added up to £{{ policy.maxPot|number_format(2, '.', ',') }} over the last year.
+
+Remember that every connection you make on so-sure earns money for your Reward Pot, which can reduce your premium. To fill up your Reward Pot, after you’ve renewed your policy, all you need to do is share your personal code with friends and family. Why not give it a try?
+
+If we don’t hear from you, we will renew your policy, starting on {{ start_date | date('d M Y', 'Europe/London') }}. Once renewed, we will send you a confirmation email that will include your new policy documents.
+
+{% endif %}
+
+Thank you for choosing so-sure and please don't hesitate to get in touch with any questions.
+
+Best regards,
+
+Dylan Bourguignon
+CEO - so-sure
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

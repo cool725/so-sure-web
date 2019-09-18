@@ -56,5 +56,11 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
 
 .hr-blue {
     border: 0;
-    border-top: 2px solid $dodger-blue;
+    border-top: 1px solid rgba(0, 217, 255, 0.2);
+}
+
+.hr-picton-blue {
+    border: 0;
+    opacity: 0.2;
+    border-top: 1px solid $pictonblue;
 }

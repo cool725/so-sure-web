@@ -11,8 +11,11 @@
     }
 }
 
-.btn.disabled {
+.btn.disabled,
+.btn:disabled,
+.btn[disabled] {
     cursor: not-allowed;
+    opacity: 0.20;
 }
 
 // Remove box-shadow on outline buttons
@@ -21,7 +24,9 @@ a[class*="btn-outline-"],
 button[class*="btn-outline-"],
 input[type="submit"][class*="btn-outline-"],
 input[type="button"][class*="btn-outline-"],
-.btn-no-shadow {
+.btn-no-shadow,
+.btn-secondary,
+.btn-link {
     box-shadow: none;
 }
 
