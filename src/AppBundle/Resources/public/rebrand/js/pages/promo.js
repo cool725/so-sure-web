@@ -20,7 +20,7 @@ let textFit = require('textfit');
 
 $(function() {
 
-    textFit($('.fit')[0], {detectMultiLine: false});
+    textFit($('.fit'), {detectMultiLine: false});
 
     setTimeout(function() {
         $('.toast-1').toast('show');

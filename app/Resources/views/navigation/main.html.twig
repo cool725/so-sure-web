@@ -183,7 +183,7 @@
                     <li class="nav-item d-none {{ menu_breakpoint }}">
                         {% if app.user is not null and app.user %}
                             {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                                <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
+                                <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email|truncate(10)~'.'  }}</u></a>
                             {% else %}
                                 <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
                             {% endif %}
