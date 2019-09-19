@@ -37,6 +37,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\SoSure;
 use AppBundle\Service\SalvaExportService;
 use Gedmo\Loggable\Document\LogEntry;
 use Symfony\Component\Validator\Constraints\Date;
@@ -5302,6 +5303,9 @@ class PolicyServiceTest extends WebTestCase
         self::$policyService->expire($policyA, new \DateTime('2017-01-01'));
     }
 
+    /**
+     * @group email
+     */
     public function testPolicyCancellationEmailNotReconnected()
     {
         /** @var Policy $policyA */
@@ -5349,10 +5353,13 @@ class PolicyServiceTest extends WebTestCase
 
         self::$policyService->setMailerMailer($mailer);
 
-        static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-01'));
+        static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-02'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $updatedRenewalPolicyA->getStatus());
     }
 
+    /**
+     * @group email
+     */
     public function testPolicyCancellationEmailReconnected()
     {
         /** @var Policy $policyA */
@@ -5398,7 +5405,7 @@ class PolicyServiceTest extends WebTestCase
         $mailer->expects($this->never())->method('send');
         self::$policyService->setMailerMailer($mailer);
 
-        static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-01'));
+        static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-02'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $updatedRenewalPolicyA->getStatus());
     }
 
