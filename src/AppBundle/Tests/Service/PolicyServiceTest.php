@@ -339,7 +339,7 @@ class PolicyServiceTest extends WebTestCase
             mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
-        $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
+        $this->assertEquals(new \DateTime('2016-01-01 04:00'), $updatedPolicy->getStart());
 
         // Needs to be prod for a valid policy number, or create will affect policy times
         static::$policyService->setEnvironment('prod');
@@ -353,7 +353,7 @@ class PolicyServiceTest extends WebTestCase
             mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
-        $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
+        $this->assertEquals(new \DateTime('2016-01-01 04:00'), $updatedPolicy->getStart());
     }
 
     /**
@@ -4588,8 +4588,8 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
 
-        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
-        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-02-01'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
@@ -4683,8 +4683,8 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
 
-        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
-        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-02-01'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
