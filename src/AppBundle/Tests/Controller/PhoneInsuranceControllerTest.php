@@ -170,4 +170,39 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertEquals(200, $this->getClientResponseStatusCode());
         $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
+
+    public function testQuoteMe()
+    {
+        self::$client->request('GET', '/quote-me/Apple+iPhone+XS+256GB');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertArrayHasKey('phoneId', $decoded);
+        $this->assertArrayHasKey('price', $decoded);
+        $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('productOverrides', $decoded);
+        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
+        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
+        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+    }
+
+    public function testQuoteMeError()
+    {
+        self::$client->request('GET', '/quote-me/Fake+Phone+256GB');
+        $this->assertEquals(404, $this->getClientResponseStatusCode());
+    }
+
+    public function testListPhones()
+    {
+        self::$client->request('GET', '/list-phones');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertGreaterThan(0, count($decoded));
+
+        // Check first phone in list is valid
+        $this->assertArrayHasKey('id', (array) $decoded[0]);
+        $this->assertArrayHasKey('make', (array) $decoded[0]);
+        $this->assertArrayHasKey('model', (array) $decoded[0]);
+        $this->assertArrayHasKey('memory', (array) $decoded[0]);
+    }
 }

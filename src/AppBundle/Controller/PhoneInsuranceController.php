@@ -523,6 +523,78 @@ class PhoneInsuranceController extends BaseController
         return $this->render($template, $data);
     }
 
+    /**
+     * @Route("/quote-me/{id}", name="quote_me", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/quote-me/{make}+{model}+{memory}GB", name="quote_me_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     */
+    public function quoteMe($id = null, $make = null, $model = null, $memory = null)
+    {
+        // For generic use by insurance aggregator sites
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $decodedModel = Phone::decodeModel($model);
+        $phone = null;
+        if ($id) {
+            /** @var Phone $phone */
+            $phone = $repo->find($id);
+        }
+        if ($memory) {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModel),
+                'memory' => (int) $memory
+            ]);
+        }
+        if ($phone) {
+            $response = new JsonResponse([
+                'phoneId' => $phone->getId(),
+                'price' => [
+                    'monthlyPremium' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentPhonePrice()->getYearlyPremiumPrice()
+                ],
+                'productOverrides' => [
+                    'excesses' => $phone->getCurrentPhonePrice()->getExcess() ?
+                        $phone->getCurrentPhonePrice()->getExcess()->toApiArray() :
+                        [],
+                    'picsureExcesses' => $phone->getCurrentPhonePrice()->getPicSureExcess() ?
+                        $phone->getCurrentPhonePrice()->getPicSureExcess()->toApiArray() :
+                        []
+                ],
+                'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
+                    str_replace(' ', '+', $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory())
+                    .'GB?skip=1'
+            ]);
+            return $response;
+        }
+
+        throw $this->createNotFoundException('Phone not found');
+    }
+
+    /**
+     * @Route("/list-phones", name="list_phones")
+     */
+    public function listPhones()
+    {
+        // For generic use by insurance aggregator sites
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findActive()->getQuery()->execute();
+        $list = [];
+        foreach ($phones as $phone) {
+            $list[] = [
+                'id'        => $phone->getId(),
+                'make'      => $phone->getMake(),
+                'model'     => $phone->getModel(),
+                'memory'    => $phone->getMemory()
+            ];
+        }
+        $response = new JsonResponse($list);
+        return $response;
+    }
+
     private function makeBuyButtonForm(string $formName, string $buttonName = 'buy')
     {
         return $this->get('form.factory')

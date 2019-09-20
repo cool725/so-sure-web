@@ -363,7 +363,6 @@ class BICommand extends ContainerAwareCommand
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
-
         $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = $this->makeLine(
@@ -403,7 +402,7 @@ class BICommand extends ContainerAwareCommand
             'First Scode Name',
             'All SCodes Used',
             'Promo Codes',
-            "Has Sign-up Bonus?",
+            'Has Sign-up Bonus?',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
             'Latest referer (user)',
@@ -419,7 +418,8 @@ class BICommand extends ContainerAwareCommand
             'Yearly Premium',
             'Premium Paid',
             'Premium Outstanding',
-            'Past Due Amount (Bad Debt Only)'
+            'Past Due Amount (Bad Debt Only)',
+            'Company of Policy'
         );
         foreach ($policies as $policy) {
             if ($policy->getEnd() <= $policy->getStart()) {
@@ -442,6 +442,7 @@ class BICommand extends ContainerAwareCommand
             if ($lastReverted) {
                 $reschedule = $scheduledPaymentRepo->getRescheduledBy($lastReverted);
             }
+            $company = $policy->getCompany();
             $lines[] = $this->makeLine(
                 $policy->getPolicyNumber(),
                 $user->getId(),
@@ -498,7 +499,8 @@ class BICommand extends ContainerAwareCommand
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremiumPaid(),
                 $policy->getUnderwritingOutstandingPremium(),
-                $policy->getBadDebtAmount()
+                $policy->getBadDebtAmount(),
+                $company ? $company->getName() : ''
             );
         }
         if (!$skipS3) {
