@@ -2129,7 +2129,8 @@ abstract class Policy
     }
 
     /**
-     * @return ScheduledPayment|null
+     * Gets the scheduled payment with status scheduled that has the lowest date.
+     * @return ScheduledPayment|null the first scheduled payment or null if there are none.
      */
     public function getNextScheduledPayment()
     {
@@ -2141,7 +2142,6 @@ abstract class Policy
                 }
             }
         }
-
         return $next;
     }
 

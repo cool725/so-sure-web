@@ -1021,14 +1021,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $this->subDays(new \DateTime(), 2)) {
-                $policy->addScheduledPayment($scheduledPayment);
-            } else {
-                $this->logger->error(sprintf(
-                    'Attempted to set scheduled payment for before today for policy \'%s\'.',
-                    $policy->getId()
-                ));
-            }
+            $policy->addScheduledPayment($scheduledPayment);
         }
         $this->dm->flush();
     }
