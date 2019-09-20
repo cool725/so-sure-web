@@ -862,9 +862,8 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2017-01-29'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
-        $timezone = new \DateTimeZone('Europe/London');
         $this->assertEquals(
-            new \DateTime('2017-02-28', $timezone),
+            new \DateTime('2017-02-28 04:00'),
             $policy->getPolicyExpirationDate()
         );
     }
@@ -889,7 +888,7 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, $date);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $this->assertEquals(
-            new \DateTime('2017-04-15 00:16:00', new \DateTimeZone('Europe/London')),
+            new \DateTime('2017-04-15 03:00'),
             $policy->getBilling()
         );
 
@@ -1618,7 +1617,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($policy->getCashback());
         $this->assertEquals(
-            new \DateTime('2017-06-01 00:00:00', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
+            new \DateTime('2017-06-01 03:00'),
             $renewalPolicy->getStart()
         );
         $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
@@ -1823,7 +1822,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($policy->getCashback());
         $this->assertEquals(
-            new \DateTime('2017-06-01 00:00:00', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
+            new \DateTime('2017-06-01 03:00'),
             $renewalPolicy->getStart()
         );
         $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
@@ -2726,7 +2725,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyB = $policyB->getNextPolicy();
 
         $renewedPolicyA = static::$policyService->renew($policyA, 12, null, false);
-        $this->assertEquals($this->startOfDay($weekAhead), $renewedPolicyA->getStart());
+        $this->assertEquals($this->startOfDay($weekAhead)->add(new \DateInterval("PT3H")), $renewedPolicyA->getStart());
         $this->assertEquals(0, $renewedPolicyA->getStart()->format('H'));
         $this->assertEquals(new \DateTimeZone('Europe/London'), $renewedPolicyA->getStart()->getTimezone());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewedPolicyA ->getStatus());
@@ -4588,8 +4587,8 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
 
-        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-02-01'));
-        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-01'));
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-02'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-02'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
@@ -4683,8 +4682,8 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
 
-        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-02-01'));
-        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-01'));
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-02'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-02'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
