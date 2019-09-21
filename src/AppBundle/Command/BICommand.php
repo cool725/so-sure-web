@@ -816,7 +816,10 @@ class BICommand extends ContainerAwareCommand
                 $transaction->getResponseCode()
             );
         }
-
+        if (!$skipS3) {
+            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
+            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
+        }
         return $lines;
     }
 
