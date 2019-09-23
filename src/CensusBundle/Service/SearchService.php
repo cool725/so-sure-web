@@ -42,7 +42,7 @@ class SearchService
         $postcodeRepo = $this->dm->getRepository(PostCode::class);
 
         $postcode = $postcodeRepo->findOneBy(['Postcode' => $code]);
-        if ($postcode) {
+        if (!$postcode) {
             return false;
         }
 
