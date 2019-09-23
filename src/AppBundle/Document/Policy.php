@@ -2653,10 +2653,8 @@ abstract class Policy
         $start = 0;
         foreach ($cancelledUpgrade as $prior) {
             $cancellationDate = $prior->getEnd()->getTimestamp();
-            var_dump($cancellationDate);
             for ($i = $start; $i < count($policies); $i++) {
                 $startDate = $policies[$i]->getStart()->getTimestamp();
-                var_dump($startDate);
                 if ($startDate <= $cancellationDate) {
                     $start++;
                 } elseif ($startDate < $cancellationDate + 60 * 60 * 24) {
