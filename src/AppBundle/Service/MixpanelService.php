@@ -64,6 +64,7 @@ class MixpanelService
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_HOME_PAGE_B = 'Home Page B';
     const EVENT_QUOTE_PAGE = 'Quote Page';
+    const EVENT_QUOTE_PAGE_PURCHASE = 'Quote Page Purchase Step';
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
 
@@ -124,6 +125,7 @@ class MixpanelService
     public static $events = [
         self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
         self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
+        self::EVENT_QUOTE_PAGE_PURCHASE => Stats::MIXPANEL_QUOTES_UK,
         self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
         self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
         self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
@@ -155,6 +157,7 @@ class MixpanelService
         self::EVENT_HOME_PAGE,
         self::EVENT_HOME_PAGE_B,
         self::EVENT_QUOTE_PAGE,
+        self::EVENT_QUOTE_PAGE_PURCHASE,
         self::EVENT_MANUFACTURER_PAGE,
         self::EVENT_LANDING_PAGE,
         self::EVENT_CPC_QUOTE_PAGE,

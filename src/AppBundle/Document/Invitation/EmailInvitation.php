@@ -51,4 +51,12 @@ class EmailInvitation extends Invitation
     {
         $this->email = mb_strtolower($email);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSharer()
+    {
+        return $this->getInviter();
+    }
 }
