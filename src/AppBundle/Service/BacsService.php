@@ -2003,7 +2003,9 @@ class BacsService
 
             // If admin has rescheduled, then allow payment to go through, but should be manually approved
             $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ||
-                $policy->getDontCancelIfUnpaid();
+                $policy->getDontCancelIfUnpaid() ||
+                $policy->hasBacsPaymentInProgress()
+            ;
             $validate = $this->validateBacs(
                 $policy,
                 $scheduledDate,
