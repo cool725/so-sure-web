@@ -75,6 +75,13 @@ class SlackCommand extends ContainerAwareCommand
                 null
             )
             ->addOption(
+                'message',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'A message to append to the start of the output',
+                null
+            )
+            ->addOption(
                 'skip-slack',
                 null,
                 InputOption::VALUE_NONE,
@@ -88,9 +95,10 @@ class SlackCommand extends ContainerAwareCommand
         $policyChannel = $input->getOption('policy-channel');
         $customerChannel = $input->getOption('customer-channel');
         $weeks = $input->getOption('weeks');
+        $message = $input->getOption('message');
         $skipSlack = $input->getOption('skip-slack');
 
-        $text = $this->policies($policyChannel, $weeks, $skipSlack);
+        $text = $this->policies($policyChannel, $weeks, $skipSlack, $message);
         $output->writeln('KPI');
         $output->writeln('----');
         $output->writeln($text);
@@ -98,7 +106,7 @@ class SlackCommand extends ContainerAwareCommand
 
         $output->writeln('Unpaid');
         $output->writeln('----');
-        $lines = $this->unpaid($customerChannel, $skipSlack);
+        $lines = $this->unpaid($customerChannel, $skipSlack, $message);
         foreach ($lines as $line) {
             $output->writeln($line);
         }
@@ -106,7 +114,7 @@ class SlackCommand extends ContainerAwareCommand
 
         $output->writeln('Renewals');
         $output->writeln('----');
-        $lines = $this->renewals($customerChannel, $skipSlack);
+        $lines = $this->renewals($customerChannel, $skipSlack, $message);
         foreach ($lines as $line) {
             $output->writeln($line);
         }
@@ -114,14 +122,14 @@ class SlackCommand extends ContainerAwareCommand
 
         $output->writeln('Cancelled w/Payment Owed');
         $output->writeln('----');
-        $lines = $this->cancelledAndPaymentOwed($customerChannel, $skipSlack);
+        $lines = $this->cancelledAndPaymentOwed($customerChannel, $skipSlack, $message);
         foreach ($lines as $line) {
             $output->writeln($line);
         }
         $output->writeln('');
     }
 
-    private function cancelledAndPaymentOwed($channel, $skipSlack)
+    private function cancelledAndPaymentOwed($channel, $skipSlack, $message)
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -148,14 +156,14 @@ class SlackCommand extends ContainerAwareCommand
 
             // @codingStandardsIgnoreEnd
             if (!$skipSlack) {
-                $this->send($text, $channel);
+                $this->send($text, $channel, $message);
             }
         }
 
         return $lines;
     }
 
-    private function unpaid($channel, $skipSlack)
+    private function unpaid($channel, $skipSlack, $message)
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -192,14 +200,14 @@ class SlackCommand extends ContainerAwareCommand
 
             // @codingStandardsIgnoreEnd
             if (!$skipSlack) {
-                $this->send($text, $channel);
+                $this->send($text, $channel, $message);
             }
         }
 
         return $lines;
     }
 
-    private function renewals($channel, $skipSlack)
+    private function renewals($channel, $skipSlack, $message)
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -228,14 +236,14 @@ class SlackCommand extends ContainerAwareCommand
 
             // @codingStandardsIgnoreEnd
             if (!$skipSlack) {
-                $this->send($text, $channel);
+                $this->send($text, $channel, $message);
             }
         }
 
         return $lines;
     }
 
-    private function policies($channel, $weeks, $skipSlack)
+    private function policies($channel, $weeks, $skipSlack, $message)
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -299,14 +307,17 @@ class SlackCommand extends ContainerAwareCommand
         );
         // @codingStandardsIgnoreEnd
         if (!$skipSlack) {
-            $this->send($text, $channel);
+            $this->send($text, $channel, $message);
         }
 
         return $text;
     }
 
-    private function send($text, $channel)
+    private function send($text, $channel, $message)
     {
+        if ($message) {
+            $text = sprintf("*%s*\n%s", $message, $text);
+        }
         $message = $this->slackClient->createMessage();
         $message
             ->to($channel)
