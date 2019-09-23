@@ -266,12 +266,6 @@ class SlackCommand extends ContainerAwareCommand
         $yesterday = $this->subDays($startOfDay, 1);
         $oneWeekAgo = $this->subDays($startOfDay, 7);
 
-        $cumulativeReport = $this->reportingService->getCumulativePolicies(
-            new \DateTime(SoSure::POLICY_START, SoSure::getSoSureTimezone()),
-            $startOfDay
-        );
-
-
         $gross = 0;
         $policies = $repo->findAllStartedPolicies(null, $yesterday, $startOfDay);
         foreach ($policies as $policy) {
@@ -284,6 +278,7 @@ class SlackCommand extends ContainerAwareCommand
         $weekStart = $repo->countAllActivePolicies($start);
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
         $weekTargetIncCancellations = 1.2 * $weekTarget;
+        $total = $repo->countAllPolicies((new PhonePolicy())->getPolicyNumberPrefix());
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
