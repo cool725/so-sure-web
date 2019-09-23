@@ -2038,8 +2038,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
-        $censusDM = $this->getCensusManager();
-        $postcodeRepo = $censusDM->getRepository(PostCode::class);
         $postcode = null;
         $census = null;
         $income = null;
