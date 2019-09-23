@@ -26,9 +26,9 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_NEW_FUNNEL = 'New Funnel';
+    // const EXPERIMENT_NEW_FUNNEL = 'New Funnel';
     // Exp 2
-    // const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
+    const EXPERIMENT_NEW_FUNNEL_V2 = 'New Funnel V2';
     // Exp 3
     // const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
     // Exp 4
@@ -115,14 +115,15 @@ class SixpackService
         'old-vs-new-funnel',
         'app-picsure-location',
         'app-request-picsure-location',
-        'app-link-sms'
+        'app-link-sms',
+        'New Funnel'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_NEW_FUNNEL,
+        // self::EXPERIMENT_NEW_FUNNEL,
         // Exp 2
-        //
+        self::EXPERIMENT_NEW_FUNNEL_V2,
         // Exp 3
         //
         // Exp 4
@@ -208,7 +209,7 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         // Exp 1
-        //
+        self::EXPERIMENT_NEW_FUNNEL_V2,
         // Exp 2
         //
         // Exp 3
@@ -237,7 +238,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_NEW_FUNNEL,
+        // self::EXPERIMENT_NEW_FUNNEL,
         // Exp 2
         //
         // Exp 3

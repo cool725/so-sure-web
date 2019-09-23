@@ -872,7 +872,7 @@ abstract class BaseController extends Controller
         }
 
         $status = (string) $form->get('status')->getData();
-        $search = new SearchService($dm, $form);
+        $search = new SearchService($dm, $this->getParameter('kernel.environment'), $form);
 
         $policies = $search->searchPolicies();
 
