@@ -10,6 +10,7 @@ use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Postcode;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
@@ -30,6 +31,7 @@ use AppBundle\Service\CheckoutService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RequestService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -883,7 +885,9 @@ class PurchaseController extends BaseController
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
             $price = $policy->getPhone()->getCurrentPhonePrice();
-            if ($price && $user->allowedMonthlyPayments()) {
+            /** @var PostcodeService $postcodeService */
+            $postcodeService = $this->get('app.postcode');
+            if ($price && $user->allowedMonthlyPayments($postcodeService)) {
                 $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
             } elseif ($price && $user->allowedYearlyPayments()) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));

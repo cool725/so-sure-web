@@ -1,0 +1,117 @@
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme postcodeForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
+
+{# Set vars #}
+{% set body_class = 'admin-postcodes' %}
+
+{% block title %}so-sure - Postcodes{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Postcodes</h1>
+            </div>
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary"
+                       data-toggle="modal"
+                       data-target="#postcode_modal">
+                        <i class="fal fa-plus fa-fw"></i> New Annual Postcode </a>
+                </div>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                    <tr><th>Outcodes</th></tr>
+                        <tr>
+                            <th>Out Code</th>
+                            <th>Added</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for outcode in outcodes %}
+                        <tr>
+                            <td>{{ outcode.postcodeCanonical }}</td>
+                            <td>{{ outcode.added|date('d-m-T H:i') }}</td>
+                            <td>{{ outcode.notes }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                    <tr><th>Postcodes</th></tr>
+                    <tr>
+                        <th>Postcode</th>
+                        <th>Added</th>
+                        <th>Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for postcode in postcodes %}
+                        <tr>
+                            <td>{{ postcode.postcodeCanonical }}</td>
+                            <td>{{ postcode.added|date('d-m-T H:i') }}</td>
+                            <td>{{ postcode.notes }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="postcode_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="postcode_modal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Postcode</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(postcodeForm) }}
+                        <div class="form-group">
+                            {{ form_label(postcodeForm.postcode, 'Postcode', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(postcodeForm.postcode, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(postcodeForm.postcode) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(postcodeForm.notes, 'Notes', {'label_attr': {'class': ''}}) }}
+                            {{ form_widget(postcodeForm.notes, {'attr': {'class': 'form-control'}}) }}
+                            <div class="with-errors">{{ form_errors(postcodeForm.notes) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(postcodeForm.next, {'attr': {'class': 'btn btn-success'}, 'label': 'Add PostCode'}) }}
+                        </div>
+                    {{ form_end(postcodeForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {# <script src="{{ asset('css-js/homepage.js') }}"></script> #}
+{% endblock %}
