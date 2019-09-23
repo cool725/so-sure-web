@@ -396,11 +396,11 @@ class ScheduledPayment
          * there to be a difference between the scheduled day and the billing day.
          * At two points in the year, this difference can be 4 days, so as long as the
          * difference is 4 or less, but still in the same month we are good to go.
+         * Customers can also change payment type to card and keep their schedule,
+         * so we cannot rely on this only happening for BACs users.
          */
-        if ($this->policy->getPaymentMethod() instanceof BacsPaymentMethod) {
-            if ($diff->d <= 4 && $diff->m === 0) {
-                return true;
-            }
+        if ($diff->d <= 4 && $diff->m === 0) {
+            return true;
         }
 
         return false;

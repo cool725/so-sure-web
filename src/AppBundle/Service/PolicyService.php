@@ -840,6 +840,7 @@ class PolicyService
         $this->dm->flush();
 
         // Ensure that billing dates are updated
+        /** @var ScheduledPayment $scheduledPayment */
         foreach ($policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED) as $scheduledPayment) {
             if ($scheduledPayment->hasCorrectBillingDay() === false) {
                 $adjustedScheduledDay = $this->setDayOfMonth(
