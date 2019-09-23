@@ -1,9 +1,6 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-Your so-sure insurance is unable to be automatically renewed.
 
-**
-------------------------------------------------------------
+Your so-sure insurance is unable to be automatically renewed 😢
+
 Dear {{ policy.user.name }},
 
 We emailed you a few week ago about automatically renewing your SO-SURE policy {{ policy.policyNumber }}.
@@ -11,4 +8,17 @@ We emailed you a few week ago about automatically renewing your SO-SURE policy {
 Unfortuantely, we were unable to automatically renew your policy as your previous policy was either cancelled or unpaid.
 
 If you have any questions, please don't hesitate to email us at support@wearesosure.com.
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Building, 114 Whitechapel High Street, London, E1 7PT, UK

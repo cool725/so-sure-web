@@ -19,7 +19,7 @@
         {# Toasts #}
         {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %}
 
-        <div class="container container-xtra">
+        <div class="container-large">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
@@ -51,7 +51,7 @@
                     </div>
                     <div class="hero__controls pb-3">
                         <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
-                        <a href="#"
+{#                         <a href="#"
                            class="btn btn-outline-white watch-video btn-block-xs"
                            data-event="watch-video-index-hero"
                            data-toggle="modal"
@@ -59,6 +59,11 @@
                            data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
                             <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                             Watch our Video
+                        </a> #}
+                        <a href="#cred"
+                           id="watch_tv_advert"
+                           class="btn btn-outline-white btn-block-xs">
+                            📺 Watch our Sky TV Ad
                         </a>
                     </div>
                 </div>
@@ -77,10 +82,12 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
-    <section class="intro py-lg-5">
-        <div class="container container-xtra py-5">
+    {# TV Add #}
+    {% include 'AppBundle::Default/CommonSections/_skyTVAd.html.twig' %}
+
+{#     <section class="intro py-lg-5">
+        <div class="container-large py-5">
             <div class="row">
-                {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
                     <h5 class="text-primary">24-72 hour replace or repair</h5>
@@ -99,7 +106,7 @@
             </div>
             <a href="#" class="btn btn-primary btn-block-xs get-a-quote disabled mb-5">Insure your phone in minutes</a>
         </div>
-    </section>
+    </section> #}
 
     {# Cover #}
     {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
@@ -108,7 +115,7 @@
     {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
 
     <section class="reward py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_why-illustration.png ">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-4">
                     <div class="text-center text-lg-left">
@@ -183,7 +190,7 @@
     {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %}
 
     <section class="banner banner-dismissible">
-        <div class="container py-5">
+        <div class="container-large py-5">
             <div class="d-lg-flex align-items-lg-center">
                 <div class="banner__image">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="Home insurance" width="250px" class="lozad">
@@ -218,7 +225,7 @@
     {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
 
     <section class="banner py-5">
-        <div class="container container-xtra">
+        <div class="container-large">
             <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
                 <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
