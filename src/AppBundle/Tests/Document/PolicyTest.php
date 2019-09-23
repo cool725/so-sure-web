@@ -167,6 +167,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $premium = new PhonePremium();
         $a = new PhonePolicy();
+        $a->setId("1");
         $a->setPolicyNumber("Mob/2016/1");
         $a->setPremium($premium);
         $a->setStart(new \DateTime('2017-01-01'));
@@ -175,24 +176,28 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $a->setCancelledReason(Policy::CANCELLED_UNPAID);
         $b = new PhonePolicy();
         $b->setPolicyNumber("Mob/2016/2");
+        $b->setId("2");
         $b->setPremium($premium);
         $b->setStart(new \DateTime('2017-10-15'));
         $b->setEnd(new \DateTime('2018-05-02 14:05'));
         $b->setStatus(Policy::STATUS_CANCELLED);
         $b->setCancelledReason(Policy::CANCELLED_UPGRADE);
         $c = new PhonePolicy();
+        $c->setId("3");
         $c->setPolicyNumber("Mob/2016/3");
         $c->setPremium($premium);
         $c->setStart(new \DateTime('2018-05-02 20:21'));
         $c->setStatus(Policy::STATUS_ACTIVE);
         $d = new PhonePolicy();
+        $d->setId("4");
         $d->setPolicyNumber("Mob/2016/4");
         $d->setPremium($premium);
-        $d->setStart(new \DateTime('2018-05-03 05:12'));
+        $d->setStart(new \DateTime('2018-05-02 20:21'));
         $d->setEnd(new \DateTime('2018-09-09 12:30'));
         $d->setStatus(Policy::STATUS_CANCELLED);
         $d->setCancelledReason(Policy::CANCELLED_UPGRADE);
         $e = new PhonePolicy();
+        $e->setId("5");
         $e->setPolicyNumber("Mob/2016/5");
         $e->setPremium($premium);
         $e->setStart(new \DateTime('2018-09-10 9:45'));
@@ -205,8 +210,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // now check each one reports what it should.
         $this->assertNull($a->getUpgradedFrom());
         $this->assertNull($b->getUpgradedFrom());
-        $this->assertEquals($b, $c->getUpgradedFrom());
-        $this->assertNull($d->getUpgradedFrom());
+        $this->assertNull($c->getUpgradedFrom());
+        $this->assertEquals($b, $d->getUpgradedFrom());
         $this->assertEquals($d, $e->getUpgradedFrom());
     }
 }
