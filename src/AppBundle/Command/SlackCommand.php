@@ -253,7 +253,8 @@ class SlackCommand extends ContainerAwareCommand
         $targetEnd = new \DateTime('2019-09-01', SoSure::getSoSureTimezone());
         $dowOffset = 0;
 
-        $startOfDay = $this->startOfDay(new \DateTime("now", SoSure::getSoSureTimezone()));
+        $startOfDay = $this->startOfDay();
+        $startOfWeek = $this->startOfWeek();
         $dow = $startOfDay->diff($start)->days % 7;
         $offset = $dow - $dowOffset >= 0 ? $dow - $dowOffset : (7 - $dowOffset) + $dow;
         $start = clone $startOfDay;
@@ -289,7 +290,7 @@ class SlackCommand extends ContainerAwareCommand
         }
         $cooloff = $repo->countAllEndingPolicies(Policy::CANCELLED_COOLOFF, $yesterday, $startOfDay);
         $cancellations = $repo->countEndingByStatus(Policy::STATUS_CANCELLED, $yesterday, $startOfDay);
-        $weekStart = $repo->countAllActivePolicies($start);
+        $weekStart = $repo->countAllActivePolicies($startOfWeek);
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
         $weekTargetIncCancellations = 1.2 * $weekTarget;
         $total = $repo->countAllActivePolicies($startOfDay);
