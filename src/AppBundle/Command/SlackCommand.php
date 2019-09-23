@@ -277,7 +277,7 @@ class SlackCommand extends ContainerAwareCommand
         $gross = 0;
         $policies = $repo->findAllStartedPolicies(null, $yesterday, $startOfDay);
         foreach ($policies as $policy) {
-            if (!$policy->hasPreviousPolicy() && !$policy->getUpdatedFrom()) {
+            if (!$policy->hasPreviousPolicy() && !$policy->getUpgradedFrom()) {
                 $gross++;
             }
         }
