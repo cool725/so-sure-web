@@ -78,7 +78,7 @@
                                     </a>
                                 </div>
                                 <div class="h1 mb-0 text-white">
-                                    {% if not app.user or app.user.allowedMonthlyPayments %}
+                                    {% if not app.user or app.user.allowedMonthly %}
                                         &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
                                     {% else %}
                                         &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}

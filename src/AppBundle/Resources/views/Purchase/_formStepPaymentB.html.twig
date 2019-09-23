@@ -12,7 +12,7 @@
     {% endif %}
 
     {# Title #}
-    {% if app.user.allowedMonthlyPayments %}
+    {% if app.user.allowedMonthly %}
         <div class="h2 text-center text-primary fit mb-4 mb-lg-1">How would you like to pay? 💳</div>
         <p class="d-none d-lg-block text-center mb-4">Choose whether you'd like to pay yearly or monthly</p>
     {% else %}
@@ -29,7 +29,7 @@
                 </div>
                 <div class="radio-btn-group">
                     <div class="row">
-                        {% if app.user.allowedMonthlyPayments %}
+                        {% if app.user.allowedMonthly %}
                             <div class="col-6">
                                 <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}"
                                     data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}"
