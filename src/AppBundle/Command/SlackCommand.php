@@ -275,9 +275,15 @@ class SlackCommand extends ContainerAwareCommand
         $oneWeekAgo = $this->subDays($startOfDay, 7);
 
         $gross = 0;
+        $renewal = 0;
+        $upgrade = 0;
         $policies = $repo->findAllStartedPolicies(null, $yesterday, $startOfDay);
         foreach ($policies as $policy) {
-            if (!$policy->hasPreviousPolicy() && !$policy->getUpgradedFrom()) {
+            if ($policy->hasPreviousPolicy()) {
+                $renewal++;
+            } elseif ($policy->getUpgradedFrom()) {
+                $upgrade++;
+            } else {
                 $gross++;
             }
         }
@@ -286,15 +292,17 @@ class SlackCommand extends ContainerAwareCommand
         $weekStart = $repo->countAllActivePolicies($start);
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
         $weekTargetIncCancellations = 1.2 * $weekTarget;
-        $total = $repo->countAllPolicies((new PhonePolicy())->getPolicyNumberPrefix());
+        $total = $repo->countAllActivePolicies($startOfDay);
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\n\nGross Policies (last 24 hours): *%d*\nNet Policies (last 24 hours): *%d*\nNon cooloff cancellations (last 24 hours): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
+            "*%s*\n\nGross Policies (last 24 hours): *%d*\nNet Policies (last 24 hours): *%d*\nNon cooloff cancellations (last 24 hours): *%d*\nRenewals (last 24 hours): *%d*\nUpgrades (last 24 hours): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
             $weekText,
             $gross,
             $gross - $cooloff,
             $cancellations - $cooloff,
+            $renewal,
+            $upgrade,
             $weekTarget,
             $weekTargetIncCancellations,
             $total - $weekStart,
