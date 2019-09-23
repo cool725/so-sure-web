@@ -308,16 +308,23 @@ class ScheduledPayment
         $this->setType(self::TYPE_ADMIN);
     }
 
-    public function isBillable()
+    public function isBillable($includePending = false)
     {
+        $status = $this->getStatus();
+        $pending = false;
+        if ($includePending) {
+            $pending = $status == self::STATUS_PENDING;
+        }
         // Admin should ignore billable status to allow an expired policy to be billed
         if ($this->getType() == self::TYPE_ADMIN) {
-            return $this->getStatus() == self::STATUS_SCHEDULED &&
+            $scheduled = $status == self::STATUS_SCHEDULED;
+            return ($scheduled || $pending) &&
                     $this->getPolicy()->isPolicy();
         } else {
-            return $this->getStatus() == self::STATUS_SCHEDULED &&
-                    $this->getPolicy()->isPolicy() &&
-                    $this->getPolicy()->isBillablePolicy();
+            $scheduled = $status == self::STATUS_SCHEDULED;
+            return ($scheduled || $pending) &&
+                $this->getPolicy()->isPolicy() &&
+                $this->getPolicy()->isBillablePolicy();
         }
     }
 
@@ -443,11 +450,12 @@ class ScheduledPayment
         ];
     }
 
-    public static function sumScheduledPaymentAmounts($scheduledPayments)
+    public static function sumScheduledPaymentAmounts($scheduledPayments, $includePending = false)
     {
         $total = 0;
+        /** @var ScheduledPayment $scheduledPayment */
         foreach ($scheduledPayments as $scheduledPayment) {
-            if ($scheduledPayment->isBillable()) {
+            if ($scheduledPayment->isBillable($includePending)) {
                 $total += $scheduledPayment->getAmount();
             }
         }
