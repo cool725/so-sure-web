@@ -32,6 +32,8 @@ class OpsReportCommand extends ContainerAwareCommand
         $this->mailerService = $mailerService;
         $this->redis = $redis;
         $this->s3 = $s3;
+        $this->bucket = 'ops.so-sure.com';
+        $this->folder = 'csp/';
     }
 
     protected function configure()
@@ -40,9 +42,6 @@ class OpsReportCommand extends ContainerAwareCommand
             ->setName('sosure:ops:report')
             ->setDescription('Send an email with any daily csp violations.')
         ;
-
-        $this->setBucket('ops.so-sure.com');
-        $this->setFolder('csp/');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -184,20 +183,5 @@ class OpsReportCommand extends ContainerAwareCommand
         ]);
 
         return $signedUrl = $this->s3->createPresignedRequest($command, strtotime('+7 days'))->getUri();
-    }
-
-    public function setS3($s3)
-    {
-        $this->s3 = $s3;
-    }
-
-    public function setBucket($bucket)
-    {
-        $this->bucket = $bucket;
-    }
-
-    public function setFolder($folder)
-    {
-        $this->folder = $folder;
     }
 }
