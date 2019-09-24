@@ -75,7 +75,7 @@
                         </div>
                         <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                             <span class="sub">For only</span>
-                            {% if not app.user or app.user.allowedMonthlyPayments %}
+                            {% if not app.user or app.user.allowedMonthly %}
                                 &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
                             {% else %}
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year

@@ -16,6 +16,7 @@ use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RouterService;
 use AppBundle\Validator\Constraints\BankAccountNameValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
@@ -2554,9 +2555,12 @@ class ApiAuthController extends BaseController
 
             $quotes = [];
             $hasPolicyWithSamePhone = false;
+            /** @var PostcodeService $postcodeService */
+            $postcodeService = $this->get('app.postcode');
+            /** @var Phone $phone */
             foreach ($phones as $phone) {
                 $hasPolicyWithSamePhone = $hasPolicyWithSamePhone || $user->hasPolicyWithSamePhone($phone);
-                if ($quote = $phone->asQuoteApiArray($user)) {
+                if ($quote = $phone->asQuoteApiArray($postcodeService, $user)) {
                     $quotes[] = $quote;
                 }
             }

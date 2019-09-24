@@ -27,6 +27,7 @@ use AppBundle\Document\ScheduledPayment;
  * @MongoDB\DiscriminatorMap({
  *      "judo"="JudoPayment",
  *      "sosure"="SoSurePayment",
+ *      "sosureCourtesy"="SoSureCourtesyPayment",
  *      "checkout"="CheckoutPayment",
  *      "bacs"="BacsPayment",
  *      "bacsIndemnity"="BacsIndemnityPayment",
@@ -74,6 +75,8 @@ abstract class Payment
             return 'judo';
         } elseif ($this instanceof SoSurePayment) {
             return 'sosure';
+        } elseif ($this instanceof SoSureCourtesyPayment) {
+            return 'sosureCourtesy';
         } elseif ($this instanceof BacsPayment) {
             return 'bacs';
         } elseif ($this instanceof BacsIndemnityPayment) {

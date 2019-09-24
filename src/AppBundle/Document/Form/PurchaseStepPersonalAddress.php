@@ -92,7 +92,7 @@ class PurchaseStepPersonalAddress
     /**
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
+     * @Assert\Length(min="1", max="10")
      * @AppAssert\Postcode()
      * @Assert\NotBlank(message="Postcode is required.")
      */

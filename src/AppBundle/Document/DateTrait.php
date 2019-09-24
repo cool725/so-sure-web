@@ -153,7 +153,7 @@ trait DateTrait
     public function startOfDay(\DateTime $date = null)
     {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime("now", SoSure::getSoSureTimezone());
         }
         $startMonth = new \DateTime(
             sprintf('%d-%d-%d 00:00:00', $date->format('Y'), $date->format('m'), $date->format('d')),

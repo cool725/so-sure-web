@@ -270,9 +270,10 @@ class ApiController extends BaseController
             }
 
             $quotes = [];
+            $postcodeService = $this->get('app.postcode');
             foreach ($phones as $phone) {
                 /** @var Phone $phone */
-                if ($quote = $phone->asQuoteApiArray()) {
+                if ($quote = $phone->asQuoteApiArray($postcodeService)) {
                     $quotes[] = $quote;
                 }
             }
