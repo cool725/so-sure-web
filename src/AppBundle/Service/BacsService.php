@@ -867,8 +867,6 @@ class BacsService
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true, false);
-                    $rescheduled = $submittedPayment->getScheduledPayment()->reschedule();
-                    $policy->addScheduledPayment($rescheduled);
 
                     // Cancel scheduled payment.
                     $scheduledPayment = $submittedPayment->getScheduledPayment();
@@ -884,7 +882,7 @@ class BacsService
                     if ($scheduledPayment) {
                         $this->dispatcher->dispatch(
                             ScheduledPaymentEvent::EVENT_FAILED,
-                            new ScheduledPaymentEvent($scheduledPayment, null, $returnCode == 0)
+                            new ScheduledPaymentEvent($scheduledPayment, null)
                         );
                     }
                     $results['failed-payments']++;
