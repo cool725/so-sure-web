@@ -61,7 +61,7 @@ class OpsReportCommand extends ContainerAwareCommand
         }
 
         $fileName = "csp-".time().".txt";
-        $file = "/tmp/" . $fileName;;
+        $file = "/tmp/" . $fileName;
         $text = implode("\n\n", $items);
         if (!$text) {
             $text = 'No csp violations';
