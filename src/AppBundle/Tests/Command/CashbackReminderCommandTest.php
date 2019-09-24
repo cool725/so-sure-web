@@ -27,7 +27,11 @@ class CashbackReminderCommandTest extends BaseControllerTest
     public function callCommand($expectedOutput, String $status)
     {
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
+        $application->add(new OpsReportCommand(
+            self::$container->get('app.mailer'),
+            self::$redis,
+            self::$container->get('aws.s3')
+        ));
         $command = $application->find('sosure:cashback:reminder');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
