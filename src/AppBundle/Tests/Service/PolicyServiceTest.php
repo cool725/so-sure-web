@@ -2725,7 +2725,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyB = $policyB->getNextPolicy();
 
         $renewedPolicyA = static::$policyService->renew($policyA, 12, null, false);
-        $this->assertEquals($this->startOfDay($weekAhead)->add(new \DateInterval("PT3H")), $renewedPolicyA->getStart());
+        $this->assertEquals($this->startOfDay($weekAhead)->add(new \DateInterval("PT4H")), $renewedPolicyA->getStart());
         $this->assertEquals(0, $renewedPolicyA->getStart()->format('H'));
         $this->assertEquals(new \DateTimeZone('Europe/London'), $renewedPolicyA->getStart()->getTimezone());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewedPolicyA ->getStatus());
@@ -3051,7 +3051,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
 
         $this->assertEquals(10, $policyA->getPotValue());
-        $this->assertEquals(9.17, $policyB->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
     }
 
     public function testPolicyRenewalConnectionsUnder60()
@@ -4847,13 +4847,14 @@ class PolicyServiceTest extends WebTestCase
             $policyB->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
             $policyB->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
         );
+
         $this->assertEquals(
             $this->toTwoDp(10/12) + $paymentB->getAmount(),
-            $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-01'), true)
+            $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-02'), true)
         );
         $this->assertEquals(
             10 + $paymentB->getAmount(),
-            $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-01'))
+            $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-02'))
         );
 
         $claimA = new Claim();
@@ -4864,11 +4865,14 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertNotNull($policyA->getNextPolicy());
         $this->assertNotNull($policyA->getNextPolicy()->getUser());
-        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-02-01'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         // use policyA->getNextPolicy to avoid having to flush/reload from db
-        $due = $policyA->getNextPolicy()->getPremium()->getYearlyPremiumPrice() -
-            $paymentA->getAmount();
+        // Note that this behaviour is arguably a bug and may need to change. If policy had a judopay payment method
+        // subtracting the £0.83 would not be necessary because it would create a scheduled payment to make the user
+        // pay that amount.
+        $due = $policyA->getNextPolicy()->getPremium()->getYearlyPremiumPrice() - $paymentA->getAmount() * 2 - 0.83;
+
         $this->assertEquals(
             $due,
             $policyA->getNextPolicy()->getOutstandingScheduledPaymentsAmount()
