@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 use Symfony\Component\HttpFoundation\Request;
+use Aws\S3\S3Client;
 
 class OpsReportCommand extends ContainerAwareCommand
 {
@@ -22,11 +23,15 @@ class OpsReportCommand extends ContainerAwareCommand
     /** @var Client  */
     protected $redis;
 
-    public function __construct(MailerService $mailerService, Client $redis)
+    /** @var S3Client */
+    protected $s3;
+
+    public function __construct(MailerService $mailerService, Client $redis, S3Client $s3)
     {
         parent::__construct();
         $this->mailerService = $mailerService;
         $this->redis = $redis;
+        $this->s3 = $s3;
     }
 
     protected function configure()
@@ -35,6 +40,9 @@ class OpsReportCommand extends ContainerAwareCommand
             ->setName('sosure:ops:report')
             ->setDescription('Send an email with any daily csp violations.')
         ;
+
+        $this->setBucket('ops.so-sure.com');
+        $this->setFolder('csp/');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -52,23 +60,28 @@ class OpsReportCommand extends ContainerAwareCommand
             $items[] = $item;
         }
 
-        $fileName = "/tmp/csp-".time().".txt";
+        $fileName = "csp-".time().".txt";
+        $file = "/tmp/" . $fileName;;
         $text = implode("\n\n", $items);
         if (!$text) {
             $text = 'No csp violations';
         }
-        $cspReport = fopen($fileName, "w");
+        $cspReport = fopen($file, "w");
         fwrite($cspReport, $text);
         fclose($cspReport);
+
+        $key = $this->uploadS3($file, $fileName);
 
         $this->mailerService->send(
             'CSP Report',
             'tech+ops@so-sure.com',
-            "See attached txt file for CSP report",
-            null,
-            [$fileName]
+            "CSP report generated.\n\n"
+                . "Bucket: " . $this->bucket . "\n"
+                . "Folder: " . $this->folder . "\n"
+                . "Follow the following link to download from S3 (this link will be valid for 1 week):\n\n"
+                . $this->createS3PresignedUrl($fileName)
         );
-        unset($fileName);
+        unset($file);
         return count($items);
     }
 
@@ -147,5 +160,42 @@ class OpsReportCommand extends ContainerAwareCommand
             'charles@so-sure.com'
         ], $html);
         return count($items) > 0 ? 'found validation failures' : 'no validation failures';
+    }
+
+    private function uploadS3($file, $fileName)
+    {
+        $result = $this->s3->putObject([
+            'Bucket' => $this->bucket,
+            'Key'    => $this->folder . $fileName,
+            'SourceFile' => $file,
+        ]);
+
+        return $this->folder . $fileName;
+    }
+
+    private function createS3PresignedUrl($fileName)
+    {
+        $command = $this->s3->getCommand('GetObject', [
+            'Bucket' => $this->bucket,
+            'Key' => $this->folder . $fileName,
+            'ResponseContentDisposition' => 'attachment; filename="' . $fileName . '"'
+        ]);
+
+        return $signedUrl = $this->s3->createPresignedRequest($command, strtotime('+7 days'))->getUri();
+    }
+
+    public function setS3($s3)
+    {
+        $this->s3 = $s3;
+    }
+
+    public function setBucket($bucket)
+    {
+        $this->bucket = $bucket;
+    }
+
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
     }
 }
