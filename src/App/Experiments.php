@@ -7,7 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        SixpackService::EXPERIMENT_NEW_FUNNEL, ['regular-funnel', 'new-funnel'],
+        SixpackService::EXPERIMENT_NEW_FUNNEL_V2, ['regular-funnel-v2', 'new-funnel-v2'],
     ];
 
     private static $authExperiments = [];

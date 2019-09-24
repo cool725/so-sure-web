@@ -7,10 +7,11 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
-use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
-use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Document\Postcode;
+use AppBundle\Document\Promotion;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
@@ -31,6 +32,7 @@ use AppBundle\Form\Type\PicSureStatusType;
 use AppBundle\Form\Type\SerialNumberType;
 use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\UserHandlingTeamType;
+use AppBundle\Form\Type\PostcodeType;
 use AppBundle\Form\Type\PromotionType;
 use AppBundle\Form\Type\RewardType;
 use AppBundle\Repository\ClaimRepository;
@@ -38,6 +40,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\PostcodeRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Security\FOSUBUserProvider;
@@ -55,6 +58,7 @@ use Doctrine\ODM\MongoDB\Query\Builder;
 use Faker\Calculator\Luhn;
 use Gedmo\Loggable\Document\Repository\LogEntryRepository;
 use Grpc\Call;
+use mysql_xdevapi\Exception;
 use Predis\Client;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -164,7 +168,6 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use MongoRegex;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use CensusBundle\Document\Postcode;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -456,9 +459,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy_route' => 'admin_policy',
             'call_form' => $callForm->createView(),
             'periods' => [
-                'Week '.(new \DateTime('-1 week'))->format('W') => 'week-1',
-                'Week '.(new \DateTime('-2 week'))->format('W') => 'week-2',
-                'Week '.(new \DateTime('-3 week'))->format('W') => 'week-3',
+                'Week ' . (new \DateTime('-1 week'))->format('W') => 'week-1',
+                'Week ' . (new \DateTime('-2 week'))->format('W') => 'week-2',
+                'Week ' . (new \DateTime('-3 week'))->format('W') => 'week-3',
                 $this->monthName('-1 month') => 'month-1',
                 $this->monthName('-2 month') => 'month-2',
                 $this->monthName('-3 month') => 'month-3'
@@ -482,7 +485,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $end = $this->startOfWeek(null, 0 - $periodNumber + 1);
             $response->headers->set(
                 'Content-Disposition',
-                'attachment; filename="so-sure-connections-week-'.$start->format('W').'-'.$start->format('Y').'.csv"'
+                'attachment; filename="so-sure-connections-week-' .
+                $start->format('W') .
+                '-' .
+                $start->format('Y') .
+                '.csv"'
             );
         } elseif ($periodType == 'month') {
             $month = (new \DateTime())->sub(new \DateInterval("P{$periodNumber}M"));
@@ -490,10 +497,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $end = $this->endOfMonth($month);
             $response->headers->set(
                 'Content-Disposition',
-                'attachment; filename="so-sure-connections-'.$start->format('F-Y').'.csv"'
+                'attachment; filename="so-sure-connections-' . $start->format('F-Y') . '.csv"'
             );
         } else {
-            throw new \Exception($periodType.' is not week/month');
+            throw new \Exception($periodType . ' is not week/month');
         }
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
@@ -1507,7 +1514,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $serialNumber = $policy->getSerialNumber();
                         if (!$serialNumber) {
-                            $serialNumber= $policy->getImei();
+                            $serialNumber = $policy->getImei();
                         }
                         $imeiService->checkSerial(
                             $policy->getPhone(),
@@ -1907,8 +1914,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $this->addFlash('success', sprintf(
                             'Rescheduled scheduled payment for %s',
                             $scheduledPayment->getScheduled() ?
-                                    $scheduledPayment->getScheduled()->format('d M Y') :
-                                    '?'
+                                $scheduledPayment->getScheduled()->format('d M Y') :
+                                '?'
                         ));
                     }
 
@@ -2031,8 +2038,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
-        $censusDM = $this->getCensusManager();
-        $postcodeRepo = $censusDM->getRepository(PostCode::class);
         $postcode = null;
         $census = null;
         $income = null;
@@ -2172,12 +2177,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     }
 
                     if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
-                            $this->addFlash(
-                                'error',
-                                'User is missing details (mobile/address/etc)'
-                            );
+                        $this->addFlash(
+                            'error',
+                            'User is missing details (mobile/address/etc)'
+                        );
 
-                            return $this->redirectToRoute('admin_user', ['id' => $id]);
+                        return $this->redirectToRoute('admin_user', ['id' => $id]);
                     }
 
                     $policyService = $this->get('app.policy');
@@ -2619,8 +2624,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $snappyPdf->getOutputFromHtml($html),
             200,
             array(
-                'Content-Type'          => 'application/pdf',
-                'Content-Disposition'   => sprintf('attachment; filename="so-sure-pl-%d-%d.pdf"', $year, $month)
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => sprintf('attachment; filename="so-sure-pl-%d-%d.pdf"', $year, $month)
             )
         );
     }
@@ -2900,8 +2905,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $connectForm->handleRequest($request);
                     if ($connectForm->isValid()) {
                         if ($sourceUser = $userRepo->findOneBy([
-                                'emailCanonical' => mb_strtolower($connectForm->getData()['email'])
-                            ])) {
+                            'emailCanonical' => mb_strtolower($connectForm->getData()['email'])
+                        ])) {
                             $reward = $rewardRepo->find($connectForm->getData()['rewardId']);
                             $invitationService = $this->get('app.invitation');
                             foreach ($sourceUser->getValidPolicies() as $policy) {
@@ -3271,8 +3276,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $policyService->getBreakdownPdf(),
             200,
             array(
-                'Content-Type'          => 'application/pdf',
-                'Content-Disposition'   =>
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' =>
                     sprintf('attachment; filename="so-sure-policy-breakdown-%s.pdf"', $now->format('Y-m-d'))
             )
         );
@@ -3659,7 +3664,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $affiliateService->processOptimiseCsv($uploadedFile);
                         $this->addFlash('success', 'File Processed');
                     } catch (\Exception $e) {
-                        $this->addFlash('error', $e->getMessage().", file not saved.");
+                        $this->addFlash('error', $e->getMessage() . ", file not saved.");
                     }
                     return new RedirectResponse($this->generateUrl('admin_optimise_csv'));
                 }
@@ -3727,7 +3732,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
                     $this->addFlash('success', 'Added affiliate');
                 } else {
-                    $this->addFlash('error', sprintf('Unable to add company. %s', (string) $companyForm->getErrors()));
+                    $this->addFlash(
+                        'error',
+                        sprintf('Unable to add company. %s', (string) $companyForm->getErrors())
+                    );
                 }
                 return new RedirectResponse($this->generateUrl('admin_affiliate'));
             }
@@ -3788,9 +3796,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $affiliate->setPromotion($promotion);
                         // History Information.
                         if ($oldPromotion) {
-                            $affiliate->createNote($user, "Promotion Removed: ".$oldPromotion->getName());
+                            $affiliate->createNote($user, "Promotion Removed: " . $oldPromotion->getName());
                         }
-                        $affiliate->createNote($user, "Promotion Added: ".$promotion->getName());
+                        $affiliate->createNote($user, "Promotion Added: " . $promotion->getName());
                         // Finalise.
                         $this->getManager()->flush();
                         $this->addFlash("success", "Added promotion to affiliate.");
@@ -3942,5 +3950,39 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $promotionRepository = $dm->getRepository(Promotion::class);
         $promotion = $promotionRepository->find($id);
         return ["promotion" => $promotion];
+    }
+
+    /**
+     * @Route("/postcodes", name="admin_annual_postcodes")
+     * @Template("AppBundle:AdminEmployee:postcodes.html.twig")
+     */
+    public function postcodesAction(Request $request)
+    {
+        $dm = $this->getManager();
+
+        $postcodeForm = $this->get('form.factory')
+            ->createNamedBuilder('postcodeForm', PostcodeType::class, null, ['method' => 'POST'])
+            ->getForm();
+        try {
+            $postcodeForm->handleRequest($request);
+            if ($postcodeForm->isSubmitted() && $postcodeForm->isValid()) {
+                $postcode = $postcodeForm->getData();
+                $postcode->setAdded(new \DateTime());
+                $dm->persist($postcode);
+                $dm->flush();
+                $this->addFlash('success', 'Added Postcode');
+                return new RedirectResponse($this->generateUrl('admin_annual_postcodes'));
+            }
+        } catch (\Exception $e) {
+            $this->addFlash(
+                'error',
+                $e->getMessage()
+            );
+        }
+        /** @var PostcodeRepository $postcodeRepository */
+        $postcodeRepository = $dm->getRepository(Postcode::class);
+        $postcodes = $postcodeRepository->findBy(["type" => Postcode::POSTCODE]);
+        $outCodes = $postcodeRepository->findBy(["type" => Postcode::OUTCODE]);
+        return ["postcodes" => $postcodes, "outcodes" => $outCodes, "postcodeForm" => $postcodeForm->createView()];
     }
 }
