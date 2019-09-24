@@ -76,9 +76,11 @@ class OpsReportCommand extends ContainerAwareCommand
             'CSP Report',
             'tech+ops@so-sure.com',
             "CSP report generated.\n\n"
+                . "Number of CSP violations: " . count($items) . "\n"
                 . "Bucket: " . $this->bucket . "\n"
                 . "Folder: " . $this->folder . "\n"
-                . "Follow the following link to download from S3 (this link will be valid for 1 week):\n\n"
+                . "Click the following link to download from S3 "
+                . "(this link will be valid for 1 week):\n\n"
                 . $this->createS3PresignedUrl($fileName)
         );
         unset($file);
