@@ -2219,7 +2219,7 @@ class BacsService
             }
         }
 
-        if ($policy->getPolicyExpirationDate() < $scheduledDate) {
+        if ($policy->getStaticEnd() < $scheduledDate) {
             if (!$ignoreNotEnoughTime) {
                 $msg = sprintf(
                     'Cancelling scheduled payment %s on policy %s as payment date is after expiration date',
