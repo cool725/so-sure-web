@@ -26,7 +26,10 @@ class OpsReportCommand extends ContainerAwareCommand
     /** @var S3Client */
     protected $s3;
 
+    /** @var string */
     protected $bucket;
+
+    /** @var string */
     protected $folder;
 
     public function __construct(MailerService $mailerService, Client $redis, S3Client $s3)
