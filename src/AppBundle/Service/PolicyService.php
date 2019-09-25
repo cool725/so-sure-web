@@ -928,9 +928,9 @@ class PolicyService
     /**
      * Cancels a policy's existing schedule of scheduled payments and creates a new schedule based on the current
      * state of the policy.
-     * @param Policy $policy is the policy to regenerate the schedule for.
-     * @param \DateTime $date is to be considered the current date.
-     * @param int       $numPayments is the number of payments desired.
+     * @param Policy    $policy        is the policy to regenerate the schedule for.
+     * @param \DateTime $date          is to be considered the current date.
+     * @param int       $numPayments   is the number of payments desired.
      * @param float     $billingOffset is the amount of apparently owed money not to factor into schedule.
      */
     public function regenerateScheduledPayments(
