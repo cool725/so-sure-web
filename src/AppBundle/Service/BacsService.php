@@ -867,8 +867,6 @@ class BacsService
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true, false);
-                    $rescheduled = $submittedPayment->getScheduledPayment()->reschedule();
-                    $policy->addScheduledPayment($rescheduled);
 
                     // Cancel scheduled payment.
                     $scheduledPayment = $submittedPayment->getScheduledPayment();
@@ -884,7 +882,7 @@ class BacsService
                     if ($scheduledPayment) {
                         $this->dispatcher->dispatch(
                             ScheduledPaymentEvent::EVENT_FAILED,
-                            new ScheduledPaymentEvent($scheduledPayment, null, $returnCode == 0)
+                            new ScheduledPaymentEvent($scheduledPayment, null)
                         );
                     }
                     $results['failed-payments']++;
@@ -2146,7 +2144,7 @@ class BacsService
 
         $this->mailerService->send(
             'Bacs Warnings',
-            'tech+ops@so-sure.com',
+            ['tech+ops@so-sure.com', 'alex@so-sure.com'],
             join('<br>', $this->warnings)
         );
 
@@ -2172,8 +2170,9 @@ class BacsService
 
         if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
             $msg = sprintf(
-                'Cancelling (scheduled) payment %s policy is not valid',
-                $id
+                'Cancelling scheduled payment %s on policy %s as policy is not valid',
+                $id,
+                $policy->getId()
             );
             $this->warnings[] = $msg;
             return self::VALIDATE_CANCEL;
@@ -2181,8 +2180,9 @@ class BacsService
 
         if (!$bacs || !$bacs->getBankAccount()) {
             $msg = sprintf(
-                'Skipping (scheduled) payment %s as unable to determine payment method or missing bank account',
-                $id
+                'Skipping scheduled payment %s on policy %s as cant determine payment method or missing bank account',
+                $id,
+                $policy->getId()
             );
             $this->warnings[] = $msg;
             return self::VALIDATE_SKIP;
@@ -2199,8 +2199,9 @@ class BacsService
             BankAccount::MANDATE_FAILURE
         ])) {
             $msg = sprintf(
-                'Cancelling (scheduled) payment %s as mandate is %s',
+                'Cancelling scheduled payment %s on policy %s as mandate is %s',
                 $id,
+                $policy->getId(),
                 $bankAccount->getMandateStatus()
             );
             $this->warnings[] = $msg;
@@ -2211,16 +2212,21 @@ class BacsService
                 $this->logger->info("skipping first scheduled payment {$id} as mandate is not set up yet.");
                 return self::VALIDATE_SKIP;
             } else {
-                $this->warnings[] = "Rescheduling scheduled payment {$id} as mandate is not set up yet.";
+                $this->warnings[] = sprintf(
+                    'Rescheduling scheduled payment %s on policy %s as mandate is not set up yet.',
+                    $id,
+                    $policy->getId()
+                );
                 return self::VALIDATE_RESCHEDULE;
             }
         }
 
-        if ($policy->getPolicyExpirationDate() < $scheduledDate) {
+        if ($policy->getStaticEnd() < $scheduledDate) {
             if (!$ignoreNotEnoughTime) {
                 $msg = sprintf(
-                    'Cancelling (scheduled) payment %s as payment date is after expiration date',
-                    $id
+                    'Cancelling scheduled payment %s on policy %s as payment date is after expiration date',
+                    $id,
+                    $policy->getId()
                 );
                 $this->warnings[] = $msg;
 
@@ -2229,7 +2235,7 @@ class BacsService
 
             // @codingStandardsIgnoreStart
             $msg = sprintf(
-                'Running admin (scheduled) payment %s for policy %s. Warning! Payment date is after expiration date and should be immediately manually approved',
+                'Running admin scheduled payment %s for policy %s. Warning! Payment date is after expiration date and should be immediately manually approved',
                 $id,
                 $policy->getId()
             );
@@ -2248,8 +2254,9 @@ class BacsService
                 }
                 // @codingStandardsIgnoreStart
                 $msg = sprintf(
-                    '(scheduled) payment %s on %s processing day is too early/late (expected: %d max: %d initial: %s) (running anyway)',
+                    'scheduled payment %s for policy %s on %s processing day is too early/late (expected: %d max: %d initial: %s) (running anyway)',
                     $id,
+                    $policy->getId(),
                     $scheduledDate->format('d/m/y'),
                     $bankAccount->getNotificationDay(),
                     $bankAccount->getMaxAllowedProcessingDay(),
