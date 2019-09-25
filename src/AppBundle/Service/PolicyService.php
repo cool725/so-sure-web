@@ -925,6 +925,14 @@ class PolicyService
         }
     }
 
+    /**
+     * Cancels a policy's existing schedule of scheduled payments and creates a new schedule based on the current
+     * state of the policy.
+     * @param Policy $policy is the policy to regenerate the schedule for.
+     * @param \DateTime $date is to be considered the current date.
+     * @param int       $numPayments is the number of payments desired.
+     * @param float     $billingOffset is the amount of apparently owed money not to factor into schedule.
+     */
     public function regenerateScheduledPayments(
         Policy $policy,
         \DateTime $date = null,
@@ -932,17 +940,31 @@ class PolicyService
         $billingOffset = null
     ) {
         $policy->cancelScheduledPayments();
-        $this->generateScheduledPayments($policy, $date, $numPayments, $billingOffset);
+        $this->generateScheduledPayments($policy, $date, $date, $numPayments, $billingOffset);
     }
 
+    /**
+     * Creates a schedule of payments for the given policy.
+     * @param Policy    $policy        is the policy to create the scheduled payments for.
+     * @param \DateTime $date          is the date at which to start the payments.
+     * @param \DateTime $now           is the date to be considered as the current date, and which payments should not
+     *                                 be able to scheduled more than a few business days before.
+     * @param int       $numPayments   is the number of payments desired or null for this to be deduced.
+     * @param float     $billingOffset is the amount of owed money not to add into the payment schedule.
+     * @param boolean   $renewal       is whether this policy is a renewal and thus should have a scheduled payment
+     *                                 right at their beginning.
+     */
     public function generateScheduledPayments(
         Policy $policy,
         \DateTime $date = null,
+        \DateTime $now = null,
         $numPayments = null,
         $billingOffset = null,
-        $renewal = false,
-        $isFixtures = false
+        $renewal = false
     ) {
+        if (!$now) {
+            $now = new \DateTime();
+        }
         if (!$date) {
             if (!$policy->getBilling()) {
                 throw new \Exception('Unable to generate payments if policy does not have a start date');
@@ -953,8 +975,7 @@ class PolicyService
         $date->setTimezone(SoSure::getSoSureTimezone());
         $date->setTime(3, 0);
 
-        // To determine any payments made
-        $initialDate = clone $date;
+        $minDate = (clone $now)->sub(new \DateIntervals("P4D"));
 
         $paymentItem = null;
         if (!$numPayments) {
@@ -979,7 +1000,7 @@ class PolicyService
 
         // premium installments must either be 1 or 12
         $policy->setPremiumInstallments($numPayments == 1 ? 1 : 12);
-        $paid = $policy->getTotalSuccessfulPayments($initialDate, true);
+        $paid = $policy->getTotalSuccessfulPayments($date, true);
         if ($billingOffset) {
             $paid += $billingOffset;
         }
@@ -1014,13 +1035,12 @@ class PolicyService
              * Unless it is a renewal policy
              */
             if ($numPaidPayments < 1 && $isBacs && $i === 1 && !$renewal) {
-                $scheduledDate = new \DateTime();
+                $scheduledDate = (clone $now)->add(new \DateInterval("P7D"));;
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
                 }
-                $scheduledDate->add(new \DateInterval('P7D'));
             } elseif ($renewal && $i == 1) {
-                $scheduledDate = $this->adjustDayForBilling(new \DateTime(), true);
+                $scheduledDate = $this->adjustDayForBilling($now, true);
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {
@@ -1053,7 +1073,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $this->subDays(new \DateTime(), 4) || $isFixtures) {
+            if ($scheduledDate >= $minDate) {
                 $policy->addScheduledPayment($scheduledPayment);
             } else {
                 $this->logger->error(sprintf(
