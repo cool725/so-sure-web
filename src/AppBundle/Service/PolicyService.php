@@ -497,7 +497,7 @@ class PolicyService
                 if ($billing) {
                     $dateToBill = $billing;
                 }
-                $this->generateScheduledPayments($policy, $dateToBill, $numPayments);
+                $this->generateScheduledPayments($policy, $dateToBill, $date, $numPayments);
                 $policy->arePolicyScheduledPaymentsCorrect(true);
             } else {
                 $policy->setPremiumInstallments($numPayments);
