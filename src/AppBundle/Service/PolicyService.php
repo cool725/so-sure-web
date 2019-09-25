@@ -2046,7 +2046,7 @@ class PolicyService
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
                 $date ? $date : \DateTime::createFromFormat('U', time())
             );
-            if ($policy->hasPolicyOrPayerOrUserJudoPaymentMethod()) {
+            if ($policy->hasCheckoutPaymentMethod()) {
                 $scheduledPayment = new ScheduledPayment();
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
                 $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
@@ -2426,7 +2426,7 @@ class PolicyService
          * We cannot do this any earlier in the renewal in case the payment
          * method changes.
          */
-        if (!$newPolicy->hasPaymentMethod()) {
+        if (!$newPolicy->hasPaymentMethod() && $policy->getPaymentMethod()) {
             $newPolicy->setPaymentMethod(clone $policy->getPaymentMethod());
         }
 
