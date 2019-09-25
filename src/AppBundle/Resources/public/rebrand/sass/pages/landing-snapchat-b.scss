@@ -15,7 +15,7 @@
 
     @include snapchat-gradient;
 
-    .container {
+    .container-large {
         position: relative;
         z-index: 4;
     }
@@ -49,24 +49,6 @@
 
         @include media-breakpoint-up(lg) {
             // right: 100px;
-        }
-    }
-}
-
-.cred {
-    text-align: center;
-    background-color: $ultramarine;
-    position: relative;
-    z-index: 5;
-
-    img {
-        width: 100px;
-        margin: 0.5rem;
-        // opacity: 0.3;
-
-        @include media-breakpoint-up(lg) {
-            width: 120px;
-            margin: 0;
         }
     }
 }

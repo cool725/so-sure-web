@@ -21,9 +21,9 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container container-xtra">
+        <div class="container-large">
             <div class="row">
-                <div class="col-lg-5">
+                <div class="col-lg-6">
                     <div class="hero__intro">
                         <h1 class="mb-4 text-columbia-blue-e fit">
                             {% if scode is defined and scode and scode.policy %}
@@ -66,23 +66,33 @@
                         </div>
                     </div>
                     <div class="hero__controls mb-4">
-                        <a href="#"
-                           class="btn btn-white btn-block-xs mr-sm-2 track-data get-a-quote disabled"
-                           data-event="
-                            {% if scode is defined and scode and scode.policy %}
-                                scode-hero-quote-btn-{{ user_code }}
-                            {% else %}
-                                scode-hero-quote-btn
-                            {% endif %}
-                           ">
-                           Get your quote</a>
-                        <a id="user_feedback_btn"
-                           href="#user_feedback"
-                           class="btn btn-outline-white btn-block-xs mr-sm-2">
-                           No thank you</a>
+                        <div class="mb-4">
+                            <a href="#"
+                               class="btn btn-white btn-block-xs mr-md-2 track-data get-a-quote disabled"
+                               data-event="
+                                {% if scode is defined and scode and scode.policy %}
+                                    scode-hero-quote-btn-{{ user_code }}
+                                {% else %}
+                                    scode-hero-quote-btn
+                                {% endif %}
+                               ">
+                               Get your quote</a>
+                            <a id="user_login_btn"
+                               href="{{ path('user_home') }}"
+                               class="btn btn-outline-white btn-block-xs">
+                                Login to connect 💰</a>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <a id="user_feedback_btn"
+                                   href="#user_feedback"
+                                   class="btn-simple-link text-white">
+                                   No thank you</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-6 offset-lg-1">
+                <div class="col-lg-5 offset-lg-1">
                     <div class="hero__illustration">
 
                         {# Overlays #}
@@ -171,7 +181,7 @@
     </section>
 
     <section class="usps pb-5 pt-md-5">
-        <div class="container container-xtra">
+        <div class="container-large">
             <ul class="list-unstyled icn-fa-list d-lg-flex justify-content-lg-between">
                 <li class="mb-4 mb-lg-0 h5">
                     <i class="far fa-check fa-lg fa-fw text-success"></i>
@@ -269,7 +279,7 @@
     </section>
 
     <section id="user_feedback" class="feedback py-lg-5">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             {% include 'AppBundle::Components/_feedback.html.twig' %}
         </div>
     </section>

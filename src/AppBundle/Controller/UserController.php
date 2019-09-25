@@ -354,10 +354,6 @@ class UserController extends BaseController
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
                         );
-                        $this->get('app.sixpack')->convertByClientId(
-                            $code,
-                            SixpackService::EXPERIMENT_APP_SHARE_METHOD
-                        );
                     } else {
                         $message = 'Your bonus has been added';
                     }
@@ -1247,23 +1243,9 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        // CTA From Quote Test - Purchase
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_CTA);
-
-        // Burger vs Full Menu - Purchase
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
-
-        $smsExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_APP_LINK_SMS,
-            [
-                SixpackService::ALTERNATIVES_NO_SMS_DOWNLOAD,
-                SixpackService::ALTERNATIVES_SMS_DOWNLOAD
-            ],
-            SixpackService::LOG_MIXPANEL_NONE,
-            $user->getId(),
-            1
-        );
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
 
         return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
@@ -1272,7 +1254,6 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
-            'sms_experiment' => $smsExperiment
         ]);
     }
 

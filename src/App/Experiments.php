@@ -7,8 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        SixpackService::EXPERIMENT_QUOTE_CTA => ['cta-original', 'cta-buy-now'],
-        SixpackService::EXPERIMENT_BURGER_MENU => ['menu-burger', 'menu-full'],
+        SixpackService::EXPERIMENT_NEW_FUNNEL_V2, ['regular-funnel-v2', 'new-funnel-v2'],
     ];
 
     private static $authExperiments = [];

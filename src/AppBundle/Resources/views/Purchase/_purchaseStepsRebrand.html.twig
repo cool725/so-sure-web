@@ -4,7 +4,8 @@
             {% if step == 1 %}
                 <span class="form-steps__item-on">1</span>
             {% else %}
-                <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span>
+                <a href="{{ path('purchase_step_personal') }}" title="Personal details">
+                    <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span></a>
             {% endif  %}
         </div>
     </div>
@@ -13,7 +14,8 @@
             {% if step == 2 %}
                 <span class="form-steps__item-on">2</span>
             {% elseif step == 3 or step == 4 %}
-                <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span>
+                <a href="{{ path('purchase_step_phone_id', {'id': policy.id}) }}" title="Phone details">
+                    <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span></a>
             {% else %}
                 <span class="form-steps__item-off"></span>
             {% endif  %}
@@ -25,7 +27,8 @@
             {% if step == 3 %}
                 <span class="form-steps__item-on">3</span>
             {% elseif step == 4 %}
-                <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span>
+                <a href="{{ path('purchase_step_pledge_id', {'id': policy.id}) }}" title="Pledge of honesty">
+                    <span class="form-steps__item-done"><i class="far fa-check text-white"></i></span></a>
             {% else %}
                 <span class="form-steps__item-off"></span>
             {% endif  %}

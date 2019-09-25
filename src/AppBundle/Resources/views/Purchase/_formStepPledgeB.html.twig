@@ -1,0 +1,72 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form p-3 pt-4 p-lg-5',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off',
+}}) }}
+
+    {% set  doc_link = '<a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v13.pdf" target="_blank" rel="noopener noreferrer"><u>policy document</u></a>' %}
+
+    {# Title #}
+    <div class="h2 text-center text-primary fit mb-4 mb-lg-1">Pledge of Honesty ✍🏻</div>
+    <p class="d-none d-lg-block text-center mb-4">Before you continue to payment...</p>
+
+    {# Contents #}
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="form-group">
+                {{ form_widget(purchase_form.agreedDamage, {
+                    'label': 'My phone is in working condition & the screen is not cracked',
+                    'attr': {'class':'custom-control-input'}}
+                ) }}
+                <div class="with-errors">{{ form_errors(purchase_form.agreedDamage) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="form-group">
+                {{ form_widget(purchase_form.agreedAgeLocation, {
+                    'label': 'I am a resident of the United Kingdom and over the age of 18',
+                    'attr': {'class':'custom-control-input'}}
+                ) }}
+                <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="form-group">
+                {{ form_widget(purchase_form.agreedExcess, {
+                    'label': 'I understand the standard excess is only reduced when validated with the so-sure app',
+                    'attr': {'class':'custom-control-input'}}
+                ) }}
+                <div class="with-errors">{{ form_errors(purchase_form.agreedExcess) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 offset-sm-2">
+            <div class="form-group">
+                {{ form_widget(purchase_form.agreedTerms, {
+                    'label': 'I have read & understood the so-sure ' ~ doc_link|raw,
+                    'attr': {'class':'custom-control-input'}}
+                ) }}
+                <div class="with-errors">{{ form_errors(purchase_form.agreedTerms) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+            <div class="form-group mt-4">
+                {{ form_widget(purchase_form.next, {
+                    'label': 'I swear I\'ll be honest!',
+                    'attr': {
+                        'class': 'btn btn-success btn-block'
+                }}) }}
+            </div>
+        </div>
+    </div>
+
+{{ form_end(purchase_form) }}

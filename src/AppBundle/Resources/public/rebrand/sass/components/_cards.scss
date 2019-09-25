@@ -3,10 +3,10 @@
 .cardbox {
     max-width: 300px;
     background-color: $white;
-    border: 2px solid rgba(37,147,243, 0.2);
+    border: 2px solid rgba(37,147,243, 0.4);
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
-    @include border-radius(12px);
+    @include border-radius($g-border-radius);
 
     &__body {
         padding: 2rem;
@@ -44,8 +44,8 @@
 
 // Only using px here for consistency
 .expanding-cardbox {
-    border: 2px solid rgba(37,147,243, 0.2);
-    @include border-radius(10px);
+    border: 2px solid rgba(37,147,243, 0.4);
+    @include border-radius($g-border-radius);
 
     &__body {
         padding: 1.2rem 1.56rem 1.56rem 1.56rem;
@@ -141,7 +141,7 @@
     flex-direction: column;
     text-align: left;
     border: 2px solid $selago;
-    @include border-radius(0.85rem);
+    @include border-radius($g-border-radius);
 
     &__header {
         padding: 1rem 1.25rem;
@@ -164,7 +164,7 @@
             background-color: $dodger-blue;
             color: $white;
             cursor: pointer;
-            @include border-bottom-radius(0.85rem);
+            @include border-bottom-radius($g-border-radius);
 
             &:hover, &:focus {
                 outline: 0;
@@ -197,7 +197,7 @@
     flex-direction: column;
     text-align: left;
     border: 2px solid $selago;
-    @include border-radius(0.85rem);
+    @include border-radius($g-border-radius);
     overflow: hidden;
 
     &__header {
@@ -261,7 +261,7 @@
             background-color: $selago;
             border: 2px solid rgba(37,147,243, 0.2);
             border-bottom: none;
-            @include border-top-radius(6px);
+            @include border-top-radius($g-border-radius);
 
             transition: all 0.1s linear;
 
@@ -293,8 +293,8 @@
         border: 2px solid rgba(37,147,243, 0.2);
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
-        @include border-bottom-radius(12px);
-        @include border-top-right-radius(12px);
+        @include border-bottom-radius($g-border-radius);
+        @include border-top-right-radius($g-border-radius);
 
         // Pad the content
         padding: 2rem;

@@ -10,6 +10,7 @@ use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Postcode;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
@@ -30,6 +31,7 @@ use AppBundle\Service\CheckoutService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RequestService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -119,16 +121,7 @@ class PurchaseController extends BaseController
     {
         $session = $request->getSession();
         $user = $this->getUser();
-        /* TODO: Consider if we want warning that you're purchasing additional policy
-        if ($user && $user->hasPolicy()) {
-            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
-        }
-        */
-        /*
-        if ($user->getFirstName() && $user->getLastName() && $user->getMobileNumber() && $user->getBirthday()) {
-            return $this->redirectToRoute('purchase_step_2');
-        }
-        */
+
         if ($user) {
             $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
         }
@@ -145,11 +138,17 @@ class PurchaseController extends BaseController
             $purchase->setEmail($session->get('email'));
         }
 
-        // CTA From Quote Test - Proceed
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_CTA);
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
+            ['regular-funnel-v2', 'new-funnel-v2'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
-        // Burger vs Full Menu - Proceed
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
+        // TEMP - As using skip add extra event
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
@@ -176,7 +175,7 @@ class PurchaseController extends BaseController
                             $purchase->getEmail()
                         ));
                         // @codingStandardsIgnoreStart
-                        $err = 'It looks like you already have an account.  Please try logging in with your details';
+                        $err = 'It looks like you already have an account. Please try logging in with your details';
                         // @codingStandardsIgnoreEnd
                         $this->addFlash('error', $err);
 
@@ -248,9 +247,8 @@ class PurchaseController extends BaseController
                         $data = [];
                         $data['Facebook'] = true;
                     }
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_AB_CONTENT_HOMEPAGE);
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
@@ -268,6 +266,12 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
+        $template = 'AppBundle:Purchase:purchaseStepPersonalAddress.html.twig';
+
+        if ($homepageFunnelExp == 'new-funnel-v2') {
+            $template = 'AppBundle:Purchase:purchaseStepPersonalAddressB.html.twig';
+        }
+
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
@@ -279,11 +283,11 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
+            'funnel_exp' => $homepageFunnelExp,
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        return $this->render($template, $data);
     }
 
     /**
@@ -333,7 +337,14 @@ class PurchaseController extends BaseController
             $policy = $user->getPartialPolicies()[0];
         }
 
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_DOB);
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
+            ['regular-funnel-v2', 'new-funnel-v2'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
@@ -481,7 +492,6 @@ class PurchaseController extends BaseController
                         }
                     }
                     $dm->flush();
-
                     if ($allowContinue) {
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
                             'Device Insured' => $purchase->getPhone()->__toString(),
@@ -496,7 +506,6 @@ class PurchaseController extends BaseController
                         );
                     }
                 } else {
-                    //$this->addFlash('error', sprintf('%s', $purchaseForm->getErrors()));
                     $this->addFlash('error', sprintf(
                         'Sorry, there seems to be an error. Please check below for further details.'
                     ));
@@ -507,6 +516,10 @@ class PurchaseController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
+
+        if ($homepageFunnelExp == 'new-funnel-v2') {
+            $template = 'AppBundle:Purchase:purchaseStepPhoneB.html.twig';
+        }
 
         $data = array(
             'policy' => $policy,
@@ -519,6 +532,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
@@ -555,7 +569,6 @@ class PurchaseController extends BaseController
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
-        $cardFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_OPTION_WITH_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
         $cardProvider = SoSure::PAYMENT_PROVIDER_CHECKOUT;
 
@@ -590,7 +603,7 @@ class PurchaseController extends BaseController
 
         /** @var Form $toCardForm */
         $toCardForm = null;
-        if ($cardFeature && $checkoutFeature) {
+        if ($checkoutFeature) {
             $toCardForm =  $this->get("form.factory")
                 ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
                 ->getForm();
@@ -754,6 +767,15 @@ class PurchaseController extends BaseController
             $this->setSessionQuotePhone($request, $phone);
         }
 
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
+            ['regular-funnel-v2', 'new-funnel-v2'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
@@ -768,7 +790,6 @@ class PurchaseController extends BaseController
                         'OS' => $phone ? $phone->getOs() : null,
                         'Policy Id' => $policy->getId(),
                     ]);
-
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
@@ -779,6 +800,10 @@ class PurchaseController extends BaseController
         }
 
         $template = 'AppBundle:Purchase:purchaseStepPledge.html.twig';
+
+        if ($homepageFunnelExp == 'new-funnel-v2') {
+            $template = 'AppBundle:Purchase:purchaseStepPledgeB.html.twig';
+        }
 
         $data = array(
             'policy' => $policy,
@@ -791,6 +816,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
@@ -847,10 +873,21 @@ class PurchaseController extends BaseController
             $this->setSessionQuotePhone($request, $phone);
         }
 
+        // A/B Funnel Test
+        // To Test use url param ?force=regular-funnel / ?force=new-funnel
+        $homepageFunnelExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
+            ['regular-funnel-v2', 'new-funnel-v2'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
             $price = $policy->getPhone()->getCurrentPhonePrice();
-            if ($price && $user->allowedMonthlyPayments()) {
+            /** @var PostcodeService $postcodeService */
+            $postcodeService = $this->get('app.postcode');
+            if ($price && $user->allowedMonthlyPayments($postcodeService)) {
                 $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
             } elseif ($price && $user->allowedYearlyPayments()) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
@@ -870,7 +907,13 @@ class PurchaseController extends BaseController
         $paymentProvider = null;
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
-        // bacs overrides any type of card payment
+        /** @var Form $toCardForm */
+        $toCardForm = null;
+        if ($checkoutFeature) {
+            $toCardForm =  $this->get("form.factory")
+                ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
+                ->getForm();
+        }        // bacs overrides any type of card payment
         if ($bacsFeature) {
             $paymentProvider = SoSure::PAYMENT_PROVIDER_BACS;
         } elseif ($checkoutFeature) {
@@ -933,12 +976,21 @@ class PurchaseController extends BaseController
                         }
                     }
                 }
+            } elseif ($request->request->has('to_card_form')) {
+                if ($checkoutFeature) {
+                    // TODO
+                    NoOp::ignore([]);
+                }
             }
         }
 
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
+
+        if ($homepageFunnelExp == 'new-funnel-v2') {
+            $template = 'AppBundle:Purchase:purchaseStepPaymentB.html.twig';
+        }
 
         $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->adjustDayForBilling($now);
@@ -958,8 +1010,13 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
+            'funnel_exp' => $homepageFunnelExp,
         );
 
+        if ($toCardForm) {
+            $data['to_card_form'] = $toCardForm->createView();
+            $data['card_provider'] = $paymentProvider;
+        }
         return $this->render($template, $data);
     }
 
@@ -1364,6 +1421,16 @@ class PurchaseController extends BaseController
 
             $token = $request->get("token");
             $pennies = $request->get("pennies");
+            $freq = $request->get('premium');
+            if ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_MONTHLY) {
+                $policy->setPremiumInstallments(12);
+                $this->getManager()->flush();
+            } elseif ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_YEARLY) {
+                $policy->setPremiumInstallments(1);
+                $this->getManager()->flush();
+            } elseif ($request->get('_route') == 'purchase_checkout') {
+                throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+            }
             $csrf = $request->get("csrf");
             $publicKey = $request->get("cko-public-key");
             $cardToken = $request->get("cko-card-token");

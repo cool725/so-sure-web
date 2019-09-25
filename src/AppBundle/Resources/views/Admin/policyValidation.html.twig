@@ -30,6 +30,7 @@
                         <th>Policy</th>
                         <th>Current Status</th>
                         <th>Validation</th>
+                        <th>Claims</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -56,15 +57,19 @@
                                     {% endfor %}
                                     </ul>
                                 </td>
-                                <td>
+                                <td class="h5 {% if validate.countClaims > 0 %}text-danger{% else %}text-success{% endif %}">
+                                    <i class="far {% if validate.countClaims > 0 %}fa-check{% else %}fa-times{% endif %} fa-fw"></i> <span>{{ validate.countClaims }}</span>
+                                </td>
+                                <td class="inline-strict">
                                     <form method="POST">
                                         <button name="flag-redis-policy"
                                                 type="submit"
-                                                class="btn {% if validate.id in flags %}btn-success{% else %}btn-secondary{% endif %} btn-square btn-sm flag-redis-policy mb-1 mr-md-2">
+                                                class="btn {% if validate.id in flags %}btn-success{% else %}btn-secondary{% endif %} btn-sm flag-redis-policy mb-1"
+                                                {% if validate.id in flags %}value="remove"{% endif %}>
                                                 <i class="fas fa-flag"></i></button>
                                         <button name="delete-redis-policy"
                                                 type="submit"
-                                                class="btn btn-secondary btn-square btn-sm delete-redis-policy mb-1 mr-md-2">
+                                                class="btn btn-secondary btn-sm delete-redis-policy mb-1">
                                             <i class="fal fa-trash-alt"></i></button>
                                         <input type="hidden" name="id" value="{{ validate.id }}"/>
                                         <input type="hidden" name="token" value="{{ csrf_token('default') }}"/>

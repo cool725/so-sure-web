@@ -262,6 +262,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         'id' => $policy->getId(),
                         'policyNumber' => $policy->getPolicyNumber(),
                         'issues' => $validation,
+                        'countClaims' => count($policy->getClaims())
                     ]) => 0]);
                 }
             } else {
@@ -301,6 +302,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                             'id' => $policy->getId(),
                             'policyNumber' => $policy->getPolicyNumber(),
                             'issues' => $validation,
+                            'countClaims' => count($policy->getClaims())
                         ]) => 0]);
                     }
                 }
@@ -554,13 +556,23 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
                 ($refundMismatch ||$refundCommissionMismatch )) {
-                $lines[] = sprintf(
-                    'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
-                    $refund,
-                    $pendingBacsTotal,
-                    $refundCommission,
-                    $pendingBacsTotalCommission
-                );
+                if ($refund != 0 && $pendingBacsTotal == 0) {
+                    $lines[] = sprintf(
+                        'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
+                        $refund,
+                        $pendingBacsTotal,
+                        $refundCommission,
+                        $pendingBacsTotalCommission
+                    );
+                } elseif ($refund === 0 && $refundCommission !== 0) {
+                    if ($refundCommission !== $pendingBacsTotalCommission) {
+                        $lines[] = $this->failureRefundCommissionMessage(
+                            $policy,
+                            $refundCommission,
+                            $pendingBacsTotalCommission
+                        );
+                    }
+                }
             }
 
             // bacs checks are only necessary on active policies
@@ -651,6 +663,16 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $policy->getTotalCommissionPaid(),
             $policy->getExpectedCommission($date)
+        );
+    }
+
+    private function failureRefundCommissionMessage(Policy $policy, $expected, $actual)
+    {
+        return sprintf(
+            'Incorrect commission on refund for policy %s (Paid: %0.2f Expected: %0.2f)',
+            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
+            $actual,
+            $expected
         );
     }
 

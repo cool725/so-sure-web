@@ -15,7 +15,7 @@
 
     @include blue-gradient;
 
-    .container {
+    .container-large {
         position: relative;
         z-index: 4;
     }
@@ -72,24 +72,6 @@
     @include media-breakpoint-up(lg) {
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/youtube/so-sure_youtube-hero-background-offset.svg');
-        }
-    }
-}
-
-.cred {
-    text-align: center;
-    background-color: $ultramarine;
-    position: relative;
-    z-index: 5;
-
-    img {
-        width: 100px;
-        margin: 0.5rem;
-        // opacity: 0.3;
-
-        @include media-breakpoint-up(lg) {
-            width: 120px;
-            margin: 0;
         }
     }
 }

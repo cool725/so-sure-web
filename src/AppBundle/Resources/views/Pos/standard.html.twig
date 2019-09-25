@@ -14,7 +14,7 @@
 {% block body %}
 
     <section class="portal d-flex align-items-center">
-        <div class="container">
+        <div class="container-large">
             <div class="portal__inner">
 
                 <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="200px" class="mb-4 d-block mx-auto" alt="so-sure">
@@ -38,7 +38,7 @@
                                     <div class="with-errors">{{ form_errors(lead_form.submittedBy) }}</div>
                                 </div>
                                 <div class="form-group text-center mb-4">
-                                    <a id="begin_btn" href="#" class="btn btn-primary btn-square">Begin</a>
+                                    <a id="begin_btn" href="#" class="btn btn-primary">Begin</a>
                                 </div>
                                 {#<div class="form-group text-center">#}
                                     {#<h5 class="text-center text-muted mb-4">OR</h5>#}
@@ -99,9 +99,9 @@
                                     <div class="with-errors">{{ form_errors(lead_form.optin) }}</div>
                                 </div>
                                 <div class="form-group d-flex justify-content-between align-items-center mb-0">
-                                    <a id="restart_btn" href="#" class="btn btn-outline-primary btn-square">Back</a>
+                                    <a id="restart_btn" href="#" class="btn btn-outline-primary">Back</a>
                                     {{ form_widget(lead_form.state) }}
-                                    {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success btn-square'}}) }}
+                                    {{ form_widget(lead_form.submit, {'attr':{'class':'btn btn-success'}}) }}
                                 </div>
                             </div>
                         {{ form_end(lead_form) }}

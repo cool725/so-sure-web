@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b5ea54fc583a730b5d36c52326676f2",
+    "content-hash": "843fda567569b053eae413835811daae",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -153,6 +153,59 @@
                 "sdk"
             ],
             "time": "2018-10-26T20:05:18+00:00"
+        },
+        {
+            "name": "aws/aws-sdk-php-symfony",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aws/aws-sdk-php-symfony.git",
+                "reference": "6a6eda7df2c72c033c5c15594ee85db7d0107784"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php-symfony/zipball/6a6eda7df2c72c033c5c15594ee85db7d0107784",
+                "reference": "6a6eda7df2c72c033c5c15594ee85db7d0107784",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "^3.2.6",
+                "php": ">=5.5",
+                "symfony/config": "~2.3|~3.0|~4.0",
+                "symfony/dependency-injection": "~2.3|~3.0|~4.0",
+                "symfony/http-kernel": "~2.3|~3.0|~4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35|^5.4.0|^6.0.0",
+                "symfony/framework-bundle": "~2.3|~3.0|~4.0",
+                "symfony/yaml": "~2.3|~3.0|~4.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Aws\\Symfony\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "A Symfony bundle for v3 of the AWS SDK for PHP",
+            "keywords": [
+                "Symfony2",
+                "amazon",
+                "aws",
+                "sdk",
+                "symfony",
+                "symfony3"
+            ],
+            "time": "2019-02-27T00:49:24+00:00"
         },
         {
             "name": "behat/transliterator",
@@ -1753,16 +1806,16 @@
         },
         {
             "name": "facebook/php-business-sdk",
-            "version": "3.2.6",
+            "version": "3.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/facebook-php-business-sdk.git",
-                "reference": "0064bac15f069c89d5b9dcca8ec477379eb21a51"
+                "reference": "dca55a5dc1f99aa828a230860b2e5bd5610354b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/0064bac15f069c89d5b9dcca8ec477379eb21a51",
-                "reference": "0064bac15f069c89d5b9dcca8ec477379eb21a51",
+                "url": "https://api.github.com/repos/facebook/facebook-php-business-sdk/zipball/dca55a5dc1f99aa828a230860b2e5bd5610354b6",
+                "reference": "dca55a5dc1f99aa828a230860b2e5bd5610354b6",
                 "shasum": ""
             },
             "require-dev": {
@@ -1786,7 +1839,7 @@
                 "page",
                 "sdk"
             ],
-            "time": "2019-01-15T23:19:09+00:00"
+            "time": "2019-07-26T19:05:24+00:00"
         },
         {
             "name": "fig/link-util",
@@ -9403,6 +9456,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-01-06T05:45:45+00:00"
         },
         {

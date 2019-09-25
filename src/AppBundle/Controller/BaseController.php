@@ -196,14 +196,14 @@ abstract class BaseController extends Controller
                 $makes[] = $phone->getMake();
             }
             $phones[$phone->getMake()][$phone->getModel()][$phone->getId()] = [
-                'memory' => $phone->getMemory(), 'featured' => $phone->isHighlight()
+                'memory' => $phone->getMemory(), 'featured' => $phone->isTopPhone()
             ];
             if ($phone->getAlternativeMake()) {
                 if (!in_array($phone->getAlternativeMake(), $makes)) {
                     $makes[] = $phone->getAlternativeMake();
                 }
                 $phones[$phone->getAlternativeMake()][$phone->getModel()][$phone->getId()] = [
-                    'memory' => $phone->getMemory(), 'featured' => $phone->isHighlight()
+                    'memory' => $phone->getMemory(), 'featured' => $phone->isTopPhone()
                 ];
             }
         }
@@ -872,7 +872,7 @@ abstract class BaseController extends Controller
         }
 
         $status = (string) $form->get('status')->getData();
-        $search = new SearchService($dm, $form);
+        $search = new SearchService($dm, $this->getParameter('kernel.environment'), $form);
 
         $policies = $search->searchPolicies();
 

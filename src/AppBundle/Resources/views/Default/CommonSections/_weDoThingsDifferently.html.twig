@@ -1,5 +1,5 @@
 <section class="differently py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png">
-    <div class="container container-xtra py-5">
+    <div class="container-large py-5">
         <h2 class="h3 mb-3 text-primary text-center">We do things  🤩 differently</h2>
         <p class="mb-5 text-center">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
         <div class="row">
@@ -26,6 +26,10 @@
                         </h5>
                         <div class="expanding-cardbox__expand mt-4">
                             We reward our careful customers.  If you and your connections don’t make a claim we return up to 80% of your premium back at the end of every policy year.
+                            {% if feature_enabled('apply-sign-up-bonus') %}
+                                <br><br>
+                                Instant &pound;5 cashback bonus when you sign up 💰
+                            {% endif %}
                         </div>
                     </div>
                 </div>

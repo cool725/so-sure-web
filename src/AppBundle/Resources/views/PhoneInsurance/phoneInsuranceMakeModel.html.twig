@@ -2,7 +2,6 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
-{% set seo_mode = true %}
 
 {% block title %}
     so-sure - phone insurance for your {{ phone.make }} {{ phone.model }}
@@ -20,7 +19,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container container-xtra">
+        <div class="container-large">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
@@ -75,11 +74,11 @@
     </section>
 
     {# Cred #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_cred.html.twig' %}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     {# Intro #}
     <section class="intro py-lg-5">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <h2 class="h3 mb-4 text-primary text-center">Why insure your {{ phone.model }} with so-sure</h2>
             {% block phone_hero_text %}{% endblock %}
             <div class="row">
@@ -107,7 +106,7 @@
     {% if hide_section == false %}
         {# Why Insure #}
         <section class="why-insure lozad py-lg-5">
-            <div class="container container-xtra py-5">
+            <div class="container-large py-5">
                 <div class="row">
                     <div class="col-lg-6">
                         <img src="{{ cdn_url }}/images/onexone.png"
@@ -152,7 +151,7 @@
     {% if hide_section == false %}
         {# Extra Content #}
         <section class="extra-content py-lg-5">
-            <div class="container container-xtra py-5">
+            <div class="container-large py-5">
                 {% block extra_content_one %}{% endblock %}
             </div>
         </section>
@@ -160,7 +159,7 @@
 
     {# Cover #}
     <section class="cover py-lg-5">
-        <div class="container container-xtra pt-lg-5">
+        <div class="container-large pt-lg-5">
             <div class="d-none d-lg-block">
                 <h2 class="h3 mb-5 text-primary text-center">Comprehensive phone insurance that starts immediately</h2>
                 <div class="row">
@@ -267,7 +266,7 @@
     </section>
 
     <section class="cover__mobile d-block d-lg-none">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <h2 class="h3 mb-4 text-primary text-center">Comprehensive phone insurance that starts immediately</h2>
             <div class="row mb-4">
                 <div class="col-lg-6">
@@ -326,7 +325,7 @@
 
     {# Why Insure Continued #}
     <section class="why-insure-continued py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-6">
                     <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
@@ -353,7 +352,7 @@
     {% if hide_section == false %}
         {# Extra Content #}
         <section class="extra-content py-lg-5">
-            <div class="container container-xtra py-5">
+            <div class="container-large py-5">
                 {% block extra_content_two %}{% endblock %}
             </div>
         </section>

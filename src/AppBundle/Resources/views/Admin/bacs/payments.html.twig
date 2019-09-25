@@ -83,7 +83,7 @@
                             {% if payment.canAction('approve') %}
                                 <button title="Mark as approved"
                                         type="button"
-                                        class="btn btn-success btn-square btn-sm mb-1 mr-md-2 bacs-approve"
+                                        class="btn btn-success btn-sm mb-1 mr-md-2 bacs-approve"
                                         data-token="{{ csrf_token('default') }}"
                                         data-bacs-approve-url="{{ path('admin_bacs_payment_approve', {'id': payment.id}) }}">
                                         Approve</button>
@@ -92,7 +92,7 @@
                             {% if payment.canAction('reject') %}
                                 <button title="Mark as rejected"
                                         type="button"
-                                        class="btn btn-danger btn-square btn-sm mb-1 mr-md-2 bacs-reject"
+                                        class="btn btn-danger btn-sm mb-1 mr-md-2 bacs-reject"
                                         data-token="{{ csrf_token('default') }}"
                                         data-bacs-reject-url="{{ path('admin_bacs_payment_reject', {'id': payment.id}) }}">
                                         Reject</button>
@@ -109,7 +109,7 @@
                             {% if payment.inProgress %}
                                 <button title="Edit Serial"
                                         type="button"
-                                        class="btn btn-warning btn-square btn-sm mb-1 mr-md-2 bacs-serial"
+                                        class="btn btn-warning btn-sm mb-1 mr-md-2 bacs-serial"
                                         data-token="{{ csrf_token('default') }}"
                                         data-serial-number="{{ payment.serialNumber }}"
                                         data-serial-number-url="{{ path('admin_bacs_payment_serial', {'id': payment.id}) }}"

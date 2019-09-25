@@ -17,6 +17,11 @@ import tracking from '../common/trackData.js';
 
 $(function() {
 
+    // Starling
+    if ($('#starling_modal').length) {
+        $('#starling_modal').modal('show');
+    }
+
     // Send app link via SMS
     let smsButtonCont = $('.onboarding__send-app-link'),
         smsBtn        = $('.onboarding__send-app-link a'),

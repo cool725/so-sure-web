@@ -21,6 +21,7 @@ Encore
     .addEntry('error', './src/AppBundle/Resources/public/rebrand/js/pages/error.js')
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
+    .addEntry('homepageB', './src/AppBundle/Resources/public/rebrand/js/pages/homepageB.js')
     .addEntry('homepage-xmas', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-xmas.js')
     .addEntry('homepage-vday', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-vday.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
@@ -48,6 +49,14 @@ Encore
     .addEntry('company-phones', './src/AppBundle/Resources/public/rebrand/js/pages/company-phones.js')
     .addEntry('usa', './src/AppBundle/Resources/public/rebrand/js/pages/usa.js')
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
+    .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')
+
+    // Homepage A/B Exp
+    .addEntry('purchase-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-b.js')
+    .addEntry('purchase-personal-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal-b.js')
+    .addEntry('purchase-phone-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-phone-b.js')
+    .addEntry('purchase-pledge-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge-b.js')
+    .addEntry('purchase-payment-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment-b.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')

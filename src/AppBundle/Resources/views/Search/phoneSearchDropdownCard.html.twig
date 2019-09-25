@@ -1,0 +1,59 @@
+<div class="cardbox cardbox-100 p-4 p-lg-5 pb-lg-0 🍆">
+    <div class="text-zaffre mb-3 h5 text-center d-md-none">Get a Quote in Seconds ⏱</div>
+    <div class="text-zaffre mb-3 h3 text-center d-none d-md-block">Get a Quote in Seconds ⏱</div>
+    <ul class="list-unstyled icn-fa-list mb-4">
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            24-72 hour replace or repair
+        </li>
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Low excess from just &pound;50
+        </li>
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Up to 80% money back
+        </li>
+    </ul>
+    {{ form_start(form_phone, { 'attr': {
+        'class': 'phone-search-dropdown-card',
+        'data-phones': phones|json_encode|raw,
+        'autocomplete': 'off'
+    }}) }}
+        <div class="form-group">
+            {{ form_widget(form_phone.make, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-make',
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.model, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-model',
+                'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.memory, {
+                'attr': {
+                    'class': 'form-control phone-search-dropdown-card__select  phone-search-option-memory',
+                    'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group mt-4 mb-0">
+            {{ form_widget(form_phone.next, {
+              'label': 'Get my quote',
+              'attr': {
+                'class': 'btn btn-secondary btn-block mb-4 phone-search-button',
+                'disabled': 'disabled'
+            }}) }}
+            <div class="text-center">
+                <a href="#cred"
+                   id="watch_tv_advert"
+                   class="text-zaffre btn-block">
+                    📺 Watch our Sky TV Ad
+                </a>
+            </div>
+        </div>
+    {{ form_end(form_phone) }}
+</div>

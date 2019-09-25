@@ -144,11 +144,9 @@ $(function(){
                 data: phone.prices,
                 columns: [
                     { title: 'Valid From', data: 'valid_from' },
-                    { title: 'Valid To', data: 'valid_to' },
                     { title: 'GWP', data: 'gwp' },
                     { title: 'Premium (current ipt rate)', data: 'premium' },
                     { title: 'Premium (ipt rate @ from date)', data: 'initial_premium' },
-                    { title: 'Premium (ipt rate @ to date)', data: 'final_premium' },
                     { title: 'Excess (Damage/Theft)', data: 'excess_detail' },
                     { title: 'picsure approved Excess (Damage/Theft)', data: 'picsure_excess_detail' },
                     { title: 'Notes', data: 'notes' }
@@ -242,6 +240,24 @@ $(function(){
 
         if (confirm('Are you sure you want to make this phone (un)highlighted?')) {
             let url = $(this).data('highlight'),
+                token = $(this).data('token');
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: { token: token },
+                success: function(result) {
+                    window.location.reload(false);
+                }
+            });
+        }
+    });
+
+    // Make top device/remove top device
+    $('.phone-topphone').on('click', function(e) {
+        e.preventDefault();
+
+        if (confirm('Are you sure you want to set/unset this as a top phone?')) {
+            let url = $(this).data('topphone'),
                 token = $(this).data('token');
             $.ajax({
                 url: url,

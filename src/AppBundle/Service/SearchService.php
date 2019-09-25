@@ -50,9 +50,16 @@ class SearchService
      */
     private $searchWithUsers = false;
 
-    public function __construct(DocumentManager $dm, FormInterface $form = null)
+    /**
+     * The environment the service is operating in.
+     * @var string
+     */
+    private $env;
+
+    public function __construct(DocumentManager $dm, $env, FormInterface $form = null)
     {
         $this->dm = $dm;
+        $this->env = $env;
         $this->form = $form;
         $this->initQueryBuilders();
     }
@@ -81,6 +88,13 @@ class SearchService
                 ->toArray();
         }
         $data = $this->form->getNormData();
+        if (array_key_exists('policy', $data)) {
+            if ($this->env == 'prod') {
+                $data['policy'] = mb_convert_case($data['policy'], MB_CASE_TITLE);
+            } else {
+                $data['policy'] = mb_convert_case($data['policy'], MB_CASE_UPPER);
+            }
+        }
         if ($data['mobile']) {
             $formatter = new MobileNumberHelper($data['mobile']);
             /**

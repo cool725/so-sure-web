@@ -25,19 +25,14 @@ class SixpackService
     // don't log to mixpanel
     const LOG_MIXPANEL_NONE = 'none';
 
-    const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
-    const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
-    const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
-    // const EXPERIMENT_SOCIAL_AD_LANDING = 'ad-landing-quotepage';
-    const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 1
-    // const EXPERIMENT_QUOTE_PAGE_CTA = 'cta-yes-please';
+    // const EXPERIMENT_NEW_FUNNEL = 'New Funnel';
     // Exp 2
-    const EXPERIMENT_BURGER_MENU = 'burger-vs-full';
+    const EXPERIMENT_NEW_FUNNEL_V2 = 'New Funnel V2';
     // Exp 3
-    const EXPERIMENT_QUOTE_CTA = 'cta-buy-now';
+    // const EXPERIMENT_APP_REQUEST_PICSURE_LOCATION = 'app-request-picsure-location';
     // Exp 4
-    //
+    // const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 5
     //
     // Exp 6
@@ -53,17 +48,8 @@ class SixpackService
     // Exp 11
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
-    const ALTERNATIVES_SMS_DOWNLOAD = 'sms-download';
-    const ALTERNATIVES_NO_SMS_DOWNLOAD = 'no-sms-download';
-    const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
-    const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
-    const ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION = 'request-location';
-    const ALTERNATIVES_APP_PICSURE_NO_LOCATION = 'no-location';
 
-    const KPI_RECEIVE_DETAILS = 'receive-details';
-    const KPI_QUOTE = 'quote';
     const KPI_POLICY_PURCHASE = 'policy-purchase';
-    const KPI_FIRST_LOGIN_APP = 'first-login-app';
 
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
 
@@ -123,15 +109,23 @@ class SixpackService
         'email-landing-text',
         'ad-landing-quotepage',
         'cta-yes-please',
+        'app-share-method',
+        'cta-buy-now',
+        'burger-vs-full',
+        'old-vs-new-funnel',
+        'app-picsure-location',
+        'app-request-picsure-location',
+        'app-link-sms',
+        'New Funnel'
     ];
 
     public static $unauthExperiments = [
-        // Exp 1.1
-        // self::EXPERIMENT_QUOTE_PAGE_CTA,
+        // Exp 1
+        // self::EXPERIMENT_NEW_FUNNEL,
         // Exp 2
-        self::EXPERIMENT_BURGER_MENU,
+        self::EXPERIMENT_NEW_FUNNEL_V2,
         // Exp 3
-        self::EXPERIMENT_QUOTE_CTA,
+        //
         // Exp 4
         //
         // Exp 5
@@ -151,31 +145,61 @@ class SixpackService
     ];
 
     public static $authExperiments = [
-        self::EXPERIMENT_APP_SHARE_METHOD,
-        self::EXPERIMENT_APP_PICSURE_LOCATION,
-        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
+        // Exp 1
+        // self::EXPERIMENT_APP_PICSURE_LOCATION,
+        // Exp 2
+        // self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
+        // Exp 3
+        //
+        // Exp 4
+        //
+        // Exp 5
+        //
+        // Exp 6
+        //
+        // Exp 7
+        //
+        // Exp 8
+        //
+        // Exp 9
+        //
+        // Exp 10
+        //
+        // Exp 11
+        //
     ];
 
     public static $appExperiments = [
-        self::EXPERIMENT_APP_SHARE_METHOD => [
-            self::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
-            self::ALTERNATIVES_APP_SHARE_METHOD_API,
-        ],
-        self::EXPERIMENT_APP_PICSURE_LOCATION => [
-            self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
-            self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
-        ],
-        self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION => [
-            self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
-            self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
-        ],
+        // Exp 1
+        // self::EXPERIMENT_APP_PICSURE_LOCATION
+        // Exp 2
+        // self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION
+        // Exp 3
+        //
+        // Exp 4
+        //
+        // Exp 5
+        //
+        // Exp 6
+        //
+        // Exp 7
+        //
+        // Exp 8
+        //
+        // Exp 9
+        //
+        // Exp 10
+        //
+        // Exp 11
+        //
+
     ];
 
     public static function getAppParticipationByClientId()
     {
         return array_diff(
             array_intersect(self::$authExperiments, array_keys(self::$appExperiments)),
-            array(self::EXPERIMENT_APP_SHARE_METHOD)
+            []
         );
     }
 
@@ -184,11 +208,10 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        // self::EXPERIMENT_SOCIAL_AD_LANDING,
         // Exp 1
-
+        self::EXPERIMENT_NEW_FUNNEL_V2,
         // Exp 2
-
+        //
         // Exp 3
         //
         // Exp 4
@@ -215,11 +238,11 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        // self::EXPERIMENT_QUOTE_PAGE_CTA,
+        // self::EXPERIMENT_NEW_FUNNEL,
         // Exp 2
-        self::EXPERIMENT_BURGER_MENU,
+        //
         // Exp 3
-        self::EXPERIMENT_QUOTE_CTA,
+        //
         // Exp 4
         //
         // Exp 5
@@ -360,11 +383,7 @@ class SixpackService
         $policyHolder = $this->requestService->getUser() && $this->requestService->getUser()->hasPolicy();
         if (($logMixpanel == self::LOG_MIXPANEL_CONVERSION && !$policyHolder) ||
             $logMixpanel == self::LOG_MIXPANEL_ALL) {
-            if (in_array($experiment, [
-                self::EXPERIMENT_APP_SHARE_METHOD,
-            ])) {
-                $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
-            } elseif (in_array($experiment, self::$authExperiments)) {
+            if (in_array($experiment, self::$authExperiments)) {
                 $this->mixpanel->queuePersonProperties(
                     ['Sixpack' => sprintf('%s=%s', $experiment, $result)],
                     false,

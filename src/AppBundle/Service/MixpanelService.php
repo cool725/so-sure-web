@@ -60,8 +60,10 @@ class MixpanelService
         self::QUEUE_FREEZE_ATTRIBUTION
     ];
 
+    // Homepage
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
+    const EVENT_QUOTE_PAGE_PURCHASE = 'Quote Page Purchase Step';
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
 
@@ -71,6 +73,8 @@ class MixpanelService
     const EVENT_CPC_QUOTE_PAGE = 'CPC Quote Page';
     const EVENT_CPC_MANUFACTURER_PAGE = 'CPC Manufacturer Page';
     const EVENT_CPC_COMPETITOR_PAGE = 'CPC Competitor Page';
+
+    // Get details
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
     const EVENT_PAYMENT = 'Payment';
@@ -95,6 +99,7 @@ class MixpanelService
     const EVENT_ONBOARDING = 'Track Onboarding Interaction';
     const EVENT_POLICY_STATUS = 'Policy Status Change';
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
+    const EVENT_PROMO_PAGE = 'Promo Page';
 
     const EVENT_EMAIL = 'Email Sent';
     const EVENT_SMS = 'Sms Sent';
@@ -116,6 +121,7 @@ class MixpanelService
     public static $events = [
         self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
         self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
+        self::EVENT_QUOTE_PAGE_PURCHASE => Stats::MIXPANEL_QUOTES_UK,
         self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
         self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
         self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
@@ -144,6 +150,7 @@ class MixpanelService
     public static $trackedEvents = [
         self::EVENT_HOME_PAGE,
         self::EVENT_QUOTE_PAGE,
+        self::EVENT_QUOTE_PAGE_PURCHASE,
         self::EVENT_MANUFACTURER_PAGE,
         self::EVENT_LANDING_PAGE,
         self::EVENT_CPC_QUOTE_PAGE,
@@ -173,7 +180,8 @@ class MixpanelService
         self::EVENT_POLICY_STATUS,
         self::EVENT_PAYMENT_METHOD_CHANGED,
         self::EVENT_EMAIL,
-        self::EVENT_SMS
+        self::EVENT_SMS,
+        self::EVENT_PROMO_PAGE
     ];
 
     public static function getCampaignSources($event)
@@ -330,7 +338,7 @@ class MixpanelService
         if (!$user) {
             return;
         }
-        
+
         list($firstAttribution, $lastAttribution) = $this->findAttributionsForUser($user);
 
         if ($firstAttribution) {

@@ -99,7 +99,7 @@ twig:
         cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
         rollbar_client_access_token: "%rollbar_client_access_token%"
         checkout_public_key: "%checkout_apipublic%"
-        business_address: "Relay Builiding\n 114 Whitechapel High Street\n London\n E1 7PT\n UK"
+        business_address: "Relay Building\n 114 Whitechapel High Street\n London\n E1 7PT\n UK"
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
 
 doctrine_mongodb:
@@ -487,6 +487,8 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - http://track.omguk.com
+                - https://track.omguk.com
                 - 'data:'
             connect-src:
                 - 'self'
@@ -541,6 +543,7 @@ nelmio_security:
                 - https://tr.snapchat.com
                 - https://smct.co
                 - http://smct.co
+                - https://ep.smct.co
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -753,6 +756,7 @@ nelmio_security:
                 - https://use.fontawesome.com
                 - https://pro.fontawesome.com
                 - https://fonts.gstatic.com
+                - https://fonts.smct.co
                 - 'data:'
             child-src:
                 - 'self'
@@ -788,6 +792,8 @@ nelmio_security:
                 - https://static.criteo.net
                 - https://smct.co
                 - http://smct.co
+                - http://track.omguk.com
+                - https://track.omguk.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -1090,6 +1096,7 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - https://fonts.smct.co
             img-src:
                 - 'self'
                 - https://wearesosure.com
@@ -1152,6 +1159,10 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - https://pixel.leadzu.com
+                - https://ssl.gstatic.com
+                - https://ep.smct.co
+                - https://*.smct.co
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

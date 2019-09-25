@@ -17,7 +17,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container">
+        <div class="container-large">
             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" class="img-center" alt="Broken phone logo" width="160px" />
             <h1 class="h2 mb-4">Cancel your policy</h1>
             <p>Please tell us why you'd like to cancel:</p>
@@ -76,11 +76,11 @@
                         {{ form_widget(cancel_form.othertxt, {'attr': {'class': 'form-control hideme', 'placeholder': 'Add your message...'}}) }}
                     </div>
                     <div class="form-group mt-4">
-                        <a href="{{ path('homepage')}}" class="btn btn-primary btn-square mr-2">🥳 I want to stay</a>
+                        <a href="{{ path('homepage')}}" class="btn btn-primary mr-2">🥳 I want to stay</a>
                         {{ form_widget(cancel_form.cancel,  {
                             'label': '😔 Cancel',
                             'attr': {
-                                'class': 'btn btn-white text-muted btn-square',
+                                'class': 'btn btn-white text-muted',
                                 'data-event': ''
                         }}) }}
                     </div>

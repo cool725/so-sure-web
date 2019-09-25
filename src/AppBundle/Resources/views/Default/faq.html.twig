@@ -2,8 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'faq' %}
-{# {% set scrollspy = 1 %} #}
-{# {% set scrollspyID = '#faq-nav' %} #}
+{% set split_mode = true %}
 
 {% block title %}so-sure - Frequently Asked Questions{% endblock %}
 
@@ -158,6 +157,16 @@
                             <div class="expanding-cardbox__expand mt-4">
                                 Your screen is cracked, no worries, we've got your back.
                                 We aim to repair your device within 24-72 hours once your claim is approved, however some repairs may take a little longer. Rest assured we are obsessed about getting you up and running quickly that's why it will be a few additional days compared to a few weeks with some of our competition.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
+                                What is the warranty on refurbished devices? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h5>
+                            <div class="expanding-cardbox__expand mt-4">
+                                <p class="mb-0">All refurbished devices come with a warranty provided by the supplier of that refurbished phone. This warranty varies by device and supplier, but all phones come with a minimum warranty of three months and over 80% of supplied phones have a 12 month warranty.</p>
                             </div>
                         </div>
                     </div>
@@ -511,7 +520,7 @@
                                 Can I cancel my policy if I have a successful claim? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
                             </h5>
                             <div class="expanding-cardbox__expand mt-4">
-                                No sorry you can't, if you have had a successful claim with us, then <mark>you are bound by the policy contract and terms and conditions and must pay until your policy has expired which is a period of 1 year</mark>.  If you claim is in review, you can withdraw your claim and cancel your policy.
+                                No sorry you can't, if you have had a successful claim with us, then <mark>you are bound by the policy contract and terms and conditions and must pay until your policy has expired which is a period of 1 year</mark>. If your claim is in review, you can withdraw your claim and cancel your policy.
                             </div>
                         </div>
                     </div>
@@ -612,6 +621,7 @@
                                 <p>We are online, you can contact us via:</p>
                                 <ul class="mb-0">
                                     <li class="mb-2"><a href="#" class="open-intercom">Live chat</a> <mark>{{ support_hours }}</mark></li>
+                                    <li class="mb-2">Live chat is not available on bank holidays.</li>
                                     <li class="mb-2">Emailing us at <a href="mailto:support@spam.so-sure.net" class="mailto append-email">support</a></li>
                                     <li class="mb-2">If you have a claim you can call our claims team on <a href="tel:01133209722">0113 320 9722</a> <small>local rates apply</small></li>
                                 </ul>

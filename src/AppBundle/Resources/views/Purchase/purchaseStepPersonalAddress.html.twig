@@ -75,12 +75,15 @@
                         </div>
                         <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                             <span class="sub">For only</span>
-                            {% if not app.user or app.user.allowedMonthlyPayments %}
+                            {% if not app.user or app.user.allowedMonthly %}
                                 &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
                             {% else %}
                                 &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
+                        {% if feature_enabled('apply-sign-up-bonus') %}
+                            <p class="text-white text-center text-lg-left mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
+                        {% endif %}
                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
                             <a href="#qpw-info-mobile"
                                id="qpw-info-btn"
@@ -92,8 +95,10 @@
                             <div class="purchase__footer__text">
                                 <h4 class="text-columbia-blue-e">An amazing level of cover:</h4>
                                 <ul class="list-unstyled icn-fa-list">
-                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cracked Screens, Theft, Loss and much more</li>
-                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Instant Cover and 24/7 live support</li><li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 replacement phone once claim approved</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 24-72 hour replacement or repair</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Low excess from just &pound;50</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% money back</li>
+                                    <li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> New, secondhand &amp; refurbished phones</li>
                                 </ul>
                             </div>
                             <div class="qpw__footer__cta">
@@ -114,21 +119,6 @@
                     <div id="qpw-info" class="qpw__info__container mt-4 collapse">
                         {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' %}
                     </div>
-
-                    {# Curve Mobile #}
-                    <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="Artboard-Copy" fill="#FFFFFF" fill-rule="nonzero">
-                                <g id="SVG-Layer" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) ">
-                                    <g id="Page-1">
-                                        <g id="Artboard">
-                                            <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(-1, 1) rotate(-180.000000) translate(-375.000000, -23.500000) "></path>
-                                        </g>
-                                    </g>
-                                </g>
-                            </g>
-                        </g>
-                    </svg>
                 </div>
 
                 {# Curve Desktop #}
@@ -157,7 +147,7 @@
             {% else %}
                 <div class="purchase__details__container">
                     <div class="purchase__details p-4 p-lg-5 mt-5">
-                        <h2 class="text-white h1 mb-5">Whoops, no phone selected... 😩</h2>
+                        <h2 class="text-white h1 mb-5 fit">Whoops, no phone selected... 😩</h2>
                         <a href="#"
                            class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
                            data-event="no-phone-in-session">

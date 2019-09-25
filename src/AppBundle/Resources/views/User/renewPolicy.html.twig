@@ -15,7 +15,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container">
+        <div class="container-large">
             <h1 class="h2 mb-4">Renew your policy 🤗</h1>
             <div class="d-lg-flex justify-content-lg-between mb-4">
                 <div class="cardbox cardbox-100 mb-4 mr-lg-4">
@@ -118,7 +118,7 @@
                             <li class="mb-4">I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v13.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
                         </ol>
                         <div class="form-group">
-                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-square btn-block-xs'}}) }}
+                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(renew_form) }}
                 </div>

@@ -41,7 +41,7 @@ class OpsReportCommandTest extends KernelTestCase
     {
 
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand(self::$mailer, self::$redis));
+        $application->add(new OpsReportCommand(self::$mailer, self::$redis, self::$container->get('aws.s3')));
         $command = $application->find('sosure:ops:report');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(

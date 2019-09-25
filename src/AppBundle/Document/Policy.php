@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\CallNote;
@@ -880,12 +881,15 @@ abstract class Policy
         });
     }
 
+    /**
+     * Gives the set of dates that the policy's premium schedule should consist of.
+     * @return array|null of the dates, and null if there is simply no schedule at all because the policy is not valid.
+     */
     public function getInvoiceSchedule()
     {
         if (!$this->isPolicy()) {
             return null;
         }
-
         $invoiceDates = [];
         $invoiceDate = clone $this->billing;
         for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
@@ -894,7 +898,6 @@ abstract class Policy
                 $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
             }
         }
-
         return $invoiceDates;
     }
 
@@ -1379,6 +1382,20 @@ abstract class Policy
         if ($this->billing && $this->billing != $billing && !$this->isPolicyPaidToDate($changeDate)) {
             throw new \Exception('Unable to changing billing date unless policy is paid to date');
         }
+        /**
+         * Billing should always be at 3am now, so when we set it we need to ensure that it is.
+         */
+        $billing->setTimezone(SoSure::getSoSureTimezone());
+        $billing->setTime(3, 0);
+        $this->billing = $billing;
+    }
+
+    /**
+     * Sets billing without validation.
+     * @param \DateTime $billing is the billing date to set.
+     */
+    public function setBillingForce(\DateTime $billing)
+    {
         $this->billing = $billing;
     }
 
@@ -2206,6 +2223,18 @@ abstract class Policy
         return $this->scodes;
     }
 
+    /**
+     * Returns the first scode that the policy has.
+     * @return SCode|null the first scode or null if there are none.
+     */
+    public function getFirstScode()
+    {
+        foreach ($this->scodes as $scode) {
+            return $scode;
+        }
+        return null;
+    }
+
     public function getActiveSCodes()
     {
         $scodes = [];
@@ -2587,6 +2616,55 @@ abstract class Policy
     {
         // TODO: Eventually remove this method
         return $this->getPaymentMethod();
+    }
+
+    /**
+     * Returns the policy that this policy is an upgrade of, if such a policy exists.
+     * Note that this method has to guess a bit because there is no direct information about this stored. If two
+     * policies are created after a policy is cancelled for upgrade, only one of those policies will say it is
+     * upgraded from that policy by this method, thus it is accurate for numerical reporting purposes, but historically
+     * the other one might actually have been the upgrade.
+     * @return Policy|null the previous policy if there is one.
+     */
+    public function getUpgradedFrom()
+    {
+        $user = $this->getUser();
+        if (!$user || $this->hasPreviousPolicy()) {
+            return null;
+        }
+        $policies = $user->getAllPolicyPolicies();
+        // Get all the users policies that were cancelled in ascending order of cancellation.
+        $cancelledUpgrade = [];
+        foreach ($policies as $policy) {
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
+                $policy->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+                $cancelledUpgrade[] = $policy;
+            }
+        }
+        usort($cancelledUpgrade, function ($a, $b) {
+            return ($a->getEnd() < $b->getEnd()) ? -1 : 1;
+        });
+        // Now match these to the oldest eligible created policy created within 24 hours.
+        usort($policies, function ($a, $b) {
+            return ($a->getStart() < $b->getStart()) ? -1 : 1;
+        });
+        $start = 0;
+        foreach ($cancelledUpgrade as $prior) {
+            $cancellationDate = $prior->getEnd()->getTimestamp();
+            for ($i = $start; $i < count($policies); $i++) {
+                $startDate = $policies[$i]->getStart()->getTimestamp();
+                if ($startDate <= $cancellationDate) {
+                    $start++;
+                } elseif ($startDate < $cancellationDate + 60 * 60 * 24) {
+                    if ($policies[$i]->getId() == $this->getId()) {
+                        return $prior;
+                    }
+                    $start++;
+                    break;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -3248,6 +3326,11 @@ abstract class Policy
         return $this->toTwoDp($totalCommission);
     }
 
+    /**
+     * Returns the total of coverholder commission in the policy's successful payments.
+     * @param array|null $payments is an optional subset of payments to use.
+     * @return float the totalled coverholder commission.
+     */
     public function getCoverholderCommissionPaid($payments = null)
     {
         $coverholderCommission = 0;
@@ -3257,13 +3340,11 @@ abstract class Policy
         if ($payments === null) {
             $payments = $this->getPayments();
         }
-
         foreach ($payments as $payment) {
             if ($payment->isSuccess()) {
-                $coverholderCommission += $payment->getTotalCommission();
+                $coverholderCommission += $payment->getCoverholderCommission();
             }
         }
-
         return $this->toTwoDp($coverholderCommission);
     }
 
@@ -3463,6 +3544,22 @@ abstract class Policy
             return self::RISK_NOT_CONNECTED_ESTABLISHED_POLICY;
             // return self::RISK_LEVEL_MEDIUM;
         }
+    }
+
+    /**
+     * Tells you what generation of renewals this policy is. If it is not a renewal it will return 1, if it is
+     * a renewal of a policy that is not a renewal it will return 2, etc.
+     * @return int the generation number that it is.
+     */
+    public function getGeneration()
+    {
+        $policy = $this;
+        $generation = 0;
+        while ($policy) {
+            $policy = $policy->getPreviousPolicy();
+            $generation++;
+        }
+        return $generation;
     }
 
     public function isPolicyWithin21Days($date = null)
@@ -3843,6 +3940,11 @@ abstract class Policy
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
             ));
+        }
+
+        // if it has a pending bacs payment it can stay for the time being.
+        if (count($this->getPendingBacsPayments(true)) > 0) {
+            return false;
         }
 
         if ($date == null) {
@@ -4435,7 +4537,14 @@ abstract class Policy
         $tooLate = clone $this->getStart();
         $tooLate = $tooLate->add(new \DateInterval('P7D'));
         if ($date < $this->getStart() || $date > $tooLate) {
-            throw new \Exception('Unable to activate a policy if more than 7 days after start date or before start');
+            throw new \Exception(
+                sprintf(
+                    'Unable to activate policy %s if not between policy dates. Must be after %s and before %s',
+                    $this->getId(),
+                    $this->getStart()->format('Y-m-d H:i:s'),
+                    $tooLate->format('Y-m-d H:i:s')
+                )
+            );
         }
 
         $this->setStatus(Policy::STATUS_ACTIVE);
@@ -5305,14 +5414,26 @@ abstract class Policy
         if ($this->areEqualToTwoDp($outstandingPremium, $totalScheduledPayments)) {
             return true;
         } elseif ($this->isUnpaidCloseToExpirationDate($date) || $this->isUnpaidBacs()) {
+            $standardTotal = $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+            $finalTotal = $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice();
             if ($this->areEqualToTwoDp(
                 $outstandingPremium,
-                $totalScheduledPayments + $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+                $standardTotal
             )) {
                 return true;
             } elseif ($this->areEqualToTwoDp(
                 $outstandingPremium,
-                $totalScheduledPayments + $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+                $finalTotal
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $standardTotal - $this->getScheduledPaymentRefundAmount()
+            )) {
+                return true;
+            } elseif ($this->areEqualToTwoDp(
+                $outstandingPremium,
+                $finalTotal - $this->getScheduledPaymentRefundAmount()
             )) {
                 return true;
             }
@@ -6212,6 +6333,7 @@ abstract class Policy
                 null,
             'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
             'card_details' => $cardDetails,
+            'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ? $this->getOutstandingPremiumToDate() : 0
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

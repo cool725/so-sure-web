@@ -94,20 +94,18 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $payment->setAmount(6);
             $policy->addPayment($payment);
             $payment->setCommission();
+            $payment->setSuccess(true);
 
             // monthly
-            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $this->assertEquals(Salva::MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
             $this->assertEquals(Salva::MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
         }
 
+        // final month
         $payment = new CheckoutPayment();
         $payment->setAmount(6);
         $policy->addPayment($payment);
         $payment->setCommission();
-
-        // final month
-        $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
         $this->assertEquals(Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
         $this->assertEquals(Salva::FINAL_MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
     }
@@ -149,6 +147,97 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setAmount(2);
         $policy->addPayment($payment);
         $payment->setCommission();
+    }
+
+    /**
+     * Returns a list of test cases for last payment commission designed to mirror real life cases where there were
+     * bugs.
+     * @return array containing the test cases.
+     */
+    public function setLastCommissionRealisticProvider()
+    {
+        return [
+            "Mr. D. L." => ['2018-09-24', 6.52, 0.12, 7],
+            "Ms. E. R." => ['2018-09-25', 7.58, 0.12, 7],
+            "Mr. W. P." => ['2018-09-25', 6.69, 0.12, 7],
+            "Ms. H. D." => ['2018-09-25', 8.92, 0.12, 7]
+        ];
+    }
+
+    /**
+     * Tests commission is set correctly on real life cases that were buggy in production.
+     * @param \DateTime $start   is the start date of the policy.
+     * @param number    $gwp     is the gwp for the policy's premium.
+     * @param number    $iptRate is the rate of ipt for the premium.
+     * @param int       $nJudo   is the number of judo payments the policy has before switching to checkout.
+     * @dataProvider setLastCommissionRealisticProvider
+     */
+    public function testSetLastCommissionRealistic($start, $gwp, $iptRate, $nJudo)
+    {
+        $date = new \DateTime($start);
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp($gwp);
+        $premium->setIptRate($iptRate);
+        $premium->setIpt($gwp * $iptRate);
+        $policy->setPremium($premium);
+        $policy->setStart($date);
+        for ($i = 0; $i < $nJudo; $i++) {
+            $payment = new JudoPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $date = (clone $date)->add(new \DateInterval("P1M"));
+            $payment->setDate($date);
+            $policy->addPayment($payment);
+            $payment->setCommission();
+            $payment->setSuccess(true);
+            $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
+        }
+        for ($i = $nJudo; $i < 11; $i++) {
+            $payment = new CheckoutPayment();
+            $date = (clone $date)->add(new \DateInterval("P1M"));
+            $payment->setDate($date);
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $policy->addPayment($payment);
+            $payment->setSuccess(true);
+            $payment->setCommission();
+            $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
+        }
+        $this->assertEquals($premium->getMonthlyPremiumPrice(), $policy->getOutstandingPremium());
+        $payment = new CheckoutPayment();
+        $date = (clone $date)->add(new \DateInterval("P1M"));
+        $payment->setDate($date);
+        $payment->setAmount($premium->getMonthlyPremiumPrice());
+        $policy->addPayment($payment);
+        $payment->setSuccess(true);
+        $payment->setCommission();
+        $this->assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
+    }
+
+    /**
+     * Tests a scenario in which the commission is set on the final payment before it is set to successful and makes
+     * sure that it still calculates it correctly.
+     */
+    public function testSetLastCommissionNotYetSuccessful()
+    {
+        $date = new \DateTime();
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(12);
+        $premium->setIptRate(0.2);
+        $premium->setIpt(12 * 0.2);
+        $policy->setPremium($premium);
+        $policy->setStart($date);
+        for ($i = 0; $i < 12; $i++) {
+            $payment = new CheckoutPayment();
+            $date = (clone $date)->add(new \DateInterval("P1M"));
+            $payment->setDate($date);
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $policy->addPayment($payment);
+            $payment->setCommission();
+            $payment->setSuccess(true);
+            $comparison = $i == 11 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION;
+            $this->assertEquals($comparison, $payment->getTotalCommission());
+        }
     }
 
     public function testTimezone()
@@ -215,6 +304,63 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setSuccess(true);
         $this->assertEquals($policy->getProratedCommission($paymentDate), $policy->getTotalCommissionPaid());
     }
+
+    /**
+     * Generates testing conditions for testSetCommissionFractionalRefundData.
+     * @return array of sets of arguments to the test.
+     */
+    public function setCommissionFractionalRefundData()
+    {
+        return [
+            "Mr F. A." => [95, 4, -12.35, -0.7, -0.05]
+        ];
+    }
+
+    /**
+     * Tests setting the commission for a fractional refund.
+     * @param int   $age                   is the age of the policy in days.
+     * @param int   $nPayments             is the number of valid payments to add to the policy.
+     * @param float $amount                is the value of the refund to check.
+     * @param float $coverholderCommission is the amount of coverholder commission to expect.
+     * @param float $brokerCommission      is the amount of broker commission to expect.
+     * @dataProvider setCommissionFractionalRefundData
+     */
+    public function testSetCommissionFractionalRefund(
+        $age,
+        $nPayments,
+        $amount,
+        $coverholderCommission,
+        $brokerCommission
+    ) {
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(1);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+        $date = new \DateTime();
+        $end = $this->addDays($date, $age);
+        $policyEnd = (clone $date)->add(new \DateInterval("P1Y"));
+        $policy->setStart($date);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setEnd($policyEnd);
+        $policy->setStaticEnd($policyEnd);
+        for ($i = 0; $i < $nPayments; $i++) {
+            $payment = new BacsPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $payment->setSuccess(true);
+            $policy->addPayment($payment);
+            $payment->setCommission(true);
+        }
+        $payment = new BacsPayment();
+        $payment->setAmount($amount);
+        $payment->setDate($end);
+        $policy->addPayment($payment);
+        $payment->setCommission(true, $end);
+        // Perform the check.
+        $this->assertEquals($coverholderCommission, $payment->getCoverholderCommission());
+        $this->assertEquals($brokerCommission, $payment->getBrokerCommission());
+    }
+
 
     /**
      * @expectedException \AppBundle\Exception\CommissionException

@@ -165,6 +165,8 @@ class PhoneInsuranceController extends BaseController
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
+        $skipToPurchase = $request->get('skip');
+
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             return new RedirectResponse($this->generateUrl('homepage'));
         }
@@ -177,7 +179,7 @@ class PhoneInsuranceController extends BaseController
         if ($id) {
             /** @var Phone $phone */
             $phone = $repo->find($id);
-            if ($phone->getMemory()) {
+            if ($phone->getMemory() && !$skipToPurchase) {
                 return $this->redirectToRoute('quote_make_model_memory', [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getEncodedModelCanonical(),
@@ -185,10 +187,12 @@ class PhoneInsuranceController extends BaseController
                 ], 301);
             }
 
-            return $this->redirectToRoute('quote_make_model', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical(),
-            ], 301);
+            if (!$skipToPurchase) {
+                return $this->redirectToRoute('quote_make_model', [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
+                ], 301);
+            }
         }
 
         if ($memory) {
@@ -206,7 +210,7 @@ class PhoneInsuranceController extends BaseController
                     'modelCanonical' => mb_strtolower($model),
                     'memory' => (int) $memory
                 ]);
-                if ($phone) {
+                if ($phone && !$skipToPurchase) {
                     return $this->redirectToRoute('quote_make_model_memory', [
                         'make' => $phone->getMakeCanonical(),
                         'model' => $phone->getEncodedModelCanonical(),
@@ -233,7 +237,7 @@ class PhoneInsuranceController extends BaseController
                     'makeCanonical' => mb_strtolower($make),
                     'modelCanonical' => mb_strtolower($model)
                 ]);
-                if ($phone) {
+                if ($phone && !$skipToPurchase) {
                     return $this->redirectToRoute('quote_make_model', [
                         'make' => $phone->getMakeCanonical(),
                         'model' => $phone->getEncodedModelCanonical()
@@ -251,7 +255,7 @@ class PhoneInsuranceController extends BaseController
             ));
 
             return new RedirectResponse($this->generateUrl('homepage'));
-        } elseif (!$phone->isSameMakeModelCanonical($make, $model)) {
+        } elseif (!$phone->isSameMakeModelCanonical($make, $model) && !$skipToPurchase) {
             return $this->redirectToRoute('quote_make_model_memory', [
                 'make' => $phone->getMakeCanonical(),
                 'model' => $phone->getEncodedModelCanonical(),
@@ -260,6 +264,11 @@ class PhoneInsuranceController extends BaseController
         }
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
+
+        if ($skipToPurchase) {
+            // A/B Funnel Test
+            return $this->redirectToRoute('purchase_step_personal');
+        }
 
         $user = new User();
 
@@ -274,17 +283,6 @@ class PhoneInsuranceController extends BaseController
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
         $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
         $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
-
-        // A/B CTA Test
-        // To Test use url param ?force=cta-original / ?force=cta-buy-now
-        $ctaText = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_QUOTE_CTA,
-            ['cta-original', 'cta-buy-now']
-        );
-
-        // Burger vs Full Menu - Proceed
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_BURGER_MENU);
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
@@ -474,92 +472,14 @@ class PhoneInsuranceController extends BaseController
             'pixel-3-xl',
         ];
 
-        // BlackBerry Generic
-        $blackberry = [
-            'dekt50'
-        ];
-
-        // HTC One Generic
-        $htcOne = [
-            'one-a9',
-            'one-m8s',
-            'one-m9',
-            'one-x9',
-        ];
-
-        $huaweiP9 = [
-            'p9',
-            'p9-plus',
-            'p9-lite'
-        ];
-
-        $motorolaMoto = [
-            'moto-g4-play',
-            'moto-g',
-            'moto-g5s-plus',
-            'moto-e4-plus',
-            'moto-g5',
-            'moto-g5s',
-            'moto-g6',
-            'moto-e3',
-            'moto-g-(3rd-gen)'
-        ];
-
-        $galaxyS5 = [
-            'galaxy-s5-neo',
-            'galaxy-s5-mini'
-        ];
-
-        $sonyXperia = [
-            'xperia-e4g',
-            'xperia-e4',
-            'xperia-xz1',
-            'xperia-e5',
-            'xperia-zx',
-            'xperia-z5-premium',
-            'xperia-z5-compact',
-            'xperia-z5',
-            'xperia-m4-aqua',
-            'xperia-xz3',
-            'xperia-xz2-compact',
-            'xperia-xz2',
-            'xperia-z3-plus',
-            'xperia-xz-premium',
-            'xperia-xa2-ultra',
-            'xperia-xa2',
-            'xperia-xa1-ultra',
-            'xperia-xa1',
-            'xperia-xa-ultra',
-            'xperia-xa',
-            'xperia-x',
-            'xperia-m5',
-        ];
-
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
         $hideSection = false;
 
         // SEO pages
-        // TODO: Add check if file exists or redirect to 404
-
         if ($request->get('_route') == 'quote_make_model') {
             // Model template
             $templateModel = $modelHyph.'.html.twig';
             $template = 'AppBundle:PhoneInsurance/Phones:'.$templateModel;
-
-            // If certain models share the same template - check
-            if (in_array($modelHyph, $blackberry)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:blackberry.html.twig';
-            } elseif (in_array($modelHyph, $htcOne)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:htc-one.html.twig';
-            } elseif (in_array($modelHyph, $huaweiP9)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:huawei-p9.html.twig';
-            } elseif (in_array($modelHyph, $motorolaMoto)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:motorola-moto.html.twig';
-            } elseif (in_array($modelHyph, $galaxyS5)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:galaxy-s5.html.twig';
-            } elseif (in_array($modelHyph, $sonyXperia)) {
-                $template = 'AppBundle:PhoneInsurance/Phones:sony-xperia.html.twig';
-            }
 
             // Check if template exists
             if (!$this->get('templating')->exists($template)) {
@@ -593,11 +513,85 @@ class PhoneInsuranceController extends BaseController
             'web_base_url'     => $this->getParameter('web_base_url'),
             'img_url'          => $modelHyph,
             'available_images' => $availableImages,
-            'cta_exp'          => $ctaText,
             'hide_section'     => $hideSection,
         );
 
+        if ($skipToPurchase) {
+            return $this->redirectToRoute('purchase');
+        }
         return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/quote-me/{id}", name="quote_me", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/quote-me/{make}+{model}+{memory}GB", name="quote_me_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     */
+    public function quoteMe($id = null, $make = null, $model = null, $memory = null)
+    {
+        // For generic use by insurance aggregator sites
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $decodedModel = Phone::decodeModel($model);
+        $phone = null;
+        if ($id) {
+            /** @var Phone $phone */
+            $phone = $repo->find($id);
+        }
+        if ($memory) {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModel),
+                'memory' => (int) $memory
+            ]);
+        }
+        if ($phone) {
+            $response = new JsonResponse([
+                'phoneId' => $phone->getId(),
+                'price' => [
+                    'monthlyPremium' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentPhonePrice()->getYearlyPremiumPrice()
+                ],
+                'productOverrides' => [
+                    'excesses' => $phone->getCurrentPhonePrice()->getExcess() ?
+                        $phone->getCurrentPhonePrice()->getExcess()->toApiArray() :
+                        [],
+                    'picsureExcesses' => $phone->getCurrentPhonePrice()->getPicSureExcess() ?
+                        $phone->getCurrentPhonePrice()->getPicSureExcess()->toApiArray() :
+                        []
+                ],
+                'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
+                    str_replace(' ', '+', $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory())
+                    .'GB?skip=1'
+            ]);
+            return $response;
+        }
+
+        throw $this->createNotFoundException('Phone not found');
+    }
+
+    /**
+     * @Route("/list-phones", name="list_phones")
+     */
+    public function listPhones()
+    {
+        // For generic use by insurance aggregator sites
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phones = $repo->findActive()->getQuery()->execute();
+        $list = [];
+        foreach ($phones as $phone) {
+            $list[] = [
+                'id'        => $phone->getId(),
+                'make'      => $phone->getMake(),
+                'model'     => $phone->getModel(),
+                'memory'    => $phone->getMemory()
+            ];
+        }
+        $response = new JsonResponse($list);
+        return $response;
     }
 
     private function makeBuyButtonForm(string $formName, string $buttonName = 'buy')

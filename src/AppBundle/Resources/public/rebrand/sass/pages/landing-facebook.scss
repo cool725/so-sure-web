@@ -15,7 +15,7 @@
 
     @include facebook-gradient;
 
-    .container {
+    .container-large {
         position: relative;
         z-index: 4;
     }
@@ -76,37 +76,6 @@
     }
 }
 
-// .cred {
-//     text-align: center;
-//     background-color: $ultramarine;
-//     position: relative;
-//     z-index: 5;
-
-//     img {
-//         width: 100px;
-//         margin: 0.5rem;
-//         // opacity: 0.3;
-
-//         @include media-breakpoint-up(lg) {
-//             width: 120px;
-//             margin: 0;
-//         }
-//     }
-// }
-
-.cred {
-    text-align: center;
-    background-color: darken($pattens-blue, 5%);
-
-    img {
-        width: 100px;
-        opacity: 0.6;
-
-        @include media-breakpoint-up(lg) {
-            width: 120px;
-        }
-    }
-}
 
 .intro {
     text-align: center;

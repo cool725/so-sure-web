@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-success btn-square mr-2">
+                            <button class="btn btn-success mr-2">
                                 <i class="fa fa-arrow-right fa-fw"></i>
                             </button>
                         </div>
@@ -96,19 +96,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for i in 1..31 %}
-                                    <tr>
-                                        <td>{{i }}</td>
-                                        <td>{{ judo[i]['web']['success'] }} / {{ judo[i]['web']['total'] }} ({{ (judo[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['web-standard']['success'] }} / {{ judo[i]['web-standard']['total'] }} ({{ (judo[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['web-unpaid']['success'] }} / {{ judo[i]['web-unpaid']['total'] }} ({{ (judo[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['web-remainder']['success'] }} / {{ judo[i]['web-remainder']['total'] }} ({{ (judo[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['policy']['success'] }} / {{ judo[i]['policy']['total'] }} ({{ (judo[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['token']['success'] }} / {{ judo[i]['token']['total'] }} ({{ (judo[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['mobile']['success'] }} / {{ judo[i]['mobile']['total'] }} ({{ (judo[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ judo[i]['apple-pay']['success'] }} / {{ judo[i]['apple-pay']['total'] }} ({{ (judo[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                    </tr>
-                                {% endfor %}
+                            {% for i in 1..31 %}
+                                <tr>
+                                    <td>{{i }}</td>
+                                    <td>{{ checkout[i]['web']['success'] }} / {{ checkout[i]['web']['total'] }} ({{ (checkout[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['web-standard']['success'] }} / {{ checkout[i]['web-standard']['total'] }} ({{ (checkout[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['web-unpaid']['success'] }} / {{ checkout[i]['web-unpaid']['total'] }} ({{ (checkout[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['web-remainder']['success'] }} / {{ checkout[i]['web-remainder']['total'] }} ({{ (checkout[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['policy']['success'] }} / {{ checkout[i]['policy']['total'] }} ({{ (checkout[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['token']['success'] }} / {{ checkout[i]['token']['total'] }} ({{ (checkout[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['mobile']['success'] }} / {{ checkout[i]['mobile']['total'] }} ({{ (checkout[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ checkout[i]['apple-pay']['success'] }} / {{ checkout[i]['apple-pay']['total'] }} ({{ (checkout[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -133,19 +133,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for i in 1..31 %}
-                                    <tr>
-                                        <td>{{i }}</td>
-                                        <td>{{ checkout[i]['web']['success'] }} / {{ checkout[i]['web']['total'] }} ({{ (checkout[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['web-standard']['success'] }} / {{ checkout[i]['web-standard']['total'] }} ({{ (checkout[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['web-unpaid']['success'] }} / {{ checkout[i]['web-unpaid']['total'] }} ({{ (checkout[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['web-remainder']['success'] }} / {{ checkout[i]['web-remainder']['total'] }} ({{ (checkout[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['policy']['success'] }} / {{ checkout[i]['policy']['total'] }} ({{ (checkout[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['token']['success'] }} / {{ checkout[i]['token']['total'] }} ({{ (checkout[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['mobile']['success'] }} / {{ checkout[i]['mobile']['total'] }} ({{ (checkout[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                        <td>{{ checkout[i]['apple-pay']['success'] }} / {{ checkout[i]['apple-pay']['total'] }} ({{ (checkout[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
-                                    </tr>
-                                {% endfor %}
+                            {% for i in 1..31 %}
+                                <tr>
+                                    <td>{{i }}</td>
+                                    <td>{{ judo[i]['web']['success'] }} / {{ judo[i]['web']['total'] }} ({{ (judo[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['web-standard']['success'] }} / {{ judo[i]['web-standard']['total'] }} ({{ (judo[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['web-unpaid']['success'] }} / {{ judo[i]['web-unpaid']['total'] }} ({{ (judo[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['web-remainder']['success'] }} / {{ judo[i]['web-remainder']['total'] }} ({{ (judo[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['policy']['success'] }} / {{ judo[i]['policy']['total'] }} ({{ (judo[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['token']['success'] }} / {{ judo[i]['token']['total'] }} ({{ (judo[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['mobile']['success'] }} / {{ judo[i]['mobile']['total'] }} ({{ (judo[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                    <td>{{ judo[i]['apple-pay']['success'] }} / {{ judo[i]['apple-pay']['total'] }} ({{ (judo[i]['apple-pay']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

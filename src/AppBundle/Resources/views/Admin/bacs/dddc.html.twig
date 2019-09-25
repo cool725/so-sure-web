@@ -46,20 +46,20 @@
                                 {% else %}
                                     <button title="Mark as submitted"
                                             type="button"
-                                            class="btn btn-success btn-square btn-sm mb-1 mr-md-2 bacs-submit"
+                                            class="btn btn-success btn-sm mb-1 mr-md-2 bacs-submit"
                                             data-token="{{ csrf_token('default') }}"
                                             data-bacs-action-url="{{ path('admin_bacs_submit', {'id': file.id}) }}">
                                             <i class="fas fa-check fa-fw"></i></button>
                                     <button title="Mark as cancelled"
                                             type="button"
-                                            class="btn btn-danger btn-square btn-sm mb-1 mr-md-2 bacs-cancel"
+                                            class="btn btn-danger btn-sm mb-1 mr-md-2 bacs-cancel"
                                             data-token="{{ csrf_token('default') }}"
                                             data-bacs-action-url="{{ path('admin_bacs_cancel', {'id': file.id}) }}">
                                             <i class="far fa-power-off"></i></button>
                                 {% endif %}
                             </td>
                             <td>
-                                <button class="btn btn-primary btn-square btn-sm mb-1 mr-md-2 bacs-serial-edit"
+                                <button class="btn btn-primary btn-sm mb-1 mr-md-2 bacs-serial-edit"
                                         data-serial-number="{{ file.serialNumber }}"
                                         data-serial-number-url="{{ path('admin_bacs_update_serial_number', {'id': file.id }) }}"
                                         data-toggle="modal"

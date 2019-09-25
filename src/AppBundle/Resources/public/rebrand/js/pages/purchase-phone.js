@@ -31,7 +31,7 @@ sosure.purchaseStepPhone = (function() {
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
-            onfocusout: false,
+            focusCleanup: true,
             onkeyup: false,
             onclick: false,
             rules: {
@@ -45,7 +45,7 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[serialNumber]" : {
                     required: true,
-                    alphanumeric: true
+                    // alphanumeric: true
                 }
             },
             messages: {
@@ -57,7 +57,7 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[serialNumber]" : {
                     required: 'Please enter a valid serial number',
-                    alphanumeric: 'Please enter a valid serial number'
+                    // alphanumeric: 'Please enter a valid serial number'
                 }
             },
 
@@ -112,10 +112,10 @@ $(function(){
         let timei = oimei.replace(/[\s\/]/g, '');
         $(this).val(timei);
         // If valid hide the warning
-        if (phone == 'Samsung') {
-            if ($(this).valid()) {
-                $('.samsung-imei').hide();
-            }
-        }
+        // if (phone == 'Samsung') {
+        //     if ($(this).valid()) {
+        //         $('.samsung-imei').hide();
+        //     }
+        // }
     });
 });

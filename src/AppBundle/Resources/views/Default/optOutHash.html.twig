@@ -17,7 +17,7 @@
 {% block body %}
 
     <section class="opt-out">
-        <div class="container">
+        <div class="container-large">
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <h1 class="h4 mb-4">Communication preferences for {{ email }}</h1>
@@ -29,7 +29,7 @@
                                     {{ form_widget(marketing_optout_form.categories) }}
                                 </div>
                                 <div class="form">
-                                    {{ form_widget(marketing_optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-square btn-block-xs'}}) }}
+                                    {{ form_widget(marketing_optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-block-xs'}}) }}
                                 </div>
                             {{ form_end(marketing_optout_form) }}
                         </div>
@@ -43,7 +43,7 @@
                                     {{ form_widget(optout_form.categories) }}
                                 </div>
                                 <div class="form-group">
-                                    {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-square btn-block-xs'}}) }}
+                                    {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-primary btn-block-xs'}}) }}
                                 </div>
                             {{ form_end(optout_form) }}
                         </div>

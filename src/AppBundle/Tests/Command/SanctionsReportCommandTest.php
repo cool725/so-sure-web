@@ -30,7 +30,11 @@ class SanctionsReportCommandTest extends BaseControllerTest
     {
 
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand(self::$container->get('app.mailer'), self::$redis));
+        $application->add(new OpsReportCommand(
+            self::$container->get('app.mailer'),
+            self::$redis,
+            self::$container->get('aws.s3')
+        ));
         $command = $application->find('sosure:sanctions:report');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(

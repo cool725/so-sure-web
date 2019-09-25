@@ -476,8 +476,9 @@ class OpsController extends BaseController
         if ($user->canRenewPolicy($policy) && $policy->isInRenewalTimeframe() &&
             $policy->isRenewalPending() && !$policy->hasCashback()) {
             if ((!$hasPot && $policy->getPotValue() == 0) || ($hasPot && $policy->getPotValue() > 0)) {
-                if ((!$yearlyOnly && $user->allowedMonthlyPayments()) ||
-                    ($yearlyOnly && !$user->allowedMonthlyPayments())) {
+                $postcodeService = $this->get('app.postcode');
+                if ((!$yearlyOnly && $user->allowedMonthlyPayments($postcodeService)) ||
+                    ($yearlyOnly && !$user->allowedMonthlyPayments($postcodeService))) {
                     return $policy->getPremiumPlan() == $plan;
                 }
             }

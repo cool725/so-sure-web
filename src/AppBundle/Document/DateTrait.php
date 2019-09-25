@@ -153,7 +153,7 @@ trait DateTrait
     public function startOfDay(\DateTime $date = null)
     {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime("now", SoSure::getSoSureTimezone());
         }
         $startMonth = new \DateTime(
             sprintf('%d-%d-%d 00:00:00', $date->format('Y'), $date->format('m'), $date->format('d')),
@@ -323,13 +323,19 @@ trait DateTrait
 
     public function adjustDayForBilling($date, $adjustTimeIfAdjusted = false)
     {
+        /**
+         * We want to make sure that if we adjust the day, we make sure the time is
+         * kept at 3 am on the date, no matter when the date is.
+         */
         $billingDate = clone $date;
         $billingDate = self::convertTimezone($billingDate, SoSure::getSoSureTimezone());
         if ($billingDate->format('d') > 28) {
             $billingDate->sub(new \DateInterval(sprintf('P%dD', $billingDate->format('d') - 28)));
             if ($adjustTimeIfAdjusted) {
-                $billingDate->setTime(22, 59, 59);
+                $billingDate->setTime(3, 0);
             }
+        } else {
+            $billingDate->setTime(3, 0);
         }
 
         return $billingDate;

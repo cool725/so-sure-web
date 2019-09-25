@@ -27,6 +27,7 @@ use AppBundle\Document\ScheduledPayment;
  * @MongoDB\DiscriminatorMap({
  *      "judo"="JudoPayment",
  *      "sosure"="SoSurePayment",
+ *      "sosureCourtesy"="SoSureCourtesyPayment",
  *      "checkout"="CheckoutPayment",
  *      "bacs"="BacsPayment",
  *      "bacsIndemnity"="BacsIndemnityPayment",
@@ -74,6 +75,8 @@ abstract class Payment
             return 'judo';
         } elseif ($this instanceof SoSurePayment) {
             return 'sosure';
+        } elseif ($this instanceof SoSureCourtesyPayment) {
+            return 'sosureCourtesy';
         } elseif ($this instanceof BacsPayment) {
             return 'bacs';
         } elseif ($this instanceof BacsIndemnityPayment) {
@@ -554,9 +557,10 @@ abstract class Payment
 
     /**
      * Sets the commission for this payment.
-     * @param boolean $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
+     * @param boolean   $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
+     * @param \DateTime $date          is the date and time pro rata values should be calculated for.
      */
-    public function setCommission($allowFraction = false)
+    public function setCommission($allowFraction = false, $date = null)
     {
         $policy = $this->getPolicy();
         if (!$this->getPolicy()) {
@@ -573,34 +577,25 @@ abstract class Payment
         if ($this->areEqualToFourDp($this->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
             $commission = $salva->sumBrokerFee(12, true);
             $this->setTotalCommission($commission);
-        } elseif ($premium->isEvenlyDivisible($this->getAmount()) ||
-            $premium->isEvenlyDivisible($this->getAmount(), true)) {
-            // payment should already be credited at this point
-            $fullPaid = false;
-            $lastPayment = false;
-            /**
-             * If the policy is BACs we need to add the final commission after the final payment.
-             * Otherwise we need to add it before the final payment.
-             */
-            if ($policy->hasBacsPaymentMethod()) {
-                $fullPaid = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
-            } else {
-                $lastPayment = $this->areEqualToTwoDp(
-                    $this->getAmount(),
-                    $policy->getOutstandingPremium()
-                );
-            }
-            $includeFinal = $fullPaid || $lastPayment;
+        } elseif ($amount >= 0 && ($premium->isEvenlyDivisible($this->getAmount()) ||
+            $premium->isEvenlyDivisible($this->getAmount(), true))) {
+            $comparison = $this->hasSuccess() ? 0 : $this->getAmount();
+            $includeFinal = $this->areEqualToTwoDp($comparison, $policy->getOutstandingPremium());
             $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
             $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $this->setTotalCommission($commission);
         } elseif ($allowFraction && $amount >= 0) {
             $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
         } elseif ($amount < 0) {
-            /**
-             * This must be a refund. We should allow the commission to be set pro-rated every time for refunds.
-             */
-            $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
+            if ($date === null) {
+                $date = new \DateTime();
+            }
+            $brokerCommission = $policy->getBrokerCommissionPaid();
+            $coverholderCommission = $policy->getCoverholderCommissionPaid();
+            $dueBrokerCommission = $policy->getProratedBrokerCommission($date);
+            $dueCoverholderCommission = $policy->getProratedCoverholderCommission($date);
+            $this->brokerCommission = $dueBrokerCommission - $brokerCommission;
+            $this->coverholderCommission = $dueCoverholderCommission - $coverholderCommission;
         } else {
             throw new CommissionException(sprintf(
                 'Failed to set correct commission for %f (policy %s)',

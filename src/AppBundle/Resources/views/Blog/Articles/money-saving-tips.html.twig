@@ -1,0 +1,127 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set split_mode = true %}
+
+{% block title %}so-sure - Money Saving Tips{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="blog">
+        <div class="d-lg-flex">
+
+            {# Main Content #}
+            <div class="blog__main__container">
+                <div class="blog__main px-4 px-lg-5">
+                    <article>
+                        <header class="mb-5">
+                            <hgroup>
+                                <div class="breadcrumbs">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <i class="fal fa-angle-right"></i>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            Money Saving Tips
+                                        </li>
+                                    </ul>
+                                </div>
+                                <h1 class="text-primary mb-4">Money Saving Tips</h1>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        <div rel="author">Fiona</div>
+                                    </li>
+                                    <li class="list-inline-item">|</li>
+                                    <li class="list-inline-item">
+                                        <time>Jun 29, 2018</time>
+                                    </li>
+                                </ul>
+                            </hgroup>
+                        </header>
+                        <p>How to pocket yourself a little extra cash from now up until (dare I say it) Christmas 2018 😳</p>
+                        <p>Everyone (well nearly everyone) is in the same financial boat. Working, getting paid, living it large and then waiting for pay day! In these summer months it is expensive, lots of drinks to buy in the sun, summer holidays on the beach. Anyway, as its summer, and we are not detoxing our bodies, we’re here to show you how to perform a financial detox on your wallet.</p>
+                        <h2>Switch up your bank account</h2>
+                        <p>There’s plenty of choice...</p>
+                        <p>People stick with their bank accounts for an inordinate amount of time. The average person in the UK <a href="https://www.theguardian.com/money/2013/sep/07/switching-banks-seven-day" target="_blank" rel="noopener noreferrer">stays with their bank longer than they manage to stay married</a>. Why people have this kind of personal attachment to their bank I’ll never know. However, Banks are aware of this, which is why they offer massive benefits just for switching. High Street Banks such as HSBC and First Direct will give you straight cash (up to &pound;150) just for changing to them. Not bad.</p>
+                        <p>While you may be thinking, isn’t it a massive hassle to change my bank, I mean I have to notify my work, change my utility bills, update my direct debit... Well, fear not, because since 2013, the FCA have ensured that each <a href="https://www.currentaccountswitch.co.uk/Pages/Home.aspx" target="_blank" rel="noopener noreferrer">bank makes it as easy as possible now</a>. Most banks will do their utmost to ensure that the process is as pain-free as possible. In fact, all you really need to do is notify them that you want to switch and they’ll take care of the rest.</p>
+                        <p>And then there are the challenger banks, which we love like <a href="https://www.starlingbank.com/" target="_blank" rel="noopener noreferrer">Starling</a> and <a href="https://monzo.com/" target="_blank" rel="noopener noreferrer">Monzo</a>. These guys are doing banking for the 21st century, no fees, easy to switch and online support. Nice!</p>
+                        <h2>Manage your bills</h2>
+                        <p>Make a few changes and you could gain £££'s</p>
+                        <p>This might seem like a fairly obvious one but it’s something that most people don’t care to think about in their daily lives. Even just a few tweaks can help you save a few pounds. For instance, if you turn down your thermostat by one degree you can <a href="http://www.energy-uk.org.uk/customers/save-money-on-energy-bills.html" target="_blank" rel="noopener noreferrer">save around &pound;85 per year</a> (that’s nearly as good as so-sure).</p>
+                        <p>Other ways to save money on your domestic bills is by switching out the energy inefficient things in your home. Old school bulbs may look nice but they sap money out of your wallet like a leech. Energy efficient bulbs last longer and use less electricity so save you a good amount of money in the long run.</p>
+                        <p>That’s the thing about these incremental changes. You won’t notice the saving immediately but over the long-term you definitely will. Maybe next time January comes round you’ll be in an even better position.</p>
+                        <h2>Change your insurance!</h2>
+                        <p>The insurance world can be a bad and scary place.</p>
+                        <p>We know insurance is rubbish (that’s why we created so-sure). However, it is a necessary evil — insurance is pretty darn useful when you lose your phone or damage your property. They are also kind of expensive. We think we negate that by offering you the opportunity to get money back when you don’t claim. If you and your friends don’t claim then we’ll give you up to 80% back 💰</p>
+                        <p>You could potentially time it now so that by the end of the year you’ll have collected a little <a href="{{ path('social_insurance') }}">Reward Pot</a> cash to ease the January financial blues (provided you and your friends don’t claim of course).</p>
+                        <h2>Switch utility providers</h2>
+                        <p>Websites such as USwitch make it easier than ever to make savings.</p>
+                        <p>This is something most people only research when they move into a new house. After you’ve set up the internet and chosen an electricity or gas provider, you tend to just pay the providers and forget about it all. However, if you don’t check, you won’t know whether you’re still getting a good deal.</p>
+                        <p>Similarly to your bank account, you should have a look at <a href="https://www.uswitch.com/" target="_blank" rel="noopener noreferrer">switching</a> up your <a href="https://www.comparethemarket.com/energy/" target="_blank" rel="noopener noreferrer">utility bill</a> providers. Things such the cost of your internet and also your electricity bills can really vary from area to area so it’s worth having a look to see how you can benefit.</p>
+                        <h2>Change your phone bill</h2>
+                        <p>Get the right deal and you can call someone on their cellphone all day/night long 📞</p>
+                        <p>I think it’s safe to say that we know a little bit about phones at so-sure which is why we always make sure we get the best deal with our providers. One of the biggest mistakes that people make is that they still pay the same price for their premium handset even after they’ve paid off the initial contract. By that point you fully own the phone so you are free to change the network in order to get the cheapest deal.</p>
+                        <p>There’s loads of decent SIM only deals out there and it doesn’t take much effort to find a good one. Check out <a href="https://www.giffgaff.com/" target="_blank" rel="noopener noreferrer">giffgaff</a> or <a href="http://www.three.com/" target="_blank" rel="noopener noreferrer">Three</a> for some pretty awesome all-inclusive bundles.</p>
+                        <p>Looking to gain a few financial pounds this New Year? Check out our <a href="{{ path('homepage') }}">website</a> and see how you can put on some financial weight through the magic of <a href="{{ path('social_insurance') }}">Social Insurance</a>.</p>
+                        <footer></footer>
+                    </article>
+                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
+                </div>
+            </div>
+
+            {# Sub Content #}
+            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
+                {# Curve Desktop #}
+                <div class="blog__curve">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
+                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
+                    <div class="blog__nav">
+{#                         <div id="blog-nav" class="list-group mb-5">
+                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
+                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
+                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
+                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
+                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
+                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
+                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
+                        </div> #}
+                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/blog.js') }}"></script>
+{% endblock %}

@@ -59,7 +59,13 @@
                     </a>
                 </span>
             </label>
-            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
+            {{ form_widget(purchase_form.serialNumber, {'attr':{
+                'class':'form-control',
+                'pattern': '[a-zA-Z0-9]{5,32}',
+                'title': 'Enter a valid serial number',
+                'placeholder':'Serial Number',
+                'data-hj-suppress' : ''
+            }}) }}
             {% if device_category() == 'Mobile' %}
                 <small class="form-text">Copy this from your iPhone settings: General &gt; About</small>
             {% else %}
@@ -69,30 +75,14 @@
         </div>
     {% endif %}
 
-    <div class="d-none">
-        {{ form_widget(purchase_form.fileValid, {'attr': {'style':'display:none'}}) }}
-        {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
-    </div>
-
-    <div class="form-group mt-5">
-        <div class="form-row">
-            <div class="col-3">
-                <a href="{{ path('purchase_step_personal') }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i>
-                </a>
-            </div>
-            <div class="col text-right">
-                {{ form_widget(purchase_form.next, {
-                    'label': 'Continue',
-                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                    'right': true,
-                    'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                }}) }}
-            </div>
-        </div>
+    <div class="form-group text-md-right mt-5">
+        {{ form_widget(purchase_form.next, {
+            'label': 'Continue',
+            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+            'right': true,
+            'attr': {
+                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+        }}) }}
     </div>
 
 {{ form_end(purchase_form) }}

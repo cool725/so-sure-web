@@ -6,6 +6,8 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Classes\NoOp;
+use AppBundle\Exception\CommissionException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -312,7 +314,11 @@ class BacsPayment extends Payment
 
         // Usually commission would not be set, however, if we may have needed to manully set the commission
         if ($setCommission && !$this->getTotalCommission()) {
-            $this->setCommission(true);
+            try {
+                $this->setCommission(true);
+            } catch (CommissionException $e) {
+                NoOp::ignore($e);
+            }
         }
 
         if ($this->getPolicy()->hasPolicyOrUserBacsPaymentMethod()) {

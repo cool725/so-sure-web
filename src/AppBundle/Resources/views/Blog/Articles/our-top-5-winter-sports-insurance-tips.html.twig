@@ -1,0 +1,132 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set split_mode = true %}
+
+{% block title %}so-sure - Our Top 5 Winter Sports Insurance Tips{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="blog">
+        <div class="d-lg-flex">
+
+            {# Main Content #}
+            <div class="blog__main__container">
+                <div class="blog__main px-4 px-lg-5">
+                    <article>
+                        <header class="mb-5">
+                            <hgroup>
+                                <div class="breadcrumbs">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <i class="fal fa-angle-right"></i>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            Our Top 5 Winter Sports Insurance Tips
+                                        </li>
+                                    </ul>
+                                </div>
+                                <h1 class="text-primary mb-4">Our Top 5 Winter Sports Insurance Tips</h1>
+                                <ul class="list-inline">
+                                    <li class="list-inline-item">
+                                        <div rel="author">Fiona</div>
+                                    </li>
+                                    <li class="list-inline-item">|</li>
+                                    <li class="list-inline-item">
+                                        <time>Nov 29, 2018</time>
+                                    </li>
+                                </ul>
+                            </hgroup>
+                        </header>
+                        <p>Tis the season to go skiing. Fa-la-la-la-la, la-la-la-la.</p>
+                        <p>A trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance.</p>
+                        <p>Here are a few tips for making sure that you’re safe and insured.</p>
+                        <h4>1. Get specialist cover</h4>
+                        <p>Check what travel insurance you have before you fly and update it so that you have full and comprehensive winter sports cover. Standard travel insurance will likely not cover winter sports, so you might need to arrange extra. If your annual policy doesn’t include winter sports, contact your insurer and add it on, as this will be cheaper than buying an additional one-trip policy.</p>
+                        <p>It’s also worth checking if your winter sports cover includes delayed departures and additional accommodation. When flying to the snow, there’s always a chance you might run into trouble that strands you for a night or two, so check your policy pays for this unfortunate eventuality. </p>
+                        <p>Also consider that your European Health Insurance Card (EHIC) will not pay for high-cost requirements, like mountain rescue or repatriation to the UK. So whilst an EHIC is essential, be sure to arrange insurance that includes cover for everything that (touch wood!) could go wrong.</p>
+                        <p><em><strong>Top tip:</strong>  Arrange a comprehensive winter sports cover. There are no excuses.</em></p>
+                        <h4>2. Find out where you can ski safely</h4>
+                        <p>When booking winter sports insurance, be sure to work out where you want to ski and make sure you have the required insurance so that you can do it safely.</p>
+                        <p>Even if your annual travel insurance has winter sports coverage, it won’t necessarily allow you to ski wherever you like. For example, many policies won’t cover off-piste so this will be an extra you have to add if feeling adventurous.</p>
+                        <p>When you get to your resort, always make sure that abide by local rules for where you are skiing. Insurers withdraw cover if you have an accident whilst failing to adhere to local rules.</p>
+                        <p><em><strong>Top tip:</strong>  Work out where you want to ski and arrange the necessary insurance.</em></p>
+                        <h4>3. Find out what sort of skiing you can do</h4>
+                        <p>Winter sports insurance won’t necessarily allow you to do whatever you like on a pair of skis. As mentioned, a high percentage don’t cover off-piste. An even higher percentage won’t cover heli-skiing, snowmobiling or skidooing. It’s also worth being aware of what the rules of your policy say about when you have to ski with a guide.</p>
+                        <p>Above all, just make sure you read your policy before you go and get a clear idea of what you can and can’t do. And do not fear. If you want to be more adventurous, that’s great, but arrange the extra cover so that you can do it safely.</p>
+                        <p><em><strong>Top tip:</strong>  Check what sort of skiing you are insured to do. If you want to do more, get insured.</em></p>
+                        <h4>4. Know what equipment you have to wear</h4>
+                        <p>First things first, get decent equipment. A common reason for accidents is that skiers use old or faulty equipment. A way to reduce the risk of ever having to use insurance is to use the right kit.</p>
+                        <p>Read your policy closely and make sure that you know what you have to wear to be insured. For example, it’s now common for some insurers and many resorts to enforce the wearing of helmets, especially for children and young skiers.</p>
+                        <p>Wearing protective equipment can also lower your premium. Body armour, wrist protectors and crash pants might make you look like The Terminator, but they can keep you safe and save you money.</p>
+                        <p><em><strong>Top tip:</strong>  Find out what you need to wear. And wear it.</em></p>
+                        <h4>5. Drinking isn’t allowed</h4>
+                        <p>Now, we all like to have a good time on the slopes. But, crucially, being ‘under the influence of alcohol’ (which is a murky term) can invalidate your insurance if you were to have an accident.</p>
+                        <p>Drinking whilst skiing is also dangerous as the altitude heightens the effect that alcohol has. It’s also worth remembering that alcohol can stay in your system long into the day after, thus a big night can leave you ‘under the influence’ the next morning.</p>
+                        <p>So take the utmost care when drinking and skiing. Sorry, it may sound dull, but the downside could be expensive for you if you invalidate your insurance policy, if not extremely dangerous.</p>
+                        <p><em><strong>Top tip:</strong> If you’re going to ski, ski hard and stay off the hard drinking.</em></p>
+                        <p>A skiing holiday should be a highlight of your year and, if you’re one of the lucky ones heading off to the mountains, enjoy it. But please be safe and get correctly insured before you go.</p>
+                        <p>Staying safe is really simple. Check your policy in detail before you fly. If you want to do activities and ski areas that aren’t covered, then get your insurance upgraded.</p>
+                        <p>As the old ski saying goes: <em>“You can’t buy happiness, but you can buy a ski pass”</em>. But make sure you buy insurance too and have a great time from all of us at <a href="{{ path('homepage') }}">so-sure</a>!</p>
+                        <footer></footer>
+                    </article>
+                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
+                </div>
+            </div>
+
+            {# Sub Content #}
+            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
+                {# Curve Desktop #}
+                <div class="blog__curve">
+                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <desc>Created with Sketch.</desc>
+                        <defs></defs>
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
+                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
+                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
+                    <div class="blog__nav">
+{#                         <div id="blog-nav" class="list-group mb-5">
+                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
+                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
+                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
+                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
+                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
+                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
+                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
+                        </div> #}
+                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/blog.js') }}"></script>
+{% endblock %}

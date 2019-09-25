@@ -8,9 +8,6 @@
 {% set body_class = 'quote' %}
 {% set quote_mode = true %}
 {% set cta_txt = 'Get Started' %}
-{% if cta_exp == 'cta-buy-now' %}
-    {% set cta_txt = 'Buy Now' %}
-{% endif %}
 
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - Welcome to Social Insurance{% endblock %}
 {% block meta %}
@@ -33,7 +30,7 @@
 
             {# Main Content #}
             <div class="qpw__main__container">
-                <div class="qpw__main px-4 px-lg-5">
+                <div class="qpw__main px-4 px-lg-5 pb-5">
                     <div class="qpw__h5 h5 text-white mb-4">Here’s your quote details, Insure your:</div>
                     <div class="d-flex justify-content-start align-items-center justify-content-lg-start">
                         <h1 class="qpw__h1 text-columbia-blue-e fit">
@@ -73,6 +70,9 @@
                         <span class="sub">For only</span>
                         &pound;{{ phone_price.monthlyPremiumPrice }} a month
                     </div>
+                    {% if feature_enabled('apply-sign-up-bonus') %}
+                        <p class="text-white mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
+                    {% endif %}
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': cta_txt,
@@ -109,22 +109,6 @@
                         </div>
                     </div>
                 </div>
-
-                {# Curve Mobile #}
-                <svg class="d-block d-lg-none" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 47" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g id="Artboard-Copy" fill="#FFFFFF" fill-rule="nonzero">
-                            <g id="SVG-Layer" transform="translate(375.000000, 23.500000) scale(1, -1) translate(-375.000000, -23.500000) ">
-                                <g id="Page-1">
-                                    <g id="Artboard">
-                                        <path d="M374,0 C499.333333,0 624.666667,15.6666667 750,47 L0,47 C124,15.6666667 248.666667,8.69674703e-16 374,0 Z" id="Rectangle" transform="translate(375.000000, 23.500000) scale(-1, 1) rotate(-180.000000) translate(-375.000000, -23.500000) "></path>
-                                    </g>
-                                </g>
-                            </g>
-                        </g>
-                    </g>
-                </svg>
-
             </div>
 
             {# Curve Desktop #}

@@ -51,7 +51,7 @@
                                     {% if equal_to_two_dp(paymentAmount, reportAmount) and not equal_to_two_dp(creditAmount, reportAmount) %}
                                         <button title="Update amount"
                                                 type="button"
-                                                class="btn btn-success btn-square btn-sm mb-1 mr-md-2 bacs-meta-update"
+                                                class="btn btn-success btn-sm mb-1 mr-md-2 bacs-meta-update"
                                                 data-token="{{ csrf_token('default') }}"
                                                 data-bacs-update-meta-url="{{ path('admin_bacs_update_meta', {'id': file.id, 'credit': paymentAmount}) }}">
                                             <i class="fas fa-sync-alt fa-fw"></i></button>

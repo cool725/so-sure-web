@@ -23,7 +23,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container">
+        <div class="container-large">
             <div class="row">
                 <div class="col-12 col-lg-4">
                     <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }} 🎉</h1>
@@ -57,7 +57,7 @@
                         <div class="mt-4">
                             <h5 class="mb-4">My connections</h5>
                             <div class="d-md-flex flex-wrap align-self-center justify-content-start">
-                                {% for connection in policy.connections %}
+                                {% for connection in policy.standardConnections %}
                                     <span>
                                         <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
                                              alt="{{ connection.linkedUser.name }}"
@@ -74,6 +74,25 @@
                                     </span>
                                 {% endfor %}
                             </div>
+                            <h5 class="mb-4">My rewards</h5>
+                           <div class="d-md-flex flex-wrap align-self-center justify-content-start">
+                                {% for connection in policy.rewardConnections %}
+                                    <span>
+                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
+                                             alt="{{ connection.linkedUser.name }}"
+                                             width="50px"
+                                             data-toggle="tooltip"
+                                             data-placement="top"
+                                             title="
+                                                {{ connection.linkedUser.name }} -
+                                                Reward on {{ connection.date|date('dS M') }}
+                                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                                    (£{{ connection.totalValue|number_format(2, '.', ',')  }})
+                                                {% endif %}
+                                             ">
+                                    </span>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% endif %}
                     {% if policy.canInvite %}
@@ -81,42 +100,45 @@
                             <h5 class="mt-4">Apply code</h5>
                         {% else %}
                             <h5 class="mt-4">Already received an invite or promocode?</h5>
-                            <p>Enter the unique 8-digit code below.</p>
                         {% endif %}
                         {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
                             <div class="custom-input-with-btn mb-4">
                                 {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-square btn-sm'}}) }}
+                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
                             </div>
                         {{ form_end(scode_form) }}
                     {% endif %}
                 </div>
                 <div class="col-12 col-lg-7 offset-lg-1">
-                    <div class="d-md-flex mb-4">
-                        <h5 class="mb-4">Reward Pot</h5>
-                        <div id="reward_pot_chart"
-                             class="user-chart mb-4 mx-auto"
-                             data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
-                             data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
-                            <div class="user-chart__value">
-                                <span class="text-dodger-blue h4">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
-                                <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
+                    <div class="row">
+                        <div class="col-md">
+                            <h5 class="mb-4">Reward Pot</h5>
+                            <div id="reward_pot_chart"
+                                 class="user-chart mb-4"
+                                 data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
+                                 data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
+                                <div class="user-chart__value">
+                                    <span class="text-dodger-blue h4">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
+                                    <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
+                                </div>
                             </div>
                         </div>
                         {% if policy.getCurrentConnectionValues %}
-                            {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
-                            {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
-                            <h5 class="mb-4">Connection Bonus</h5>
-                            <div id="connection_bonus_chart"
-                                 class="user-chart mb-4 mx-auto"
-                                 data-bonus-days-total="{{ days_total }}"
-                                 data-bonus-days-remaining="{{ days_left }}">
-                                <div class="user-chart__value">
-                                    <span class="text-danger h4">{{ days_left }}</span>
-                                    <br><small class="opacity-50">DAYS</small>
-                                    {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
-                                        <small class="opacity-50">UNTIL BONUS <br> REDUCED</small>
-                                    {% endif %}
+                            <div class="col-md">
+                                {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
+                                {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
+                                <h5 class="mb-4">Connection Bonus</h5>
+                                <div id="connection_bonus_chart"
+                                     class="user-chart mb-4"
+                                     data-bonus-days-total="{{ days_total }}"
+                                     data-bonus-days-remaining="{{ days_left }}">
+                                    <div class="user-chart__value">
+                                        <span class="text-danger h4">{{ days_left }}</span>
+                                        <br><small class="opacity-50">DAYS</small>
+                                        {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
+                                            <small class="opacity-50">UNTIL BONUS <br> REDUCED</small>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         {% endif %}
@@ -124,13 +146,6 @@
                     {% if policy.canInvite %}
                         {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
                             <h5>Earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback by inviting your friends to so-sure</h5>
-                            <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
-                            {% if policy.getCurrentConnectionValues %}
-                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
-                                    <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
-                                {% endif %}
-                                    <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
-                            {% endif %}
                         {% endif %}
                         <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
                             <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
@@ -144,7 +159,7 @@
                         <div class="custom-input-with-btn mb-4">
                             <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
                             <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
-                            <button class="btn btn-primary btn-copy btn-square btn-sm track-data"
+                            <button class="btn btn-primary btn-copy btn-sm track-data"
                                 data-clipboard-target="#scode_share"
                                 data-toggle="tooltip"
                                 data-placement="top"
@@ -156,10 +171,19 @@
                             <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
                             <div class="custom-input-with-btn mb-4">
                                 <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                <button class="btn btn-success btn-square btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
                                     Invite</button>
                             </div>
                         </form>
+                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                            <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
+                            {% if policy.getCurrentConnectionValues %}
+                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
+                                    <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
+                                {% endif %}
+                                    <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
                     {% if friends %}
                         <div class="card mb-4">

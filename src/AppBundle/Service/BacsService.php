@@ -748,6 +748,7 @@ class BacsService
             'failed-payments' => 0,
             'failed-value' => 0,
             'details' => [],
+            'amounts' => []
         ];
 
         /** @var UserRepository $repo */
@@ -788,7 +789,11 @@ class BacsService
             $returnDescription = $this->getNodeValue($element, 'returnDescription');
             $amount = $this->getNodeValue($element, 'valueOf');
             $results['value'] += $amount;
-            $results['amounts'][$reference] = $amount;
+            if (array_key_exists($reference, $results['amounts'])) {
+                $results['amounts'][$reference] += $amount;
+            } else {
+                $results['amounts'][$reference] = $amount;
+            }
 
             if ($reprocess) {
                 continue;
@@ -862,8 +867,6 @@ class BacsService
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true, false);
-                    $rescheduled = $submittedPayment->getScheduledPayment()->reschedule();
-                    $policy->addScheduledPayment($rescheduled);
 
                     // Cancel scheduled payment.
                     $scheduledPayment = $submittedPayment->getScheduledPayment();
@@ -879,7 +882,7 @@ class BacsService
                     if ($scheduledPayment) {
                         $this->dispatcher->dispatch(
                             ScheduledPaymentEvent::EVENT_FAILED,
-                            new ScheduledPaymentEvent($scheduledPayment, null, $returnCode == 0)
+                            new ScheduledPaymentEvent($scheduledPayment, null)
                         );
                     }
                     $results['failed-payments']++;
@@ -1997,7 +2000,8 @@ class BacsService
             $policy = $scheduledPayment->getPolicy();
 
             // If admin has rescheduled, then allow payment to go through, but should be manually approved
-            $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN;
+            $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ||
+                $policy->getDontCancelIfUnpaid();
             $validate = $this->validateBacs(
                 $policy,
                 $scheduledDate,
@@ -2138,7 +2142,7 @@ class BacsService
 
         $this->mailerService->send(
             'Bacs Warnings',
-            'tech+ops@so-sure.com',
+            ['tech+ops@so-sure.com', 'alex@so-sure.com'],
             join('<br>', $this->warnings)
         );
 
@@ -2164,21 +2168,21 @@ class BacsService
 
         if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
             $msg = sprintf(
-                'Cancelling (scheduled) payment %s policy is not valid',
-                $id
+                'Cancelling scheduled payment %s on policy %s as policy is not valid',
+                $id,
+                $policy->getId()
             );
-            $this->logger->warning($msg);
-
+            $this->warnings[] = $msg;
             return self::VALIDATE_CANCEL;
         }
 
         if (!$bacs || !$bacs->getBankAccount()) {
             $msg = sprintf(
-                'Skipping (scheduled) payment %s as unable to determine payment method or missing bank account',
-                $id
+                'Skipping scheduled payment %s on policy %s as cant determine payment method or missing bank account',
+                $id,
+                $policy->getId()
             );
-            $this->logger->warning($msg);
-
+            $this->warnings[] = $msg;
             return self::VALIDATE_SKIP;
         }
 
@@ -2193,58 +2197,34 @@ class BacsService
             BankAccount::MANDATE_FAILURE
         ])) {
             $msg = sprintf(
-                'Cancelling (scheduled) payment %s as mandate is %s',
+                'Cancelling scheduled payment %s on policy %s as mandate is %s',
                 $id,
+                $policy->getId(),
                 $bankAccount->getMandateStatus()
             );
             $this->warnings[] = $msg;
 
             return self::VALIDATE_CANCEL;
         } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
-            $msg = sprintf(
-                'Skipping (scheduled) payment %s as mandate is not enabled (%s)',
-                $id,
-                $bankAccount->getMandateStatus()
-            );
-            // for first payment, would expected that mandate may not yet be setup
             if ($bankAccount->isFirstPayment()) {
-                $this->logger->info($msg);
+                $this->logger->info("skipping first scheduled payment {$id} as mandate is not set up yet.");
+                return self::VALIDATE_SKIP;
             } else {
-                $this->warnings[] = $msg;
-            }
-
-            return self::VALIDATE_SKIP;
-        }
-
-        try {
-            if (!$bankAccount->allowedSubmission()) {
-                $msg = sprintf(
-                    'Skipping payment %s as submission is not yet allowed (must be at least %s) [Rescheduled]',
+                $this->warnings[] = sprintf(
+                    'Rescheduling scheduled payment %s on policy %s as mandate is not set up yet.',
                     $id,
-                    $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
+                    $policy->getId()
                 );
-                $this->warnings[] = $msg;
-
                 return self::VALIDATE_RESCHEDULE;
             }
-        } catch (\Exception $e) {
-            $msg = sprintf(
-                'Skipping payment %s. Error: %s',
-                $id,
-                $e->getMessage()
-            );
-            $this->warnings[] = $msg;
-
-            return self::VALIDATE_RESCHEDULE;
         }
 
-        $bacsPaymentForDateCalcs = new BacsPayment();
-        $bacsPaymentForDateCalcs->submit($scheduledDate);
-        if ($policy->getPolicyExpirationDate() < $bacsPaymentForDateCalcs->getBacsReversedDate()) {
+        if ($policy->getStaticEnd() < $scheduledDate) {
             if (!$ignoreNotEnoughTime) {
                 $msg = sprintf(
-                    'Cancelling (scheduled) payment %s as payment date is after expiration date',
-                    $id
+                    'Cancelling scheduled payment %s on policy %s as payment date is after expiration date',
+                    $id,
+                    $policy->getId()
                 );
                 $this->warnings[] = $msg;
 
@@ -2253,7 +2233,7 @@ class BacsService
 
             // @codingStandardsIgnoreStart
             $msg = sprintf(
-                'Running admin (scheduled) payment %s for policy %s. Warning! Payment date is after expiration date and should be immediately manually approved',
+                'Running admin scheduled payment %s for policy %s. Warning! Payment date is after expiration date and should be immediately manually approved',
                 $id,
                 $policy->getId()
             );
@@ -2272,8 +2252,9 @@ class BacsService
                 }
                 // @codingStandardsIgnoreStart
                 $msg = sprintf(
-                    'Skipping (scheduled) payment %s on %s as processing day is too early/late (expected: %d max: %d initial: %s)',
+                    'scheduled payment %s for policy %s on %s processing day is too early/late (expected: %d max: %d initial: %s) (running anyway)',
                     $id,
+                    $policy->getId(),
                     $scheduledDate->format('d/m/y'),
                     $bankAccount->getNotificationDay(),
                     $bankAccount->getMaxAllowedProcessingDay(),
@@ -2281,8 +2262,6 @@ class BacsService
                 );
                 // @codingStandardsIgnoreEnd
                 $this->warnings[] = $msg;
-
-                return self::VALIDATE_SKIP;
             }
         }
 

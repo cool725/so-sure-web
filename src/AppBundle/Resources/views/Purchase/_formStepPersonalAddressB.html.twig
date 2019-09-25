@@ -1,0 +1,192 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form p-3 pt-4 p-lg-5',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off',
+    'data-csrf': lead_csrf,
+    'data-lead': path('lead', {'source': 'purchase-flow'}),
+}}) }}
+
+    {# Title #}
+    <div class="h2 text-center text-primary fit mb-4 mb-lg-1">Tell us about you 👍</div>
+    <p class="d-none d-lg-block text-center mb-4">Fill in some details below and we’ll have you covered in no time</p>
+
+    {# Contents #}
+    <div class="row">
+        <div class="col-lg">
+            <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
+                {{ form_label(purchase_form.firstName, 'First Name') }}
+                {{ form_widget(purchase_form.firstName, {'attr':{
+                    'class':'form-control lead-input',
+                    'placeholder': 'Enter first name',
+                    'data-hj-suppress' : ''
+                }}) }}
+                <div class="with-errors">{{ form_errors(purchase_form.firstName) }}</div>
+            </div>
+        </div>
+        <div class="col-lg">
+            <div class="form-group {% if form_errors(purchase_form.lastName) %}has-error{% endif %}">
+                {{ form_label(purchase_form.lastName, 'Last Name') }}
+                {{ form_widget(purchase_form.lastName, {'attr':{
+                    'class':'form-control lead-input',
+                    'placeholder': 'Enter last name',
+                    'data-hj-suppress' : ''
+                }}) }}
+                <div class="with-errors">{{ form_errors(purchase_form.lastName) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg">
+            <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
+                {{ form_label(purchase_form.email, 'Email') }}
+                {{ form_widget(purchase_form.email, {'attr':{
+                    'class':'form-control lead-input',
+                    'placeholder': 'Enter email address',
+                    'data-hj-suppress' : ''
+                }}) }}
+                <div class="with-errors">{{ form_errors(purchase_form.email) }}</div>
+            </div>
+        </div>
+        <div class="col-lg">
+            <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
+                {{ form_label(purchase_form.birthday, 'Date of Birth') }}
+                {{ form_widget(purchase_form.birthday, {'attr':{
+                    'class': 'birthday form-control dob',
+                    'placeholder': 'Enter D.O.B. (DD/MM/YY)',
+                    'data-hj-suppress': '',
+                    'id': 'dob_field'
+                }}) }}
+                <div class="with-errors">{{ form_errors(purchase_form.birthday) }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg">
+            <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
+                {{ form_label(purchase_form.mobileNumber, 'Mobile Number') }}
+                {{ form_widget(purchase_form.mobileNumber, {'attr':{
+                    'class':'form-control',
+                    'placeholder':'Enter mobile number',
+                    'data-hj-suppress' : ''
+                }}) }}
+                <div class="mobile-err with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
+            </div>
+        </div>
+        <div class="col-lg">
+            <div id="address_search" class="form-group has-error {% if showAddress %}invisible{% endif %}">
+                <label class="">Billing Address</label>
+                <input id="address_select"
+                       class="typeahead form-control"
+                       type="text"
+                       placeholder="Enter postcode"
+                       {% if not showAddress %}required="required"{% endif %}
+                       data-hj-suppress="">
+                <div id="select_address_errors" class="with-errors"></div>
+            </div>
+            <small class="form-text text-right mb-4 {% if showAddress %}hideme{% endif %}">
+                <a id="address_manual_btn"
+                   href="#"
+                   data-manual="false">Enter manually</a>
+            </small>
+        </div>
+    </div>
+
+    <div id="address_submit_btn" class="row {% if showAddress %}hideme{% endif %}">
+        <div class="col-sm-6 offset-sm-3">
+            <div class="form-group">
+                {{ form_widget(purchase_form.next, {
+                    'label': 'Continue',
+                    'attr': {
+                        'class': 'btn btn-success btn-block'
+                }}) }}
+            </div>
+        </div>
+    </div>
+
+    <div id="address_manual" class="{% if not showAddress %}hideme{% endif %}">
+        <label id="address_error" class="is-invalid" style="display: none;"></label>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
+                    {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1') }}
+                    {{ form_widget(purchase_form.addressLine1, {'attr':{
+                        'class':'form-control addressLine1',
+                        'placeholder': 'Address Line 1',
+                        'data-hj-suppress' : ''
+                    }}) }}
+                    {% if showAddress %}
+                        <div class="with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
+                    {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2') }}
+                    {{ form_widget(purchase_form.addressLine2, {'attr':{
+                        'class':'form-control addressLine2',
+                        'placeholder': 'Address Line 2',
+                        'data-hj-suppress' : ''
+                    }}) }}
+                    {% if showAddress %}
+                        <div class="with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg">
+                <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
+                    {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3') }}
+                    {{ form_widget(purchase_form.addressLine3, {'attr':{
+                        'class':'form-control addressLine3',
+                        'placeholder': 'Address Line 3',
+                        'data-hj-suppress' : ''
+                    }}) }}
+                    {% if showAddress %}
+                        <div class="with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
+                    {{ form_label(purchase_form.city, 'Billing Address City') }}
+                    {{ form_widget(purchase_form.city, {'attr':{
+                        'class':'form-control city',
+                        'placeholder': 'City',
+                        'data-hj-suppress' : ''
+                    }}) }}
+                    {% if showAddress %}
+                        <div class="with-errors">{{ form_errors(purchase_form.city) }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
+                    {{ form_label(purchase_form.postcode, 'Billing Address Postcode') }}
+                    {{ form_widget(purchase_form.postcode, {'attr':{
+                        'class':'form-control postcode',
+                        'placeholder': 'Postcode',
+                        'data-hj-suppress' : ''
+                    }}) }}
+                    {% if showAddress %}
+                        <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 offset-sm-3">
+                <div class="form-group mt-4">
+                    {{ form_widget(purchase_form.manual_next, {
+                        'label': 'Continue',
+                        'attr': {
+                            'class': 'btn btn-success btn-block'
+                    }}) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{{ form_end(purchase_form) }}

@@ -1,4 +1,4 @@
-{# Set Vars #}
+{# Set menu vars and experiments #}
 {% set navbar_class = 'navbar-so-sure fixed-top' %}
 {% if quote_mode is defined and quote_mode == true %}
     {% set navbar_class = 'navbar-so-sure-quote fixed-top' %}
@@ -6,181 +6,203 @@
 {% if onboarding_mode is defined and onboarding_mode == true %}
     {% set navbar_class = 'navbar-so-sure' %}
 {% endif %}
-
-{# Set menu exp #}
 {% set menu_breakpoint = 'd-xl-block' %}
 {% set menu_show = 'd-xl-none' %}
-{% if menu_exp is defined and menu_exp == 'menu-burger' %}
-    {% set menu_breakpoint = '' %}
-    {% set menu_show = '' %}
+{% set hide_quote_btn = '' %}
+{% if funnel_exp is defined and funnel_exp == 'new-funnel' %}
+    {% set hide_quote_btn = 'd-none' %}
 {% endif %}
 
-<nav id="main-nav" class="navbar {{ navbar_class }} justify-content-between flex-nowrap flex-row pl-lg-5">
+<nav id="main-nav" class="navbar {{ navbar_class }} {% if admin_mode is defined and admin_mode == true or quote_mode is defined and quote_mode == true or onboarding_mode is defined and onboarding_mode == true %}justify-content-between flex-nowrap flex-row{% endif %}">
 
-    {# Logo #}
-    <a href="/" class="navbar-brand show-in-nav show-in-quote">
-        <div class="navbar-brand__logo"></div>
-        <span class="sr-only">so-sure</span>
-    </a>
-
-    {# Navs #}
+    {# Navs - Look to depricate modes ASAP #}
     {% if admin_mode is defined and admin_mode == true %}
+        {# Logo #}
+        <a href="/" class="navbar-brand show-in-nav show-in-quote">
+            <div class="navbar-brand__logo"></div>
+            <span class="sr-only">so-sure</span>
+        </a>
         {% include '::navigation/admin.html.twig' %}
     {% elseif quote_mode is defined and quote_mode == true %}
-        {# 🍆 HIDE NAV 🍆 #}
+        {# Logo #}
+        <a href="/" class="navbar-brand show-in-nav show-in-quote">
+            <div class="navbar-brand__logo"></div>
+            <span class="sr-only">so-sure</span>
+        </a>
+    {% elseif funnel_mode is defined and funnel_mode == true %}
+        <div class="container-large d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="/" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+        </div>
     {% elseif onboarding_mode is defined and onboarding_mode == true %}
+        {# Logo #}
+        <a href="/" class="navbar-brand show-in-nav show-in-quote">
+            <div class="navbar-brand__logo"></div>
+            <span class="sr-only">so-sure</span>
+        </a>
         {% include '::navigation/onboarding.html.twig' %}
-    {% elseif seo_mode is defined and seo_mode == true %}
-        {% include '::navigation/seo.html.twig' %}
-    {% elseif company_mode is defined and company_mode == true %}
-        {% include '::navigation/company.html.twig' %}
     {% else %}
-        <ul class="nav navbar-nav flex-row align-items-center">
-            <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
-                <a href="#"
-                   class="nav-link dropdown-toggle"
-                   id="why_so_sure_nav"
-                   role="button"
-                   {# data-toggle="dropdown" #}
-                   aria-haspopup="true"
-                   aria-expanded="false">Why so-sure? <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
-                <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="why_so_sure_nav">
-                    <a class="dropdown-item dropdown-item-nav h6 mb-0"
-                       href="{{ path('social_insurance') }}">
-                        <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_social_insurance.png" alt="so-sure - Social insurance" width="50px" class="mr-4">
-                        <span>
-                            Social insurance 🤔<br>
-                            <small class="sub text-zaffre">What is social insurance?</small>
-                        </span>
-                    </a>
-                    <a class="dropdown-item dropdown-item-nav h6 mb-0"
-                       href="{{ path('comparison') }}">
-                        <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_compare_cover.png" alt="so-sure - Compare cover" width="50px" class="mr-4">
-                        <span>
-                            Compare cover 😎<br>
-                            <small class="sub text-zaffre">Why we're better than the rest!</small>
-                        </span>
-                    </a>
-                </div>
-            </li>
-            <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
-                <a href="#"
-                   class="nav-link dropdown-toggle"
-                   id="about_us_nav"
-                   role="button"
-                   {# data-toggle="dropdown" #}
-                   aria-haspopup="true"
-                   aria-expanded="false">About us <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
-                <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="about_us_nav">
-                    <a class="dropdown-item dropdown-item-nav h6 mb-0"
-                       href="{{ path('faq') }}">
-                        <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_faqs.png" alt="so-sure - FAQs" width="50px" class="mr-4">
-                        <span>
-                            FAQs 🤓<br>
-                            <small class="sub text-zaffre">We all need a little extra info</small>
-                        </span>
-                    </a>
-                    <a class="dropdown-item dropdown-item-nav h6 mb-0"
-                       href="{{ path('about_how_to_contact_so_sure') }}">
-                        <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_contact_us.png" alt="so-sure - Contact us" width="50px" class="mr-4">
-                        <span>
-                            Contact us 💬<br>
-                            <small class="sub text-zaffre">We are always happy to talk</small>
-                        </span>
-                    </a>
-                    {# <a class="dropdown-item dropdown-item-nav h6 mb-0"
-                       href="{{ path('careers') }}">
-                        <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_careers.png" alt="so-sure - Careers" width="50px" class="mr-4">
-                        <span>
-                            Careers 👩‍💻<br>
-                            <small class="sub text-zaffre">Fancy working with us?</small>
-                        </span>
-                    </a> #}
-                </div>
-            </li>
-            <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-                <a href="https://blog.wearesosure.com"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="nav-link">Blog</a>
-            </li>
-            {% if hide_login is not defined %}
+        <div class="{% if split_mode is defined and split_mode %}w-100{% else %}container-large{% endif %} d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="/" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+            {# Navs #}
+            <ul class="nav navbar-nav flex-row align-items-center">
+                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
+                    <a href="#"
+                       class="nav-link dropdown-toggle"
+                       id="why_so_sure_nav"
+                       role="button"
+                       {# data-toggle="dropdown" #}
+                       aria-haspopup="true"
+                       aria-expanded="false">Why so-sure? <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+                    <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="why_so_sure_nav">
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('social_insurance') }}">
+                            <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_social_insurance.png" alt="so-sure - Social insurance" width="50px" class="mr-4">
+                            <span>
+                                Social insurance 🤔<br>
+                                <small class="sub text-zaffre">What is social insurance?</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('comparison') }}">
+                            <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_compare_cover.png" alt="so-sure - Compare cover" width="50px" class="mr-4">
+                            <span>
+                                Compare cover 😎<br>
+                                <small class="sub text-zaffre">Why we're better than the rest!</small>
+                            </span>
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
+                    <a href="#"
+                       class="nav-link dropdown-toggle"
+                       id="about_us_nav"
+                       role="button"
+                       {# data-toggle="dropdown" #}
+                       aria-haspopup="true"
+                       aria-expanded="false">About us <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+                    <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="about_us_nav">
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('faq') }}">
+                            <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_faqs.png" alt="so-sure - FAQs" width="50px" class="mr-4">
+                            <span>
+                                FAQs 🤓<br>
+                                <small class="sub text-zaffre">We all need a little extra info</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('about_how_to_contact_so_sure') }}">
+                            <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_contact_us.png" alt="so-sure - Contact us" width="50px" class="mr-4">
+                            <span>
+                                Contact us 💬<br>
+                                <small class="sub text-zaffre">We are always happy to talk</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('blog_index') }}">
+                            <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_reviews.png" alt="so-sure - Blog" width="50px" class="mr-4">
+                            <span>
+                                Blog 📚<br>
+                                <small class="sub text-zaffre">Insurance and bits</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('careers') }}">
+                            <img src="{{ cdn_url }}/images/rebrand/nav-icons/so-sure_nav_icon_careers.png" alt="so-sure - Careers" width="50px" class="mr-4">
+                            <span>
+                                Careers 👩‍💻<br>
+                                <small class="sub text-zaffre">Fancy working with us?</small>
+                            </span>
+                        </a>
+                    </div>
+                </li>
                 <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-                    <a href="{{ path('claim') }}"
-                       class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
-                        Make a Claim
-                    </a>
+                    <a href="{{ path('phone_insurance') }}"
+                       class="nav-link">
+                        Phone Insurance</a>
                 </li>
-            {% endif %}
-            {% if user_mode is not defined %}
-                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-                    <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
-                </li>
-            {% endif %}
-            {# Mobile Login #}
-            {% if hide_login is not defined %}
-                <li class="nav-item d-none-xxs d-xl-none pr-xl-5">
-                    {% if app.user is not null and app.user %}
-                        {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}"
-                               class="btn btn-outline-white btn-sm show-in-nav btn-swap hideme"
-                               title="{{ app.user.email }}"
-                               ><i class="fas fa-user fa-fw"></i>
-                                Exit User</a>
-                        {% else %}
-                            <a href="{{ path('fos_user_security_logout') }}"
-                               class="btn btn-outline-white btn-sm show-in-nav btn-swap hideme">
-                               <i class="fas fa-user fa-fw"></i> Log out</i></a>
-                        {% endif %}
-                    {% else %}
-                        <a href="{{ path('fos_user_security_login') }}"
-                           class="btn btn-outline-white btn-sm show-in-nav btn-swap hideme"><i class="fas fa-user fa-fw"></i> Customer login</a>
-                    {% endif %}
-                </li>
-            {% endif %}
-            {# End Mobile Login #}
-            {% if app.user is not null and app.user %}
-                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-                    {% if is_granted('ROLE_ADMIN') %}
-                        <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
-                    {% elseif is_granted('ROLE_EMPLOYEE') %}
-                        <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
-                    {% elseif is_granted('ROLE_CLAIMS') %}
-                        <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
-                    {% else %}
-                        <a href="{{ path('user_home') }}" class="nav-link user-link">Your account</a>
-                    {% endif %}
-                </li>
-            {% endif %}
-            {# Desktop Login #}
-            {% if hide_login is not defined %}
-                <li class="nav-item d-none d-xl-block {% if menu_exp is defined and menu_exp == 'menu-burger' %}pr-xl-2{% else %}pr-xl-5{% endif %}">
-                    {% if app.user is not null and app.user %}
-                        {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
-                        {% else %}
-                            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link {% if menu_exp is defined and menu_exp == 'menu-burger' %}show-in-nav{% endif %}">Log out</i></a>
-                        {% endif %}
-                    {% else %}
-                        {% if menu_exp is defined and menu_exp == 'menu-burger' %}
-                            <a href="{{ path('fos_user_security_login') }}"
-                               class="btn btn-outline-columbia-blue-f btn-sm show-in-nav">Customer login</a>
+                {% if hide_login is not defined %}
+                    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+                        <a href="{{ path('claim') }}"
+                           class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
+                            Make a Claim
+                        </a>
+                    </li>
+                {% endif %}
+                {% if user_mode is not defined %}
+                    <li class="nav-item pr-xl-5 {{ hide_quote_btn }}">
+                        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                    </li>
+                {% endif %}
+                {# Mobile Login #}
+                {% if hide_login is not defined %}
+                    <li class="nav-item d-none-xxs {{ menu_show }} pr-xl-5">
+                        {% if app.user is not null and app.user %}
+                            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                                <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}"
+                                   class="btn btn-outline-white btn-sm show-in-nav btn-swap hideme"
+                                   title="{{ app.user.email }}"
+                                   ><i class="fas fa-user fa-fw"></i>
+                                    Exit User</a>
+                            {% else %}
+                                <a href="{{ path('fos_user_security_logout') }}"
+                                   class="btn btn-outline-white btn-sm show-in-nav btn-swap hideme">
+                                   <i class="fas fa-user fa-fw"></i> Log out</i></a>
+                            {% endif %}
                         {% else %}
                             <a href="{{ path('fos_user_security_login') }}"
-                               class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+                               class="btn btn-outline-white btn-sm show-in-nav btn-swap hideme"><i class="fas fa-user fa-fw"></i> Customer login</a>
                         {% endif %}
-                    {% endif %}
+                    </li>
+                {% endif %}
+                {# End Mobile Login #}
+                {# If Logged in #}
+                {% if app.user is not null and app.user %}
+                    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
+                        {% elseif is_granted('ROLE_EMPLOYEE') %}
+                            <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
+                        {% elseif is_granted('ROLE_CLAIMS') %}
+                            <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
+                        {% else %}
+                            <a href="{{ path('user_home') }}" class="nav-link user-link">Your account</a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+                {# End if Logged in #}
+                {# Desktop Login #}
+                {% if hide_login is not defined %}
+                    <li class="nav-item d-none {{ menu_breakpoint }}">
+                        {% if app.user is not null and app.user %}
+                            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                                <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email|truncate(10)~'.'  }}</u></a>
+                            {% else %}
+                                <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
+                            {% endif %}
+                        {% else %}
+                                <a href="{{ path('fos_user_security_login') }}"
+                                   class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+                {# End Desktop Login #}
+                <li class="nav-item {{ menu_show }}">
+                    <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse show-in-nav" type="button">
+                        <span class="hamburger-box">
+                            <span class="hamburger-inner"></span>
+                        </span>
+                    </button>
                 </li>
-            {% endif %}
-            {# End Desktop Login #}
-            <li class="nav-item {% if menu_exp is defined and menu_exp == 'menu-burger' %}pr-lg-5{% else %}d-xl-none{% endif %}">
-                <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse show-in-nav" type="button">
-                    <span class="hamburger-box">
-                        <span class="hamburger-inner"></span>
-                    </span>
-                </button>
-            </li>
-        </ul>
+            </ul>
+        </div>
     {% endif %}
 
     {# Get a quote #}

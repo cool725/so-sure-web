@@ -47,24 +47,13 @@
         </div>
     </div>
 
-    <div class="form-group mt-5">
-        <div class="form-row">
-            <div class="col-3">
-                <a href="{{ path('purchase_step_phone_id', {'id': policy.id}) }}"
-                   class="btn btn-outline-grey btn-circle d-flex justify-content-center align-items-center">
-                    <span class="sr-only">back</span>
-                    <i class="far fa-arrow-left"></i>
-                </a>
-            </div>
-            <div class="col-9 text-right">
-                {{ form_widget(purchase_form.next, {
-                    'label': 'I swear I\'ll be honest!',
-                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                    'right': true,
-                    'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                }}) }}
-            </div>
-        </div>
+    <div class="form-group text-md-right mt-5">
+        {{ form_widget(purchase_form.next, {
+            'label': 'I swear I\'ll be honest!',
+            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+            'right': true,
+            'attr': {
+                'class': 'btn btn-success btn-green-gradient btn-block-xs'
+        }}) }}
     </div>
 {{ form_end(purchase_form) }}

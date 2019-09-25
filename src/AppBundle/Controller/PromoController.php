@@ -24,6 +24,8 @@ class PromoController extends BaseController
 {
     /**
      * @Route("/promo/{code}", name="promo")
+     * @Route("/amazon/{code}", name="amazon_promo")
+     * @Route("/pizzaexpress/{code}", name="pizzaexpress_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -33,6 +35,7 @@ class PromoController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
 
         $scode = null;
+        $custom = null;
 
         try {
             if ($scode = $repo->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {
@@ -48,7 +51,17 @@ class PromoController extends BaseController
         $session = $this->get('session');
         $session->set('scode', $code);
 
+        // Check route so we can use custom to update template
+        if ($request->get('_route') == 'amazon_promo') {
+            $custom = 'amazon';
+        } elseif ($request->get('_route') == 'pizzaexpress_promo') {
+            $custom = 'pizzaexpress';
+        }
+
         if ($scode && $request->getMethod() === "GET") {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PROMO_PAGE, [
+                'Promo code' => $scode,
+            ]);
             $this->get('app.mixpanel')->queuePersonProperties([
                 'Attribution Invitation Method' => 'reward',
             ], true);
@@ -57,6 +70,7 @@ class PromoController extends BaseController
         return [
             'scode'    => $scode,
             'use_code' => $code,
+            'custom' => $custom,
         ];
     }
 }
