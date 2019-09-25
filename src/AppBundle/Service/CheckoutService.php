@@ -346,6 +346,7 @@ class CheckoutService
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
         foreach ($rescheduledPayments as $rescheduled) {
+            //TODO: Watch this, if payments are still being cancelled on a 0 amount payment, this will be why!
             $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
         }
         if (!$policy->getStatus() ||
@@ -976,7 +977,9 @@ class CheckoutService
                     // Make sure upcoming rescheduled scheduled payments are now cancelled.
                     $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
                     foreach ($rescheduledPayments as $rescheduled) {
-                        $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
+                        if ($payment->getAmount() > 0 ) {
+                            $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
+                        }
                     }
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
