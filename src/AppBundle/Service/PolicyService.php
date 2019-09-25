@@ -929,26 +929,29 @@ class PolicyService
      * Cancels a policy's existing schedule of scheduled payments and creates a new schedule based on the current
      * state of the policy.
      * @param Policy    $policy        is the policy to regenerate the schedule for.
-     * @param \DateTime $date          is to be considered the current date.
+     * @param \DateTime $date          is the point from which to begin regenerating the schedule, with null being the
+     *                                 policy start of billing.
+     * @param \DateTime $now           is to be considered the current date, with null being the system time.
      * @param int       $numPayments   is the number of payments desired.
      * @param float     $billingOffset is the amount of apparently owed money not to factor into schedule.
      */
     public function regenerateScheduledPayments(
         Policy $policy,
         \DateTime $date = null,
+        \DateTime $now = null,
         $numPayments = null,
         $billingOffset = null
     ) {
         $policy->cancelScheduledPayments();
-        $this->generateScheduledPayments($policy, $date, $date, $numPayments, $billingOffset);
+        $this->generateScheduledPayments($policy, $date, $now, $numPayments, $billingOffset);
     }
 
     /**
      * Creates a schedule of payments for the given policy.
      * @param Policy    $policy        is the policy to create the scheduled payments for.
-     * @param \DateTime $date          is the date at which to start the payments.
-     * @param \DateTime $now           is the date to be considered as the current date, and which payments should not
-     *                                 be able to scheduled more than a few business days before.
+     * @param \DateTime $date          is the date at which to start the payments, null being the policy billing start.
+     * @param \DateTime $now           is the date to be considered the current date, which payments should not be able
+     *                                 to scheduled more than a few business days before, null being system time.
      * @param int       $numPayments   is the number of payments desired or null for this to be deduced.
      * @param float     $billingOffset is the amount of owed money not to add into the payment schedule.
      * @param boolean   $renewal       is whether this policy is a renewal and thus should have a scheduled payment
@@ -2060,7 +2063,7 @@ class PolicyService
                 $date ? $date : \DateTime::createFromFormat('U', time()),
                 true
             );
-            $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, null, $outstanding);
+            $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, $date, null, $outstanding);
 
             // bill for outstanding payments due
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
