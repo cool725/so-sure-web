@@ -978,7 +978,7 @@ class PolicyService
         $date->setTimezone(SoSure::getSoSureTimezone());
         $date->setTime(3, 0);
 
-        $minDate = (clone $now)->sub(new \DateIntervals("P4D"));
+        $minDate = (clone $now)->sub(new \DateInterval("P4D"));
 
         $paymentItem = null;
         if (!$numPayments) {
@@ -2453,7 +2453,7 @@ class PolicyService
             $newPolicy->setPaymentMethod(clone $policy->getPaymentMethod());
         }
 
-        $this->generateScheduledPayments($newPolicy, $billing, $numPayments, null, true);
+        $this->generateScheduledPayments($newPolicy, $billing, $date, $numPayments, null, true);
 
         $policy->addMetric(Policy::METRIC_RENEWAL);
 
