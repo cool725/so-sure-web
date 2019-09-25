@@ -977,7 +977,7 @@ class CheckoutService
                     // Make sure upcoming rescheduled scheduled payments are now cancelled.
                     $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
                     foreach ($rescheduledPayments as $rescheduled) {
-                        if ($payment->getAmount() > 0 ) {
+                        if ($payment->getAmount() > 0) {
                             $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
                         }
                     }
