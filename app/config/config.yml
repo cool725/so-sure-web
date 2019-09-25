@@ -544,7 +544,6 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://ep.smct.co
-                - https://cognito-identity.eu-west-1.amazonaws.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
