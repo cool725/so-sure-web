@@ -479,10 +479,11 @@ class PhoneInsuranceController extends BaseController
         if ($request->get('_route') == 'quote_make_model') {
             // Model template
             $templateModel = $modelHyph.'.html.twig';
+            $templateOveride = $make." ".$model;
             $template = 'AppBundle:PhoneInsurance/Phones:'.$templateModel;
 
             // Check if template exists
-            if (!$this->get('templating')->exists($template)) {
+            if (!$this->get('templating')->exists($template) or $templateOveride == 'nokia 6') {
                 $hideSection = true;
                 $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
             }
