@@ -524,13 +524,6 @@ class UserController extends BaseController
         $this->addRepurchaseExpiredPolicyFlash();
         $this->addUnInitPolicyInsureFlash();
 
-        $sixpack = $this->get('app.sixpack');
-        $shareExperimentText = $sixpack->getText(
-            SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
-            SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-            [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
-        );
-
         $fbFriends = null;
         if ($this->get('app.feature')->isEnabled(Feature::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION)) {
             $fbFriends = $this->getFacebookFriends($request, $policy);
@@ -544,7 +537,6 @@ class UserController extends BaseController
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
-            'share_experiment_text' => $shareExperimentText,
             'friends' => $fbFriends,
         );
     }
