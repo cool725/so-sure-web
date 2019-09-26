@@ -89,7 +89,13 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
 
         $scheduledPayment->setScheduled(new \DateTime('2017-06-16 12:00'));
-        $this->assertFalse($scheduledPayment->hasCorrectBillingDay());
+        $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
+
+        $scheduledPayment->setScheduled(new \DateTime('2017-06-17 12:00'));
+        $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
+
+        $scheduledPayment->setScheduled(new \DateTime('2017-06-18 12:00'));
+        $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
 
         $scheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
         $this->assertNull($scheduledPayment->hasCorrectBillingDay());
