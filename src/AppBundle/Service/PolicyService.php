@@ -1039,7 +1039,7 @@ class PolicyService
              * Unless it is a renewal policy
              */
             if ($numPaidPayments < 1 && $isBacs && $i === 1 && !$renewal) {
-                $scheduledDate = (clone $now)->add(new \DateInterval("P7D"));;
+                $scheduledDate = (clone $now)->add(new \DateInterval("P7D"));
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
                 }
