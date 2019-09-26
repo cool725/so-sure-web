@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DataFixtures\MongoDB\d\Feature;
+namespace AppBundle\DataFixtures\MongoDB\d\Postcode;
 
 use AppBundle\Document\Postcode;
 use Doctrine\Common\DataFixtures\FixtureInterface;
