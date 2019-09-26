@@ -103,25 +103,7 @@ class ApiPartialController extends BaseController
 
         $sixpack = $this->get('app.sixpack');
 
-        if ($name == SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE) {
-            $scode = $user->getStandardSCode();
-            if (!$scode) {
-                $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
-                throw new NotFoundHttpException();
-            }
-
-            $text = $sixpack->getText(
-                SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
-                SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                [$scode->getShareLink(), $scode->getCode()]
-            );
-
-            return array(
-                'name' => $name,
-                'option' => SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                'text' => $text
-            );
-        } elseif (in_array($name, array_keys(SixpackService::$appExperiments))) {
+        if (in_array($name, array_keys(SixpackService::$appExperiments))) {
             $clientId = null;
             if (in_array($name, SixpackService::getAppParticipationByClientId())) {
                 $clientId = $user->getId();

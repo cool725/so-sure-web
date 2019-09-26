@@ -181,10 +181,6 @@ class UserJsonController extends BaseController
             Charge::TYPE_SMS_DOWNLOAD
         );
         if ($sent) {
-            /** @var MixpanelService $mixpanel */
-            $mixpanel = $this->get('app.mixpanel');
-            $mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_TEST, ['Test Name' => 'SMS Download Link']);
-
             return $this->getSuccessJsonResponse("Sms invitation sent.");
         } else {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, "Sms could not be sent.");
