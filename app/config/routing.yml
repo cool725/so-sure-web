@@ -315,22 +315,6 @@ redirect_discount_vouchers:
         route: homepage
         permanent: true
 
-# redirect_blog_insuretech:
-#     path: /blog/2016/06/07/what-is-insurtech.html
-#     defaults:
-#         _controller: FrameworkBundle:Redirect:urlRedirect
-#         path: https://blog.wearesosure.com/the-insurtech-revolution
-#         permanent: true
-
-# redirect_blog:
-#     path: /blog/{file}
-#     requirements:
-#         file: ".*"
-#     defaults:
-#         _controller: FrameworkBundle:Redirect:urlRedirect
-#         path: https://blog.wearesosure.com/
-#         permanent: false # not convinced we may need to add additional redirects, so keep temp for now
-
 redirect_blog:
     path: https://blog.wearesosure.com/
     defaults:
@@ -344,22 +328,6 @@ redirect_change_password:
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: user_home
-        permanent: true
-
-redirect_help_centre:
-    path: /help/{file}
-    defaults:
-        _controller: FrameworkBundle:Redirect:redirect
-        route: faq
-        permanent: true
-    requirements:
-        file: .*
-
-redirect_help_base_centre:
-    path: /help
-    defaults:
-        _controller: FrameworkBundle:Redirect:redirect
-        route: faq
         permanent: true
 
 # https://symfony.com/doc/3.4/routing/redirect_trailing_slash.html with a 301
