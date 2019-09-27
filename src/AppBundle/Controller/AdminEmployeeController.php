@@ -3981,6 +3981,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 //            ->createNamedBuilder('offer_form')
 //            ->getForm();
 //        return ['offer_form' => $offerForm];
+    }
 
     /*
      * @Route("/postcodes", name="admin_annual_postcodes")
