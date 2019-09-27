@@ -2,7 +2,6 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
-{% set seo_mode = true %}
 
 {% block title %}
     so-sure - phone insurance for your {{ phone.make }} {{ phone.model }}
@@ -20,7 +19,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container container-xtra">
+        <div class="container-large">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
@@ -75,11 +74,11 @@
     </section>
 
     {# Cred #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_cred.html.twig' %}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     {# Intro #}
     <section class="intro py-lg-5">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <h2 class="h3 mb-4 text-primary text-center">Why insure your {{ phone.model }} with so-sure</h2>
             {% block phone_hero_text %}{% endblock %}
             <div class="row">
@@ -107,7 +106,7 @@
     {% if hide_section == false %}
         {# Why Insure #}
         <section class="why-insure lozad py-lg-5">
-            <div class="container container-xtra py-5">
+            <div class="container-large py-5">
                 <div class="row">
                     <div class="col-lg-6">
                         <img src="{{ cdn_url }}/images/onexone.png"
@@ -152,7 +151,7 @@
     {% if hide_section == false %}
         {# Extra Content #}
         <section class="extra-content py-lg-5">
-            <div class="container container-xtra py-5">
+            <div class="container-large py-5">
                 {% block extra_content_one %}{% endblock %}
             </div>
         </section>
@@ -160,12 +159,12 @@
 
     {# Cover #}
     <section class="cover py-lg-5">
-        <div class="container container-xtra pt-lg-5">
+        <div class="container-large pt-lg-5">
             <div class="d-none d-lg-block">
                 <h2 class="h3 mb-5 text-primary text-center">Comprehensive phone insurance that starts immediately</h2>
                 <div class="row">
                     <div class="col-md-6">
-                        <p class="mb-5">Losing your {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
+                        <p class="mb-5">Losing your {{ phone.make }} {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
                     </div>
                     <div class="col-md-6">
                         <p class="mb-5">With our comprehensive insurance, you’ll be fully covered for theft or loss, letting you rest easy if your phone suddenly goes missing. We also provide cover for any accidental damage that happens to your iPhone, such as a cracked screen or accidental water damage.</p>
@@ -267,11 +266,11 @@
     </section>
 
     <section class="cover__mobile d-block d-lg-none">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <h2 class="h3 mb-4 text-primary text-center">Comprehensive phone insurance that starts immediately</h2>
             <div class="row mb-4">
                 <div class="col-lg-6">
-                    <p class="mb-3 text-center">Losing your {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
+                    <p class="mb-3 text-center">Losing your {{ phone.make }} {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
                 </div>
                 <div class="col-lg-6">
                     <p class="mb-3 text-center">With our comprehensive insurance, you’ll be fully covered for theft or loss, letting you rest easy if your phone suddenly goes missing. We also provide cover for any accidental damage that happens to your iPhone, such as a cracked screen or accidental water damage.</p>
@@ -326,14 +325,14 @@
 
     {# Why Insure Continued #}
     <section class="why-insure-continued py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
-        <div class="container container-xtra py-5">
+        <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-6">
                     <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
                 </div>
                 <div class="col-lg-6">
                     <h2 class="h3 mb-4 text-primary">With great {{ phone.make }} {{ phone.model }} insurance, comes great responsibility</h2>
-                    <p>Worried about losing your {{ phone.make }} {{ phone.model }}? We're here to help. Our hassle-free claims process (and our UK-based claims team) makes it fast and easy to get a replacement if your {{ phone.model }} goes missing or is stolen while you’re out and about, running errands or traveling abroad.</p>
+                    <p>Worried about losing your {{ phone.make }} {{ phone.model }}? We're here to help. Our hassle-free claims process (and our UK-based claims team) makes it fast and easy to get a replacement if your {{ phone.make }} {{ phone.model }} goes missing or is stolen while you’re out and about, running errands or traveling abroad.</p>
                     <p class="mb-5">We aim to provide a replacement or perform a complete repair for your handset in 24-72 hours after approving your claim. Our fast, efficient team completes 74% of claims in 24 hours or less, meaning you’ll have a new or repaired phone in your hand without having to wait.</p>
                     <a href="#" class="btn btn-primary btn-block-xs mx-auto mb-5 get-a-quote disabled">Get a Quote</a>
                 </div>
@@ -353,7 +352,7 @@
     {% if hide_section == false %}
         {# Extra Content #}
         <section class="extra-content py-lg-5">
-            <div class="container container-xtra py-5">
+            <div class="container-large py-5">
                 {% block extra_content_two %}{% endblock %}
             </div>
         </section>

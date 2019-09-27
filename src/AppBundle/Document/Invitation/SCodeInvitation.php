@@ -46,4 +46,12 @@ class SCodeInvitation extends EmailInvitation
     {
         return $this->getSCode() ? $this->getSCode()->getType() : null;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSharer()
+    {
+        return $this->getInvitee();
+    }
 }

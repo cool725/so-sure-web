@@ -5,11 +5,13 @@ use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use AppBundle\Repository\Invitation\FacebookInvitationRepository;
 use AppBundle\Repository\Invitation\SCodeInvitationRepository;
 use AppBundle\Repository\Invitation\SmsInvitationRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
+use AppBundle\Classes\NoOp;
 use AppBundle\Repository\OptOut\SmsOptOutRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Repository\UserRepository;
@@ -1018,7 +1020,22 @@ class InvitationService
             );
         }
 
+
         $invitation->setAccepted($date);
+
+        // add connection bonus if there is one.
+        $sharer = $invitation->getSharer();
+        /** @var RewardRepository */
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+        $sharerPolicy = ($sharer->getId() == $inviterPolicy->getUser()->getId()) ? $inviterPolicy : $inviteePolicy;
+        $connectionBonus = $rewardRepo->getConnectionBonus($date);
+        if ($connectionBonus && $connectionBonus->canApply($sharerPolicy, $date)) {
+            try {
+                $this->addReward($sharerPolicy, $connectionBonus);
+            } catch (\Exception $e) {
+                NoOp::ignore([]);
+            }
+        }
 
         // TODO: ensure transaction state for this one....
         $this->dm->flush();
@@ -1097,6 +1114,10 @@ class InvitationService
     ) {
         if ($policy->getId() == $linkedPolicy->getId()) {
             throw new \Exception('Unable to connect to the same policy');
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
         }
 
         $connectionValue = $policy->getAllowedConnectionValue($date);

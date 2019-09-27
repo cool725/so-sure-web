@@ -524,13 +524,6 @@ class UserController extends BaseController
         $this->addRepurchaseExpiredPolicyFlash();
         $this->addUnInitPolicyInsureFlash();
 
-        $sixpack = $this->get('app.sixpack');
-        $shareExperimentText = $sixpack->getText(
-            SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
-            SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-            [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
-        );
-
         $fbFriends = null;
         if ($this->get('app.feature')->isEnabled(Feature::FEATURE_APP_FACEBOOK_USERFRIENDS_PERMISSION)) {
             $fbFriends = $this->getFacebookFriends($request, $policy);
@@ -544,7 +537,6 @@ class UserController extends BaseController
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
-            'share_experiment_text' => $shareExperimentText,
             'friends' => $fbFriends,
         );
     }
@@ -1245,19 +1237,7 @@ class UserController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OLD_VS_NEW_FUNNEL);
-
-        $smsExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_APP_LINK_SMS,
-            [
-                SixpackService::ALTERNATIVES_NO_SMS_DOWNLOAD,
-                SixpackService::ALTERNATIVES_SMS_DOWNLOAD
-            ],
-            SixpackService::LOG_MIXPANEL_NONE,
-            $user->getId(),
-            1
-        );
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
 
         return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
@@ -1266,7 +1246,6 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
-            'sms_experiment' => $smsExperiment
         ]);
     }
 

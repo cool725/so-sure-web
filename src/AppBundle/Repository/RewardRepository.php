@@ -20,4 +20,21 @@ class RewardRepository extends DocumentRepository
             ->getQuery()
             ->getSingleResult();
     }
+
+    /**
+     * Gives you a connection bonus if there is one. If there are two you only get one and the one you get is arbitrary
+     * because you can't use two anyway.
+     * @param \DateTime $date is the date at which they must have not expired.
+     * @return Reward|null the bonus if it exists.
+     */
+    public function getConnectionBonus($date)
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd($qb->expr()->field("isConnectionBonus")->equals(true));
+        $qb->addOr($qb->expr()->field("expiryDate")->exists(false));
+        $qb->addOr($qb->expr()->field("expiryDate")->gte($date));
+        /** @var Reward|null $reward */
+        $reward =  $qb->getQuery()->getSingleResult();
+        return $reward;
+    }
 }

@@ -15,7 +15,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container">
+        <div class="container-large">
             <h1 class="h2 mb-4">Renew your policy 🤗</h1>
             <div class="d-lg-flex justify-content-lg-between mb-4">
                 <div class="cardbox cardbox-100 mb-4 mr-lg-4">
@@ -75,9 +75,9 @@
                            id="renew_reward_btn">
                         <input type="radio"
                                name="options"
-                               {% if app.user.allowedMonthlyPayments and not app.user.allowedYearlyPayments %}
+                               {% if app.user.allowedMonthly and not app.user.allowedYearlyPayments %}
                                     data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1"
-                               {% elseif not app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                               {% elseif not app.user.allowedMonthly and app.user.allowedYearlyPayments %}
                                     data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
                                {% endif %}
                                autocomplete="off"
@@ -87,23 +87,23 @@
                            id="renew_cashback_btn">
                         <input type="radio"
                                name="options"
-                               {% if app.user.allowedMonthlyPayments and not app.user.allowedYearlyPayments %}
+                               {% if app.user.allowedMonthly and not app.user.allowedYearlyPayments %}
                                     data-value="{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|0"
-                               {% elseif not app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                               {% elseif not app.user.allowedMonthly and app.user.allowedYearlyPayments %}
                                     data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
                                {% endif %}
                                autocomplete="off"> 💸 No I want cashback
                     </label>
                 </div>
             {% endif %}
-            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+            {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
                 <h4 class="mb-4">How would you like to pay?</h4>
             {% else %}
                 <h4 class="mb-4">Your yearly premium</h4>
             {% endif %}
 
             <div id="renew_without_reward_btns">
-                {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
                     <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
                         <label class="btn btn-outline-primary payment-btn"
                                id="renew_adjusted_monthly_btn">
@@ -136,7 +136,7 @@
 
             {% if policy.potValue > 0 %}
                 <div id="renew_with_reward_btns" style="display: none;">
-                    {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                    {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
                         <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
                             <label class="btn btn-outline-primary payment-btn"
                                    id="renew_monthly_btn">

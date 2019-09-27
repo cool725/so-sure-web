@@ -38,7 +38,7 @@ class PolicyUpdatePaymentCommandTest extends BaseControllerTest
     {
 
         $application = new Application(self::$kernel);
-        $application->add(new OpsReportCommand(self::$mailer, self::$redis));
+        $application->add(new OpsReportCommand(self::$mailer, self::$redis, self::$container->get('aws.s3')));
         $command = $application->find('sosure:policy:update:payment');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(

@@ -196,15 +196,6 @@ class ApiController extends BaseController
             if (!$user->getFirstLoginInApp()) {
                 $user->setFirstLoginInApp(new \DateTime());
                 $dm->flush();
-
-                // User's first login in app is a KPI in the sms link experiment.
-                // If they're not participating nothing will happen.
-                $sixpack = $this->get('app.sixpack');
-                $sixpack->convertByClientId(
-                    $user->getId(),
-                    $sixpack::EXPERIMENT_APP_LINK_SMS,
-                    $sixpack::KPI_FIRST_LOGIN_APP
-                );
             }
 
             $response = $user->toApiArray($intercomHash, $identityId, $token);
@@ -279,9 +270,10 @@ class ApiController extends BaseController
             }
 
             $quotes = [];
+            $postcodeService = $this->get('app.postcode');
             foreach ($phones as $phone) {
                 /** @var Phone $phone */
-                if ($quote = $phone->asQuoteApiArray()) {
+                if ($quote = $phone->asQuoteApiArray($postcodeService)) {
                     $quotes[] = $quote;
                 }
             }

@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Policy;
+use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\ScheduledPayment;
@@ -155,5 +156,62 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // try to to get nonexistent reverted scheduled payment.
         $foundRevertedPayment = $policy->getLastRevertedScheduledPayment();
         $this->assertNull($foundRevertedPayment);
+    }
+
+    /**
+     * Tests to make sure that getUpgradedFrom can accurately detect upgrades without over reporting them even when
+     * dates are close together enough that there is some ambigiuity.
+     */
+    public function testGetUpgradedFrom()
+    {
+        $user = new User();
+        $premium = new PhonePremium();
+        $a = new PhonePolicy();
+        $a->setId("1");
+        $a->setPolicyNumber("Mob/2016/1");
+        $a->setPremium($premium);
+        $a->setStart(new \DateTime('2017-01-01'));
+        $a->setEnd(new \DateTime('2017-12-30'));
+        $a->setStatus(Policy::STATUS_CANCELLED);
+        $a->setCancelledReason(Policy::CANCELLED_UNPAID);
+        $b = new PhonePolicy();
+        $b->setPolicyNumber("Mob/2016/2");
+        $b->setId("2");
+        $b->setPremium($premium);
+        $b->setStart(new \DateTime('2017-10-15'));
+        $b->setEnd(new \DateTime('2018-05-02 14:05'));
+        $b->setStatus(Policy::STATUS_CANCELLED);
+        $b->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        $c = new PhonePolicy();
+        $c->setId("3");
+        $c->setPolicyNumber("Mob/2016/3");
+        $c->setPremium($premium);
+        $c->setStart(new \DateTime('2018-05-02 20:21'));
+        $c->setStatus(Policy::STATUS_ACTIVE);
+        $d = new PhonePolicy();
+        $d->setId("4");
+        $d->setPolicyNumber("Mob/2016/4");
+        $d->setPremium($premium);
+        $d->setStart(new \DateTime('2018-05-02 20:21'));
+        $d->setEnd(new \DateTime('2018-09-09 12:30'));
+        $d->setStatus(Policy::STATUS_CANCELLED);
+        $d->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        $e = new PhonePolicy();
+        $e->setId("5");
+        $e->setPolicyNumber("Mob/2016/5");
+        $e->setPremium($premium);
+        $e->setStart(new \DateTime('2018-09-10 9:45'));
+        $e->setStatus(Policy::STATUS_ACTIVE);
+        $user->addPolicy($b);
+        $user->addPolicy($c);
+        $user->addPolicy($a);
+        $user->addPolicy($d);
+        $user->addPolicy($e);
+        // now check each one reports what it should.
+        $this->assertNull($a->getUpgradedFrom());
+        $this->assertNull($b->getUpgradedFrom());
+        $this->assertNull($c->getUpgradedFrom());
+        $this->assertEquals($b, $d->getUpgradedFrom());
+        $this->assertEquals($d, $e->getUpgradedFrom());
     }
 }

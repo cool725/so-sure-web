@@ -59,7 +59,13 @@
                     </a>
                 </span>
             </label>
-            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
+            {{ form_widget(purchase_form.serialNumber, {'attr':{
+                'class':'form-control',
+                'pattern': '[a-zA-Z0-9]{5,32}',
+                'title': 'Enter a valid serial number',
+                'placeholder':'Serial Number',
+                'data-hj-suppress' : ''
+            }}) }}
             {% if device_category() == 'Mobile' %}
                 <small class="form-text">Copy this from your iPhone settings: General &gt; About</small>
             {% else %}

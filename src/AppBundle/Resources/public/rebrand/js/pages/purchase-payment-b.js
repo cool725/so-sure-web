@@ -102,9 +102,11 @@ $(function(){
 
         // Adjust the price in the copy
         let premium = $(this).data('premium-type'),
-            price = $('#purchase_price');
+            price = $('#purchase_price'),
+            freq = $('#purchase_freq');
 
-        price.html('&pound;' + val + ' a ' + premium);
+        price.html('&pound;' + val);
+        freq.html(' a ' + premium);
 
         let checkoutUrl = paymentForm.data('url'),
             type = $(this).data('premium-param');

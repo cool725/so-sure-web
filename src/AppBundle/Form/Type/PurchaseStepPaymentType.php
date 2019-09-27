@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Service\PostcodeService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,16 +37,23 @@ class PurchaseStepPaymentType extends AbstractType
 
     protected $logger;
 
+    protected $postcodeService;
+
     /**
      * @param RequestStack    $requestStack
      * @param boolean         $required
      * @param LoggerInterface $logger
      */
-    public function __construct(RequestStack $requestStack, $required, LoggerInterface $logger)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        $required,
+        LoggerInterface $logger,
+        PostcodeService $postcodeService
+    ) {
         $this->requestStack = $requestStack;
         $this->required = $required;
         $this->logger = $logger;
+        $this->postcodeService = $postcodeService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -64,7 +72,7 @@ class PurchaseStepPaymentType extends AbstractType
                 $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
                 $additionalPremium = $purchase->getUser()->getAdditionalPremium();
                 $choices = [];
-                if ($purchase->getUser()->allowedMonthlyPayments()) {
+                if ($purchase->getUser()->allowedMonthlyPayments($this->postcodeService)) {
                     $choices[sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice($additionalPremium))] =
                             sprintf('%.2f', $price->getMonthlyPremiumPrice($additionalPremium));
                 }

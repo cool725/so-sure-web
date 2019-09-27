@@ -1535,7 +1535,7 @@ services:
 
     app.form.type.purchasesteppayment:
         class: AppBundle\Form\Type\PurchaseStepPaymentType
-        arguments: ["@request_stack", "%form_required%", "@logger"]
+        arguments: ["@request_stack", "%form_required%", "@logger", "@app.postcode"]
         tags:
             - { name: form.type }
 
@@ -1721,3 +1721,12 @@ services:
     AppBundle\Service\SearchService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+
+    app.postcode:
+        alias: AppBundle\Service\PostcodeService
+        public: true
+
+    AppBundle\Service\PostcodeService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"

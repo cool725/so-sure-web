@@ -60,8 +60,10 @@ class MixpanelService
         self::QUEUE_FREEZE_ATTRIBUTION
     ];
 
+    // Homepage
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
+    const EVENT_QUOTE_PAGE_PURCHASE = 'Quote Page Purchase Step';
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
 
@@ -71,6 +73,8 @@ class MixpanelService
     const EVENT_CPC_QUOTE_PAGE = 'CPC Quote Page';
     const EVENT_CPC_MANUFACTURER_PAGE = 'CPC Manufacturer Page';
     const EVENT_CPC_COMPETITOR_PAGE = 'CPC Competitor Page';
+
+    // Get details
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
     const EVENT_PAYMENT = 'Payment';
@@ -117,6 +121,7 @@ class MixpanelService
     public static $events = [
         self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
         self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
+        self::EVENT_QUOTE_PAGE_PURCHASE => Stats::MIXPANEL_QUOTES_UK,
         self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
         self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
         self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
@@ -145,6 +150,7 @@ class MixpanelService
     public static $trackedEvents = [
         self::EVENT_HOME_PAGE,
         self::EVENT_QUOTE_PAGE,
+        self::EVENT_QUOTE_PAGE_PURCHASE,
         self::EVENT_MANUFACTURER_PAGE,
         self::EVENT_LANDING_PAGE,
         self::EVENT_CPC_QUOTE_PAGE,

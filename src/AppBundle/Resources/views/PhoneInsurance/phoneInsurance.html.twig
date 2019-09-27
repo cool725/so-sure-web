@@ -2,7 +2,6 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance' %}
-{% set seo_mode = true %}
 
 {% block title %}so-sure - phone insurance{% endblock %}
 {% block meta %}
@@ -17,7 +16,7 @@
 {% block body %}
 
     <section class="hero">
-        <div class="container container-xtra">
+        <div class="container-large">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="hero__intro">
@@ -60,7 +59,7 @@
     </section>
 
     {# Cred #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_cred.html.twig' %}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     {# Intro #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_intro.html.twig' %}

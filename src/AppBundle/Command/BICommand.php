@@ -363,7 +363,6 @@ class BICommand extends ContainerAwareCommand
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
-
         $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = $this->makeLine(
@@ -383,7 +382,7 @@ class BICommand extends ContainerAwareCommand
             'First Time Policy',
             'Policy Number Prior Renewal',
             'Policy Number Renewal',
-            'Upgrade Prior Policy Number',
+            'Policy Result of Upgrade',
             'This Policy is the X renewal',
             'Policy Status',
             'Expected Unpaid Cancellation Date',
@@ -403,7 +402,7 @@ class BICommand extends ContainerAwareCommand
             'First Scode Name',
             'All SCodes Used',
             'Promo Codes',
-            "Has Sign-up Bonus?",
+            'Has Sign-up Bonus?',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
             'Latest referer (user)',
@@ -419,7 +418,8 @@ class BICommand extends ContainerAwareCommand
             'Yearly Premium',
             'Premium Paid',
             'Premium Outstanding',
-            'Past Due Amount (Bad Debt Only)'
+            'Past Due Amount (Bad Debt Only)',
+            'Company of Policy'
         );
         foreach ($policies as $policy) {
             if ($policy->getEnd() <= $policy->getStart()) {
@@ -442,6 +442,7 @@ class BICommand extends ContainerAwareCommand
             if ($lastReverted) {
                 $reschedule = $scheduledPaymentRepo->getRescheduledBy($lastReverted);
             }
+            $company = $policy->getCompany();
             $lines[] = $this->makeLine(
                 $policy->getPolicyNumber(),
                 $user->getId(),
@@ -459,7 +460,7 @@ class BICommand extends ContainerAwareCommand
                 $policy->useForAttribution() ? 'yes' : 'no',
                 $previous ? $previous->getPolicyNumber() : '',
                 $next ? $next->getPolicyNumber() : '',
-                $this->getPreviousPolicyNumberIfUpgrade($policy),
+                $this->getPreviousPolicyIsUpgrade($policy),
                 $policy->getGeneration(),
                 $policy->getStatus(),
                 $policy->getStatus() == Policy::STATUS_UNPAID ?
@@ -498,7 +499,8 @@ class BICommand extends ContainerAwareCommand
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremiumPaid(),
                 $policy->getUnderwritingOutstandingPremium(),
-                $policy->getBadDebtAmount()
+                $policy->getBadDebtAmount(),
+                $company ? $company->getName() : ''
             );
         }
         if (!$skipS3) {
@@ -814,7 +816,10 @@ class BICommand extends ContainerAwareCommand
                 $transaction->getResponseCode()
             );
         }
-
+        if (!$skipS3) {
+            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
+            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
+        }
         return $lines;
     }
 
@@ -971,7 +976,7 @@ class BICommand extends ContainerAwareCommand
         return false;
     }
 
-    public function getPreviousPolicyNumberIfUpgrade(Policy $policy)
+    public function getPreviousPolicyIsUpgrade(Policy $policy)
     {
         $user = $policy->getUser();
         $previousPolicies = $user->getPolicies();
@@ -989,11 +994,11 @@ class BICommand extends ContainerAwareCommand
                 $cancelled = $previousPolicy->isCancelled();
                 $isUpgrade = $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE;
                 if ($cancelled && $isUpgrade) {
-                    return $previousPolicy->getPolicyNumber();
+                    return 'Yes';
                 }
             }
         }
-        return '';
+        return 'No';
     }
 
     /**

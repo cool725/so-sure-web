@@ -8,6 +8,7 @@ use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\Offer;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
+use AppBundle\Service\PostcodeService;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -476,6 +477,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\ManualOffer")
      */
     protected $offers = [];
+  
+    protected $allowedMonthly = true;
+
+    protected $allowedYearly = true;
 
     public function __construct()
     {
@@ -489,6 +494,42 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->multipays = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = \DateTime::createFromFormat('U', time());
         $this->resetToken();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedMonthly()
+    {
+        return $this->allowedMonthly;
+    }
+
+    /**
+     * @param bool $allowedMonthly
+     * @return User
+     */
+    public function setAllowedMonthly(bool $allowedMonthly)
+    {
+        $this->allowedMonthly = $allowedMonthly;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedYearly()
+    {
+        return $this->allowedYearly;
+    }
+
+    /**
+     * @param bool $allowedYearly
+     * @return User
+     */
+    public function setAllowedYearly(bool $allowedYearly)
+    {
+        $this->allowedYearly = $allowedYearly;
+        return $this;
     }
 
     public function resetToken()
@@ -2060,7 +2101,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
-    public function allowedMonthlyPayments()
+    public function allowedMonthlyPayments(PostcodeService $postcodeService)
     {
         // Billing address is required as necessary to determine postcode
         if (!$this->hasValidDetails() || !$this->getBillingAddress()) {
@@ -2071,14 +2112,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        $postcode = new Postcode($this->getBillingAddress()->getPostcode());
+        $postcode = $this->getBillingAddress()->getPostcode();
 
-        if (in_array(mb_strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes)) {
-            return false;
-        } elseif (in_array($postcode->normalise(), SoSure::$yearlyOnlyPostcodes)) {
+        if ($postcodeService->getIsAnnualOnlyPostCode($postcode)) {
+            $this->allowedMonthly = false;
             return false;
         }
-
+        $this->allowedMonthly = true;
         return true;
     }
 
@@ -2086,9 +2126,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         // No need to require Billing address as no postcode check
         if (!$this->hasValidDetails()) {
+            $this->allowedYearly = false;
             return false;
         }
-
+        $this->allowedYearly = true;
         return true;
     }
 
