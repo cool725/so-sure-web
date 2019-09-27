@@ -5537,10 +5537,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
-
-        static::$policyService->validatePremium($policy);
-
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertEquals(
             $price->getMonthlyPremiumPrice(),
@@ -5577,8 +5573,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
-
-        $currentPrice->setValidTo($validFrom);
 
         $payment = new JudoPayment();
         $payment->setAmount($price->getMonthlyPremiumPrice());
@@ -5623,8 +5617,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
-
         $payment = new JudoPayment();
         $payment->setAmount($price->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
@@ -5667,8 +5659,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
-
-        $currentPrice->setValidTo($validFrom);
 
         $payment = new JudoPayment();
         $payment->setAmount($price->getMonthlyPremiumPrice());
@@ -5713,8 +5703,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
-
         $payment = new JudoPayment();
         $payment->setAmount($price->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
@@ -5758,8 +5746,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
-
         $payment = new JudoPayment();
         $payment->setAmount($currentPrice->getMonthlyPremiumPrice());
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
@@ -5802,8 +5788,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
-
-        $currentPrice->setValidTo($validFrom);
 
         $payment = new JudoPayment();
         $payment->setAmount($currentPrice->getYearlyPremiumPrice());
@@ -5851,8 +5835,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
 
-        $currentPrice->setValidTo($validFrom);
-
         $payment = new JudoPayment();
         $payment->setAmount($price->getMonthlyPremiumPrice()+1);
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
@@ -5892,8 +5874,6 @@ class PolicyServiceTest extends WebTestCase
         $price->setGwp($phone->getCurrentPhonePrice()->getGwp()+1);
         $price->setValidFrom($validFrom);
         $phone->addPhonePrice($price);
-
-        $currentPrice->setValidTo($validFrom);
 
         $payment = new JudoPayment();
         $payment->setAmount($price->getYearlyPremiumPrice()+10);
