@@ -16,9 +16,10 @@ SKIP_PHING=0
 SKIP_FLUSH_REDIS=0
 COVER=0
 GROUP=""
+FAIL_RULE=""
 FUNCTIONAL_TEST="test:functional"
 DEBUG=""
-while getopts ":snpdDhcClrg:" opt; do
+while getopts ":snpdDhcClrfg:" opt; do
   case $opt in
     s)
       SKIP_POLICY=0
@@ -44,7 +45,10 @@ while getopts ":snpdDhcClrg:" opt; do
       COVER=1
       ;;
     g)
-      GROUP="$OPTARG"
+      GROUP="--group $OPTARG"
+      ;;
+    f)
+      FAIL_RULE="--stop-on-failure"
       ;;
     n)
       FUNCTIONAL_TEST="test:functional:nonet"
@@ -117,11 +121,7 @@ if [ "$RUN_FILTER" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
-  if [ "$GROUP" == "" ]; then
-    ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php
-  else
-    ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php --group "$GROUP"
-  fi
+  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php "$GROUP" "$FAIL_RULE"
 fi
 if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
   echo "Flushing redis"
