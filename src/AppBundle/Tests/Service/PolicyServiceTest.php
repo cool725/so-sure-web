@@ -339,7 +339,7 @@ class PolicyServiceTest extends WebTestCase
             mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
-        $this->assertEquals(new \DateTime('2016-01-01 04:00'), $updatedPolicy->getStart());
+        $this->assertEquals(new \DateTime('2016-01-01 03:00'), $updatedPolicy->getStart());
 
         // Needs to be prod for a valid policy number, or create will affect policy times
         static::$policyService->setEnvironment('prod');
@@ -353,7 +353,7 @@ class PolicyServiceTest extends WebTestCase
             mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
-        $this->assertEquals(new \DateTime('2016-01-01 04:00'), $updatedPolicy->getStart());
+        $this->assertEquals(new \DateTime('2016-01-01 03:00'), $updatedPolicy->getStart());
     }
 
     public function testCreatePolicyWithoutBillingSetBillingAt3am()
@@ -942,7 +942,7 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $this->assertEquals(
-            new \DateTime('2017-02-28 04:00'),
+            new \DateTime('2017-02-28 03:00'),
             $policy->getPolicyExpirationDate()
         );
     }
