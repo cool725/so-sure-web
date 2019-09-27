@@ -159,7 +159,7 @@ class Postcode
         // @codingStandardsIgnoreStart
         $regex = "(([^QVX][0-9]{1,2})|(([^QVX][^IJZ][0-9]{1,2})|(([^QVX][0-9][A-HJKSTUW])|([^QVX][^IJZ][0-9][ABEHMNPRVWXY]))))";
         // @codingStandardsIgnoreEnd
-        if (mb_strlen($postcode) >= 6) {
+        if (mb_strlen($postcode) >= 5) {
             $this->setType(self::POSTCODE);
             $outCode = mb_substr($postcode, 0, mb_strlen($postcode) -3);
             $inCode = mb_substr($postcode, -3);
