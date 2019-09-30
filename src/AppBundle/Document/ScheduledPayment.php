@@ -308,16 +308,23 @@ class ScheduledPayment
         $this->setType(self::TYPE_ADMIN);
     }
 
-    public function isBillable()
+    public function isBillable($includePending = false)
     {
+        $status = $this->getStatus();
+        $pending = false;
+        if ($includePending) {
+            $pending = $status == self::STATUS_PENDING;
+        }
         // Admin should ignore billable status to allow an expired policy to be billed
         if ($this->getType() == self::TYPE_ADMIN) {
-            return $this->getStatus() == self::STATUS_SCHEDULED &&
+            $scheduled = $status == self::STATUS_SCHEDULED;
+            return ($scheduled || $pending) &&
                     $this->getPolicy()->isPolicy();
         } else {
-            return $this->getStatus() == self::STATUS_SCHEDULED &&
-                    $this->getPolicy()->isPolicy() &&
-                    $this->getPolicy()->isBillablePolicy();
+            $scheduled = $status == self::STATUS_SCHEDULED;
+            return ($scheduled || $pending) &&
+                $this->getPolicy()->isPolicy() &&
+                $this->getPolicy()->isBillablePolicy();
         }
     }
 
@@ -396,11 +403,11 @@ class ScheduledPayment
          * there to be a difference between the scheduled day and the billing day.
          * At two points in the year, this difference can be 4 days, so as long as the
          * difference is 4 or less, but still in the same month we are good to go.
+         * Customers can also change payment type to card and keep their schedule,
+         * so we cannot rely on this only happening for BACs users.
          */
-        if ($this->policy->getPaymentMethod() instanceof BacsPaymentMethod) {
-            if ($diff->d <= 4 && $diff->m === 0) {
-                return true;
-            }
+        if ($diff->d <= 4 && $diff->m === 0) {
+            return true;
         }
 
         return false;
@@ -443,11 +450,12 @@ class ScheduledPayment
         ];
     }
 
-    public static function sumScheduledPaymentAmounts($scheduledPayments)
+    public static function sumScheduledPaymentAmounts($scheduledPayments, $includePending = false)
     {
         $total = 0;
+        /** @var ScheduledPayment $scheduledPayment */
         foreach ($scheduledPayments as $scheduledPayment) {
-            if ($scheduledPayment->isBillable()) {
+            if ($scheduledPayment->isBillable($includePending)) {
                 $total += $scheduledPayment->getAmount();
             }
         }

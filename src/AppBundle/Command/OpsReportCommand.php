@@ -80,12 +80,13 @@ class OpsReportCommand extends ContainerAwareCommand
         $this->mailerService->send(
             'CSP Report',
             'tech+ops@so-sure.com',
-            "CSP report generated.\n\n"
-                . "Number of CSP violations: " . count($items) . "\n"
-                . "Bucket: " . $this->bucket . "\n"
-                . "Folder: " . $this->folder . "\n"
+            "CSP report generated.<br /><br />"
+                . "Number of CSP violations: " . count($items) . "<br />"
+                . "Bucket: " . $this->bucket . "<br />"
+                . "Folder: " . $this->folder . "<br />"
+                . "File: " . $fileName . "<br />"
                 . "Click the following link to download from S3 "
-                . "(this link will be valid for 1 week):\n\n"
+                . "(this link will be valid for 1 week):<br /><br />"
                 . $this->createS3PresignedUrl($fileName)
         );
         unset($file);

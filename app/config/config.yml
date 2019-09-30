@@ -544,6 +544,7 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://ep.smct.co
+                - https://*.eu-west-1.amazonaws.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -756,6 +757,7 @@ nelmio_security:
                 - https://use.fontawesome.com
                 - https://pro.fontawesome.com
                 - https://fonts.gstatic.com
+                - https://fonts.smct.co
                 - 'data:'
             child-src:
                 - 'self'
@@ -1160,6 +1162,8 @@ nelmio_security:
                 - https://cdn.smct.co
                 - https://pixel.leadzu.com
                 - https://ssl.gstatic.com
+                - https://ep.smct.co
+                - https://*.smct.co
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

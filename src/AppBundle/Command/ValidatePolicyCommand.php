@@ -710,7 +710,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     private function failureScheduledPaymentsMessage(Policy $policy, $date)
     {
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
-        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, true);
         $billingDayIssue = $policy->arePolicyScheduledPaymentsCorrect(false, $date);
 
         // @codingStandardsIgnoreStart

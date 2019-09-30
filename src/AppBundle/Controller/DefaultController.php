@@ -779,6 +779,18 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/help", name="help")
+     * @Route("/help/{section}", name="help_section", requirements={"section"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/help/{section}/{article}", name="help_section_article",
+     * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Template
+     */
+    public function helpAction()
+    {
+        return $this->redirectToRoute('faq', [], 301);
+    }
+
+    /**
      * @Route("/faq", name="faq")
      * @Template
      */
