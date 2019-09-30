@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
