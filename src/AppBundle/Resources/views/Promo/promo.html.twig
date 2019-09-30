@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'promo' %}
+{% set robots_noindex = true %}
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
@@ -31,8 +32,6 @@
     {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a special code to get cash back if you dont\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% endif %}
-
-{% set robots_noindex = true %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/promo.css') }}">
