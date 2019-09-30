@@ -340,6 +340,8 @@ class CheckoutService
                 $policy->getId()
             ));
         }
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
+        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $payment = null;
         if (!$policy->getStatus() ||
             in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
@@ -395,8 +397,6 @@ class CheckoutService
         }
         // Make sure upcoming rescheduled scheduled payments are now cancelled.
         if ($payment && $payment->getAmount() > 0) {
-            /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
-            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
             $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
             foreach ($rescheduledPayments as $rescheduled) {
                 $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
