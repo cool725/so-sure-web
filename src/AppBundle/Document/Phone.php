@@ -111,6 +111,11 @@ class Phone
     protected $phonePrices = [];
 
     /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
+     */
+    protected $annualPhonePrices = [];
+
+    /**
      * List of the phone's retail prices over time. Not guaranteed to be in order.
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhoneRetailPrice")
      */
@@ -606,6 +611,16 @@ class Phone
     public function addPhonePrice(PhonePrice $phonePrice)
     {
         $this->phonePrices[] = $phonePrice;
+    }
+
+    public function getAnnualPhonePrices()
+    {
+        return $this->annualPhonePrices;
+    }
+
+    public function addAnnualPhonePrice(PhonePrice $phonePrice)
+    {
+        $this->annualPhonePrices[] = $phonePrice;
     }
 
     public function getInitialPrice()
