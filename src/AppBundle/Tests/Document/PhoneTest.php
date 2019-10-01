@@ -489,8 +489,11 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->addPhonePrice($priceB);
         $phone->addPhonePrice($priceA);
         $phone->addPhonePrice($priceC);
-        $this->assertEquals([$priceA], $phone->getPreviousPhonePrices());
-        $this->assertEquals([$priceB, $priceA], $phone->getPreviousPhonePrices(new \DateTime('2050-01-01')));
+        $this->assertEquals([$priceA], $phone->getPreviousPhonePrices(PhonePrice::STREAM_ANY));
+        $this->assertEquals(
+            [$priceB, $priceA],
+            $phone->getPreviousPhonePrices(PhonePrice::STREAM_ANY, new \DateTime('2050-01-01'))
+        );
     }
 
     /**
@@ -529,13 +532,13 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceB->setValidFrom((clone $date)->sub(new \DateInterval("PT5M")));
         $priceC->setValidFrom((clone $date)->add(new \DateInterval("PT5M")));
         $priceD->setValidFrom((clone $date)->add(new \DateInterval("P1DT37M")));
-        $this->assertEquals([], $phone->getRecentPhonePrices(10));
+        $this->assertEquals([], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10));
         $phone->addPhonePrice($priceB);
         $phone->addPhonePrice($priceA);
         $phone->addPhonePrice($priceC);
         $phone->addPhonePrice($priceD);
-        $this->assertEquals([$priceB], $phone->getRecentPhonePrices(10));
-        $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(100000));
+        $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10));
+        $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 100000));
     }
 
     private function getSamplePhoneA()
