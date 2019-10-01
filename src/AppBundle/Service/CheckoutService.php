@@ -340,30 +340,21 @@ class CheckoutService
                 $policy->getId()
             ));
         }
-
-        // Make sure upcoming rescheduled scheduled payments are now cancelled.
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
-        $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
-        foreach ($rescheduledPayments as $rescheduled) {
-            //TODO: Watch this, if payments are still being cancelled on a 0 amount payment, this will be why!
-            $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
-        }
+        $payment = null;
         if (!$policy->getStatus() ||
             in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
             // New policy
-
             // Mark policy as pending for monitoring purposes
             $policy->setStatus(PhonePolicy::STATUS_PENDING);
             $this->dm->flush();
-
             $payment = $this->createPayment(
                 $policy,
                 $chargeId,
                 $source,
                 $date
             );
-
             $this->policyService->create($policy, $date, true, null, $identityLog);
             $this->dm->flush();
         } else {
@@ -401,19 +392,22 @@ class CheckoutService
                 /** @var Policy $policy */
                 $policy = $this->dm->merge($policy);
             }
-
             $this->validatePolicyStatus($policy, $date);
             $this->dm->flush();
         }
-
+        // Make sure upcoming rescheduled scheduled payments are now cancelled.
+        if ($payment && $payment->getAmount() > 0) {
+            $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
+            foreach ($rescheduledPayments as $rescheduled) {
+                $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
+            }
+        }
         // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
         if ($policy->isDifferentPayer()) {
             $policy->setPayer($policy->getUser());
             $this->dm->flush();
         }
-
         $this->statsd->endTiming("judopay.add");
-
         return true;
     }
 
