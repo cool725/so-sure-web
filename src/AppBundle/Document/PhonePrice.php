@@ -21,6 +21,10 @@ class PhonePrice extends Price
     const STREAM_ANY = 'any';
     const STREAMS = [
         self::STREAM_MONTHLY,
+        self::STREAM_YEARLY
+    ];
+    const STREAM_POSITIONS = [
+        self::STREAM_MONTHLY,
         self::STREAM_YEARLY,
         self::STREAM_ALL
     ];
@@ -33,7 +37,7 @@ class PhonePrice extends Price
     protected $picSureExcess;
 
     /**
-     * @Assert\Choice(choices=PhonePrice::STREAMS)
+     * @Assert\Choice(choices=PhonePrice::STREAM_POSITIONS)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

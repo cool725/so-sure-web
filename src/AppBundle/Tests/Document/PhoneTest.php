@@ -368,39 +368,33 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         // before start none should work.
         $date = new \DateTime('2018-12-25');
         $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
-        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
         $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
         $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
         // After A start all should be A.
         $date = new \DateTime('2019-01-17');
         $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
-        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
         $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
         $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
         // After B start, yearly any and all will find it.
         $date = new \DateTime('2019-02-15');
         $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
-        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
         $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
         $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
         // After C start, monthly has it's own value and all is now gone.
         $date = new \DateTime('2019-04-11');
         $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
-        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
         $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
-        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
         // After D start, there is a new monthly.
-        $date = new \DateTime('2019-04-25');
-        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
-        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $date = new \DateTime('2019-04-28');
+        $this->assertEquals($priceD, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
         $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
-        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        $this->assertEquals($priceD, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
         // After E start, everything becomes E.
         $date = new \DateTime('2019-05-21');
-        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
-        $this->assertEquals($priceE, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
-        $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
-        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        $this->assertEquals($priceE, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertEquals($priceE, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        $this->assertEquals($priceE, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
     }
 
     /**
@@ -409,8 +403,38 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLowestCurrentPhonePrice()
     {
-        // TODO: this.
-        $this->assertFalse(false);
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceD = new PhonePrice();
+        $priceE = new PhonePrice();
+        $priceB->setGwp(1);
+        $priceC->setGwp(2);
+        $priceA->setGwp(3);
+        $priceE->setGwp(4);
+        $priceD->setGwp(5);
+        $priceA->setValidFrom(new \DateTime('2019-01-01'));
+        $priceB->setValidFrom(new \DateTime('2019-02-13'));
+        $priceC->setValidFrom(new \DateTime('2019-04-08'));
+        $priceD->setValidFrom(new \DateTime('2019-04-27'));
+        $priceE->setValidFrom(new \DateTime('2019-05-19'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
+        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
+        // Add them out of order to show it is irrelevant.
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceC);
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceD);
+        $phone->addPhonePrice($priceE);
+        // Now we find what we are looking for.
+        $this->assertNull($phone->getLowestCurrentPhonePrice(new \DateTime('2018-06-12')));
+        $this->assertEquals($priceA, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-01-02')));
+        $this->assertEquals($priceB, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-02-14')));
+        $this->assertEquals($priceB, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-04-14')));
+        $this->assertEquals($priceB, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-05-02')));
+        $this->assertEquals($priceE, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-07-22')));
     }
 
     /**
@@ -419,8 +443,33 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetOldestCurrentPhonePrice()
     {
-        // TODO: this.
-        $this->assertTrue(false);
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceD = new PhonePrice();
+        $priceE = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2019-01-01'));
+        $priceB->setValidFrom(new \DateTime('2019-02-13'));
+        $priceC->setValidFrom(new \DateTime('2019-04-08'));
+        $priceD->setValidFrom(new \DateTime('2019-04-27'));
+        $priceE->setValidFrom(new \DateTime('2019-05-19'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
+        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
+        // Add them out of order to show it is irrelevant.
+        $phone->addPhonePrice($priceE);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceD);
+        $phone->addPhonePrice($priceC);
+        // Now we find what we are looking for.
+        $this->assertNull($phone->getLowestCurrentPhonePrice(new \DateTime('2018-06-12')));
+        $this->assertEquals($priceA, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-01-02')));
+        $this->assertEquals($priceA, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-02-14')));
+        $this->assertEquals($priceB, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-04-14')));
+        $this->assertEquals($priceB, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-05-02')));
+        $this->assertEquals($priceE, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-07-22')));
     }
 
     /**
@@ -436,7 +485,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceA->setValidFrom(new \DateTime('2018-02-19'));
         $priceB->setValidFrom(new \DateTime('2019-05-02'));
         $priceC->setValidFrom(new \DateTime('2020-11-08'));
-        $this->assertEquals([], $phone->getPreviousPhonePrices());
+        $this->assertEquals([], $phone->getPreviousPhonePrices(PhonePrice::STREAM_ANY));
         $phone->addPhonePrice($priceB);
         $phone->addPhonePrice($priceA);
         $phone->addPhonePrice($priceC);
@@ -457,11 +506,11 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceA->setValidFrom(new \DateTime('2018-02-19'));
         $priceB->setValidFrom(new \DateTime('2019-05-02'));
         $priceC->setValidFrom(new \DateTime('2020-11-08'));
-        $this->assertEquals([], $phone->getFuturePhonePrices());
+        $this->assertEquals([], $phone->getFuturePhonePrices(PhonePrice::STREAM_ANY));
         $phone->addPhonePrice($priceB);
         $phone->addPhonePrice($priceA);
         $phone->addPhonePrice($priceC);
-        $this->assertEquals([$priceC], $phone->getFuturePhonePrices());
+        $this->assertEquals([$priceC], $phone->getFuturePhonePrices(PhonePrice::STREAM_ANY));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\Excess\PhoneExcess;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Tests\Document\PhoneExcessTest;
+use AppBundle\Exception\InvalidPriceStreamException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
@@ -305,7 +306,7 @@ class Phone
         $this->initialPriceUrl = mb_strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
         if ($premium > 0) {
-            $phonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_ALL);
+            $phonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             if (!$phonePrice) {
                 $phonePrice = new PhonePrice();
                 $phonePrice->setValidFrom($date);
@@ -947,9 +948,11 @@ class Phone
      */
     public function getCurrentPhonePrice($stream, \DateTime $date = null)
     {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+        if ($stream == PhonePrice::STREAM_ALL) {
+            // Note that it would be possible to calculate this, but it would make the code ugly and seems illogical.
+            throw new InvalidPriceStreamException("Can't get current price occupying all streams");
         }
+        $date = $date ?: new \DateTime();
         foreach ($this->getOrderedPhonePrices($stream) as $price) {
             if ($price->getValidFrom() <= $date) {
                 return $price;
@@ -965,9 +968,21 @@ class Phone
      */
     public function getLowestCurrentPhonePrice(\DateTime $date = null)
     {
-        if (!date) {
-            $date = new \DateTime();
+        $date = $date ?: new \DateTime();
+        $prices = [];
+        foreach (PhonePrice::STREAMS as $stream) {
+            $price = $this->getCurrentPhonePrice($stream, $date);
+            if ($price) {
+                $prices[] = $price;
+            }
         }
+        if (count($prices) == 0) {
+            return null;
+        }
+        usort($prices, function ($a, $b) {
+            return ($a->getGwp() < $b->getGwp()) ? -1 : 1;
+        });
+        return $prices[0];
     }
 
     /**
@@ -977,9 +992,21 @@ class Phone
      */
     public function getOldestCurrentPhonePrice(\DateTime $date = null)
     {
-        if (!$date) {
-            $date = new \DateTime();
+        $date = $date ?: new \DateTime();
+        $prices = [];
+        foreach (PhonePrice::STREAMS as $stream) {
+            $price = $this->getCurrentPhonePrice($stream, $date);
+            if ($price) {
+                $prices[] = $price;
+            }
         }
+        if (count($prices) == 0) {
+            return null;
+        }
+        usort($prices, function ($a, $b) {
+            return ($a->getValidFrom() < $b->getValidFrom()) ? -1 : 1;
+        });
+        return $prices[0];
     }
 
     /**
@@ -991,9 +1018,7 @@ class Phone
      */
     public function getPreviousPhonePrices($stream, \DateTime $date = null)
     {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
-        }
+        $date = $date ?: new \DateTime();
         $previous = [];
         $old = false;
         foreach ($this->getOrderedPhonePrices($stream) as $price) {
@@ -1014,9 +1039,7 @@ class Phone
      */
     public function getFuturePhonePrices($stream, \DateTime $date = null)
     {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
-        }
+        $date = $date ?: new \DateTime();
         $future = [];
         foreach ($this->getPhonePrices() as $price) {
             if ($price->getValidFrom() > $date && $price->inStream($stream)) {
