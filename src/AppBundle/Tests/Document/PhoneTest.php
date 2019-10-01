@@ -303,30 +303,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Makes sure that getOrderedPhonePrices gives all phone prices in descending order.
+     * @dataProvider priceStreamProvider
      */
-    public function testGetOrderedPhonePrices()
+    public function testGetOrderedPhonePrices($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceD = new PhonePrice();
-        $priceE = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2019-01-01'));
-        $priceB->setValidFrom(new \DateTime('2019-02-13'));
-        $priceC->setValidFrom(new \DateTime('2019-04-08'));
-        $priceD->setValidFrom(new \DateTime('2019-04-27'));
-        $priceE->setValidFrom(new \DateTime('2019-05-19'));
-        $priceB->setStream(PhonePrice::STREAM_YEARLY);
-        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
-        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
-        // Add them out of order to show it is irrelevant.
-        $phone->addPhonePrice($priceE);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceD);
-        $phone->addPhonePrice($priceC);
-        // now make sure we get what we desire.
         $this->assertEquals([$priceE, $priceA], $phone->getOrderedPhonePrices(PhonePrice::STREAM_ALL));
         $this->assertEquals([$priceE, $priceB, $priceA], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY));
         $this->assertEquals(
@@ -342,29 +322,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     /**
      * Makes sure that getCurrentPhonePrice gets the phone price that is current so long as there is one, and uses no
      * maximum dates.
+     * @dataProvider priceStreamProvider
      */
-    public function testGetCurrentPhonePrice()
+    public function testGetCurrentPhonePrice($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceD = new PhonePrice();
-        $priceE = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2019-01-01'));
-        $priceB->setValidFrom(new \DateTime('2019-02-13'));
-        $priceC->setValidFrom(new \DateTime('2019-04-08'));
-        $priceD->setValidFrom(new \DateTime('2019-04-27'));
-        $priceE->setValidFrom(new \DateTime('2019-05-19'));
-        $priceB->setStream(PhonePrice::STREAM_YEARLY);
-        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
-        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
-        // Add them out of order to show it is irrelevant.
-        $phone->addPhonePrice($priceE);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceD);
-        $phone->addPhonePrice($priceC);
         // before start none should work.
         $date = new \DateTime('2018-12-25');
         $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
@@ -400,35 +361,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     /**
      * Makes sure that getLowestCurrentPhonePrice finds the phone price that is the lowest in the streams of those that
      * are currently going.
+     * @dataProvider priceStreamProvider
      */
-    public function testGetLowestCurrentPhonePrice()
+    public function testGetLowestCurrentPhonePrice($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceD = new PhonePrice();
-        $priceE = new PhonePrice();
-        $priceB->setGwp(1);
-        $priceC->setGwp(2);
-        $priceA->setGwp(3);
-        $priceE->setGwp(4);
-        $priceD->setGwp(5);
-        $priceA->setValidFrom(new \DateTime('2019-01-01'));
-        $priceB->setValidFrom(new \DateTime('2019-02-13'));
-        $priceC->setValidFrom(new \DateTime('2019-04-08'));
-        $priceD->setValidFrom(new \DateTime('2019-04-27'));
-        $priceE->setValidFrom(new \DateTime('2019-05-19'));
-        $priceB->setStream(PhonePrice::STREAM_YEARLY);
-        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
-        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
-        // Add them out of order to show it is irrelevant.
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceC);
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceD);
-        $phone->addPhonePrice($priceE);
-        // Now we find what we are looking for.
         $this->assertNull($phone->getLowestCurrentPhonePrice(new \DateTime('2018-06-12')));
         $this->assertEquals($priceA, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-01-02')));
         $this->assertEquals($priceB, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-02-14')));
@@ -440,30 +376,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     /**
      * Makes sure that getOldestCurrentPhonePrice finds the phone price that is the oldest in the streams of those that
      * are currently going.
+     * @dataProvider priceStreamProvider
      */
-    public function testGetOldestCurrentPhonePrice()
+    public function testGetOldestCurrentPhonePrice($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceD = new PhonePrice();
-        $priceE = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2019-01-01'));
-        $priceB->setValidFrom(new \DateTime('2019-02-13'));
-        $priceC->setValidFrom(new \DateTime('2019-04-08'));
-        $priceD->setValidFrom(new \DateTime('2019-04-27'));
-        $priceE->setValidFrom(new \DateTime('2019-05-19'));
-        $priceB->setStream(PhonePrice::STREAM_YEARLY);
-        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
-        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
-        // Add them out of order to show it is irrelevant.
-        $phone->addPhonePrice($priceE);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceD);
-        $phone->addPhonePrice($priceC);
-        // Now we find what we are looking for.
         $this->assertNull($phone->getLowestCurrentPhonePrice(new \DateTime('2018-06-12')));
         $this->assertEquals($priceA, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-01-02')));
         $this->assertEquals($priceA, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-02-14')));
@@ -539,6 +455,46 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->addPhonePrice($priceD);
         $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10));
         $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 100000));
+    }
+
+    /**
+     * Provides a set of data pertaining to price streams.
+     * Price A is all streams and starts at 2019-01-01.
+     * Price B is yearly and starts at 2019-02-13.
+     * Price C is monthly and starts at 2019-04-08.
+     * Price D is monthly and starts at 2019-04-27.
+     * Price E is all streams and starts at 2019-05-19.
+     * @return array of test cases which actually only contains one test case.
+     */
+    public function priceStreamProvider()
+    {
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceD = new PhonePrice();
+        $priceE = new PhonePrice();
+        $priceB->setGwp(1);
+        $priceC->setGwp(2);
+        $priceA->setGwp(3);
+        $priceE->setGwp(4);
+        $priceD->setGwp(5);
+        $priceA->setValidFrom(new \DateTime('2019-01-01'));
+        $priceB->setValidFrom(new \DateTime('2019-02-13'));
+        $priceC->setValidFrom(new \DateTime('2019-04-08'));
+        $priceD->setValidFrom(new \DateTime('2019-04-27'));
+        $priceE->setValidFrom(new \DateTime('2019-05-19'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
+        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceC);
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceD);
+        $phone->addPhonePrice($priceE);
+        return [
+            [$phone, $priceA, $priceB, $priceC, $priceD, $priceE]
+        ];
     }
 
     private function getSamplePhoneA()

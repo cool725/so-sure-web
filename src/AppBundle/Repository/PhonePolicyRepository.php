@@ -151,7 +151,8 @@ class PhonePolicyRepository extends PolicyRepository
 
         $policy = new PhonePolicy();
 
-        $qb = $this->createQueryBuilder()->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        $qb = $this->createQueryBuilder()
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
         $qb->field('start')->lt($endDate);
         if ($startDate) {
