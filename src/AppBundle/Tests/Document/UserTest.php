@@ -889,6 +889,7 @@ class UserTest extends WebTestCase
     /**
      * Tests that getCurrentPremiumForPhone gets the premium the user should use for the given phone whether they have
      * an offer or multiple offers or just the normal premium on the phone.
+     * TODO: this is going to be using redis so we are going to have to move this to a functional test.
      */
     public function testGetCurrentPriceForPhone()
     {
@@ -904,12 +905,9 @@ class UserTest extends WebTestCase
         $phoneA->setId("bing bing");
         $phoneB->setId("wahoo");
         $priceA->setValidFrom(new \DateTime('2019-05-06'));
-        $priceA->setValidTo(new \DateTime('2019-06-02'));
         $priceB->setValidFrom(new \DateTime('2019-01-06'));
         $priceC->setValidFrom(new \DateTime('2019-04-01'));
-        $priceC->setValidTo(new \DateTime('2019-09-01'));
         $priceD->setValidFrom(new \DateTime('2019-01-01'));
-        $priceD->setValidTo(new \DateTime('2019-01-07'));
         $offerA->setPhone($phoneA);
         $offerA->setPrice($priceA);
         $offerB->setPhone($phoneB);

@@ -7,6 +7,7 @@ use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
@@ -194,7 +195,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $adjusted[] = $phone->getId();
             /** @var PhonePremium $currentPrice */
-            $currentPrice = $phone->getCurrentPhonePrice();
+            $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL);
             $adjustedPrice = $currentPrice->getGwp() - 0.01;
             if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $currentPrice->getGwp() - 0.30) {
                 $adjustedPrice = $currentPrice->getGwp() - 0.30;

@@ -130,7 +130,6 @@ use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\BarclaysStatementFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
-use AppBundle\Helpers\PolicyPhonePriceHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

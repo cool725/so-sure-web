@@ -3962,14 +3962,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function userOffersAction($id)
     {
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(Policy::class);
-        /** @var OfferRepository */
-        $offerRepo = $dm->getRepository(Offer::class);
-        $offers = $offerRepo->find([]);
-        return [
-            "offers" => $offers
-        ];
+        // TODO: consider implementing.
+        return [];
     }
 
     public function createOfferFormAction()

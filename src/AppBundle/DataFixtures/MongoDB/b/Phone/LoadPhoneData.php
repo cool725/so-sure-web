@@ -7,6 +7,7 @@ use AppBundle\Service\MailerService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -333,7 +334,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             $manager->persist($phone);
             $manager->flush();
-            if (!$phone->getCurrentPhonePrice() && $premium > 0) {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL) && $premium > 0) {
                 throw new \Exception('Failed to init phone');
             }
 
@@ -375,7 +376,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         $phone->init($make, $model, $policyPrice + 1.5, $latestTerms, $memory, $devices);
         $manager->persist($phone);
 
-        if (!$phone->getCurrentPhonePrice()) {
+        if (!$phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL)) {
             throw new \Exception('Failed to init phone');
         }
         /*

@@ -310,14 +310,33 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceA = new PhonePrice();
         $priceB = new PhonePrice();
         $priceC = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2018-02-19'));
-        $priceB->setValidFrom(new \DateTime('2019-05-02'));
-        $priceC->setValidFrom(new \DateTime('2020-11-08'));
-        $this->assertEquals([], $phone->getOrderedPhonePrices());
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceC);
-        $this->assertEquals([$priceC, $priceB, $priceA], $phone->getOrderedPhonePrices());
+        $priceD = new PhonePrice();
+        $priceE = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2019-01-01'));
+        $priceB->setValidFrom(new \DateTime('2019-02-13'));
+        $priceC->setValidFrom(new \DateTime('2019-04-08'));
+        $priceD->setValidFrom(new \DateTime('2019-04-27'));
+        $priceE->setValidFrom(new \DateTime('2019-05-19'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
+        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
+        // Add them out of order to show it is irrelevant.
+        $phone->addPrice($priceE);
+        $phone->addPrice($priceA);
+        $phone->addPrice($priceB);
+        $phone->addPrice($priceD);
+        $phone->addPrice($priceC);
+        // now make sure we get what we desire.
+        $this->assertEquals([$priceA, $priceE], $phone->getOrderedPhonePrices(PhonePrice::STREAM_ALL));
+        $this->assertEquals([$priceA, $priceB, $priceE], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY));
+        $this->assertEquals(
+            [$priceA, $priceC, $priceD, $priceE],
+            $phone->getOrderedPhonePrices(PhonePrice::STREAM_MONTHLY)
+        );
+        $this->assertEquals(
+            [$priceA, $priceB, $priceC, $priceD, $priceE],
+            $phone->getOrderedPhonePrices(PhonePrice::STREAM_ANY)
+        );
     }
 
     /**
@@ -339,6 +358,12 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->addPhonePrice($priceC);
         $this->assertEquals($priceB, $phone->getCurrentPhonePrice());
         $this->assertEquals($priceC, $phone->getCurrentPhonePrice(new \DateTime('2050-01-01')));
+    }
+
+    public function testGetLowestCurrentPhonePrice()
+    {
+        // TODO: this.
+        $this->assert(false);
     }
 
     /**
