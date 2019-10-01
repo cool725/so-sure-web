@@ -394,6 +394,8 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetPreviousPhonePrices()
     {
+        // TODO: accomodate price streams.
+        $this->assertTrue(false);
         $phone = new Phone();
         $priceA = new PhonePrice();
         $priceB = new PhonePrice();
@@ -418,6 +420,8 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetFuturePhonePrices()
     {
+        // TODO: accomodate price streams.
+        $this->assertTrue(false);
         $phone = new Phone();
         $priceA = new PhonePrice();
         $priceB = new PhonePrice();
@@ -438,6 +442,8 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRecentPhonePrices()
     {
+        // TODO: accomodate price streams.
+        $this->assertTrue(false);
         $phone = new Phone();
         $priceA = new PhonePrice();
         $priceB = new PhonePrice();
