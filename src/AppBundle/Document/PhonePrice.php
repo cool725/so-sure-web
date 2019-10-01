@@ -22,8 +22,7 @@ class PhonePrice extends Price
     const STREAMS = [
         self::STREAM_MONTHLY,
         self::STREAM_YEARLY,
-        self::STREAM_ALL,
-        self::STREAM_ANY
+        self::STREAM_ALL
     ];
 
     /**
@@ -68,9 +67,6 @@ class PhonePrice extends Price
      */
     public function setStream($stream)
     {
-        if ($stream == self::STREAM_ANY) {
-            throw new \IllegalArgumentException("You cannot put a price into 'any' stream");
-        }
         $this->stream = $stream;
     }
 

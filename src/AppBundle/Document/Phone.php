@@ -305,7 +305,7 @@ class Phone
         $this->initialPriceUrl = mb_strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
         if ($premium > 0) {
-            $phonePrice = $this->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL);
+            $phonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_ALL);
             if (!$phonePrice) {
                 $phonePrice = new PhonePrice();
                 $phonePrice->setValidFrom($date);
@@ -887,13 +887,13 @@ class Phone
 
     /**
      * Gives you the amount of profit that policies on this phone should yield under some assumed variables.
-     * @param string $channel        is the price channel we are calculating this for.
+     * @param string $stream         is the price stream we are calculating this for.
      * @param float  $claimFrequency is the assumed frequency of claims.
      * @param float  $consumerPayout is an assumed amount removed from earned money after underwriter commission.
      * @param float  $iptRebate      is the assumed amount of IPT rebated.
      * @return float the amount of profit that there should be per policy on this phone under the given assumptions.
      */
-    public function policyProfit($channel, $claimFrequency, $consumerPayout, $iptRebate)
+    public function policyProfit($stream, $claimFrequency, $consumerPayout, $iptRebate)
     {
         $price = $this->getReplacementPrice();
         if (!$price && $this->getSuggestedReplacement()) {
@@ -905,7 +905,7 @@ class Phone
         // Avg Excess + Expected Recycling - Claims handling fee - Claims Check fee - replacement phone price
         $netCostOfClaims = 56 + 19 - 14 - 1 - $price;
         /** @var PhonePrice $price */
-        $price = $this->getCurrentPhonePrice($channel);
+        $price = $this->getCurrentPhonePrice($stream);
         $uwReceived = $price->getYearlyGwp() - Salva::YEARLY_COVERHOLDER_COMMISSION;
         $nwp = $uwReceived - $consumerPayout;
         $uwPrefReturn = ($nwp * 0.08);
@@ -914,11 +914,11 @@ class Phone
     }
 
     /**
-     * Gives you all of the phone's prices in the given channel in descending order of when they become valid.
-     * @param string $channel is the channel of prices we are trying to get.
+     * Gives you all of the phone's prices in the given stream in descending order of when they become valid.
+     * @param string $stream is the stream of prices we are trying to get.
      * @return array of the prices.
      */
-    public function getOrderedPhonePrices($channel)
+    public function getOrderedPhonePrices($stream)
     {
         $prices = $this->getPhonePrices();
         if (!is_array($prices)) {
@@ -934,23 +934,23 @@ class Phone
             }
             return 0;
         });
-        return array_filter($prices, function ($price) {
-            return $price->inChannel($channel);
-        });
+        return array_values(array_filter($prices, function ($price) use ($stream) {
+            return $price->inStream($stream);
+        }));
     }
 
     /**
      * Returns the price that is current.
-     * @param string         $channel is the price channel that we want the current price for.
+     * @param string         $stream is the price stream that we want the current price for.
      * @param \DateTime|null $date    the date at which the price should be current. Null for now.
      * @return PhonePrice|null the found price or null if there is no price current at that time.
      */
-    public function getCurrentPhonePrice($channel, \DateTime $date = null)
+    public function getCurrentPhonePrice($stream, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-        foreach ($this->getOrderedPhonePrices($channel) as $price) {
+        foreach ($this->getOrderedPhonePrices($stream) as $price) {
             if ($price->getValidFrom() <= $date) {
                 return $price;
             }
@@ -959,20 +959,44 @@ class Phone
     }
 
     /**
+     * Gets all the phone prices that are current in different streams and then returns the one that is the cheapest.
+     * @param \DateTime|null $date is the date at which the prices should be current or null for current time.
+     * @return PhonePrice|null the lowest current phone price or null if no phone prices are current at all.
+     */
+    public function getLowestCurrentPhonePrice(\DateTime $date = null)
+    {
+        if (!date) {
+            $date = new \DateTime();
+        }
+    }
+
+    /**
+     * Gets all the phone prices that are current in different streams and then returns the one that is the oldest.
+     * @param \DateTime|null $date is the date at which the prices should be current or null to use the current time.
+     * @return PhonePrice|null the oldest current phone price or null if there are no current prices.
+     */
+    public function getOldestCurrentPhonePrice(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+    }
+
+    /**
      * Gives a list of all phone prices that have been current in the past but are not any more. The list will be in
      * order from newest to oldest.
-     * @param string         $channel is the price channel that we want the previous prices for.
+     * @param string         $stream is the price stream that we want the previous prices for.
      * @param \DateTime|null $date    is the date at which we are checking.
      * @return array of matching phone prices.
      */
-    public function getPreviousPhonePrices($channel, \DateTime $date = null)
+    public function getPreviousPhonePrices($stream, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
         $previous = [];
         $old = false;
-        foreach ($this->getOrderedPhonePrices($channel) as $price) {
+        foreach ($this->getOrderedPhonePrices($stream) as $price) {
             if ($old) {
                 $previous[] = $price;
             } elseif ($price->getValidFrom() <= $date) {
@@ -984,18 +1008,18 @@ class Phone
 
     /**
      * Gives all phone prices that are yet in the future.
-     * @param string         $channel is the price channel that we want the future prices for.
+     * @param string         $stream  is the price stream that we want the future prices for.
      * @param \DateTime|null $date    is the date which is to be considered the present.
      * @return array containing the prices.
      */
-    public function getFuturePhonePrices($channel, \DateTime $date = null)
+    public function getFuturePhonePrices($stream, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
         $future = [];
         foreach ($this->getPhonePrices() as $price) {
-            if ($price->getValidFrom() > $date && $price->inChannel($channel)) {
+            if ($price->getValidFrom() > $date && $price->inStream($stream)) {
                 $future[] = $price;
             }
         }
@@ -1004,18 +1028,18 @@ class Phone
 
     /**
      * Gives a list of all phone prices that have been valid since the given number of minutes from right now.
-     * @param string $channel is the price channel that we want the recent prices for.
+     * @param string $stream  is the price stream that we want the recent prices for.
      * @param int    $minutes is the number of minutes deviance within which to find the prices.
      * @return array with all the prices within it.
      */
-    public function getRecentPhonePrices($channel, int $minutes)
+    public function getRecentPhonePrices($stream, int $minutes)
     {
         $date = new \DateTime();
         $line = (clone $date)->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
         $recent = [];
         foreach ($this->getPhonePrices() as $price) {
             $validFrom = $price->getValidFrom();
-            if ($validFrom >= $line && $validFrom < $date && $price->inChannel($channel)) {
+            if ($validFrom >= $line && $validFrom < $date && $price->inStream($stream)) {
                 $recent[] = $price;
             }
         }
@@ -1024,12 +1048,12 @@ class Phone
 
     public function getPreviousPhonePricesAsString(\DateTime $date = null)
     {
-        return $this->getPhonePricesAsString($this->getPreviousPhonePrices(PhonePrice::CHANNEL_ALL, $date));
+        return $this->getPhonePricesAsString($this->getPreviousPhonePrices(PhonePrice::STREAM_ALL, $date));
     }
 
     public function getFuturePhonePricesAsString(\DateTime $date = null)
     {
-        return $this->getPhonePricesAsString($this->getFuturePhonePrices(PhonePrice::CHANNEL_ALL, $date));
+        return $this->getPhonePricesAsString($this->getFuturePhonePrices(PhonePrice::STREAM_ALL, $date));
     }
 
     public function getPhonePricesAsString($prices)
@@ -1040,7 +1064,7 @@ class Phone
                 "%s @ £%.2f - %s",
                 $price->getValidFrom()->format(\DateTime::ATOM),
                 $price->getMonthlyPremiumPrice(),
-                $price->getChannel()
+                $price->getStream()
             );
         }
         return implode(PHP_EOL, $lines);
@@ -1408,12 +1432,12 @@ class Phone
                 $this->getSalvaMiniumumBinderMonthlyPremium()
             ));
         }
-        if ($this->getCurrentPhonePrice()) {
-            if ($this->getCurrentPhonePrice()->getValidFrom() > $from) {
+        if ($this->getOldestCurrentPhonePrice()) {
+            if ($this->getOldestCurrentPhonePrice()->getValidFrom() > $from) {
                 throw new \Exception(sprintf(
                     '%s must be after current pricing start date %s',
                     $from->format(\DateTime::ATOM),
-                    $this->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
+                    $this->getoldestCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
                 ));
             }
         }

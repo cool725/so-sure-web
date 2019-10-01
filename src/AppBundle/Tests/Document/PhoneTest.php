@@ -39,8 +39,8 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     {
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
-        $this->assertEquals(95.88, $phoneA->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $this->assertEquals(101.88, $phoneB->getCurrentPhonePrice()->getYearlyPremiumPrice());
+        $this->assertEquals(95.88, $phoneA->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getYearlyPremiumPrice());
+        $this->assertEquals(101.88, $phoneB->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getYearlyPremiumPrice());
     }
 
     public function testMaxPot()
@@ -48,9 +48,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
         // 76.704
-        $this->assertEquals(76.70, $phoneA->getCurrentPhonePrice()->getMaxPot());
+        $this->assertEquals(76.70, $phoneA->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMaxPot());
         // 81.504
-        $this->assertEquals(81.50, $phoneB->getCurrentPhonePrice()->getMaxPot());
+        $this->assertEquals(81.50, $phoneB->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMaxPot());
     }
 
     public function testMaxConnections()
@@ -58,9 +58,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phoneA = $this->getSamplePhoneA();
         $phoneB = $this->getSamplePhoneB();
         // 76.704
-        $this->assertEquals(8, $phoneA->getCurrentPhonePrice()->getMaxConnections());
+        $this->assertEquals(8, $phoneA->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMaxConnections());
         // 81.504
-        $this->assertEquals(9, $phoneB->getCurrentPhonePrice()->getMaxConnections());
+        $this->assertEquals(9, $phoneB->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMaxConnections());
     }
 
     public function testPolicy2dp()
@@ -68,7 +68,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone = new Phone();
         $phone->init('Apple', 'iPhone 6', 6.990001, static::$policyTerms, 1.5);
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         $this->assertEquals(6.99, $price->getMonthlyPremiumPrice());
     }
 
@@ -77,7 +77,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone = new Phone();
         $phone->init('Apple', 'iPhone 6', 6.990001, static::$nonPicSurePolicyTerms, 1.5);
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
         $this->assertNotNull($price->getPhoneExcess());
         if ($price->getPhoneExcess()) {
             $this->assertEquals(50, $price->getPhoneExcess()->getDamage());
@@ -94,7 +94,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone = new Phone();
         $phone->init('Apple', 'iPhone 6', 6.990001, static::$policyTerms, 1.5);
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
 
         $this->assertNotNull($price->getPicSureExcess());
         if ($price->getPicSureExcess()) {
@@ -157,9 +157,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->init('Apple', 'Price', 9, static::$nonPicSurePolicyTerms, 32, ['time'], 500);
         $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
-        $this->assertNotNull($phone->getCurrentPhonePrice());
-        if ($phone->getCurrentPhonePrice()) {
-            $excess = $phone->getCurrentPhonePrice()->getPhoneExcess();
+        $this->assertNotNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY));
+        if ($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)) {
+            $excess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getPhoneExcess();
             $this->assertNotNull($excess);
             if ($excess) {
                 $this->assertTrue($excess->equal(PolicyTerms::getLowExcess()));
@@ -176,9 +176,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
             static::$policyTerms->getDefaultPicSureExcess()
         );
 
-        $this->assertNotNull($phone->getCurrentPhonePrice($future));
-        if ($phone->getCurrentPhonePrice($future)) {
-            $excess = $phone->getCurrentPhonePrice($future)->getPhoneExcess();
+        $this->assertNotNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $future));
+        if ($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $future)) {
+            $excess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $future)->getPhoneExcess();
             $this->assertNotNull($excess);
             if ($excess) {
                 $this->assertTrue($excess->equal(PolicyTerms::getHighExcess()));
@@ -321,20 +321,20 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceC->setStream(PhonePrice::STREAM_MONTHLY);
         $priceD->setStream(PhonePrice::STREAM_MONTHLY);
         // Add them out of order to show it is irrelevant.
-        $phone->addPrice($priceE);
-        $phone->addPrice($priceA);
-        $phone->addPrice($priceB);
-        $phone->addPrice($priceD);
-        $phone->addPrice($priceC);
+        $phone->addPhonePrice($priceE);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceD);
+        $phone->addPhonePrice($priceC);
         // now make sure we get what we desire.
-        $this->assertEquals([$priceA, $priceE], $phone->getOrderedPhonePrices(PhonePrice::STREAM_ALL));
-        $this->assertEquals([$priceA, $priceB, $priceE], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY));
+        $this->assertEquals([$priceE, $priceA], $phone->getOrderedPhonePrices(PhonePrice::STREAM_ALL));
+        $this->assertEquals([$priceE, $priceB, $priceA], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY));
         $this->assertEquals(
-            [$priceA, $priceC, $priceD, $priceE],
+            [$priceE, $priceD, $priceC, $priceA],
             $phone->getOrderedPhonePrices(PhonePrice::STREAM_MONTHLY)
         );
         $this->assertEquals(
-            [$priceA, $priceB, $priceC, $priceD, $priceE],
+            [$priceE, $priceD, $priceC, $priceB, $priceA],
             $phone->getOrderedPhonePrices(PhonePrice::STREAM_ANY)
         );
     }
@@ -349,21 +349,78 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceA = new PhonePrice();
         $priceB = new PhonePrice();
         $priceC = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2018-02-19'));
-        $priceB->setValidFrom(new \DateTime('2019-05-02'));
-        $priceC->setValidFrom(new \DateTime('2020-11-08'));
-        $this->assertNull($phone->getCurrentPhonePrice());
-        $phone->addPhonePrice($priceB);
+        $priceD = new PhonePrice();
+        $priceE = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2019-01-01'));
+        $priceB->setValidFrom(new \DateTime('2019-02-13'));
+        $priceC->setValidFrom(new \DateTime('2019-04-08'));
+        $priceD->setValidFrom(new \DateTime('2019-04-27'));
+        $priceE->setValidFrom(new \DateTime('2019-05-19'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $priceC->setStream(PhonePrice::STREAM_MONTHLY);
+        $priceD->setStream(PhonePrice::STREAM_MONTHLY);
+        // Add them out of order to show it is irrelevant.
+        $phone->addPhonePrice($priceE);
         $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceD);
         $phone->addPhonePrice($priceC);
-        $this->assertEquals($priceB, $phone->getCurrentPhonePrice());
-        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(new \DateTime('2050-01-01')));
+        // before start none should work.
+        $date = new \DateTime('2018-12-25');
+        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        // After A start all should be A.
+        $date = new \DateTime('2019-01-17');
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        // After B start, yearly any and all will find it.
+        $date = new \DateTime('2019-02-15');
+        $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        // After C start, monthly has it's own value and all is now gone.
+        $date = new \DateTime('2019-04-11');
+        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        // After D start, there is a new monthly.
+        $date = new \DateTime('2019-04-25');
+        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertNull($phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
+        // After E start, everything becomes E.
+        $date = new \DateTime('2019-05-21');
+        $this->assertEquals($priceC, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date));
+        $this->assertEquals($priceE, $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL, $date));
+        $this->assertEquals($priceB, $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date));
+        $this->assertEquals($priceA, $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date));
     }
 
+    /**
+     * Makes sure that getLowestCurrentPhonePrice finds the phone price that is the lowest in the streams of those that
+     * are currently going.
+     */
     public function testGetLowestCurrentPhonePrice()
     {
         // TODO: this.
-        $this->assert(false);
+        $this->assertFalse(false);
+    }
+
+    /**
+     * Makes sure that getOldestCurrentPhonePrice finds the phone price that is the oldest in the streams of those that
+     * are currently going.
+     */
+    public function testGetOldestCurrentPhonePrice()
+    {
+        // TODO: this.
+        $this->assertTrue(false);
     }
 
     /**
