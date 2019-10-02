@@ -300,7 +300,7 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        $charge = $this->capturePaymentMethod($policy, $token, $amount);
+        $charge = $this->capturePaymentMethod($policy, $token, $amount, $source);
         if ($charge->getRedirectUrl()) {
             return $charge;
         }
@@ -769,7 +769,8 @@ class CheckoutService
     public function capturePaymentMethod(
         Policy $policy,
         $token,
-        $amount = null
+        $amount = null,
+        $source = null
     ) {
         $user = $policy->getUser();
         $details = null;
@@ -796,7 +797,9 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
-            $charge->setChargeMode(2);
+            if ($source == Payment::SOURCE_WEB) {
+                $charge->setChargeMode(2);
+            }
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
