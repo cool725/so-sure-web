@@ -112,14 +112,11 @@ class UnpaidListener
      */
     private function smsNotification($policy, $number)
     {
-        // TODO: Bacs sms copy
-        if ($policy->getPolicyOrUserBacsPaymentMethod()) {
+        $bacs = $policy->getBacsPaymentMethod() && true;
+        if ($number < $bacs ? 1 : 2 || $number > 4) {
             return;
         }
-        if ($number < 2 || $number > 4) {
-            return;
-        }
-        $smsTemplate = sprintf("AppBundle:Sms:card/failedPayment-%d.txt.twig", $number);
+        $smsTemplate = sprintf("AppBundle:Sms:%s/failedPayment-%d.txt.twig", $bacs ? "bacs" : "card", $number);
         $this->smsService->sendUser($policy, $smsTemplate, ["policy" => $policy], Charge::TYPE_SMS_PAYMENT);
     }
 
