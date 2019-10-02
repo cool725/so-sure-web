@@ -389,78 +389,48 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Makes sure that getPreviousPhonePrices gets the list of all phone prices that are old and does not include the
-     * current phone price.
-     */
-    public function testGetPreviousPhonePrices()
-    {
-        // TODO: accomodate price streams.
-        $this->assertTrue(false);
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2018-02-19'));
-        $priceB->setValidFrom(new \DateTime('2019-05-02'));
-        $priceC->setValidFrom(new \DateTime('2020-11-08'));
-        $this->assertEquals([], $phone->getPreviousPhonePrices(PhonePrice::STREAM_ANY));
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceC);
-        $this->assertEquals([$priceA], $phone->getPreviousPhonePrices(PhonePrice::STREAM_ANY));
-        $this->assertEquals(
-            [$priceB, $priceA],
-            $phone->getPreviousPhonePrices(PhonePrice::STREAM_ANY, new \DateTime('2050-01-01'))
-        );
-    }
-
-    /**
-     * Makes sure that getFuturePhonePrices gets all phone prices that appear in the future not including the current
-     * price.
-     */
-    public function testGetFuturePhonePrices()
-    {
-        // TODO: accomodate price streams.
-        $this->assertTrue(false);
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2018-02-19'));
-        $priceB->setValidFrom(new \DateTime('2019-05-02'));
-        $priceC->setValidFrom(new \DateTime('2020-11-08'));
-        $this->assertEquals([], $phone->getFuturePhonePrices(PhonePrice::STREAM_ANY));
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceC);
-        $this->assertEquals([$priceC], $phone->getFuturePhonePrices(PhonePrice::STREAM_ANY));
-    }
-
-    /**
      * Makes sure that getRecentPhonePrices gets all phone prices that have been going in the last few minutes
      * including the current phone price.
+     * @dataProvider priceStreamProvider
      */
-    public function testGetRecentPhonePrices()
+    public function testGetRecentPhonePrices($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
-        // TODO: accomodate price streams.
-        $this->assertTrue(false);
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceD = new PhonePrice();
-        $date = new \DateTime();
-        $priceA->setValidFrom((clone $date)->sub(new \DateInterval("P1DT5M")));
-        $priceB->setValidFrom((clone $date)->sub(new \DateInterval("PT5M")));
-        $priceC->setValidFrom((clone $date)->add(new \DateInterval("PT5M")));
-        $priceD->setValidFrom((clone $date)->add(new \DateInterval("P1DT37M")));
-        $this->assertEquals([], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10));
-        $phone->addPhonePrice($priceB);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceC);
-        $phone->addPhonePrice($priceD);
-        $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10));
-        $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 100000));
+        // before start no stream or time will get you a price.
+        $date = new \DateTime('2018-12-25');
+        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
+        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 1, $date));
+        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10000, $date));
+        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 35, $date));
+        // After A they should all pick it up unless they have super short time.
+        $date = new \DateTime('2019-01-21 11:05');
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 20, $date));
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 1, $date));
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10000, $date));
+        // After B appears, yearly should also find B.
+        $date = new \DateTime('2019-02-21 17:25');
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
+        $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
+        $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 73500, $date));
+        $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10, $date));
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10, $date));
+        // Once C appers, A can only be found if searching over a long time period.
+        $date = new \DateTime('2019-04-08 17:25');
+        $this->assertEquals([$priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
+        $this->assertEquals([$priceC, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 1000, $date));
+        $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
+        $this->assertEquals([$priceB, $priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10, $date));
+        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10, $date));
+        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 100000000000, $date));
+        // Once D appears we can now get D, C, and A in the monthly channel if we look far enough.
+        $date = new \DateTime('2019-04-28');
+        $this->assertEquals(
+            [$priceD, $priceC, $priceA],
+            $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10000000000, $date)
+        );
+        $this->assertEquals([$priceD, $priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 1000, $date));
+
+
     }
 
     /**
@@ -499,8 +469,52 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->addPhonePrice($priceD);
         $phone->addPhonePrice($priceE);
         return [
-            [$phone, $priceA, $priceB, $priceC, $priceD, $priceE]
+            "Test price stream sequence" => [$phone, $priceA, $priceB, $priceC, $priceD, $priceE]
         ];
+    }
+
+    /**
+     * Makes sure that getPreviousPhonePrices gets the list of all phone prices that are old and does not include the
+     * current phone price.
+     */
+    public function testGetPreviousPhonePrices()
+    {
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2018-02-19'));
+        $priceB->setValidFrom(new \DateTime('2019-05-02'));
+        $priceC->setValidFrom(new \DateTime('2020-11-08'));
+        $this->assertEquals([], $phone->getPreviousPhonePrices());
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceC);
+        $this->assertEquals([$priceA], $phone->getPreviousPhonePrices());
+        $this->assertEquals(
+            [$priceB, $priceA],
+            $phone->getPreviousPhonePrices(new \DateTime('2050-01-01'))
+        );
+    }
+
+    /**
+     * Makes sure that getFuturePhonePrices gets all phone prices that appear in the future not including the current
+     * price.
+     */
+    public function testGetFuturePhonePrices()
+    {
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceC = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2018-02-19'));
+        $priceB->setValidFrom(new \DateTime('2019-05-02'));
+        $priceC->setValidFrom(new \DateTime('2020-11-08'));
+        $this->assertEmpty($phone->getFuturePhonePrices());
+        $phone->addPhonePrice($priceB);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceC);
+        $this->assertEquals([$priceC], $phone->getFuturePhonePrices());
     }
 
     private function getSamplePhoneA()

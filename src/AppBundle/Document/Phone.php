@@ -1012,16 +1012,15 @@ class Phone
     /**
      * Gives a list of all phone prices that have been current in the past but are not any more. The list will be in
      * order from newest to oldest.
-     * @param string         $stream is the price stream that we want the previous prices for.
      * @param \DateTime|null $date    is the date at which we are checking.
      * @return array of matching phone prices.
      */
-    public function getPreviousPhonePrices($stream, \DateTime $date = null)
+    public function getPreviousPhonePrices(\DateTime $date = null)
     {
         $date = $date ?: new \DateTime();
         $previous = [];
         $old = false;
-        foreach ($this->getOrderedPhonePrices($stream) as $price) {
+        foreach ($this->getOrderedPhonePrices(PhonePrice::STREAM_ANY) as $price) {
             if ($old) {
                 $previous[] = $price;
             } elseif ($price->getValidFrom() <= $date) {
@@ -1033,16 +1032,15 @@ class Phone
 
     /**
      * Gives all phone prices that are yet in the future.
-     * @param string         $stream  is the price stream that we want the future prices for.
      * @param \DateTime|null $date    is the date which is to be considered the present.
-     * @return array containing the prices.
+     * @return array containing the prices in descending order of date.
      */
-    public function getFuturePhonePrices($stream, \DateTime $date = null)
+    public function getFuturePhonePrices(\DateTime $date = null)
     {
         $date = $date ?: new \DateTime();
         $future = [];
-        foreach ($this->getPhonePrices() as $price) {
-            if ($price->getValidFrom() > $date && $price->inStream($stream)) {
+        foreach ($this->getOrderedPhonePrices(PhonePrice::STREAM_ANY) as $price) {
+            if ($price->getValidFrom() > $date) {
                 $future[] = $price;
             }
         }
@@ -1051,19 +1049,30 @@ class Phone
 
     /**
      * Gives a list of all phone prices that have been valid since the given number of minutes from right now.
-     * @param string $stream  is the price stream that we want the recent prices for.
-     * @param int    $minutes is the number of minutes deviance within which to find the prices.
-     * @return array with all the prices within it.
+     * @param string    $stream  is the price stream that we want the recent prices for.
+     * @param int       $minutes is the number of minutes deviance within which to find the prices.
+     * @param \DateTime $date    is the date from which the prices must be recent.
+     * @return array with all the prices within it in descending order of date.
      */
-    public function getRecentPhonePrices($stream, int $minutes)
+    public function getRecentPhonePrices($stream, int $minutes, \DateTime $date = null)
     {
-        $date = new \DateTime();
+        $date = $date ?: new \DateTime();
         $line = (clone $date)->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
+        $ends = [];
+        foreach (PhonePrice::STREAM_POSITIONS as $streamType) {
+            $ends[$streamType] = $date;
+        }
         $recent = [];
-        foreach ($this->getPhonePrices() as $price) {
+        foreach ($this->getOrderedPhonePrices($stream) as $price) {
+            $priceStream = $price->getStream();
             $validFrom = $price->getValidFrom();
-            if ($validFrom >= $line && $validFrom < $date && $price->inStream($stream)) {
+            if ($ends[$priceStream] <= $date && $ends[$priceStream] > $line && $validFrom < $date) {
                 $recent[] = $price;
+                foreach (PhonePrice::STREAM_POSITIONS as $streamType) {
+                    if ($price->inStream($streamType)) {
+                        $ends[$streamType] = $validFrom;
+                    }
+                }
             }
         }
         return $recent;
