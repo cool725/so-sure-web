@@ -1576,7 +1576,7 @@ class PurchaseController extends BaseController
             $logger->info(sprintf('Missing policy'));
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
         }
-        $redirectSuccess = $this->generateUrl('user_payment_details_policy', ['policyId' => $policyId]);
+        $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $policyId]);
         $redirectFailure = $this->generateUrl('user_payment_details_policy', ['policyId' => $policyId]);
         try {
             $checkout->add($policy, $details->getId(), Payment::SOURCE_WEB);
