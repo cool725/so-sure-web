@@ -301,6 +301,9 @@ class CheckoutService
         IdentityLog $identityLog = null
     ) {
         $charge = $this->capturePaymentMethod($policy, $token, $amount);
+        if ($charge->getRedirectUrl()) {
+            return $charge;
+        }
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
 
@@ -345,6 +348,7 @@ class CheckoutService
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
+        /** @var ScheduledPayment $rescheduled */
         foreach ($rescheduledPayments as $rescheduled) {
             //TODO: Watch this, if payments are still being cancelled on a 0 amount payment, this will be why!
             $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
@@ -756,6 +760,14 @@ class CheckoutService
         return $transactionDetails;
     }
 
+    public function verifyChargeByToken($token)
+    {
+        $service = $this->client->chargeService();
+
+        $charge = $service->verifyCharge($token);
+        return $charge;
+    }
+
     /**
      * @param Policy $policy
      * @param string $token
@@ -791,12 +803,16 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
+            $charge->setChargeMode(2);
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
 
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+            if ($details->getRedirectUrl()) {
+                return $details;
+            }
 
             if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
                 /**
@@ -1170,7 +1186,9 @@ class CheckoutService
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
-        if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED) {
+        if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED &&
+            $payment->getResult() != CheckoutPayment::RESULT_AUTHORIZED
+        ) {
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
         }

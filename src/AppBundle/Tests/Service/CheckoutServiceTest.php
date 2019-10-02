@@ -12,7 +12,9 @@ use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\JudopayService;
+use com\checkout\ApiClient;
 use com\checkout\ApiServices\Cards\ResponseModels\Card;
+use com\checkout\ApiServices\Charges\RequestModels\CardTokenChargeCreate;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -1995,8 +1997,6 @@ class CheckoutServiceTest extends WebTestCase
         $this->assertEquals('none', $paymentMethod->getPreviousChargeId());
     }
 
-
-
     public function testCheckoutUnpaidUpdateCardStatusActive()
     {
         $user = $this->createValidUser(
@@ -2106,5 +2106,57 @@ class CheckoutServiceTest extends WebTestCase
         $newId = $paymentMethod->getCustomerId();
 
         self::assertNotEquals($originalId, $newId);
+    }
+
+    public function testCheckout3DPayment()
+    {
+        /** @var User $user */
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckout3DPayment',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /** @var CheckoutPaymentMethod $paymentMethod */
+        $policy->setPaymentMethod(new CheckoutPaymentMethod());
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $paymentMethod = $policy->getPaymentMethod();
+        /**
+         * This test creates a new user, so they will not have a previous charge.
+         * We want to set one so that we know that there is one to remove.
+         */
+        $paymentMethod->setPreviousChargeId("charge_test_PHPUNITTEST12345");
+        $this->assertTrue($paymentMethod->hasPreviousChargeId());
+
+        $token = self::$checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+        $this->assertNotNull($token);
+
+        $apiSecret = 'sk_test_3563236e-9159-4900-9898-e298c4c83cf0';
+        $apipublic = 'pk_test_7e229c33-f969-4f22-82c2-f216bf228e24';
+
+        $charge = new CardTokenChargeCreate();
+
+        $charge->setEmail($user->getEmail());
+        $charge->setAutoCapTime(0);
+        $charge->setAutoCapture('N');
+        $charge->setCurrency('GBP');
+        $charge->setMetadata(['policy_id' => $policy->getId()]);
+        $charge->setCardToken($token->token);
+        $charge->setChargeMode(2);
+
+        $client = new ApiClient($apiSecret, 'sandbox', true);
+        $chargeService = $client->chargeService();
+
+        $pay = $chargeService->chargeWithCardToken($charge);
+        self::assertNotEmpty($pay->getRedirectUrl());
     }
 }
