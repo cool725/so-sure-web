@@ -2,6 +2,9 @@
 
 namespace AppBundle\Service;
 
+use AppBundle\Document\User;
+use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -9,8 +12,6 @@ use Psr\Log\LoggerInterface;
  */
 class PriceService
 {
-    const CACHE_KEY_FORMAT = "offer:%s:%s";
-
     /** @var LoggerInterface */
     protected $logger;
 
@@ -81,7 +82,7 @@ class PriceService
      */
     private function getAllOffersForUser($user)
     {
-
+        $offers = $this->redis->smembers($this->getUserSetKey($user));
     }
 
     /**
@@ -92,6 +93,7 @@ class PriceService
      */
     private function addOfferToUser($user, $offer, $time)
     {
+
 
     }
 
@@ -105,5 +107,15 @@ class PriceService
     private function getOfferForPhone($user, $phone, $date)
     {
 
+    }
+
+    /**
+     * Gives the key to be used in redis for a user's set of offers.
+     * @param User $user is the user that we are getting the set of offers for.
+     * @return string the user's unique offer cache key.
+     */
+    private function getUserSetKey($user)
+    {
+        return sprintf("offers:%s", $user->getId());
     }
 }
