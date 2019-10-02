@@ -582,7 +582,7 @@ class PolicyService
             $rewardService = new RewardService($this->dm, $this->logger);
             /** @var Reward $reward */
             $reward = $rewardService->getSignUpBonus();
-            if (null != $reward) {
+            if (null != $reward && !$policy->getCompany()) {
                 $connection = new RewardConnection();
                 $policy->addConnection($connection);
                 $connection->setLinkedUser($reward->getUser());
