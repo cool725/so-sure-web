@@ -949,7 +949,6 @@ class Phone
     public function getCurrentPhonePrice($stream, \DateTime $date = null)
     {
         if ($stream == PhonePrice::STREAM_ALL) {
-            // Note that it would be possible to calculate this, but it would make the code ugly and seems illogical.
             throw new InvalidPriceStreamException("Can't get current price occupying all streams");
         }
         $date = $date ?: new \DateTime();
@@ -1056,25 +1055,27 @@ class Phone
      */
     public function getRecentPhonePrices($stream, int $minutes, \DateTime $date = null)
     {
+        if ($stream == PhonePrice::STREAM_ALL) {
+            throw new InvalidPriceStreamException("Can't get recent prices occupying all streams");
+        }
         $date = $date ?: new \DateTime();
         $line = (clone $date)->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
-        $ends = [];
-        foreach (PhonePrice::STREAM_POSITIONS as $streamType) {
-            $ends[$streamType] = $date;
-        }
         $recent = [];
-        foreach ($this->getOrderedPhonePrices($stream) as $price) {
-            $priceStream = $price->getStream();
-            $validFrom = $price->getValidFrom();
-            if ($ends[$priceStream] <= $date && $ends[$priceStream] > $line && $validFrom < $date) {
-                $recent[] = $price;
-                foreach (PhonePrice::STREAM_POSITIONS as $streamType) {
-                    if ($price->inStream($streamType)) {
-                        $ends[$streamType] = $validFrom;
+        foreach (PhonePrice::subStreams($stream) as $subStream) {
+            $end = $date;
+            foreach ($this->getOrderedPhonePrices($subStream) as $price) {
+                $validFrom = $price->getValidFrom();
+                if ($end >= $line && $validFrom < $date) {
+                    $end = $validFrom;
+                    if (!in_array($price, $recent)) {
+                        $recent[] = $price;
                     }
                 }
             }
         }
+        usort($recent, function ($a, $b) {
+            return $a->getValidFrom() < $b->getValidFrom() ? 1 : -1;
+        });
         return $recent;
     }
 

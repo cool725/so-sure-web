@@ -399,38 +399,31 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime('2018-12-25');
         $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
         $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 1, $date));
-        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10000, $date));
         $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 35, $date));
         // After A they should all pick it up unless they have super short time.
         $date = new \DateTime('2019-01-21 11:05');
         $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 20, $date));
         $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
         $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 1, $date));
-        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10000, $date));
         // After B appears, yearly should also find B.
         $date = new \DateTime('2019-02-21 17:25');
         $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
         $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
         $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 73500, $date));
         $this->assertEquals([$priceB, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10, $date));
-        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10, $date));
         // Once C appers, A can only be found if searching over a long time period.
         $date = new \DateTime('2019-04-08 17:25');
         $this->assertEquals([$priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
-        $this->assertEquals([$priceC, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 1000, $date));
+        $this->assertEquals([$priceC, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 168500, $date));
         $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
-        $this->assertEquals([$priceB, $priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10, $date));
-        $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 10, $date));
-        $this->assertEquals([$priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_ALL, 100000000000, $date));
+        $this->assertEquals([$priceC, $priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10, $date));
         // Once D appears we can now get D, C, and A in the monthly channel if we look far enough.
         $date = new \DateTime('2019-04-28');
         $this->assertEquals(
             [$priceD, $priceC, $priceA],
             $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10000000000, $date)
         );
-        $this->assertEquals([$priceD, $priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 1000, $date));
-
-
+        $this->assertEquals([$priceD, $priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 25000, $date));
     }
 
     /**

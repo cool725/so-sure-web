@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Document\Excess\PhoneExcess;
+use AppBundle\Exception\InvalidPriceStreamException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -133,5 +134,25 @@ class PhonePrice extends Price
             'picsure_excess_detail' =>
                 $this->getPicSureExcess() ? $this->getPicSureExcess()->toPriceArray()['detail'] : '??',
         ]);
+    }
+
+    /**
+     * Tells you what streams go into the passed stream.
+     * @param string $stream is the stream to find streams feeding into.
+     * @return array containing the stream passed and other feeding streams if they exist.
+     */
+    public static function subStreams($stream)
+    {
+        if ($stream == self::STREAM_MONTHLY) {
+            return [self::STREAM_MONTHLY];
+        } elseif ($stream == self::STREAM_YEARLY) {
+            return [self::STREAM_YEARLY];
+        } elseif ($stream == self::STREAM_ANY) {
+            return [self::STREAM_MONTHLY, self::STREAM_YEARLY];
+        } elseif ($stream == self::STREAM_ALL) {
+            return [self::STREAM_ALL];
+        } else {
+            throw new InvalidPriceStreamException(sprintf("%s is not a type of price stream", $stream));
+        }
     }
 }
