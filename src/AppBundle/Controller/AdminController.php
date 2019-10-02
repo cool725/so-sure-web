@@ -500,7 +500,7 @@ class AdminController extends BaseController
         $phone->setDevices($devices);
         $phone->setMemory($request->get('memory'));
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
         $price->setGwp($request->get('gwp'));
         $dm->persist($phone);
         $dm->flush();

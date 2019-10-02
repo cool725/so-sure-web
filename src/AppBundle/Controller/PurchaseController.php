@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Feature;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
@@ -884,7 +885,8 @@ class PurchaseController extends BaseController
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
-            $price = $policy->getPhone()->getCurrentPhonePrice();
+            // TODO: stream should be decided upon.
+            $price = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             /** @var PostcodeService $postcodeService */
             $postcodeService = $this->get('app.postcode');
             if ($price && $user->allowedMonthlyPayments($postcodeService)) {
@@ -932,7 +934,7 @@ class PurchaseController extends BaseController
 
                 if ($purchaseFormValid) {
                     if ($allowPayment) {
-                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice();
+                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
                         $monthly = null;
                         $yearly = null;
                         if ($currentPrice) {

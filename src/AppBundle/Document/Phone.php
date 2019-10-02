@@ -892,7 +892,8 @@ class Phone
      * @param float  $claimFrequency is the assumed frequency of claims.
      * @param float  $consumerPayout is an assumed amount removed from earned money after underwriter commission.
      * @param float  $iptRebate      is the assumed amount of IPT rebated.
-     * @return float the amount of profit that there should be per policy on this phone under the given assumptions.
+     * @return float|null the amount of profit that there should be per policy on this phone under the given
+     *                    assumptions or null if it cannot be calculated.
      */
     public function policyProfit($stream, $claimFrequency, $consumerPayout, $iptRebate)
     {
@@ -1081,12 +1082,12 @@ class Phone
 
     public function getPreviousPhonePricesAsString(\DateTime $date = null)
     {
-        return $this->getPhonePricesAsString($this->getPreviousPhonePrices(PhonePrice::STREAM_ALL, $date));
+        return $this->getPhonePricesAsString($this->getPreviousPhonePrices($date));
     }
 
     public function getFuturePhonePricesAsString(\DateTime $date = null)
     {
-        return $this->getPhonePricesAsString($this->getFuturePhonePrices(PhonePrice::STREAM_ALL, $date));
+        return $this->getPhonePricesAsString($this->getFuturePhonePrices($date));
     }
 
     public function getPhonePricesAsString($prices)
@@ -1213,7 +1214,7 @@ class Phone
 
     public function asQuoteApiArray(PostcodeService $postcodeService, User $user = null)
     {
-        $currentPhonePrice = $this->getCurrentPhonePrice();
+        $currentPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         if (!$currentPhonePrice) {
             if ($this->getActive()) {
                 return null;
@@ -1405,11 +1406,13 @@ class Phone
 
     public function getMaxComparision()
     {
-        if (!$this->getCurrentPhonePrice()) {
+        $yearlyPrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
+        if (!$yearlyPrice) {
             return null;
         }
-
-        $maxComparision = $this->getCurrentPhonePrice()->getYearlyPremiumPrice();
+        /** @var PhonePrice */
+        $yearlyPrice = $yearlyPrice;
+        $maxComparision = $yearlyPrice->getYearlyPremiumPrice();
         $comparision = $this->getComparisions();
         if (count($comparision) > 0) {
             $maxComparision = 0;
@@ -1419,7 +1422,6 @@ class Phone
                 }
             }
         }
-
         return $maxComparision;
     }
 
@@ -1470,7 +1472,7 @@ class Phone
                 throw new \Exception(sprintf(
                     '%s must be after current pricing start date %s',
                     $from->format(\DateTime::ATOM),
-                    $this->getoldestCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
+                    $this->getOldestCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
                 ));
             }
         }

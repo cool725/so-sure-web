@@ -243,9 +243,11 @@ class PhonePolicy extends Policy
     public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
     {
         $this->phone = $phone;
-        if (!$phone->getCurrentPhonePrice($date)) {
+        if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date)) {
             throw new \Exception('Phone must have a price');
         }
+
+        // TODO: figure out which stream of price is meant to be placed upon the policy.
 
         // Only set premium if not already present
         if (!$this->getPremium()) {
@@ -254,7 +256,7 @@ class PhonePolicy extends Policy
                 $additionalPremium = $this->getUser()->getAdditionalPremium();
             }
             /** @var PhonePrice $price */
-            $price = $phone->getCurrentPhonePrice($date);
+            $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
             $this->setPremium($price->createPremium($additionalPremium, $date));
             // in the normal flow we should have policy terms before setting the phone
             // however, many test cases do not have it
@@ -702,7 +704,8 @@ class PhonePolicy extends Policy
      */
     public function validatePremium($adjust, \DateTime $date = null)
     {
-        $phonePrice = $this->getPhone()->getCurrentPhonePrice($date);
+        // TODO: this should probably be taking into account the stream.
+        $phonePrice = $this->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
         if (!$phonePrice) {
             throw new \UnexpectedValueException(sprintf('Missing phone price'));
         }

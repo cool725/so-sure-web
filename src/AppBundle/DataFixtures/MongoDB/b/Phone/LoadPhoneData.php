@@ -334,7 +334,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             $manager->persist($phone);
             $manager->flush();
-            if (!$phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL) && $premium > 0) {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY) && $premium > 0) {
                 throw new \Exception('Failed to init phone');
             }
 
@@ -376,7 +376,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         $phone->init($make, $model, $policyPrice + 1.5, $latestTerms, $memory, $devices);
         $manager->persist($phone);
 
-        if (!$phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL)) {
+        if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)) {
             throw new \Exception('Failed to init phone');
         }
         /*

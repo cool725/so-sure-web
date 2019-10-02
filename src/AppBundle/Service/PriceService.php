@@ -9,6 +9,8 @@ use Psr\Log\LoggerInterface;
  */
 class PriceService
 {
+    const CACHE_KEY_FORMAT = "offer:%s:%s";
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -73,14 +75,35 @@ class PriceService
     }
 
     /**
-     * Gets an offer price for a phone if such a thing exists.
-     * @param PhonePolicy $policy is the policy we are looking into which is assumed to have a user and phone.
-     * @param \DateTime   $date   is the date at which this must be correct.
-     * @return PhonePrice|null the price found or none if there is not an offer.
+     * Gives all of the offers that are applicable to a given user.
+     * @param User $user is the user to check for.
+     * @return array containing all the offers.
      */
-    private function phoneOfferPrice($policy, $date)
+    private function getAllOffersForUser($user)
     {
 
+    }
+
+    /**
+     * Adds an offer specifically to a user by caching it.
+     * @param User  $user  is the user to add it to.
+     * @param Offer $offer is the offer to add.
+     * @param int   $time  is the time in seconds that the offer will last for.
+     */
+    private function addOfferToUser($user, $offer, $time)
+    {
+
+    }
+
+    /**
+     * Gives you the most eligible offer that should be used for the given phone and user.
+     * @param User $user is the user we are checking for.
+     * @param Phone $phone the phone it is about.
+     * @param \DateTime $date is the date that we are checking about.
+     * @return Offer|null the offer to use or null if there is not an offer.
+     */
+    private function getOfferForPhone($user, $phone, $date)
+    {
 
     }
 }

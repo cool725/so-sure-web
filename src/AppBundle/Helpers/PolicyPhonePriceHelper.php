@@ -51,7 +51,7 @@ class PolicyPhonePriceHelper
             // TODO: this is not really necessarily the right price.
             //       right now this class is not used anywhere but if you actually want to use it you will need to
             //       figure this out.
-            $this->setCurrentPhonePrice($this->phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL));
+            $this->setCurrentPhonePrice($this->phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL));
         } catch (\Exception $e) {
             throw new PolicyPhonePriceException(
                 sprintf(

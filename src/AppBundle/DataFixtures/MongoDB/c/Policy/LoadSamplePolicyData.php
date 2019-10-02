@@ -195,7 +195,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $adjusted[] = $phone->getId();
             /** @var PhonePremium $currentPrice */
-            $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::CHANNEL_ALL);
+            $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ALL);
             $adjustedPrice = $currentPrice->getGwp() - 0.01;
             if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $currentPrice->getGwp() - 0.30) {
                 $adjustedPrice = $currentPrice->getGwp() - 0.30;
