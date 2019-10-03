@@ -35,6 +35,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -424,25 +425,27 @@ class PhoneInsuranceController extends BaseController
         }
 
         // if no price, will be sample policy of £100 annually
-        $maxPot = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxPot() : 80;
-        $maxConnections = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxConnections() : 8;
-        $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
+        // TODO: decide whether this should be the lowest price or the monthly price.
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        $maxPot = $price ? $price->getMaxPot() : 80;
+        $maxConnections = $price ? $price->getMaxConnections() : 8;
+        $annualPremium = $price ? $price->getYearlyPremiumPrice() : 100;
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
         $expIntercom = null;
 
         // only need to run this once - if its a post, then ignore
-        if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
+        if ('GET' === $request->getMethod() && $price) {
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
                 $event = MixpanelService::EVENT_CPC_QUOTE_PAGE;
             }
             $this->get('app.mixpanel')->queueTrackWithUtm($event, [
                 'Device Selected' => $phone->__toString(),
-                'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                'Monthly Cost' => $price->getMonthlyPremiumPrice(),
             ]);
             $this->get('app.mixpanel')->queuePersonProperties([
                 'First Device Selected' => $phone->__toString(),
-                'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
             ], true);
 
             // Deprecated - Landing Page event - Keep for awhile for a transition period
@@ -450,7 +453,7 @@ class PhoneInsuranceController extends BaseController
             if ($event == MixpanelService::EVENT_CPC_QUOTE_PAGE) {
                 $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                     'Device Selected' => $phone->__toString(),
-                    'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                    'Monthly Cost' => $price->getMonthlyPremiumPrice(),
                 ]);
             }
         }
@@ -491,7 +494,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = array(
             'phone'                 => $phone,
-            'phone_price'           => $phone->getCurrentPhonePrice(),
+            'phone_price'           => $price,
             'policy_key'            => $this->getParameter('policy_key'),
             'connection_value'      => PhonePolicy::STANDARD_VALUE,
             'lead_form'             => $leadForm->createView(),
@@ -510,7 +513,7 @@ class PhoneInsuranceController extends BaseController
             ),
             'comparision'      => $phone->getComparisions(),
             'comparision_max'  => $maxComparision,
-            'coming_soon'      => $phone->getCurrentPhonePrice() ? false : true,
+            'coming_soon'      => $phone->getOldestCurrentPhonePrice() ? false : true,
             'web_base_url'     => $this->getParameter('web_base_url'),
             'img_url'          => $modelHyph,
             'available_images' => $availableImages,

@@ -32,10 +32,10 @@ class Offer
     protected $created;
 
     /**
-     * The offered price which also stores the time period in which is it valid.
-     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PhonePrice")
+     * The offered price.
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Price")
      * @Gedmo\Versioned
-     * @var PhonePrice
+     * @var Price
      */
     protected $price;
 
@@ -61,6 +61,22 @@ class Offer
      * @MongoDB\Field(type="boolean")
      */
     protected $active;
+
+    /**
+     * Contains all users that this offer is offered to.
+     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @Gedmo\Versioned
+     * @var User
+     */
+    protected $users = [];
+
+    /**
+     * Contains all policies that are using the price from this offer.
+     * @MongoDB\ReferenceOne(targetDocument="Policy")
+     * @Gedmo\Versioned
+     * @var Policy
+     */
+    protected $policies = [];
 
     /**
      * Gives the time at which the offer was created.

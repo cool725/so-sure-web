@@ -34,8 +34,7 @@
             data-toggle="modal"
             data-target="#offer_modal"
             data-update="{{ path('admin_phone_offer', {'id': phone.id}) }}"
-            data-ipt-rate="{{ phone.currentIptRate }}"
-            data-phone="{{ phone.toPriceArray()|json_encode }}">
+            data-offers="{{ phone.toOfferArray()|json_encode }}">
         <i class="far fa-handshake fa-fw"></i></button>
     {# Edit Phone Details #}
     <button title="Edit Phone Details"
