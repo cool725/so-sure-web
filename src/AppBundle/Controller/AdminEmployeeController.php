@@ -3976,7 +3976,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 //        return ['offer_form' => $offerForm];
     }
 
-    /*
+    /**
      * @Route("/postcodes", name="admin_annual_postcodes")
      * @Template("AppBundle:AdminEmployee:postcodes.html.twig")
      */

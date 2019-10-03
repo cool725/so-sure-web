@@ -743,8 +743,7 @@ class ApiAuthController extends BaseController
                     isset($data['phone_policy']['memory'])) {
                     if (!$this->validateFields($data['phone_policy'], ['make', 'device', 'memory'])) {
                         return $this->getErrorJsonResponse(
-                            ApiErrorCode::ERROR_MISSING_PARAM,
-                            'Missing parameters',
+                            ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters',
                             400
                         );
                     }
@@ -788,6 +787,7 @@ class ApiAuthController extends BaseController
                         $additionalPremium = $policy->getUser()->getAdditionalPremium();
                     }
                     /** @var PhonePrice $price */
+                    // TODO: Possibly need to reposition the setting the price.
                     $price = $phone->getCurrentPhonePrice(null);
                     $policy->setPremium($price->createPremium($additionalPremium, null));
 

@@ -108,7 +108,9 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         $this->dm->persist($policy);
         $this->dm->flush();
 
-        $currentPrice = $phone->getCurrentPhonePrice();
+        $currentPrice = $phone->getCurrentPhonePrice(
+            ($payments == 12) ? PhonePrice::STREAM_MONTHLY : PhonePrice::STREAM_YEARLY
+        );
         if ($currentPrice && $payments == 12) {
             $amount = $currentPrice->getMonthlyPremiumPrice($date);
         } elseif ($currentPrice && $payments = 1) {

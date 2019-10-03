@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Classes;
 
+/**
+ * AS SEEN ON TV!
+ */
 class SoSure
 {
     const SOSURE_TRACKING_COOKIE_NAME = 'sosure-tracking';

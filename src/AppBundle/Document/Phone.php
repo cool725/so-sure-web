@@ -908,6 +908,9 @@ class Phone
         $netCostOfClaims = 56 + 19 - 14 - 1 - $price;
         /** @var PhonePrice $price */
         $price = $this->getCurrentPhonePrice($stream);
+        if (!$price) {
+            return null;
+        }
         $uwReceived = $price->getYearlyGwp() - Salva::YEARLY_COVERHOLDER_COMMISSION;
         $nwp = $uwReceived - $consumerPayout;
         $uwPrefReturn = ($nwp * 0.08);
@@ -1189,6 +1192,15 @@ class Phone
 
     public function toPriceArray(\DateTime $date = null)
     {
+        // sort out phone price list.
+        $apiPrices = [];
+        $prices = $this->getPhonePrices();
+        foreach ($prices as $price) {
+            $priceArray = $price->toPriceArray($date);
+            $priceArray["stream"] = $price->getStream();
+            $apiPrices[] = $priceArray;
+        }
+        // send all of the things.
         return [
             'make' => $this->getMake(),
             'model' => $this->getModel(),
@@ -1196,7 +1208,7 @@ class Phone
             'memory' => $this->getMemory(),
             'gwp' => $this->getLowestCurrentPhonePrice() ? $this->getLowestCurrentPhonePrice()->getGwp() : null,
             'active' => $this->getActive(),
-            'prices' => $this->eachApiMethod($this->getPhonePrices(), 'toPriceArray', $date),
+            'prices' => $apiPrices
         ];
     }
 
@@ -1431,6 +1443,7 @@ class Phone
         PhoneExcess $excess,
         PhoneExcess $picSureExcess,
         $notes = null,
+        $stream = null,
         \DateTime $date = null
     ) {
         if (!$date) {
@@ -1460,6 +1473,9 @@ class Phone
         $price->setGwp($gwp);
         $price->setValidFrom($from);
         $price->setNotes($notes);
+        if ($stream) {
+            $price->setStream($stream);
+        }
         if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',

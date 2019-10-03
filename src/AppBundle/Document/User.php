@@ -474,7 +474,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * The offers that have been manually given to a user.
-     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\ManualOffer")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
      */
     protected $offers = [];
   
