@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class AlphanumericSpaceDot extends Constraint
 {
-    public $message = 'The string "%string%" contains an illegal character: it can only contain ' .
-        'letters, numbers, spaces, dots, and some other basic punctuation.';
+    public $message = <<<EOD
+The string "%string%" contains an illegal character: it can only contain letters, numbers, spaces, dots, etc
+EOD;
 }
