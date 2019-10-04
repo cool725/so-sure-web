@@ -1237,7 +1237,7 @@ class UserController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
+        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
 
         return $this->render('AppBundle:User:onboarding.html.twig', [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),

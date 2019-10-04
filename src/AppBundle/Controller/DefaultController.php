@@ -96,30 +96,30 @@ class DefaultController extends BaseController
 
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        $homepageFunnelExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
-            ['regular-funnel-v2', 'new-funnel-v2'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        // $homepageFunnelExp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
+        //     ['regular-funnel-v2', 'new-funnel-v2'],
+        //     SixpackService::LOG_MIXPANEL_ALL
+        // );
 
         $template = 'AppBundle:Default:index.html.twig';
 
-        if ($homepageFunnelExp == 'new-funnel-v2') {
-            // Set Test Template
-            $template = 'AppBundle:Default:indexB.html.twig';
-            // Track Test
-            $this->get('app.mixpanel')->queueTrack(
-                MixpanelService::EVENT_TEST,
-                ['Test Name' => 'New Funnel V2']
-            );
-        } else {
+        // if ($homepageFunnelExp == 'new-funnel-v2') {
+        //     // Set Test Template
+        //     $template = 'AppBundle:Default:indexB.html.twig';
+        //     // Track Test
+        //     $this->get('app.mixpanel')->queueTrack(
+        //         MixpanelService::EVENT_TEST,
+        //         ['Test Name' => 'New Funnel V2']
+        //     );
+        // } else {
             // Track Test - Just incase so we can filter funnels
-            $this->get('app.mixpanel')->queueTrack(
-                MixpanelService::EVENT_TEST,
-                ['Test Name' => 'Regular Funnel V2']
-            );
-        }
+        $this->get('app.mixpanel')->queueTrack(
+            MixpanelService::EVENT_TEST,
+            ['Test Name' => 'Regular Funnel V2']
+        );
+        // }
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -128,7 +128,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'funnel_exp' => $homepageFunnelExp,
+            // 'funnel_exp' => $homepageFunnelExp,
         );
 
         return $this->render($template, $data);
