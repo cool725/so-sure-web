@@ -797,6 +797,7 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
+            $charge->setChargeMode(1);
             if ($source == Payment::SOURCE_WEB) {
                 $charge->setChargeMode(2);
             }

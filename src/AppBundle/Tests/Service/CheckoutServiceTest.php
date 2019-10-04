@@ -2124,7 +2124,7 @@ class CheckoutServiceTest extends WebTestCase
 
         /** @var CheckoutPaymentMethod $paymentMethod */
         $policy->setPaymentMethod(new CheckoutPaymentMethod());
-        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
         $paymentMethod = $policy->getPaymentMethod();
         /**
          * This test creates a new user, so they will not have a previous charge.
@@ -2140,23 +2140,55 @@ class CheckoutServiceTest extends WebTestCase
         );
         $this->assertNotNull($token);
 
-        $apiSecret = 'sk_test_3563236e-9159-4900-9898-e298c4c83cf0';
-        $apipublic = 'pk_test_7e229c33-f969-4f22-82c2-f216bf228e24';
+        $pay = self::$checkout->pay(
+            $policy,
+            $token->token,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Payment::SOURCE_WEB
+        );
 
-        $charge = new CardTokenChargeCreate();
-
-        $charge->setEmail($user->getEmail());
-        $charge->setAutoCapTime(0);
-        $charge->setAutoCapture('N');
-        $charge->setCurrency('GBP');
-        $charge->setMetadata(['policy_id' => $policy->getId()]);
-        $charge->setCardToken($token->token);
-        $charge->setChargeMode(2);
-
-        $client = new ApiClient($apiSecret, 'sandbox', true);
-        $chargeService = $client->chargeService();
-
-        $pay = $chargeService->chargeWithCardToken($charge);
         self::assertNotEmpty($pay->getRedirectUrl());
+    }
+
+    public function testCheckoutNo3DPaymentMobile()
+    {
+        /** @var User $user */
+        $user = $this->createValidUser(
+            static::generateEmail(
+                'testCheckoutNo3DPaymentMobile',
+                $this,
+                true
+            )
+        );
+
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        /** @var CheckoutPaymentMethod $paymentMethod */
+        $policy->setPaymentMethod(new CheckoutPaymentMethod());
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        $paymentMethod = $policy->getPaymentMethod();
+        /**
+         * This test creates a new user, so they will not have a previous charge.
+         * We want to set one so that we know that there is one to remove.
+         */
+        $paymentMethod->setPreviousChargeId("charge_test_PHPUNITTEST12345");
+        $this->assertTrue($paymentMethod->hasPreviousChargeId());
+
+        $token = self::$checkout->createCardToken(
+            self::$CHECKOUT_TEST_CARD_NUM,
+            self::$CHECKOUT_TEST_CARD_EXP,
+            self::$CHECKOUT_TEST_CARD_PIN
+        );
+        $this->assertNotNull($token);
+
+        $pay = self::$checkout->pay(
+            $policy,
+            $token->token,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Payment::SOURCE_MOBILE
+        );
+
+        self::assertTrue($pay);
     }
 }
