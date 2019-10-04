@@ -4,7 +4,6 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Form\Bacs;
-use AppBundle\Document\Form\Offer;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
@@ -593,10 +592,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/offer/{id}/create", name="admin_offer_create")
+     * @Route("/create-offer/{id}", name="admin_offer_create")
      * @Template
      */
-    public function offerFormAction(Request $request, $id)
+    public function offerFormAction(Request $request, $id = null)
     {
         $offerForm = $this->get('form.factory')
             ->createNamedBuilder('offer_form', OfferType::class)
@@ -606,6 +605,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             if ($request->request->has('offer_form')) {
                 $offerForm->handleRequest($request);
                 if ($offerForm->isValid()) {
+                    die($id);
                 } else {
                     $this->addFlash(
                         'error',
@@ -615,7 +615,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 return new RedirectResponse($this->generateUrl('admin_phone_offers', ["id" => $id]));
             }
         }
-        return ['form' => $companyForm->createView()];
+        return ['form' => $offerForm->createView()];
     }
 
     /**

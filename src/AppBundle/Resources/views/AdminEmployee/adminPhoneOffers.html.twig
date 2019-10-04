@@ -25,7 +25,7 @@
                     <a href="#"
                        class="btn btn-primary"
                        data-toggle="modal"
-                       data-target="#offer_form_modal"><i class="fal fa-plus fa-fw"></i> New Affiliate </a>
+                       data-target="#offer_form_modal"><i class="fal fa-plus fa-fw"></i> New Offer</a>
                 </div>
             </div>
             {# Content area #}
@@ -45,16 +45,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Carphone Warehouse Price Match 2019-10-04</td>
-                            <td>2019-10-04 by Daly Barron</td>
-                            <td>All</td>
-                            <td>8.32</td>
-                            <td>150 / 150</td>
-                            <td>50 / 70</td>
-                            <td>6 / 10</td>
-                            <td>Button</td>
-                        </tr>
+                        {% for offer in phone.activeOffers %}
+                            <tr>
+                                <td>{{ offer.name }}</td>
+                                <td>{{ offer.created|format('YYYY-MM-dd') }} by TODO: Create Name Here</td>
+                                <td>{{ offer.price.stream }}</td>
+                                <td>{{ offer.price.gwp }}</td>
+                                <td>{{ offer.price.excess.damage }} / {{ offer.price.excess.theft }} </td>
+                                <td>{{ offer.price.picsureExcess.damage }} / {{ offer.price.picsureExcess.theft }}</td>
+                                <td>{{ offer.policies|length }} / {{ offer.users|length }}</td>
+                                <td>TODO: Button</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -74,16 +76,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Making idiot shut up with discount</td>
-                            <td>2019-10-04 by Ted Moseley</td>
-                            <td>Monthly</td>
-                            <td>8.32</td>
-                            <td>150 / 150</td>
-                            <td>50 / 70</td>
-                            <th>3 / 20</th>
-                            <td>Button</td>
-                        </tr>
+                        {% for offer in phone.inactiveOffers %}
+                            <tr>
+                                <td>{{ offer.name }}</td>
+                                <td>{{ offer.created|format('YYYY-MM-dd') }} by TODO: Create Name Here</td>
+                                <td>{{ offer.price.stream }}</td>
+                                <td>{{ offer.price.gwp }}</td>
+                                <td>{{ offer.price.excess.damage }} / {{ offer.price.excess.theft }} </td>
+                                <td>{{ offer.price.picsureExcess.damage }} / {{ offer.price.picsureExcess.theft }}</td>
+                                <td>{{ offer.policies|length }} / {{ offer.users|length }}</td>
+                                <td>TODO: Button</td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -94,7 +98,7 @@
     {% include 'AppBundle::Admin/adminConfirmModalNew.html.twig' with {
         'route': 'AppBundle:AdminEmployee:offerForm',
         'id': 'offer_form_modal',
-        'item': phone,
+        'params': {'id': phone.id, 'phone': phone},
         'title': 'Create New Offer',
         'size': 'modal-lg'
     } %}

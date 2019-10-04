@@ -13,10 +13,8 @@
         {{ render(controller(route, params)) }}
       {% elseif policy is defined %}
         {{ render(controller(route, {'id': policy.id})) }}
-      {% elseif item is defined %}
-        {{ render(controller(route, {'id': item.id})) }}
       {% else %}
-          {{ render(controller(route)) }}
+        {{ render(controller(route)) }}
       {% endif %}
     </div>
   </div>

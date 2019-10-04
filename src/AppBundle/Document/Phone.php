@@ -645,6 +645,34 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
+    public function addOffer($offer)
+    {
+        $this->offers[] = $offer;
+    }
+
+    public function getOffers()
+    {
+        return $this->offers;
+    }
+
+    public function getActiveOffers()
+    {
+        foreach ($this->getOffers() as $offer) {
+            if ($offer->getActive()) {
+                yield $offer;
+            }
+        }
+    }
+
+    public function getInactiveOffers()
+    {
+        foreach ($this->getOffers() as $offer) {
+            if (!$offer->getActive()) {
+                yield $offer;
+            }
+        }
+    }
+
     /**
      * Adds a retail price to the phone's list of retail prices.
      * @param float     $price is the actual price value.
