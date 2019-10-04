@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Form\Offer;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
@@ -603,45 +604,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('offer_form')) {
-                $companyForm->handleRequest($request);
-                if ($companyForm->isValid()) {
-                    $company = new AffiliateCompany();
-                    $company->setName($this->getDataString($companyForm->getData(), 'name'));
-                    $address = new Address();
-                    $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
-                    $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
-                    $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
-                    $address->setCity($this->getDataString($companyForm->getData(), 'city'));
-                    $postcode = $this->getDataString($companyForm->getData(), 'postcode');
-                    try {
-                        $address->setPostcode($postcode);
-                    } catch (\InvalidArgumentException $e) {
-                        $this->addFlash('error', "{$postcode} is not a valid post code.");
-                    }
-                    $company->setAddress($address);
-                    $company->setDays($this->getDataString($companyForm->getData(), 'days'));
-                    $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
-                    if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
-                        $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
-                    }
-                    $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
-                    $company->setCampaignName($this->getDataString($companyForm->getData(), 'campaignName'));
-                    $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
-                    $company->setLeadSourceDetails(
-                        $this->getDataString($companyForm->getData(), 'leadSourceDetails')
-                    );
-                    $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
-                    $dm = $this->getManager();
-                    $dm->persist($company);
-                    $dm->flush();
-                    $this->addFlash('success', 'Added affiliate');
+                $offerForm->handleRequest($request);
+                if ($offerForm->isValid()) {
                 } else {
                     $this->addFlash(
                         'error',
-                        sprintf('Unable to add company. %s', (string) $companyForm->getErrors())
+                        sprintf('Unable to add offer. %s', (string) $offerForm->getErrors())
                     );
                 }
-                return new RedirectResponse($this->generateUrl('admin_affiliate'));
+                return new RedirectResponse($this->generateUrl('admin_phone_offers', ["id" => $id]));
             }
         }
         return ['form' => $companyForm->createView()];
