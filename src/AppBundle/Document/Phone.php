@@ -270,6 +270,12 @@ class Phone
     protected $newHighDemand;
 
     /**
+     * The offers that pertain to this phone.
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
+     */
+    protected $offers = [];
+
+    /**
      * If set, then use this path for the canonical link
      *
      * @Assert\Length(min="1", max="200")
@@ -1278,6 +1284,14 @@ class Phone
                 $currentPhonePrice->getPicSureExcess()->toApiArray() :
                 [],
         ];
+    }
+
+    /**
+     * Makes an array of offers.
+     * @return array containing the offers TODO: be more specific.
+     */
+    public function toOfferArray()
+    {
     }
 
     public function toAlternativeArray()

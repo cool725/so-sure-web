@@ -31,10 +31,7 @@
     <button title="Offer Pricing"
             type="button"
             class="btn btn-primary btn-sm mb-2 mr-2"
-            data-toggle="modal"
-            data-target="#offer_modal"
-            data-update="{{ path('admin_phone_offer', {'id': phone.id}) }}"
-            data-offers="{{ phone.toOfferArray()|json_encode }}">
+            onclick="window.location.href='{{ path('admin_phone_offers', {'id': phone.id}) }}'">
         <i class="far fa-handshake fa-fw"></i></button>
     {# Edit Phone Details #}
     <button title="Edit Phone Details"

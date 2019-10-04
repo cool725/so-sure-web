@@ -122,11 +122,6 @@ $(function(){
         $('#date_time_pickr_from').datetimepicker('maxDate', e.date);
     });
 
-    // Offer Modal
-    $('#offer_modal').on('show.bs.modal', function(e) {
-        console.log("PROPER BREXIT");
-    });
-
     // Phone Modal
     $('#phone_modal').on('show.bs.modal', function (e) {
         let button = $(e.relatedTarget),

@@ -1,0 +1,105 @@
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-affiliates' %}
+
+{% block title %}Offers - {{ phone }}{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Offer Prices - {{ phone }}</h1>
+            </div>
+            <a href="{{ path('admin_phones') }}">Return to Phones</a>
+            {# Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <a href="#"
+                       class="btn btn-primary"
+                       data-toggle="modal"
+                       data-target="#offer_form_modal"><i class="fal fa-plus fa-fw"></i> New Affiliate </a>
+                </div>
+            </div>
+            {# Content area #}
+            <h2>Active Offers</h2>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Created</th>
+                            <th>Pricing Stream</th>
+                            <th>GWP</th>
+                            <th>Excess (Damage/Theft)</th>
+                            <th>Picsure Approved Excess (Damage/Theft)</th>
+                            <th>Policies / Users</th>
+                            <th>Deactivate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Carphone Warehouse Price Match 2019-10-04</td>
+                            <td>2019-10-04 by Daly Barron</td>
+                            <td>All</td>
+                            <td>8.32</td>
+                            <td>150 / 150</td>
+                            <td>50 / 70</td>
+                            <td>6 / 10</td>
+                            <td>Button</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <h2>Past Offers</h2>
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Created</th>
+                            <th>Pricing Stream</th>
+                            <th>GWP</th>
+                            <th>Excess (Damage/Theft)</th>
+                            <th>Picsure Approved Excess (Damage/Theft)</th>
+                            <th>Policies / Users</th>
+                            <th>Reactivate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Making idiot shut up with discount</td>
+                            <td>2019-10-04 by Ted Moseley</td>
+                            <td>Monthly</td>
+                            <td>8.32</td>
+                            <td>150 / 150</td>
+                            <td>50 / 70</td>
+                            <th>3 / 20</th>
+                            <td>Button</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Admin/adminConfirmModalNew.html.twig' with {
+        'route': 'AppBundle:AdminEmployee:offerForm',
+        'id': 'offer_form_modal',
+        'title': 'Create New Offer',
+        'size': 'modal-lg'
+    } %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/confirm-modal.js') }}"></script>
+{% endblock %}

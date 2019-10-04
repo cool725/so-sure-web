@@ -578,6 +578,76 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/offers/{id}", name="admin_phone_offers")
+     * @Template("AppBundle::AdminEmployee/adminPhoneOffers.html.twig")
+     */
+    public function adminPhoneOffersAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = $phoneRepo->find($id);
+        return [
+            "phone" => $phone
+        ];
+    }
+
+    /**
+     * @Route("/offer/{id}/create", name="admin_offer_create")
+     * @Template
+     */
+    public function offerFormAction(Request $request, $id)
+    {
+        $offerForm = $this->get('form.factory')
+            ->createNamedBuilder('offer_form', OfferType::class)
+            ->setAction($this->generateUrl('admin_offer_create'))
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('offer_form')) {
+                $companyForm->handleRequest($request);
+                if ($companyForm->isValid()) {
+                    $company = new AffiliateCompany();
+                    $company->setName($this->getDataString($companyForm->getData(), 'name'));
+                    $address = new Address();
+                    $address->setLine1($this->getDataString($companyForm->getData(), 'address1'));
+                    $address->setLine2($this->getDataString($companyForm->getData(), 'address2'));
+                    $address->setLine3($this->getDataString($companyForm->getData(), 'address3'));
+                    $address->setCity($this->getDataString($companyForm->getData(), 'city'));
+                    $postcode = $this->getDataString($companyForm->getData(), 'postcode');
+                    try {
+                        $address->setPostcode($postcode);
+                    } catch (\InvalidArgumentException $e) {
+                        $this->addFlash('error', "{$postcode} is not a valid post code.");
+                    }
+                    $company->setAddress($address);
+                    $company->setDays($this->getDataString($companyForm->getData(), 'days'));
+                    $company->setChargeModel($this->getDataString($companyForm->getData(), 'chargeModel'));
+                    if ($company->getChargeModel() == AffiliateCompany::MODEL_ONGOING) {
+                        $company->setRenewalDays($this->getDataString($companyForm->getData(), 'renewalDays'));
+                    }
+                    $company->setCampaignSource($this->getDataString($companyForm->getData(), 'campaignSource'));
+                    $company->setCampaignName($this->getDataString($companyForm->getData(), 'campaignName'));
+                    $company->setLeadSource($this->getDataString($companyForm->getData(), 'leadSource'));
+                    $company->setLeadSourceDetails(
+                        $this->getDataString($companyForm->getData(), 'leadSourceDetails')
+                    );
+                    $company->setCPA($this->getDataString($companyForm->getData(), 'cpa'));
+                    $dm = $this->getManager();
+                    $dm->persist($company);
+                    $dm->flush();
+                    $this->addFlash('success', 'Added affiliate');
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Unable to add company. %s', (string) $companyForm->getErrors())
+                    );
+                }
+                return new RedirectResponse($this->generateUrl('admin_affiliate'));
+            }
+        }
+        return ['form' => $companyForm->createView()];
+    }
+
+    /**
      * @Route("/users", name="admin_users")
      * @Template("AppBundle::AdminEmployee/adminUsers.html.twig")
      */
@@ -3952,28 +4022,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
         $promotionRepository = $dm->getRepository(Promotion::class);
         $promotion = $promotionRepository->find($id);
-
-
         return ["promotion" => $promotion];
-    }
-
-    /**
-     * @Route("/user-offers", name="admin_user_offers")
-     * @Template("AppBundle:AdminEmployee:offers.html.twig")
-     */
-    public function userOffersAction($id)
-    {
-        // TODO: consider implementing.
-        return [];
-    }
-
-    public function createOfferFormAction()
-    {
-        return new Response();
-//        $offerForm = $this->get('form.factory')
-//            ->createNamedBuilder('offer_form')
-//            ->getForm();
-//        return ['offer_form' => $offerForm];
     }
 
     /**
