@@ -103,14 +103,12 @@ class SearchController extends BaseController
                         return $this->redirectToRoute('quote_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                            'skip' => true
+                            'memory' => $phone->getMemory()
                         ]);
                     } else {
                         return $this->redirectToRoute('quote_make_model', [
                             'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'skip' => true
+                            'model' => $phone->getEncodedModel()
                         ]);
                     }
                 }
@@ -174,14 +172,12 @@ class SearchController extends BaseController
                         return $this->redirectToRoute('quote_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                            'skip' => true
+                            'memory' => $phone->getMemory()
                         ]);
                     } else {
                         return $this->redirectToRoute('quote_make_model', [
                             'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'skip' => true
+                            'model' => $phone->getEncodedModel()
                         ]);
                     }
                 }

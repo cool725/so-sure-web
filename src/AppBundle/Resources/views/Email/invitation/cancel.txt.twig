@@ -1,5 +1,25 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-{{ invitation.inviter.name }} has cancelled your invite to so-sure.
 
-{% endblock body %}
+Invite cancelled ⛔️
+
+Hmm, looks like your friend {{ invitation.inviter.name }} has cancelled your invite to so-sure 😢
+
+Maybe invite some of your better friends?
+
+Invite more friends: {{ branch_share_url }}
+
+Have a question or issue? Contact us: {{ contact_us_url }}
+
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

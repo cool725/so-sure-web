@@ -1,14 +1,25 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-{{ invitation.inviterName }} wants to connect with you on so-sure.
 
-**
-------------------------------------------------------------
-Great news! Your friend, {{ invitation.inviterName }}, wants to connect with you on so-sure.
+👉 {{ invitation.inviterName }} wants to connect
 
-Open your so-sure app to connect with them!
+Great news! Your friend, {{ invitation.inviterName }}, wants to connect with you on so-sure ☺️
+
+Head to the so-sure website or the app to connect with them!
 
 Accept Invitation: {{ invitation.link }}
 
-Need more information? Visit wearesosure.com or contact hello@wearesosure.com.
-{% endblock body %}
+Have a question or issue? Contact us: {{ contact_us_url }}
+
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
