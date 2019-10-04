@@ -1,14 +1,25 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-{{ invitation.inviterName }} invited you to join so-sure - join today and we’ll reward both of you.
 
-**
-------------------------------------------------------------
-Your friend, {{ invitation.inviterName }}, just got their phone covered with so-sure – better & up to 80% cheaper phone insurance designed for friends.
+👉 {{ invitation.inviterName }} invited you to connect
 
-Join today and we'll reward both of you!
+Your friend, {{ invitation.inviterName }}, just got their phone covered with so-sure – better &amp; up to 80% cheaper phone insurance designed for friends ☺️
+
+Connect today and we'll reward both of you!
 
 Accept Invitation: {{ invitation.link }}
 
-Need more information? Visit wearesosure.com or contact hello@wearesosure.com.
-{% endblock body %}
+Have a question or issue? Contact us: {{ contact_us_url }}
+
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
