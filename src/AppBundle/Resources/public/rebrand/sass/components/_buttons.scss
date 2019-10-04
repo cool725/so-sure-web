@@ -3,8 +3,8 @@
 // Add shadow to solid buttons
 .btn {
     font-family: $g-medium;
-    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                0 5px 15px 0 rgba(8,27,154,0.08);
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
+                0 5px 15px 0 rgba(8,27,154,0.2);
 
     &:hover {
         box-shadow: none;
