@@ -1556,7 +1556,6 @@ class PurchaseController extends BaseController
 
     /**
      * @Route("/checkout/process-three-d", name="checkout_process_threed")
-     * @param $token
      */
     public function processThreeDAction(Request $request)
     {
