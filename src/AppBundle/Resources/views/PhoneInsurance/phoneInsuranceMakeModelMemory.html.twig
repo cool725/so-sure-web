@@ -52,35 +52,117 @@
                                     <i class="fal fa-angle-right text-white"></i>
                                 </li>
                                 <li class="list-inline-item text-white">
-                                    {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }}
+                                    {{ phone.model }} ({{ phone.memory }}GB)
                                 </li>
                             </ul>
                         </div>
-                        <h1 class="text-white h1m mb-0">
-                            {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price.monthlyPremiumPrice }} per month
+                        <h1 class="text-white h1b mb-4 fit">
+                            <a href="#mem_sizes"
+                               class="text-white"
+                               data-toggle="collapse"
+                               role="button"
+                               aria-expanded="false"
+                               aria-controls="mem_sizes"
+                               title="Not the phone you're looking for?">
+                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ phone_price.monthlyPremiumPrice }} per month</span>
+                            </a>
                         </h1>
-                        {% if phone is defined and phone %}
-                            {{ render(controller('AppBundle:Search:memorySearchDropdown', {
-                                'id': phone.id,
-                            }|merge(app.request.query.all))) }}
-                        {% else %}
-                            {{ render(controller('AppBundle:Search:memorySearchDropdown', { }|merge(app.request.query.all))) }}
-                        {% endif %}
+                        <div class="collapse mb-4" id="mem_sizes">
+                            {% if phones | length > 1 %}
+                                <ul class="list-inline">
+                                    {% for phone_mem in phones %}
+                                        {% if phone_mem.id != phone.id  %}
+                                            <li class="list-inline-item">
+                                                <a href="{{ path('quote_phone', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            <a class="text-white get-a-quote disabled" href="#">
+                                <small>Not the phone you're looking for?</small>
+                            </a>
+                        </div>
+                        {{ form_start(buy_form, {'attr': { 'class': 'my-5'}}) }}
+                            {{ form_widget(buy_form.buy, {
+                                'label': 'Get Started',
+                                'attr': {
+                                    'class': 'btn btn-success btn-green-gradient btn-block-xs mr-sm-2'
+                            }}) }}
+                            <a href="#"
+                               class="btn btn-outline-white watch-video btn-block-xs"
+                               data-event="watch-video-quote"
+                               data-toggle="modal"
+                               data-target="#sosure-video-modal"
+                               data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                                <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                                Watch our Video
+                            </a>
+                        {{ form_end(buy_form) }}
+                        <h2 class="h4 text-columbia-blue-e mb-4">What's covered:</h2>
+                        <ul class="list-unstyled icn-fa-list mb-0">
+                            <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Loss &amp; Theft</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 90 days global travel</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Out of warranty breakdown</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
+                            <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
+                            <li class="text-white mb-5"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+                        </ul>
+                        <h2 class="h4 text-columbia-blue-e my-4">What's not covered:</h2>
+                        <ul class="list-unstyled icn-fa-list mb-0">
+                            <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> A claim where you have knowingly put your phone at risk</li>
+                            <li class="text-white mb-5"><i class="far fa-times text-columbia-blue-e fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+                        </ul>
+                        <h2 class="h4 text-columbia-blue-e my-4">Insurance Product Information Document:</h2>
+                        <ul class="list-unstyled icn-fa-list mb-0">
+                            <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
+                            <li class="text-white mb-5">
+                                <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
+                                <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="track-data text-white"
+                                   data-event="user-download-ipid"
+                                   data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
+                            </li>
+                        </ul>
+                        <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
+                        <p class="mb-5 text-white">Prove your {{ make_desc }} {{ phone.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-white">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th class="h6">Damage</th>
+                                        <th class="h6">Loss</th>
+                                        <th class="h6">Theft</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="h6">Validated with app</td>
+                                        <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
+                                        <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
+                                        <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="h6">Not validated with app</td>
+                                        <td>&pound;{{ phone_price.excess.damage }}</td>
+                                        <td>&pound;{{ phone_price.excess.loss }}</td>
+                                        <td>&pound;{{ phone_price.excess.theft }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                   <div class="hero__illustration hero__illustration-{{ img_url }} text-center">
-                        {% if img_url in available_images %}
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                                 data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hero-{{ img_url }}.png"
-                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                                 class="lozad img-fluid animated bounceInUp">
-                        {% else %}
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                                 data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
-                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                                 class="lozad img-fluid hero-generic animated bounceInUp">
-                        {% endif %}
+                   <div class="hero__illustration hero__illustration-generic text-center">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
+                             alt="{{ phone.make }} {{ phone.model }} {{ phone.memory }} - Phone Insurance"
+                             class="lozad img-fluid hero-generic animated bounceInUp">
                     </div>
                 </div>
             </div>
@@ -90,119 +172,57 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
-    {# Intro #}
     <section class="intro py-lg-5">
         <div class="container-large py-5">
-            <h2 class="h3 mb-4 text-primary text-center">Why insure your {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }} with so-sure</h2>
-            {% block phone_hero_text %}{% endblock %}
+            <h2 class="h3 mb-4 text-primary text-center">Why insure your {{ phone.model }} with so-sure</h2>
             <div class="row">
                 {# TODO: Needs copy #}
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
-                    <h3 class="h5 text-primary">24-72 hour replace or repair</h3>
+                    <h3 class="h6 text-primary">24-72 hour replace or repair</h3>
                     <p class="mb-5">We aim to replace or repair your phone within <span class="text-nowrap">24-72</span> hours after your claim is approved</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="180px" class="lozad">
-                    <h3 class="h5 text-primary">Up to 80% money back</h3>
+                    <h3 class="h6 text-primary">Up to 80% money back</h3>
                     <p class="mb-5">Connect with friends and get rewarded when you and your connections don't claim</p>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px" class="lozad">
-                    <h3 class="h5 text-primary">Low excess from just &pound;50</h3>
+                    <h3 class="h6 text-primary">Low excess from just &pound;50</h3>
                     <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess</p>
                 </div>
             </div>
-            <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Insure your phone in minutes</a>
+            {{ form_start(buy_form_banner) }}
+                {{ form_widget(buy_form_banner.buy, {
+                    'label': 'Insure your phone in minutes',
+                    'attr': {
+                        'class': 'btn btn-primary btn-block-xs mb-5'
+                }}) }}
+            {{ form_end(buy_form_banner) }}
         </div>
     </section>
 
-    {% if hide_section == false %}
-        {# Why Insure #}
-        <section class="why-insure lozad py-lg-5">
-            <div class="container-large py-5">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_{{ phone.make|lower }}-logo.png"
-                             alt="{{ phone.make }} - Phone Insurance"
-                             class="d-none d-lg-inline lozad">
-                        {% if img_url in available_images %}
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                                 data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hand-holding-{{ img_url }}.png"
-                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                                 class="img-fluid lozad mb-4 d-lg-none"
-                                 width="320px">
-                        {% else %}
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                                 data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
-                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                                 class="img-fluid lozad mb-4 d-lg-none"
-                                 width="320px">
-                        {% endif %}
-                        <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }}?</h2>
-                        {% block phone_why_insure_text %}{% endblock %}
-                        <a href="#" class="btn btn-success btn-block-xs mx-auto my-5 get-a-quote disabled">Get a Quote</a>
-                    </div>
-                </div>
-                <div class="why-insure__illustration-desktop d-none d-lg-block">
-                    {% if img_url in available_images %}
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hand-holding-{{ img_url }}.png"
-                             alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                             class="img-fluid lozad mb-4">
-                    {% else %}
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
-                             alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
-                             class="img-fluid lozad mb-4">
-                    {% endif %}
-                </div>
-            </div>
-        </section>
-    {% endif %}
-
-    {% if hide_section == false %}
-        {# Extra Content #}
-        <section class="extra-content py-lg-5">
-            <div class="container-large py-5">
-                {% block extra_content_one %}{% endblock %}
-            </div>
-        </section>
-    {% endif %}
-
     {# Cover #}
     <section class="cover py-lg-5">
-        <div class="container-large {% if hide_section == false %}pt-lg-5{% else %}pt-5{% endif %}">
+        <div class="container-large pt-lg-5">
             <div class="d-none d-lg-block">
-                {% if hide_section == true %}
-                    <h2 class="h3 mb-5 text-primary text-center">Comprehensive Phone Insurance that starts immediately</h2>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-5">Losing your {{ make_desc }} {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-5">With our comprehensive insurance, you’ll be fully covered for theft or loss, letting you rest easy if your phone suddenly goes missing. We also provide cover for any accidental damage that happens to your iPhone, such as a cracked screen or accidental water damage.</p>
-                        </div>
+                <h2 class="h3 mb-5 text-primary text-center">Comprehensive Phone Insurance that starts immediately</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-5">Losing your {{ make_desc }} {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
                     </div>
-                {% else %}
-                    <h2 class="h3 mb-5 text-primary text-center">Relax 😎, we’ve got you covered</h2>
-                {% endif %}
+                    <div class="col-md-6">
+                        <p class="mb-5">With our comprehensive insurance, you’ll be fully covered for theft or loss, letting you rest easy if your phone suddenly goes missing. We also provide cover for any accidental damage that happens to your iPhone, such as a cracked screen or accidental water damage.</p>
+                    </div>
+                </div>
             </div>
             <div class="cover__illustration__mobile text-center d-block d-lg-none">
-                {% if img_url in available_images %}
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_cover-{{ img_url }}.png"
-                         alt="{{ phone.make }} {{ phone.model }} - Phone Insurance what's covered"
-                         width="300px"
-                         class="lozad">
-                {% else %}
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_cover-phone.png"
-                         alt="{{ phone.make }} {{ phone.model }} - Phone Insurance what's covered"
-                         width="300px"
-                         class="lozad">
-                {% endif %}
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_cover-phone.png"
+                     alt="{{ phone.make }} {{ phone.model }} - Phone Insurance what's covered"
+                     width="300px"
+                     class="lozad">
             </div>
             <div class="cover__desktop d-none d-lg-block">
                 <div class="row">
@@ -210,21 +230,21 @@
                         <ul class="list-unstyled text-right cover__list">
                             <li class="media">
                                 <div class="media-body mb-5">
-                                    <h3 class="h5 text-primary">International travel</h3>
+                                    <h3 class="h6 text-primary">International travel</h3>
                                     90 days of globe trotting, from backpacking to business you're covered
                                 </div>
                                 <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="50px" class="ml-3 lozad">
                             </li>
                             <li class="media">
                                 <div class="media-body mb-5">
-                                    <h3 class="h5 text-primary">Out-of-warranty breakdowns</h3>
+                                    <h3 class="h6 text-primary">Out-of-warranty breakdowns</h3>
                                     Phone breaks out of warranty, no worries you're covered
                                 </div>
                                 <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="50px" class="ml-3 lozad">
                             </li>
                             <li class="media">
                                 <div class="media-body mb-5">
-                                    <h3 class="h5 text-primary">Phones up to three years old</h3>
+                                    <h3 class="h6 text-primary">Phones up to three years old</h3>
                                     We're one of the only insurers that covers phones up to 3 years old
                                 </div>
                                 <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_old-phones-icn.svg" alt="so-sure - Phone up to three years old" width="50px" class="ml-3 lozad">
@@ -232,38 +252,31 @@
                         </ul>
                     </div>
                     <div class="col-lg-4 text-center">
-                        {% if img_url in available_images %}
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                                 data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_cover-{{ img_url }}.png"
-                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance what's covered"
-                                 class="img-fluid lozad">
-                        {% else %}
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                                 data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_cover-phone.png"
-                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance what's covered"
-                                 class="img-fluid lozad">
-                        {% endif %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_cover-phone.png"
+                             alt="{{ phone.make }} {{ phone.model }} - Phone Insurance what's covered"
+                             class="img-fluid lozad">
                     </div>
                     <div class="col-lg-4">
                         <ul class="list-unstyled cover__list">
                             <li class="media">
                                 <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="50px" class="mr-3 lozad">
                                 <div class="media-body mb-5">
-                                    <h3 class="h5 text-primary">Accidental damage</h3>
+                                    <h3 class="h6 text-primary">Accidental damage</h3>
                                     Don't worry we can usually repair this device so its a good as new
                                 </div>
                             </li>
                             <li class="media">
                                 <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="50px" class="mr-3 lozad">
                                 <div class="media-body mb-5">
-                                    <h3 class="h5 text-primary">Theft or loss</h3>
+                                    <h3 class="h6 text-primary">Theft or loss</h3>
                                     Phones been snatched, don't stress we've got your back
                                 </div>
                             </li>
                             <li class="media">
                                 <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="50px" class="mr-3 lozad">
                                 <div class="media-body">
-                                    <h3 class="h5 text-primary">Accessories</h3>
+                                    <h3 class="h6 text-primary">Accessories</h3>
                                     No tunes, no problem. You're covered up to the value of &pound;100 inc. VAT
                                 </div>
                             </li>
@@ -298,42 +311,42 @@
                 <li class="media">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_travel-icn.svg" alt="so-sure - Travel Cover" width="50px" class="mr-3 lozad">
                     <div class="media-body mb-5">
-                        <h3 class="h5">International travel</h3>
+                        <h3 class="h6">International travel</h3>
                         90 days of globe trotting covered
                     </div>
                 </li>
                 <li class="media">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_out-of-warranty-icn.svg" alt="so-sure - Out of Warranty Breakdown" width="50px" class="mr-3 lozad">
                     <div class="media-body mb-5">
-                        <h3 class="h5">Out-of-warranty breakdowns</h3>
+                        <h3 class="h6">Out-of-warranty breakdowns</h3>
                         Phone breaks out of warranty, no worries you're covered
                     </div>
                 </li>
                 <li class="media">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_old-phones-icn.svg" alt="so-sure - Phones up to three years old" width="50px" class="mr-3 lozad">
                     <div class="media-body mb-5">
-                        <h3 class="h5">Phones up to three years old</h3>
+                        <h3 class="h6">Phones up to three years old</h3>
                         We're one of the only insurers that covers phones up to 3 years old
                     </div>
                 </li>
                 <li class="media">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_accidental-damage-icn.svg" alt="so-sure - Accidental damage" width="50px" class="mr-3 lozad">
                     <div class="media-body mb-5">
-                        <h3 class="h5">Accidental damage</h3>
+                        <h3 class="h6">Accidental damage</h3>
                         Don't worry we can usually repair this device so it’s as good as new
                     </div>
                 </li>
                 <li class="media">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_theft-loss-icn.svg" alt="so-sure - Theft or loss" width="50px" class="mr-3 lozad">
                     <div class="media-body mb-5">
-                        <h3 class="h5">Theft or loss</h3>
+                        <h3 class="h6">Theft or loss</h3>
                         Phones been snatched, don't stress we've got your back
                     </div>
                 </li>
                 <li class="media">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_broken-phone-icn.svg" alt="so-sure - Broken headphone jack" width="50px" class="mr-3 lozad">
                     <div class="media-body">
-                        <h3 class="h5">Accessories</h3>
+                        <h3 class="h6">Accessories</h3>
                         No tunes, no problem. You're covered up to the value of &pound;100 inc. VAT
                     </div>
                 </li>
@@ -342,17 +355,16 @@
     </section>
 
     {# Why Insure Continued #}
-    <section class="why-insure-continued py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
-        <div class="container-large py-5">
+    <section class="why-insure-continued py-lg-5 mb-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
+        <div class="container-large py-5 mb-lg-5">
             <div class="row">
                 <div class="col-lg-6">
                     <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
                 </div>
                 <div class="col-lg-6">
                     <h2 class="h3 mb-4 text-primary">With great {{ make_desc }} {{ with_phone }} Insurance, comes great responsibility</h2>
-                    <p>Worried about losing your {{ phone.make }} {{ phone.model }}? We're here to help. Our hassle-free claims process (and our UK-based claims team) makes it fast and easy to get a replacement if your {{ make_desc }} {{ phone.model }} goes missing or is stolen while you’re out and about, running errands or traveling abroad.</p>
+                    <p>Worried about losing your {{ make_desc }} {{ phone.model }}? We're here to help. Our hassle-free claims process (and our UK-based claims team) makes it fast and easy to get a replacement if your {{ make_desc }} {{ phone.model }} goes missing or is stolen while you’re out and about, running errands or traveling abroad.</p>
                     <p class="mb-5">We aim to provide a replacement or perform a complete repair for your handset in 24-72 hours after approving your claim. Our fast, efficient team completes 74% of claims in 24 hours or less, meaning you’ll have a new or repaired phone in your hand without having to wait.</p>
-                    <a href="#" class="btn btn-success btn-block-xs mx-auto mb-5 get-a-quote disabled">Get a Quote</a>
                 </div>
             </div>
         </div>
@@ -367,18 +379,6 @@
     {# Comparison #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
 
-    {% if hide_section == false %}
-        {# Extra Content #}
-        <section class="extra-content py-lg-5">
-            <div class="container-large py-5">
-                {% block extra_content_two %}{% endblock %}
-            </div>
-        </section>
-    {% endif %}
-
-    {# Other phones #}
-    {# {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %} #}
-
     {# FAQ #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_miniFaq.html.twig' with { 'phone': phone } %}
 
@@ -386,19 +386,16 @@
         <div class="container-large">
             <h4>{{ make_desc }} {{ phone.model }} Specs 🧐</h4>
             <ul class="list-inline mb-0">
-                <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ phone.camera }} MP</li>
+                <li class="list-inline-item"><strong class="h6">Camera</strong>: {{ phone.camera }} MP</li>
                 <li class="list-inline-item">|</li>
-                <li class="list-inline-item"><strong class="h5">Size</strong>: {{ phone.getScreenPhysicalInch }}</li>
+                <li class="list-inline-item"><strong class="h6">Size</strong>: {{ phone.getScreenPhysicalInch }}</li>
                 <li class="list-inline-item">|</li>
-                <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ phone.getScreenResolution }}</li>
+                <li class="list-inline-item"><strong class="h6">Screen Resolution</strong>: {{ phone.getScreenResolution }}</li>
                 <li class="list-inline-item">|</li>
-                <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ phone.getRamDisplay }}</li>
+                <li class="list-inline-item"><strong class="h6">RAM</strong>: {{ phone.getRamDisplay }}</li>
             </ul>
         </div>
     </section>
-
-    {# Banner #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_banner.html.twig' %}
 
     {# Page Modals #}
 

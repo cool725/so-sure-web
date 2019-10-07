@@ -40,9 +40,9 @@ $(function() {
             // If only one option for size auto select
             // Note: The placeholder value means a length of 2
             // if (memory.find('option').length == 2)
-            memory.find('option:eq(1)').prop('selected', true).resizeselect();
-            button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow').addClass('animated heartBeat');
-            sizeTxt.toggleText('for exact price', 'get covered today');
+            // memory.find('option:eq(1)').prop('selected', true).resizeselect();
+            // button.prop('disabled', '').removeClass('btn-outline-white').addClass('btn-success btn-shadow').addClass('animated heartBeat');
+            // sizeTxt.toggleText('for exact price', 'get covered today');
             memory.resizeselect();
         }
 
@@ -56,13 +56,12 @@ $(function() {
 
             if ($(this).val()) {
                 $(this).addClass('valid-select');
-                sizeTxt.toggleText('for exact price', 'get covered today');
+                // sizeTxt.text('get covered 👇');
                 button.prop('disabled', '').addClass('animated heartBeat');
-
             } else {
                 $(this).removeClass('valid-select');
-                sizeTxt.toggleText('for exact price', 'get covered today');
-                button.prop('disabled', 'disabled');
+                // sizeTxt.text('to get covered');
+                button.prop('disabled', 'disabled').removeClass('animated heartBeat');;
             }
 
         });

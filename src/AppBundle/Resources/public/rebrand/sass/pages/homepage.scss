@@ -114,6 +114,17 @@
     }
 }
 
+.other-phones {
+    text-align: center;
+
+    a img {
+
+        &:hover {
+            transform: translateY(-5px);
+        }
+    }
+}
+
 .differently {
     position: relative;
     z-index: 1;

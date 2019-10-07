@@ -50,14 +50,14 @@ class PhoneSitemapGenerator implements GeneratorInterface
             $phoneMake = $phone->getMake();
             $makes[$phoneMake] = $phoneMake;
         }
-        
+
         $phones = $repo->findActive()->getQuery()->execute();
         foreach ($phones as $phone) {
             /** @var Phone $phone */
             if ($phone->getCanonicalPath() && mb_strlen($phone->getCanonicalPath()) > 0) {
                 $url = $this->router->generateUrlFromPath($phone->getCanonicalPath());
             } else {
-                $url = $this->router->generateUrl('quote_make_model', [
+                $url = $this->router->generateUrl('phone_insurance_make_model', [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getEncodedModelCanonical()
                 ]);
