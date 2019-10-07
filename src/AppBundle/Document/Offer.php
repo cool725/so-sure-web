@@ -85,6 +85,15 @@ class Offer
     protected $policies = [];
 
     /**
+     * Gives you the offer's id.
+     * @return string the offer's id.
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Gives the time at which the offer was created.
      * @return \DateTime of creation.
      */
@@ -241,16 +250,15 @@ class Offer
      */
     public function toArray()
     {
-        $users = array_map(function ($user) {
-            return $user->getEmail();
+        $users = array_map(function($user) {
+            $data = array_map(function($policy) {
+                return $policy->getPolicyNumber();
+            }, $user->getPolicies());
+            return [$user->getEmail, $data];
         }, $this->getUsers());
-        $policies = array_map(function ($policy) {
-            return $policy->getPolicyNumber();
-        }, $this->getPolicies());
         return [
             "name" => $this->getName(),
-            "users" => $users,
-            "policies" => $policies
+            "users" => $users
         ];
     }
 }

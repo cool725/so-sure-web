@@ -57,17 +57,23 @@
                                 <td style="width:15%">
                                     <button title="View Users and Policies"
                                             type="button"
-                                            class="btn btn-primary btn-sm mb-2 mr-2">
+                                            class="btn btn-primary btn-sm mb-2 mr-2"
+                                            data-toggle="modal"
+                                            data-target="#details_modal">
                                         <i class="far fa-microscope fa-fw"></i>
                                     </button>
                                     <button title="Add User"
                                             type="button"
-                                            class="btn btn-warning btn-sm mb-2 mr-2">
+                                            class="btn btn-warning btn-sm mb-2 mr-2"
+                                            data-toggle="modal"
+                                            data-target="#user_modal">
                                         <i class="far fa-plus-square fa-fw"></i>
                                     </button>
                                     <button title="Deactivate"
                                             type="button"
-                                            class="btn btn-danger btn-sm mb-2 mr-2">
+                                            class="btn btn-danger btn-sm mb-2 mr-2"
+                                            data-token="{{ csrf_token('default') }}"
+                                            data-active="{{ path('admin_offer_disable', {'id': offer.id}) }}">
                                         <i class="far fa-power-off fa-fw"></i>
                                     </button>
                                 </td>
@@ -129,6 +135,62 @@
         'title': 'Create New Offer',
         'size': 'modal-lg'
     } %}
+
+    {# Details Modal#}
+    <div class="modal fade"
+         id="details_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="details_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Offer Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4 id="details_name"></h4>
+                    <p>Created by <a id="details_creator"></a></p>
+                    <div class="card">
+                        <div class="card-header h5">Users / Policies</div>
+                        <div class="card-body">
+                            <ul id="details_user_list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Add User Modal#}
+    <div class="modal fade"
+         id="user_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="details_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add User To Offer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4 id="details_name"></h4>
+                    <p>Created by <a id="details_creator"></a></p>
+                    <div class="card">
+                        <div class="card-header h5">Users / Policies</div>
+                        <div class="card-body">
+                            <ul id="details_user_list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
