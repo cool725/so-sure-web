@@ -54,7 +54,7 @@
                                 <td>{{ offer.price.excess.damage }} / {{ offer.price.excess.theft }} </td>
                                 <td>{{ offer.price.picsureExcess.damage }} / {{ offer.price.picsureExcess.theft }}</td>
                                 <td>{{ offer.policies|length }} / {{ offer.users|length }}</td>
-                                <td style="width:15%">
+                                <td>
                                     <button title="View Users and Policies"
                                             type="button"
                                             class="btn btn-primary btn-sm mb-2 mr-2"
@@ -69,13 +69,14 @@
                                             data-target="#user_modal">
                                         <i class="far fa-plus-square fa-fw"></i>
                                     </button>
-                                    <button title="Deactivate"
-                                            type="button"
-                                            class="btn btn-danger btn-sm mb-2 mr-2"
-                                            data-token="{{ csrf_token('default') }}"
-                                            data-active="{{ path('admin_offer_disable', {'id': offer.id}) }}">
-                                        <i class="far fa-power-off fa-fw"></i>
-                                    </button>
+                                    <form action="{{ path('admin_offer_able', {'id': offer.id}) }}" method="post">
+                                        <input type="hidden" name="able" value="disable"/>
+                                        <button title="Deactivate"
+                                                type="submit"
+                                                class="btn btn-danger btn-sm mb-2 mr-2">
+                                            <i class="far fa-power-off fa-fw"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -107,17 +108,20 @@
                                 <td>{{ offer.price.excess.damage }} / {{ offer.price.excess.theft }} </td>
                                 <td>{{ offer.price.picsureExcess.damage }} / {{ offer.price.picsureExcess.theft }}</td>
                                 <td>{{ offer.policies|length }} / {{ offer.users|length }}</td>
-                                <td style="width:10%">
+                                <td>
                                     <button title="View Users and Policies"
                                             type="button"
                                             class="btn btn-primary btn-sm mb-1 mr-2">
                                         <i class="far fa-microscope fa-fw"></i>
                                     </button>
-                                    <button title="Reactivate"
-                                            type="button"
-                                            class="btn btn-danger btn-sm mb-1 mr-2">
-                                        <i class="far fa-power-off fa-fw"></i>
-                                    </button>
+                                    <form action="{{ path('admin_offer_able', {'id': offer.id}) }}" method="post">
+                                        <input type="hidden" name="able" value="enable"/>
+                                        <button title="Reactivate"
+                                                type="submit"
+                                                class="btn btn-danger btn-sm mb-2 mr-2">
+                                            <i class="far fa-power-off fa-fw"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -179,14 +183,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h4 id="details_name"></h4>
-                    <p>Created by <a id="details_creator"></a></p>
-                    <div class="card">
-                        <div class="card-header h5">Users / Policies</div>
-                        <div class="card-body">
-                            <ul id="details_user_list"></ul>
-                        </div>
-                    </div>
+                    Going to need javascript stuff for this.
                 </div>
             </div>
         </div>

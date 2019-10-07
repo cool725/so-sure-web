@@ -688,29 +688,38 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * Gives the details on an offer including a list of all users and policies using it as JSON.
+     * Turns an offer on or off.
      * @param Request $request is the http request.
      * @param string  $id      is the id of the offer we are requesting information on.
      * @return HttpResponse to send back to the client.
-     * @Route("/offer/{id}/disable", name="admin_offer_disable")
+     * @Route("/offer/{id}/enable", name="admin_offer_able")
      * @Method({"POST"})
      */
-    public function offerDisableAction(Request $request, $id)
+    public function offerAbleAction(Request $request, $id)
     {
-
-    }
-
-    /**
-     * Gives the details on an offer including a list of all users and policies using it as JSON.
-     * @param Request $request is the http request.
-     * @param string  $id      is the id of the offer we are requesting information on.
-     * @return HttpResponse to send back to the client.
-     * @Route("/offer/{id}/enable", name="admin_offer_enable")
-     * @Method({"POST"})
-     */
-    public function offerEnableAction(Request $request, $id)
-    {
-
+        $dm = $this->getManager();
+        $offerRepo = $dm->getRepository(Offer::class);
+        $offer = $offerRepo->find($id);
+        $ableText = $request->request->get("able");
+        if (!$offer) {
+            throw new \Exception("No offer with id '{$id}'");
+        }
+        $able = false;
+        if ($ableText == "enable") {
+            $able = true;
+        } elseif ($ableText != "disable") {
+            $this->addFlash("error", "Request to change offer state was invalid");
+            return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
+        }
+        $offer->setActive($able);
+        $dm->persist($offer);
+        $dm->flush();
+        $this->addFlash("success", sprintf(
+            "%s %s",
+            $offer->getName(),
+            $able ? "reenabled" : "disabled"
+        ));
+        return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
     }
 
     /**
