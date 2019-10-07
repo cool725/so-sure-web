@@ -1,0 +1,181 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'phone-insurance phone-insurance-make' %}
+{# Adjust for Apple as iPhone is more commonly recognised #}
+{% set make_desc = phone.make %}
+{% set with_phone = phone.make ~ ' Phone' %}
+{% if phone.make == 'Apple' %}
+    {% set make_desc = 'iPhone' %}
+    {% set with_phone = 'iPhone' %}
+{% endif %}
+
+{% block title %}{{ with_phone }} Insurance | so-sure{% endblock %}
+{% block meta %}
+    <meta name="description" content="{{ with_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better."/>
+{% endblock %}
+{% set og_title = with_phone ~ ' Insurance | so-sure' %}
+{% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
+{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="text-center mb-5">
+                <h1 class="text-white fit">{{ with_phone }} Insurance <br class="d-md-none"> <span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
+                <div class="breadcrumbs">
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            <a class="text-columbia-blue-e" href="{{ path('homepage') }}">Home</a>
+                        </li>
+                        <li class="list-inline-item text-white">
+                            <i class="fal fa-angle-right text-white"></i>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="text-columbia-blue-e" href="{{ path('phone_insurance') }}">Phone Insurance</a>
+                        </li>
+                        <li class="list-inline-item text-white">
+                            <i class="fal fa-angle-right text-white"></i>
+                        </li>
+                        <li class="list-inline-item text-white">
+                            {{ make_desc }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="d-none d-xl-flex col-xl-6 align-items-center">
+                    {% if phone.make == 'Apple'  %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_hand-holding-iphone-x.png"
+                             alt="{{ phone.make }} - Phone Insurance"
+                             class="img-fluid lozad">
+                    {% elseif phone.make == 'Samsung'  %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_hand-holding-galaxy-s9.png"
+                             alt="{{ phone.make }} - Phone Insurance"
+                             class="img-fluid lozad">
+                    {% elseif phone.make == 'Google'  %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/google/so-sure_hand-holding-pixel-3xl.png"
+                             alt="{{ phone.make }} - Phone Insurance"
+                             class="img-fluid lozad">
+                    {% else %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
+                             alt="{{ phone.make }} - Phone Insurance"
+                             class="img-fluid lozad">
+                    {% endif %}
+                </div>
+                <div class="col-md-8 offset-md-2 col-xl-5 offset-xl-1">
+                    {# Phone Search Card #}
+                    {# TODO: Rework if phone in session #}
+                    {% if phone is defined and phone %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'seo', 'id': phone.id }|merge(app.request.query.all))) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'seo' }|merge(app.request.query.all))) }}
+                    {% endif %}
+                    {# End Phone Search #}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="make py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="make__illustration__mobile d-block d-lg-none my-5">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png" alt="so-sure - pic-sure" class="img-fluid lozad">
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-lg-5 pb-lg-5">
+                    <h2 class="text-primary mb-3">{{ with_phone }} Insurance</h2>
+                    <p class="mb-4 mb-lg-5">Insuring your {{ with_phone }} is affordable and easy with so-sure: we cover almost all eventualities, so you can be confident that you're prepared for any unwanted surprises like accidental damage or smartphone theft/loss. It only takes minutes to get it insured.</p>
+                    <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Popular Models #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_popularModels.html.twig' %}
+
+    <section class="protect py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="text-zaffre mb-3">Protect Your {{ make_desc }}: <br> <span class="text-primary">Phone Insurance that gives you more</span></h2>
+                    <p class="mb-4">Your {{ with_phone }} insurance should come with real benefits like money back if there’s no claim, faster-than-fast repair or replacement, and the option  to include family or friends in your plan to save money. Second hand phone?  Not a problem with so-sure.</p>
+                    <h3 class="h5 text-primary">{{ make_desc }} Insurance by the pros</h3>
+                    <p class="mb-4 mb-lg-5">Our mobile device insurance keeps your {{ make_desc }} fully covered for theft and loss as standard- at home and abroad. We also provide coverage for any accidental damage to your phone. Our {{ make_desc }} insurance is designed to  focus on your peace of mind so you have one thing less to worry about. We  also see that your favourite accessories are covered, with a value of up to &pound;100.</p>
+                    <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Get a Quote</a>
+                </div>
+                <div class="col-lg-6 align-items-center">
+                    <div class="protect__illustration">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_phone-group-large.png" alt="so-sure - phones" class="img-fluid lozad">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Reviews #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviews.html.twig' %}
+
+    <section class="travel py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="travel__illustration">
+                        <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="text-zaffre mb-3 fit">Need to travel outside the UK? <br> <span class="text-primary">No problem with so-sure!</span></h2>
+                    <p>Our phone insurance includes up to 90 days of worldwide cover, meaning you’ll be covered while you’re traveling. Someone uses your phone while it’s lost or stolen? No worries. You’re covered for up to &pound;1,000 in unauthorised network charges.</p>
+                    <p>If your phone is lost, stolen or damaged, we'll aim to provide a replacement or repair in 24-72 hours after approving your claim. We complete 74% of all insurance claims within 24 hours to provide the fastest, most convenient service possible.</p>
+                    <p class="mb-4 mb-lg-5">Finally, if you and your connections don't make any claims, you could receive up to 80% of your premiums as cash back at the end of the policy year, making it even more cost-effective to keep your {{ make_desc }} fully covered.</p>
+                    <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Comparison #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
+
+    <section class="makes py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-5 text-deep-sky-blue-d">Popular manufacturers we cover</h2>
+            <div class=" d-lg-flex align-items-center justify-content-lg-between">
+                <a href="{{ path('phone_insurance_make', {'make': 'apple'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_apple-logo.png" alt="Apple" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_samsung-logo.png" alt="Samsung" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'google'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_google-logo.png" alt="Google" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'htc'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_htc-logo.png" alt="HTC" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'huawei'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_huawei-logo.png" alt="Huawei" class="m-1 m-lg-2 lozad"></a>
+            </div>
+            <div class=" d-lg-flex align-items-center justify-content-lg-between">
+                <a href="{{ path('phone_insurance_make', {'make': 'motorola'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_motorola-logo.png" alt="motorola" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'nokia'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_nokia-logo.png" alt="nokia" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'asus'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_asus-logo.png" alt="Asus" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'sony'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_sony-logo.png" alt="Sony" class="m-1 m-lg-2 lozad"></a>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/phone-insurance.js') }}"></script>
+{% endblock %}

@@ -100,13 +100,13 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory()
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel()
                         ]);
@@ -137,9 +137,6 @@ class SearchController extends BaseController
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
-            if ($phone) {
-                $phoneMake->setMake($phone->getMake());
-            }
         }
 
         if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
@@ -169,13 +166,13 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory()
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel()
                         ]);
@@ -238,13 +235,13 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -307,13 +304,13 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);

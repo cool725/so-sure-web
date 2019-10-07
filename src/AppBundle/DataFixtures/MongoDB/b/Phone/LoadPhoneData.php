@@ -358,13 +358,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         // Validate that the regex for quote make model is working for all the data
         if ($make != "ALL") {
             if ($memory) {
-                $router->generate('quote_make_model_memory', [
+                $router->generate('phone_insurance_make_model_memory', [
                     'make' => mb_strtolower($make),
                     'model' => mb_strtolower($model),
                     'memory' => $memory,
                 ]);
             } else {
-                $router->generate('quote_make_model', [
+                $router->generate('phone_insurance_make_model', [
                     'make' => mb_strtolower($make),
                     'model' => mb_strtolower($model),
                 ]);
@@ -380,7 +380,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         }
         /*
         \Doctrine\Common\Util\Debug::dump($phone->getCurrentPhonePrice());
-        
+
         $repo = $manager->getRepository(Phone::class);
         $compare = $repo->find($phone->getId());
         \Doctrine\Common\Util\Debug::dump($compare->getCurrentPhonePrice());
