@@ -1999,6 +1999,11 @@ class BacsService
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             $policy = $scheduledPayment->getPolicy();
 
+            $hasPending = $policy->getPendingBacsPayments();
+            if (count($hasPending) > 0) {
+                continue;
+            }
+
             // If admin has rescheduled, then allow payment to go through, but should be manually approved
             $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ||
                 $policy->getDontCancelIfUnpaid() ||
