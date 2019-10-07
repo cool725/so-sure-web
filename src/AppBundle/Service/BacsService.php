@@ -2006,8 +2006,13 @@ class BacsService
              */
             $hasPending = $policy->getPendingBacsPayments();
             if (count($hasPending) > 0) {
+                $scheduledPayment->setNotes("Cancelling as BACs payment already in progress");
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate, 4);
+                $rescheduled->setNotes(sprintf(
+                    "Rescheduled from cancelled payment %s",
+                    $scheduledPayment->getId()
+                ));
                 $policy->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 continue;
