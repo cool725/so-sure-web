@@ -41,20 +41,36 @@
                             <th>Excess (Damage/Theft)</th>
                             <th>Picsure Approved Excess (Damage/Theft)</th>
                             <th>Policies / Users</th>
-                            <th>Deactivate</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for offer in phone.activeOffers %}
                             <tr>
                                 <td>{{ offer.name }}</td>
-                                <td>{{ offer.created|format('YYYY-MM-dd') }} by TODO: Create Name Here</td>
+                                <td>{{ offer.created|date('Y-m-d') }} by TODO: Create Name Here</td>
                                 <td>{{ offer.price.stream }}</td>
                                 <td>{{ offer.price.gwp }}</td>
                                 <td>{{ offer.price.excess.damage }} / {{ offer.price.excess.theft }} </td>
                                 <td>{{ offer.price.picsureExcess.damage }} / {{ offer.price.picsureExcess.theft }}</td>
                                 <td>{{ offer.policies|length }} / {{ offer.users|length }}</td>
-                                <td>TODO: Button</td>
+                                <td style="width:15%">
+                                    <button title="View Users and Policies"
+                                            type="button"
+                                            class="btn btn-primary btn-sm mb-2 mr-2">
+                                        <i class="far fa-microscope fa-fw"></i>
+                                    </button>
+                                    <button title="Add User"
+                                            type="button"
+                                            class="btn btn-warning btn-sm mb-2 mr-2">
+                                        <i class="far fa-plus-square fa-fw"></i>
+                                    </button>
+                                    <button title="Deactivate"
+                                            type="button"
+                                            class="btn btn-danger btn-sm mb-2 mr-2">
+                                        <i class="far fa-power-off fa-fw"></i>
+                                    </button>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -72,20 +88,31 @@
                             <th>Excess (Damage/Theft)</th>
                             <th>Picsure Approved Excess (Damage/Theft)</th>
                             <th>Policies / Users</th>
-                            <th>Reactivate</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for offer in phone.inactiveOffers %}
                             <tr>
                                 <td>{{ offer.name }}</td>
-                                <td>{{ offer.created|format('YYYY-MM-dd') }} by TODO: Create Name Here</td>
+                                <td>{{ offer.created|date('Y-m-d') }} by TODO: Create Name Here</td>
                                 <td>{{ offer.price.stream }}</td>
                                 <td>{{ offer.price.gwp }}</td>
                                 <td>{{ offer.price.excess.damage }} / {{ offer.price.excess.theft }} </td>
                                 <td>{{ offer.price.picsureExcess.damage }} / {{ offer.price.picsureExcess.theft }}</td>
                                 <td>{{ offer.policies|length }} / {{ offer.users|length }}</td>
-                                <td>TODO: Button</td>
+                                <td style="width:10%">
+                                    <button title="View Users and Policies"
+                                            type="button"
+                                            class="btn btn-primary btn-sm mb-1 mr-2">
+                                        <i class="far fa-microscope fa-fw"></i>
+                                    </button>
+                                    <button title="Reactivate"
+                                            type="button"
+                                            class="btn btn-danger btn-sm mb-1 mr-2">
+                                        <i class="far fa-power-off fa-fw"></i>
+                                    </button>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

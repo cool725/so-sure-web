@@ -645,14 +645,26 @@ class Phone
         return $this->toTwoDp($this->replacementPrice);
     }
 
+    /**
+     * Adds an offer into the phone's list of offers and sets a pointer to this phone on the offer.
+     * @param Offer $offer is the offer to add.
+     */
     public function addOffer($offer)
     {
         $this->offers[] = $offer;
+        $offer->setPhone($this);
     }
 
+    /**
+     * Gives a list of all offers associated with this phone.
+     * @return array containing all offers.
+     */
     public function getOffers()
     {
-        return $this->offers;
+        if (is_array($this->offers)) {
+            return $this->offers;
+        }
+        return $this->offers->toArray();
     }
 
     public function getActiveOffers()

@@ -8,6 +8,8 @@ use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
 use AppBundle\Document\Offer;
+use AppBundle\Document\Excess\PhoneExcess;
+use AppBundle\Document\Excess\Excess;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
@@ -578,7 +580,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/offers/{id}", name="admin_phone_offers")
+     * @Route("/offer/phone/{id}", name="admin_phone_offers")
      * @Template("AppBundle::AdminEmployee/adminPhoneOffers.html.twig")
      */
     public function adminPhoneOffersAction(Request $request, $id)
@@ -592,30 +594,123 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * @Route("/create-offer/{id}", name="admin_offer_create")
+     * @Route("/offer/create/{id}", name="admin_offer_create")
      * @Template
      */
-    public function offerFormAction(Request $request, $id = null)
+    public function offerFormAction(Request $request, $id)
     {
-        $offerForm = $this->get('form.factory')
-            ->createNamedBuilder('offer_form', OfferType::class)
-            ->setAction($this->generateUrl('admin_offer_create'))
+        $offerForm = $this->get("form.factory")
+            ->createNamedBuilder("offer_form", OfferType::class)
+            ->setAction($this->generateUrl("admin_offer_create", ["id" => $id]))
             ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('offer_form')) {
+        if ("POST" === $request->getMethod()) {
+            if ($request->request->has("offer_form")) {
                 $offerForm->handleRequest($request);
                 if ($offerForm->isValid()) {
-                    die($id);
+                    $dm = $this->getManager();
+                    $phoneRepo = $dm->getRepository(Phone::class);
+                    $phone = $phoneRepo->find($id);
+                    if (!$phone) {
+                        throw new \Exception("trying to create offer for nonexistent phone");
+                    }
+                    $date = new \DateTime();
+                    $data = $offerForm->getData();
+                    $offer = new Offer();
+                    $offer->setName($data["name"]);
+                    $offer->setCreated($date);
+                    $phone->addOffer($offer);
+                    $excess = new PhoneExcess();
+                    $picsureExcess = new PhoneExcess();
+                    $excess->setDamage($data["damage"]);
+                    $excess->setWarranty($data["warranty"]);
+                    $excess->setExtendedWarranty($data["extendedWarranty"]);
+                    $excess->setLoss($data["loss"]);
+                    $excess->setTheft($data["theft"]);
+                    $picsureExcess->setDamage($data["picsureDamage"]);
+                    $picsureExcess->setWarranty($data["picsureWarranty"]);
+                    $picsureExcess->setExtendedWarranty($data["picsureExtendedWarranty"]);
+                    $picsureExcess->setLoss($data["picsureLoss"]);
+                    $picsureExcess->setTheft($data["picsureTheft"]);
+                    $price = new PhonePrice();
+                    $price->setStream($data["stream"]);
+                    $price->setValidFrom($date);
+                    $price->setGwp($data["gwp"]);
+                    $price->setExcess($excess);
+                    $price->setPicsureExcess($picsureExcess);
+                    $offer->setPrice($price);
+                    $offer->setActive(true);
+                    $dm->persist($offer);
+                    $dm->persist($phone);
+                    $dm->flush();
+                    $this->addFlash("success", "Created Offer");
+                    return new RedirectResponse($this->generateUrl("admin_phone_offers", ["id" => $id]));
                 } else {
-                    $this->addFlash(
-                        'error',
-                        sprintf('Unable to add offer. %s', (string) $offerForm->getErrors())
-                    );
+                    $this->addFlash("error", sprintf(
+                        "Unable to add offer. %s",
+                        (string) $offerForm->getErrors()
+                    ));
                 }
-                return new RedirectResponse($this->generateUrl('admin_phone_offers', ["id" => $id]));
+                return new RedirectResponse($this->generateUrl("admin_phone_offers", ["id" => $id]));
             }
         }
-        return ['form' => $offerForm->createView()];
+        return ["form" => $offerForm->createView()];
+    }
+
+    /**
+     * Gives the details on an offer including a list of all users and policies using it as JSON.
+     * @param Request $request is the http request.
+     * @param string  $id      is the id of the offer we are requesting information on.
+     * @return HttpResponse to send back to the client.
+     * @Route("/offer/{id}", name="admin_offer_details")
+     */
+    public function offerDetailsAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $offerRepo = $dm->getRepository(Offer::class);
+        $offer = $offerRepo->find($id);
+        if (!$offer) {
+            throw new \Exception("No offer with id '{$id}'");
+        }
+        return $this->json($offer->toArray());
+    }
+
+    /**
+     * Adds a given user to the given offer.
+     * @param Request $request is the http request.
+     * @param string  $id      is the id of the offer we are requesting information on.
+     * @return HttpResponse to send back to the client.
+     * @Route("/offer/{id}/add-user", name="admin_offer_add_user")
+     * @Method({"POST"})
+     */
+    public function offerAddUserAction(Request $request, $id)
+    {
+
+    }
+
+    /**
+     * Gives the details on an offer including a list of all users and policies using it as JSON.
+     * @param Request $request is the http request.
+     * @param string  $id      is the id of the offer we are requesting information on.
+     * @return HttpResponse to send back to the client.
+     * @Route("/offer/{id}/disable", name="admin_offer_disable")
+     * @Method({"POST"})
+     */
+    public function offerDisableAction(Request $request, $id)
+    {
+
+    }
+
+    /**
+     * Gives the details on an offer including a list of all users and policies using it as JSON.
+     * @param Request $request is the http request.
+     * @param string  $id      is the id of the offer we are requesting information on.
+     * @return HttpResponse to send back to the client.
+     * @Route("/offer/{id}/enable", name="admin_offer_enable")
+     * @Method({"POST"})
+     */
+    public function offerEnableAction(Request $request, $id)
+    {
+
     }
 
     /**

@@ -472,12 +472,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $isBlacklisted = false;
 
-    /**
-     * The offers that have been manually given to a user.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
-     */
-    protected $offers = [];
-  
     protected $allowedMonthly = true;
 
     protected $allowedYearly = true;
@@ -1796,16 +1790,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this;
     }
 
-    public function getOffers()
-    {
-        return $this->offers;
-    }
-
-    public function addOffer($offer)
-    {
-        $this->offers[] = $offer;
-    }
-
     public function hasEmail()
     {
         return mb_strlen(trim($this->getEmail())) > 0;
@@ -2248,27 +2232,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getCreatedDay()
     {
         return $this->startOfDay($this->created);
-    }
-
-    /**
-     * Gives you the current price that this user ought to pay for the given phone. First it checks for any price
-     * offers, and if there are not any it returns the current phone price.
-     * @param Phone     $phone   is the phone we are enquiring about.
-     * @param string    $channel is the channel of payment we are enquiring about.
-     * @param \DateTime $date    is the date at which we are checking.
-     * @return PhonePrice|null the price that the user should pay if they make a policy on this phone model now, or
-     *                         if there is no price for this phone at the current time.
-     */
-    public function getCurrentPriceForPhone($phone, $channel, $date)
-    {
-        // TODO: we can no longer get offers out of the user object so we are going to have to do this probable in the
-        //       price service.
-        foreach ($this->getOffers() as $offer) {
-            if ($offer->getPhone()->getId() == $phone->getId() && $offer->getPrice()->isValidAt($date)) {
-                return $offer->getPrice();
-            }
-        }
-        return $phone->getCurrentPhonePrice($channel, $date);
     }
 
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)

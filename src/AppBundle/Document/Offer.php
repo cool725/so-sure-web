@@ -32,6 +32,14 @@ class Offer
     protected $created;
 
     /**
+     * Creator of the offer.
+     * @MongoDB\ReferenceOne(targetDocument="User")
+     * @Gedmo\Versioned
+     * @var User
+     */
+    protected $author;
+
+    /**
      * The offered price.
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Price")
      * @Gedmo\Versioned
@@ -64,16 +72,14 @@ class Offer
 
     /**
      * Contains all users that this offer is offered to.
-     * @MongoDB\ReferenceOne(targetDocument="User")
-     * @Gedmo\Versioned
+     * @MongoDB\ReferenceMany(targetDocument="User")
      * @var User
      */
     protected $users = [];
 
     /**
      * Contains all policies that are using the price from this offer.
-     * @MongoDB\ReferenceOne(targetDocument="Policy")
-     * @Gedmo\Versioned
+     * @MongoDB\ReferenceMany(targetDocument="Policy")
      * @var Policy
      */
     protected $policies = [];
@@ -94,6 +100,24 @@ class Offer
     public function setCreated($created)
     {
         $this->created = $created;
+    }
+
+    /**
+     * Gives you the creator of the offer.
+     * @return User the author.
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * Sets the author of the offer.
+     * @param User $author is the one who created it.
+     */
+    public function setAuthor($author)
+    {
+        $this->author = $author;
     }
 
     /**
@@ -166,5 +190,67 @@ class Offer
     public function setActive($active)
     {
         $this->active = $active;
+    }
+
+    /**
+     * Gives you the list of affected users.
+     * @return array containing the users.
+     */
+    public function getUsers()
+    {
+        if (is_array($this->users)) {
+            return $this->users;
+        }
+        return $this->users->toArray();
+    }
+
+    /**
+     * Adds a user to the list of users to whom this offer is applied.
+     * @param User $user is the user to give it to.
+     */
+    public function addUser($user)
+    {
+        $this->users[] = $user;
+    }
+
+    /**
+     * Gives a list of the policies affected by this offer.
+     * @return array of policies that have used this offer themselves.
+     */
+    public function getPolicies()
+    {
+        if (is_array($this->policies)) {
+            return $this->policies;
+        }
+        return $this->policies->toArray();
+    }
+
+    /**
+     * Adds a policy to the offer's list of policies it has been used on.
+     * @param Policy $policy is the policy to add to the list.
+     */
+    public function addPolicy($policy)
+    {
+        // TODO: should this do anything else like set the offer on the policy?
+        $this->policies[] = $policy;
+    }
+
+    /**
+     * Turns the details of the offer into an array that can be sent to JSON endpoints and such.
+     * @return array with string indices.
+     */
+    public function toArray()
+    {
+        $users = array_map(function ($user) {
+            return $user->getEmail();
+        }, $this->getUsers());
+        $policies = array_map(function ($policy) {
+            return $policy->getPolicyNumber();
+        }, $this->getPolicies());
+        return [
+            "name" => $this->getName(),
+            "users" => $users,
+            "policies" => $policies
+        ];
     }
 }

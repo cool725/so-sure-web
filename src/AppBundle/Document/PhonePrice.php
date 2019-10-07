@@ -16,10 +16,10 @@ class PhonePrice extends Price
 {
     use CurrencyTrait;
 
-    const STREAM_MONTHLY = 'monthly';
-    const STREAM_YEARLY = 'yearly';
-    const STREAM_ALL = 'all';
-    const STREAM_ANY = 'any';
+    const STREAM_MONTHLY = "monthly";
+    const STREAM_YEARLY = "yearly";
+    const STREAM_ALL = "all";
+    const STREAM_ANY = "any";
     const STREAMS = [
         self::STREAM_MONTHLY,
         self::STREAM_YEARLY
