@@ -1097,13 +1097,13 @@ abstract class BaseController extends Controller
     protected function setPhoneSession(Request $request, Phone $phone)
     {
         if ($phone->getMemory()) {
-            $url = $this->generateUrl('phone_insurance_make_model_memory', [
+            $url = $this->generateUrl('quote_make_model_memory', [
                 'make' => $phone->getMakeCanonical(),
                 'model' => $phone->getEncodedModelCanonical(),
                 'memory' => $phone->getMemory(),
             ], UrlGeneratorInterface::ABSOLUTE_URL);
         } else {
-            $url = $this->generateUrl('phone_insurance_make_model', [
+            $url = $this->generateUrl('quote_make_model', [
                 'make' => $phone->getMakeCanonical(),
                 'model' => $phone->getEncodedModelCanonical(),
             ], UrlGeneratorInterface::ABSOLUTE_URL);

@@ -15,7 +15,7 @@
     {% if phone.canonicalPath|length > 0 %}
     <link rel="canonical" href="{{ web_base_url }}{{ phone.canonicalPath }}" />
     {% else %}
-    <link rel="canonical" href="{{ url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
     {% endif %}
 {% endblock %}
 
@@ -52,7 +52,7 @@
                                 {% if phones | length > 1 %}
                                     {% for phone_mem in phones %}
                                         {% if phone_mem.id != phone.id  %}
-                                            <a href="{{ path('phone_insurance_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6 mb-0" href="#">
+                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6 mb-0" href="#">
                                                 {{ phone_mem.memory }}GB <br>
                                                 <small class="sub">{{ phone.make }} {{ phone.model }}</small>
                                             </a>

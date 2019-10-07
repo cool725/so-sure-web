@@ -137,8 +137,8 @@
 
         .review {
             opacity: 1;
-            box-shadow: 0 5px 20px 0 rgba(8,27,154,0.1),
-                        0 5px 5px 0 rgba(8,27,154,0.1);
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                        0 5px 15px 0 rgba(8,27,154,0.08);
 
             .review__rating .fas {
                 color: $dodger-blue;

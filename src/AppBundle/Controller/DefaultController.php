@@ -115,11 +115,11 @@ class DefaultController extends BaseController
         //     );
         // } else {
             // Track Test - Just incase so we can filter funnels
-        // $this->get('app.mixpanel')->queueTrack(
-        //     MixpanelService::EVENT_TEST,
-        //     ['Test Name' => 'Regular Funnel V2']
-        // );
-        // // }
+        $this->get('app.mixpanel')->queueTrack(
+            MixpanelService::EVENT_TEST,
+            ['Test Name' => 'Regular Funnel V2']
+        );
+        // }
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -608,13 +608,13 @@ class DefaultController extends BaseController
                         throw $this->createNotFoundException('Invalid id');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
+                        return $this->redirectToRoute('quote_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
+                        return $this->redirectToRoute('quote_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -679,13 +679,13 @@ class DefaultController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
+                        return $this->redirectToRoute('quote_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
+                        return $this->redirectToRoute('quote_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -1238,7 +1238,7 @@ class DefaultController extends BaseController
      */
     public function iPhone8RedirectAction()
     {
-        return new RedirectResponse($this->generateUrl('phone_insurance_make_model', [
+        return new RedirectResponse($this->generateUrl('quote_make_model', [
             'make' => 'apple',
             'model' => 'iphone+8',
             'utm_medium' => 'flyer',

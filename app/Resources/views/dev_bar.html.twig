@@ -5,7 +5,7 @@
                 <ul class="navbar-brand list-inline">
                     <li><strong class="text-red">{{ environment }}</strong></li>
                     <li><a href="{{ path('ops_pages') }}"><i class="fa fa-wrench fa-lg"></i></a></li>
-                    <li><a href="{{ path('phone_insurance_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
+                    <li><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
                     <li><a href="#" id="dev-reload"><i class="fa fa-refresh fa-lg" aria-hidden="true"></i></a></li>
                     <li><a href="#" id="dev-modal" data-toggle="modal" data-target="#devModal"><i class="fa fa-info fa-lg" aria-hidden="true"></i></a></li>
                     {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}

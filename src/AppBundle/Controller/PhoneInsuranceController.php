@@ -101,366 +101,15 @@ class PhoneInsuranceController extends BaseController
 
 
     /**
-     * SEO Pages - Phone Insurance
      * @Route("/phone-insurance", name="phone_insurance")
      */
     public function phoneInsuranceAction()
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
 
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice() < $b->getCurrentPhonePrice() ? -1 : 1;
-        });
-
-        // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentPhonePrice()->getMonthlyPremiumPrice();
-
-        $data = [
-            'from_price' => $fromPrice,
-            'from_phones' => $fromPhones,
-        ];
-
-        return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
+        return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig');
     }
 
     /**
-     * Route for Quote ID
-     * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
-    */
-    public function phoneInsuranceIdAction($id = null, $make = null, $model = null, $memory = null)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-        $decodedModel = Phone::decodeModel($model);
-
-        if ($id) {
-            /** @var Phone $phone */
-            $phone = $repo->find($id);
-            return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical(),
-                'memory' => $phone->getMemory(),
-            ], 301);
-        }
-
-        if (!$phone) {
-            $this->get('logger')->info(sprintf(
-                'Failed to find phone for id: %s make: %s model: %s mem: %s',
-                $id,
-                $make,
-                $model,
-                $memory
-            ));
-            return new RedirectResponse($this->generateUrl('phone_insurance'));
-        }
-    }
-
-    /**
-     * SEO Pages - Phone Insurance > Make
-     * @Route("/phone-insurance/{make}",
-     * name="phone_insurance_make", requirements={"make":"[a-zA-Z]+"})
-     */
-    public function phoneInsuranceMakeAction($make = null)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-
-        $phones = $repo->findBy([
-            'active' => true,
-            'makeCanonical' => mb_strtolower($make)
-        ]);
-
-        if (count($phones) != 0) {
-            $phone = $phones[0];
-        } else {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'makeCanonical' => mb_strtolower($make),
-            ]);
-        }
-
-        if (!$phone) {
-            $this->get('logger')->info(sprintf(
-                'Failed to find make page for: %s',
-                $make
-            ));
-            return new RedirectResponse($this->generateUrl('phone_insurance'));
-        }
-
-        // To display in Popular Models sections
-        $topPhones = $repo->findBy([
-            'active' => true,
-            'topPhone' => true,
-            'makeCanonical' => mb_strtolower($make)
-        ]);
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-            'makeCanonical' => mb_strtolower($make)
-        ]);
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice() < $b->getCurrentPhonePrice() ? -1 : 1;
-        });
-
-        // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentPhonePrice()->getMonthlyPremiumPrice();
-
-        $data = [
-            'phone' => $phone,
-            'top_phones' => $topPhones,
-            'from_price' => $fromPrice
-        ];
-
-        return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
-    }
-
-    /**
-     * SEO Pages - Phone Insurance > Make > Model
-     * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     */
-    public function phoneInsuranceMakeModelAction($make = null, $model = null)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-        $decodedModel = Phone::decodeModel($model);
-
-        $phones = $repo->findBy([
-            'active' => true,
-            'makeCanonical' => mb_strtolower($make),
-            'modelCanonical' => mb_strtolower($decodedModel)
-        ]);
-
-        if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
-            $phone = $phones[0];
-        } else {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'makeCanonical' => mb_strtolower($make),
-                'modelCanonical' => mb_strtolower($model)
-            ]);
-            if ($phone) {
-                return $this->redirectToRoute('phone_insurance_make_model', [
-                    'make' => $phone->getMakeCanonical(),
-                    'model' => $phone->getEncodedModelCanonical()
-                ], 301);
-            }
-        }
-
-        if (!$phone) {
-            $this->get('logger')->info(sprintf(
-                'Failed to find phone for make/model page - make: %s model: %s',
-                $make,
-                $model
-            ));
-            return new RedirectResponse($this->generateUrl('phone_insurance'));
-        }
-
-        // Model template control
-        // Hyphenate Model for images/template
-        $modelHyph = str_replace('+', '-', $model);
-        // List all available hero images otherwise switch to genric
-        $availableImages = [
-            'iphone-x',
-            'iphone-xr',
-            'iphone-xs',
-            'iphone-7',
-            'iphone-8',
-            'galaxy-s8',
-            'galaxy-s9',
-            'galaxy-note-9',
-            'pixel',
-            'pixel-3-xl',
-        ];
-        // TODO: use make in template names
-        $templateOverides = [
-            'nokia 6'
-        ];
-        $templateOveride = $make." ".$model;
-        $hideSection = false;
-        $templateModel = $modelHyph.'.html.twig';
-        $template = 'AppBundle:PhoneInsurance/Phones:'.$templateModel;
-
-        // Check if template exists else default
-        if (!$this->get('templating')->exists($template) or in_array($templateOveride, $templateOverides)) {
-            $hideSection = true;
-            $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
-        }
-
-        $data = [
-            'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
-            'img_url' => $modelHyph,
-            'available_images' => $availableImages,
-            'hide_section' => $hideSection,
-        ];
-
-        return $this->render($template, $data);
-    }
-
-    /**
-     * SEO/Quote Page - Phone Insurance > Make > Model > Memory
-     * @Route("/phone-insurance/{make}+{model}+{memory}GB",
-     * name="phone_insurance_make_model_memory",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
-     */
-    public function phoneInsuranceMakeModelMemoryAction(
-        Request $request,
-        $make = null,
-        $model = null,
-        $memory = null
-    ) {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-        $decodedModel = Phone::decodeModel($model);
-
-        $phone = $repo->findOneBy([
-            'active' => true,
-            'makeCanonical' => mb_strtolower($make),
-            'modelCanonical' => mb_strtolower($decodedModel),
-            'memory' => (int) $memory
-        ]);
-        // check for historical urls
-        if (!$phone || mb_stripos($model, ' ') !== false) {
-            $phone = $repo->findOneBy([
-                'active' => true,
-                'makeCanonical' => mb_strtolower($make),
-                'modelCanonical' => mb_strtolower($model),
-                'memory' => (int) $memory
-            ]);
-            if ($phone->getMemory()) {
-                return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                    'make' => $phone->getMakeCanonical(),
-                    'model' => $phone->getEncodedModelCanonical(),
-                    'memory' => $phone->getMemory(),
-                ], 301);
-            }
-        }
-
-        if (!$phone) {
-            $this->get('logger')->info(sprintf(
-                'Failed to find phone for make/model/memory page - make: %s model: %s mem: %s',
-                $make,
-                $model,
-                $memory
-            ));
-            return new RedirectResponse($this->generateUrl('phone_insurance'));
-        }
-
-        $quoteUrl = $this->setPhoneSession($request, $phone);
-
-        $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
-        $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
-        $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('buy_form')) {
-                $buyForm->handleRequest($request);
-                if ($buyForm->isValid()) {
-                    $properties = [];
-                    if ($buyForm->get('buy')->isClicked()) {
-                        $properties['Location'] = 'main';
-                    }
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
-
-                    // Multipolicy should skip user details
-                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
-                        // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_phone');
-                    }
-
-                    return $this->redirectToRoute('purchase');
-                }
-            } elseif ($request->request->has('buy_form_banner')) {
-                $buyBannerForm->handleRequest($request);
-                if ($buyBannerForm->isValid()) {
-                    $properties = [];
-                    $properties['Location'] = 'seeFullDetailsMobile';
-
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
-
-                    // Multipolicy should skip user details
-                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
-                        // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_phone');
-                    }
-
-                    return $this->redirectToRoute('purchase');
-                }
-            } elseif ($request->request->has('buy_form_banner_two')) {
-                $buyBannerTwoForm->handleRequest($request);
-                if ($buyBannerTwoForm->isValid()) {
-                    $properties = [];
-                    $properties['Location'] = 'seeFullDetailsDesktop';
-
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
-
-                    // Multipolicy should skip user details
-                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
-                        // don't check for partial partial as quote phone may be different from partial policy phone
-                        return $this->redirectToRoute('purchase_step_phone');
-                    } else {
-                        return $this->redirectToRoute('purchase');
-                    }
-                }
-            }
-        }
-
-        // only need to run this once - if its a post, then ignore
-        if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
-            $event = MixpanelService::EVENT_QUOTE_PAGE;
-            $this->get('app.mixpanel')->queueTrackWithUtm($event, [
-                'Device Selected' => $phone->__toString(),
-                'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            ]);
-            $this->get('app.mixpanel')->queuePersonProperties([
-                'First Device Selected' => $phone->__toString(),
-                'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            ], true);
-        }
-
-        $data = [
-            'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
-            'buy_form' => $buyForm->createView(),
-            'buy_form_banner' => $buyBannerForm->createView(),
-            'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
-            'phones' => $repo->findBy(
-                [
-                    'active' => true,
-                    'makeCanonical' => mb_strtolower($make),
-                    'modelCanonical' => mb_strtolower($decodedModel)
-                ],
-                ['memory' => 'asc']
-            ),
-        ];
-
-        return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
-    }
-
-
-    /**
-     * ONLY Used for admin ????
      * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
@@ -495,6 +144,370 @@ class PhoneInsuranceController extends BaseController
                 return $this->redirectToRoute('purchase');
             }
         }
+    }
+
+    /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/phone-insurance/{make}+{model}+{memory}GB", name="quote_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/phone-insurance/{make}+{model}", name="quote_make_model",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/insure/{make}+{model}+{memory}GB", name="insure_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/insure/{make}+{model}", name="insure_make_model",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/insurance-phone/{make}+{model}+{memory}GB", name="test_insurance_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/insurance/{make}+{model}+{memory}GB", name="insurance_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     */
+    public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
+    {
+        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+            return new RedirectResponse($this->generateUrl('homepage'));
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+        $decodedModel = Phone::decodeModel($model);
+        if ($id) {
+            /** @var Phone $phone */
+            $phone = $repo->find($id);
+            if ($phone->getMemory()) {
+                return $this->redirectToRoute('quote_make_model_memory', [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
+                    'memory' => $phone->getMemory(),
+                ], 301);
+            }
+            return $this->redirectToRoute('quote_make_model', [
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
+            ], 301);
+        }
+
+        if ($memory) {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModel),
+                'memory' => (int) $memory
+            ]);
+            // check for historical urls
+            if (!$phone || mb_stripos($model, ' ') !== false) {
+                $phone = $repo->findOneBy([
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model),
+                    'memory' => (int) $memory
+                ]);
+                if ($phone) {
+                    return $this->redirectToRoute('quote_make_model_memory', [
+                        'make' => $phone->getMakeCanonical(),
+                        'model' => $phone->getEncodedModelCanonical(),
+                        'memory' => $phone->getMemory(),
+                    ], 301);
+                }
+            }
+        } else {
+            $phones = $repo->findBy(
+                [
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($decodedModel)
+                ],
+                ['memory' => 'asc'],
+                1
+            );
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
+                $phone = $phones[0];
+            } else {
+                // check for historical urls
+                $phone = $repo->findOneBy([
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model)
+                ]);
+                if ($phone) {
+                    return $this->redirectToRoute('quote_make_model', [
+                        'make' => $phone->getMakeCanonical(),
+                        'model' => $phone->getEncodedModelCanonical()
+                    ], 301);
+                }
+            }
+        }
+        if (!$phone) {
+            $this->get('logger')->info(sprintf(
+                'Failed to find phone for id: %s make: %s model: %s mem: %s',
+                $id,
+                $make,
+                $model,
+                $memory
+            ));
+
+            return new RedirectResponse($this->generateUrl('homepage'));
+        } elseif (!$phone->isSameMakeModelCanonical($make, $model)) {
+            return $this->redirectToRoute('quote_make_model_memory', [
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
+                'memory' => $phone->getMemory(),
+            ], 301);
+        }
+
+        $quoteUrl = $this->setPhoneSession($request, $phone);
+
+        $user = new User();
+
+        $lead = new Lead();
+        $lead->setSource(Lead::SOURCE_SAVE_QUOTE);
+        $leadForm = $this->get('form.factory')
+            ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
+            ->getForm();
+
+        $buyForm = $this->makeBuyButtonForm('buy_form', 'buy_tablet');
+        $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
+        $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
+        $buyBannerThreeForm = $this->makeBuyButtonForm('buy_form_banner_three');
+        $buyBannerFourForm = $this->makeBuyButtonForm('buy_form_banner_four', 'buy');
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('lead_form')) {
+                try {
+                    $leadForm->handleRequest($request);
+
+                    if ($leadForm->isValid()) {
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $days = \DateTime::createFromFormat('U', time());
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 7)));
+                        $mailer = $this->get('app.mailer');
+                        $mailer->sendTemplate(
+                            sprintf('Your saved so-sure quote for %s', $phone),
+                            $lead->getEmail(),
+                            'AppBundle:Email:quote/priceGuarentee.html.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl],
+                            'AppBundle:Email:quote/priceGuarentee.txt.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl]
+                        );
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+
+                        $this->addFlash('success', sprintf(
+                            "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
+                        ));
+                    } else {
+                        $this->addFlash('error', sprintf(
+                            "Sorry, didn't quite catch that email.  Please try again."
+                        ));
+                    }
+                } catch (InvalidEmailException $ex) {
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
+                    $this->addFlash('error', sprintf(
+                        "Sorry, didn't quite catch that email.  Please try again."
+                    ));
+                }
+            } elseif ($request->request->has('buy_form')) {
+                $buyForm->handleRequest($request);
+                if ($buyForm->isValid()) {
+                    $properties = [];
+                    if ($buyForm->get('buy_tablet')->isClicked()) {
+                        $properties['Location'] = 'main';
+                    }
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_phone');
+                    }
+
+                    return $this->redirectToRoute('purchase');
+                }
+            } elseif ($request->request->has('buy_form_banner')) {
+                $buyBannerForm->handleRequest($request);
+                if ($buyBannerForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'seeFullDetailsMobile';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_phone');
+                    }
+
+                    return $this->redirectToRoute('purchase');
+                }
+            } elseif ($request->request->has('buy_form_banner_two')) {
+                $buyBannerTwoForm->handleRequest($request);
+                if ($buyBannerTwoForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'seeFullDetailsDesktop';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_phone');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
+                }
+            } elseif ($request->request->has('buy_form_banner_three')) {
+                $buyBannerThreeForm->handleRequest($request);
+                if ($buyBannerThreeForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'sidebar';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_phone');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
+                }
+            } elseif ($request->request->has('buy_form_banner_four')) {
+                $buyBannerFourForm->handleRequest($request);
+                if ($buyBannerFourForm->isValid()) {
+                    $properties = [];
+                    $properties['Location'] = 'sticky';
+                    // if ($buyForm->getData()['claim_used']) {
+                    //     $properties['Played with Claims'] = true;
+                    // }
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    // Multipolicy should skip user details
+                    if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                        // don't check for partial partial as quote phone may be different from partial policy phone
+                        return $this->redirectToRoute('purchase_step_phone');
+                    } else {
+                        return $this->redirectToRoute('purchase');
+                    }
+                }
+            }
+        }
+
+        // if no price, will be sample policy of £100 annually
+        $maxPot = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxPot() : 80;
+        $maxConnections = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxConnections() : 8;
+        $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
+        $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
+        $expIntercom = null;
+
+        // only need to run this once - if its a post, then ignore
+        if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
+            $event = MixpanelService::EVENT_QUOTE_PAGE;
+            if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+                $event = MixpanelService::EVENT_CPC_QUOTE_PAGE;
+            }
+            $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                'Device Selected' => $phone->__toString(),
+                'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            ]);
+            $this->get('app.mixpanel')->queuePersonProperties([
+                'First Device Selected' => $phone->__toString(),
+                'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            ], true);
+
+            // Deprecated - Landing Page event - Keep for awhile for a transition period
+            // TODO: Remove
+            if ($event == MixpanelService::EVENT_CPC_QUOTE_PAGE) {
+                $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                    'Device Selected' => $phone->__toString(),
+                    'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                ]);
+            }
+        }
+
+        // Hyphenate Model for images/template
+        $modelHyph = str_replace('+', '-', $model);
+
+        // List all available hero images otherwise switch to genric
+        $availableImages = [
+            'iphone-x',
+            'iphone-xr',
+            'iphone-xs',
+            'iphone-7',
+            'iphone-8',
+            'galaxy-s8',
+            'galaxy-s9',
+            'galaxy-note-9',
+            'pixel',
+            'pixel-3-xl',
+        ];
+
+        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        $hideSection = false;
+
+        // SEO pages
+        if ($request->get('_route') == 'quote_make_model') {
+            // Model template
+            $templateModel = $modelHyph.'.html.twig';
+            $templateOveride = $make." ".$model;
+            $template = 'AppBundle:PhoneInsurance/Phones:'.$templateModel;
+
+            // Check if template exists
+            if (!$this->get('templating')->exists($template) or $templateOveride == 'nokia 6') {
+                $hideSection = true;
+                $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
+            }
+        }
+
+        $data = array(
+            'phone'                 => $phone,
+            'phone_price'           => $phone->getCurrentPhonePrice(),
+            'policy_key'            => $this->getParameter('policy_key'),
+            'connection_value'      => PhonePolicy::STANDARD_VALUE,
+            'lead_form'             => $leadForm->createView(),
+            'buy_form'              => $buyForm->createView(),
+            'buy_form_banner'       => $buyBannerForm->createView(),
+            'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
+            'buy_form_banner_three' => $buyBannerThreeForm->createView(),
+            'buy_form_banner_four'  => $buyBannerFourForm->createView(),
+            'phones'                => $repo->findBy(
+                [
+                    'active'         => true,
+                    'makeCanonical'  => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($decodedModel)
+                ],
+                ['memory' => 'asc']
+            ),
+            'comparision'      => $phone->getComparisions(),
+            'comparision_max'  => $maxComparision,
+            'coming_soon'      => $phone->getCurrentPhonePrice() ? false : true,
+            'web_base_url'     => $this->getParameter('web_base_url'),
+            'img_url'          => $modelHyph,
+            'available_images' => $availableImages,
+            'hide_section'     => $hideSection,
+        );
+
+        return $this->render($template, $data);
     }
 
     /**
@@ -578,7 +591,7 @@ class PhoneInsuranceController extends BaseController
             ->getForm();
     }
 
-    private function getAllPhones($make)
+    private function getAllPhonesByMake($make)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -607,7 +620,7 @@ class PhoneInsuranceController extends BaseController
                 ];
             }
             $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
-                'phone_insurance_make_model_memory',
+                'quote_make_model_memory',
                 [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getModelCanonical(),
