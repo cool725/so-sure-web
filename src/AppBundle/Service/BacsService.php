@@ -1999,8 +1999,17 @@ class BacsService
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             $policy = $scheduledPayment->getPolicy();
 
+            /**
+             * If the policy already has a submitted or generated payment then we
+             * don't want to add this one, but we might not want to lose the payment,
+             * so we will reschedule it for 4 days time, then it will be tried again tomorrow.
+             */
             $hasPending = $policy->getPendingBacsPayments();
             if (count($hasPending) > 0) {
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+                $rescheduled = $scheduledPayment->reschedule($scheduledDate, 4);
+                $policy->addScheduledPayment($rescheduled);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 continue;
             }
 
