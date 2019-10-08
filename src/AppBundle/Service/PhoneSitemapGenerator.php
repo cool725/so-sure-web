@@ -42,30 +42,36 @@ class PhoneSitemapGenerator implements GeneratorInterface
         $repo = $this->dm->getRepository(Phone::class);
 
         $makes = [];
-        $phones = $repo->findBy(
-            ['active' => true, 'highlight' => true]
-        );
+        $phones = $repo->findBy(['active' => true]);
         foreach ($phones as $phone) {
-            /** @var Phone $phone */
             $phoneMake = $phone->getMake();
-            $makes[$phoneMake] = $phoneMake;
+            if ($phoneMake == "ALL") {
+                continue;
+            }
+            if (array_key_exists($phoneMake, $makes)) {
+                $makes[$phoneMake][] = $phone;
+            } else {
+                $makes[$phoneMake] = [$phone];
+            }
         }
 
-        $phones = $repo->findActive()->getQuery()->execute();
-        foreach ($phones as $phone) {
-            /** @var Phone $phone */
-            if ($phone->getCanonicalPath() && mb_strlen($phone->getCanonicalPath()) > 0) {
-                $url = $this->router->generateUrlFromPath($phone->getCanonicalPath());
-            } else {
-                $url = $this->router->generateUrl('phone_insurance_make_model', [
+        foreach ($makes as $make => $phones) {
+            // We need to ignore
+            // /phone-insurance/all
+            // We also need Broken phone, cracked screen etc in this list under one heading
+            $url = $this->router->generateUrl('phone_insurance_make', ['make' => $make]);
+            $topItem = new Entry($url, null, 'weekly', 0.7);
+            $topItem->setDescription($make);
+            $entries[$topItem->getDescription()] = $topItem;
+            foreach ($phones as $phone) {
+                $itemUrl = $this->router->generateUrl('phone_insurance_make_model', [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getEncodedModelCanonical()
                 ]);
+                $item = new Entry($itemUrl, null, 'weekly', 0.7);
+                $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' Insurance');
+                $entries[$item->getDescription()] = $item;
             }
-
-            $item = new Entry($url, null, 'weekly', 0.7);
-            $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' insurance');
-            $entries[$item->getDescription()] = $item;
         }
 
         return $entries;
