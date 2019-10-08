@@ -690,7 +690,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $offerRepo = $dm->getRepository(Offer::class);
         $userRepo = $dm->getRepository(User::class);
         $offer = $offerRepo->find($offerId);
-        $user = $userRepo->findBy(["emailCanonical" => mb_strtolower($email)]);
+        $user = $userRepo->findOneBy(["emailCanonical" => mb_strtolower($email)]);
         if (!$offer) {
             throw new \Exception(sprintf(
                 "'%s' is not a valid offer id",

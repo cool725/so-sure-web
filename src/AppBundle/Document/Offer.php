@@ -2,8 +2,9 @@
 
 namespace AppBundle\Document;
 
-use AppBundle\Classes\Salva;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\User;
+use AppBundle\Classes\Salva;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Form\PreloadedExtension;
@@ -72,13 +73,15 @@ class Offer
 
     /**
      * Contains all users that this offer is offered to.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User", inversedBy="offers")
+     * @var ArrayCollection
      */
-    protected $users = [];
+    protected $users;
 
     /**
      * Contains all policies that are using the price from this offer.
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Policy")
+     * @var ArrayCollection
      */
     protected $policies = [];
 

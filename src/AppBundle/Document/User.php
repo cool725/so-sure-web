@@ -471,6 +471,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $isBlacklisted = false;
 
+    /**
+     * Contains references to all the offers that are offered to this user.
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer", mappedBy="users")
+     * @var ArrayCollection
+     */
+    protected $offers;
+
     protected $allowedMonthly = true;
 
     protected $allowedYearly = true;
