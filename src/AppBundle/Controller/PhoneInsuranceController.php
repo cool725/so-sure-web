@@ -116,9 +116,14 @@ class PhoneInsuranceController extends BaseController
             'active' => true,
         ]);
 
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice();
+        });
+
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice() < $b->getCurrentPhonePrice() ? -1 : 1;
+            return $a->getCurrentPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
@@ -213,9 +218,14 @@ class PhoneInsuranceController extends BaseController
             'makeCanonical' => mb_strtolower($make)
         ]);
 
+        $fromPhones = array_filter($phones, function ($phone) {
+            return $phone->getCurrentPhonePrice();
+        });
+
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice() < $b->getCurrentPhonePrice() ? -1 : 1;
+            return $a->getCurrentPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
