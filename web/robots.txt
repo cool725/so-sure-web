@@ -2,6 +2,7 @@
 # www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156449
 
 Sitemap: https://wearesosure.com/sitemap.xml
+Sitemap: https://wearesosure.com/sitemap_index.xml
 User-agent: *
 Disallow: /claims
 Disallow: /admin
