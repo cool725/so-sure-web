@@ -26,7 +26,7 @@ use AppBundle\Document\Lead;
 class AboutController extends BaseController
 {
     /**
-     * @Route("/careers", name="careers", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/careers", name="careers")
      * @Template
      */
     public function careersAction()
@@ -35,7 +35,7 @@ class AboutController extends BaseController
     }
 
     /**
-     * @Route("/terms", name="terms", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/terms", name="terms")
      * @Template
      */
     public function termsAction()
@@ -44,7 +44,7 @@ class AboutController extends BaseController
     }
 
     /**
-     * @Route("/privacy", name="privacy", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/privacy", name="privacy")
      * @Template
      */
     public function privacyAction(Request $request)

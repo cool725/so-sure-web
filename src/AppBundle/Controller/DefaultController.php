@@ -69,7 +69,7 @@ class DefaultController extends BaseController
     use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
-     * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     * @Route("/", name="homepage")
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/mb", name="mb")
@@ -201,7 +201,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/social-insurance", name="social_insurance", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/social-insurance", name="social_insurance")
      */
     public function socialInsurance()
     {
@@ -831,8 +831,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/company-phone-insurance",
-     *  name="company_phone_insurance",
-     *  options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     *  name="company_phone_insurance")
      * @Route("/company-phone-insurance/thank-you",
      *  name="company_phone_insurance_thanks")
      */
