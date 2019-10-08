@@ -56,11 +56,10 @@ class PhoneSitemapGenerator implements GeneratorInterface
         }
 
         foreach ($makes as $make => $phones) {
-            // We need to ignore
-            // /phone-insurance/all
-            // We also need Broken phone, cracked screen etc in this list under one heading
-            $url = $this->router->generateUrl('phone_insurance_make', ['make' => $make]);
-            $topItem = new Entry($url, null, 'weekly', 0.7);
+            $url = $this->router->generateUrl('phone_insurance_make', [
+                'make' => mb_strtolower($make)
+            ]);
+            $topItem = new Entry($url, null);
             $topItem->setDescription($make);
             $entries[$topItem->getDescription()] = $topItem;
             foreach ($phones as $phone) {
@@ -68,7 +67,8 @@ class PhoneSitemapGenerator implements GeneratorInterface
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getEncodedModelCanonical()
                 ]);
-                $item = new Entry($itemUrl, null, 'weekly', 0.7);
+                $itemUrl = urldecode($itemUrl);
+                $item = new Entry($itemUrl, null);
                 $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' Insurance');
                 $entries[$item->getDescription()] = $item;
             }
