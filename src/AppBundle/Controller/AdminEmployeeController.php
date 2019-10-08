@@ -695,7 +695,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             throw new \Exception(sprintf(
                 "'%s' is not a valid offer id",
                 $offerId
-            );
+            ));
         } elseif (!$user) {
             $this->addFlash("error", sprintf(
                 "'%s' is not a user email in our system",
@@ -707,7 +707,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $dm->flush();
             $this->addFlash("success", "Added user to offer");
         }
-        return new RedirectResponse($this->generateUrl("admin_phone_offers" 
+        return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
     }
 
     /**

@@ -6,7 +6,6 @@ namespace AppBundle\Document;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\Opt;
-use AppBundle\Document\Offer;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Service\PostcodeService;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -72,15 +72,13 @@ class Offer
 
     /**
      * Contains all users that this offer is offered to.
-     * @MongoDB\ReferenceMany(targetDocument="User")
-     * @var User
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User")
      */
     protected $users = [];
 
     /**
      * Contains all policies that are using the price from this offer.
-     * @MongoDB\ReferenceMany(targetDocument="Policy")
-     * @var Policy
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Policy")
      */
     protected $policies = [];
 
