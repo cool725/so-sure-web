@@ -66,7 +66,8 @@
                                             type="button"
                                             class="btn btn-warning btn-sm mb-2 mr-2"
                                             data-toggle="modal"
-                                            data-target="#user_modal">
+                                            data-target="#user_modal"
+                                            data-offer="{{ offer.id }}">
                                         <i class="far fa-plus-square fa-fw"></i>
                                     </button>
                                     <form action="{{ path('admin_offer_able', {'id': offer.id}) }}" method="post">
@@ -183,7 +184,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Going to need javascript stuff for this.
+                    <form action="{{ path('admin_offer_add_user') }}" method="post">
+                        <input id="add_user_offer_id" name="offer_id" type="hidden" />
+                        <input name="user_email" type="email" />
+                        <button type="submit" class="btn btn-danger btn-sm mb-2 mr-2">
+                            <i class="far fa-power-off fa-fw"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -193,4 +200,5 @@
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/confirm-modal.js') }}"></script>
+    <script src="{{ asset('css-js/offer.js') }}"></script>
 {% endblock %}

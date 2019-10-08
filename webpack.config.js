@@ -69,6 +69,7 @@ Encore
     .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
     .addEntry('features', './src/AppBundle/Resources/public/rebrand/js/pages/admin/features.js')
     .addEntry('phone', './src/AppBundle/Resources/public/rebrand/js/pages/admin/phone.js')
+    .addEntry('offer', './src/AppBundle/Resources/public/rebrand/js/pages/admin/offer.js')
     .addEntry('kpi', './src/AppBundle/Resources/public/rebrand/js/pages/admin/kpi.js')
     .addEntry('bacs', './src/AppBundle/Resources/public/rebrand/js/pages/admin/bacs.js')
     .addEntry('policy-validations', './src/AppBundle/Resources/public/rebrand/js/pages/admin/policy-validations.js')

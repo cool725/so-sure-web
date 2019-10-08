@@ -661,7 +661,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @param Request $request is the http request.
      * @param string  $id      is the id of the offer we are requesting information on.
      * @return HttpResponse to send back to the client.
-     * @Route("/offer/{id}", name="admin_offer_details")
+     * @Route("/offer/{id}/details", name="admin_offer_details")
      */
     public function offerDetailsAction(Request $request, $id)
     {
@@ -675,16 +675,39 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
-     * Adds a given user to the given offer.
+     * Adds a given user to the given offer. The offer id must be passed as a POST parameter as well as the email for
+     * this request.
      * @param Request $request is the http request.
-     * @param string  $id      is the id of the offer we are requesting information on.
      * @return HttpResponse to send back to the client.
-     * @Route("/offer/{id}/add-user", name="admin_offer_add_user")
+     * @Route("/offer/add-user", name="admin_offer_add_user")
      * @Method({"POST"})
      */
-    public function offerAddUserAction(Request $request, $id)
+    public function offerAddUserAction(Request $request)
     {
-
+        $offerId = $request->request->get("offer_id");
+        $email = $request->request->get("user_email");
+        $dm = $this->getManager();
+        $offerRepo = $dm->getRepository(Offer::class);
+        $userRepo = $dm->getRepository(User::class);
+        $offer = $offerRepo->find($offerId);
+        $user = $userRepo->findBy(["emailCanonical" => mb_strtolower($email)]);
+        if (!$offer) {
+            throw new \Exception(sprintf(
+                "'%s' is not a valid offer id",
+                $offerId
+            );
+        } elseif (!$user) {
+            $this->addFlash("error", sprintf(
+                "'%s' is not a user email in our system",
+                $email
+            ));
+        } else {
+            $offer->addUser($user);
+            $dm->persist($offer);
+            $dm->flush();
+            $this->addFlash("success", "Added user to offer");
+        }
+        return new RedirectResponse($this->generateUrl("admin_phone_offers" 
     }
 
     /**
