@@ -58,7 +58,6 @@ class SitemapTwigExtension extends \Twig_Extension
             '/about/social-insurance/privacy' => 'Website privacy policy (GDPR version)',
             '/about/social-insurance/terms' => 'Terms & Conditions',
             '/phone-insurance' => 'Get a quote for your phone',
-            '/mobile-insurance' => 'Popular quotes for your phone',
             '/download-app' => 'Get covered in seconds using our app (IOS and Android)',
             '/phone-insurance/broken-phone' => 'Broken phone',
             '/phone-insurance/cracked-screen' => 'Cracked screen',
