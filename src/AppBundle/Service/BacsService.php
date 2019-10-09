@@ -828,12 +828,17 @@ class BacsService
             }
 
             $foundPayments = 0;
+            $processed = [];
             foreach ($submittedPayments as $submittedPayment) {
                 /** @var BacsPayment $submittedPayment */
                 $policy = $submittedPayment->getPolicy();
                 if (($referencePolicy && $referencePolicy->getId() == $policy->getId()) ||
                     ($referenceUser && $referenceUser->getId() == $policy->getUser()->getId())) {
                     $foundPayments++;
+                    if (in_array($submittedPayment->getId(), $processed)) {
+                        continue;
+                    }
+                    $processed[] = $submittedPayment->getId();
 
                     $debitPayment = new BacsPayment();
                     $debitPayment->setAmount(0 - $submittedPayment->getAmount());
