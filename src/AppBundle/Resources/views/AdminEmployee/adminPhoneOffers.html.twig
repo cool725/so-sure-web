@@ -59,15 +59,16 @@
                                             type="button"
                                             class="btn btn-primary btn-sm mb-2 mr-2"
                                             data-toggle="modal"
-                                            data-target="#details_modal">
+                                            data-target="#details_modal"
+                                            data-offer="{{ offer.id }}"
+                                            data-source="{{ path('admin_offer_details', {'id': offer.id}) }}">
                                         <i class="far fa-microscope fa-fw"></i>
                                     </button>
                                     <button title="Add User"
                                             type="button"
                                             class="btn btn-warning btn-sm mb-2 mr-2"
                                             data-toggle="modal"
-                                            data-target="#user_modal"
-                                            data-offer="{{ offer.id }}">
+                                            data-target="#user_modal">
                                         <i class="far fa-plus-square fa-fw"></i>
                                     </button>
                                     <form action="{{ path('admin_offer_able', {'id': offer.id}) }}" method="post">
@@ -156,14 +157,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h4 id="details_name"></h4>
-                    <p>Created by <a id="details_creator"></a></p>
-                    <div class="card">
-                        <div class="card-header h5">Users / Policies</div>
-                        <div class="card-body">
-                            <ul id="details_user_list"></ul>
-                        </div>
+                    <div class="details-spinner spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
+                    <h4 class="details-title"></h4>
+                    <ul class="details-list"></ul>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -187,9 +186,7 @@
                     <form action="{{ path('admin_offer_add_user') }}" method="post">
                         <input id="add_user_offer_id" name="offer_id" type="hidden" />
                         <input name="user_email" type="email" />
-                        <button type="submit" class="btn btn-danger btn-sm mb-2 mr-2">
-                            <i class="far fa-power-off fa-fw"></i>
-                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm mb-2 mr-2">Add user</button>
                     </form>
                 </div>
             </div>

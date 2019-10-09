@@ -247,19 +247,28 @@ class Offer
 
     /**
      * Turns the details of the offer into an array that can be sent to JSON endpoints and such.
-     * @return array with string indices.
+     * @return array with field name being the name of the offer and field users being an array containing arrays with
+     *               field email being the email of the user and field policies being an array containing arrays with
+     *               field policy number being the policy's policy number and field start being the policy's start
+     *               date.
      */
     public function toArray()
     {
-        $users = array_map(function($user) {
-            $data = array_map(function($policy) {
-                return $policy->getPolicyNumber();
-            }, $user->getPolicies());
-            return [$user->getEmail, $data];
-        }, $this->getUsers());
         return [
             "name" => $this->getName(),
-            "users" => $users
+            "users" => array_map(function($user) {
+                $policies = $user->getPolicies();
+                $policies = is_array($policies) ? $policies : $policies->toArray();
+                return [
+                    "email" => $user->getEmail(),
+                    "policies" => array_map(function($policy) {
+                        return [
+                            "policyNumber" => $policy->getPolicyNumber(),
+                            "start" => $policy->getStart()
+                        ];
+                    }, $policies)
+                ];
+            }, $this->getUsers())
         ];
     }
 }
