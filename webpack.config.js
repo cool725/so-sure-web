@@ -139,6 +139,12 @@ Encore
 
 var config = Encore.getWebpackConfig();
 
+// enable file system polling.
+config.watchOptions = {
+    poll: true,
+    ignored: /node_modules/
+};
+
 // disable amd, for datatable
 config.module.rules.unshift({
   parser: {
