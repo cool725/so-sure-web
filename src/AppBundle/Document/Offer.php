@@ -247,28 +247,30 @@ class Offer
 
     /**
      * Turns the details of the offer into an array that can be sent to JSON endpoints and such.
-     * @return array with field name being the name of the offer and field users being an array containing arrays with
-     *               field email being the email of the user and field policies being an array containing arrays with
-     *               field policy number being the policy's policy number and field start being the policy's start
-     *               date.
+     * @return array with the field name being the name of this offer and the field id being the id of this offer and
+     *               the field users being an array containing arrays where the field email is the email of a user and
+     *               id is the id of that same user for all the users who currently have the offer on them and also
+     *               there is a field policies which is an array containing arrays where policyNumber is the policy
+     *               number of a policy and id is the id of that same policy for all policies that are using the price
+     *               from this offer.
      */
-    public function toArray()
+    public function toDetailsArray()
     {
         return [
             "name" => $this->getName(),
+            "id" => $this->getId(),
             "users" => array_map(function($user) {
-                $policies = $user->getPolicies();
-                $policies = is_array($policies) ? $policies : $policies->toArray();
                 return [
                     "email" => $user->getEmail(),
-                    "policies" => array_map(function($policy) {
-                        return [
-                            "policyNumber" => $policy->getPolicyNumber(),
-                            "start" => $policy->getStart()
-                        ];
-                    }, $policies)
+                    "id" => $user->getId()
                 ];
-            }, $this->getUsers())
+            }, $this->getUsers()),
+            "policies" => array_map(function($policy) {
+                return [
+                    "policyNumber" => $policy->getPolicyNumber(),
+                    "id" => $policy->getId()
+                ];
+            }, $this->getPolicies())
         ];
     }
 }
