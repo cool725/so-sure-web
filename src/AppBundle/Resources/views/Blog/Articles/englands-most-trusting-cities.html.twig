@@ -26,15 +26,42 @@
                         <header class="mb-5">
                             <hgroup>
                                 <div class="breadcrumbs">
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                    <ul class="list-inline"
+                                        vocab="https://schema.org/"
+                                        typeof="BreadcrumbList">
+                                        <li class="list-inline-item"
+                                            property="itemListElement"
+                                            typeof="ListItem">
+                                            <a href="{{ path('homepage') }}"
+                                               class="text-primary"
+                                               property="item"
+                                               typeof="WebPage">
+                                               <span property="name">Home</span>
+                                            </a>
+                                            <meta property="position" content="1">
                                         </li>
                                         <li class="list-inline-item">
                                             <i class="fal fa-angle-right"></i>
                                         </li>
+                                        <li class="list-inline-item"
+                                            property="itemListElement"
+                                            typeof="ListItem">
+                                            <a href="{{ path('blog_index') }}"
+                                               class="text-primary"
+                                               property="item"
+                                               typeof="WebPage">
+                                               <span property="name">Blog</span>
+                                            </a>
+                                            <meta property="position" content="2">
+                                        </li>
                                         <li class="list-inline-item">
-                                            England's Most Trusting Cities
+                                            <i class="fal fa-angle-right"></i>
+                                        </li>
+                                        <li class="list-inline-item"
+                                            property="itemListElement"
+                                            typeof="ListItem">
+                                            <span property="name">England's Most Trusting Cities</span>
+                                            <meta property="position" content="3">
                                         </li>
                                     </ul>
                                 </div>

@@ -17,6 +17,32 @@
             <div class="row">
                 <div class="col-lg-7">
                     <div class="hero__intro">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-columbia-blue-e"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-white"></i>
+                                </li>
+                                <li class="list-inline-item text-white"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Make a claim login</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
                         <h1 class="mb-4 text-white fit">Review your claim</h1>
                         <h4 class="text-columbia-blue-e">Enter your email and we'll send you a link</h4>
                         <p class="mb-4 text-white">Prefer to speak to a human? Call our claims team on <a href="tel:01133209722" class="text-white text-nowrap"><u>0113 320 9722</u></a> (local rates apply).</p>

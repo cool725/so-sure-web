@@ -19,7 +19,46 @@
         <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-8">
-                    <h5 class="text-zaffre mb-0">Phone Insurance</h5>
+                    <div class="breadcrumbs">
+                        <ul class="list-inline"
+                            vocab="https://schema.org/"
+                            typeof="BreadcrumbList">
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('homepage') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Home</span>
+                                </a>
+                                <meta property="position" content="1">
+                            </li>
+                            <li class="list-inline-item text-zaffre">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('phone_insurance') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Phone Insurance</span>
+                                </a>
+                                <meta property="position" content="2">
+                            </li>
+                            <li class="list-inline-item text-zaffre">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item text-zaffre"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <span property="name">Loss</span>
+                                <meta property="position" content="3">
+                            </li>
+                        </ul>
+                    </div>
                     <h1 class="text-primary mb-4">Loss</h1>
                     <p class="mb-4">We love our phones here at so-sure and it really bums us out when we end up losing them. Losing your phone can totally feel like the end of the world - sometimes things get so bad that you start feeling like Leo before he won an Oscar. </p>
                     <h2 class="h3">Look after it with so-sure</h2>
