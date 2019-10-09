@@ -783,6 +783,9 @@ class DefaultController extends BaseController
      * @Route("/help/{section}", name="help_section", requirements={"section"="[\+\-\.a-zA-Z0-9() ]+"})
      * @Route("/help/{section}/{article}", name="help_section_article",
      * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/help/{section}/{article}/{sub}", name="help_section_article_sub",
+     * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+",
+     * "sub"="[\+\-\.a-zA-Z0-9() ]+"})
      * @Template
      */
     public function helpAction()
