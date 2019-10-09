@@ -1483,7 +1483,7 @@ class PurchaseController extends BaseController
                 if ($pay->getRedirectUrl()) {
                     $policy->setThreeDToken($pay->getId());
                     $dm->flush();
-                    return $this->redirect($pay->getRedirectUrl());
+                    return $this->json(["redirect" => $pay->getRedirectUrl()]);
                 }
             } else {
                 $checkout->updatePaymentMethod(
