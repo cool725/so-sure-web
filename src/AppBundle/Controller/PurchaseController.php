@@ -1486,11 +1486,16 @@ class PurchaseController extends BaseController
                     return $this->json(["redirect" => $pay->getRedirectUrl()]);
                 }
             } else {
-                $checkout->updatePaymentMethod(
+                $update = $checkout->updatePaymentMethod(
                     $policy,
                     $token,
                     $amount
                 );
+                if ($update->getRedirectUrl()) {
+                    $policy->setThreeDToken($update->getId());
+                    $dm->flush();
+                    return $this->json(["redirect" => $update->getRedirectUrl()]);
+                };
             }
 
             $this->addFlash('success', $successMessage);
@@ -1559,7 +1564,7 @@ class PurchaseController extends BaseController
      */
     public function processThreeDAction(Request $request)
     {
-        $successMessage = 'Success! Your payment has been successfully completed';
+        $successMessage = 'Success! Your payment has been completed';
         $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
             details are correct and try again or get in touch if you continue to have issues';
         $logger = $this->get('logger');
@@ -1576,6 +1581,9 @@ class PurchaseController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
         }
         $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $policyId]);
+        if (count($policy->getPayments()) > 1) {
+            $redirectSuccess = $this->generateUrl('user_policy', ['policyId' => $policyId]);
+        }
         $redirectFailure = $this->generateUrl('user_payment_details_policy', ['policyId' => $policyId]);
         try {
             $checkout->add($policy, $details->getId(), Payment::SOURCE_WEB);

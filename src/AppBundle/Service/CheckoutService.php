@@ -913,6 +913,7 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
+            $charge->setChargeMode(2);
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
@@ -922,6 +923,9 @@ class CheckoutService
 
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+            if ($details->getRedirectUrl()) {
+                return $details;
+            }
 
             if ($details && $payment) {
                 $payment->setReceipt($details->getId());
