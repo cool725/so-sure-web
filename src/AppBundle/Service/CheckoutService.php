@@ -913,7 +913,8 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
-            $charge->setChargeMode(2);
+            $charge->setChargeMode($amount ? 1 : 2);
+
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
