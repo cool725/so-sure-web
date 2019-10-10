@@ -1,15 +1,15 @@
-> Match pull request name to the branch name 🌳
+* [ ] Match pull request name to the branch name 🌳
 
-> Assign reviewer(s) 🤓
+* [ ] Assign reviewer(s) 🤓
 
-> Assign required labels 🏷
+* [ ] Assign required labels 🏷
 
-> Is the pull request blocked? ⛔️
+* [ ] Is the pull request blocked? ⛔️
 
-> Add to the 'Release Calendar'? 📅
+* [ ] Add to the 'Release Calendar'? 📅
 
-> Do tests need updating?
+* [ ] Do tests need updating?
 
-> PAYMENT RELATED??? Test the s&ast;&ast;t out of it
+* [ ] PAYMENT RELATED??? Test the s&ast;&ast;t out of it
 
 🖋 Add a description for reviewer(s) here (replace this)
