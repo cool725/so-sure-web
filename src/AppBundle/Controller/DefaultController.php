@@ -73,6 +73,8 @@ class DefaultController extends BaseController
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/mb", name="mb")
+     * @Route("/reimagined", name="reimagined")
+     * @Route("/hasslefree", name="hasslefree")
      */
     public function indexAction(Request $request)
     {
@@ -527,38 +529,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/reimagined", name="reimagined")
-     * @Route("/hasslefree", name="hasslefree")
-     * @Template
-     */
-    public function homepageLanding()
-    {
-        // $data = [];
-        // if ($request->get('_route') == "reimagined") {
-        //     $data = array(
-        //         'main'              => 'Mobile Insurance',
-        //         'main_cont'         => 'Re-Imagined',
-        //         'sub'               => 'Quicker. Easier. Jargon Free.',
-        //         // 'sub_cont'  => '',
-        //     );
-        // } elseif ($request->get('_route') == "hasslefree") {
-        //     $data = array(
-        //         'main'              => 'Hassle Free',
-        //         'main_cont'         => 'Mobile Insurance',
-        //         'sub'               => 'We dont give you the run around when you claim.',
-        //         // 'sub_cont'  => '',
-        //     );
-        // }
-
-        // $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-        //     'Page' => $request->get('_route'),
-        // ]);
-
-        return $this->render('AppBundle:Default:index.html.twig');
-    }
-
-
-    /**
      * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
      * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
      * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
@@ -889,6 +859,16 @@ class DefaultController extends BaseController
         ];
 
         return $this->render('AppBundle:Default:indexCompany.html.twig', $data);
+    }
+
+    /**
+     * @Route("/starling-business",
+     *  name="starling_business")
+     */
+    public function starlingBusiness(Request $request)
+    {
+        $this->starlingOAuthSession($request);
+        return $this->render('AppBundle:Default:starlingBusiness.html.twig');
     }
 
     /**
