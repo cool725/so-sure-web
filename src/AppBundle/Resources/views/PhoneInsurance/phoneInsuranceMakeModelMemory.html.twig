@@ -157,7 +157,7 @@
                             </li>
                         </ul>
                         <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-                        <p class="mb-5 text-white">Prove your {{ make_desc }} {{ phone.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
+                        <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
                         <div class="table-responsive">
                             <table class="table table-bordered text-white">
                                 <thead>
@@ -170,16 +170,13 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="h6">Validated with app</td>
+                                        <td class="h6">Excess</td>
                                         <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
                                         <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
                                         <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="h6">Not validated with app</td>
-                                        <td>&pound;{{ phone_price.excess.damage }}</td>
-                                        <td>&pound;{{ phone_price.excess.loss }}</td>
-                                        <td>&pound;{{ phone_price.excess.theft }}</td>
+                                        <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
                                     </tr>
                                 </tbody>
                             </table>
