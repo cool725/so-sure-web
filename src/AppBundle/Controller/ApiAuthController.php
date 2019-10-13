@@ -1551,7 +1551,8 @@ class ApiAuthController extends BaseController
                 $checkout = $this->get('app.checkout');
                 $checkout->updatePaymentMethod(
                     $policy,
-                    $this->getDataString($checkoutData, 'token')
+                    $this->getDataString($checkoutData, 'token'),
+                    false
                 );
             }
 

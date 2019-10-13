@@ -1489,6 +1489,7 @@ class PurchaseController extends BaseController
                 $update = $checkout->updatePaymentMethod(
                     $policy,
                     $token,
+                    true,
                     $amount
                 );
                 if ($update->getRedirectUrl()) {

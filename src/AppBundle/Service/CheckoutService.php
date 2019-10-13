@@ -869,11 +869,12 @@ class CheckoutService
 
     /**
      * Stores new card details and starts a new chain of payments.
-     * @param Policy     $policy is the policy to whom the new details belong.
-     * @param string     $token  is the checkout token with which we can make the request to checkout.
-     * @param float|null $amount is an optional amount of money to charge in the same request.
+     * @param Policy     $policy   is the policy to whom the new details belong.
+     * @param string     $token    is the checkout token with which we can make the request to checkout.
+     * @param boolean    $enable3D tells whether or not to allow the payment to require 3D secure.
+     * @param float|null $amount   is an optional amount of money to charge in the same request.
      */
-    public function updatePaymentMethod(Policy $policy, $token, $amount = null)
+    public function updatePaymentMethod(Policy $policy, $token, $enable3D = true, $amount = null)
     {
         $throwLater = false;
         $thingToThrow = null;
@@ -905,7 +906,6 @@ class CheckoutService
             }
 
             $service = $this->client->chargeService();
-
             $charge = new CardTokenChargeCreate();
             $charge->setEmail($user->getEmail());
             $charge->setAutoCapTime(0);
@@ -913,10 +913,9 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
-            if ($amount) {
+            if ($enable3D) {
                 $charge->setChargeMode(2);
             }
-
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
