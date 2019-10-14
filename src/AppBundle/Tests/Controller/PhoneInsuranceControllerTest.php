@@ -204,24 +204,26 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('make', (array) $decoded[0]);
         $this->assertArrayHasKey('model', (array) $decoded[0]);
         $this->assertArrayHasKey('aggregatorId', (array) $decoded[0]);
-   }
+    }
 
-   public function testListPhonesWithAggregatorGoCompare()
-   {
-       self::$client->request('GET', '/list-phones?aggregator=GoCompare');
-       $decoded = (array) json_decode($this->getClientResponseContent());
-       $this->assertGreaterThan(0, count($decoded));
-       // Check first phone in list is valid
-       $this->assertArrayHasKey('id', (array) $decoded[0]);
-       $this->assertArrayHasKey('make', (array) $decoded[0]);
-       $this->assertArrayHasKey('model', (array) $decoded[0]);
-       $this->assertArrayHasKey('memory', (array) $decoded[0]);
-       $this->assertArrayHasKey('aggregatorId', (array) $decoded[0]);
-       // Make sure at least one of the phones has an aggregator ID
-       $found = false;
-       foreach($decoded as $phone) {
-           if($phone->aggregatorId != '') $found = true;
-       }
-       $this->assertEquals(true, $found);
-   }
+    public function testListPhonesWithAggregatorGoCompare()
+    {
+        self::$client->request('GET', '/list-phones?aggregator=GoCompare');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertGreaterThan(0, count($decoded));
+        // Check first phone in list is valid
+        $this->assertArrayHasKey('id', (array) $decoded[0]);
+        $this->assertArrayHasKey('make', (array) $decoded[0]);
+        $this->assertArrayHasKey('model', (array) $decoded[0]);
+        $this->assertArrayHasKey('memory', (array) $decoded[0]);
+        $this->assertArrayHasKey('aggregatorId', (array) $decoded[0]);
+        // Make sure at least one of the phones has an aggregator ID
+        $found = false;
+        foreach ($decoded as $phone) {
+            if ($phone->aggregatorId != '') {
+                $found = true;
+            }
+        }
+        $this->assertEquals(true, $found);
+    }
 }

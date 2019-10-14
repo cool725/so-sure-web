@@ -557,13 +557,12 @@ class PhoneInsuranceController extends BaseController
         foreach ($phones as $phone) {
             // Loop through each phone and make an array for the response
             $aggregatorId = '';
-            if($request->query->get('aggregator')) {
+            if ($request->query->get('aggregator')) {
                 // If aggregator set, look for aggregator ID (if applicable)
                 if ($request->query->get('aggregator') == 'GoCompare') {
                     $goCompare = new GoCompare();
                     foreach ($goCompare::$models as $index => $model) {
-                        if(
-                            $model['make'] == $phone->getMake()
+                        if ($model['make'] == $phone->getMake()
                             && $model['model'] == $phone->getModel()
                             && $model['memory'] == $phone->getMemory()
                         ) {
