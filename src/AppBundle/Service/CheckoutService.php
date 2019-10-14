@@ -793,7 +793,6 @@ class CheckoutService
             }
             $charge->setEmail($user->getEmail());
             $charge->setAutoCapTime(0);
-            $charge->setAutoCapture('N');
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
@@ -827,24 +826,8 @@ class CheckoutService
                 if ($card) {
                     $this->setCardToken($policy, $card);
                 }
-            }
-
-            if ($amount) {
-                $capture = new ChargeCapture();
-                $capture->setChargeId($details->getId());
-
-                if (!$paymentMethod->hasPreviousChargeId()) {
+                if (!$paymentMethod->hasPreviousChargeId() && $amount) {
                     $paymentMethod->setPreviousChargeId($details->getId());
-                }
-
-                $details = $service->CaptureCardCharge($capture);
-                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
-
-                if ($details) {
-                    $card = $details->getCard();
-                    if ($card) {
-                        $this->setCardToken($policy, $card);
-                    }
                 }
             }
         } catch (\Exception $e) {
