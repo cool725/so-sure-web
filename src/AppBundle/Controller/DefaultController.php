@@ -69,10 +69,12 @@ class DefaultController extends BaseController
     use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
-     * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     * @Route("/", name="homepage")
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/mb", name="mb")
+     * @Route("/reimagined", name="reimagined")
+     * @Route("/hasslefree", name="hasslefree")
      */
     public function indexAction(Request $request)
     {
@@ -115,11 +117,11 @@ class DefaultController extends BaseController
         //     );
         // } else {
             // Track Test - Just incase so we can filter funnels
-        $this->get('app.mixpanel')->queueTrack(
-            MixpanelService::EVENT_TEST,
-            ['Test Name' => 'Regular Funnel V2']
-        );
-        // }
+        // $this->get('app.mixpanel')->queueTrack(
+        //     MixpanelService::EVENT_TEST,
+        //     ['Test Name' => 'Regular Funnel V2']
+        // );
+        // // }
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -201,7 +203,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/social-insurance", name="social_insurance", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/social-insurance", name="social_insurance")
      */
     public function socialInsurance()
     {
@@ -527,38 +529,6 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/reimagined", name="reimagined")
-     * @Route("/hasslefree", name="hasslefree")
-     * @Template
-     */
-    public function homepageLanding()
-    {
-        // $data = [];
-        // if ($request->get('_route') == "reimagined") {
-        //     $data = array(
-        //         'main'              => 'Mobile Insurance',
-        //         'main_cont'         => 'Re-Imagined',
-        //         'sub'               => 'Quicker. Easier. Jargon Free.',
-        //         // 'sub_cont'  => '',
-        //     );
-        // } elseif ($request->get('_route') == "hasslefree") {
-        //     $data = array(
-        //         'main'              => 'Hassle Free',
-        //         'main_cont'         => 'Mobile Insurance',
-        //         'sub'               => 'We dont give you the run around when you claim.',
-        //         // 'sub_cont'  => '',
-        //     );
-        // }
-
-        // $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-        //     'Page' => $request->get('_route'),
-        // ]);
-
-        return $this->render('AppBundle:Default:index.html.twig');
-    }
-
-
-    /**
      * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
      * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
      * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
@@ -608,13 +578,13 @@ class DefaultController extends BaseController
                         throw $this->createNotFoundException('Invalid id');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -679,13 +649,13 @@ class DefaultController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -783,6 +753,9 @@ class DefaultController extends BaseController
      * @Route("/help/{section}", name="help_section", requirements={"section"="[\+\-\.a-zA-Z0-9() ]+"})
      * @Route("/help/{section}/{article}", name="help_section_article",
      * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/help/{section}/{article}/{sub}", name="help_section_article_sub",
+     * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+",
+     * "sub"="[\+\-\.a-zA-Z0-9() ]+"})
      * @Template
      */
     public function helpAction()
@@ -831,8 +804,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/company-phone-insurance",
-     *  name="company_phone_insurance",
-     *  options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     *  name="company_phone_insurance")
      * @Route("/company-phone-insurance/thank-you",
      *  name="company_phone_insurance_thanks")
      */
@@ -887,6 +859,16 @@ class DefaultController extends BaseController
         ];
 
         return $this->render('AppBundle:Default:indexCompany.html.twig', $data);
+    }
+
+    /**
+     * @Route("/starling-business",
+     *  name="starling_business")
+     */
+    public function starlingBusiness(Request $request)
+    {
+        $this->starlingOAuthSession($request);
+        return $this->render('AppBundle:Default:starlingBusiness.html.twig');
     }
 
     /**
@@ -1238,7 +1220,7 @@ class DefaultController extends BaseController
      */
     public function iPhone8RedirectAction()
     {
-        return new RedirectResponse($this->generateUrl('quote_make_model', [
+        return new RedirectResponse($this->generateUrl('phone_insurance_make_model', [
             'make' => 'apple',
             'model' => 'iphone+8',
             'utm_medium' => 'flyer',

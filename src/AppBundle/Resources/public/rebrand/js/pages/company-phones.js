@@ -6,7 +6,7 @@ require('../../sass/pages/company-phones.scss');
 // require('bootstrap/js/dist/carousel');
 
 // Require components
-// let textFit = require('textfit');
+let textFit = require('textfit');
 require('jquery-validation');
 require('../common/validationMethods.js');
 
@@ -20,7 +20,7 @@ observer.observe();
 $(function() {
 
     // Use textfit plugin for h1 tag
-    // textFit($('.fit')[0], {detectMultiLine: true});
+    textFit($('.fit'), {detectMultiLine: true});
 
     // Scroll to feedback section
     $('.get-in-touch').on('click', function(e) {

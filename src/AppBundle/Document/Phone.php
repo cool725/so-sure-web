@@ -512,7 +512,7 @@ class Phone
     {
         $model = str_replace('+', '-plus', $this->getModelCanonical());
 
-        return str_replace(' ', '+', $model);
+        return str_replace(' ', '-', $model);
     }
 
     /**
@@ -527,9 +527,18 @@ class Phone
 
     public static function decodeModel($encodedModel)
     {
-        $decodedModel = str_replace('+', ' ', $encodedModel);
+        $decodedModel = str_replace(['+','-'], ' ', $encodedModel);
         $decodedModel = str_replace('-Plus', '+', $decodedModel);
         $decodedModel = str_replace('-plus', '+', $decodedModel);
+
+        return $decodedModel;
+    }
+
+    public static function decodedModelHyph($encodedModel)
+    {
+        $decodedModel = str_replace(['+','-'], ' ', $encodedModel);
+        $decodedModel = str_replace(' Plus', '+', $decodedModel);
+        $decodedModel = str_replace(' plus', '+', $decodedModel);
 
         return $decodedModel;
     }

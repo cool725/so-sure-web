@@ -22,23 +22,25 @@
             </span>
         </label>
         {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : '', 'data-make': phone.make}}) }}
-        {% if device_category() == 'Mobile' %}
-            {% if phone.make == 'Apple' %}
-                <small class="form-text">Copy this from your iPhone settings: General &gt; About</small>
-            {% else %}
-                <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
-                {% if phone.make == 'Samsung' %}
-                    <small class="form-text samsung-imei">Numbers only please (no / required)</small>
-                {% endif %}
-            {% endif %}
+        {% if phone.make == 'Apple' %}
+            <small class="form-text">
+                <span class="d-inline-block mb-1">How to get your IMEI number:</span>
+                <ul class="pl-4">
+                    <li class="mb-1">From your iPhone's settings: General &gt; About.</li>
+                    <li class="mb-1">Or dial <strong>*#06#</strong> on your phone to display your IMEI number.</li>
+                    {% if device_category() == 'Desktop' %}<li class="mb-1">Or go to iTunes/iCloud: copy and paste.</li>{% endif %}
+                </ul>
+            </small>
         {% else %}
-            {% if phone.make == 'Apple' %}
-                <small class="form-text">Go to iTunes/iCloud: copy and paste</small>
-            {% else %}
-                <small class="form-text">Dial <strong>*#06#</strong> on your phone to display your IMEI number.</small>
-                {% if phone.make == 'Samsung' %}
-                    <small class="form-text samsung-imei">Numbers only please (no / required)</small>
-                {% endif %}
+            <small class="form-text">
+                <span class="d-inline-block mb-1">How to get your IMEI number:</span>
+                <ul class="pl-4">
+                    <li class="mb-1">From your phone's settings.</li>
+                    <li class="mb-1">or dial <strong>*#06#</strong> on your phone to display your IMEI number.</li>
+                </ul>
+            </small>
+            {% if phone.make == 'Samsung' %}
+                <small class="form-text samsung-imei">Numbers only please (no / required)</small>
             {% endif %}
         {% endif %}
         <div class="with-errors">{{ form_errors(purchase_form.imei) }}</div>
@@ -66,11 +68,13 @@
                 'placeholder':'Serial Number',
                 'data-hj-suppress' : ''
             }}) }}
-            {% if device_category() == 'Mobile' %}
-                <small class="form-text">Copy this from your iPhone settings: General &gt; About</small>
-            {% else %}
-                <small class="form-text">Go to iTunes/iCloud: copy and paste</small>
-            {% endif %}
+            <small class="form-text">
+                <span class="d-inline-block mb-1">How to get your iPhone's serial number:</span>
+                <ul class="pl-4">
+                    <li class="mb-1">From your iPhone's settings: General &gt; About.</li>
+                    {% if device_category() == 'Desktop' %}<li class="mb-1">Or go to iTunes/iCloud: copy and paste.</li>{% endif %}
+                </ul>
+            </small>
             <div class="with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
         </div>
     {% endif %}

@@ -4,6 +4,7 @@
 {# Set vars #}
 {% set use_pca = true %}
 {% set funnel_mode = true %}
+{% set robots_noindex = true %}
 {% if phone %}
     {% set body_class = 'purchase' %}
 {% endif %}
@@ -16,13 +17,7 @@
     {% endif %}
 {% endif %}
 
-{% block title %}
-    {% if phone %}
-        so-sure | {{ phone.make }} {{ phone.model }} Insurance
-    {% else %}
-        so-sure | Welcome to Social Insurance
-    {% endif %}
-{% endblock %}
+{% block title %}Purchase | so-sure{% endblock %}
 
 {% block meta %}{% endblock %}
 

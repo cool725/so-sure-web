@@ -1,15 +1,18 @@
-> Match pull request name to the branch name 🌳
+#### Manditory:
 
-> Assign reviewer(s) 🤓
+* [ ] Match pull request name to the branch name 🌳
 
-> Assign required labels 🏷
+* [ ] Assign reviewer(s) 🤓
 
-> Is the pull request blocked? ⛔️
+* [ ] Assign required label(s) 🏷
 
-> Add to the 'Release Calendar'? 📅
-
-> Do tests need updating?
-
-> PAYMENT RELATED??? Test the s&ast;&ast;t out of it
+* [ ] Tested on another environment 🧪
 
 🖋 Add a description for reviewer(s) here (replace this)
+
+#### Reminders:
+
+- Do tests need updating?
+- Is the pull request blocked?
+- Add to the Release Calendar only if team reqiure exposure
+

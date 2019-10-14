@@ -22,7 +22,33 @@
             <div class="faq__main__container">
                 <div class="faq__main px-4 px-lg-5">
                     {%  if not hide_title %}
-                        <h5 class="text-zaffre mb-0">Welcome to the so-sure's privacy notice</h5>
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-primary"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-zaffre"></i>
+                                </li>
+                                <li class="list-inline-item text-zaffre"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Privacy Policy</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="text-zaffre h5 mb-0">Welcome to the so-sure's privacy notice</div>
                         <h1 class="text-primary mb-4">Website Privacy Policy</h1>
                     {% endif %}
                     <p>so-sure respects your privacy and is committed to protecting your personal data. This privacy notice will inform you as to how we look after your personal data when you visit our website (regardless of where you visit it from) and tell you about your privacy rights and how the law protects you.</p>

@@ -28,6 +28,20 @@
             font-size: 2rem;
         }
 
+        .h1b {
+            line-height: 1.5;
+            font-size: 2rem;
+
+            a,
+            a.text-white:hover,
+            a.text-white:focus,
+            a.text-white:active {
+                text-decoration: none;
+                color: $white !important;
+                outline: 0;
+            }
+        }
+
         @include media-breakpoint-up(lg) {
             padding-top: 2.7rem;
         }
@@ -87,12 +101,12 @@
         z-index: 1;
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
-        opacity: 0.44;
+        opacity: 0.34;
     }
 
     @include media-breakpoint-up(lg) {
         &:before {
-            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-b.svg');
         }
     }
 
@@ -111,7 +125,7 @@
 }
 
 .why-insure {
-    text-align: center;
+    // text-align: center;
     overflow: hidden;
 
     .container-large {
@@ -130,16 +144,16 @@
         }
     }
 
-    @include media-breakpoint-up(lg) {
-        text-align: left;
-    }
+    // @include media-breakpoint-up(lg) {
+    //     text-align: left;
+    // }
 }
 
 .cover {
     position: relative;
 
     @include media-breakpoint-up(lg) {
-        background-color: $pattens-blue;
+        // background-color: $pattens-blue;
     }
 
     &__illustration__mobile {
@@ -163,7 +177,6 @@
 }
 
 .why-insure-continued {
-    text-align: center;
 
     @include media-breakpoint-up(lg) {
         padding-bottom: inherit;
@@ -240,7 +253,8 @@
     }
 }
 
-.other-phones {
+.other-phones,
+.make-phones {
     text-align: center;
 
     a img {
@@ -268,5 +282,87 @@
 
     @include media-breakpoint-up(lg) {
         text-align: left;
+    }
+}
+
+.make {
+    position: relative;
+    z-index: 1;
+
+    @include media-breakpoint-up(lg) {
+        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 100px;
+        background-size: 500px;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: -10px 100px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: 500px 100px;
+    }
+}
+
+.protect {
+
+    &__illustration {
+        width: 260px;
+        margin: 0 auto;
+
+        @include media-breakpoint-up(md) {
+            width: 400px;
+        }
+    }
+}
+
+.travel {
+    background: $athens-gray;
+
+    @include media-breakpoint-up(lg) {
+        padding-bottom: inherit;
+        margin-bottom: 0;
+        background: $athens-gray url('#{$cdn_url}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png') no-repeat -100px 70px;
+        background-size: 600px;
+        text-align: left;
+    }
+
+    @include media-breakpoint-up(xl) {
+        background-position: -100px 70px;
+        background-size: 700px;
+    }
+
+    @include media-breakpoint-up(fk) {
+        background-position: -100px 70px;
+    }
+
+    &__illustration__mobile {
+        width: 260px;
+        margin: 0 auto;
+
+        @include media-breakpoint-up(md) {
+            width: 400px;
+        }
+    }
+}
+
+.makes {
+    text-align: center;
+    position: relative;
+    @include blue-gradient;
+    z-index: 5;
+
+    img {
+        width: 120px;
+        margin: 0.5rem;
+        // opacity: 0.3;
+
+        &:hover {
+            filter: brightness(0.9);
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 160px;
+            margin: 0;
+        }
     }
 }
