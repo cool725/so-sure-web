@@ -871,10 +871,9 @@ class CheckoutService
      * Stores new card details and starts a new chain of payments.
      * @param Policy     $policy   is the policy to whom the new details belong.
      * @param string     $token    is the checkout token with which we can make the request to checkout.
-     * @param boolean    $enable3D tells whether or not to allow the payment to require 3D secure.
      * @param float|null $amount   is an optional amount of money to charge in the same request.
      */
-    public function updatePaymentMethod(Policy $policy, $token, $enable3D = true, $amount = null)
+    public function updatePaymentMethod(Policy $policy, $token, $amount = null)
     {
         $throwLater = false;
         $thingToThrow = null;
@@ -913,9 +912,6 @@ class CheckoutService
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
-            if ($enable3D) {
-                $charge->setChargeMode(2);
-            }
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
@@ -1131,7 +1127,9 @@ class CheckoutService
         if (!$payment) {
             $payment = new CheckoutPayment();
             $payment->setReference($transactionDetails->getTrackId());
-            $payment->setAmount($transactionAmount);
+            if ($transactionDetails->getStatus() != CheckoutPayment::RESULT_CARD_VERIFIED) {
+                $payment->setAmount($transactionAmount);
+            }
             $payment->setUser($policy->getUser());
             $policy->addPayment($payment);
             $this->dm->persist($payment);
@@ -1190,7 +1188,8 @@ class CheckoutService
         $this->validatePaymentAmount($payment);
 
         if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED &&
-            $payment->getResult() != CheckoutPayment::RESULT_AUTHORIZED
+            $payment->getResult() != CheckoutPayment::RESULT_AUTHORIZED &&
+            $payment->getResult() != CheckoutPayment::RESULT_CARD_VERIFIED
         ) {
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
