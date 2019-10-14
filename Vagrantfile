@@ -76,11 +76,14 @@ Vagrant.configure("2") do |config|
 
     # Fix for OSX Catalina
     nfsPath = "."
+    nfsExport = true
+
     if Dir.exist?("/System/Volumes/Data")
         nfsPath = "/System/Volumes/Data" + Dir.pwd
+        nfsExport = false
     end
 
-    dev1804_config.vm.synced_folder nfsPath, "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
+    dev1804_config.vm.synced_folder nfsPath, "/vagrant", type: nfs, nfs_export: nfsExport, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
     #dev1804_config.vm.synced_folder ".", "/vagrant"
     dev1804_config.ssh.forward_agent = true
     dev1804_config.vm.provision "shell",
