@@ -6,7 +6,7 @@
 
 <div class="policy__info mx-4 mx-lg-5 py-5">
     {% if body_class is defined and body_class != 'quote' %}
-        <div class="h1 text-white">{{ device.make }} {{ device.model }} <span class="sub">({{ device.memory }}GB)</span></div>
+        <div class="h1 text-white">{{ make_desc }} {{ device.model }} <span class="sub">({{ device.memory }}GB)</span></div>
     {% endif %}
     <div class="h1 text-columbia-blue-e mb-5">Full Cover Details</div>
     <h4 class="text-columbia-blue-e mb-4">What's covered:</h4>
@@ -119,29 +119,26 @@
         </div>
         <div class="col-md-8">
             <h4 class="my-4 text-columbia-blue-e">Excess</h4>
-            <p class="mb-5 text-white">Prove your {{ device.make }} {{ device.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
+            <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
             <div class="table-responsive">
                 <table class="table table-bordered text-white">
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Damage</th>
-                            <th>Loss</th>
-                            <th>Theft</th>
+                            <th class="h6">Damage</th>
+                            <th class="h6">Loss</th>
+                            <th class="h6">Theft</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Validated with app</td>
+                            <td class="h6">Excess</td>
                             <td>&pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</td>
                             <td>&pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</td>
                             <td>&pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</td>
                         </tr>
                         <tr>
-                            <td>Not validated with app</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.damage }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.loss }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.excess.theft }}</td>
+                            <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
                         </tr>
                     </tbody>
                 </table>
@@ -251,7 +248,7 @@
             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
         </div>
         <div class="col-md-8 text-white">
-            <h4 class="my-4 text-columbia-blue-e">About the {{ device.make }} {{ device.model }}</h4>
+            <h4 class="my-4 text-columbia-blue-e">About the {{ make_desc }} {{ device.model }}</h4>
             <ul class="list-inline mb-0">
                 <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ device.camera }} MP</li>
                 <li class="list-inline-item text-columbia-blue-e">|</li>

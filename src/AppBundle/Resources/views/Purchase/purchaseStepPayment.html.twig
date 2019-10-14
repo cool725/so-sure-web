@@ -5,6 +5,11 @@
 {% if phone %}
     {% set body_class = 'purchase' %}
 {% endif %}
+{% set make_desc = phone.make %}
+{% if phone.make == 'Apple' %}
+    {% set make_desc = '' %}
+{% endif %}
+
 
 {% block title %}Purchase | so-sure{% endblock %}
 
@@ -26,7 +31,7 @@
                         <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
                             <h1 class="qpw__h1 text-columbia-blue-e fit">
                                 <span class="sub">
-                                    {{ phone.make }} {{ phone.model }}
+                                    {{ make_desc }} {{ phone.model }}
                                     <small>({{ phone.memory }}GB)</small>
                                 </span>
                             </h1>
@@ -45,7 +50,7 @@
                                             {% if phone_mem.id != phone.id  %}
                                                 <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="dropdown-item h6" href="#">
                                                     {{ phone_mem.memory }}GB
-                                                    <small>{{ phone.make }} {{ phone.model }}</small>
+                                                    <small>{{ make_desc }} {{ phone.model }}</small>
                                                 </a>
                                             {% endif %}
                                         {% endfor %}
