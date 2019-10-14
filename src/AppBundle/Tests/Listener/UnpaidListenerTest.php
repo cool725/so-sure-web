@@ -60,22 +60,45 @@ class UnpaidListenerTest extends WebTestCase
     {
         $policy = $this->payingPolicy(new BacsPaymentMethod());
         $scheduledPayment = $this->payment($policy, new \DateTime(), ScheduledPayment::STATUS_REVERTED);
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-1.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-1.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-1.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
+
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
         self::$dm->flush();
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-2.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-2.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-2.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
+
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
         self::$dm->flush();
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-3.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-3.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-3.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
+
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
         self::$dm->flush();
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-4.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-4.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-4.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
     }
 
