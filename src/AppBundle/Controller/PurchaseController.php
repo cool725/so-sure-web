@@ -1569,7 +1569,7 @@ class PurchaseController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Policy not found');
         }
         $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $policyId]);
-        if (count($policy->getPayments()) > 1) {
+        if (count($policy->getPayments()) > 0) {
             $redirectSuccess = $this->generateUrl('user_policy', ['policyId' => $policyId]);
         }
         $redirectFailure = $this->generateUrl('user_payment_details_policy', ['policyId' => $policyId]);
