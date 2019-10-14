@@ -50,7 +50,7 @@ class SmsCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $policyNumber = $input->getOption('policyNumber');
-        $attempt = true === $input->getOption('attempt');
+        $attempt = $input->getOption('attempt');
 
         if ($policyNumber && $attempt) {
             $repo = $this->dm->getRepository(Policy::class);
