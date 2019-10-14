@@ -45,6 +45,8 @@ use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
 use AppBundle\Service\IntercomService;
 
+use AppBundle\Classes\GoCompare;
+
 class PhoneInsuranceController extends BaseController
 {
     use PhoneTrait;
@@ -544,19 +546,38 @@ class PhoneInsuranceController extends BaseController
     /**
      * @Route("/list-phones", name="list_phones")
      */
-    public function listPhones()
+    public function listPhones(Request $request)
     {
         // For generic use by insurance aggregator sites
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
         $list = [];
+
         foreach ($phones as $phone) {
+            // Loop through each phone and make an array for the response
+            $aggregatorId = '';
+            if($request->query->get('aggregator')) {
+                // If aggregator set, look for aggregator ID (if applicable)
+                if ($request->query->get('aggregator') == 'GoCompare') {
+                    $goCompare = new GoCompare();
+                    foreach ($goCompare::$models as $index => $model) {
+                        if(
+                            $model['make'] == $phone->getMake()
+                            && $model['model'] == $phone->getModel()
+                            && $model['memory'] == $phone->getMemory()
+                        ) {
+                            $aggregatorId = $index;
+                        }
+                    }
+                }
+            }
             $list[] = [
-                'id'        => $phone->getId(),
-                'make'      => $phone->getMake(),
-                'model'     => $phone->getModel(),
-                'memory'    => $phone->getMemory()
+                'id'            => $phone->getId(),
+                'make'          => $phone->getMake(),
+                'model'         => $phone->getModel(),
+                'memory'        => $phone->getMemory(),
+                'aggregatorId'  => $aggregatorId
             ];
         }
         $response = new JsonResponse($list);
