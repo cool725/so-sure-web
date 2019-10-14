@@ -784,9 +784,7 @@ class CheckoutService
 
         try {
             $service = $this->client->chargeService();
-
             $user = $policy->getUser();
-
             $charge = new CardTokenChargeCreate();
             if ($paymentMethod->hasPreviousChargeId()) {
                 $charge->setPreviousChargeId($paymentMethod->getPreviousChargeId());
