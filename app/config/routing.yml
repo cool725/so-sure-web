@@ -368,14 +368,6 @@ redirect_discount_vouchers:
         route: homepage
         permanent: true
 
-redirect_blog:
-    path: https://blog.wearesosure.com/
-    defaults:
-        _controller: FrameworkBundle:Redirect:urlRedirect
-        route: blog_index
-        permanent: true
-
-
 redirect_change_password:
     path: /change-password
     defaults:
@@ -454,7 +446,7 @@ redirect_sosure_vs_gadgetcover:
         permanent: true
 
 redirect_sosure_vs_halifax:
-    path: /so-sure-vs-halifax-phone-insuranc
+    path: /so-sure-vs-halifax-phone-insurance
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
         route: comparison
