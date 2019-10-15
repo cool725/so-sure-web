@@ -25,13 +25,10 @@ $(function() {
         title.text(data.name);
         for (user of data.users) {
             let userItem = $(`<li><a href="/admin/user/${user.id}">${user.email}</a></li>`);
-            if (user.policies.length > 0) {
-                let policyList = $("<ul></ul>");
-                for (policy of user.policies) {
-                    policyList.append(`<li><a href="/admin/policy/${policy.id}">${policy.policyNumber}</a>`);
-                }
-                userItem.append(policyList);
-            }
+            list.append(userItem);
+        }
+        for (policy of data.policies) {
+            let policyItem = $(`<li><a href="/admin/user/${policy.id}">${policy.policyNumber}</a></li>`);
             list.append(userItem);
         }
     }

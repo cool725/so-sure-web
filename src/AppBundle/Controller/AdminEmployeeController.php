@@ -671,7 +671,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (!$offer) {
             throw new \Exception("No offer with id '{$id}'");
         }
-        return $this->json($offer->toArray());
+        return $this->json($offer->toDetailsArray());
     }
 
     /**
