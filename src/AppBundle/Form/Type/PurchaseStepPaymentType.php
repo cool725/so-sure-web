@@ -69,16 +69,19 @@ class PurchaseStepPaymentType extends AbstractType
             $form = $event->getForm();
 
             if ($purchase->getPolicy()->getPhone()) {
-                $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
+                $monthlyPrice = $purchase->getPolicy()->getPhone()->getCurrentMonthlyPhonePrice();
+                $yearlyPrice = $purchase->getPolicy()->getPhone()->getCurrentYearlyPhonePrice();
+
+
                 $additionalPremium = $purchase->getUser()->getAdditionalPremium();
                 $choices = [];
                 if ($purchase->getUser()->allowedMonthlyPayments($this->postcodeService)) {
-                    $choices[sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice($additionalPremium))] =
-                            sprintf('%.2f', $price->getMonthlyPremiumPrice($additionalPremium));
+                    $choices[sprintf('£%.2f Monthly', $monthlyPrice->getMonthlyPremiumPrice($additionalPremium))] =
+                            sprintf('%.2f', $monthlyPrice->getMonthlyPremiumPrice($additionalPremium));
                 }
                 if ($purchase->getUser()->allowedYearlyPayments()) {
-                    $choices[sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice($additionalPremium))] =
-                            sprintf('%.2f', $price->getYearlyPremiumPrice($additionalPremium));
+                    $choices[sprintf('£%.2f Yearly', $yearlyPrice->getYearlyPremiumPrice($additionalPremium))] =
+                            sprintf('%.2f', $yearlyPrice->getYearlyPremiumPrice($additionalPremium));
                 }
 
                 if (count($choices) > 0) {

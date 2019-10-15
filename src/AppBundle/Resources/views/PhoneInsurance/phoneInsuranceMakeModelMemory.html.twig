@@ -95,7 +95,7 @@
                                aria-expanded="false"
                                aria-controls="mem_sizes"
                                title="Not the phone you're looking for?">
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ phone_price.monthlyPremiumPrice }} per month</span>
+                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }}Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ phone_price_monthly.monthlyPremiumPrice }} per month</span>
                             </a>
                         </h1>
                         <div class="collapse mb-4" id="mem_sizes">
@@ -173,9 +173,9 @@
                                 <tbody>
                                     <tr>
                                         <td class="h6">Excess</td>
-                                        <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
-                                        <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
-                                        <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
+                                        <td>&pound;{{ phone_price_monthly.picsureexcess.damage }}</td>
+                                        <td>&pound;{{ phone_price_monthly.picsureexcess.loss }}</td>
+                                        <td>&pound;{{ phone_price_monthly.picsureexcess.theft }}</td>
                                     </tr>
                                     <tr>
                                         <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
@@ -432,7 +432,7 @@
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
                     <div class="banner__text text-center text-lg-left ml-lg-4">
                         <h4 class="text-white">Insure your phone in minutes</h4>
-                        <p class="lead text-white">{{ make_desc }} {{ phone.model }} for just <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> per month</p>
+                        <p class="lead text-white">{{ make_desc }} {{ phone.model }} for just <strong>&pound;{{ phone_price_monthly.monthlyPremiumPrice }}</strong> per month</p>
                     </div>
                 </div>
                 <div class="banner__controls text-center text-lg-left">

@@ -1020,6 +1020,26 @@ class Phone
     }
 
     /**
+     * Convenience method for getting the current monthly price without needing to pass a stream name.
+     * @param \DateTime|null $date is the date at which the given price should be current. null for the present.
+     * @return PhonePrice|null the found price or null if there is no such price.
+     */
+    public function getCurrentMonthlyPhonePrice(\DateTime $date = null)
+    {
+        return $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date ?: new \DateTime());
+    }
+
+    /**
+     * Convenience method for getting the current yearly price without needing to pass a stream name.
+     * @param \DateTime|null $date is the date at which the given price should be current. null for the present.
+     * @return PhonePrice|null the found price or null if there is no such price.
+     */
+    public function getCurrentYearlyPhonePrice(\DateTime $date = null)
+    {
+        return $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date ?: new \DateTime());
+    }
+
+    /**
      * Gets all the phone prices that are current in different streams and then returns the one that is the cheapest.
      * @param \DateTime|null $date is the date at which the prices should be current or null for current time.
      * @return PhonePrice|null the lowest current phone price or null if no phone prices are current at all.

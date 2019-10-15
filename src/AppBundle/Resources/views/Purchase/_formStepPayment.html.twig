@@ -7,7 +7,7 @@
 
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
 
-    {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}
+    {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
         {% set premium = 'monthly' %}
     {% else %}
         {% set premium = 'yearly' %}
@@ -23,20 +23,22 @@
             <div class="row">
                 {% if app.user.allowedMonthly %}
                     <div class="col-6">
-                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month" data-premium-param="monthly">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}"
+                            data-value="{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month" data-premium-param="monthly">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Monthly</h6>
-                                <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                <div class="radio-btn__price">&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
                             </div>
                         </div>
                     </div>
                 {% endif %}
                 {% if app.user.allowedYearlyPayments %}
                     <div class="col-6">
-                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount ==
+                            phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Yearly</h6>
-                                <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                <div class="radio-btn__price">&pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
                             </div>
                         </div>
                     </div>

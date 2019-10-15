@@ -443,9 +443,12 @@ class PhoneInsuranceController extends BaseController
             ], true);
         }
 
+        // TODO: get user price from price service.
+
         $data = [
             'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
+            'phone_price_monthly' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY),
+            'phone_price_yearly' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
