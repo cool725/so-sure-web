@@ -105,15 +105,13 @@ class PulloutCommand extends ContainerAwareCommand
             $startDate->format("Y-m-d"),
             $endDate->format("Y-m-d")
         );
-        foreach ($input->getOption("mail") as $target) {
-            $this->mailer->send(
-                "Database Pullout",
-                $target,
-                "<p>{$message}</p>",
-                $message,
-                [$filename]
-            );
-        }
+        $this->mailer->send(
+            "Database Pullout",
+            $input->getOption("mail"),
+            "<p>{$message}</p>",
+            $message,
+            [$filename]
+        );
     }
 
     /**
