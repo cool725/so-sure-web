@@ -175,9 +175,9 @@ class PulloutCommand extends ContainerAwareCommand
 
     /**
      * Creates the right temporary filename for the given csv file and report date and time.
-     * @param string $report is the type of csv that this is meant to be.
-     * @param \DateTime $start is the start date of the data in the report.
-     * @param \DateTime $end if the end date of the data in the report.
+     * @param string    $report is the type of csv that this is meant to be.
+     * @param \DateTime $start  is the start date of the data in the report.
+     * @param \DateTime $end    if the end date of the data in the report.
      * @return string containing the appropriate temporary file name.
      */
     private function tempFile($report, $start, $end)
