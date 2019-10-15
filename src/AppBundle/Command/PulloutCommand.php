@@ -90,21 +90,24 @@ class PulloutCommand extends ContainerAwareCommand
         // get commandline options.
         $start = $input->getOption("start");
         $end = $input->getOption("end");
-        $startDate = $start ? new \DateTime($start, "YYYY-MM-DD") : $this->startOfYear();
-        $endDate = $end ? new \DateTime($end, "YYYY-MM-DD") : new \DateTime();
+        $startDate = $start ? \DateTime::createFromFormat("Y-m-d", $start) : $this->startOfYear();
+        $endDate = $end ? \DateTime::createFromFormat("Y-m-d", $end) : new \DateTime();
+        if (!($startDate && $endDate)) {
+            $output->writeln("<error>Dates are not valid</error>");
+            return 1;
+        }
         // Create sheets.
-        $adwordsFile = tempnam("/tmp", "pull");
-        $facebookFile = tempnam("/tmp", "pull");
-        $adwords = $this->adwordsSheet($start, $end, $adwordsFile);
-        $facebook = $this->facebookSheet($start, $end, $facebookFile);
+        $adwordsFile = $this->tempFile("adwordsPullout", $startDate, $endDate);
+        $facebookFile = $this->tempFile("facebookPullout", $startDate, $endDate);
+        $this->adwordsSheet($startDate, $endDate, $adwordsFile);
         // Mail sheets.
         foreach ($input->getOption("mail") as $target) {
             $this->mailer->send(
                 "Database Pullout",
                 $target,
-                "<p>I am the bingo bongo man</p>",
-                "I am the bingo bongo man",
-                [$adwordsFile, $facebookFile]
+                "<p>Database Pullout from wuhifheuwf ifurufto iuhregh</p>",
+                "Database Pullout from uihhu to hiuerhg",
+                [$adwordsFile]
             );
         }
     }
@@ -117,25 +120,73 @@ class PulloutCommand extends ContainerAwareCommand
      */
     private function adwordsSheet($start, $end, $filename)
     {
+        // Create an array representing the final data.
         $userRepo = $this->dm->getRepository(User::class);
         $policyRepo = $this->dm->getRepository(Policy::class);
+        $users = $userRepo->findPulloutUsers($start, $end);
+        $rows = [];
+        foreach ($users as $user) {
+            if (count($user->getPolicies()) == 0) {
+                continue;
+            }
+            $purchased = 0;
+            $net = 0;
+            foreach ($user->getPolicies() as $policy) {
+                if ($policy->getStart()) {
+                    $purchased = 1;
+                    $net = 0;
+                    if (!$policy->isCooloffCancelled()) {
+                        $net = 1;
+                    }
+                }
+            }
+            $birth = $user->getCreated()->format("Y-m-d");
+            $campaign = $user->getAttribution()->getCampaignName();
+            $channel = $user->getAttribution()->getCampaignSource();
+            $device = $user->getAttribution()->getDeviceCategory();
+            $key = sprintf("%s:%s:%s:%s", $birth, $campaign, $channel, $device);
+            // if this line already exists we increment it, and if it does not then we create it.
+            if (array_key_exists($key, $rows)) {
+                $rows[$key]["createAccount"]++;
+                $rows[$key]["purchased"] += $purchased;
+                $rows[$key]["net"] += $net;
+            } else {
+                $rows[$key] = [
+                    "date" => $birth,
+                    "campaign" => $campaign,
+                    "channel" => $channel,
+                    "device" => $device,
+                    "createAccount" => 1,
+                    "purchased" => $purchased,
+                    "net" => $net
+                ];
+            }
+        }
+        // now write the array.
         $file = fopen($filename, "w");
-        fwrite($file, "writing to temp file");
+        fwrite($file, "Date,Campaign,Channel,Device,Create Account,Purchased,Net\n");
+        foreach ($rows as $row) {
+            fwrite($file, implode(",", $row)."\n");
+        }
+
         fclose($file);
     }
 
     /**
-     * Creates a pullout sheet on facebook / instagram campaigns.
-     * @param \DateTime $start    is the date from which to start reporting information.
-     * @param \DateTime $end      is the date at which to stop reporting information.
-     * @param string    $filename is the name of the file that the csv should be written to.
+     * Creates the right temporary filename for the given csv file and report date and time.
+     * @param string $report is the type of csv that this is meant to be.
+     * @param \DateTime $start is the start date of the data in the report.
+     * @param \DateTime $end if the end date of the data in the report.
+     * @return string containing the appropriate temporary file name.
      */
-    private function facebookSheet($start, $end, $filename)
+    private function tempFile($report, $start, $end)
     {
-        $userRepo = $this->dm->getRepository(User::class);
-        $policyRepo = $this->dm->getRepository(Policy::class);
-        $file = fopen($filename, "w");
-        fwrite($file, "writing to temp file");
-        fclose($file);
+        return sprintf(
+            "%s/%s(%s-to-%s).csv",
+            sys_get_temp_dir(),
+            $report,
+            $start->format("Y-m-d"),
+            $end->format("Y-m-d")
+        );
     }
 }

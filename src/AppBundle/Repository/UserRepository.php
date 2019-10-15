@@ -158,10 +158,31 @@ class UserRepository extends DocumentRepository
     public function findNewUsers(\DateTime $startDate, \DateTime $endDate)
     {
         $qb = $this->createQueryBuilder()
-            ->field('created')->lt($endDate)
-            ->field('created')->gte($startDate);
+            ->field('created')->gte($startDate)
+            ->field('created')->lt($endDate);
 
         return $qb
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Finds users appropriate for katte and co database pullout.
+     * @param \DateTime $startDate is the first date at which users should be found.
+     * @param \DateTime $endDate   is the last date at which users should be found.
+     * @return array containing the appropriate users.
+     */
+    public function findPulloutUsers(\DateTime $startDate, \DateTime $endDate)
+    {
+        return $this->createQueryBuilder()
+            ->field('created')->gte($startDate)
+            ->field('created')->lt($endDate)
+            ->field('attribution.campaignSource')->in([
+                'facebook',
+                'instagram',
+                'google',
+                'bing'
+            ])
             ->getQuery()
             ->execute();
     }
