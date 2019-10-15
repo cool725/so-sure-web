@@ -113,10 +113,7 @@ class UnpaidListener
     private function smsNotification($policy, $number)
     {
         $bacs = $policy->getBacsPaymentMethod() && true;
-        if (!$bacs && $number == 1) {
-            // Don't send if first checkout failure as we don't have copy
-            return;
-        } else if ($number >= 1 && $number <= 4) {
+        if ($number >= 1 && $number <= 4) {
             $smsTemplate = sprintf("AppBundle:Sms:%s/failedPayment-%d.txt.twig", $bacs ? "bacs" : "card", $number);
             $this->smsService->sendUser($policy, $smsTemplate, ["policy" => $policy], Charge::TYPE_SMS_PAYMENT);
         }

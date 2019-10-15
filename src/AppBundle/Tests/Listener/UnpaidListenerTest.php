@@ -18,6 +18,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Repository\ScheduledPaymentRepository;
 
 /**
@@ -52,9 +53,8 @@ class UnpaidListenerTest extends WebTestCase
     }
 
     /**
-     * Tests the bacs unpaid comms with and without claims, and makes sure that scheduled payments are rescheduled to
-     * the right dates.
-     * Note that this currently expects no smses to be sent because that has not been implemented yet.
+     * Tests the bacs unpaid comms with and without claims, and makes sure that scheduled payments
+     * are rescheduled to the right dates.
      */
     public function testBacsUnpaid()
     {
@@ -101,6 +101,8 @@ class UnpaidListenerTest extends WebTestCase
         );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
     }
+
+    // TODO: testCheckoutUnpaid()
 
     /**
      * Tests the judo unpaid comms with no claims and a card.
