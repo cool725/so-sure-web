@@ -2,19 +2,32 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance phone-insurance-make' %}
-{# Adjust for Apple as iPhone is more commonly recognised #}
+
+{# SEO Adjustments #}
 {% set make_desc = phone.make %}
 {% set with_phone = phone.make ~ ' Phone' %}
 {% if phone.make == 'Apple' %}
     {% set make_desc = 'iPhone' %}
     {% set with_phone = 'iPhone' %}
 {% endif %}
+{% if phone.make == 'Asus' %}
+    {% set with_phone = 'Asus Mobile' %}
+{% endif %}
+{% if phone.make == 'BlackBerry' %}
+    {% set with_phone = 'BlackBerry' %}
+{% endif %}
+{% if phone.make == 'Razer' %}
+    {% set with_phone = 'Razer' %}
+{% endif %}
+{% if phone.make == 'Vodafone' %}
+    {% set with_phone = 'Vodafone Mobile' %}
+{% endif %}
 
-{% block title %}{{ with_phone }} Insurance | so-sure{% endblock %}
+{% block title %}{{ with_phone }} Insurance From &pound;{{ from_price }} Monthly | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="{{ with_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better."/>
 {% endblock %}
-{% set og_title = with_phone ~ ' Insurance | so-sure' %}
+{% set og_title = with_phone ~ ' Insurance From £' ~ from_price ~ ' Monthly | so-sure' %}
 {% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 

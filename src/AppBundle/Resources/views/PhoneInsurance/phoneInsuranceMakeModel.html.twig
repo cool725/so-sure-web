@@ -2,23 +2,53 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
+
+{# SEO Adjustments #}
 {% set make_desc = phone.make %}
-{% set with_phone = phone.model ~ ' Phone' %}
+{% set with_phone = phone.model %}
+{% set add_phone = '' %}
 {% if phone.make == 'Apple' %}
     {% set make_desc = '' %}
     {% set with_phone = phone.model %}
 {% endif %}
+{% if phone.make == 'HP' %}
+    {% set add_phone = ' Phone' %}
+{% endif %}
+{% if phone.make == 'Motorola' and phone.model == 'Moto G5' %}
+    {% set make_desc = '' %}
+{% endif %}
+{% if phone.make == 'Sony' and phone.model == 'Xperia XZ Premium' %}
+    {% set make_desc = '' %}
+{% endif %}
+{% set samsungModels = [
+    'Galaxy Note10',
+    'Galaxy Note10+',
+    'Galaxy Note10+ 5G',
+    'Galaxy S5 mini',
+    'Galaxy S6 Edge',
+    'Galaxy S6 Edge+',
+    'Galaxy S7 Edge'
+] %}
+{% if phone.make == 'Samsung' %}
+    {% if phone.model in samsungModels %}
+        {% set make_desc = '' %}
+    {% elseif phone.model in ['Galaxy Note 8'] %}
+        {% set make_desc = '' %}
+        {% set with_phone = 'Note 8' %}
+    {% endif %}
+{% endif %}
+
 {% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
 
-{% block title %}{% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ with_phone }} Insurance | so-sure{% endblock %}
+{% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance From &pound;{{ phone_price.monthlyPremiumPrice }} Monthly | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="{{ make_desc }} {{ with_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ make_desc }} {{ with_phone }} Insurance that's simply better."/>
+    <meta name="description" content="{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ make_desc }} {{ with_phone }} Insurance that's simply better."/>
     <link rel="canonical" href="{{ canonical|url_decode }}" />
 {% endblock %}
-{% set og_title = make_desc ~ ' ' ~ with_phone ~ ' Insurance | so-sure' %}
+{% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance From £' ~ phone_price.monthlyPremiumPrice ~ ' Monthly | so-sure' %}
 {% set og_url = canonical|url_decode %}
-{% set og_description = make_desc ~ ' ' ~ with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
+{% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
