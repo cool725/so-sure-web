@@ -100,12 +100,17 @@ class PulloutCommand extends ContainerAwareCommand
         $filename = $this->tempFile("adwordsPullout", $startDate, $endDate);
         $this->writeSheet($startDate, $endDate, $filename);
         // Mail sheets.
+        $message = sprintf(
+            "Database pullout from %s to %s",
+            $startDate->format("Y-m-d"),
+            $endDate->format("Y-m-d")
+        );
         foreach ($input->getOption("mail") as $target) {
             $this->mailer->send(
                 "Database Pullout",
                 $target,
-                "<p>Database Pullout from wuhifheuwf ifurufto iuhregh</p>",
-                "Database Pullout from uihhu to hiuerhg",
+                "<p>{$message}</p>",
+                $message,
                 [$filename]
             );
         }
