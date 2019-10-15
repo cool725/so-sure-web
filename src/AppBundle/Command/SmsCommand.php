@@ -50,7 +50,7 @@ class SmsCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $policyNumber = $input->getOption('policyNumber');
-        $attempt = true === $input->getOption('attempt');
+        $attempt = $input->getOption('attempt');
 
         if ($policyNumber && $attempt) {
             $repo = $this->dm->getRepository(Policy::class);
@@ -60,7 +60,7 @@ class SmsCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));
             }
 
-            $smsTemplate = sprintf('AppBundle:Sms:card/failedPayment-%d.txt.twig', $attempt);
+            $smsTemplate = sprintf('AppBundle:Sms:bacs/failedPayment-%d.txt.twig', $attempt);
 
             $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
         } else {
