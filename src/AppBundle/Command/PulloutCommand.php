@@ -97,9 +97,8 @@ class PulloutCommand extends ContainerAwareCommand
             return 1;
         }
         // Create sheets.
-        $adwordsFile = $this->tempFile("adwordsPullout", $startDate, $endDate);
-        $facebookFile = $this->tempFile("facebookPullout", $startDate, $endDate);
-        $this->adwordsSheet($startDate, $endDate, $adwordsFile);
+        $filename = $this->tempFile("adwordsPullout", $startDate, $endDate);
+        $this->writeSheet($startDate, $endDate, $filename);
         // Mail sheets.
         foreach ($input->getOption("mail") as $target) {
             $this->mailer->send(
@@ -107,22 +106,22 @@ class PulloutCommand extends ContainerAwareCommand
                 $target,
                 "<p>Database Pullout from wuhifheuwf ifurufto iuhregh</p>",
                 "Database Pullout from uihhu to hiuerhg",
-                [$adwordsFile]
+                [$filename]
             );
         }
     }
 
     /**
-     * Creates a pullout sheet on adwords campaigns.
+     * Creates a pullout for katte and co.
      * @param \DateTime $start    is the date from which to start reporting information.
      * @param \DateTime $end      is the date at which to stop reporting information.
      * @param string    $filename is the name of the file that the csv should be written to.
      */
-    private function adwordsSheet($start, $end, $filename)
+    private function writeSheet($start, $end, $filename)
     {
         // Create an array representing the final data.
+        /** @var UserRepository */
         $userRepo = $this->dm->getRepository(User::class);
-        $policyRepo = $this->dm->getRepository(Policy::class);
         $users = $userRepo->findPulloutUsers($start, $end);
         $rows = [];
         foreach ($users as $user) {
@@ -168,7 +167,6 @@ class PulloutCommand extends ContainerAwareCommand
         foreach ($rows as $row) {
             fwrite($file, implode(",", $row)."\n");
         }
-
         fclose($file);
     }
 
