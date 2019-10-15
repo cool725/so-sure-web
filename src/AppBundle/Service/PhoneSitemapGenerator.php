@@ -45,6 +45,9 @@ class PhoneSitemapGenerator implements GeneratorInterface
         $phones = $repo->findBy(['active' => true]);
         foreach ($phones as $phone) {
             $phoneMake = $phone->getMake();
+            if ($phoneMake == "ALL") {
+                continue;
+            }
             if (array_key_exists($phoneMake, $makes)) {
                 $makes[$phoneMake][] = $phone;
             } else {
@@ -53,16 +56,20 @@ class PhoneSitemapGenerator implements GeneratorInterface
         }
 
         foreach ($makes as $make => $phones) {
-            $url = $this->router->generateUrl('quote_make', ['make' => $make]);
-            $topItem = new Entry($url, null, 'weekly', 0.7);
-            $item->setDescription($make." insurance");
+            $url = $this->router->generateUrl('phone_insurance_make', [
+                'make' => mb_strtolower($make)
+            ]);
+            $topItem = new Entry($url, null);
+            $topItem->setDescription($make);
+            $entries[$topItem->getDescription()] = $topItem;
             foreach ($phones as $phone) {
-                $url = $this->router->generateUrl('quote_make_model', [
+                $itemUrl = $this->router->generateUrl('phone_insurance_make_model', [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getEncodedModelCanonical()
                 ]);
-                $item = new Entry($url, null, 'weekly', 0.7);
-                $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' insurance');
+                $itemUrl = urldecode($itemUrl);
+                $item = new Entry($itemUrl, null);
+                $item->setDescription($phone->getMakeWithAlternative() . ' ' . $phone->getModel() . ' Insurance');
                 $entries[$item->getDescription()] = $item;
             }
         }

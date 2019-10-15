@@ -21,24 +21,8 @@
 
     &__intro {
 
-        h1 {
-            // font-size: 1.4rem;
-
-            @include media-breakpoint-up(ss) {
-                // font-size: 1.86rem;
-            }
-
-            @include media-breakpoint-up(sm) {
-                // font-size: 2.2rem;
-            }
-        }
-
         @include media-breakpoint-up(lg) {
-            padding-top: 4rem;
-        }
-
-        @include media-breakpoint-up(xl) {
-            // padding-top: 6rem;
+            padding-top: 2rem;
         }
 
     }
@@ -127,6 +111,17 @@
     svg {
         position: absolute;
         bottom: -1px; left: 0; right: 0;
+    }
+}
+
+.other-phones {
+    text-align: center;
+
+    a img {
+
+        &:hover {
+            transform: translateY(-5px);
+        }
     }
 }
 

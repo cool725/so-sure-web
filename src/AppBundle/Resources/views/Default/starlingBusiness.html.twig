@@ -1,0 +1,146 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'company-phones' %}
+
+{% block title %}Phone Insurance Starling Business | so-sure{% endblock %}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Insure your company phones and up to 80% money back"/>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/company-phones.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-lg-7">
+                    <div class="hero__intro">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-columbia-blue-e"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-white"></i>
+                                </li>
+                                <li class="list-inline-item text-white"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Starling Business</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
+                        <h1 class="mb-4 text-turquoise fit">
+                            Mobile Insurance <br>
+                            <span class="sub text-white">for Starling Business Customers</span>
+                        </h1>
+                        <ul class="list-unstyled icn-fa-list mt-4 mb-5">
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                24-72 hour replace or repair
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                Low excess from just &pound;50
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                Up to 80% money back
+                            </li>
+                            <li class="h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
+                                New, secondhand &amp; refurbished phones
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="hero__controls pb-4">
+                        <a href="#" class="btn btn-success btn-turquoise-gradient btn-block-xs get-a-quote disabled">Get a Quote</a>
+                        <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-columbia-blue-e btn-block-xs ml-md-2">Link Starling Business</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration d-block d-lg-none">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hero-partnerships-hero-illustration-starling-logo.png" alt="Cityscape" class="img-fluid animated zoomInUp lozad">
+            </div>
+            <span class="hero__illustration__left d-none d-lg-block animated zoomInDown">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hero-partnerships-buildings-left.png " alt="Cityscape" class="lozad">
+            </span>
+            <span class="hero__illustration__right d-none d-lg-block animated zoomInDown">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hero-partnerships-hero-illustration-starling-logo.png" alt="Cityscape" width="660px" class="lozad">
+            </span>
+        </div>
+        <div class="hero__base d-none d-lg-block">
+            <svg viewBox="0 0 1440 117"
+                 preserveAspectRatio="xMinYMin meet"
+                 version="1.1"
+                 xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 class="animated fadeInUp">
+                <g id="make_for_web" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.297712054">
+                    <g id="Artboard" transform="translate(-255.000000, -410.000000)" fill="#00AFFD">
+                        <g id="hills">
+                            <path d="M1694.81033,526.075685 L1694.81033,435.061523 C1562.23625,421.443534 1457.27861,455.007925 1366.65269,444.511474 C1254.20674,431.486352 1192.02424,418.14683 1086.12582,453.045174 C829.649526,469.331068 879.571549,381.622592 692.773656,446.788624 C534.404004,414.091077 408.696101,393.942561 255,426.667057 L255,526.075685 L1694.81033,526.075685 Z" id="Path" style="mix-blend-mode: overlay;" opacity="0.75"></path>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="intro py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                {# TODO: Needs copy #}
+                <div class="col-md-6 col-lg-4">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px" class="lozad">
+                    <h5 class="text-primary">24-72 hour replace or repair</h5>
+                    <p class="mb-5">We aim to replace or repair your phone within <span class="text-nowrap">24-72</span> hours after your claim is approved</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="180px" class="lozad">
+                    <h5 class="text-primary">Up to 80% money back</h5>
+                    <p class="mb-5">Connect your employees devices and get rewarded when they don't claim</p>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - bring employees together" width="180px" class="lozad">
+                    <h5 class="text-primary">Enjoy a night out!</h5>
+                    <p class="mb-5">Bring the team together for lunch or a night out with their rewards for being careful</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Cover #}
+    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
+
+    {# We do things differently #}
+    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
+
+    {# Reviews #}
+    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/company-phones.js') }}"></script>
+{% endblock %}

@@ -21,6 +21,32 @@
             {# Main Content #}
             <div class="faq__main__container">
                 <div class="faq__main px-4 px-lg-5">
+                    <div class="breadcrumbs">
+                        <ul class="list-inline"
+                            vocab="https://schema.org/"
+                            typeof="BreadcrumbList">
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('homepage') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Home</span>
+                                </a>
+                                <meta property="position" content="1">
+                            </li>
+                            <li class="list-inline-item text-white">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item text-zaffre"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <span property="name">Terms &amp; Conditions</span>
+                                <meta property="position" content="2">
+                            </li>
+                        </ul>
+                    </div>
                     <h1 class="text-primary mb-4">Terms &amp; Conditions</h1>
                     <p class="mb-5">The following terminology applies to this Terms of Use, Cookies and Privacy Policy and any or all Agreements: “You” and “Your” refers to you, the person accessing this website and accepting the Company’s terms and conditions. "The Company", “Ourselves”, “We” and "Us", refers to so-sure Limited. “Party”, “Parties”, or “Us”, refers to both You and ourselves, or either You or ourselves.</p>
                     <h5 class="text-zaffre">Terms of Use</h5>

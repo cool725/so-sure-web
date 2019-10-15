@@ -4,9 +4,11 @@ require('../../sass/pages/phone-insurance.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/carousel');
+require('bootstrap/js/dist/collapse');
 
 // Require components
 require('../components/banner.js');
+require('../components/phone-search-dropdown-card.js');
 let textFit = require('textfit');
 
 let jQueryBridget = require('jquery-bridget');
@@ -24,9 +26,10 @@ const observer = lozad(); // lazy loads elements with default selector as '.loza
 observer.observe();
 
 $(function() {
+
     // Textfit h1
     if ($('.fit').length) {
-        textFit($('.fit')[0]);
+        textFit($('.fit'), {detectMultiLine: false});
     }
 
     // Reviews

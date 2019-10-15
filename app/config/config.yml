@@ -545,6 +545,7 @@ nelmio_security:
                 - http://smct.co
                 - https://ep.smct.co
                 - https://*.eu-west-1.amazonaws.com
+                - http://*.oribi.io
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -876,6 +877,7 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - http://*.oribi.io
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
