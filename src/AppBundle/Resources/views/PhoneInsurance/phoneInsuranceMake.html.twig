@@ -26,51 +26,89 @@
 
     <section class="hero">
         <div class="container-large">
-            <div class="text-center mb-5">
-                <h1 class="text-white fit">{{ with_phone }} Insurance <br class="d-md-none"> <span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
-                <div class="breadcrumbs">
-                    <ul class="list-inline"
-                        vocab="https://schema.org/"
-                        typeof="BreadcrumbList">
-                        <li class="list-inline-item"
-                            property="itemListElement"
-                            typeof="ListItem">
-                            <a href="{{ path('homepage') }}"
-                               class="text-columbia-blue-e"
-                               property="item"
-                               typeof="WebPage">
-                               <span property="name">Home</span>
-                            </a>
-                            <meta property="position" content="1">
-                        </li>
-                        <li class="list-inline-item text-white">
-                            <i class="fal fa-angle-right text-white"></i>
-                        </li>
-                        <li class="list-inline-item"
-                            property="itemListElement"
-                            typeof="ListItem">
-                            <a href="{{ path('phone_insurance') }}"
-                               class="text-columbia-blue-e"
-                               property="item"
-                               typeof="WebPage">
-                               <span property="name">Phone Insurance</span>
-                            </a>
-                            <meta property="position" content="2">
-                        </li>
-                        <li class="list-inline-item text-white">
-                            <i class="fal fa-angle-right text-white"></i>
-                        </li>
-                        <li class="list-inline-item text-white"
-                            property="itemListElement"
-                            typeof="ListItem">
-                            <span property="name">{{ make_desc }}</span>
-                            <meta property="position" content="3">
-                        </li>
-                    </ul>
-                </div>
-            </div>
             <div class="row">
-                <div class="d-none d-xl-flex col-xl-6 align-items-center">
+                <div class="col-lg-6 offset-lg-1 order-lg-2">
+                    <div class="hero__intro">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-columbia-blue-e"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-white"></i>
+                                </li>
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('phone_insurance') }}"
+                                       class="text-columbia-blue-e"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Phone Insurance</span>
+                                    </a>
+                                    <meta property="position" content="2">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-white"></i>
+                                </li>
+                                <li class="list-inline-item text-white"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">{{ make_desc }}</span>
+                                    <meta property="position" content="3">
+                                </li>
+                            </ul>
+                        </div>
+                        <h1 class="text-white mb-4 fit">{{ with_phone }} Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
+                        <ul class="list-unstyled icn-fa-list mb-5">
+                            {% if feature_enabled('apply-sign-up-bonus') %}
+                                <li class="mb-3 h5 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                     Instant &pound;5 cashback bonus 💰
+                                </li>
+                            {% endif %}
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                24-72 hour replace or repair
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                Low excess from just &pound;50
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                Up to 80% money back
+                            </li>
+                            <li class="h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                New, secondhand &amp; refurbished phones
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-white watch-video btn-block-xs"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch our Video
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-8 offset-md-2 offset-lg-0 col-lg-5 order-lg-1 d-flex align-items-center">
                     {% if phone.make == 'Apple'  %}
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_hand-holding-iphone-x.png"
@@ -92,16 +130,6 @@
                              alt="{{ phone.make }} - Phone Insurance"
                              class="img-fluid lozad">
                     {% endif %}
-                </div>
-                <div class="col-md-8 offset-md-2 col-xl-5 offset-xl-1">
-                    {# Phone Search Card #}
-                    {# TODO: Rework if phone in session #}
-                    {% if phone is defined and phone %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'seo', 'id': phone.id }|merge(app.request.query.all))) }}
-                    {% else %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'seo' }|merge(app.request.query.all))) }}
-                    {% endif %}
-                    {# End Phone Search #}
                 </div>
             </div>
         </div>
