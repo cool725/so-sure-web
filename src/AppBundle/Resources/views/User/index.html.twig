@@ -1,239 +1,299 @@
 {% extends 'base_rebrand.html.twig' %}
+{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
-{% set body_class = 'home' %}
+{% set body_class = 'user' %}
+{% set user_mode = true %}
 
-{% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
-{% block meta %}
-    <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure."/>
-{% endblock %}
+{% block title %}so-sure - Welcome back {{ app.user.firstname }}{% endblock %}
+
+{# Set Meta #}
+{% set og_title = 'Sign up and save' %}
+{% set og_description = "Hey, I just insured my mobile phone with so-sure. They give you 80% of your cash back if we are connected and don\'t claim!" %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
 {% endblock %}
 
 {% block body %}
 
     <section class="hero">
-
-        {# Toasts #}
-        {# {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %} #}
-
         <div class="container-large">
             <div class="row">
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
-                    </div>
+                <div class="col-12 col-lg-4">
+                    <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }} 🎉</h1>
+                    {% if policy is defined and policy %}
+                        {% if policy.user.getValidPolicies(true) | length == 1 %}
+                            <div class="h6">Policy: <u>{{ policy.policyNumber }}</u></div>
+                        {% else %}
+                            <div class="h6">
+                                <div class="dropdown">
+                                    <a href="#"
+                                       class="dropdown-toggle"
+                                       id="dropdown_menu_link"
+                                       data-toggle="dropdown"
+                                       aria-haspopup="true"
+                                       aria-expanded="false">
+                                        Policy: <u>{{ policy.policyNumber }}</u>
+                                        <i class="far fa-chevron-down fa-lg fa-fw ml-1"></i>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="dropdown_menu_link">
+                                        {% for policyItem in policy.user.getValidPolicies(true) %}
+                                            <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="dropdown-item">{{ policyItem.defaultName }} <br> <small>({{ policyItem.policyNumber }})</small></a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="h6"><span class="sub">{{ policy.start|date('jS M Y') }} - {{ policy.end|date('jS M Y') }}</span></div>
+                        <div class="h6">📱<span class="sub">{{ policy.phone }}</span></div>
+                    {% endif %}
+                    {% if policy.connections|length > 0 %}
+                        <div class="mt-4">
+                            <h5 class="mb-4">My connections</h5>
+                            <div class="d-md-flex flex-wrap align-self-center justify-content-start">
+                                {% for connection in policy.standardConnections %}
+                                    <span>
+                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
+                                             alt="{{ connection.linkedUser.name }}"
+                                             width="50px"
+                                             data-toggle="tooltip"
+                                             data-placement="top"
+                                             title="
+                                                {{ connection.linkedUser.name }} -
+                                                Connected on {{ connection.date|date('dS M') }}
+                                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                                    (£{{ connection.totalValue|number_format(2, '.', ',')  }})
+                                                {% endif %}
+                                             ">
+                                    </span>
+                                {% endfor %}
+                            </div>
+                            <h5 class="mb-4">My rewards</h5>
+                           <div class="d-md-flex flex-wrap align-self-center justify-content-start">
+                                {% for connection in policy.rewardConnections %}
+                                    <span>
+                                        <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
+                                             alt="{{ connection.linkedUser.name }}"
+                                             width="50px"
+                                             data-toggle="tooltip"
+                                             data-placement="top"
+                                             title="
+                                                {{ connection.linkedUser.name }} -
+                                                Reward on {{ connection.date|date('dS M') }}
+                                                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                                    (£{{ connection.totalValue|number_format(2, '.', ',')  }})
+                                                {% endif %}
+                                             ">
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if policy.canInvite %}
+                        {% if scode and scode %}
+                            <h5 class="mt-4">Apply code</h5>
+                        {% else %}
+                            <h5 class="mt-4">Already received an invite or promocode?</h5>
+                        {% endif %}
+                        {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
+                            <div class="custom-input-with-btn mb-4">
+                                {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
+                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
+                            </div>
+                        {{ form_end(scode_form) }}
+                    {% endif %}
                 </div>
-                <div class="col-lg-5 offset-md-2 offset-lg-1">
-                    <div class="hero__intro">
-                        <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
-                        <ul class="list-unstyled icn-fa-list mb-5">
-                            {% if feature_enabled('apply-sign-up-bonus') %}
-                                <li class="mb-3 h5 text-white">
-                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                     Instant &pound;5 cashback bonus 💰
-                                </li>
+                <div class="col-12 col-lg-7 offset-lg-1">
+                    <div class="row">
+                        <div class="col-md">
+                            <h5 class="mb-4">Reward Pot</h5>
+                            <div id="reward_pot_chart"
+                                 class="user-chart mb-4"
+                                 data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
+                                 data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
+                                <div class="user-chart__value">
+                                    <span class="text-dodger-blue h4">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
+                                    <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% if policy.getCurrentConnectionValues %}
+                            <div class="col-md">
+                                {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
+                                {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
+                                <h5 class="mb-4">Connection Bonus</h5>
+                                <div id="connection_bonus_chart"
+                                     class="user-chart mb-4"
+                                     data-bonus-days-total="{{ days_total }}"
+                                     data-bonus-days-remaining="{{ days_left }}">
+                                    <div class="user-chart__value">
+                                        <span class="text-danger h4">{{ days_left }}</span>
+                                        <br><small class="opacity-50">DAYS</small>
+                                        {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
+                                            <small class="opacity-50">UNTIL BONUS <br> REDUCED</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if policy.canInvite %}
+                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                            <h5>Earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback by inviting your friends to so-sure</h5>
+                        {% endif %}
+                        <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                            <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                            {# TODO: Rework icons #}
+                            <div id="onboarding_btn_share"
+                                 data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
+                                 data-share-text="Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out:">
+                            </div>
+                        </div>
+                        <h5 class="text-zaffre">🔗 Share this link</h5>
+                        <div class="custom-input-with-btn mb-4">
+                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
+                            <button class="btn btn-primary btn-copy btn-sm track-data"
+                                data-clipboard-target="#scode_share"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-event="user-welcome-copy-scode">
+                                copy</button>
+                        </div>
+                        <h5 class="text-zaffre">📨 Invite via email</h5>
+                        <form id="invite_form" autocomplete="nope" class="mb-4">
+                            <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                            <div class="custom-input-with-btn mb-4">
+                                <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
+                                <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                    Invite</button>
+                            </div>
+                        </form>
+                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                            <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
+                            {% if policy.getCurrentConnectionValues %}
+                                {% if policy.getCurrentConnectionValues['description']|length > 0 %}
+                                    <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
+                                {% endif %}
+                                    <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
                             {% endif %}
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                24-72 hour replace or repair
-                            </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low excess from just &pound;50
-                            </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Up to 80% money back
-                            </li>
-                            <li class="h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                New, secondhand &amp; refurbished phones
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="hero__controls pb-3">
-                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
-                        <a href="#cred"
-                           id="watch_tv_advert"
-                           class="btn btn-outline-white btn-block-xs">
-                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-                            Watch the Ad
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8 offset-md-2">
-                    <div class="hero__illustration d-block d-lg-none mt-4">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    {# Cred #}
-    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
-
-    {# TV Add #}
-    {% include 'AppBundle::Default/CommonSections/_skyTVAd.html.twig' %}
-
-    {# Cover #}
-    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
-
-    {# Top Manufacturers #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_topManufacturers.html.twig' %}
-
-    {# We do things differently #}
-    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
-
-    <section class="reward py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_why-illustration.png ">
-        <div class="container-large py-5">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="text-center text-lg-left">
-                        <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
-                        <p class="mb-4">
-                            We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!
-                            {% if feature_enabled('apply-sign-up-bonus') %}
-                                <br><br>
-                                Instant &pound;5 cashback bonus 💰 when you sign up!
-                            {% endif %}
-                        </p>
-                        <a href="{{ path('social_insurance') }}" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">How it works</h3>
-                            <div class="cardbox__text">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</div>
+                        {% endif %}
+                    {% endif %}
+                    {% if friends %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Here are your facebook friends you can invite</span>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for friend in friends %}
+                                    <li class="list-group-item">
+                                        <div class="d-md-flex align-items-center">
+                                            <img class="d-none d-md-inline rounded-circle mr-2 mr-md-4" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" width="50px" />
+                                            <h6 class="flex-grow-1">
+                                                {{ friend['name'] }} <br>
+                                                <span class="sub mt-2"><a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer">See on facebook</a></span>
+                                            </h6>
+                                            <a href="{{ path('user_invite', {policyId: policy.id, facebookId: friend['id']}) }}" class="btn btn-primary btn-sm">Invite</a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">How it works</h3>
-                        <p class="mb-5">If you and your friends take good care of your phones and don't need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</p>
-                    </div>
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">Be careful</h3>
-                            <div class="cardbox__text">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</div>
+                    {% endif %}
+                    {% if policy.hasUnconnectedUserPolicies %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Connect with your other policies</span>
+                            </div>
+                            {{ form_start(unconnected_user_policy_form) }}
+                                <ul class="list-group list-group-flush">
+                                    {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
+                                        <li class="list-group-item">
+                                            <div class="d-md-flex align-items-center">
+                                                <img src="{{ app.user.getImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ unconnectedPolicy.defaultName }}" width="50px">
+                                                <h6 class="flex-grow-1">
+                                                    {{ unconnectedPolicy.defaultName }} <br>
+                                                    <span class="sub mt-2">{{ unconnectedPolicy.policyNumber }} <br>Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London') }}</span>
+                                                </h6>
+                                                {{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-outline-primary btn-sm'}}) }}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {{ form_errors(unconnected_user_policy_form) }}
+                            {{ form_end(unconnected_user_policy_form) }}
                         </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">Connect</h3>
-                        <p class="mb-5">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">Connect</h3>
-                            <div class="cardbox__text">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</div>
+                    {% endif %}
+                    {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Received invitations</span>
+                            </div>
+                            {{ form_start(invitation_form) }}
+                                <ul class="list-group list-group-flush">
+                                    {% for invitation in policy.user.unprocessedReceivedInvitations %}
+                                        <li class="list-group-item">
+                                            <div class="d-md-flex align-items-center">
+                                                <img src="{{ invitation.inviter.getImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviter.name }}" width="50px">
+                                                <h6 class="flex-grow-1">
+                                                    {{ invitation.inviter.name }} <br>
+                                                    <span class="sub mt-2">Received on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
+                                                </h6>
+                                                <ul class="list-inline">
+                                                    <li class="list-inline-item">{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
+                                                    <li class="list-inline-item">{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {{ form_errors(invitation_form) }}
+                            {{ form_end(invitation_form) }}
                         </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">Be careful</h3>
-                        <p class="mb-5">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</p>
-                    </div>
-                    <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">Get rewarded</h3>
-                            <div class="cardbox__text">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</div>
+                    {% endif %}
+                    {% if policy.sentInvitations|length > 0 %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <span class="h5">Sent invitations</span>
+                            </div>
+                            {{ form_start(sent_invitation_form) }}
+                                <ul class="list-group list-group-flush">
+                                    {% for invitation in policy.sentInvitations|reverse %}
+                                        <li class="list-group-item">
+                                            <div class="d-md-flex align-items-center">
+                                                <img src="{{ invitation.inviteeImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviteeName }}" width="50px">
+                                                <h6 class="flex-grow-1">
+                                                    {{ invitation.inviteeName }} <br>
+                                                    <span class="sub mt-2">Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
+                                                </h6>
+                                                <ul class="list-inline">
+                                                    <li class="list-inline-item">{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
+                                                    <li class="list-inline-item">{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {{ form_errors(sent_invitation_form) }}
+                            {{ form_end(sent_invitation_form) }}
                         </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">Get rewarded</h3>
-                        <p class="mb-5">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</p>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
 
-    {# Top Models #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}
-
-    {# Claims Process #}
-    {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %}
-
-    <section class="banner banner-dismissible">
-        <div class="container-large py-5">
-            <div class="d-lg-flex align-items-lg-center">
-                <div class="banner__image">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="Home insurance" width="250px" class="lozad">
-                </div>
-                <div class="banner__text ml-lg-4">
-                    <h2 class="text-white">Home Insurance Coming 2019</h2>
-                    <p class="text-columbia-blue-e lead mb-0">Take our survey to be in for a chance to <strong>win a phone cover</strong></p>
-                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2019, 1 per customer.</small></p>
-                    <a href="https://sosure.typeform.com/to/CdsghS"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="btn btn-white track-data"
-                       data-event="take-survey-banner-clicked"
-                       data-event-url="https://sosure.typeform.com/to/CdsghS"
-                       data-event-blank="true">
-                        Take Survey
-                        <i class="far fa-long-arrow-right fa-lg ml-2"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <button type="button"
-                class="banner__close close text-white"
-                data-dismiss="banner"
-                data-event="take-survey-banner-closed"
-                aria-label="Close">
-            <i class="fal fa-times fa-lg"></i>
-        </button>
-    </section>
-
-    {# Reviews #}
-    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
-
-    <section class="banner py-5">
-        <div class="container-large">
-            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
-                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
-                    <div class="banner__text text-center text-lg-left ml-lg-4">
-                        <h2 class="h4 text-white">Mobile insurance designed for you</h2>
-                        <p class="lead text-white">Cover your phone in minutes </p>
-                    </div>
-                </div>
-                <div class="banner__controls text-center text-lg-left">
-                    <a href="#"
-                       class="btn btn-outline-white watch-video btn-block-xs mr-sm-2"
-                       data-event="watch-video-index-bottom-banner"
-                       data-toggle="modal"
-                       data-target="#sosure-video-modal"
-                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
-                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-                        Watch our Video
-                    </a>
-                    <a href="#" class="btn btn-white btn-block-xs get-a-quote disabled">Get a Quote</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {# Page Modals #}
+    {# Page Modal #}
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    <script src="{{ asset('css-js/user.js') }}"></script>
+    <script src="{{ asset('css-js/user-dashboard.js') }}"></script>
 {% endblock %}
