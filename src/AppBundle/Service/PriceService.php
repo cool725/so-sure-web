@@ -19,7 +19,9 @@ class PriceService
     protected $dm;
 
     /**
-     * @param LoggerInterface $logger
+     * Builds the service and injects dependencies.
+     * @param LoggerInterface $logger is used for logging.
+     * @param DocumentManager $dm     is used for access to database.
      */
     public function __construct(LoggerInterface $logger, DocumentManager $dm)
     {
@@ -28,94 +30,44 @@ class PriceService
     }
 
     /**
-     * Gets the right price for a given phone policy.
-     * @param PhonePolicy $policy is the policy we are getting the price for.
-     * @param \DateTime   $date   is the date that this price should be correct for.
-     * @return PhonePrice the price that should be paid.
+     * Gets a price for a given phone in a given stream for a given user, assuming this is a new purchase and not
+     * a refund.
+     * @param User      $user   is the user who will be paying the price.
+     * @param Phone     $phone  is the phone that they will be paying for.
+     * @param string    $stream is whether they are going to be paying monthly or yearly (Don't pass ALL or ANY).
+     * @param \DateTime $date   is the date at which the purchase is occuring.
+     * @return PhonePrice the price that they should pay under these conditions.
      */
-    public function phonePrice($policy, $date)
+    public function userPhonePrice($user, $phone, $stream, $date)
     {
-        $user = $policy->getUser();
-        $phone = $policy->getPhone();
-        if (!$user) {
-            throw new \IllegalArgumentException(sprintf(
-                "Trying to get price for phone policy '%s' lacking user",
-                $policy->getId()
-            ));
+        // first check for an offer price.
+        $offer = $user->findApplicableOffer($phone, $stream);
+        if ($offer) {
+            // TODO: price should be made unique and branded with it's origin.
+            return $offer->getPrice();
         }
-        if (!$phone) {
-            throw new \InvalidArgumentException(sprintf(
-                "Trying to get price for phone policy '%s' lacking phone",
-                $policy->getId()
-            ));
+        // if there is no applicable offer price we use the appropriate normal price.
+        return $phone->getCurrentPhonePrice($stream, $date);
+    }
+
+    /**
+     * Finds the price that a given renewal policy should pay.
+     * @param Policy $policy is the policy that will have this price potentially.
+     * @param \DateTime $date is the date at which the policy shall start.
+     * @return PhonePrice the price that the policy should pay.
+     */
+    public function renewalPhonePrice($policy, $date)
+    {
+        if (!$policy->getPreviousPolicy()) {
+            throw new \InvalidArgumentException(sprintf("Given policy '%s' is not a renewal", $policy->getId()));
         }
-        // Renewal price logic takes precedence.
-        $isRenewal = someLogic();
-        if ($isRenewal) {
-            return $this->phoneRenewalPrice($policy);
+        // TODO: price should be made unique and branded with it's origin.
+        if ($policy->hasMonetaryClaimed(true)) {
+            return $policy->getPhone()->getCurrentPhonePrice($policy->getStream(), $date);
+        } else {
+            // TODO: it's meant to return a price not a premium you idiiot.
+            //       hmmmm though actually maybe premiums SHOULD be returned insteaed of prices. hemmememem.
+            return $policy->getPreviousPolicy()->getPremium();
         }
-        // Offers are then checked and if present used, if there is no offer then normal scheduled price is used.
-        $price = $this->phoneOfferPrice($policy);
-        if ($price) {
-            return $price;
-        }
-        return $policy->getPhone()->getCurrentPrice();
-    }
-
-    /**
-     * Gets the right price for a given renewal phone policy.
-     * @param PhonePolicy $policy is the policy to get the price for. It is assumed that a user and phone are present.
-     * @param \DateTime   $date   is the date that this price must be correct for.
-     * @return PhonePrice the price that has been calculated.
-     */
-    private function phoneRenewalPrice($policy, $date)
-    {
-        // In future there will be some more complex decision making logic regarding what price to use.
-        // For the moment this will just return the current price.
-        return $policy->getPhone()->getCurrentPrice($date);
-    }
-
-    /**
-     * Gives all of the offers that are applicable to a given user.
-     * @param User $user is the user to check for.
-     * @return array containing all the offers.
-     */
-    private function getAllOffersForUser($user)
-    {
-        $offers = $this->redis->smembers($this->getUserSetKey($user));
-    }
-
-    /**
-     * Adds an offer specifically to a user by caching it.
-     * @param User  $user  is the user to add it to.
-     * @param Offer $offer is the offer to add.
-     * @param int   $time  is the time in seconds that the offer will last for.
-     */
-    private function addOfferToUser($user, $offer, $time)
-    {
-
-
-    }
-
-    /**
-     * Gives you the most eligible offer that should be used for the given phone and user.
-     * @param User $user is the user we are checking for.
-     * @param Phone $phone the phone it is about.
-     * @param \DateTime $date is the date that we are checking about.
-     * @return Offer|null the offer to use or null if there is not an offer.
-     */
-    private function getOfferForPhone($user, $phone, $date)
-    {
-
-    }
-
-    /**
-     * Gives the key to be used in redis for a user's set of offers.
-     * @param User $user is the user that we are getting the set of offers for.
-     * @return string the user's unique offer cache key.
-     */
-    private function getUserSetKey($user)
-    {
-        return sprintf("offers:%s", $user->getId());
     }
 }

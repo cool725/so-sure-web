@@ -1,35 +1,37 @@
 $(function() {
     let detailsModal = $('#details_modal');
+    let detailsBody = detailsModal.find('.modal-body');
     let spinner = detailsModal.find('.details-spinner');
     let title = detailsModal.find('.details-title');
-    let list = detailsModal.find('.details-list');
+    let userList = detailsModal.find('.details-user-list');
+    let policyList = detailsModal.find('.details-policy-list');
 
     /**
      * Makes the details modal look like it is loading.
      */
     function detailsLoading() {
+        detailsBody.children().hide();
         spinner.show();
-        title.hide();
-        list.empty();
     }
 
     /**
      * Renders the details modal with some data.
-     * @param string name is the name of the offer that you are looking at.
-     * @param data is a list containing objects that have a name field and a policies field, the policies field being
-     * an array of objects that have a policyNumber field and a start field.
+     * @param data is expected to be an array containing a name, a list of users with email and id and a list of
+     *             policies with policyNumber, start date, and id.
      */
     function detailsReady(data) {
+        detailsBody.children().show();
         spinner.hide();
-        title.show();
         title.text(data.name);
+        userList.empty();
+        policyList.empty();
         for (user of data.users) {
             let userItem = $(`<li><a href="/admin/user/${user.id}">${user.email}</a></li>`);
-            list.append(userItem);
+            userList.append(userItem);
         }
         for (policy of data.policies) {
             let policyItem = $(`<li><a href="/admin/user/${policy.id}">${policy.policyNumber}</a></li>`);
-            list.append(userItem);
+            userList.append(userItem);
         }
     }
 
@@ -38,10 +40,9 @@ $(function() {
      * @param message is the error message to show.
      */
     function detailsFailed(message) {
-        spinner.hide();
+        detailsModal.children().hide();
         title.show();
         title.text(message);
-        console.log("faile");
     }
 
     // Set the right offer id on the add user modal.
