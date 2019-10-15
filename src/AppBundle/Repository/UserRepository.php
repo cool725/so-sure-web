@@ -174,17 +174,14 @@ class UserRepository extends DocumentRepository
      */
     public function findPulloutUsers(\DateTime $startDate, \DateTime $endDate)
     {
-        return $this->createQueryBuilder()
+        $qb = $this->createQueryBuilder()
             ->field('created')->gte($startDate)
-            ->field('created')->lt($endDate)
-            ->field('attribution.campaignSource')->in([
-                'facebook',
-                'instagram',
-                'google',
-                'bing'
-            ])
-            ->getQuery()
-            ->execute();
+            ->field('created')->lt($endDate);
+        $qb->addOr($qb->expr()->field('attribution.campaignSource')->equals(new \MongoRegex("/^facebook/i")));
+        $qb->addOr($qb->expr()->field('attribution.campaignSource')->equals(new \MongoRegex("/^instagram/i")));
+        $qb->addOr($qb->expr()->field('attribution.campaignSource')->equals(new \MongoRegex("/^google/i")));
+        $qb->addOr($qb->expr()->field('attribution.campaignSource')->equals(new \MongoRegex("/^bing/i")));
+        return $qb->getQuery()->execute();
     }
 
     public function findPendingMandates(\DateTime $date = null)
