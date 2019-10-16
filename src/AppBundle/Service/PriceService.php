@@ -36,7 +36,8 @@ class PriceService
      * @param Phone     $phone  is the phone that they will be paying for.
      * @param string    $stream is whether they are going to be paying monthly or yearly (Don't pass ALL or ANY).
      * @param \DateTime $date   is the date at which the purchase is occuring.
-     * @return PhonePrice the price that they should pay under these conditions.
+     * @return PhonePrice|null the price that they should pay under these conditions, or null if there is no applicable
+     *                         price.
      */
     public function userPhonePrice($user, $phone, $stream, $date)
     {
@@ -48,6 +49,23 @@ class PriceService
         }
         // if there is no applicable offer price we use the appropriate normal price.
         return $phone->getCurrentPhonePrice($stream, $date);
+    }
+
+    /**
+     * Finds the right phone price for a user in every stream so that they can see their options.
+     * @param User $user is the user we are enquiring about.
+     * @param Phone $phone is the phone we are enquiring about.
+     * @param \DateTime $date is the date at which this must be valid.
+     * @return array with keys on each real price stream and offers or null under each.
+     */
+    public function userPhonePriceStreams($user, $phone, $date)
+    {
+        return array_map(
+            function ($stream) use ($user, $phone, $date) {
+                return $this->userPhonePrice($user, $phone, $stream, $date);
+            },
+            array_map(null, PhonePrice::STREAMS, PhonePrice::STREAMS)
+        );
     }
 
     /**

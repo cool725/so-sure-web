@@ -285,6 +285,7 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
+            'prices' => $this->priceService->userPhonePrice($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
         );
 
@@ -533,6 +534,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
+            'prices' => $this->priceService->userPhonePrice($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
         );
 
@@ -583,6 +585,7 @@ class PurchaseController extends BaseController
         $bacs = new Bacs();
         $bacs->setValidateName($user->getLastName());
         $bacsConfirm = new Bacs();
+        // TODO: price stuff.
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
             $this->getManager()->flush();

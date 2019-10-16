@@ -1796,6 +1796,48 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this;
     }
 
+    /**
+     * Gives you all of the offers that are applied to this user.
+     * @return array of the offers.
+     */
+    public function getOffers()
+    {
+        if (is_array($this->offers)) {
+            return $this->offers;
+        }
+        return $this->offers->toArray();
+    }
+
+    /**
+     * Links an offer to this user.
+     * @param Offer $offer is the offer to add to the user.
+     */
+    public function addOffer(Offer $offer)
+    {
+        $this->offers[] = $offer;
+    }
+
+    /**
+     * Finds an offer on this user that matches the required conditions.
+     * @param Phone $phone is the phone that the offer must be for.
+     * @param string $stream is the stream of price the offer must be for.
+     * @param \DateTime $date is the date at which the offer must be applicable.
+     * @return Offer|null the found offer if there is one.
+     */
+    public function getApplicableOffer(Phone $phone, $stream, \DateTime $date)
+    {
+        $phoneId = $phone->getId();
+        foreach ($this->getOffers() as $offer) {
+            $price = $offer->getPrice();
+            if ($offer->getId() == $phoneId && $price && $price->inStream($stream) &&
+                $price->getValidFrom() <= $date
+            ) {
+                return $offer;
+            }
+        }
+        return null;
+    }
+
     public function hasEmail()
     {
         return mb_strlen(trim($this->getEmail())) > 0;
