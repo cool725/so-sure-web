@@ -128,37 +128,50 @@ class PulloutCommand extends ContainerAwareCommand
         $users = $userRepo->findPulloutUsers($start, $end);
         $rows = [];
         foreach ($users as $user) {
-            if (count($user->getPolicies()) == 0) {
-                continue;
-            }
             $purchased = 0;
             $net = 0;
+            $mainPolicy = null;
             foreach ($user->getPolicies() as $policy) {
-                if ($policy->getStart()) {
+                if ($policy->getStatus() && !$policy->getPreviousPolicy() && $policy->getStart()) {
+                    $mainPolicy = $policy;
                     $purchased = 1;
-                    $net = 0;
+                    // $net = 0;
                     if (!$policy->isCooloffCancelled()) {
                         $net = 1;
                     }
                 }
             }
             $birth = $user->getCreated()->format("Y-m-d");
+            $creation = $mainPolicy ? $mainPolicy->getStart()->format("Y-m-d") : "0-0-0";
             $campaign = $user->getAttribution()->getCampaignName();
             $channel = $user->getAttribution()->getCampaignSource();
             $device = $user->getAttribution()->getDeviceCategory();
-            $key = sprintf("%s:%s:%s:%s", $birth, $campaign, $channel, $device);
+            $userKey = sprintf("%s:%s:%s:%s", $birth, $campaign, $channel, $device);
+            $policyKey = sprintf("%s:%s:%s:%s", $creation, $campaign, $channel, $device);
             // if this line already exists we increment it, and if it does not then we create it.
-            if (array_key_exists($key, $rows)) {
-                $rows[$key]["createAccount"]++;
-                $rows[$key]["purchased"] += $purchased;
-                $rows[$key]["net"] += $net;
+            if (array_key_exists($userKey, $rows)) {
+                $rows[$userKey]["createAccount"]++;
             } else {
-                $rows[$key] = [
+                $rows[$userKey] = [
                     "date" => $birth,
                     "campaign" => $campaign,
                     "channel" => $channel,
                     "device" => $device,
                     "createAccount" => 1,
+                    "purchased" => 0,
+                    "net" => 0
+                ];
+            }
+            if (array_key_exists($policyKey, $rows)) {
+                $rows[$policyKey]["purchased"] += $purchased;
+                $rows[$policyKey]["net"] += $net;
+            } else {
+                $rows[$policyKey] = [
+                    "date" => $birth,
+                    "campaign" => $campaign,
+                    "channel" => $channel,
+                    "device" => $device,
+                    "createAccount" => 0,
                     "purchased" => $purchased,
                     "net" => $net
                 ];
