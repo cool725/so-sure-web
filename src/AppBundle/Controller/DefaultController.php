@@ -69,7 +69,7 @@ class DefaultController extends BaseController
     use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="homepage", options={"sitemap" = true})
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/mb", name="mb")
