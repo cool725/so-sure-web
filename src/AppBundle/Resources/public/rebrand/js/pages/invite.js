@@ -25,7 +25,7 @@ $(function() {
 
     // Adjust top position of knowledge base as true value differs between browser
     let knowledgeBaseD = $('.knowledge-base__desktop'),
-        tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 2;
+        tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 4;
         knowledgeBaseD.css('top', -tabsHeight);
 
     let knowledgeBaseM = $('.knowledge-base__mobile'),
