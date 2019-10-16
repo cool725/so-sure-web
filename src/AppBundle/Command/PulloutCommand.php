@@ -135,7 +135,6 @@ class PulloutCommand extends ContainerAwareCommand
                 if ($policy->getStatus() && !$policy->getPreviousPolicy() && $policy->getStart()) {
                     $mainPolicy = $policy;
                     $purchased = 1;
-                    // $net = 0;
                     if (!$policy->isCooloffCancelled()) {
                         $net = 1;
                     }
