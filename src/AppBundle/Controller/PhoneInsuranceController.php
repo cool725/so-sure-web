@@ -99,7 +99,7 @@ class PhoneInsuranceController extends BaseController
 
     /**
      * SEO Pages - Phone Insurance
-     * @Route("/phone-insurance", name="phone_insurance")
+     * @Route("/phone-insurance", name="phone_insurance", options={"sitemap" = true})
      */
     public function phoneInsuranceAction()
     {
