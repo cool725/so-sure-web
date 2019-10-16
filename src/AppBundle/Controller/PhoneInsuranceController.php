@@ -447,8 +447,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'phone' => $phone,
-            'phone_price_monthly' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY),
-            'phone_price_yearly' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY),
+            'prices' => $priceService->getUserPhonePriceStreams(null, $phone, new \DateTime()),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),

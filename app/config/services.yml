@@ -1730,3 +1730,14 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
+
+    AppBundle\Service\PriceService:
+        arguments:
+            - "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+
+    app.price:
+        alias: AppBundle\Service\PriceService
+        public: true
+
+

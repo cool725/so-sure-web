@@ -5,7 +5,10 @@ namespace AppBundle\Service;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePrice;
+use AppBundle\Document\Offer;
 use Psr\Log\LoggerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Calculates the right pricing for things.
@@ -32,7 +35,7 @@ class PriceService
     /**
      * Gets a price for a given phone in a given stream for a given user, assuming this is a new purchase and not
      * a refund.
-     * @param User      $user   is the user who will be paying the price.
+     * @param User|null $user   is the user who will be paying the price.
      * @param Phone     $phone  is the phone that they will be paying for.
      * @param string    $stream is whether they are going to be paying monthly or yearly (Don't pass ALL or ANY).
      * @param \DateTime $date   is the date at which the purchase is occuring.
@@ -42,7 +45,7 @@ class PriceService
     public function userPhonePrice($user, $phone, $stream, $date)
     {
         // first check for an offer price.
-        $offer = $user->findApplicableOffer($phone, $stream);
+        $offer = $user ? $user->getApplicableOffer($phone, $stream, $date) : null;
         if ($offer) {
             // TODO: price should be made unique and branded with it's origin.
             return $offer->getPrice();
@@ -52,20 +55,20 @@ class PriceService
     }
 
     /**
-     * Finds the right phone price for a user in every stream so that they can see their options.
-     * @param User $user is the user we are enquiring about.
-     * @param Phone $phone is the phone we are enquiring about.
-     * @param \DateTime $date is the date at which this must be valid.
+     * Finds the right phone price for a user in every stream so that they can see their options. If the user is null
+     * then it just gives the most up to date general pricing.
+     * @param User|null $user  is the user we are enquiring about.
+     * @param Phone     $phone is the phone we are enquiring about.
+     * @param \DateTime $date  is the date at which this must be valid.
      * @return array with keys on each real price stream and offers or null under each.
      */
     public function userPhonePriceStreams($user, $phone, $date)
     {
-        return array_map(
-            function ($stream) use ($user, $phone, $date) {
-                return $this->userPhonePrice($user, $phone, $stream, $date);
-            },
-            array_map(null, PhonePrice::STREAMS, PhonePrice::STREAMS)
-        );
+        $prices = [];
+        foreach (PhonePrice::STREAMS as $stream) {
+            $prices[$stream] = $this->userPhonePrice($user, $phone, $stream, $date);
+        }
+        return $prices;
     }
 
     /**

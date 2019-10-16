@@ -31,6 +31,7 @@ use AppBundle\Security\PolicyVoter;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
+use AppBundle\Service\PriceService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RequestService;
@@ -264,6 +265,8 @@ class PurchaseController extends BaseController
             }
         }
 
+        $priceService = $this->get('app.price');
+
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
@@ -285,7 +288,7 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
-            'prices' => $this->priceService->userPhonePrice($user, $phone, new \DateTime())
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
         );
 
@@ -522,6 +525,8 @@ class PurchaseController extends BaseController
         // if ($homepageFunnelExp == 'new-funnel-v2') {
         //     $template = 'AppBundle:Purchase:purchaseStepPhoneB.html.twig';
         // }
+        
+        $priceService = $this->get('app.price');
 
         $data = array(
             'policy' => $policy,
@@ -534,7 +539,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'prices' => $this->priceService->userPhonePrice($user, $phone, new \DateTime())
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
         );
 
@@ -803,6 +808,8 @@ class PurchaseController extends BaseController
             }
         }
 
+        $priceService = $this->get('app.price');
+
         $template = 'AppBundle:Purchase:purchaseStepPledge.html.twig';
 
         // if ($homepageFunnelExp == 'new-funnel-v2') {
@@ -820,6 +827,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
         );
 
@@ -859,6 +867,7 @@ class PurchaseController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
 
         $phone = $this->getSessionQuotePhone($request);
+        $priceService = $this->get('app.price');
 
         $purchase = new PurchaseStepPayment();
         $purchase->setUser($user);
