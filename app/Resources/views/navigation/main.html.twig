@@ -194,9 +194,11 @@
                     </li>
                 {% endif %}
                 {% if hide_quote_btn is not defined %}
-                    <li class="nav-item pr-xl-4">
-                        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
-                    </li>
+                    {% if user_mode is not defined %}
+                        <li class="nav-item pr-xl-4">
+                            <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
                 {# Mobile Login #}
                 {% if hide_login is not defined %}
