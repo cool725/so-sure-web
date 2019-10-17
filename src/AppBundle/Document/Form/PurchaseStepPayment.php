@@ -3,6 +3,7 @@
 namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -36,6 +37,9 @@ class PurchaseStepPayment
 
     protected $new;
 
+    /** @var array */
+    protected $prices = [];
+
     public function getPolicy()
     {
         return $this->policy;
@@ -61,15 +65,22 @@ class PurchaseStepPayment
         return $this->amount;
     }
 
+    /**
+     * Sets the amount on the payment step and validates that it is an acceptable amount.
+     * @param float $amount is the amount that we are setting to pay.
+     */
     public function setAmount($amount)
     {
         $additionalPremium = $this->getUser()->getAdditionalPremium();
-        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
-        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice($additionalPremium)) &&
-            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice($additionalPremium))) {
-            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
+        foreach ($this->getPrices() as $price) {
+            if ($this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice($additionalPremium)) ||
+                $this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice($additionalPremium))
+            ) {
+                $this->amount = $amount;
+                return;
+            }
         }
-        $this->amount = $amount;
+        throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
     }
 
     public function getNew()
@@ -80,6 +91,24 @@ class PurchaseStepPayment
     public function setNew($new)
     {
         $this->new = $new;
+    }
+
+    /**
+     * Gives the list of allowed prices.
+     * @return array containing the prices.
+     */
+    public function getPrices()
+    {
+        return $this->prices;
+    }
+
+    /**
+     * Adds a price to the list of prices.
+     * @param PhonePrice $price is the price to add to the list.
+     */
+    public function addPrice(PhonePrice $price)
+    {
+        $this->prices[] = $price;
     }
 
     public function allowedAmountChange()

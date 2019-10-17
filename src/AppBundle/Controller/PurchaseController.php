@@ -874,6 +874,9 @@ class PurchaseController extends BaseController
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
         $purchase->setPolicy($policy);
+        foreach ($priceService->userPhonePriceStreams($user, $phone, new \DateTime()) as $price) {
+            $purchase->addPrice($price);
+        }
 
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
@@ -1024,6 +1027,7 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
+            'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
         );
 
@@ -1555,7 +1559,7 @@ class PurchaseController extends BaseController
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
             } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown Error');
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, $e->getMessage());
             }
         }
     }

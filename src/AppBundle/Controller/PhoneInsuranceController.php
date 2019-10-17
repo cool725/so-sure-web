@@ -443,11 +443,11 @@ class PhoneInsuranceController extends BaseController
             ], true);
         }
 
-        // TODO: get user price from price service.
+        $priceService = $this->get('app.price');
 
         $data = [
             'phone' => $phone,
-            'prices' => $priceService->getUserPhonePriceStreams(null, $phone, new \DateTime()),
+            'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
