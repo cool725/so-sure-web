@@ -166,7 +166,7 @@ class PulloutCommand extends ContainerAwareCommand
                 $rows[$policyKey]["net"] += $net;
             } else {
                 $rows[$policyKey] = [
-                    "date" => $birth,
+                    "date" => $creation,
                     "campaign" => $campaign,
                     "channel" => $channel,
                     "device" => $device,
