@@ -69,7 +69,7 @@ class DefaultController extends BaseController
     use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
-     * @Route("/", name="homepage")
+     * @Route("/", name="homepage", options={"sitemap" = true})
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/mb", name="mb")
@@ -203,7 +203,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/social-insurance", name="social_insurance")
+     * @Route("/social-insurance", name="social_insurance", options={"sitemap" = true})
      */
     public function socialInsurance()
     {
@@ -764,7 +764,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/faq", name="faq")
+     * @Route("/faq", name="faq", options={"sitemap" = true})
      * @Template
      */
     public function faqAction(Request $request)
@@ -804,7 +804,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/company-phone-insurance",
-     *  name="company_phone_insurance")
+     *  name="company_phone_insurance", options={"sitemap" = true})
      * @Route("/company-phone-insurance/thank-you",
      *  name="company_phone_insurance_thanks")
      */
@@ -872,7 +872,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/claim", name="claim")
+     * @Route("/claim", name="claim", options={"sitemap" = true})
      * @Route("/claim/login", name="claim_login")
      */
     public function claimAction(Request $request)

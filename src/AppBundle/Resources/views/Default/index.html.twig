@@ -8,6 +8,31 @@
     <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure."/>
 {% endblock %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context" : "http://schema.org",
+    "@type" : "Organization",
+    "url": "https://wearesosure.com/",
+    "legalName": "so-sure Ltd",
+    "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Tower Hamlets",
+          "addressRegion": "London",
+          "postalCode": "E1 7PT",
+          "streetAddress": "114 Whitechapel High Street"
+        },
+        "name": "Relay Building"
+    },
+    "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
+    "description": "The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure.",
+    "sameAs": ["https://twitter.com/wearesosure", "https://www.facebook.com/wearesosure"]
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
 {% endblock %}

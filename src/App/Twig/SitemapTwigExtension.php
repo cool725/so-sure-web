@@ -23,19 +23,19 @@ class SitemapTwigExtension extends \Twig_Extension
 
         // @codingStandardsIgnoreStart
         static $urlToDescription = [
-            null => 'SO-SURE',    // special case for http://wearesosure.com (no /)
-            '/'  => 'SO-SURE Homepage',
-            '/blog/' => 'Blog Index',
-            '/blog' => 'Blog Posts',
+            null => 'so-sure',    // special case for http://wearesosure.com (no /)
+            '/'  => 'Homepage',
+            '/blog/' => 'Blog',
+            '/blog' => 'Blog',
             '/blog/looking-back-and-forward' => 'Looking Back and Forward',
             '/blog/what-to-do-if-you-break-your-phone-screen' => 'What to do if You Break Your Phone Screen',
             '/blog/5-great-gadgets-from-2018-for-the-january-sales' => '5 Great Gadgets from 2018 for the January Sales',
             '/blog/all-i-want-for-christmas-is-a-new-phone' => 'All I Want for Christmas is a New Phone',
             '/blog/broken-promises' => 'Broken Promises',
-            '/blog/so-sure-people-dylan-bourguignon' => 'SO-SURE People Dylan Bourguignon',
+            '/blog/so-sure-people-dylan-bourguignon' => 'so-sure People Dylan Bourguignon',
             '/blog/5-ways-to-protect-your-valuables-abroad' => '5 Ways to Protect your Valuables Abroad',
             '/blog/englands-most-trusting-cities' => 'England\'s Most Trusting Cities',
-            '/blog/starling-bank-and-so-sure-team-up-to-offer-mobile-phone-insurance-through-the-starling-marketplace' => 'Starling Bank and SO-SURE Team Up to Offer Mobile Phone Insurance Through the Starling App',
+            '/blog/starling-bank-and-so-sure-team-up-to-offer-mobile-phone-insurance-through-the-starling-marketplace' => 'Starling Bank and so-sure Team Up to Offer Mobile Phone Insurance Through the Starling App',
             '/blog/dirty-tricks-to-watch-out-for-when-buying-insurance' => 'Dirty Tricks to Watch Out for when Buying Insurance',
             '/blog/googles-pixel-3-takes-on-apples-iphone-xs' => 'Google\'s Pixel 3 Takes on Apple\'s iPhone XS',
             '/blog/the-development-of-insurance-as-we-know-it' => 'The Development of Insurance as we Know it',
@@ -53,10 +53,11 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/disruptive-technology-what-is-it' => 'Disruptive Technology What is it',
             '/blog/our-top-5-winter-sports-insurance-tips' => 'Our Top 5 Winter Sports Insurance Tips',
             '/blog/3-technologies-that-will-shape-the-future-of-insurance' => '3 Technologies that will Shape the Future of Insurance',
-            '/about/social-insurance' => 'About Social Insurance',
-            '/about/social-insurance/careers' => 'Careers at SO-SURE',
+            '/about/social-insurance' => 'About so-sure',
+            '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Website privacy policy (GDPR version)',
             '/about/social-insurance/terms' => 'Terms & Conditions',
+            '/about/social-insurance/how-to-contact-so-sure' => 'Contact Us',
             '/phone-insurance' => 'Phone Insurance',
             '/download-app' => 'Get covered in seconds using our app (IOS and Android)',
             '/phone-insurance/broken-phone' => 'Broken phone',
@@ -87,7 +88,10 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/sony' => 'Sony Insurance',
             '/phone-insurance/wileyfox' => 'WileyFox Insurance',
             '/phone-insurance/xiaomi' => 'Xiaomi Insurance',
-            '/phone-insurance/blackberry' => 'Blackberry Insurance'
+            '/phone-insurance/blackberry' => 'Blackberry Insurance',
+            '/phone-insurance/vodafone' => 'Vodafone Insurance',
+            '/claim' => 'Make a claim',
+            '/faq' => 'FAQ'
         ];
         // @codingStandardsIgnoreEnd
 

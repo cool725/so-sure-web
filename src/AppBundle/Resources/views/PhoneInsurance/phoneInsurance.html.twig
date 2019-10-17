@@ -3,10 +3,13 @@
 {# Set vars #}
 {% set body_class = 'phone-insurance' %}
 
-{% block title %}Phone Insurance | so-sure{% endblock %}
+{% block title %}Mobile Phone Insurance From &pound;{{ from_price }} Monthly | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Choose Phone Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today."/>
 {% endblock %}
+{% set og_title = 'Mobile Phone Insurance From £' ~ from_price ~ ' Monthly | so-sure' %}
+{% set og_description = "Choose Phone Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today." %}
+{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
@@ -45,7 +48,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <h1 class="text-white fit">Phone Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
+                        <h1 class="text-white fit">Mobile Phone Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
                         <p class="my-4 text-white">Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re here protecting customers when they claim and rewarding them when they don’t.</p>
                     </div>
                     <div class="hero__controls pb-3">

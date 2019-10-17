@@ -105,19 +105,18 @@ class UnpaidListener
     }
 
     /**
-     * Sends an sms warning the user that they are unpaid with special copy based on bacs vs judo. Only sends on the
-     * second to fourth failures.
+     * Sends an sms warning the user that they are unpaid with special copy based on bacs vs judo. Only sends between
+     * the first and fourth failures.
      * @param Policy $policy is the policy for which we are notifying.
      * @param int    $number is the number of times failure has occurred including this time.
      */
     private function smsNotification($policy, $number)
     {
         $bacs = $policy->getBacsPaymentMethod() && true;
-        if ($number < $bacs ? 1 : 2 || $number > 4) {
-            return;
+        if ($number >= 1 && $number <= 4) {
+            $smsTemplate = sprintf("AppBundle:Sms:%s/failedPayment-%d.txt.twig", $bacs ? "bacs" : "card", $number);
+            $this->smsService->sendUser($policy, $smsTemplate, ["policy" => $policy], Charge::TYPE_SMS_PAYMENT);
         }
-        $smsTemplate = sprintf("AppBundle:Sms:%s/failedPayment-%d.txt.twig", $bacs ? "bacs" : "card", $number);
-        $this->smsService->sendUser($policy, $smsTemplate, ["policy" => $policy], Charge::TYPE_SMS_PAYMENT);
     }
 
     /**
