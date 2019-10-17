@@ -27,7 +27,7 @@ class UserPolicySummary
         return $this->serializer->normalize(
             $user,
             null,
-            ['groups' => [Oauth2Scopes::USER_STARLING_SUMMARY]]
+            ['groups' => [Oauth2Scopes::USER_STARLING_SUMMARY, Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY]]
         );
     }
 }

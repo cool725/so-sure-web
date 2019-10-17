@@ -6,6 +6,7 @@ namespace App;
  */
 final class Oauth2Scopes
 {
+    /*public */const USER_STARLING_BUSINESS_SUMMARY = 'user.starling_business.summary';
     /*public */const USER_STARLING_SUMMARY = 'user.starling.summary';
     private static $descriptions = [
         self::USER_STARLING_SUMMARY => [

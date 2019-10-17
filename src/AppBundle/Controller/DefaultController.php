@@ -391,6 +391,7 @@ class DefaultController extends BaseController
      * @Route("/money", name="money")
      * @Route("/money-free-phone-case", name="money_free_phone_case")
      * @Route("/starling-bank", name="starling_bank")
+     * @Route("/starling-business", name="starling_business")
      * @Route("/comparison", name="comparison")
      * @Route("/vendi-app", name="vendi_app")
      * @Route("/so-sure-compared", name="so_sure_compared")
@@ -483,6 +484,18 @@ class DefaultController extends BaseController
                 'competitor3' => 'LICI',
             ];
             $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            $this->starlingOAuthSession($request);
+        } elseif ($request->get('_route') == 'starling_business') {
+            $data = [
+                'competitor' => $this->competitorsData(),
+                'affiliate_page' => 'starling-business',
+                // 'affiliate_company' => 'Starling Bank',
+                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'LICI',
+            ];
+            $template = 'AppBundle:Default:starlingBusiness.html.twig';
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'comparison') {
             $data = [
@@ -859,16 +872,6 @@ class DefaultController extends BaseController
         ];
 
         return $this->render('AppBundle:Default:indexCompany.html.twig', $data);
-    }
-
-    /**
-     * @Route("/starling-business",
-     *  name="starling_business")
-     */
-    public function starlingBusiness(Request $request)
-    {
-        $this->starlingOAuthSession($request);
-        return $this->render('AppBundle:Default:starlingBusiness.html.twig');
     }
 
     /**
