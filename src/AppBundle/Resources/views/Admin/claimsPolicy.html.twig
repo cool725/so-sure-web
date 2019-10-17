@@ -72,24 +72,31 @@
 
         <div class="row">
             <div class="col-md-6">
-                <h4>Scheduled Policy Cancellation</h4>
-                <p>For User Requested Cancellation (given after 14 days of policy start date)</p>
-                {{ form_start(pending_cancel_form, {'attr': {'class': 'form-inline', 'autocomplete': 'off'}}) }}
-                <div class="form-group">
-                    {{ form_label(pending_cancel_form.pendingCancellation, 'Policy Termination Date') }}
-                    {{ form_errors(pending_cancel_form.pendingCancellation) }}
-                    {{ form_widget(pending_cancel_form.pendingCancellation) }}
-                </div>
-                <div class="form-group">
-                30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
-                or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank" rel="noopener noreferrer">online calculator</a>.
-                </div>
-                {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning' }}) }}
-                {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger', 'placeholder': '30 days after notice' }}) }}
-                {{ form_end(pending_cancel_form) }}
-                <br>
-                <b>This schedules the policy cancellation.
-                </b>
+                {% if not policy.policyTerms.isInstantUserCancellationEnabled %}
+                    <h4>Scheduled Policy Cancellation</h4>
+                    <p>For User Requested Cancellation (given after 14 days of policy start date)</p>
+                    {{ form_start(pending_cancel_form, {'attr': {'class': 'form-inline', 'autocomplete': 'off'}}) }}
+                    <div class="form-group">
+                        {{ form_label(pending_cancel_form.pendingCancellation, 'Policy Termination Date') }}
+                        {{ form_errors(pending_cancel_form.pendingCancellation) }}
+                        {{ form_widget(pending_cancel_form.pendingCancellation) }}
+                    </div>
+                    <div class="form-group">
+                    30 days from now is <strong>{{ suggested_cancellation_date|date('d M Y') }}</strong>
+                    or use <a href="https://www.timeanddate.com/date/dateadded.html?ad=30" target="_blank" rel="noopener noreferrer">online calculator</a>.
+                    </div>
+                    {{ form_widget(pending_cancel_form.clear, {'label': 'Abort cancellation', 'attr': {'class': 'btn btn-warning' }}) }}
+                    {{ form_widget(pending_cancel_form.cancel, {'label': 'Schedule cancellation', 'attr': {'class': 'btn btn-danger', 'placeholder': '30 days after notice' }}) }}
+                    {{ form_end(pending_cancel_form) }}
+                    <br>
+                    <b>This schedules the policy cancellation.
+                    </b>
+                {% else %}
+                    <h4>
+                        From Policy Terms version 14 released in October 2019, user requested cancellations are
+                        effective immediately with no refund.
+                    </h4>
+                {% endif %}
             </div>
             <div class="col-md-6">
                 <h4>Immediate Cancellation</h4>
