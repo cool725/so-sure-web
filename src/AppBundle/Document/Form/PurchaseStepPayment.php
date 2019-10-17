@@ -35,6 +35,8 @@ class PurchaseStepPayment
      */
     protected $amount;
 
+    protected $stream;
+
     protected $new;
 
     /** @var array */
@@ -104,9 +106,10 @@ class PurchaseStepPayment
 
     /**
      * Adds a price to the list of prices.
-     * @param PhonePrice $price is the price to add to the list.
+     * @param string     $stream is the stream of the price.
+     * @param PhonePrice $price  is the price to add to the list.
      */
-    public function addPrice(PhonePrice $price)
+    public function addPrice($stream, PhonePrice $price)
     {
         $this->prices[] = $price;
     }

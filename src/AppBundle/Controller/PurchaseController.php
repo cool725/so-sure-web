@@ -413,6 +413,7 @@ class PurchaseController extends BaseController
                                 $purchase->getPhone(),
                                 $purchase->getImei(),
                                 $purchase->getSerialNumber(),
+                                $purchase->getStream(),
                                 $this->getIdentityLogWeb($request)
                             );
                             $dm->persist($policy);

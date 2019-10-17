@@ -52,6 +52,7 @@ use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\File\S3File;
 
 use AppBundle\Service\SalvaExportService;
+use AppBundle\Service\PriceService;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\UserPaymentEvent;
 
@@ -208,6 +209,7 @@ class PolicyService
      * @param SCodeService             $scodeService
      * @param SixpackService           $sixpackService
      * @param FeatureService           $featureService
+     * @param PriceService             $priceService
      */
     public function __construct(
         DocumentManager $dm,
@@ -232,7 +234,8 @@ class PolicyService
         SmsService $sms,
         SCodeService $scodeService,
         SixpackService $sixpackService,
-        FeatureService $featureService
+        FeatureService $featureService,
+        PriceService $priceService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -257,6 +260,7 @@ class PolicyService
         $this->scodeService = $scodeService;
         $this->sixpackService = $sixpackService;
         $this->featureService = $featureService;
+        $this->priceService = $priceService;
     }
 
     public function validateUser(User $user)
@@ -316,6 +320,7 @@ class PolicyService
         Phone $phone,
         $imei,
         $serialNumber,
+        $stream,
         IdentityLog $identityLog = null,
         $phoneData = null,
         $modelNumber = null
@@ -341,7 +346,7 @@ class PolicyService
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
-            $policy->setPhone($phone);
+            $policy->setPhone($phone, $stream);
             $policy->setImei($imei);
             $policy->setSerialNumber($serialNumber);
             $policy->setModelNumber($modelNumber);

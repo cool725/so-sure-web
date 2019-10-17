@@ -732,6 +732,7 @@ services:
             - "@app.scode"
             - "@app.sixpack"
             - "@app.feature"
+            - "@app.price"
 
     app.quote:
         alias: AppBundle\Service\QuoteService

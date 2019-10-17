@@ -240,14 +240,21 @@ class PhonePolicy extends Policy
         return $this->makeModelValidatedStatus;
     }
 
-    public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
+    /**
+     * Sets the policy's phone.
+     * @param Phone          $phone  is the phone to give to the policy.
+     * @param string         $stream is the kind of price that they are paying.
+     * @param \DateTime|null $date   is the date at which they are having the phone set and at which their new price
+     *                               should be valid.
+     * @param boolean        $validateExcess is whether or not the set excess from the phone price should be validated.
+     */
+    public function setPhone(Phone $phone, $stream, \DateTime $date = null, $validateExcess = true)
     {
         $this->phone = $phone;
-        if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date)) {
+        $price = $phone->getCurrentPhonePrice($stream, $date);
+        if (!$price) {
             throw new \Exception('Phone must have a price');
         }
-
-        // TODO: figure out which stream of price is meant to be placed upon the policy.
 
         // Only set premium if not already present
         if (!$this->getPremium()) {
@@ -255,8 +262,6 @@ class PhonePolicy extends Policy
             if ($this->getUser()) {
                 $additionalPremium = $this->getUser()->getAdditionalPremium();
             }
-            /** @var PhonePrice $price */
-            $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
             $this->setPremium($price->createPremium($additionalPremium, $date));
             // in the normal flow we should have policy terms before setting the phone
             // however, many test cases do not have it
