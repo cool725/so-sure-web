@@ -48,6 +48,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('charles@so-sure.com', self::DEFAULT_PASSWORD, 'Charles', 'Roels', [User::ROLE_ADMIN]);
         $this->newUser('dev@so-sure.com', self::DEFAULT_PASSWORD, 'Robo', 'Bogdan', [User::ROLE_ADMIN]);
         $this->newUser('elliot@so-sure.com', self::DEFAULT_PASSWORD, 'Elliot', 'Mitchell', [User::ROLE_ADMIN]);
+        $this->newUser('etienne@so-sure.com', self::DEFAULT_PASSWORD, 'Etienne', 'Bourhis', [User::ROLE_ADMIN]);
         $manager->flush();
         // $this->valdiateGedmoLogging($manager);
     }
