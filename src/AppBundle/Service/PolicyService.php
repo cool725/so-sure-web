@@ -320,7 +320,6 @@ class PolicyService
         Phone $phone,
         $imei,
         $serialNumber,
-        $stream,
         IdentityLog $identityLog = null,
         $phoneData = null,
         $modelNumber = null
@@ -346,7 +345,7 @@ class PolicyService
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
-            $policy->setPhone($phone, $stream);
+            $policy->setPhone($phone);
             $policy->setImei($imei);
             $policy->setSerialNumber($serialNumber);
             $policy->setModelNumber($modelNumber);

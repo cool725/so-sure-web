@@ -5527,6 +5527,9 @@ abstract class Policy
 
     public function isCancelledAndPaymentOwed()
     {
+        if (!$this->getPremium()) {
+            return false;
+        }
         if (!$this->isFullyPaid() &&
             count($this->getApprovedClaims(true, true)) > 0 &&
             $this->getStatus() == self::STATUS_CANCELLED &&

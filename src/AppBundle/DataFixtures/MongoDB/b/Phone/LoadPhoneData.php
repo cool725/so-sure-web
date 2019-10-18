@@ -116,7 +116,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $linesWithPrice[] = sprintf(
                 '"%s for £%0.2f / month',
                 $phone,
-                $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMonthlyPremiumPrice()
             );
             $linesWithDevice[] = sprintf('"%s %s" as "%s"', $phone->getMake(), $phone->getModel(), $device);
         }
