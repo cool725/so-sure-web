@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\Premium;
 use AppBundle\Document\Offer;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -91,12 +92,13 @@ class PriceService
      */
     public function policySetPhonePremium($policy, $stream, $date)
     {
-        $priceSource = $this->userPhonePriceSource($user, $phone, $stream, $date);
+        $priceSource = $this->userPhonePriceSource($policy->getUser(), $policy->getPhone(), $stream, $date);
         $premium = $priceSource["price"]->createPremium();
-        $premium->setSource($priceSource["source"];
+        $premium->setSource($priceSource["source"]);
         $policy->setPremium($premium);
         $this->dm->persist($policy);
         $this->dm->flush();
+        var_dump("cunt");
     }
 
     /**

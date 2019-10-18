@@ -63,6 +63,7 @@ abstract class Premium implements EqualsInterface
 
     /**
      * Tells us by what path did the premium get onto the policy.
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      * @var string
      */

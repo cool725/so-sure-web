@@ -1444,10 +1444,10 @@ class PurchaseController extends BaseController
                 $priceService = $this->get('app.price');
                 if ($freq == Policy::PLAN_MONTHLY) {
                     $policy->setPremiumInstallments(12);
-                    $priceService->policyPhonePremium($policy, PhonePrice::STREAM_MONTHLY, new \DateTime());
+                    $priceService->policySetPhonePremium($policy, PhonePrice::STREAM_MONTHLY, new \DateTime());
                 } elseif ($freq == Policy::PLAN_YEARLY) {
                     $policy->setPremiumInstallments(1);
-                    $priceService->policyPhonePremium($policy, PhonePrice::STREAM_YEARLY, new \DateTime());
+                    $priceService->policySetPhonePremium($policy, PhonePrice::STREAM_YEARLY, new \DateTime());
                 } else {
                     throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
                 }
