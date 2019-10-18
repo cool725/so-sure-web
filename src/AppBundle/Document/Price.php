@@ -20,15 +20,6 @@ abstract class Price
 {
     use CurrencyTrait;
 
-    const SOURCE_STANDARD = "normal";
-    const SOURCE_RENEWAL = "renewal";
-    const SOURCE_OFFER = "offer";
-    const SOURCES = [
-        self::SOURCE_STANDARD,
-        self::SOURCE_RENEWAL,
-        self::SOURCE_OFFER
-    ];
-
     /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
@@ -54,13 +45,6 @@ abstract class Price
      * @var Excess|null
      */
     protected $excess;
-
-    /**
-     * @Assert\Choice(choices=Price::SOURCES, strict=true)
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $source;
 
     public function __construct()
     {

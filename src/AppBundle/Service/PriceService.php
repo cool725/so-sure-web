@@ -33,6 +33,25 @@ class PriceService
     }
 
     /**
+     * Gives you the right price for the given user and phone and also the source of the price in an array.
+     * @param User      $user   is the user to get the price for.
+     * @param Phone     $phone  is the phone that they are getting a policy for.
+     * @param string    $stream is the price stream that they are paying in.
+     * @param \DateTime $date   is the date at which they are purchasing.
+     * @return array containing the price and the source of the price.
+     */
+    public function userPhonePriceSource($user, $phone, $stream, $date)
+    {
+        // Offer price takes first precedence.
+        $offer = $user ? $user->getApplicableOffer($phone, $stream, $date) : null;
+        if ($offer) {
+            return ["price" => $offer->getPrice(), "source" => Premium::SOURCE_OFFER];
+        }
+        // Default phone price.
+        return ["price" => $phone->getCurrentPhonePrice($stream, $date), "source" => Premium::SOURCE_PHONE];
+    }
+
+    /**
      * Gets a price for a given phone in a given stream for a given user, assuming this is a new purchase and not
      * a refund.
      * @param User|null $user   is the user who will be paying the price.
@@ -44,14 +63,7 @@ class PriceService
      */
     public function userPhonePrice($user, $phone, $stream, $date)
     {
-        // first check for an offer price.
-        $offer = $user ? $user->getApplicableOffer($phone, $stream, $date) : null;
-        if ($offer) {
-            // TODO: price should be made unique and branded with it's origin.
-            return $offer->getPrice();
-        }
-        // if there is no applicable offer price we use the appropriate normal price.
-        return $phone->getCurrentPhonePrice($stream, $date);
+        return $this->userPhonePriceSource($user, $phone, $stream, $date)["price"];
     }
 
     /**
@@ -77,10 +89,11 @@ class PriceService
      * @param string $stream is the price stream that they need.
      * @param \DateTime $date is the date at which the price should be correct.
      */
-    public function policyPhonePremium($policy, $stream, $date)
+    public function policySetPhonePremium($policy, $stream, $date)
     {
-        $premium = $this->userPhonePrice($policy->getUser(), $policy->getPhone(), $stream, $date);
-        // TODO: brand it.
+        $priceSource = $this->userPhonePriceSource($user, $phone, $stream, $date);
+        $premium = $priceSource["price"]->createPremium();
+        $premium->setSource($priceSource["source"];
         $policy->setPremium($premium);
         $this->dm->persist($policy);
         $this->dm->flush();

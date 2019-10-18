@@ -22,6 +22,10 @@ abstract class Premium implements EqualsInterface
 {
     use CurrencyTrait;
 
+    const SOURCE_OFFER = "offer";
+    const SOURCE_RENEWAL = "renewal";
+    const SOURCE_PHONE = "phone";
+
     /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
@@ -56,6 +60,13 @@ abstract class Premium implements EqualsInterface
      * @var Excess|null
      */
     protected $excess;
+
+    /**
+     * Tells us by what path did the premium get onto the policy.
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $source;
 
     public function __construct()
     {
@@ -195,6 +206,24 @@ abstract class Premium implements EqualsInterface
     public function clearExcess()
     {
         $this->excess = null;
+    }
+
+    /**
+     * Gives you the source of this premium.
+     * @return string the source.
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Sets the source of the premium.
+     * @param string $source is the source of the premium.
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
     }
 
     public function isEvenlyDivisible($amount, $accountInitial = false)
