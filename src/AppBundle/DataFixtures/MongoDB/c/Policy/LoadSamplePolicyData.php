@@ -206,7 +206,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
                 null,
-                null
+                null,
+                $sevenMonthsAgo
             );
         }
         $manager->flush();
