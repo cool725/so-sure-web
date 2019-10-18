@@ -28,11 +28,11 @@
             data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
             data-phone="{{ phone.toPriceArray()|json_encode }}">
         <i class="far fa-pound-sign fa-fw"></i></button>
-    <button title="Offer Pricing"
+    {#<button title="Offer Pricing"
             type="button"
             class="btn btn-primary btn-sm mb-2 mr-2"
             onclick="window.location.href='{{ path('admin_phone_offers', {'id': phone.id}) }}'">
-        <i class="far fa-handshake fa-fw"></i></button>
+        <i class="far fa-handshake fa-fw"></i></button>#}
     {# Edit Phone Details #}
     <button title="Edit Phone Details"
             type="button"

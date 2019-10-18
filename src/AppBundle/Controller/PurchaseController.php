@@ -1440,19 +1440,21 @@ class PurchaseController extends BaseController
             $token = $request->get("token");
             $pennies = $request->get("pennies");
             $freq = $request->get('premium');
-            if ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_MONTHLY) {
-                $policy->setPremiumInstallments(12);
-                $this->getManager()->flush();
-            } elseif ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_YEARLY) {
-                $policy->setPremiumInstallments(1);
-                $this->getManager()->flush();
-            } elseif ($request->get('_route') == 'purchase_checkout') {
-                throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+            if ($request->get('_route') == 'purchase_checkout') {
+                $priceService = $this->get('app.price');
+                if ($freq == Policy::PLAN_MONTHLY) {
+                    $policy->setPremiumInstallments(12);
+                    $priceService->policyPhonePremium($policy, PhonePrice::STREAM_MONTHLY, new \DateTime());
+                } elseif ($freq == Policy::PLAN_YEARLY) {
+                    $policy->setPremiumInstallments(1);
+                    $priceService->policyPhonePremium($policy, PhonePrice::STREAM_YEARLY, new \DateTime());
+                } else {
+                    throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+                }
             }
             $csrf = $request->get("csrf");
             $publicKey = $request->get("cko-public-key");
             $cardToken = $request->get("cko-card-token");
-
             if ($token && $pennies && $csrf) {
                 $type = 'modal';
             } elseif ($publicKey && $cardToken) {
@@ -1559,7 +1561,7 @@ class PurchaseController extends BaseController
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
             } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, $e->getMessage());
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, "bongo".$e->getMessage());
             }
         }
     }

@@ -72,6 +72,21 @@ class PriceService
     }
 
     /**
+     * Gives the passed policy the appropriate premium.
+     * @param Phone Policy $policy is the policy to give a premium to.
+     * @param string $stream is the price stream that they need.
+     * @param \DateTime $date is the date at which the price should be correct.
+     */
+    public function policyPhonePremium($policy, $stream, $date)
+    {
+        $premium = $this->userPhonePrice($policy->getUser(), $policy->getPhone(), $stream, $date);
+        // TODO: brand it.
+        $policy->setPremium($premium);
+        $this->dm->persist($policy);
+        $this->dm->flush();
+    }
+
+    /**
      * Finds the price that a given renewal policy should pay.
      * @param Policy $policy is the policy that will have this price potentially.
      * @param \DateTime $date is the date at which the policy shall start.
@@ -87,7 +102,6 @@ class PriceService
             return $policy->getPhone()->getCurrentPhonePrice($policy->getStream(), $date);
         } else {
             // TODO: it's meant to return a price not a premium you idiiot.
-            //       hmmmm though actually maybe premiums SHOULD be returned insteaed of prices. hemmememem.
             return $policy->getPreviousPolicy()->getPremium();
         }
     }
