@@ -490,7 +490,7 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            // TODO: Possibly sanity check premium.
+            $this->logger->error($policy->getPremium());
 
             if ($numPayments === null) {
                 $dateToBill = $date;

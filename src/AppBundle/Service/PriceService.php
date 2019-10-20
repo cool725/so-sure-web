@@ -98,7 +98,6 @@ class PriceService
         $policy->setPremium($premium);
         $this->dm->persist($policy);
         $this->dm->flush();
-        var_dump("cunt");
     }
 
     /**
