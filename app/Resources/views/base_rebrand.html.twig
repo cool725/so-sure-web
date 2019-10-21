@@ -10,11 +10,7 @@
 
         <title>{% block title %}so-sure{% endblock %}</title>
 
-        {% if use_fa_cdn %}
-            <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
-        {% else %}
-            <link rel="stylesheet" href="{{ asset('css-js/fontawesome.css') }}">
-        {% endif %}
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
 
         {% if include_emoji is defined and include_emoji == true %}
             <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
