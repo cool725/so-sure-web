@@ -48,43 +48,30 @@ class PriceServiceTest extends WebTestCase
      */
     public function testUserPhonePriceSource()
     {
-        // see without offers present.
-        $user = new User();
-        $phone = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceA->setValidFrom(new \DateTime('2019-02-06'));
-        $priceA->setStream(PhonePrice::STREAM_ALL);
-        $priceB->setValidFrom(new \DateTime('2019-03-02'));
-        $priceB->setStream(PhonePrice::STREAM_YEARLY);
-        $phone->addPhonePrice($priceA);
-        $phone->addPhonePrice($priceB);
-        self::$dm->persist($user);
-        self::$dm->persist($phone);
-        self::$dm->flush();
+        $data = $this->userData();
         $this->assertEquals(
-            ["price" => $priceA, "source" => $phone],
+            ["price" => $data["priceA"], "source" => $data["phone"]],
             self::$priceService->userPhonePriceSource(
-                $user,
-                $phone,
+                $data["user"],
+                $data["phone"],
                 PhonePrice::STREAM_ANY,
                 new \DateTime('2019-02-09')
             )
         );
         $this->assertEquals(
-            ["price" => $priceB, "source" => $phone],
+            ["price" => $data["priceB"], "source" => $data["phone"]],
             self::$priceService->userPhonePriceSource(
-                $user,
-                $phone,
+                $data["user"],
+                $data["phone"],
                 PhonePrice::STREAM_ANY,
                 new \DateTime('2019-03-09')
             )
         );
         $this->assertEquals(
-            ["price" => $priceA, "source" => $phone],
+            ["price" => $data["priceA"], "source" => $data["phone"]],
             self::$priceService->userPhonePriceSource(
-                $user,
-                $phone,
+                $data["user"],
+                $data["phone"],
                 PhonePrice::STREAM_MONTHLY,
                 new \DateTime('2019-03-09')
             )
@@ -105,11 +92,11 @@ class PriceServiceTest extends WebTestCase
         $offerA->setPrice($offerPriceA);
         $offerB->setPrice($offerPriceB);
         $offerC->setPrice($offerPriceC);
-        $offerA->setPhone($phone);
-        $offerB->setPhone($phone);
-        $offerC->setPhone($phone);
-        $offerA->addUser($user);
-        $offerB->addUser($user);
+        $offerA->setPhone($data["phone"]);
+        $offerB->setPhone($data["phone"]);
+        $offerC->setPhone($data["phone"]);
+        $offerA->addUser($data["user"]);
+        $offerB->addUser($data["user"]);
         self::$dm->persist($offerA);
         self::$dm->persist($offerB);
         self::$dm->persist($offerC);
@@ -117,8 +104,8 @@ class PriceServiceTest extends WebTestCase
         $this->assertEquals(
             ["price" => $offerPriceA, "source" => $offerA],
             self::$priceService->userPhonePriceSource(
-                $user,
-                $phone,
+                $data["user"],
+                $data["phone"],
                 PhonePrice::STREAM_MONTHLY,
                 new \DateTime('2019-05-19')
             )
@@ -126,8 +113,8 @@ class PriceServiceTest extends WebTestCase
         $this->assertEquals(
             ["price" => $offerPriceB, "source" => $offerB],
             self::$priceService->userPhonePriceSource(
-                $user,
-                $phone,
+                $data["user"],
+                $data["phone"],
                 PhonePrice::STREAM_YEARLY,
                 new \DateTime('2019-05-19')
             )
@@ -135,26 +122,55 @@ class PriceServiceTest extends WebTestCase
     }
 
     /**
-     * Makes sure the price service gives the right price for a user and phone.
-     */
-    public function testUserPhonePrice()
-    {
-
-    }
-
-    /**
-     * Makes sure the price service gives the right price in all streams for a user and phone.
-     */
-    public function testUserPhonePriceStreams()
-    {
-
-    }
-
-    /**
      * Makes sure the price service can accurately set the premium on a policy.
      */
     public function testPolicySetPhonePremium()
     {
+        $data = $this->userData();
+        self::$priceService->policySetPhonePremium($data["policy"], PhonePrice::STREAM_YEARLY, 0, new \DateTime('2019-08-08'));
+        $this->assertEquals(
+            "phone",
+            $data["policy"]->getPremium()->getSource()
+        );
+        $this->assertEquals(
+            1.23,
+            $data["policy"]->getPremium()->getGwp()
+        );
+    }
 
+    /**
+     * Creates data used for each test.
+     */
+    private function userData()
+    {
+        $user = new User();
+        $user->setEmail(uniqid()."@yandex.com");
+        $user->setFirstname(uniqid());
+        $user->setLastname(uniqid());
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2019-02-06'));
+        $priceA->setStream(PhonePrice::STREAM_ALL);
+        $priceA->setGwp(20);
+        $priceB->setValidFrom(new \DateTime('2019-03-02'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $priceB->setGwp(1.23);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceB);
+        $policy = new PhonePolicy();
+        $policy->setPhone($phone);
+        $user->addPolicy($policy);
+        self::$dm->persist($user);
+        self::$dm->persist($phone);
+        self::$dm->persist($policy);
+        self::$dm->flush();
+        return [
+            "user" => $user,
+            "phone" => $phone,
+            "policy" => $policy,
+            "priceA" => $priceA,
+            "priceB" => $priceB
+        ];
     }
 }

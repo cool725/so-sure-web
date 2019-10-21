@@ -144,6 +144,9 @@ trait UserClassTrait
                 throw new \Exception('Missing phone');
             }
             $policy->setPhone($phone, $date);
+            /** @var PhonePrice */
+            $price = $phone->getCurrentPhonePrice();
+            $policy->setPremium($price->createPremium());
             if (!$imei) {
                 $policy->setImei(static::generateRandomImei());
             }
