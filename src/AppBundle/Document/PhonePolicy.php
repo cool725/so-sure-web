@@ -694,7 +694,6 @@ class PhonePolicy extends Policy
      */
     public function validatePremium($adjust, \DateTime $date = null)
     {
-        // TODO: this should probably be taking into account the stream.
         $phonePrice = $this->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
         if (!$phonePrice) {
             throw new \UnexpectedValueException(sprintf('Missing phone price'));

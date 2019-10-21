@@ -1442,12 +1442,24 @@ class PurchaseController extends BaseController
             $freq = $request->get('premium');
             if ($request->get('_route') == 'purchase_checkout') {
                 $priceService = $this->get('app.price');
+                $additionalPremium = $policy->getUser()->getAdditionalPremium();
+                // TODO: would be nice to validate that premium paid is premium set and log if not or something.
                 if ($freq == Policy::PLAN_MONTHLY) {
                     $policy->setPremiumInstallments(12);
-                    $priceService->policySetPhonePremium($policy, PhonePrice::STREAM_MONTHLY, new \DateTime());
+                    $priceService->policySetPhonePremium(
+                        $policy,
+                        PhonePrice::STREAM_MONTHLY,
+                        $additionalPremium,
+                        new \DateTime()
+                    );
                 } elseif ($freq == Policy::PLAN_YEARLY) {
                     $policy->setPremiumInstallments(1);
-                    $priceService->policySetPhonePremium($policy, PhonePrice::STREAM_YEARLY, new \DateTime());
+                    $priceService->policySetPhonePremium(
+                        $policy,
+                        PhonePrice::STREAM_YEARLY,
+                        $additionalPremium,
+                        new \DateTime()
+                    );
                 } else {
                     throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
                 }

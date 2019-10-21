@@ -2867,9 +2867,6 @@ abstract class Policy
         $this->setEnd($nextYear);
         $this->setStaticEnd($nextYear);
 
-        // Premium and/or IPT rate may have changed
-        $this->validatePremium(true, $startDate);
-
         $initialPolicyNumber = 5500000;
         $this->setPolicyNumber(sprintf(
             "%s/%s/%d",
