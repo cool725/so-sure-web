@@ -254,13 +254,13 @@ class Offer
         return [
             "name" => $this->getName(),
             "id" => $this->getId(),
-            "users" => array_map(function($user) {
+            "users" => array_map(function ($user) {
                 return [
                     "email" => $user->getEmail(),
                     "id" => $user->getId()
                 ];
             }, $this->getUsers()),
-            "policies" => array_map(function($policy) {
+            "policies" => array_map(function ($policy) {
                 return [
                     "policyNumber" => $policy->getPolicyNumber(),
                     "id" => $policy->getId()

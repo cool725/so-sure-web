@@ -1798,11 +1798,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Gives you all of the offers that are applied to this user.
-     * @return ArrayCollection of the offers.
+     * @return ArrayCollection|array of the offers.
      */
     public function getOffers()
     {
-        return $this->offers;
+        return $this->offers ?: [];
     }
 
     /**
@@ -1816,9 +1816,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Finds an offer on this user that matches the required conditions.
-     * @param Phone $phone is the phone that the offer must be for.
-     * @param string $stream is the stream of price the offer must be for.
-     * @param \DateTime $date is the date at which the offer must be applicable.
+     * @param Phone     $phone  is the phone that the offer must be for.
+     * @param string    $stream is the stream of price the offer must be for.
+     * @param \DateTime $date   is the date at which the offer must be applicable.
      * @return Offer|null the found offer if there is one.
      */
     public function getApplicableOffer(Phone $phone, $stream, \DateTime $date)

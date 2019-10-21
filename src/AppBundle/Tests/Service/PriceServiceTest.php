@@ -2,11 +2,13 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;
-use AppBundle\Repository\Phone;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @group cover-nonet
@@ -44,6 +46,48 @@ class PriceServiceTest extends WebTestCase
      */
     public function testUserPhonePriceSource()
     {
+        // see without offers present.
+        $user = new User();
+        $phone = new Phone();
+        $priceA = new PhonePrice();
+        $priceB = new PhonePrice();
+        $priceA->setValidFrom(new \DateTime('2019-02-06'));
+        $priceA->setStream(PhonePrice::STREAM_ALL);
+        $priceB->setValidFrom(new \DateTime('2019-03-02'));
+        $priceB->setStream(PhonePrice::STREAM_YEARLY);
+        $phone->addPhonePrice($priceA);
+        $phone->addPhonePrice($priceB);
+        self::$dm->persist($user);
+        self::$dm->persist($phone);
+        self::$dm->flush();
+        $this->assertEquals(
+            ["price" => $priceA, "source" => "phone"],
+            self::$priceService->userPhonePriceSource(
+                $user,
+                $phone,
+                PhonePrice::STREAM_ANY,
+                new \DateTime('2019-02-09')
+            )
+        );
+        $this->assertEquals(
+            ["price" => $priceB, "source" => "phone"],
+            self::$priceService->userPhonePriceSource(
+                $user,
+                $phone,
+                PhonePrice::STREAM_ANY,
+                new \DateTime('2019-03-09')
+            )
+        );
+        $this->assertEquals(
+            ["price" => $priceA, "source" => "phone"],
+            self::$priceService->userPhonePriceSource(
+                $user,
+                $phone,
+                PhonePrice::STREAM_MONTHLY,
+                new \DateTime('2019-03-09')
+            )
+        );
+        // with offers present.
 
     }
 
@@ -56,12 +100,16 @@ class PriceServiceTest extends WebTestCase
     }
 
     /**
-     * Makes sure the p:tab
+     * Makes sure the price service gives the right price in all streams for a user and phone.
+     */
     public function testUserPhonePriceStreams()
     {
 
     }
 
+    /**
+     * Makes sure the price service can accurately set the premium on a policy.
+     */
     public function testPolicySetPhonePremium()
     {
 
