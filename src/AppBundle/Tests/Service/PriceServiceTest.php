@@ -13,7 +13,9 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * @group cover-nonet
+ * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Service\\PriceServiceTest
  */
 class PriceServiceTest extends WebTestCase
 {
@@ -95,6 +97,8 @@ class PriceServiceTest extends WebTestCase
         $offerA->setPhone($data["phone"]);
         $offerB->setPhone($data["phone"]);
         $offerC->setPhone($data["phone"]);
+        $data["user"]->addOffer($offerA);
+        $data["user"]->addOffer($offerB);
         $offerA->addUser($data["user"]);
         $offerB->addUser($data["user"]);
         self::$dm->persist($offerA);

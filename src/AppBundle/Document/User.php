@@ -473,7 +473,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Contains references to all the offers that are offered to this user.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer", inversedBy="users")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
      */
     protected $offers = [];
 
@@ -1825,7 +1825,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $phoneId = $phone->getId();
         foreach ($this->getOffers() as $offer) {
             $price = $offer->getPrice();
-            if ($offer->getId() == $phoneId && $price && $price->inStream($stream) &&
+            if ($offer->getPhone()->getId() == $phoneId && $price && $price->inStream($stream) &&
                 $price->getValidFrom() <= $date
             ) {
                 return $offer;

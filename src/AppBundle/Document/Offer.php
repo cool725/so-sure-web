@@ -74,7 +74,7 @@ class Offer
 
     /**
      * Contains all users that this offer is offered to.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User", inversedBy="offers")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User")
      */
     protected $users = [];
 
