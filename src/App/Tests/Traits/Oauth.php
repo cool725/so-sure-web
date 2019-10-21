@@ -52,7 +52,7 @@ trait Oauth
         $accessToken->setUser($user);
         $accessToken->setToken($token);
         $accessToken->setExpiresAt(PHP_INT_MAX);
-        $accessToken->setScope(Oauth2Scopes::USER_STARLING_SUMMARY);
+        $accessToken->setScope(Oauth2Scopes::USER_STARLING_SUMMARY . ' ' . Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY);
 
         $manager->persist($accessToken);
         $manager->flush();
