@@ -86,15 +86,17 @@ class PriceService
 
     /**
      * Gives the passed policy the appropriate premium.
-     * @param Phone Policy $policy is the policy to give a premium to.
-     * @param string $stream is the price stream that they need.
-     * @param \DateTime $date is the date at which the price should be correct.
+     * @param PhonePolicy $policy            is the policy to give a premium to.
+     * @param string      $stream            is the price stream that they need.
+     * @param float       $additionalPremium is an additional amount of cost to add to the overall price.
+     * @param \DateTime   $date              is the date at which the price should be correct.
      */
-    public function policySetPhonePremium($policy, $stream, $date)
+    public function policySetPhonePremium($policy, $stream, $additionalPremium, $date)
     {
         $priceSource = $this->userPhonePriceSource($policy->getUser(), $policy->getPhone(), $stream, $date);
-        $premium = $priceSource["price"]->createPremium();
+        $premium = $priceSource["price"]->createPremium($additionalPremium);
         $premium->setSource($priceSource["source"]);
+        $premium->setStream($priceSource["price"]->getStream());
         $policy->setPremium($premium);
         $this->dm->persist($policy);
         $this->dm->flush();

@@ -62,6 +62,14 @@ abstract class Premium implements EqualsInterface
     protected $excess;
 
     /**
+     * Tells us the stream of pricing the originating price belonged to.
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $stream;
+
+    /**
      * Tells us by what path did the premium get onto the policy.
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -207,6 +215,31 @@ abstract class Premium implements EqualsInterface
     public function clearExcess()
     {
         $this->excess = null;
+    }
+
+    /**
+     * Gets this premium's originating price's stream.
+     * @return string|null the stream if existent.
+     */
+    public function getStream()
+    {
+        return $this->stream;
+    }
+
+    /**
+     * Sets the premium's originating stream.
+     * @param string $stream is the stream to set it to.
+     */
+    public function setStream($stream)
+    {
+        if (!in_array(PhonePrice::STREAM_POSITIONS)) {
+            throw new \IllegalArgumentException(sprintf(
+                "'%s' is not a stream position for premium '%s'",
+                $stream,
+                $this->getId()
+            );
+        }
+        $this->stream = $stream;
     }
 
     /**

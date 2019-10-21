@@ -490,8 +490,6 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            $this->logger->error($policy->getPremium());
-
             if ($numPayments === null) {
                 $dateToBill = $date;
                 if ($billing) {
