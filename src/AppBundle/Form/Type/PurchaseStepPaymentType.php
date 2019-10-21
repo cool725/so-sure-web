@@ -57,7 +57,7 @@ class PurchaseStepPaymentType extends AbstractType
      * @param RequestStack    $requestStack    is used to set the form action.
      * @param boolean         $required        sets whether this form must be filled in.
      * @param LoggerInterface $logger          is used to log output.
-     * @param PostCodeService $postcodeService is used to check if users are in dangerous postcodes.
+     * @param PostcodeService $postcodeService is used to check if users are in dangerous postcodes.
      * @param PriceService    $priceService    gets the prices that should be allowed.
      */
     public function __construct(
@@ -99,14 +99,14 @@ class PurchaseStepPaymentType extends AbstractType
                     new \DateTime()
                 );
                 $additionalPremium = $purchase->getUser()->getAdditionalPremium();
+                $monthlyPremiumPrice = $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice($additionalPremium) : 0;
+                $yearlyPremiumPrice = $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice($additionalPremium) : 0;
                 $choices = [];
                 if ($purchase->getUser()->allowedMonthlyPayments($this->postcodeService)) {
-                    $choices[sprintf('£%.2f Monthly', $monthlyPrice->getMonthlyPremiumPrice($additionalPremium))] =
-                            sprintf('%.2f', $monthlyPrice->getMonthlyPremiumPrice($additionalPremium));
+                    $choices[sprintf('£%.2f Monthly', $monthlyPremiumPrice)] = sprintf('%.2f', $monthlyPremiumPrice);
                 }
                 if ($purchase->getUser()->allowedYearlyPayments()) {
-                    $choices[sprintf('£%.2f Yearly', $yearlyPrice->getYearlyPremiumPrice($additionalPremium))] =
-                            sprintf('%.2f', $yearlyPrice->getYearlyPremiumPrice($additionalPremium));
+                    $choices[sprintf('£%.2f Yearly', $yearlyPremiumPrice)] = sprintf('%.2f', $yearlyPremiumPrice);
                 }
                 if (count($choices) > 0) {
                     $form->add('amount', ChoiceType::class, [

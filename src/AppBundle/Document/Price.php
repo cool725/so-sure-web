@@ -159,16 +159,6 @@ abstract class Price
         $this->excess = $excess;
     }
 
-    public function getSource()
-    {
-        return $this->source;
-    }
-
-    public function setSource($source)
-    {
-        $this->source = $source;
-    }
-
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
     protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)

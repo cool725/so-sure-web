@@ -17,6 +17,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePrice;
 
 class SalvaManualPolicyCommand extends ContainerAwareCommand
 {

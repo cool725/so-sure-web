@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Classes\Salva;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -42,9 +43,9 @@ class Offer
 
     /**
      * The offered price.
-     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Price")
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\PhonePrice")
      * @Gedmo\Versioned
-     * @var Price
+     * @var PhonePrice
      */
     protected $price;
 
@@ -76,7 +77,7 @@ class Offer
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User", inversedBy="offers")
      * @var ArrayCollection
      */
-    protected $users;
+    protected $users = [];
 
     /**
      * Contains all policies that are using the price from this offer.
