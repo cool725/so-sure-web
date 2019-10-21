@@ -233,11 +233,7 @@ abstract class Premium implements EqualsInterface
     public function setStream($stream)
     {
         if (!in_array($stream, PhonePrice::STREAM_POSITIONS)) {
-            throw new \IllegalArgumentException(sprintf(
-                "'%s' is not a stream position for premium '%s'",
-                $stream,
-                $this->getId()
-            ));
+            throw new \InvalidArgumentException(sprintf("'%s' is not a stream position", $stream));
         }
         $this->stream = $stream;
     }

@@ -2797,7 +2797,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policy = $repo->find($data['id']);
         $phone = $policy->getPhone();
 
-        $currentPrice = $phone->getCurrentPhonePrice();
+        $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
 
         $validFrom = \DateTime::createFromFormat('U', time());
         $validFrom->sub(new \DateInterval('PT1H'));

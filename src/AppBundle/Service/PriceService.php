@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\Offer;
 use Psr\Log\LoggerInterface;
@@ -35,7 +36,7 @@ class PriceService
 
     /**
      * Gives you the right price for the given user and phone and also the source of the price in an array.
-     * @param User      $user   is the user to get the price for.
+     * @param User|null $user   is the user to get the price for.
      * @param Phone     $phone  is the phone that they are getting a policy for.
      * @param string    $stream is the price stream that they are paying in.
      * @param \DateTime $date   is the date at which they are purchasing.
@@ -88,7 +89,7 @@ class PriceService
      * Gives the passed policy the appropriate premium.
      * @param PhonePolicy $policy            is the policy to give a premium to.
      * @param string      $stream            is the price stream that they need.
-     * @param float       $additionalPremium is an additional amount of cost to add to the overall price.
+     * @param float|null  $additionalPremium is an additional amount of cost to add to the overall price.
      * @param \DateTime   $date              is the date at which the price should be correct.
      */
     public function policySetPhonePremium($policy, $stream, $additionalPremium, $date)
@@ -104,21 +105,26 @@ class PriceService
 
     /**
      * Finds the price that a given renewal policy should pay.
-     * @param Policy $policy is the policy that will have this price potentially.
+     * @param PhonePolicy $policy is the policy that will have this price potentially.
      * @param \DateTime $date is the date at which the policy shall start.
-     * @return PhonePrice the price that the policy should pay.
+     * @return PhonePrice|null the price that the policy should pay.
      */
     public function renewalPhonePrice($policy, $date)
     {
         if (!$policy->getPreviousPolicy()) {
             throw new \InvalidArgumentException(sprintf("Given policy '%s' is not a renewal", $policy->getId()));
         }
-        // TODO: price should be made unique and branded with it's origin.
         if ($policy->hasMonetaryClaimed(true)) {
-            return $policy->getPhone()->getCurrentPhonePrice($policy->getStream(), $date);
+            return $policy->getPhone()->getCurrentPhonePrice(
+                PhonePrice::installmentsStream($policy->getPremiumInstallments()),
+                $date
+            );
         } else {
-            // TODO: it's meant to return a price not a premium you idiiot.
-            return $policy->getPreviousPolicy()->getPremium();
+            // TODO: should be more like the apply premium function so that renewal price can be old price.
+            return $policy->getPhone()->getCurrentPhonePrice(
+                PhonePrice::installmentsStream($policy->getPremiumInstallments()),
+                $date
+            );
         }
     }
 }

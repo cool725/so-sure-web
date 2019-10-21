@@ -636,7 +636,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $price->setValidFrom($date);
                     $price->setGwp($data["gwp"]);
                     $price->setExcess($excess);
-                    $price->setPicsureExcess($picsureExcess);
+                    $price->setPicSureExcess($picsureExcess);
                     $offer->setPrice($price);
                     $offer->setActive(true);
                     $dm->persist($offer);
@@ -660,7 +660,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * Gives the details on an offer including a list of all users and policies using it as JSON.
      * @param Request $request is the http request.
      * @param string  $id      is the id of the offer we are requesting information on.
-     * @return HttpResponse to send back to the client.
+     * @return JsonResponse to send back to the client.
      * @Route("/offer/{id}/details", name="admin_offer_details")
      */
     public function offerDetailsAction(Request $request, $id)
@@ -678,7 +678,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * Adds a given user to the given offer. The offer id must be passed as a POST parameter as well as the email for
      * this request.
      * @param Request $request is the http request.
-     * @return HttpResponse to send back to the client.
+     * @return Response to send back to the client.
      * @Route("/offer/add-user", name="admin_offer_add_user")
      * @Method({"POST"})
      */
@@ -714,7 +714,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * Turns an offer on or off.
      * @param Request $request is the http request.
      * @param string  $id      is the id of the offer we are requesting information on.
-     * @return HttpResponse to send back to the client.
+     * @return Response to send back to the client.
      * @Route("/offer/{id}/enable", name="admin_offer_able")
      * @Method({"POST"})
      */

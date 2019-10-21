@@ -151,6 +151,9 @@ class PolicyService
     /** @var FeatureService */
     protected $featureService;
 
+    /** @var PriceService */
+    protected $priceService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)

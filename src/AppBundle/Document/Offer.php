@@ -77,14 +77,14 @@ class Offer
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User", inversedBy="offers")
      * @var ArrayCollection
      */
-    protected $users = [];
+    protected $users;
 
     /**
      * Contains all policies that are using the price from this offer.
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Policy")
      * @var ArrayCollection
      */
-    protected $policies = [];
+    protected $policies;
 
     /**
      * Gives you the offer's id.
@@ -205,14 +205,11 @@ class Offer
 
     /**
      * Gives you the list of affected users.
-     * @return array containing the users.
+     * @return ArrayCollection containing the users.
      */
     public function getUsers()
     {
-        if (is_array($this->users)) {
-            return $this->users;
-        }
-        return $this->users->toArray();
+        return $this->users;
     }
 
     /**
@@ -226,14 +223,11 @@ class Offer
 
     /**
      * Gives a list of the policies affected by this offer.
-     * @return array of policies that have used this offer themselves.
+     * @return ArrayCollection of policies that have used this offer themselves.
      */
     public function getPolicies()
     {
-        if (is_array($this->policies)) {
-            return $this->policies;
-        }
-        return $this->policies->toArray();
+        return $this->policies;
     }
 
     /**

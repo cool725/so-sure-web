@@ -473,7 +473,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Contains references to all the offers that are offered to this user.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer", mappedBy="users")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer", inversedBy="users")
      * @var ArrayCollection
      */
     protected $offers;
@@ -1798,14 +1798,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * Gives you all of the offers that are applied to this user.
-     * @return array of the offers.
+     * @return ArrayCollection of the offers.
      */
     public function getOffers()
     {
-        if (is_array($this->offers)) {
-            return $this->offers;
-        }
-        return $this->offers->toArray();
+        return $this->offers;
     }
 
     /**

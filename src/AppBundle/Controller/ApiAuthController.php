@@ -786,10 +786,13 @@ class ApiAuthController extends BaseController
                     if ($policy->getUser()) {
                         $additionalPremium = $policy->getUser()->getAdditionalPremium();
                     }
-                    /** @var PhonePrice $price */
-                    // TODO: Possibly need to reposition the setting the price.
-                    $price = $phone->getCurrentPhonePrice(null);
-                    $policy->setPremium($price->createPremium($additionalPremium, null));
+                    $priceService = $this->get("app.price");
+                    $priceService->policySetPhonePremium(
+                        $policy,
+                        PhonePrice::installmentsStream($policy->getPremiumInstallments()),
+                        $additionalPremium,
+                        new \DateTime()
+                    );
 
                     $needUpdate = true;
                 }
