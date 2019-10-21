@@ -8,6 +8,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Document\Offer;
+use AppBundle\Service\PriceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -21,7 +22,7 @@ class PriceServiceTest extends WebTestCase
     use \AppBundle\Document\DateTrait;
 
     protected static $container;
-    /** @var AffiliateService */
+    /** @var PriceService */
     protected static $priceService;
     protected static $dm;
 
@@ -62,7 +63,7 @@ class PriceServiceTest extends WebTestCase
         self::$dm->persist($phone);
         self::$dm->flush();
         $this->assertEquals(
-            ["price" => $priceA, "source" => "phone"],
+            ["price" => $priceA, "source" => $phone],
             self::$priceService->userPhonePriceSource(
                 $user,
                 $phone,
@@ -71,7 +72,7 @@ class PriceServiceTest extends WebTestCase
             )
         );
         $this->assertEquals(
-            ["price" => $priceB, "source" => "phone"],
+            ["price" => $priceB, "source" => $phone],
             self::$priceService->userPhonePriceSource(
                 $user,
                 $phone,
@@ -80,7 +81,7 @@ class PriceServiceTest extends WebTestCase
             )
         );
         $this->assertEquals(
-            ["price" => $priceA, "source" => "phone"],
+            ["price" => $priceA, "source" => $phone],
             self::$priceService->userPhonePriceSource(
                 $user,
                 $phone,
@@ -114,7 +115,7 @@ class PriceServiceTest extends WebTestCase
         self::$dm->persist($offerC);
         self::$dm->flush();
         $this->assertEquals(
-            ["price" => $offerPriceA, "source" => "offer"],
+            ["price" => $offerPriceA, "source" => $offerA],
             self::$priceService->userPhonePriceSource(
                 $user,
                 $phone,
@@ -123,7 +124,7 @@ class PriceServiceTest extends WebTestCase
             )
         );
         $this->assertEquals(
-            ["price" => $offerPriceB, "source" => "offer"],
+            ["price" => $offerPriceB, "source" => $offerB],
             self::$priceService->userPhonePriceSource(
                 $user,
                 $phone,
