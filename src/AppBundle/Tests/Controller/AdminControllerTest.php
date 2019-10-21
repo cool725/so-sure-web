@@ -4,7 +4,9 @@ namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Offer;
 use AppBundle\Document\Charge;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
@@ -409,7 +411,6 @@ class AdminControllerTest extends BaseControllerTest
         $phone = static::getRandomPhone(self::$dm);
         $price = new PhonePrice();
         $price->setGwp(100);
-        $price->setIpt(10);
         $offerA = new Offer();
         $offerB = new Offer();
         $offerC = new Offer();

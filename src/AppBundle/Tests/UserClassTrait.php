@@ -12,6 +12,7 @@ use AppBundle\Document\IdentityLog;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -251,9 +252,13 @@ trait UserClassTrait
             $phone = $phones[random_int(0, count($phones) - 1)];
 
             // Many tests rely on past dates, so ensure the date is ok for the past
-            if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01')) ||
+                $phone->getMake() == "ALL"
+            ) {
                 $phone = null;
-            } elseif (!$phone->getCurrentPhonePrice($date) || !$phone->getCurrentPhonePrice($date)->getExcess()) {
+            } elseif (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date) ||
+                !$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date)->getExcess()
+            ) {
                 $phone = null;
             }
 
@@ -279,7 +284,7 @@ trait UserClassTrait
         $allPhones = $phoneRepo->findBy($query);
         $phones = array_values(array_filter($allPhones, function ($phone) use ($monthlyPrice, $date) {
             /** @var Phone $phone */
-            $currentPrice = $phone->getCurrentPhonePrice($date);
+            $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
             if (!$currentPrice) {
                 return false;
             }
@@ -295,9 +300,13 @@ trait UserClassTrait
             $phone = $phones[random_int(0, count($phones) - 1)];
 
             // Many tests rely on past dates, so ensure the date is ok for the past
-            if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01')) ||
+                $phone->getMake() == "ALL"
+            ) {
                 $phone = null;
-            } elseif (!$phone->getCurrentPhonePrice($date) || !$phone->getCurrentPhonePrice($date)->getExcess()) {
+            } elseif (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date) ||
+                !$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date)->getExcess()
+            ) {
                 $phone = null;
             }
 

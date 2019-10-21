@@ -885,44 +885,4 @@ class UserTest extends WebTestCase
             $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
         );
     }
-
-    /**
-     * Tests that getCurrentPremiumForPhone gets the premium the user should use for the given phone whether they have
-     * an offer or multiple offers or just the normal premium on the phone.
-     * TODO: this is going to be using redis so we are going to have to move this to a functional test.
-     */
-    public function testGetCurrentPriceForPhone()
-    {
-        $user = new User();
-        $phoneA = new Phone();
-        $phoneB = new Phone();
-        $priceA = new PhonePrice();
-        $priceB = new PhonePrice();
-        $priceC = new PhonePrice();
-        $priceD = new PhonePrice();
-        $offerA = new Offer();
-        $offerB = new Offer();
-        $phoneA->setId("bing bing");
-        $phoneB->setId("wahoo");
-        $priceA->setValidFrom(new \DateTime('2019-05-06'));
-        $priceB->setValidFrom(new \DateTime('2019-01-06'));
-        $priceC->setValidFrom(new \DateTime('2019-04-01'));
-        $priceD->setValidFrom(new \DateTime('2019-01-01'));
-        $offerA->setPhone($phoneA);
-        $offerA->setPrice($priceA);
-        $offerB->setPhone($phoneB);
-        $offerB->setPrice($priceB);
-        $phoneA->addPhonePrice($priceC);
-        $phoneB->addPhonePrice($priceD);
-        $user->addOffer($offerA);
-        $user->addOffer($offerB);
-        // check that it returns the right things at the right dates.
-        $this->assertEquals($priceA, $user->getCurrentPriceForPhone($phoneA, new \DateTime('2019-05-19')));
-        $this->assertEquals($priceC, $user->getCurrentPriceForPhone($phoneA, new \DateTime('2019-04-29')));
-        $this->assertEquals($priceC, $user->getCurrentPriceForPhone($phoneA, new \DateTime('2019-06-29')));
-        $this->assertEquals($priceD, $user->getCurrentPriceForPhone($phoneB, new \DateTime('2019-01-03')));
-        $this->assertEquals($priceB, $user->getCurrentPriceForPhone($phoneB, new \DateTime('2019-05-19')));
-        $this->assertEquals($priceB, $user->getCurrentPriceForPhone($phoneB, new \DateTime('2050-01-01')));
-        $this->assertNull($user->getCurrentPriceForPhone($phoneB, new \DateTime('2016-02-04')));
-    }
 }

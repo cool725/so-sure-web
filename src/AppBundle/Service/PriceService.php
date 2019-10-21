@@ -55,7 +55,7 @@ class PriceService
 
     /**
      * Gets a price for a given phone in a given stream for a given user, assuming this is a new purchase and not
-     * a refund.
+     * a renewal.
      * @param User|null $user   is the user who will be paying the price.
      * @param Phone     $phone  is the phone that they will be paying for.
      * @param string    $stream is whether they are going to be paying monthly or yearly (Don't pass ALL or ANY).
