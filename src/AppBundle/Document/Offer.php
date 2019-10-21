@@ -75,16 +75,14 @@ class Offer
     /**
      * Contains all users that this offer is offered to.
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\User", inversedBy="offers")
-     * @var ArrayCollection
      */
-    protected $users;
+    protected $users = [];
 
     /**
      * Contains all policies that are using the price from this offer.
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Policy")
-     * @var ArrayCollection
      */
-    protected $policies;
+    protected $policies = [];
 
     /**
      * Gives you the offer's id.

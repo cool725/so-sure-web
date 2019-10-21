@@ -7,6 +7,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;
+use AppBundle\Document\Offer;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -88,7 +89,48 @@ class PriceServiceTest extends WebTestCase
             )
         );
         // with offers present.
-
+        $offerA = new Offer();
+        $offerB = new Offer();
+        $offerC = new Offer();
+        $offerPriceA = new PhonePrice();
+        $offerPriceB = new PhonePrice();
+        $offerPriceC = new PhonePrice();
+        $offerPriceA->setStream(PhonePrice::STREAM_MONTHLY);
+        $offerPriceB->setStream(PhonePrice::STREAM_YEARLY);
+        $offerPriceC->setStream(PhonePrice::STREAM_ALL);
+        $offerPriceA->setValidFrom(new \DateTime("2019-03-01"));
+        $offerPriceB->setValidFrom(new \DateTime("2019-03-01"));
+        $offerPriceC->setValidFrom(new \DateTime("2019-03-01"));
+        $offerA->setPrice($offerPriceA);
+        $offerB->setPrice($offerPriceB);
+        $offerC->setPrice($offerPriceC);
+        $offerA->setPhone($phone);
+        $offerB->setPhone($phone);
+        $offerC->setPhone($phone);
+        $offerA->addUser($user);
+        $offerB->addUser($user);
+        self::$dm->persist($offerA);
+        self::$dm->persist($offerB);
+        self::$dm->persist($offerC);
+        self::$dm->flush();
+        $this->assertEquals(
+            ["price" => $offerPriceA, "source" => "offer"],
+            self::$priceService->userPhonePriceSource(
+                $user,
+                $phone,
+                PhonePrice::STREAM_MONTHLY,
+                new \DateTime('2019-05-19')
+            )
+        );
+        $this->assertEquals(
+            ["price" => $offerPriceB, "source" => "offer"],
+            self::$priceService->userPhonePriceSource(
+                $user,
+                $phone,
+                PhonePrice::STREAM_YEARLY,
+                new \DateTime('2019-05-19')
+            )
+        );
     }
 
     /**

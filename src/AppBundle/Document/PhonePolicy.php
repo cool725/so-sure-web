@@ -242,9 +242,9 @@ class PhonePolicy extends Policy
 
     /**
      * Sets the policy's phone.
-     * @param Phone          $phone  is the phone to give to the policy.
-     * @param \DateTime|null $date   is the date at which they are having the phone set and at which their new price
-     *                               should be valid.
+     * @param Phone          $phone          is the phone to give to the policy.
+     * @param \DateTime|null $date           is the date at which they are having the phone set and at which their new
+     *                                       price should be valid.
      * @param boolean        $validateExcess is whether or not the set excess from the phone price should be validated.
      */
     public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)

@@ -47,10 +47,10 @@ class PriceService
         // Offer price takes first precedence.
         $offer = $user ? $user->getApplicableOffer($phone, $stream, $date) : null;
         if ($offer) {
-            return ["price" => $offer->getPrice(), "source" => Premium::SOURCE_OFFER];
+            return ["price" => $offer->getPrice(), "source" => $offer];
         }
         // Default phone price.
-        return ["price" => $phone->getCurrentPhonePrice($stream, $date), "source" => Premium::SOURCE_PHONE];
+        return ["price" => $phone->getCurrentPhonePrice($stream, $date), "source" => $phone];
     }
 
     /**
@@ -98,6 +98,12 @@ class PriceService
         $premium = $priceSource["price"]->createPremium($additionalPremium);
         $premium->setSource($priceSource["source"]);
         $premium->setStream($priceSource["price"]->getStream());
+        if ($priceSource["source"] instanceof Offer) {
+            $priceSource["source"]->addPolicy($policy);
+            $premium->setSource(Premium::SOURCE_OFFER);
+        } elseif ($priceSource["source"] instanceof Phone) {
+            $premium->setSource(Premium::SOURCE_PHONE);
+        }
         $policy->setPremium($premium);
         $this->dm->persist($policy);
         $this->dm->flush();
