@@ -86,8 +86,9 @@ class CancelPolicyType extends AbstractType
                     );
                 }
             }
-        } else {
+        } elseif (!$policy->hasMonetaryClaimed(true) && $policy->getStatus() != Policy::STATUS_UNPAID) {
             $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_USER_REQUESTED, 'User Requested');
+            $preferred[] = Policy::CANCELLED_USER_REQUESTED;
         }
 
         if ($policy->getStatus() == Policy::STATUS_UNPAID) {

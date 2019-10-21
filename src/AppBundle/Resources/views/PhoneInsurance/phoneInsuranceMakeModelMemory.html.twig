@@ -2,23 +2,54 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
+
+{# SEO Adjustments #}
 {% set make_desc = phone.make %}
-{% set with_phone = phone.model ~ ' Phone' %}
+{% set with_phone = phone.model %}
+{% set add_phone = '' %}
 {% if phone.make == 'Apple' %}
     {% set make_desc = '' %}
     {% set with_phone = phone.model %}
 {% endif %}
-{% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
+{% if phone.make == 'HP' %}
+    {% set add_phone = ' Phone' %}
+{% endif %}
+{% if phone.make == 'Motorola' and phone.model == 'Moto G5' %}
+    {% set make_desc = '' %}
+{% endif %}
+{% if phone.make == 'Sony' and phone.model == 'Xperia XZ Premium' %}
+    {% set make_desc = '' %}
+{% endif %}
+{% set samsungModels = [
+    'Galaxy Note10',
+    'Galaxy Note10+',
+    'Galaxy Note10+ 5G',
+    'Galaxy S5 mini',
+    'Galaxy S6 Edge',
+    'Galaxy S6 Edge+',
+    'Galaxy S7 Edge'
+] %}
+{% if phone.make == 'Samsung' %}
+    {% if phone.model in samsungModels %}
+        {% set make_desc = '' %}
+    {% elseif phone.model in ['Galaxy Note 8'] %}
+        {% set make_desc = '' %}
+        {% set with_phone = 'Note 8' %}
+    {% endif %}
+{% endif %}
 
-{% block title %}{% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ with_phone }} Insurance | so-sure{% endblock %}
+{% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
+{% set hide_quote_btn = true %}
+
+{% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance For &pound;{{ phone_price.monthlyPremiumPrice }} Monthly | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="{{ make_desc }} {{ with_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ make_desc }} {{ with_phone }} Insurance that's simply better."/>
+    <meta name="description" content="{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ make_desc }} {{ with_phone }} Insurance that's simply better."/>
     <link rel="canonical" href="{{ canonical|url_decode }}" />
 {% endblock %}
-{% set og_title = make_desc ~ ' ' ~ with_phone ~ ' Insurance | so-sure' %}
-{% set og_url = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical|url_decode }) %}
-{% set og_description = make_desc ~ ' ' ~ with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
+{% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance For £' ~ phone_price.monthlyPremiumPrice ~ ' Monthly | so-sure' %}
+{% set og_url = canonical|url_decode %}
+{% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
@@ -30,7 +61,7 @@
     <section class="hero">
         <div class="container-large">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-lg-2">
                     <div class="hero__intro">
                         <div class="breadcrumbs">
                             <ul class="list-inline"
@@ -117,7 +148,7 @@
                             {{ form_widget(buy_form.buy, {
                                 'label': 'Get Started',
                                 'attr': {
-                                    'class': 'btn btn-success btn-green-gradient btn-block-xs mr-sm-2'
+                                    'class': 'btn btn-success btn-block-xs mr-sm-2'
                             }}) }}
                             <a href="#"
                                class="btn btn-outline-white watch-video btn-block-xs"
@@ -184,7 +215,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-lg-1">
                    <div class="hero__illustration hero__illustration-generic text-center">
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
@@ -224,7 +255,7 @@
                 {{ form_widget(buy_form_banner.buy, {
                     'label': 'Insure your phone in minutes',
                     'attr': {
-                        'class': 'btn btn-primary btn-block-xs mb-5'
+                        'class': 'btn btn-success btn-block-xs mb-5'
                 }}) }}
             {{ form_end(buy_form_banner) }}
         </div>
@@ -423,6 +454,30 @@
             </ul>
         </div>
     </section>
+
+    <section class="banner py-5">
+        <div class="container-large">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h4 class="text-white">Insure your phone in minutes</h4>
+                        <p class="lead text-white">{{ make_desc }} {{ phone.model }} for just <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> per month</p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    {{ form_start(buy_form_banner_two) }}
+                        {{ form_widget(buy_form_banner_two.buy, {
+                            'label': 'Get Started',
+                            'attr': {
+                                'class': 'btn btn-success btn-block-xs'
+                        }}) }}
+                    {{ form_end(buy_form_banner_two) }}
+                </div>
+            </div>
+        </div>
+    </section>
+
 
     {# Page Modals #}
 

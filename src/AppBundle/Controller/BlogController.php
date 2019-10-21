@@ -28,7 +28,7 @@ class BlogController extends BaseController
     /** @codingStandardsIgnoreStart */
 
     /**
-     * @Route("/", name="blog_index")
+     * @Route("/", name="blog_index", options={"sitemap" = true})
      * @Template
      */
     public function blogAction()
@@ -41,7 +41,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/looking-back-and-forward", name="looking_back_and_forward")
+     * @Route("/looking-back-and-forward", name="looking_back_and_forward", options={"sitemap" = true})
      * @Template
      */
     public function lookingBackAndForwardAction()
@@ -54,7 +54,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/what-to-do-if-you-break-your-phone-screen", name="what_to_do_if_you_break_your_phone_screen")
+     * @Route("/what-to-do-if-you-break-your-phone-screen", name="what_to_do_if_you_break_your_phone_screen", options={"sitemap" = true})
      * @Template
      */
     public function whaToDoIfYouBreakYourPhoneScreenAction()
@@ -67,7 +67,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/5-great-gadgets-from-2018-for-the-january-sales", name="5_great_gadgets_from_2018_for_the_january_sales")
+     * @Route("/5-great-gadgets-from-2018-for-the-january-sales", name="5_great_gadgets_from_2018_for_the_january_sales", options={"sitemap" = true})
      * @Template
      */
     public function greatGadgetsFrom2018ForTheJanuarySalesAction()
@@ -80,7 +80,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/all-i-want-for-christmas-is-a-new-phone", name="all_i_want_for_christmas_is_a_new_phone")
+     * @Route("/all-i-want-for-christmas-is-a-new-phone", name="all_i_want_for_christmas_is_a_new_phone", options={"sitemap" = true})
      * @Template
      */
     public function allIWantForChristmasIsANewPhoneAction()
@@ -93,7 +93,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/broken-promises", name="broken_promises")
+     * @Route("/broken-promises", name="broken_promises", options={"sitemap" = true})
      * @Template
      */
     public function brokenPromisesAction()
@@ -106,7 +106,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/so-sure-people-dylan-bourguignon", name="so_sure_people_dylan_bourguignon")
+     * @Route("/so-sure-people-dylan-bourguignon", name="so_sure_people_dylan_bourguignon", options={"sitemap" = true})
      * @Template
      */
     public function soSurePeopleDylanBourguignonAction()
@@ -119,7 +119,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/5-ways-to-protect-your-valuables-abroad", name="5_ways_to_protect_your_valuables_abroad")
+     * @Route("/5-ways-to-protect-your-valuables-abroad", name="5_ways_to_protect_your_valuables_abroad", options={"sitemap" = true})
      * @Template
      */
     public function waysToProtectYourValuablesAbroadAction()
@@ -132,7 +132,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/englands-most-trusting-cities", name="englands_most_trusting_cities")
+     * @Route("/englands-most-trusting-cities", name="englands_most_trusting_cities", options={"sitemap" = true})
      * @Template
      */
     public function englandsMostTrustingCitiesAction()
@@ -145,7 +145,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/starling-bank-and-so-sure-team-up-to-offer-mobile-phone-insurance-through-the-starling-marketplace", name="starling_bank_and_so_sure_team_up_to_offer_mobile_phone_insurance_through_the_starling_marketplace")
+     * @Route("/starling-bank-and-so-sure-team-up-to-offer-mobile-phone-insurance-through-the-starling-marketplace", name="starling_bank_and_so_sure_team_up_to_offer_mobile_phone_insurance_through_the_starling_marketplace", options={"sitemap" = true})
      * @Template
      */
     public function starlingBankAndSoSureAction()
@@ -158,7 +158,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/dirty-tricks-to-watch-out-for-when-buying-insurance", name="dirty_tricks_to_watch_out_for_when_buying_insurance")
+     * @Route("/dirty-tricks-to-watch-out-for-when-buying-insurance", name="dirty_tricks_to_watch_out_for_when_buying_insurance", options={"sitemap" = true})
      * @Template
      */
     public function dirtyTricksToWatchOutForAction()
@@ -171,7 +171,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/googles-pixel-3-takes-on-apples-iphone-xs", name="googles_pixel_3_takes_on_apples_iphone_xs")
+     * @Route("/googles-pixel-3-takes-on-apples-iphone-xs", name="googles_pixel_3_takes_on_apples_iphone_xs", options={"sitemap" = true})
      * @Template
      */
     public function googlesPixel3TakesOnIPhoneAction()
@@ -184,7 +184,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/the-development-of-insurance-as-we-know-it", name="the_development_of_insurance_as_we_know_it")
+     * @Route("/the-development-of-insurance-as-we-know-it", name="the_development_of_insurance_as_we_know_it", options={"sitemap" = true})
      * @Template
      */
     public function theDevelopmentOfInsuranceAsWeKnowItAction()
@@ -197,7 +197,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/introducing-social-insurance", name="introducing_social_insurance")
+     * @Route("/introducing-social-insurance", name="introducing_social_insurance", options={"sitemap" = true})
      * @Template
      */
     public function introducingSocialInsuranceAction()
@@ -210,7 +210,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/samsungs-note-9-takes-on-apples-iphone-x", name="samsungs_note_9_takes_on_apples_iphone_x")
+     * @Route("/samsungs-note-9-takes-on-apples-iphone-x", name="samsungs_note_9_takes_on_apples_iphone_x", options={"sitemap" = true})
      * @Template
      */
     public function samsungsNote9TakesOnApplesIphoneXAction()
@@ -223,7 +223,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/what-to-look-out-for-when-buying-phone-insurance", name="what_to_look_out_for_when_buying_phone_insurance")
+     * @Route("/what-to-look-out-for-when-buying-phone-insurance", name="what_to_look_out_for_when_buying_phone_insurance", options={"sitemap" = true})
      * @Template
      */
     public function whatToLookOutForWhenBuyingPhoneInsuranceAction()
@@ -236,7 +236,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/the-weird-and-wonderful-origins-of-insurance-from-the-babylonians-to-benjamin-franklin", name="the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin")
+     * @Route("/the-weird-and-wonderful-origins-of-insurance-from-the-babylonians-to-benjamin-franklin", name="the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin", options={"sitemap" = true})
      * @Template
      */
     public function theWeirdAndWonderfulOriginsOfInsuranceAction()
@@ -249,7 +249,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/how-to-fix-a-problem-like-insurance", name="how_to_fix_a_problem_like_insurance")
+     * @Route("/how-to-fix-a-problem-like-insurance", name="how_to_fix_a_problem_like_insurance", options={"sitemap" = true})
      * @Template
      */
     public function howToFixAProblemLikeInsuranceAction()
@@ -262,7 +262,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/the-insurtech-revolution", name="the_insurtech_revolution")
+     * @Route("/the-insurtech-revolution", name="the_insurtech_revolution", options={"sitemap" = true})
      * @Template
      */
     public function theInsurtechRevolutionAction()
@@ -275,7 +275,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/the-internet-of-things", name="the_internet_of_things")
+     * @Route("/the-internet-of-things", name="the_internet_of_things", options={"sitemap" = true})
      * @Template
      */
     public function theInternetOfThingsAction()
@@ -288,7 +288,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/samsung-galaxy-s9-versus-the-s9-plus", name="samsung_galaxy_s9_versus_the_s9_plus")
+     * @Route("/samsung-galaxy-s9-versus-the-s9-plus", name="samsung_galaxy_s9_versus_the_s9_plus", options={"sitemap" = true})
      * @Template
      */
     public function samsungGalaxyS9VersusTheS9PlusAction()
@@ -301,7 +301,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/mwc-2018-preview", name="mwc_2018_preview")
+     * @Route("/mwc-2018-preview", name="mwc_2018_preview", options={"sitemap" = true})
      * @Template
      */
     public function mwc2018PreviewAction()
@@ -314,7 +314,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/money-saving-tips", name="money_saving_tips")
+     * @Route("/money-saving-tips", name="money_saving_tips", options={"sitemap" = true})
      * @Template
      */
     public function moneySavingTipsAction()
@@ -327,7 +327,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/mobile-phone-insurance-buying-guide", name="mobile_phone_insurance_buying_guide")
+     * @Route("/mobile-phone-insurance-buying-guide", name="mobile_phone_insurance_buying_guide", options={"sitemap" = true})
      * @Template
      */
     public function mobilePhoneInsuranceBuyingGuideAction()
@@ -340,7 +340,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/disruptive-technology-what-is-it", name="disruptive_technology_what_is_it")
+     * @Route("/disruptive-technology-what-is-it", name="disruptive_technology_what_is_it", options={"sitemap" = true})
      * @Template
      */
     public function disruptiveTechnologyWhatIsItAction()
@@ -353,7 +353,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/our-top-5-winter-sports-insurance-tips", name="our_top_5_winter_sports_insurance_tips")
+     * @Route("/our-top-5-winter-sports-insurance-tips", name="our_top_5_winter_sports_insurance_tips", options={"sitemap" = true})
      * @Template
      */
     public function ourTop5WinterSportsInsuranceTipsAction()
@@ -366,7 +366,7 @@ class BlogController extends BaseController
     }
 
     /**
-     * @Route("/3-technologies-that-will-shape-the-future-of-insurance", name="3_technologies_that_will_shape_the_future_of_insurance")
+     * @Route("/3-technologies-that-will-shape-the-future-of-insurance", name="3_technologies_that_will_shape_the_future_of_insurance", options={"sitemap" = true})
      * @Template
      */
     public function technologiesThatWillShapeTheFutureOfInsuranceAction()

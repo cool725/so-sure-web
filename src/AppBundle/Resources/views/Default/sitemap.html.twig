@@ -30,7 +30,7 @@
                                 {% if path != prev_path %}
                                     </ul>
                                     {% if path != "http:" and path != "https:" %}
-                                        <h4 class="mb-2">{{ path|translateSitemapUrl() }}</h4>
+                                        <h2 class="h4 mb-2">{{ path|translateSitemapUrl() }}</h2>
                                     {% endif %}
                                 <ul class="list-unstyled mb-4">
                                 {% endif %}

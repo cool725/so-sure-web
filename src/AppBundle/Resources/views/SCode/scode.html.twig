@@ -11,7 +11,7 @@
     <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 {% set og_title = 'Sign up and save' %}
-{% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!' %}
+{% set og_description = "Hey, I just insured my mobile phone with so-sure. They give you 80% of your cashback if we are connected and don\'t claim!" %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
@@ -242,7 +242,7 @@
             {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
 
             <div class="end-cta end-cta__mobile d-md-none">
-                <h4 class="mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
+                <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
                 <a href="#"
                    class="btn btn-success btn-block-xs track-data get-a-quote"
                    data-event="
@@ -261,7 +261,7 @@
                              width="180px"
                              class="lozad">
                         <div class="ml-5">
-                            <h4 class="mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h4>
+                            <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
                             <a href="#"
                                class="btn btn-success btn-block-xs track-data get-a-quote"
                                data-event="

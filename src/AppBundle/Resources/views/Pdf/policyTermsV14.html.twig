@@ -436,7 +436,7 @@
                     £10
                 </td>
                 <td>
-                    17%
+                    8%
                 </td>
             </tr>
             <tr>
@@ -447,18 +447,7 @@
                     £20
                 </td>
                 <td>
-                    33%
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    3
-                </td>
-                <td>
-                    £30
-                </td>
-                <td>
-                    50%
+                    17%
                 </td>
             </tr>
             <tr>
@@ -469,15 +458,26 @@
                     £40
                 </td>
                 <td>
+                    33%
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    8
+                </td>
+                <td>
+                    £80
+                </td>
+                <td>
                     67%
                 </td>
             </tr>
             <tr>
                 <td>
-                    5
+                    10
                 </td>
                 <td>
-                    £48
+                    £96
                 </td>
                 <td>
                     80%
@@ -650,12 +650,13 @@
         </ul>
         <h4>Cancelling your insurance</h4>
         <p>If you elect to cancel your insurance within the 14 days after your policy start date, you will be entitled to receive a full refund, providing no claim has been made.</p>
-        <p>If you have not claimed, at all other time during your period of insurance you can cancel by giving us 30 days written notice. We will be entitled to collect premium from you for this 30 day period. If you pay by instalment this will mean we will collect one further monthly payment from you. If you pay an annual premium this will mean we will return any unexpired period to you. If you do wish to exercise your right to cancel your policy, you can do so at any time by contacting us by email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> or in writing at so-sure, 5 Martin Lane, London EC4R 0DP.</p>
+        <p>If you have not claimed, at all other time during your period of insurance you can cancel by giving us written notice. If you pay an annual premium this will mean we will return any unexpired period to you.  If you pay by instalment there will be no refund of any premium paid. If you do wish to exercise your right to cancel your policy, you can do so at any time by contacting us by email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> or in writing at so-sure, {{ business_address|replace({'\n':','}) }}.</p>
+        <p>If you have not claimed, at all other time during your period of insurance you can cancel immediately by giving us written notice. If you pay an annual premium this will mean we will return any unexpired period to you. If you pay by instalment there will be no refund of any premium paid. If you do wish to exercise your right to cancel your policy, you can do so at any time by contacting us by email <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> or in writing at so-sure, {{ business_address|replace({'\n':','}) }}.</p>
         <p>If a claim has been made by you we will not return any premium and you must still pay us the remaining annual premium. If you do not pay the remaining amount of your annual premium, we will take legal proceedings against you to recover any outstanding premium amount and full reimbursement of any claims fulfilled. We have to do this because we don't want non-payers of premium to cause our honest customers see increased premium costs.</p>
         <p>We can cancel the insurance without notice if you do not pay the monthly premium when due, if you make a claim which we believe to be fraudulent or you have breached any of your policy terms and/or conditions.</p>
         <p>In certain circumstances we may require you to validate your phone through our app for your policy to be valid. In such case, we will inform you of this prior purchase and if you have not validated your phone within 13 days of purchase, we will cancel your policy.</p>
         <h4>Making an enquiry or complaint</h4>
-        <p>We will always try to be fair and reasonable. If you believe we have not provided you with a satisfactory level of service, please tell us so that we can do our best to resolve the problem. The easiest way to contact us is to call us on 0113 320 9722. We will do everything possible to ensure that your query is dealt with promptly. Alternatively, you can email complaints@wearesosure.com or write to: Quality Assurance Manager, so-sure Limited, 5 Martin Lane, London EC4R 0DP. Please quote your mobile phone number in any correspondence.</p>
+        <p>We will always try to be fair and reasonable. If you believe we have not provided you with a satisfactory level of service, please tell us so that we can do our best to resolve the problem. The easiest way to contact us is to call us on 0113 320 9722. We will do everything possible to ensure that your query is dealt with promptly. Alternatively, you can email complaints@wearesosure.com or write to: Quality Assurance Manager, so-sure Limited, {{ business_address|replace({'\n':','}) }}. Please quote your mobile phone number in any correspondence.</p>
         <p>
             {% if claims_default_direct_group %}
                 Direct Group Property Services Limited
@@ -669,7 +670,7 @@
 
     <div>
         <h4>Status Disclosure</h4>
-        <p>so-sure Limited is a company registered in England and Wales (registration company number 9365669), FCA registration number 744729 and registered address, 5 Martin Lane, London EC4R 0DP. so-sure Limited is an appointed representative of {{ broker_name }} which is authorised and regulated by the Financial Conduct Authority under registration number 308657.<br /> SALVA is authorised by the Financial Conduct Authority as an insurer under registration number 622523 with registered office Pärnu road 16, 10141 Tallinn, Estonia, and is not protected under the Financial Services Compensation Scheme. While SALVA itself is an unrated insurer, it is backed by Munich Re, a highly rated reinsurance company. Hence, in the unlikely event of insolvency the risk of your claim not being settled is strongly reduced.</p>
+        <p>so-sure Limited is a company registered in England and Wales (registration company number 9365669), FCA registration number 744729 and registered address, {{ business_address|replace({'\n':','}) }}. so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority under registration number 308657.<br /> SALVA is authorised by the Financial Conduct Authority as an insurer under registration number 622523 with registered office Pärnu road 16, 10141 Tallinn, Estonia, and is not protected under the Financial Services Compensation Scheme. While SALVA itself is an unrated insurer, it is backed by Munich Re, a highly rated reinsurance company. Hence, in the unlikely event of insolvency the risk of your claim not being settled is strongly reduced.</p>
         <h4>Choice of law</h4>
         <p>English law applies to this policy. All communication with you will be in English.</p>
         <h4>If we need to change the terms of the policy</h4>
@@ -678,7 +679,7 @@
         <p>We comply with the General Data Protection Regulation. We are committed to preserving the privacy of our customers. Please read the following privacy policy in conjunction to those on our website, and if applicable, the apps downloaded, to understand how we will use and protect the information that you provide to us. If you are purchasing the policy on behalf of another person (family member or employee), you will secure the consent of that person to share their personal data with us in accordance to our terms and conditions.</p>
         <p>By purchasing this insurance from us you consent to the collection and use of your information under the terms of this privacy policy for the purposes of effecting and administering this insurance policy. The information you provide will be used by us to supply you with the services for which you have registered and we may use the information to contact you to obtain your views on our services and to let you know about important changes to the services which we offer.</p>
         <p>The information you provide to us about you and the mobile phone will be shared with the insurer and the authorised agents of the insurer. If you make a claim that has been approved, the fact that the claim has been approved will be shared with your connections in view to evaluate their reward pot value, however, the details of your claim will not be shared with your connections. In order to prevent fraud we may share information with other insurers and fraud prevention agencies where this had been detected.</p>
-        <p>We may contact you by post, mobile phone, text or e-mail. You will only be contacted by the methods you have asked to be contacted by. Your information will not be used or disclosed other than in accordance with this privacy policy, or without your permission, unless required by law. If you would prefer us not to contact you to obtain your views and/or you change your mind in the future and would like us to stop contacting you for this purpose, please write to: Support, so-sure Limited, 5 Martin Lane, London EC4R 0DP.</p>
+        <p>We may contact you by post, mobile phone, text or e-mail. You will only be contacted by the methods you have asked to be contacted by. Your information will not be used or disclosed other than in accordance with this privacy policy, or without your permission, unless required by law. If you would prefer us not to contact you to obtain your views and/or you change your mind in the future and would like us to stop contacting you for this purpose, please write to: Support, so-sure Limited, {{ business_address|replace({'\n':','}) }}.</p>
         <p>The details of mobile phones reported lost or stolen will be submitted, where applicable, to mobile phone databases to prevent further use. We may co-operate with the Police and any other relevant authorities or organisations in connection with any misuse or suspected misuse of the services provided by us or other telecommunications services provided by any member of our group of companies. If necessary, we may divulge information about you for this purpose. You have a right to ask for a copy of the data held about you and you may ask us to make any necessary changes to ensure that it is accurate and kept up-to-date. If you wish to do this, please contact Customer Support on support@wearesosure.com</p>
         <p>We employ security measures to protect your information from access by unauthorised persons and against unlawful use, accidental loss, destruction and damage. We will retain your information for a reasonable period or as long as the law requires. Any changes to our privacy policy will be notified to you in the appropriate way. All comments, queries and requests relating to our use of your information are welcomed and should be addressed as specified above.</p>
         <p>If we transfer your information to a person, office, branch, organisation, service provider or agent in another country, we will make sure that they agree to apply the same levels of protection as we are required to apply to information held in the UK and to use your information only for the purposes that we have permitted. You confirm that you consent to transfers of your data outside the EEA for the purposes described in this policy.</p>
