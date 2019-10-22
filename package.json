@@ -8,7 +8,7 @@
   "license": "proprietary",
   "private": true,
   "devDependencies": {
-    "@fortawesome/fontawesome-pro": "^5.5.0",
+    "@fortawesome/fontawesome-pro": "^5.11.2",
     "@symfony/webpack-encore": "git://github.com/symfony/webpack-encore.git#master",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
