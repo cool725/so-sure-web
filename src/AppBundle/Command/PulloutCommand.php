@@ -166,7 +166,7 @@ class PulloutCommand extends ContainerAwareCommand
                 $rows[$policyKey]["net"] += $net;
             } else {
                 $rows[$policyKey] = [
-                    "date" => $birth,
+                    "date" => $creation,
                     "campaign" => $campaign,
                     "channel" => $channel,
                     "device" => $device,
@@ -176,6 +176,9 @@ class PulloutCommand extends ContainerAwareCommand
                 ];
             }
         }
+        // order descending by date
+        array_reverse($rows, true);
+
         // now write the array.
         $file = fopen($filename, "w");
         fwrite($file, "Date,Campaign,Channel,Device,Create Account,Purchased,Net\n");

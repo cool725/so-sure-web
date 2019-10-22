@@ -3039,11 +3039,8 @@ abstract class Policy
             $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
             // Never refund for certain cancellation reasons
             return false;
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
-            // user has 30 days from when they requested cancellation
-            // however, as we don't easily have a scheduled cancellation
-            // we will start with a manual cancellation that should be done
-            // 30 days after they requested, such that the cancellation will be immediate then
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED &&
+            !$this->getPolicyTerms()->isInstantUserCancellationEnabled()) {
             return true;
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return true;
@@ -3053,6 +3050,7 @@ abstract class Policy
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
             throw new \UnexpectedValueException('Badrisk is not implemented');
         }
+        return false;
     }
 
     public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false, $countScheduled = false)

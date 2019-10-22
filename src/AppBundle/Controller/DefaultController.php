@@ -311,7 +311,7 @@ class DefaultController extends BaseController
      */
     public function termsTest()
     {
-        return $this->render('AppBundle:Pdf:policyTermsV13.html.twig');
+        return $this->render('AppBundle:Pdf:policyTermsV14.html.twig');
     }
 
     private function competitorsData()
