@@ -16,6 +16,7 @@ parameters:
     report_excluded_policy_ids:
         - 57d829aa04e76f403c74ab39 # Dylan
         - 57ef7c67a6b37e5b2359e995 # Patrick
+        - 5daef79dd8102f6edb5342ee # Nick
     roles:
         - ROLE_ADMIN
         - ROLE_CLAIMS
