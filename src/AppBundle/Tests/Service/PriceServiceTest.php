@@ -175,8 +175,8 @@ class PriceServiceTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail(uniqid()."@yandex.com");
-        $user->setFirstname(uniqid());
-        $user->setLastname(uniqid());
+        $user->setFirstName(uniqid());
+        $user->setLastName(uniqid());
         $phone = new Phone();
         $priceA = new PhonePrice();
         $priceB = new PhonePrice();

@@ -1002,7 +1002,7 @@ class Phone
     /**
      * Returns the price that is current.
      * @param string         $stream is the price stream that we want the current price for.
-     * @param \DateTime|null $date    the date at which the price should be current. Null for now.
+     * @param \DateTime|null $date   the date at which the price should be current. Null for now.
      * @return PhonePrice|null the found price or null if there is no price current at that time.
      */
     public function getCurrentPhonePrice($stream, \DateTime $date = null)
@@ -1090,7 +1090,7 @@ class Phone
     /**
      * Gives a list of all phone prices that have been current in the past but are not any more. The list will be in
      * order from newest to oldest.
-     * @param \DateTime|null $date    is the date at which we are checking.
+     * @param \DateTime|null $date is the date at which we are checking.
      * @return array of matching phone prices.
      */
     public function getPreviousPhonePrices(\DateTime $date = null)
@@ -1110,7 +1110,7 @@ class Phone
 
     /**
      * Gives all phone prices that are yet in the future.
-     * @param \DateTime|null $date    is the date which is to be considered the present.
+     * @param \DateTime|null $date is the date which is to be considered the present.
      * @return array containing the prices in descending order of date.
      */
     public function getFuturePhonePrices(\DateTime $date = null)

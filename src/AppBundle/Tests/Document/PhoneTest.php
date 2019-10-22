@@ -414,7 +414,10 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         // Once C appers, A can only be found if searching over a long time period.
         $date = new \DateTime('2019-04-08 17:25');
         $this->assertEquals([$priceC], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));
-        $this->assertEquals([$priceC, $priceA], $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 168500, $date));
+        $this->assertEquals(
+            [$priceC, $priceA],
+            $phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 168500, $date)
+        );
         $this->assertEquals([$priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_YEARLY, 10, $date));
         $this->assertEquals([$priceC, $priceB], $phone->getRecentPhonePrices(PhonePrice::STREAM_ANY, 10, $date));
         // Once D appears we can now get D, C, and A in the monthly channel if we look far enough.
