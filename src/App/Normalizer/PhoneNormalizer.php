@@ -40,6 +40,12 @@ class PhoneNormalizer implements NormalizerInterface, SerializerAwareInterface
             }
         }
 
+        if (in_array(Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY, $context['groups'])) {
+            if ($object instanceof Phone) {
+                return $object->__toString();
+            }
+        }
+
         return [];
     }
 }
