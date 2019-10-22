@@ -43,7 +43,8 @@ class UserNormalizer implements NormalizerInterface, SerializerAwareInterface
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (in_array(Oauth2Scopes::USER_STARLING_SUMMARY, $context['groups'])) {
+        if (in_array(Oauth2Scopes::USER_STARLING_SUMMARY, $context['groups'])
+            || in_array(Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY, $context['groups'])) {
             /** @var PhonePolicy $policy */
             $policy = $object->getPolicies()
                 ->filter(function (Policy $policy) {

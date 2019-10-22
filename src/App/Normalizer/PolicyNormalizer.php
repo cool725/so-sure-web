@@ -42,6 +42,17 @@ class PolicyNormalizer implements NormalizerInterface, SerializerAwareInterface
             ];
         }
 
+        if (isset($groups[Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY]) && $object->isActive()) {
+            return [
+                'policyNumber' => $object->getPolicyNumber(),
+                'endDate' => $object->getEnd()->format('Y-m-d'),
+                'insuredPhone' => $this->serializer->normalize($object->getPhone(), $format, $context),
+                'connections' => count($object->getConnections()),
+                'rewardPot' => (float) $object->getPotValue(),
+                'rewardPotCurrency' =>'GBP' ,
+            ];
+        }
+
         return [];
     }
 }
