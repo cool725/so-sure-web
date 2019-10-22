@@ -126,7 +126,8 @@ class PriceService
                 $date
             );
         } else {
-            // TODO: should be more like the apply premium function so that renewal price can be old price.
+            // TODO: should be more like the apply premium function so that renewal price can be old price which at
+            //       this point is a premium not a price.
             return $policy->getPhone()->getCurrentPhonePrice(
                 PhonePrice::installmentsStream($policy->getPremiumInstallments()),
                 $date

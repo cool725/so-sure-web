@@ -48,7 +48,7 @@ class PriceServiceTest extends WebTestCase
     /**
      * Makes sure the price service can get the applicable price with it's source.
      */
-    public function testUserPhonePriceSource()
+    public function testUserPhonePriceStreams()
     {
         $data = $this->userData();
         $this->assertEquals(
@@ -131,15 +131,41 @@ class PriceServiceTest extends WebTestCase
     public function testPolicySetPhonePremium()
     {
         $data = $this->userData();
-        self::$priceService->policySetPhonePremium($data["policy"], PhonePrice::STREAM_YEARLY, 0, new \DateTime('2019-08-08'));
-        $this->assertEquals(
-            "phone",
-            $data["policy"]->getPremium()->getSource()
+        $offer = new Offer();
+        $offerPrice = new PhonePrice();
+        $offerPrice->setGwp(41);
+        $offerPrice->setValidFrom(new \DateTime("2019-05-01"));
+        $offerPrice->setStream(PhonePrice::STREAM_YEARLY);
+        $offer->setPrice($offerPrice);
+        $offer->setPhone($data["phone"]);
+        $offer->addUser($data["user"]);
+        $data["user"]->addOffer($offer);
+        self::$dm->persist($offer);
+        self::$dm->flush();
+        self::$priceService->policySetPhonePremium(
+            $data["policy"],
+            PhonePrice::STREAM_YEARLY,
+            0,
+            new \DateTime('2019-04-08')
         );
-        $this->assertEquals(
-            1.23,
-            $data["policy"]->getPremium()->getGwp()
+        $this->assertEquals("phone", $data["policy"]->getPremium()->getSource());
+        $this->assertEquals(1.23, $data["policy"]->getPremium()->getGwp());
+        self::$priceService->policySetPhonePremium(
+            $data["policy"],
+            PhonePrice::STREAM_YEARLY,
+            0,
+            new \DateTime('2019-07-08')
         );
+        $this->assertEquals("offer", $data["policy"]->getPremium()->getSource());
+        $this->assertEquals(41, $data["policy"]->getPremium()->getGwp());
+        self::$priceService->policySetPhonePremium(
+            $data["policy"],
+            PhonePrice::STREAM_MONTHLY,
+            0,
+            new \DateTime('2019-07-08')
+        );
+        $this->assertEquals("phone", $data["policy"]->getPremium()->getSource());
+        $this->assertEquals(20, $data["policy"]->getPremium()->getGwp());
     }
 
     /**
