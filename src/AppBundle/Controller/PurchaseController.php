@@ -33,9 +33,6 @@ use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RequestService;
-use com\checkout\ApiServices\Charges\ChargeService;
-use com\checkout\ApiServices\Charges\RequestModels\ChargeRetrieveWithPaymentToken;
-use com\checkout\ApiServices\Tokens\ResponseModels\PaymentToken;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1471,19 +1468,21 @@ class PurchaseController extends BaseController
             /** @var CheckoutService $checkout */
             $checkout = $this->get('app.checkout');
 
-            // pay and handle 3DS.
-            $pay = $checkout->pay(
-                $policy,
-                $token,
-                $amount,
-                Payment::SOURCE_WEB,
-                null,
-                $this->getIdentityLogWeb($request)
-            );
-            if ($pay->getRedirectUrl()) {
-                $policy->setThreeDToken($pay->getId());
-                $dm->flush();
-                return $this->json(["redirect" => $pay->getRedirectUrl()]);
+            if ($request->get('_route') == 'purchase_checkout') {
+                $checkout->pay(
+                    $policy,
+                    $token,
+                    $amount,
+                    Payment::SOURCE_WEB,
+                    null,
+                    $this->getIdentityLogWeb($request)
+                );
+            } else {
+                $checkout->updatePaymentMethod(
+                    $policy,
+                    $token,
+                    $amount
+                );
             }
 
             $this->addFlash('success', $successMessage);
@@ -1545,42 +1544,5 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown Error');
             }
         }
-    }
-
-    /**
-     * @Route("/checkout/process-three-d", name="checkout_process_threed")
-     */
-    public function processThreeDAction(Request $request)
-    {
-        $successMessage = 'Success! Your payment has been completed';
-        $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
-            details are correct and try again or get in touch if you continue to have issues';
-        $logger = $this->get('logger');
-        $token = $request->get('cko-payment-token');
-        /** @var CheckoutService $checkout */
-        $checkout = $this->get('app.checkout');
-        $details = $checkout->verifyChargeByToken($token);
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        $policyId = $details->getMetadata()['policy_id'];
-        $policy = $repo->find($policyId);
-        if (!$policy) {
-            $logger->info(sprintf('Missing policy'));
-            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Policy not found');
-        }
-        $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $policyId]);
-        if (count($policy->getPayments()) > 0) {
-            $redirectSuccess = $this->generateUrl('user_policy', ['policyId' => $policyId]);
-        }
-        $redirectFailure = $this->generateUrl('user_payment_details_policy', ['policyId' => $policyId]);
-        // Add the payment again but with 3DS verification.
-        try {
-            $checkout->add($policy, $details->getId(), Payment::SOURCE_WEB);
-        } catch (PaymentDeclinedException $e) {
-            $this->addFlash('error', $errorMessage);
-            return new RedirectResponse($redirectFailure);
-        }
-        $this->addFlash('success', $successMessage);
-        return new RedirectResponse($redirectSuccess);
     }
 }

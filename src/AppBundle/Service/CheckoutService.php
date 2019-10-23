@@ -300,10 +300,7 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        $charge = $this->capturePaymentMethod($policy, $token, $amount, $source);
-        if ($charge->getRedirectUrl()) {
-            return $charge;
-        }
+        $charge = $this->capturePaymentMethod($policy, $token, $amount);
         return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
     }
 
@@ -753,14 +750,6 @@ class CheckoutService
         return $transactionDetails;
     }
 
-    public function verifyChargeByToken($token)
-    {
-        $service = $this->client->chargeService();
-
-        $charge = $service->verifyCharge($token);
-        return $charge;
-    }
-
     /**
      * @param Policy $policy
      * @param string $token
@@ -769,8 +758,7 @@ class CheckoutService
     public function capturePaymentMethod(
         Policy $policy,
         $token,
-        $amount = null,
-        $source = null
+        $amount = null
     ) {
         $user = $policy->getUser();
         $details = null;
@@ -784,29 +772,25 @@ class CheckoutService
 
         try {
             $service = $this->client->chargeService();
+
             $user = $policy->getUser();
+
             $charge = new CardTokenChargeCreate();
             if ($paymentMethod->hasPreviousChargeId()) {
                 $charge->setPreviousChargeId($paymentMethod->getPreviousChargeId());
             }
             $charge->setEmail($user->getEmail());
             $charge->setAutoCapTime(0);
+            $charge->setAutoCapture('N');
             $charge->setCurrency('GBP');
             $charge->setMetadata(['policy_id' => $policy->getId()]);
             $charge->setCardToken($token);
-            $charge->setChargeMode(1);
-            if ($source == Payment::SOURCE_WEB) {
-                $charge->setChargeMode(2);
-            }
             if ($amount) {
                 $charge->setValue($this->convertToPennies($amount));
             }
 
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
-            if ($details->getRedirectUrl()) {
-                return $details;
-            }
 
             if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
                 /**
@@ -824,8 +808,24 @@ class CheckoutService
                 if ($card) {
                     $this->setCardToken($policy, $card);
                 }
-                if (!$paymentMethod->hasPreviousChargeId() && $amount) {
+            }
+
+            if ($amount) {
+                $capture = new ChargeCapture();
+                $capture->setChargeId($details->getId());
+
+                if (!$paymentMethod->hasPreviousChargeId()) {
                     $paymentMethod->setPreviousChargeId($details->getId());
+                }
+
+                $details = $service->CaptureCardCharge($capture);
+                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+
+                if ($details) {
+                    $card = $details->getCard();
+                    if ($card) {
+                        $this->setCardToken($policy, $card);
+                    }
                 }
             }
         } catch (\Exception $e) {
@@ -886,6 +886,7 @@ class CheckoutService
             }
 
             $service = $this->client->chargeService();
+
             $charge = new CardTokenChargeCreate();
             $charge->setEmail($user->getEmail());
             $charge->setAutoCapTime(0);
@@ -902,9 +903,6 @@ class CheckoutService
 
             $details = $service->chargeWithCardToken($charge);
             $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
-            if ($details->getRedirectUrl()) {
-                return $details;
-            }
 
             if ($details && $payment) {
                 $payment->setReceipt($details->getId());
@@ -1108,9 +1106,7 @@ class CheckoutService
         if (!$payment) {
             $payment = new CheckoutPayment();
             $payment->setReference($transactionDetails->getTrackId());
-            if ($transactionDetails->getStatus() != CheckoutPayment::RESULT_CARD_VERIFIED) {
-                $payment->setAmount($transactionAmount);
-            }
+            $payment->setAmount($transactionAmount);
             $payment->setUser($policy->getUser());
             $policy->addPayment($payment);
             $this->dm->persist($payment);
@@ -1168,10 +1164,7 @@ class CheckoutService
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
-        if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED &&
-            $payment->getResult() != CheckoutPayment::RESULT_AUTHORIZED &&
-            $payment->getResult() != CheckoutPayment::RESULT_CARD_VERIFIED
-        ) {
+        if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED) {
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
         }
