@@ -76,13 +76,13 @@ $(function(){
                 let url = paymentForm.data('url'),
                     csrf = paymentForm.data('csrf'),
                     pennies = paymentForm.data('value');
-                let redirect = paymentForm.data('redirect-url');
                 // console.log(url);
                 $.post(url, {'csrf': csrf, 'token': event.data.cardToken, 'pennies': pennies}, function(resp) {
-                    if (resp.redirect) redirect = resp.redirect;
+                    // console.log(resp);
                 }).fail(function() {
                     $('.loading-screen').fadeOut();
                 }).always(function() {
+                    let redirect = paymentForm.data('redirect-url');
                     if (redirect) {
                         window.location.href = redirect;
                     } else {
