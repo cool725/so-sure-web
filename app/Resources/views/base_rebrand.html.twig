@@ -10,11 +10,7 @@
 
         <title>{% block title %}so-sure{% endblock %}</title>
 
-        {% if use_fa_cdn %}
-            <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-TXfwrfuHVznxCssTxWoPZjhcss/hp38gEOH8UPZG/JcXonvBQ6SlsIF49wUzsGno" crossorigin="anonymous">
-        {% else %}
-            <link rel="stylesheet" href="{{ asset('css-js/fontawesome.css') }}">
-        {% endif %}
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
 
         {% if include_emoji is defined and include_emoji == true %}
             <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
@@ -154,9 +150,5 @@
         <script src="{{ asset('css-js/global.js') }}"></script>
 
         {% block javascriptsPage %}{% endblock %}
-
-        {% if trustpilot is defined and trustpilot == true %}
-            <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-        {% endif %}
     </body>
 </html>
