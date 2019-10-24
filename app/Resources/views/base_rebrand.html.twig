@@ -10,15 +10,11 @@
 
         <title>{% block title %}so-sure{% endblock %}</title>
 
-        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
-
-        {% if include_emoji is defined and include_emoji == true %}
-            <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
-        {% endif %}
-
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
 
         {% block cssPage %}{% endblock %}
+
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
 
         {% include '::meta_rebrand.html.twig' %}
 
@@ -144,7 +140,7 @@
         {% endif %}
 
         {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
-            <script src="{{ asset('css-js/cookie.js') }}"></script>
+            <script async src="{{ asset('css-js/cookie.js') }}"></script>
         {% endif %}
 
         <script src="{{ asset('css-js/global.js') }}"></script>
