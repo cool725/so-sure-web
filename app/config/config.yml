@@ -1389,7 +1389,6 @@ nelmio_security:
             - campaign.wearesosure.com
             - accounts.google.com
             - blog.wearesosure.com
-            - checkout.com
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this
     #forced_ssl:
