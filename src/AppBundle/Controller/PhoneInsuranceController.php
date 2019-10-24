@@ -365,6 +365,9 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
@@ -449,6 +452,7 @@ class PhoneInsuranceController extends BaseController
                 ],
                 ['memory' => 'asc']
             ),
+            'instore' => $instore,
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);

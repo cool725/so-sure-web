@@ -1183,6 +1183,8 @@ class UserController extends BaseController
      *
      * @Route("/welcome", name="user_welcome")
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
+     * @Route("/complete", name="user_instore")
+     * @Route("/complete/{id}", name="user_instore_id")
      * @Template
      */
     public function welcomeAction(Request $request, $id = null)
@@ -1235,17 +1237,27 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         // A/B Funnel Test
         // To Test use url param ?force=regular-funnel / ?force=new-funnel
         // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
 
-        return $this->render('AppBundle:User:onboarding.html.twig', [
+        $template = 'AppBundle:User:onboarding.html.twig';
+
+        if ($request->get('_route') == 'user_instore') {
+            $template = 'AppBundle:User:complete.html.twig';
+        }
+
+        return $this->render($template, [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
+            'instore' => $instore,
         ]);
     }
 

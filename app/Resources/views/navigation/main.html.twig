@@ -33,6 +33,14 @@
                 <span class="sr-only">so-sure</span>
             </a>
         </div>
+    {% elseif instore_mode is defined and instore_mode == true %}
+        <div class="container-large d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="{{ app.request.uri }}" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+        </div>
     {% elseif onboarding_mode is defined and onboarding_mode == true %}
         {# Logo #}
         <a href="/" class="navbar-brand show-in-nav show-in-quote">
