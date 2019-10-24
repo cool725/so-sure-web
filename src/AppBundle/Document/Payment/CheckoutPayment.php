@@ -105,15 +105,11 @@ class CheckoutPayment extends Payment
     public function setResult($result)
     {
         $this->result = $result;
-        if (in_array($result, [
-            self::RESULT_CAPTURED,
-            self::RESULT_REFUNDED,
-            self::RESULT_CARD_VERIFIED,
-            self::RESULT_AUTHORIZED,
-            self::RESULT_AUTHORIZED_3D,
-        ])) {
+        if (in_array($result, [self::RESULT_CAPTURED, self::RESULT_REFUNDED, self::RESULT_CARD_VERIFIED])) {
             $this->setSuccess(true);
         } elseif (in_array($result, [
+            self::RESULT_AUTHORIZED,
+            self::RESULT_AUTHORIZED_3D,
             self::RESULT_PENDING,
             self::RESULT_DEFERRED,
             self::RESULT_TIMEOUT,

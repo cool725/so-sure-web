@@ -619,13 +619,6 @@ abstract class Policy
      */
     protected $dontCancelIfUnpaid;
 
-    /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $threeDToken;
-
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -639,24 +632,6 @@ abstract class Policy
         $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
         $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getThreeDToken()
-    {
-        return $this->threeDToken;
-    }
-
-    /**
-     * @param mixed $threeDToken
-     * @return Policy
-     */
-    public function setThreeDToken($threeDToken)
-    {
-        $this->threeDToken = $threeDToken;
-        return $this;
     }
 
     public function getId()
