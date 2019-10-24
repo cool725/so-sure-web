@@ -36,32 +36,34 @@
                                     <small>({{ phone.memory }}GB)</small>
                                 </span>
                             </h1>
-                            <div class="qpw__alt__phones dropdown dropleft">
-                                <a href="#"
+                            <div class="qpw__alt__phones">
+                                <a href="#mem_sizes"
                                    class="dropdown-toggle"
                                    id="dropdownMenuLink"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="false">
+                                   data-toggle="collapse"
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="mem_sizes"
+                                   title="Not the phone you're looking for?">
                                     <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    {% if phones | length > 1 %}
-                                        {% for phone_mem in phones %}
-                                            {% if phone_mem.id != phone.id  %}
-                                                <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="dropdown-item h6" href="#">
-                                                    {{ phone_mem.memory }}GB
-                                                    <small>{{ make_desc }} {{ phone.model }}</small>
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                    <a class="dropdown-item h6 get-a-quote disabled" href="#">
-                                        Start a new quote
-                                        <small>Not the phone you're looking for?</small>
-                                    </a>
-                                </div>
                             </div>
+                        </div>
+                        <div class="collapse my-4 text-center text-lg-left" id="mem_sizes">
+                            {% if phones | length > 1 %}
+                                <ul class="list-inline">
+                                    {% for phone_mem in phones %}
+                                        {% if phone_mem.id != phone.id  %}
+                                            <li class="list-inline-item">
+                                                <a href="{{ path('quote_phone', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            <a class="text-white get-a-quote disabled" href="#">
+                                <small>Not the phone you're looking for?</small>
+                            </a>
                         </div>
                         <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
                             <span class="sub">For only</span>
