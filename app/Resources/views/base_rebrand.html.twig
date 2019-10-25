@@ -134,17 +134,18 @@
 
         <script src="{{ asset('css-js/runtime.js') }}"></script>
         <script src="{{ asset('css-js/vendor.js') }}"></script>
+        <script src="{{ asset('css-js/global.js') }}"></script>
 
-        {% if environment != 'prod' %}
-            <script src="{{ asset('css-js/dev.js') }}"></script>
-        {% endif %}
+        {% block javascriptsPage %}{% endblock %}
+
+        <script async type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 
         {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
             <script async src="{{ asset('css-js/cookie.js') }}"></script>
         {% endif %}
 
-        <script src="{{ asset('css-js/global.js') }}"></script>
-
-        {% block javascriptsPage %}{% endblock %}
+        {% if environment != 'prod' %}
+            <script src="{{ asset('css-js/dev.js') }}"></script>
+        {% endif %}
     </body>
 </html>
