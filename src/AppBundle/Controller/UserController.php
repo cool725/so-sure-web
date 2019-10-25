@@ -181,6 +181,7 @@ class UserController extends BaseController
         }
 
         $scode = null;
+        $codeMessage = null;
 
         if ($session = $this->get('session')) {
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
@@ -455,22 +456,11 @@ class UserController extends BaseController
             }
         } elseif ($scode) {
             if ($scode->isStandard()) {
-                $this->addFlash(
-                    'success-raw',
-                    sprintf(
-                        '%s has invited you to connect. Connect below',
-                        $scode->getUser()->getName()
-                    )
-                );
+                $codeMessage = sprintf('%s has invited you to connect. Connect below', $scode->getUser()->getName());
             } elseif ($scode->isReward()) {
-                $this->addFlash(
-                    'success-raw',
-                    sprintf(
-                        'Get your £%0.2f reward bonus from %s. Apply below',
-                        $scode->getReward()->getDefaultValue(),
-                        $scode->getUser()->getName()
-                    )
-                );
+                // @codingStandardsIgnoreStart
+                $codeMessage = sprintf('Apply your £%0.2f reward bonus from %s', $scode->getReward()->getDefaultValue(), $scode->getUser()->getName());
+                // @codingStandardsIgnoreEnd
             }
         }
 
@@ -538,6 +528,7 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'friends' => $fbFriends,
+            'code_message' => $codeMessage,
         );
     }
 

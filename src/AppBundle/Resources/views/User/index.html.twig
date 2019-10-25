@@ -1,11 +1,10 @@
 {% extends 'base_rebrand.html.twig' %}
-{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
 {% set body_class = 'user' %}
 {% set user_mode = true %}
 
-{% block title %}so-sure - Welcome back {{ app.user.firstname }}{% endblock %}
+{% block title %}Welcome back {{ app.user.firstname }} 🎉 | so-sure{% endblock %}
 
 {# Set Meta #}
 {% set og_title = 'Sign up and save' %}
@@ -25,8 +24,8 @@
     <section class="hero">
         <div class="container-large">
             <div class="row">
-                <div class="col-12 col-lg-4">
-                    <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }} 🎉</h1>
+                <div class="col-12 col-lg-4 mb-4">
+                    <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }}</h1>
                     {% if policy is defined and policy %}
                         {% if policy.user.getValidPolicies(true) | length == 1 %}
                             <div class="h6">Policy: <u>{{ policy.policyNumber }}</u></div>
@@ -51,7 +50,17 @@
                             </div>
                         {% endif %}
                         <div class="h6"><span class="sub">{{ policy.start|date('jS M Y') }} - {{ policy.end|date('jS M Y') }}</span></div>
-                        <div class="h6">📱<span class="sub">{{ policy.phone }}</span></div>
+                        <div class="h6 mb-4">📱<span class="sub">{{ policy.phone }}</span></div>
+                    {% endif %}
+                    {% if policy.canInvite %}
+                        <a href="#"
+                           id="apply_reward_btn"
+                           data-toggle="modal"
+                           data-target="#apply_reward_modal"
+                           data-populate="{% if scode and scode %}true{% endif %}"
+                           class="btn btn-success">
+                           Apply invite or promo code
+                       </a>
                     {% endif %}
                     {% if policy.connections|length > 0 %}
                         <div class="mt-4">
@@ -73,6 +82,9 @@
                                              ">
                                     </span>
                                 {% endfor %}
+                                {% if policy.standardConnections|length < 1 %}
+                                    <p>No connections</p>
+                                {% endif %}
                             </div>
                             <h5 class="mb-4">My rewards</h5>
                            <div class="d-md-flex flex-wrap align-self-center justify-content-start">
@@ -92,21 +104,11 @@
                                              ">
                                     </span>
                                 {% endfor %}
+                                {% if policy.rewardConnections|length < 1 %}
+                                    <p>No rewards</p>
+                                {% endif %}
                             </div>
                         </div>
-                    {% endif %}
-                    {% if policy.canInvite %}
-                        {% if scode and scode %}
-                            <h5 class="mt-4">Apply code</h5>
-                        {% else %}
-                            <h5 class="mt-4">Already received an invite or promocode?</h5>
-                        {% endif %}
-                        {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
-                            <div class="custom-input-with-btn mb-4">
-                                {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
-                            </div>
-                        {{ form_end(scode_form) }}
                     {% endif %}
                 </div>
                 <div class="col-12 col-lg-7 offset-lg-1">
@@ -290,6 +292,34 @@
     </section>
 
     {# Page Modal #}
+    <div class="modal fade"
+         id="apply_reward_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="apply_reward_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add code</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if code_message is not null %}
+                        <div class="h6">{{ code_message }} 🥳</div>
+                    {% endif %}
+                    {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
+                        <div class="custom-input-with-btn mb-4">
+                            {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
+                            {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
+                        </div>
+                    {{ form_end(scode_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}
 
