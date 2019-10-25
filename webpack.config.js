@@ -16,7 +16,6 @@ Encore
     // List all files here
     .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
-    .addEntry('cookie', './src/AppBundle/Resources/public/rebrand/js/cookie.js')
     .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')
     .addEntry('error', './src/AppBundle/Resources/public/rebrand/js/pages/error.js')
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
