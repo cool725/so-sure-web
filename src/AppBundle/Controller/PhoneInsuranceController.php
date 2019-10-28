@@ -492,7 +492,7 @@ class PhoneInsuranceController extends BaseController
                 // don't check for partial partial as quote phone may be different from partial policy phone
                 return $this->redirectToRoute('purchase_step_phone');
             } else {
-                return $this->redirectToRoute('purchase');
+                return $this->redirectToRoute('purchase', [], 301);
             }
         }
     }

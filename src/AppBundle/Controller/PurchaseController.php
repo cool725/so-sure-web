@@ -307,7 +307,7 @@ class PurchaseController extends BaseController
         /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('purchase');
+            return $this->redirectToRoute('purchase', [], 301);
         } elseif (!$user->canPurchasePolicy()) {
             $this->addFlash(
                 'error',
