@@ -863,6 +863,7 @@ nelmio_security:
                 - https://widget.trustpilot.com
                 - https://track.omguk.com
                 - http://www.iubenda.com
+                - https://www.iubenda.com
                 - 'data:'
                 - https://bat.bing.com
                 - https://www.gstatic.com
