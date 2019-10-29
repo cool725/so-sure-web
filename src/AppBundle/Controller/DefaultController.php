@@ -708,7 +708,7 @@ class DefaultController extends BaseController
             }
 
             // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_phone');
+            return $this->redirectToRoute('purchase_step_phone', [], 301);
         }
 
         return [

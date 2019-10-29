@@ -10,15 +10,11 @@
 
         <title>{% block title %}so-sure{% endblock %}</title>
 
-        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
-
-        {% if include_emoji is defined and include_emoji == true %}
-            <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
-        {% endif %}
-
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
 
         {% block cssPage %}{% endblock %}
+
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
 
         {% include '::meta_rebrand.html.twig' %}
 
@@ -27,6 +23,13 @@
         {% block pixel %}{% endblock %}
 
         {% block schema %}{% endblock %}
+
+        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
+            <script type="text/javascript">
+            var _iub = _iub || [];
+            _iub.csConfiguration = {"lang":"en","siteId":505658,"cookiePolicyId":7804419,"cookiePolicyUrl":"https://www.iubenda.com/privacy-policy/7805295/cookie-policy", "banner":{ "acceptButtonDisplay":true,"customizeButtonDisplay":true,"position":"float-top-center","acceptButtonColor":"#3fc67d","acceptButtonCaptionColor":"#ffffff","customizeButtonColor":"#2593f3","customizeButtonCaptionColor":"#ffffff","textColor":"#081a9a","backgroundColor":"#f5f7f9","backgroundOverlay":true }};
+            </script><script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+        {% endif %}
 
         <script>
             var dataLayer = window.dataLayer = window.dataLayer || [];
@@ -138,17 +141,14 @@
 
         <script src="{{ asset('css-js/runtime.js') }}"></script>
         <script src="{{ asset('css-js/vendor.js') }}"></script>
+        <script src="{{ asset('css-js/global.js') }}"></script>
+
+        {% block javascriptsPage %}{% endblock %}
+
+        <script async type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 
         {% if environment != 'prod' %}
             <script src="{{ asset('css-js/dev.js') }}"></script>
         {% endif %}
-
-        {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
-            <script src="{{ asset('css-js/cookie.js') }}"></script>
-        {% endif %}
-
-        <script src="{{ asset('css-js/global.js') }}"></script>
-
-        {% block javascriptsPage %}{% endblock %}
     </body>
 </html>

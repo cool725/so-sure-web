@@ -2,6 +2,9 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
+{% if instore is not null %}
+    {% set instore_mode = true %}
+{% endif %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
@@ -189,7 +192,9 @@
                             </li>
                         </ul>
                         <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-                        <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
+                        {% if instore is null %}
+                            <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
+                        {% endif %}
                         <div class="table-responsive">
                             <table class="table table-bordered text-white">
                                 <thead>
@@ -207,9 +212,11 @@
                                         <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
                                         <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
-                                    </tr>
+                                    {% if instore is null %}
+                                        <tr>
+                                            <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
+                                        </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>
@@ -438,7 +445,7 @@
     {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
 
     {# FAQ #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_miniFaq.html.twig' with { 'phone': phone } %}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_miniFaq.html.twig' with { 'phone': phone, 'instore': instore } %}
 
     <section class="specs py-5">
         <div class="container-large">

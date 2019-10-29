@@ -1,37 +1,17 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'home' %}
+{% if phone is defined and phone %}
+    {% set body_class = 'home-instore' %}
+{% else %}
+    {% set body_class = 'home' %}
+{% endif %}
+{% set instore_mode = true %}
+{% set robots_noindex = true %}
 
-{% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
-{% block meta %}
-    <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure."/>
-{% endblock %}
-
-{% block schema %}
-<script type="application/ld+json">
-{
-    "@context" : "http://schema.org",
-    "@type" : "Organization",
-    "url": "https://wearesosure.com/",
-    "legalName": "so-sure Ltd",
-    "location": {
-        "@type": "Place",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Tower Hamlets",
-          "addressRegion": "London",
-          "postalCode": "E1 7PT",
-          "streetAddress": "114 Whitechapel High Street"
-        },
-        "name": "Relay Building"
-    },
-    "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
-    "description": "The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure.",
-    "sameAs": ["https://twitter.com/wearesosure", "https://www.facebook.com/wearesosure"]
-}
-</script>
-{% endblock %}
+{% block title %}{{ store|capitalize }} | Insure with so-sure{% endblock %}
+{% block meta %}{% endblock %}
+{% block schema %}{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
@@ -40,27 +20,28 @@
 {% block body %}
 
     <section class="hero">
-
-        {# Toasts #}
-        {# {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %} #}
-
         <div class="container-large">
             <div class="row">
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% if store is not null %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-{{ store }}.png" class="img-fluid lozad animated jackInTheBox">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-lg-5 offset-md-2 offset-lg-1">
                     <div class="hero__intro">
-                        <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
-                        <ul class="list-unstyled icn-fa-list mb-5">
-                            {% if feature_enabled('apply-sign-up-bonus') %}
-                                <li class="mb-3 h5 text-white">
-                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                     Instant &pound;5 cashback bonus 💰
-                                </li>
+                        <h1 class="mb-4 text-white fit">
+                            Mobile Insurance <br>
+                            {% if store is not null %}
+                                <span class="sub text-deep-sky-blue-d">in partnership with {{ store|capitalize }}</span>
+                            {% else %}
+                                <span class="sub text-deep-sky-blue-d">that's Simply Better</span>
                             {% endif %}
+                        </h1>
+                        <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
                                 24-72 hour replace or repair
@@ -93,7 +74,11 @@
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <div class="hero__illustration d-block d-lg-none mt-4">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
+                        {% if store is not null %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-{{ store }}.png" class="img-fluid animated lozad jackInTheBox">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -104,17 +89,112 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
+    {% if top_phones is defined and top_phones is not empty %}
+        <section class="other-phones bg-athens-gray py-lg-5 mb-lg-5">
+            <div class="container-large py-5 mb-lg-5">
+                <h2 class="h3 mb-5 text-primary">{{ top_phones|first.make }} Models</h2>
+                <div class="row justify-content-center">
+                    {% for topPhone in top_phones %}
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <a href="{{ path('phone_insurance_make_model', {'make': topPhone.makeCanonical, 'model': topPhone.encodedModelCanonical}) }}">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png"
+                                     alt="so-sure phone smiling"
+                                     title="{{ topPhone.make}} {{ topPhone.model }} {{ topPhone.memory }}GB"
+                                     width="150px"
+                                     class="mb-3 lozad">
+                                <h3 class="h6 mb-3">{{ topPhone.model}}</h3>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+
     {# TV Add #}
     {% include 'AppBundle::Default/CommonSections/_skyTVAd.html.twig' %}
 
     {# Cover #}
     {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
 
-    {# Top Manufacturers #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_topManufacturers.html.twig' %}
+    <section class="differently py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-3 text-primary text-center">We do things  🤩 differently</h2>
+            <p class="mb-5 text-center">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="differently__illustration__mobile d-block d-lg-none my-5">
+                        <img data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png" alt="so-sure - pic-sure" class="img-fluid lozad">
+                    </div>
+                </div>
+                <div class="col-lg-6 pb-lg-5">
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title mb-0">
+                                Aim for 24-72 hour replace or repair <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We understand it's stressful to be without your phone, that’s why we aim to get you back up and running quickly after your claim is approved. While we aim for 24-72 hours, some repairs may take a little longer.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title mb-0">
+                                Up to 80% money back <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We reward our careful customers.  If you and your connections don’t make a claim we return up to 80% of your premium back at the end of every policy year.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title mb-0">
+                                Low excess from just &pound;50 with our app <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand mt-4">
+                                {% if store is not null %}
+                                    <div class="h6">{{ store|capitalize }} customers - phones insured in-store are exempt from verifying their device.</div>
+                                {% endif %}
+                                Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss &amp; theft when you validate your phone with our app.
+                                <br><br>
+                                Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!
+                                <br><br>
+                                So, if something unfortunate happens and you haven't validated your phone with our app you will need to pay up to &pound;100 extra for any loss, damage or theft claims.
+                                <br><br>
+                                Excess levels vary by make, model and memory size and might be higher for latest, most-expensive new handsets.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title mb-0">
+                                Insuring second hand phones <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We're one of the only ones in the UK that insure older phones and second hand devices.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title mb-0">
+                                We decline less than 3.5% of claims* <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand mt-4">
+                                We have our customers backs and we're here to protect you when you need us. That's what insurance is for after all. <br><br>
+                                <small>*as of July 18</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    {# We do things differently #}
-    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
 
     <section class="reward py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_why-illustration.png ">
         <div class="container-large py-5">
@@ -124,10 +204,6 @@
                         <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
                         <p class="mb-4">
                             We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!
-                            {% if feature_enabled('apply-sign-up-bonus') %}
-                                <br><br>
-                                Instant &pound;5 cashback bonus 💰 when you sign up!
-                            {% endif %}
                         </p>
                         <a href="{{ path('social_insurance') }}" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
                     </div>
@@ -188,43 +264,8 @@
         </div>
     </section>
 
-    {# Top Models #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}
-
     {# Claims Process #}
     {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %}
-
-    <section class="banner banner-dismissible">
-        <div class="container-large py-5">
-            <div class="d-lg-flex align-items-lg-center">
-                <div class="banner__image">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon-home.png" alt="Home insurance" width="250px" class="lozad">
-                </div>
-                <div class="banner__text ml-lg-4">
-                    <h2 class="text-white">Home Insurance Coming 2020</h2>
-                    <p class="text-columbia-blue-e lead mb-0">Take our survey to be in for a chance to <strong>win a phone cover</strong></p>
-                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2019, 1 per customer.</small></p>
-                    <a href="https://sosure.typeform.com/to/CdsghS"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="btn btn-white track-data"
-                       data-event="take-survey-banner-clicked"
-                       data-event-url="https://sosure.typeform.com/to/CdsghS"
-                       data-event-blank="true">
-                        Take Survey
-                        <i class="far fa-long-arrow-right fa-lg ml-2"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <button type="button"
-                class="banner__close close text-white"
-                data-dismiss="banner"
-                data-event="take-survey-banner-closed"
-                aria-label="Close">
-            <i class="fal fa-times fa-lg"></i>
-        </button>
-    </section>
 
     {# Reviews #}
     {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}

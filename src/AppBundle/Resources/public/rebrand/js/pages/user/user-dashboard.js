@@ -172,4 +172,9 @@ $(function() {
             });
         }
     });
+
+    // If scode in session show modal with code pre-populated
+    if ($('#apply_reward_btn').data('populate') == true) {
+        $('#apply_reward_modal').modal('show');
+    }
 });

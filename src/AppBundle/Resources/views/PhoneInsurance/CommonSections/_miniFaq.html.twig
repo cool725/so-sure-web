@@ -55,8 +55,12 @@
                             How much is excess? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
                         </h3>
                         <div class="expanding-cardbox__expand text-zaffre mt-4">
-                            <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology</p>
-                            <p class="mb-0"><mark>If you don't validate your phone with pic-sure using our app, the excess is &pound;150.</mark></p>
+                            {% if instore is null %}
+                                <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft when you validate your phone with our anti-fraud technology</p>
+                                <p class="mb-0"><mark>If you don't validate your phone with pic-sure using our app, the excess is &pound;150.</mark></p>
+                            {% else %}
+                                <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

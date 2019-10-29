@@ -267,6 +267,9 @@ class PurchaseController extends BaseController
 
         $priceService = $this->get('app.price');
 
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
@@ -290,6 +293,7 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore,
         );
 
         return $this->render($template, $data);
@@ -308,7 +312,7 @@ class PurchaseController extends BaseController
         /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
-            return $this->redirectToRoute('purchase');
+            return $this->redirectToRoute('purchase', [], 301);
         } elseif (!$user->canPurchasePolicy()) {
             $this->addFlash(
                 'error',
@@ -518,6 +522,9 @@ class PurchaseController extends BaseController
             }
         }
 
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
@@ -541,6 +548,7 @@ class PurchaseController extends BaseController
             ) : null,
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore,
         );
 
         return $this->render($template, $data);
@@ -810,6 +818,9 @@ class PurchaseController extends BaseController
 
         $priceService = $this->get('app.price');
 
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         $template = 'AppBundle:Purchase:purchaseStepPledge.html.twig';
 
         // if ($homepageFunnelExp == 'new-funnel-v2') {
@@ -829,6 +840,7 @@ class PurchaseController extends BaseController
             ) : null,
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore,
         );
 
         return $this->render($template, $data);
@@ -1001,6 +1013,9 @@ class PurchaseController extends BaseController
             }
         }
 
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
@@ -1029,6 +1044,7 @@ class PurchaseController extends BaseController
             'payment_provider' => $paymentProvider,
             'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime())
             // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore,
         );
 
         if ($toCardForm) {
@@ -1394,6 +1410,8 @@ class PurchaseController extends BaseController
     {
         $logger = $this->get('logger');
         $type = null;
+        // In-store
+        $instore = $this->get('session')->get('store');
         $successMessage = 'Success! Your payment has been successfully completed';
         $errorMessage = 'Oh no! There was a problem with your payment. Please check your card
         details are correct and try again or get in touch if you continue to have issues';

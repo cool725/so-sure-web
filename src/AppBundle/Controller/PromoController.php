@@ -26,6 +26,7 @@ class PromoController extends BaseController
      * @Route("/promo/{code}", name="promo")
      * @Route("/amazon/{code}", name="amazon_promo")
      * @Route("/pizzaexpress/{code}", name="pizzaexpress_promo")
+     * @Route("/xiaomi/{code}", name="xiaomi_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -56,6 +57,8 @@ class PromoController extends BaseController
             $custom = 'amazon';
         } elseif ($request->get('_route') == 'pizzaexpress_promo') {
             $custom = 'pizzaexpress';
+        } elseif ($request->get('_route') == 'xiaomi_promo') {
+            $custom = 'xiaomi';
         }
 
         if ($scode && $request->getMethod() === "GET") {

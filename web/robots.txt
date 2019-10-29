@@ -6,5 +6,7 @@ Sitemap: https://wearesosure.com/sitemap_index.xml
 User-agent: *
 Disallow: /claims
 Disallow: /admin
+Disallow: /ops
+Disallow: /ops/csp
 
 
