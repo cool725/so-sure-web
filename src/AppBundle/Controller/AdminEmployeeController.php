@@ -597,7 +597,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/offer/create/{id}", name="admin_offer_create")
      * @Template
      */
-    public function offerFormAction(Request $requst, $id)
+    public function offerFormAction(Request $request, $id)
     {
         $offerForm = $this->get("form.factory")
             ->createNamedBuilder("offer_form", OfferType::class)
