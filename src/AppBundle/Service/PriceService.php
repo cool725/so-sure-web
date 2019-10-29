@@ -112,7 +112,7 @@ class PriceService
     /**
      * Finds the price that a given renewal policy should pay.
      * @param PhonePolicy $policy is the policy that will have this price potentially.
-     * @param \DateTime $date is the date at which the policy shall start.
+     * @param \DateTime   $date   is the date at which the policy shall start.
      * @return PhonePrice|null the price that the policy should pay.
      */
     public function renewalPhonePrice($policy, $date)
