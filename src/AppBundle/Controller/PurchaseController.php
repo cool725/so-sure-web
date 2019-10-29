@@ -546,9 +546,9 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
             // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore,
+            'instore' => $instore
         );
 
         return $this->render($template, $data);
@@ -838,9 +838,9 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime())
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
             // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore,
+            'instore' => $instore
         );
 
         return $this->render($template, $data);
@@ -1042,9 +1042,9 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
-            'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime())
+            'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime()),
             // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore,
+            'instore' => $instore
         );
 
         if ($toCardForm) {
