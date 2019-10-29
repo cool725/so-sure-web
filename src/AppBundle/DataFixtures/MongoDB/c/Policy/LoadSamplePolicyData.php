@@ -683,7 +683,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPaymentMethod(
             $this->getPaymentMethod($policy, ($isPaymentMethodBacs !== null) ? $isPaymentMethodBacs : (rand(0, 1) == 0))
         );
-        $policy->setPhone($phone, null, false);
+        $policy->setPhone($phone, null);
         $policy->setPremium($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->createPremium());
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {

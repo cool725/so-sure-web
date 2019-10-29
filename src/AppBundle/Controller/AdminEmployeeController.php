@@ -583,7 +583,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/offer/phone/{id}", name="admin_phone_offers")
      * @Template("AppBundle::AdminEmployee/adminPhoneOffers.html.twig")
      */
-    public function adminPhoneOffersAction(Request $request, $id)
+    public function adminPhoneOffersAction($id)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -597,7 +597,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      * @Route("/offer/create/{id}", name="admin_offer_create")
      * @Template
      */
-    public function offerFormAction(Request $request, $id)
+    public function offerFormAction($id)
     {
         $offerForm = $this->get("form.factory")
             ->createNamedBuilder("offer_form", OfferType::class)
