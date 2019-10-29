@@ -658,12 +658,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
     /**
      * Gives the details on an offer including a list of all users and policies using it as JSON.
-     * @param Request $request is the http request.
-     * @param string  $id      is the id of the offer we are requesting information on.
-     * @return JsonResponse to send back to the client.
      * @Route("/offer/{id}/details", name="admin_offer_details")
      */
-    public function offerDetailsAction(Request $request, $id)
+    public function offerDetailsAction($id)
     {
         $dm = $this->getManager();
         $offerRepo = $dm->getRepository(Offer::class);
