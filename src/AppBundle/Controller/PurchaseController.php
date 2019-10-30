@@ -976,7 +976,6 @@ class PurchaseController extends BaseController
                         }
 
                         if ($monthly || $yearly) {
-                            $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
                             if ($paymentProvider == SoSure::PAYMENT_PROVIDER_BACS) {
                                 return new RedirectResponse(
                                     $this->generateUrl('purchase_step_payment_bacs_id', [

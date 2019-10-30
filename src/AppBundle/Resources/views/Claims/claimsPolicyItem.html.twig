@@ -898,6 +898,7 @@
                     <td>Chase Payment<br> (Policy Cancelled w/Successful Claim)</td>
                     <td>{% if policy.user.hasPolicyCancelledAndPaymentOwed %}Yes{% else %}No{% endif %}</td>
                 </tr>
+                {# Offers not yet implemented.
                 <tr>
                     <td>Offers</td>
                     <td>
@@ -911,6 +912,7 @@
                         </button>
                     </td>
                 </tr>
+                #}
             </table>
             {% if policy.namedUser %}
             <h2>Additional Named User</h2>
@@ -2027,8 +2029,6 @@
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:bacsPaymentRequestForm', 'policy': policy, 'id': 'bacsPaymentRequestForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:tasteCardForm', 'policy': policy, 'id': 'tasteCardForm', 'title': 'Taste Card Settings'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:createOfferForm', 'policy': policy, 'id': 'createOfferForm', 'title': 'Create a new Offer'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:userOffers', 'policy': policy, 'id': 'userOffers', 'title': 'Eligible Offers'} %}
         {% for scheduledPayment in policy.scheduledPayments if scheduledPayment.status == 'scheduled' %}
             {%
                 include 'AppBundle::Admin/adminConfirmModal.html.twig' with

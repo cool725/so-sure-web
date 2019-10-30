@@ -115,12 +115,12 @@ class PhoneInsuranceController extends BaseController
         ]);
 
         $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice();
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         });
 
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice()->getMonthlyPremiumPrice() <
+            return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
             $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
