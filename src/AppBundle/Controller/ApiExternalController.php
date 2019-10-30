@@ -238,8 +238,8 @@ class ApiExternalController extends BaseController
                 $quotes[] = ['rate' => [
                     'reference' => $phone->getId(),
                     'product_name' => $phone->__toString(),
-                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
-                    'annual_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
+                    'monthly_premium' => $monthlyPrice->getMonthlyPremiumPrice(),
+                    'annual_premium' => $yearlyPrice->getYearlyPremiumPrice(),
                     'additional_gadget' => 0,
                 ]];
             }
