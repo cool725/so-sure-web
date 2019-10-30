@@ -322,17 +322,17 @@ class DefaultController extends BaseController
                 'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
-                'trustpilot' => 4
+                'trustpilot' => 4.5,
             ],
             'GC' => [
                 'name' => 'Gadget<br>Cover',
                 'days' => '<strong>5 - 7</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
                 'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 2,
@@ -342,7 +342,7 @@ class DefaultController extends BaseController
                 'days' => '<strong>3 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 1,
@@ -352,7 +352,7 @@ class DefaultController extends BaseController
                 'days' => '<strong>3 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 3,
@@ -362,7 +362,7 @@ class DefaultController extends BaseController
                 'days' => '<strong>1 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-check',
-                'oldphones' => 'fa-check',
+                'oldphones' => '<i class="far fa-check fa-2x"></i>',
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 1,
@@ -372,11 +372,21 @@ class DefaultController extends BaseController
                 'days' => '<strong>1 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 2,
-            ]
+            ],
+            'O2' => [
+                'name' => 'O2',
+                'days' => '<strong>1 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From 02 only',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones early</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1.5,
+            ],
         ];
 
         return $competitor;
@@ -442,7 +452,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [
@@ -461,7 +471,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [
@@ -471,7 +481,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'starling_bank') {
             $data = [
@@ -481,7 +491,7 @@ class DefaultController extends BaseController
                 // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
             $template = 'AppBundle:Default:indexStarlingBank.html.twig';
             $this->starlingOAuthSession($request);
@@ -493,7 +503,7 @@ class DefaultController extends BaseController
                 // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
             $template = 'AppBundle:Default:starlingBusiness.html.twig';
             $this->starlingOAuthSession($request);
@@ -505,7 +515,7 @@ class DefaultController extends BaseController
                 'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'vendi_app') {
             $data = [
@@ -515,7 +525,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'so_sure_compared') {
             $data = [
@@ -523,7 +533,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'so-sure-compared',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'moneyback') {
             $data = [
@@ -531,7 +541,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'moneyback',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         }
 

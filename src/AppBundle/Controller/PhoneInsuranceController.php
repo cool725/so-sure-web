@@ -153,6 +153,10 @@ class PhoneInsuranceController extends BaseController
         $data = [
             'from_price' => $fromPrice,
             'from_phones' => $fromPhones,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
@@ -255,7 +259,11 @@ class PhoneInsuranceController extends BaseController
         $data = [
             'phone' => $phone,
             'top_phones' => $topPhones,
-            'from_price' => $fromPrice
+            'from_price' => $fromPrice,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -337,6 +345,10 @@ class PhoneInsuranceController extends BaseController
             'img_url' => $modelHyph,
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render($template, $data);
@@ -477,6 +489,10 @@ class PhoneInsuranceController extends BaseController
                 ['memory' => 'asc']
             ),
             'instore' => $instore,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
@@ -660,5 +676,83 @@ class PhoneInsuranceController extends BaseController
         }
 
         return $phonesMem;
+    }
+
+    private function competitorsData()
+    {
+        $competitor = [
+            'PYB' => [
+                'name' => 'Protect Your Bubble',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 4.5,
+            ],
+            'GC' => [
+                'name' => 'Gadget<br>Cover',
+                'days' => '<strong>5 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
+                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'SS' => [
+                'name' => 'Simplesurance',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'CC' => [
+                'name' => 'CloudCover',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 3,
+            ],
+            'END' => [
+                'name' => 'Endsleigh',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-check',
+                'oldphones' => '<i class="far fa-check fa-2x"></i>',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'LICI' => [
+                'name' => 'Loveit<br>coverIt.co.uk',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'O2' => [
+                'name' => 'O2',
+                'days' => '<strong>1 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From 02 only',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones early</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1.5,
+            ],
+        ];
+
+        return $competitor;
     }
 }
