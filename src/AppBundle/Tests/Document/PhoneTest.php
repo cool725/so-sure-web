@@ -8,6 +8,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Classes\NoOp;
 
 /**
  * @group unit
@@ -365,6 +366,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLowestCurrentPhonePrice($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
+        NoOp::ignore([$priceC, $priceD]);
         $this->assertNull($phone->getLowestCurrentPhonePrice(new \DateTime('2018-06-12')));
         $this->assertEquals($priceA, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-01-02')));
         $this->assertEquals($priceB, $phone->getLowestCurrentPhonePrice(new \DateTime('2019-02-14')));
@@ -380,6 +382,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetOldestCurrentPhonePrice($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
+        NoOp::ignore([$priceC, $priceD]);
         $this->assertNull($phone->getLowestCurrentPhonePrice(new \DateTime('2018-06-12')));
         $this->assertEquals($priceA, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-01-02')));
         $this->assertEquals($priceA, $phone->getOldestCurrentPhonePrice(new \DateTime('2019-02-14')));
@@ -395,6 +398,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRecentPhonePrices($phone, $priceA, $priceB, $priceC, $priceD, $priceE)
     {
+        NoOp::ignore($priceE);
         // before start no stream or time will get you a price.
         $date = new \DateTime('2018-12-25');
         $this->assertEmpty($phone->getRecentPhonePrices(PhonePrice::STREAM_MONTHLY, 10, $date));

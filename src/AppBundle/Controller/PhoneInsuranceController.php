@@ -121,11 +121,11 @@ class PhoneInsuranceController extends BaseController
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
             return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+            $b->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $fromPhones[0]->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'from_price' => $fromPrice,
@@ -217,17 +217,17 @@ class PhoneInsuranceController extends BaseController
         ]);
 
         $fromPhones = array_filter($phones, function ($phone) {
-            return $phone->getCurrentPhonePrice();
+            return $phone->getCurrentMonthlyPhonePrice();
         });
 
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+            return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $fromPhones[0]->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'phone' => $phone,
@@ -310,7 +310,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
+            'phone_price' => $phone->getCurrentMonthlyPhonePrice(),
             'img_url' => $modelHyph,
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
@@ -537,15 +537,15 @@ class PhoneInsuranceController extends BaseController
             $response = new JsonResponse([
                 'phoneId' => $phone->getId(),
                 'price' => [
-                    'monthlyPremium' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentPhonePrice()->getYearlyPremiumPrice()
+                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
                 ],
                 'productOverrides' => [
-                    'excesses' => $phone->getCurrentPhonePrice()->getExcess() ?
-                        $phone->getCurrentPhonePrice()->getExcess()->toApiArray() :
+                    'excesses' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
                         [],
-                    'picsureExcesses' => $phone->getCurrentPhonePrice()->getPicSureExcess() ?
-                        $phone->getCurrentPhonePrice()->getPicSureExcess()->toApiArray() :
+                    'picsureExcesses' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
                         []
                 ],
                 'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
