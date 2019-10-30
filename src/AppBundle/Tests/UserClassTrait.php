@@ -145,7 +145,7 @@ trait UserClassTrait
             }
             $policy->setPhone($phone, $date);
             /** @var PhonePrice */
-            $price = $phone->getCurrentPhonePrice();
+            $price = $phone->getOldestCurrentPhonePrice();
             $policy->setPremium($price->createPremium());
             if (!$imei) {
                 $policy->setImei(static::generateRandomImei());
@@ -357,6 +357,7 @@ trait UserClassTrait
 
         if ($phone) {
             $policy->setPhone($phone, $date);
+            $policy->setPremium($phone->getOldestCurrentPhonePrice()->createPremium());
         }
 
         if ($addPayment) {
