@@ -36,6 +36,16 @@ class CreateReward
     protected $code;
 
     /**
+     * @var string
+     */
+    protected $type;
+
+    /**
+     * @var string
+     */
+    protected $target;
+
+    /**
      * @var float
      */
     protected $defaultValue;
@@ -134,6 +144,26 @@ class CreateReward
     public function setCode($code)
     {
         $this->code = $code;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    public function setTarget($target)
+    {
+        $this->target = $target;
     }
 
     public function getDefaultValue()
