@@ -3114,6 +3114,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->flush();
                         $reward = new Reward();
                         $reward->setUser($user);
+                        $reward->setType($createReward->getType());
+                        $reward->setTarget($createReward->getTarget());
                         $reward->setDefaultValue($createReward->getDefaultValue());
                         $reward->setExpiryDate($createReward->getExpiryDate());
                         $reward->setPolicyAgeMin($createReward->getPolicyAgeMin());
