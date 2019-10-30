@@ -53,49 +53,73 @@ class PhoneInsuranceController extends BaseController
 
     /**
      * @Route("/phone-insurance/water-damage", name="phone_insurance_water_damage")
+     * @Route("/mobile-insurance/water-damage", name="mobile_insurance_water_damage")
      * @Template()
      */
-    public function waterDamageAction()
+    public function waterDamageAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_water_damage') {
+            return $this->redirectToRoute('phone_insurance_water_damage', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/theft", name="phone_insurance_theft")
+     * @Route("/mobile-insurance/theft", name="mobile_insurance_theft")
      * @Template()
      */
-    public function theftAction()
+    public function theftAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_theft') {
+            return $this->redirectToRoute('phone_insurance_theft', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/loss", name="phone_insurance_loss")
+     * @Route("/mobile-insurance/loss", name="mobile_insurance_loss")
      * @Template()
      */
-    public function lossAction()
+    public function lossAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_loss') {
+            return $this->redirectToRoute('phone_insurance_loss', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/cracked-screen", name="phone_insurance_cracked_screen")
+     * @Route("/mobile-insurance/cracked-screen", name="mobile_insurance_cracked_screen")
      * @Template()
      */
-    public function crackedScreenAction()
+    public function crackedScreenAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_cracked_screen') {
+            return $this->redirectToRoute('phone_insurance_cracked_screen', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/broken-phone", name="phone_insurance_broken_phone")
+     * @Route("/mobile-insurance/broken-phone", name="mobile_insurance_broken_phone")
      * @Template()
      */
-    public function brokenPhoneAction()
+    public function brokenPhoneAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_broken_phone') {
+            return $this->redirectToRoute('phone_insurance_broken_phone', [], 301);
+        }
+
         return array();
     }
-
 
     /**
      * SEO Pages - Phone Insurance

@@ -573,7 +573,6 @@ redirect_mobile_insurance_make_model:
         _controller: FrameworkBundle:Redirect:redirect
         route: phone_insurance_make_model
 
-# SEO Redirects
 redirect_seo_mobile_insurance:
     path: /mobile-insurance
     defaults:
@@ -581,6 +580,232 @@ redirect_seo_mobile_insurance:
         path: /phone-insurance
         permanent: true
 
+# SEO Specific Redirects
+redirect_seo_mobile_insurance_htc_desire:
+    path: /mobile-insurance/htc-desire
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/htc
+        permanent: true
+
+redirect_seo_mobile_insurance_htc_one:
+    path: /mobile-insurance/htc-one
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/htc
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone:
+    path: /mobile-insurance/iphone
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_6:
+    path: /mobile-insurance/iphone-6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple
+        permanent: true
+
+redirect_seo_phone_insurance_iphone_6:
+    path: /phone-insurance/iphone-6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_6_plus:
+    path: /mobile-insurance/iphone-6-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_6_s:
+    path: /mobile-insurance/iphone-6s
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-6s
+        permanent: true
+
+redirect_seo_phone_insurance_iphone_6_s:
+    path: /phone-insurance/iphone-6s
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-6s
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_7:
+    path: /mobile-insurance/iphone-7
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-7
+        permanent: true
+
+redirect_seo_phone_insurance_iphone_7:
+    path: /phone-insurance/iphone-7
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-7
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_7_plus:
+    path: /mobile-insurance/iphone-7-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-7-plus
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_8:
+    path: /mobile-insurance/iphone-8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-8
+        permanent: true
+
+redirect_seo_phone_insurance_iphone_8:
+    path: /phone-insurance/iphone-8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-8
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_8_plus:
+    path: /mobile-insurance/iphone-8-plus
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-8-plus
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_se:
+    path: /mobile-insurance/iphone-se
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-se
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_x:
+    path: /mobile-insurance/iphone-x
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-x
+        permanent: true
+
+redirect_seo_phone_insurance_iphone_x:
+    path: /phone-insurance/iphone-x
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-x
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_xr:
+    path: /mobile-insurance/iphone-xr
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-xr
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_xs:
+    path: /mobile-insurance/iphone-xs
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-xs
+        permanent: true
+
+redirect_seo_mobile_insurance_iphone_xs_max:
+    path: /mobile-insurance/iphone-xs-max
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/apple/iphone-xs-max
+        permanent: true
+
+redirect_seo_mobile_insurance_motorola_moto:
+    path: /mobile-insurance/motorola-moto
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/motorola
+        permanent: true
+
+redirect_seo_mobile_insurance_oneplus_6:
+    path: /mobile-insurance/oneplus-6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/oneplus/6
+        permanent: true
+
+redirect_seo_phone_insurance_oneplus_6:
+    path: /phone-insurance/oneplus-6
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/oneplus/6
+        permanent: true
+
+redirect_seo_mobile_insurance_pixel:
+    path: /mobile-insurance/pixel
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/google/pixel
+        permanent: true
+
+redirect_seo_mobile_insurance_pixel_2:
+    path: /mobile-insurance/pixel-2
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/google/pixel-2
+        permanent: true
+
+redirect_seo_mobile_insurance_pixel_3:
+    path: /mobile-insurance/pixel-3
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/google/pixel-3
+        permanent: true
+
+redirect_seo_mobile_insurance_galaxy_s5:
+    path: /mobile-insurance/samsung-galaxy-a5-2017
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung/galaxy-a5-(2017)
+        permanent: true
+
+redirect_seo_mobile_insurance_galaxy_a7_2018:
+    path: /mobile-insurance/samsung-galaxy-a7-2018
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung/galaxy-a7-(2018)
+        permanent: true
+
+redirect_seo_mobile_insurance_galaxy_j3:
+    path: /mobile-insurance/samsung-galaxy-j3
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung/galaxy-j3-(2016)
+        permanent: true
+
+redirect_seo_mobile_insurance_galaxy_j5_2017:
+    path: /mobile-insurance/samsung-galaxy-j5-2017
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung/galaxy-j5-(2017)
+        permanent: true
+
+redirect_seo_mobile_insurance_galaxy_a5:
+    path: /mobile-insurance/samsung-galaxy-a5
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/samsung
+        permanent: true
+
+redirect_seo_mobile_insurance_sony_xperia:
+    path: /mobile-insurance/sony-xperia
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/sony
+        permanent: true
+
+# SEO Redirects {param}
 redirect_seo_mobile_insurance_make:
     path: /mobile-insurance/{make}
     requirements:
@@ -616,6 +841,27 @@ redirect_old_company_insurance_page:
 
 redirect_blog_leakbot:
     path: /blog/Leakbot
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog
+        permanent: true
+
+redirect_blog_tag_technology:
+    path: /blog/tag/technology
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog
+        permanent: true
+
+redirect_blog_tag_insurance:
+    path: /blog/tag/insurance
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog
+        permanent: true
+
+redirect_blog_2016_06_07:
+    path: /blog/2016/06/06/5-ways-careful-wins-every-time.html
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /blog
