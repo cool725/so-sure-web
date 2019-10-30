@@ -355,6 +355,7 @@ class CheckoutService
                 $source,
                 $date
             );
+            // TODO: infer price from payment and validate.
             $this->policyService->create($policy, $date, true, null, $identityLog);
             $this->dm->flush();
         } else {

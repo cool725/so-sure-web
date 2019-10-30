@@ -976,8 +976,8 @@ class PhonePolicy extends Policy
         $picSureValidated = $this->isPicSureValidated();
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
-        $excess = $phonePremium->getExcess();
-        $picsureExcess = $phonePremium->getPicSureExcess();
+        $excess = $phonePremium ? $phonePremium->getExcess() : null;
+        $picsureExcess = $phonePremium ? $phonePremium->getPicSureExcess() : null;
         return array_merge(parent::toApiArray(), [
             'phone_policy' => [
                 'imei' => $this->getImei(),
