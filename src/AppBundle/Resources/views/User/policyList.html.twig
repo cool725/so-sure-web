@@ -20,7 +20,83 @@
                 <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
             {% endif %}
 
-            <div class="row">
+            <div class="d-lg-flex justify-content-lg-between mb-4">
+                {% for policyItem in user.getDisplayablePoliciesSorted %}
+                    <div class="cardbox cardbox-100 mb-4 mr-lg-4">
+                        <div class="cardbox__body">
+                            <h5 class="cardbox__title">
+                                {{ policyItem.phone }}
+                                {% if policyItem.status == 'active' %}
+                                    <span class="badge badge-success ml-2">{{ policyItem.status|capitalize }}</span>
+                                {% else %}
+                                    <span class="badge badge-primary  ml-2">{{ policyItem.status|capitalize }}</span>
+                                {% endif %}
+                            </h5>
+                            <div class="cardbox__text">
+                                <p class="card-text">{{ policyItem.policyNumber }}</p>
+                            </div>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">{{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</li>
+                            {% if policyItem.isPicSurePolicy %}
+                                <li class="list-group-item h5">
+                                    Phone validated
+                                    {% if policyItem.isPicSureValidated %}
+                                        <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i></span>
+                                    {% else %}
+                                        <span class="badge badge-pill badge-danger ml-2"><i class="far fa-times fa-fw"></i></span>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                            {% if not policyItem.isPicSureValidated %}
+                                <li class="list-group-item">
+                                    Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.
+                                </li>
+                            {% endif %}
+                            <li class="list-group-item">
+                               Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
+                            </li>
+                            <li class="list-group-item">
+                                Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
+                            </li>
+                            <li class="list-group-item">
+                                Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
+                            </li>
+                        </ul>
+                        {% if policyItem.getPolicyTermsFiles|length > 0 or policyItem.getPolicyScheduleFiles|length > 0 %}
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                                        <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Terms</a>
+                                    {% endif %}
+                                    {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                                        <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Schedule</a>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        {% endif %}
+                        <div class="cardbox__body justify-content-start">
+{#                      <a href="{{ path('user_data_portability') }}"
+                        target="_blank" rel="noopener noreferrer"
+                        class="btn btn-outline-primary"
+                        title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download my policy data</a> #}
+                            {% if policyItem.getPolicyTermsFiles|length > 0 or policyItem.getPolicyScheduleFiles|length > 0 %}
+                                {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                                    <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary"><i class="far fa-file-download"></i> Policy Terms</a>
+                                {% endif %}
+                                {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                                    <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary"><i class="far fa-file-download"></i> Policy Schedule</a>
+                                {% endif %}
+                            {% endif %}
+                            {% if policyItem.displayRepurchase %}
+                                <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success">Repurchase Policy</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+    {#         <div class="row">
                 {% for policyItem in user.getDisplayablePoliciesSorted %}
                     <div class="col-12 col-md-6">
                         <div class="card mb-4">
@@ -116,7 +192,7 @@
                         class="btn btn-outline-primary"
                         title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download my policy data</a>
                 </div>
-            </div>
+            </div> #}
         </div>
     </section>
 
