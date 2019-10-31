@@ -105,6 +105,15 @@ class DefaultController extends BaseController
         //     SixpackService::LOG_MIXPANEL_ALL
         // );
 
+        // A/B UK Flag Test
+        // To Test use url param ?force=flag / ?force=no-flag
+        $ukFlagTest = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_UK_FLAG,
+            ['flag', 'no-flag'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         $template = 'AppBundle:Default:index.html.twig';
 
         // if ($homepageFunnelExp == 'new-funnel-v2') {
@@ -130,7 +139,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            // 'funnel_exp' => $homepageFunnelExp,
+            'flag_exp' => $ukFlagTest,
         );
 
         return $this->render($template, $data);
@@ -383,7 +392,7 @@ class DefaultController extends BaseController
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
                 'oldphones' => 'From 02 only',
-                'phoneage' => '<strong>29 days</strong> <div>O2 phones early</div>',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 1.5,
             ],

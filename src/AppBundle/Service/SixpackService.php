@@ -34,7 +34,7 @@ class SixpackService
     // Exp 4
     // const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 5
-    //
+    const EXPERIMENT_UK_FLAG = 'UK flag';
     // Exp 6
     //
     // Exp 7
@@ -126,7 +126,7 @@ class SixpackService
         // Exp 2
         // self::EXPERIMENT_NEW_FUNNEL_V2,
         // Exp 3
-        //
+        self::EXPERIMENT_UK_FLAG,
         // Exp 4
         //
         // Exp 5
@@ -241,7 +241,7 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_NEW_FUNNEL,
         // Exp 2
-        //
+        self::EXPERIMENT_UK_FLAG,
         // Exp 3
         //
         // Exp 4
