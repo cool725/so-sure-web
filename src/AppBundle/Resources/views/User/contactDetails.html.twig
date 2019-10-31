@@ -19,23 +19,26 @@
             {% if policy is defined and policy %}
                 <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
             {% endif %}
+
             <div class="row">
-                <div class="col-lg-4">
-                    <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                        <div class="cardbox__body">
-                            <h5 class="cardbox__title">Email</h5>
-                            <div class="cardbox__text">
-                                <p>{{ user.email }}</p>
-                                <p><a href="{{ path('optout') }}"><i class="fal fa-cog fa-fw mr-1"></i> Manage my preferences</a></p>
-                                <a href="#"
-                                   class="btn btn-outline-primary"
-                                   data-toggle="modal"
-                                   data-target="#email_modal">Edit email</a>
-                            </div>
+                <div class="col-12 col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Email</h5>
+                            <p class="card-text">{{ user.email }}</p>
+                            <a href="#"
+                               class="card-link"
+                               data-toggle="modal"
+                               data-target="#email_modal">
+                                <i class="fal fa-edit fa-fw mr-1"></i> Edit email</a>
+                            <a href="{{ path('optout') }}"
+                               class="card-link">
+                               <i class="fal fa-cog fa-fw mr-1"></i> Manage my preferences</a>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 
