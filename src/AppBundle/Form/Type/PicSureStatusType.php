@@ -61,6 +61,18 @@ class PicSureStatusType extends BaseType
             // approved to not started for vouchers, etc
             if (in_array($policy->getPicSureStatus(), [
                 PhonePolicy::PICSURE_STATUS_APPROVED,
+            ])) {
+                $choices = [
+                    'Not started' => null,
+                    PhonePolicy::PICSURE_STATUS_MANUAL => PhonePolicy::PICSURE_STATUS_MANUAL,
+                    PhonePolicy::PICSURE_STATUS_INVALID => PhonePolicy::PICSURE_STATUS_INVALID,
+                    PhonePolicy::PICSURE_STATUS_APPROVED => PhonePolicy::PICSURE_STATUS_APPROVED,
+                    PhonePolicy::PICSURE_STATUS_PREAPPROVED => PhonePolicy::PICSURE_STATUS_PREAPPROVED,
+                ];
+            }
+
+            // approved to not started for vouchers, etc
+            if (in_array($policy->getPicSureStatus(), [
                 PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED,
             ])) {
                 $choices = [
