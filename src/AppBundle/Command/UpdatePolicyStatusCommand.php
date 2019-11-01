@@ -58,6 +58,12 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
                 'Do not cancel policies, just report on policies that would be cancelled'
             )
             ->addOption(
+                'dry-unpaid',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not cancel unpaid policies but do everything else'
+            )
+            ->addOption(
                 'prefix',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -91,6 +97,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
         $dryRun = true === $input->getOption('dry-run');
+        $dryUnpaid = true === $input->getOption('dry-unpaid');
         $skipEmail = true === $input->getOption('skip-email');
         $prefix = $input->getOption('prefix');
         $policyId = $input->getOption('id');
@@ -118,9 +125,13 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // Unpaid Policies - Cancel
-        $cancelled = $this->policyService->cancelUnpaidPolicies($prefix, $dryRun, $skipUnpaidMinTimeframeCheck);
+        $cancelled = $this->policyService->cancelUnpaidPolicies(
+            $prefix,
+            $dryRun || $dryUnpaid,
+            $skipUnpaidMinTimeframeCheck
+        );
         $copy = 'Unpaid cancelled policy';
-        if ($dryRun) {
+        if ($dryRun || $dryUnpaid) {
             $copy = 'Dry Run - Should cancel Policy (unpaid)';
         }
         foreach ($cancelled as $id => $number) {
