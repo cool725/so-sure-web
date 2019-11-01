@@ -34,6 +34,11 @@ class ImeiType extends AbstractType
                 'required' => false,
                 'choice_value' => 'id',
                 'choice_label' => 'getNameFormSafe',
+                'choice_attr' => function ($id) {
+                    return [
+                         'data-binder' => $id->getSalvaBinderMonthlyPremium(),
+                    ];
+                },
             ])
             ->add('note', TextareaType::class, [
                 'trim' => true

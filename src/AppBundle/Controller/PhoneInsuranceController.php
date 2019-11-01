@@ -474,6 +474,10 @@ class PhoneInsuranceController extends BaseController
             ], true);
         }
 
+        // A/B UK Flag Test
+        // To Test use url param ?force=flag / ?force=no-flag
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_UK_FLAG);
+
         $data = [
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
@@ -747,7 +751,7 @@ class PhoneInsuranceController extends BaseController
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
                 'oldphones' => 'From 02 only',
-                'phoneage' => '<strong>29 days</strong> <div>O2 phones early</div>',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 1.5,
             ],

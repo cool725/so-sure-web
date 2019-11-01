@@ -102,7 +102,7 @@ twig:
         checkout_public_key: "%checkout_apipublic%"
         business_address: "Relay Building\n 114 Whitechapel High Street\n London\n E1 7PT\n UK"
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
-        broker_name: "AFL Insurance Brokers Limited"
+        broker_name: "Shepherd Compello Ltd"
 
 doctrine_mongodb:
     connections:

@@ -53,7 +53,8 @@
                 </div>
                 <div class="col-lg-5 offset-md-2 offset-lg-1">
                     <div class="hero__intro">
-                        <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
+                        <h1 class="mb-4 text-white fit">
+                            Mobile Insurance {% if flag_exp is defined and flag_exp == 'flag' %}🇬🇧{% endif %} <br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
                             {% if feature_enabled('apply-sign-up-bonus') %}
                                 <li class="mb-3 h5 text-white">
