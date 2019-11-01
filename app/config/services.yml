@@ -1165,13 +1165,6 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
 
-    app.listener.trustpilot:
-        class:   AppBundle\Listener\TrustpilotListener
-        arguments:
-        - "@app.mailer"
-        tags:
-        -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
-
     app.listener.gocompare:
         class:   AppBundle\Listener\GoCompareListener
         arguments:
