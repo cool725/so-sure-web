@@ -677,7 +677,7 @@ class PolicyService
                     throw new \Exception(sprintf('Unknown policy in queue %s', json_encode($data)));
                 }
 
-                $this->generatePolicyFiles($policy, true, ['wearesosure.com+f9e2e9f7ce@invite.trustpilot.com']);
+                $this->generatePolicyFiles($policy, true, 'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com');
 
                 $count = $count + 1;
             } catch (\Exception $e) {
