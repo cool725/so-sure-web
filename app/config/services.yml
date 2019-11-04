@@ -1556,6 +1556,18 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.reward:
+        class: AppBundle\Form\Type\RewardType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.rewardedit:
+        class: AppBundle\Form\Type\RewardEditType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
     app.validator.age:
         class: AppBundle\Validator\Constraints\AgeValidator
         tags:

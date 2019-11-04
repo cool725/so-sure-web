@@ -11,6 +11,7 @@ require('tempusdominus-bootstrap-4');
 
 $(function(){
 
+    //Apply reward Modals
     $('#connect_modal').on('show.bs.modal', function (event) {
         let button = $(event.relatedTarget),
             rewardId = button.data('reward-id'),
@@ -29,6 +30,7 @@ $(function(){
         format: 'DD/MM/YYYY',
     });
 
+    // Submission alert
     $('#rewardForm_next').on('click', function(e) {
         e.preventDefault();
 
@@ -37,6 +39,7 @@ $(function(){
         }
     });
 
+    // Default T&Cs
     $('#default_terms').on('click', function(e) {
         e.preventDefault();
 
@@ -46,5 +49,29 @@ $(function(){
         // Clear the terms then apply
         textArea.val(text);
     });
+
+    // Add new Category to the select field
+    $('#add-cat').click(function(){
+        $('#error-cat').empty();
+        let newCat = $('#new-cat').val();
+
+        // Does the category already exists
+        let exists = false;
+        $('#rewardForm_type').each(function(){
+            if (this.value == newCat) {
+                exists = true;
+                return false;
+            }
+        });
+
+        //If not, add to the select and set as value
+        if (!exists) {
+            $("#rewardForm_type").append(new Option(newCat, newCat)).val(newCat);
+            $('#new-cat').val('');
+        } else{
+            $('#error-cat').html('The category already exists');
+        }
+    });
+
 
 });

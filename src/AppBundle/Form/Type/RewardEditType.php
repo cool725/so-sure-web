@@ -8,7 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -23,9 +22,8 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 /**
  * Makes a form which lets you make a reward.
  */
-class RewardType extends AbstractType
+class RewardEditType extends AbstractType
 {
-
     protected $dm;
 
     protected $typesOptions;
@@ -52,15 +50,13 @@ class RewardType extends AbstractType
             $this->typesOptions[$type]=$type;
         }
 
-        $builder->add('firstName', TextType::class, ['required' => true])
-            ->add('lastName', TextType::class, ['required' => true])
-            ->add('code', TextType::class, ['required' => false])
+        $builder
+            ->add('code', TextType::class, ['required' => false ,'mapped' => false])
             ->add('type', ChoiceType::class, [
                   'required' => true,
                   'choices' => $this->typesOptions
-            ])
+             ])
             ->add('target', TextareaType::class, ['required' => false])
-            ->add('email', EmailType::class, ['required' => true])
             ->add('defaultValue', TextType::class, ['required' => true])
             ->add('expiryDate', DateType::class, [
                   'format'   => 'dd/MM/yyyy',
@@ -78,7 +74,7 @@ class RewardType extends AbstractType
             ->add('isSignUpBonus', CheckboxType::class, ['required' => false])
             ->add('isConnectionBonus', CheckboxType::class, ['required' => false])
             ->add('termsAndConditions', TextareaType::class, ['required' => false])
-            ->add('next', SubmitType::class);
+            ->add('submit', SubmitType::class);
 
             $builder->get('type')->addEventListener(
                 FormEvents::PRE_SUBMIT,
@@ -96,7 +92,7 @@ class RewardType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['data_class' => 'AppBundle\Document\Form\CreateReward']);
+        $resolver->setDefaults(['data_class' => 'AppBundle\Document\Reward']);
     }
 
     /**

@@ -38,15 +38,16 @@
                         <tr>
                             <th>Bonus Type</th>
                             <th>Code</th>
-                            <th>Type</th>
+                            <th>Category</th>
                             <th>Target</th>
-                            <th>Value</th>
+                            <th>Default value</th>
                             <th>Used</th>
                             <th>Total</th>
                             <th>Limit</th>
                             <th>Expires</th>
                             <th>Active</th>
-                            <th>Add manually</th>
+                            <th>Apply</th>
+                            <th>View/Edit</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,6 +78,13 @@
                                        data-target="#connect_modal"
                                        title="Add bonus to user"
                                     ><i class="fas fa-user fa-fw"></i></a>
+                                </td>
+                                <td>
+                                  <a href="{{ path('admin_reward', {'id': reward.id }) }}"
+                                     class="btn btn-primary btn-sm"
+                                     title="View reward">
+                                    <i class="fas fa-eye fa-fw"></i>
+                                  </a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -129,9 +137,21 @@
                                     <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
                                 </div>
                                 <div class="form-group">
-                                    {{ form_label(rewardForm.type, 'Type ') }}
+                                    {{ form_label(rewardForm.type, 'Category ') }}
                                     {{ form_widget(rewardForm.type, {'attr': {'placeholder':'Reward\'s type', 'class': 'form-control'}}) }}
                                     <div class="with-errors">{{ form_errors(rewardForm.type) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    <small class="form-text text-primary">New category</small>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input type="text" id="new-cat" class="form-control form-control-sm" value="">
+                                        </div>
+                                        <div class="col">
+                                            <button type="button" id="add-cat" class="btn btn-secondary btn-sm">Add</button>
+                                        </div>
+                                    </div>
+                                    <small id="error-cat"class="form-text text-danger"></small>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(rewardForm.target, 'Target ') }}
