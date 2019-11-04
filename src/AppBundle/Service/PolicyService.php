@@ -1766,9 +1766,10 @@ class PolicyService
                 } elseif ($policy->shouldCancelPolicy($prefix)) {
                     $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                     $this->logger->error(sprintf(
-                        "Policy should allegedly be cancelled %s %s",
+                        "Policy should allegedly be cancelled %s %s %s",
                         $policy->getPolicyExpirationDate()->format("Y-m-d H:i"),
-                        $policy->shouldPolicyBeCancelled() ? "yes" : "no"
+                        \DateTime::createFromFormat("U", time())->format("Y-m-d H:i"),
+                        $policy->shouldCancelPolicy($prefix) ? "yes" : "no"
                     ));
                     if (!$dryRun) {
                         $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
