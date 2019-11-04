@@ -1766,7 +1766,8 @@ class PolicyService
                 } elseif ($policy->shouldCancelPolicy($prefix)) {
                     $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                     $this->logger->error(sprintf(
-                        "Policy should allegedly be cancelled %s %s %s",
+                        "Policy should allegedly be cancelled %s %s %s %s",
+                        $policy->getId(),
                         $policy->getPolicyExpirationDate()->format("Y-m-d H:i"),
                         \DateTime::createFromFormat("U", time())->format("Y-m-d H:i"),
                         $policy->shouldCancelPolicy($prefix) ? "yes" : "no"
