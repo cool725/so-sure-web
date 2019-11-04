@@ -70,26 +70,6 @@ input[type="button"][class*="btn-outline-"],
     }
 }
 
-.btn-green-gradient {
-    border: none;
-    @include linear-gradient(100deg, $islamic-green, $ufo-green);
-
-    &:hover,
-    &:focus,
-    &:active {
-        @include linear-gradient(100deg, $ufo-green, $islamic-green);
-    }
-
-    &:not(:disabled):not(.disabled).active,
-    &:not(:disabled):not(.disabled):active {
-        @include linear-gradient(100deg, $islamic-green, $islamic-green);
-
-        &:focus {
-          @include linear-gradient(100deg, $islamic-green, $islamic-green);
-        }
-    }
-}
-
 .btn-turquoise-gradient {
     border: none;
     @include linear-gradient(100deg, $java, $turquoise);
