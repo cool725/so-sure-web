@@ -199,6 +199,16 @@ class InvitationController extends BaseController
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 2,
+            ],
+            'O2' => [
+                'name' => 'O2',
+                'days' => '<strong>1 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From 02 only',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1.5,
             ]
         ];
 
