@@ -6130,6 +6130,27 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($policy->getBilling()->add(new \DateInterval("P1Y")), $renewalPolicy->getBilling());
     }
 
+    /**
+     * Makes sure that start of state finds the start of the state and the correct one when there are many of them.
+     * Even if the dates are in the past.
+     */
+    public function testStartOfState()
+    {
+        $policy = new PhonePolicy();
+        $policy->setId("bongo");
+        $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, '2019-01-01');
+        $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, '2019-01-01');
+
+    }
+
+    private function createLogEntry($policy, $status, $dateString)
+    {
+        $logEntry = new LogEntry();
+        $logEntry->setLoggedAt(new \DateTime($dateString));
+        $logEntry->setObjectId($policy->getId());
+
+    }
+
     private function getFormattedWeekendsForOneYear($fromDate = null)
     {
         if (!$fromDate) {

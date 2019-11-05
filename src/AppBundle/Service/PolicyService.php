@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
@@ -1785,8 +1786,18 @@ class PolicyService
                 $this->logger->error($msg, ['exception' => $e]);
             }
         }
-
         return $cancelled;
+    }
+
+    public function cancelOverduePicsurePolicies($prefix, $dry)
+    {
+        $cancelled = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_PICSURE_REQUIRED]);
+        foreach ($policies as $policy) {
+            
+        }
+
     }
 
     public function activateRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
@@ -2722,5 +2733,31 @@ class PolicyService
         $participation->setStatus(Participation::STATUS_ACTIVE);
         $this->dm->persist($participation);
         return $participation;
+    }
+
+    /**
+     * Gives you the date at which the given policy entered it's current state.
+     * @param Policy    $policy is the policy that we are checking about.
+     * @return \DateTime the date at which the policy entered it's current state.
+     */
+    public function startOfState(Policy $policy)
+    {
+        $date = new \DateTime();
+        $logRepo = $this->dm->getRepository(LogEntry::class);
+        $history = $logRepo->find([
+            'objectId' => $policy->getId(),
+            'data.status' => $policy->getStatus()
+        ]);
+        if (count($history) == 0) {
+            throw new \Exception(sprintf(
+                "Policy %s is in status %s but there is no such log entry",
+                $policy->getId(),
+                $policy->getStatus()
+            ));
+        }
+        usort($history, function ($a, $b) {
+            return ($a->getLoggedAt() < $b->getLoggedAt()) ? -1 : 1;
+        });
+        return $history[0];
     }
 }

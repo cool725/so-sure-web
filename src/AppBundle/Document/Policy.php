@@ -89,6 +89,7 @@ abstract class Policy
     const STATUS_PENDING_RENEWAL = 'pending-renewal';
     const STATUS_DECLINED_RENEWAL = 'declined-renewal';
     const STATUS_UNRENEWED = 'unrenewed';
+    const STATUS_PICSURE_REQUIRED = 'picsure-required';
 
     const CANCELLED_UNPAID = 'unpaid';
     const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
@@ -99,6 +100,7 @@ abstract class Policy
     const CANCELLED_DISPOSSESSION = 'dispossession';
     const CANCELLED_WRECKAGE = 'wreckage';
     const CANCELLED_UPGRADE = 'upgrade';
+    const CANCELLED_INACTION = 'inaction';
 
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
