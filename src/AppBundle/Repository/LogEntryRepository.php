@@ -8,4 +8,9 @@ use AppBundle\Document\Policy;
 
 class LogEntryRepository extends DocumentRepository
 {
+    public function findStatus()
+    {
+
+    }
+
 }

@@ -2745,12 +2745,13 @@ class PolicyService
         $date = new \DateTime();
         $logRepo = $this->dm->getRepository(LogEntry::class);
         $history = $logRepo->find([
-            'objectId' => $policy->getId(),
-            'data.status' => $policy->getStatus()
+            "objectId" => $policy->getId(),
+            "data.status" => $policy->getStatus()
         ]);
-        if (count($history) == 0) {
+        var_dump($history);
+        if (!$history) {
             throw new \Exception(sprintf(
-                "Policy %s is in status %s but there is no such log entry",
+                "Policy '%s' is in status %s but there is no such log entry",
                 $policy->getId(),
                 $policy->getStatus()
             ));

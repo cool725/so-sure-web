@@ -6138,17 +6138,27 @@ class PolicyServiceTest extends WebTestCase
     {
         $policy = new PhonePolicy();
         $policy->setId("bongo");
-        $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, '2019-01-01');
-        $this->createLogEntry($policy, Policy::STATUS_UNPAID, '2019-01-09');
-
+        $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, 60);
+        $this->createLogEntry($policy, Policy::STATUS_UNPAID, 51);
+        $this->createLogEntry($policy, Policy::STATUS_ACTIVE, 39);
+        $this->createLogEntry($policy, Policy::STATUS_UNPAID, 12);
+        // test each state.
+        $policy->setStatus(Policy::STATUS_PICSURE_REQUIRED);
+        $this->assertEquals($this->subDays(new \DateTime(), 60), static::$policyService->startOfState($policy));
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $this->assertEquals($this->subDays(new \DateTime(), 12), static::$policyService->startOfState($policy));
     }
 
-    private function createLogEntry($policy, $status, $dateString)
+    private function createLogEntry($policy, $status, $daysAgo)
     {
+        $date = new \DateTime();
+        $this->subDays($date, $daysAgo);
         $logEntry = new LogEntry();
-        $logEntry->setLoggedAt(new \DateTime($dateString));
+        $logEntry->setLoggedAt($date);
         $logEntry->setObjectId($policy->getId());
-
+        $logEntry->setData(["status" => $status]);
+        static::$dm->persist($logEntry);
+        static::$dm->flush();
     }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)
