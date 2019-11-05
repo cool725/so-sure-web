@@ -4010,39 +4010,11 @@ abstract class Policy
             }
         }
 
-        $billingDate = $this->getNextBillingDate($date);
-        if (!$billingDate || !$this->getBilling()) {
-            throw new \Exception(sprintf(
-                'Failed to find a next billing date. Policy %s/%s',
-                $this->getPolicyNumber(),
-                $this->getId()
-            ));
-        }
-        $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
- 
-        // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-        while ($this->greaterThanZero($this->getOutstandingPremiumToDate($billingDate))) {
-            $billingDate = $billingDate->sub(new \DateInterval('P1M'));
-            // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-            // print $this->getOutstandingPremiumToDate($billingDate) . PHP_EOL;
-
-            // Ensure we don't loop indefinitely
-            $maxCount--;
-            if ($maxCount < 0) {
-                throw new \Exception(sprintf(
-                    'Failed to find a date with a 0 outstanding premium (%f). Policy %s/%s',
-                    $this->getOutstandingPremiumToDate($billingDate),
-                    $this->getPolicyNumber(),
-                    $this->getId()
-                ));
-                // Older method of using the last payment recevied date to determine expiration
-                // $billingDate = clone $this->getLastSuccessfulUserPaymentCredit()->getDate();
-                // $billingDate->add(new \DateInterval('P1M'));
-                // break;
-            }
-        }
-        // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-
+        $billingDate = clone $this->getBilling();
+        $successes = $this->getPremium()->getNumberOfMonthlyPayments(
+            $this->getTotalSuccessfulPayments($date, true)
+        );
+        $billingDate->add(new \DateInterval("P{$successes}M"));
         // and business rule of 30 days unpaid before auto cancellation
         $billingDate->add(new \DateInterval('P30D'));
         $billingDate = $this->startOfDay($billingDate);
@@ -5085,7 +5057,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getBilling(), false, $firstDayIsUnpaid);
+            $months = $this->dateDiffMonths($date, $this->getBilling(), true, $firstDayIsUnpaid);
             if ($months > 12) {
                 $months = 12;
             }
