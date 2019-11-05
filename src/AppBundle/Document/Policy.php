@@ -3948,7 +3948,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         return $date >= $this->getPolicyExpirationDate($date);
@@ -3988,7 +3988,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         // Yearly payments are a bit different
@@ -4019,7 +4019,7 @@ abstract class Policy
             ));
         }
         $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
-
+ 
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
         while ($this->greaterThanZero($this->getOutstandingPremiumToDate($billingDate))) {
             $billingDate = $billingDate->sub(new \DateInterval('P1M'));
@@ -5076,7 +5076,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         //$date->setTimezone(new \DateTimeZone(self::TIMEZONE));
         $date = $this->adjustDayForBilling($date, true);
@@ -5085,7 +5085,7 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
-            $months = $this->dateDiffMonths($date, $this->getBilling(), true, $firstDayIsUnpaid);
+            $months = $this->dateDiffMonths($date, $this->getBilling(), false, $firstDayIsUnpaid);
             if ($months > 12) {
                 $months = 12;
             }
@@ -5118,7 +5118,7 @@ abstract class Policy
         $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
 
         $diff = $expectedPaid - $totalPaid;
-        //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
+        // print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
         if (!$allowNegative && $diff < 0) {
             return 0;
         }
