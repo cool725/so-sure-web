@@ -6139,7 +6139,7 @@ class PolicyServiceTest extends WebTestCase
         $policy = new PhonePolicy();
         $policy->setId("bongo");
         $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, '2019-01-01');
-        $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, '2019-01-01');
+        $this->createLogEntry($policy, Policy::STATUS_UNPAID, '2019-01-09');
 
     }
 
