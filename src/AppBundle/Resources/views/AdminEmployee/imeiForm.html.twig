@@ -29,7 +29,7 @@
             <a class="list-group-item list-group-item-action">IMEI was updated by claims team but the system could not auto-update the IMEI number</a>
             <a class="list-group-item list-group-item-action">Voucher was issued by the claims team</a>
             <a class="list-group-item list-group-item-action">User had a warranty issue that was handled outside the claims process - same make/model, just different IMEI.</a>
-            <a class="list-group-item list-group-item-action bg-danger"><span class="text-danger">Upgraded device - within binder price</span></a>
+            <a class="list-group-item list-group-item-action bg-danger"><span class="text-danger">Upgraded device - within premium price</span></a>
         </div>
         <div class="row">
             <div class="col-xs-6">
@@ -42,7 +42,7 @@
                 <div class="form-group">
                     <label>Current Phone</label>
                     <p>{{ policy.phone }}</p>
-                    <p>Current binder price: <strong>&pound;<span id="old_binder" data-old-binder="{{ policy.phone.getSalvaBinderMonthlyPremium }}">{{ policy.phone.getSalvaBinderMonthlyPremium }}</span></strong></p>
+                    <p>Current premium: <strong>&pound;<span id="old_premium" data-old-premium="{{ policy.phone.getCurrentPhonePrice.getMonthlyPremiumPrice }}">{{ policy.phone.getCurrentPhonePrice.getMonthlyPremiumPrice }}</span></strong></p>
                 </div>
             </div>
         </div>
@@ -58,8 +58,9 @@
                     <label>Upgrade/Insured Phone</label>
                     {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
                 </div>
-                <p>New binder price: <strong>&pound;<span id="new_binder">-</span></strong></p>
-                <p>Valid upgrade: <strong id="valid_upgrade"></strong></p>
+                <p>New premium price: <strong>&pound;<span id="new_premium">-</span></strong></p>
+                <p>Is valid upgrade: <strong id="valid_upgrade"></strong></p>
+                <p>Premium diff: <strong id="diff_premium"></strong></p>
             </div>
             <div class="col-xs-12">
                 <div class="form-group">

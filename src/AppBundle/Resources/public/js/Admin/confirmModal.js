@@ -5,15 +5,15 @@ $('.confirmModal').on('show.bs.modal', function (event) {
 
     // Updates for upgrade
     if ($('.modal-upgrade').length) {
-        var newBinder = $('#new_binder'),
-            oldBinderPrice = $('#old_binder').data('old-binder'),
+        var newPremium = $('#new_premium'),
+            oldPremiumPrice = $('#old_premium').data('old-premium'),
             phones = $('#imei_form_phone'),
             validUpgrade = $('#valid_upgrade'),
-            newBinderPrice = $('#imei_form_phone option:selected').data('binder'),
+            newPremiumPrice = $('#imei_form_phone option:selected').data('premium'),
             limitDiff = 2,
-            binderDiff;
+            premiumDiff;
 
-        newBinder.text(newBinderPrice);
+        newPremium.text(newPremiumPrice);
 
         // Set value on valid - default for normal imei update
         validUpgrade.text('✅');
@@ -22,17 +22,19 @@ $('.confirmModal').on('show.bs.modal', function (event) {
 
         phones.on('change', function(e) {
             // Set price
-            newBinderPriceUpdate = $('#imei_form_phone option:selected').data('binder');
-            newBinder.text(newBinderPriceUpdate);
-            binderDiff = newBinderPriceUpdate - oldBinderPrice;
+            newPremiumPriceUpdate = $('#imei_form_phone option:selected').data('premium');
+            newPremium.text(newPremiumPriceUpdate);
+            premiumDiff = Math.abs(newPremiumPriceUpdate - oldPremiumPrice);
 
-            if (binderDiff < limitDiff) {
+            if (premiumDiff <= limitDiff) {
                 validUpgrade.text('✅');
                 $(modal).find('button[type="submit"]').attr('disabled', false);
             } else {
                 validUpgrade.text('⛔️ Requires old upgrade method');
                 $(modal).find('button[type="submit"]').attr('disabled', true);
             }
+
+            $('#diff_premium').text('£' + premiumDiff.toFixed(2));
         });
     }
 

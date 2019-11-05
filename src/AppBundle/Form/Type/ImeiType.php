@@ -36,7 +36,7 @@ class ImeiType extends AbstractType
                 'choice_label' => 'getNameFormSafe',
                 'choice_attr' => function ($id) {
                     return [
-                         'data-binder' => $id->getSalvaBinderMonthlyPremium(),
+                         'data-premium' => $id->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                     ];
                 },
             ])
