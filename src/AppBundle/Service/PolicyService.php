@@ -1156,14 +1156,13 @@ class PolicyService
         $skipUnpaidMinTimeframeCheck = false,
         $fullRefund = false
     ) {
-        if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
+        if ($reason == Policy::CANCELLED_UNPAID && $policy->getStatus() == Policy::STATUS_UNPAID &&
+            !$skipUnpaidMinTimeframeCheck
+        ) {
             /** @var LogEntryRepository $logRepo */
             $logRepo = $this->dm->getRepository(LogEntry::class);
-            /** @var LogEntry $history */
-            $history = $logRepo->findOneBy([
-                'objectId' => $policy->getId(),
-                'data.status' => Policy::STATUS_UNPAID,
-            ], ['loggedAt' => 'desc']);
+            /** @var LogEntry|null $history */
+            $history = $logRepo->findRecentStatus($policy);
             $now = $date;
             if (!$now) {
                 $now = \DateTime::createFromFormat('U', time());
@@ -1803,6 +1802,7 @@ class PolicyService
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_PICSURE_REQUIRED]);
         foreach ($policies as $policy) {
+            /** @var LogEntry|null $history */
             $history = $logEntryRepo->findRecentStatus($policy);
             if (!$history) {
                 $this->logger->error(sprintf(
