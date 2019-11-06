@@ -70,7 +70,7 @@ class Oauth2LoginEntryPoint implements AuthenticationEntryPointInterface
                 'utm_campaign' => 'partner'
             ],
             Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY => [
-                'utm_source' => 'starling-business',
+                'utm_source' => 'starling',
                 'utm_medium' => 'app',
                 'utm_campaign' => 'partner'
             ],
