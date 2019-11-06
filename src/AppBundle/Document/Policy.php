@@ -100,7 +100,7 @@ abstract class Policy
     const CANCELLED_DISPOSSESSION = 'dispossession';
     const CANCELLED_WRECKAGE = 'wreckage';
     const CANCELLED_UPGRADE = 'upgrade';
-    const CANCELLED_INACTION = 'inaction';
+    const CANCELLED_PICSURE_REQUIRED_EXPIRED = 'picsure-required-expired';
 
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
@@ -250,7 +250,7 @@ abstract class Policy
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "expired-wait-claim",
      *                  "unpaid", "multipay-requested", "multipay-rejected", "renewal",
-     *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
+     *                  "pending-renewal", "declined-renewal", "unrenewed", "picsure-required"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      * @DataChange(categories="hubspot")
@@ -274,7 +274,7 @@ abstract class Policy
     /**
      * @Assert\Choice({
      *  "unpaid", "actual-fraud", "suspected-fraud", "user-requested",
-     *  "cooloff", "badrisk", "dispossession", "wreckage", "upgrade"
+     *  "cooloff", "badrisk", "dispossession", "wreckage", "upgrade", "picsure-required-expired"
      * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned

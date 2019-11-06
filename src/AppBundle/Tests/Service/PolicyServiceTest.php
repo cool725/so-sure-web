@@ -18,6 +18,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePolicy;
@@ -38,7 +39,7 @@ use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
-use Gedmo\Loggable\Document\LogEntry;
+use AppBundle\Document\LogEntry;
 use Symfony\Component\Validator\Constraints\Date;
 
 /**
@@ -6134,31 +6135,70 @@ class PolicyServiceTest extends WebTestCase
      * Makes sure that start of state finds the start of the state and the correct one when there are many of them.
      * Even if the dates are in the past.
      */
-    public function testStartOfState()
+    public function testCancelOverduePicsurePolicies()
     {
-        $policy = new PhonePolicy();
-        $policy->setId("bongo");
-        $this->createLogEntry($policy, Policy::STATUS_PICSURE_REQUIRED, 60);
-        $this->createLogEntry($policy, Policy::STATUS_UNPAID, 51);
-        $this->createLogEntry($policy, Policy::STATUS_ACTIVE, 39);
-        $this->createLogEntry($policy, Policy::STATUS_UNPAID, 12);
-        // test each state.
-        $policy->setStatus(Policy::STATUS_PICSURE_REQUIRED);
-        $this->assertEquals($this->subDays(new \DateTime(), 60), static::$policyService->startOfState($policy));
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        $this->assertEquals($this->subDays(new \DateTime(), 12), static::$policyService->startOfState($policy));
+        $policyRepo = static::$dm->getRepository(Policy::class);
+        $user = new User();
+        $a = new PhonePolicy();
+        $b = new PhonePolicy();
+        $c = new PhonePolicy();
+        $a->setUser($user);
+        $b->setUser($user);
+        $c->setUser($user);
+        $a->setPolicyNumber("Mob/2020/1111111");
+        $b->setPolicyNumber("Mob/2019/2222222");
+        $c->setPolicyNumber("Mob/2019/3333333");
+        $a->setStatus(Policy::STATUS_PICSURE_REQUIRED);
+        $b->setStatus(Policy::STATUS_PICSURE_REQUIRED);
+        $c->setStatus(Policy::STATUS_UNPAID);
+        $a->setPremium(new PhonePremium());
+        $b->setPremium(new PhonePremium());
+        $c->setPremium(new PhonePremium());
+        static::$dm->persist($user);
+        static::$dm->persist($a);
+        static::$dm->persist($b);
+        static::$dm->persist($c);
+        static::$dm->flush();
+        // Don't want creation logs as they are at the current date and time.
+        /** @var LogEntryRepository $logEntryRepo */
+        $logEntryRepo = static::$dm->getRepository(LogEntry::class);
+        $logEntryRepo->createQueryBuilder()->remove()->getQuery()->execute();
+        // create new update logs.
+        $this->createLogEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12);
+        $this->createLogEntry($a, Policy::STATUS_UNPAID, 51);
+        $this->createLogEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60);
+        $this->createLogEntry($a, Policy::STATUS_ACTIVE, 39);
+        $this->createLogEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30);
+        $this->createLogEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30);
+        $this->createLogEntry($c, Policy::STATUS_UNPAID, 31);
+        static::$dm->flush();
+        // Make sure a dry run is dry.
+        $cancelled = static::$policyService->cancelOverduePicsurePolicies(true);
+        $a = $policyRepo->findOneBy(["id" => $a->getId()]);
+        $b = $policyRepo->findOneBy(["id" => $b->getId()]);
+        $c = $policyRepo->findOneBy(["id" => $c->getId()]);
+        $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
+        $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $b->getStatus());
+        $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
+        // Now do a wet run
+        $cancelled = static::$policyService->cancelOverduePicsurePolicies(false);
+        $a = $policyRepo->findOneBy(["id" => $a->getId()]);
+        $b = $policyRepo->findOneBy(["id" => $b->getId()]);
+        $c = $policyRepo->findOneBy(["id" => $c->getId()]);
+        $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
+        $this->assertEquals(Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, $b->getCancelledReason());
+        $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
     }
 
     private function createLogEntry($policy, $status, $daysAgo)
     {
-        $date = new \DateTime();
-        $this->subDays($date, $daysAgo);
+        $date = (new \DateTime())->sub(new \DateInterval("P{$daysAgo}D"));
         $logEntry = new LogEntry();
-        $logEntry->setLoggedAt($date);
         $logEntry->setObjectId($policy->getId());
         $logEntry->setData(["status" => $status]);
+        $logEntry->setLoggedAtSpecifically($date);
         static::$dm->persist($logEntry);
-        static::$dm->flush();
     }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)

@@ -16,7 +16,8 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
-use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use AppBundle\Document\LogEntry;
+use AppBundle\Repository\LogEntryRepository;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
@@ -67,7 +68,6 @@ use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\AlreadyParticipatingException;
 
-use Gedmo\Loggable\Document\LogEntry;
 use Symfony\Component\Templating\EngineInterface;
 
 class PolicyService
@@ -1789,15 +1789,36 @@ class PolicyService
         return $cancelled;
     }
 
-    public function cancelOverduePicsurePolicies($prefix, $dry)
+    /**
+     * Cancels all policies that entered the picsure required stage 14 days ago or more.
+     * @param boolean $dry is whether to not really cancel them but just pretend.
+     * @return array containing the ids and policy numbers of the cancelled or pretend cancelled policies.
+     */
+    public function cancelOverduePicsurePolicies($dry)
     {
+        /** @var LogEntryRepository $logEntryRepo */
+        $logEntryRepo = $this->dm->getRepository(LogEntry::class);
+        $cutoffDate = (new \DateTime())->sub(new \DateInterval("P14D"));
         $cancelled = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_PICSURE_REQUIRED]);
         foreach ($policies as $policy) {
-            
+            $history = $logEntryRepo->findRecentStatus($policy);
+            if (!$history) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' is in picsure-required status, but there is no relevant log entry",
+                    $policy->getId()
+                ));
+                continue;
+            }
+            if ($history->getLoggedAt() <= $cutoffDate) {
+                $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                if (!$dry) {
+                    $this->cancel($policy, Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, true);
+                }
+            }
         }
-
+        return $cancelled;
     }
 
     public function activateRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
@@ -2733,32 +2754,5 @@ class PolicyService
         $participation->setStatus(Participation::STATUS_ACTIVE);
         $this->dm->persist($participation);
         return $participation;
-    }
-
-    /**
-     * Gives you the date at which the given policy entered it's current state.
-     * @param Policy    $policy is the policy that we are checking about.
-     * @return \DateTime the date at which the policy entered it's current state.
-     */
-    public function startOfState(Policy $policy)
-    {
-        $date = new \DateTime();
-        $logRepo = $this->dm->getRepository(LogEntry::class);
-        $history = $logRepo->find([
-            "objectId" => $policy->getId(),
-            "data.status" => $policy->getStatus()
-        ]);
-        var_dump($history);
-        if (!$history) {
-            throw new \Exception(sprintf(
-                "Policy '%s' is in status %s but there is no such log entry",
-                $policy->getId(),
-                $policy->getStatus()
-            ));
-        }
-        usort($history, function ($a, $b) {
-            return ($a->getLoggedAt() < $b->getLoggedAt()) ? -1 : 1;
-        });
-        return $history[0];
     }
 }
