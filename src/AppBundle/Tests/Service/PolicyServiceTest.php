@@ -6181,7 +6181,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $b->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
         // Now do a wet run
-        $cancelled = static::$policyService->cancelOverduePicsurePolicies(false);
+        $cancelledAgain = static::$policyService->cancelOverduePicsurePolicies(false);
         $a = $policyRepo->findOneBy(["id" => $a->getId()]);
         $b = $policyRepo->findOneBy(["id" => $b->getId()]);
         $c = $policyRepo->findOneBy(["id" => $c->getId()]);
@@ -6189,6 +6189,11 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
         $this->assertEquals(Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, $b->getCancelledReason());
         $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
+        // look at the cancelled lists.
+        $this->assertEquals($cancelled, $cancelledAgain);
+        $this->assertArrayHasKey($b->getId(), $cancelled);
+        $this->assertContains($b->getPolicyNumber(), $cancelled);
+        $this->assertEquals(1, count($cancelled));
     }
 
     private function createLogEntry($policy, $status, $daysAgo)
