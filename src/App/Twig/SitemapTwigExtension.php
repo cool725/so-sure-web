@@ -55,7 +55,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/3-technologies-that-will-shape-the-future-of-insurance' => '3 Technologies that will Shape the Future of Insurance',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
-            '/about/social-insurance/privacy' => 'Website privacy policy (GDPR version)',
+            '/about/social-insurance/privacy' => 'Privacy Policy',
             '/about/social-insurance/terms' => 'Terms & Conditions',
             '/about/social-insurance/how-to-contact-so-sure' => 'Contact Us',
             '/phone-insurance' => 'Phone Insurance',
