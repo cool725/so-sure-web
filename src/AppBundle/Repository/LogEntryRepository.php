@@ -3,7 +3,7 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\Claim;
+use AppBundle\Document\LogEntry;
 use AppBundle\Document\Policy;
 
 class LogEntryRepository extends DocumentRepository
@@ -15,11 +15,13 @@ class LogEntryRepository extends DocumentRepository
      */
     public function findRecentStatus($policy)
     {
-        return $this->createQueryBuilder()
+        /** @var LogEntry $entry */
+        $entry =  $this->createQueryBuilder()
             ->field('objectId')->equals($policy->getId())
             ->field('data.status')->equals($policy->getStatus())
             ->sort('loggedAt', 'desc')
             ->getQuery()
             ->getSingleResult();
+        return $entry;
     }
 }

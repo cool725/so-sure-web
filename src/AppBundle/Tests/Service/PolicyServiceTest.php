@@ -40,6 +40,7 @@ use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Document\LogEntry;
+use AppBundle\Repository\LogEntryRepository;
 use Symfony\Component\Validator\Constraints\Date;
 
 /**
@@ -6174,16 +6175,22 @@ class PolicyServiceTest extends WebTestCase
         static::$dm->flush();
         // Make sure a dry run is dry.
         $cancelled = static::$policyService->cancelOverduePicsurePolicies(true);
+        /** @var Policy $a */
         $a = $policyRepo->findOneBy(["id" => $a->getId()]);
+        /** @var Policy $b */
         $b = $policyRepo->findOneBy(["id" => $b->getId()]);
+        /** @var Policy $c */
         $c = $policyRepo->findOneBy(["id" => $c->getId()]);
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $b->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
         // Now do a wet run
         $cancelledAgain = static::$policyService->cancelOverduePicsurePolicies(false);
+        /** @var Policy $a */
         $a = $policyRepo->findOneBy(["id" => $a->getId()]);
+        /** @var Policy $b */
         $b = $policyRepo->findOneBy(["id" => $b->getId()]);
+        /** @var Policy $c */
         $c = $policyRepo->findOneBy(["id" => $c->getId()]);
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
         $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
