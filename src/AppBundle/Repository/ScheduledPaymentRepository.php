@@ -35,6 +35,20 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         return $query->getQuery()->execute();
     }
 
+    /**
+     * Gives you the amount of money a given policy currently has rescheduled to pay.
+     * @param Policy $policy is the policy that must pay this money.
+     * @return float the amount of money.
+     */
+    public function getRescheduledAmount(Policy $policy)
+    {
+        $total = 0;
+        foreach ($this->findRescheduled($policy) as $payment) {
+            $total += $payment->getAmount();
+        }
+        return $total;
+    }
+
     public function findScheduled(\DateTime $date = null)
     {
         if (!$date) {

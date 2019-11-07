@@ -1121,7 +1121,8 @@ class UserController extends BaseController
         // Validate unpaid policy and use rescheduled amount if no owed amount due to bacs timing or whatever.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         if (!$this->greaterThanZero($amount)) {
-            $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+            $dm = $this->getManager();
+            $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
             $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
             if ($this->greaterThanZero($rescheduledAmount)) {
                 $amount = $rescheduledAmount;

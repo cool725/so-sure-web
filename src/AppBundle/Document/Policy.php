@@ -5558,12 +5558,6 @@ abstract class Policy
             return null;
         }
 
-        $outstandingPremium = $this->getOutstandingPremiumToDate($date);
-        if ($this->areEqualToTwoDp(0, $outstandingPremium)) {
-            return self::UNPAID_PAID;
-        }
-
-
         $nextScheduledPayment = $this->getNextScheduledPayment();
         $lastPaymentCredit = $this->getLastPaymentCredit();
         $lastPaymentInProgress = false;
