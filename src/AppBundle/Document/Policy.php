@@ -5558,6 +5558,7 @@ abstract class Policy
             return null;
         }
 
+        $outstandingPremium = $this->getOutstandingPremiumToDate($date);
         $nextScheduledPayment = $this->getNextScheduledPayment();
         $lastPaymentCredit = $this->getLastPaymentCredit();
         $lastPaymentInProgress = false;
