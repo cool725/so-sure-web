@@ -8,7 +8,7 @@
 
 {# Set Meta #}
 {% set og_title = 'Sign up and save' %}
-{% set og_description = "Hey, I just insured my mobile phone with so-sure. They give you 80% of your cash back if we are connected and don\'t claim!" %}
+{% set og_description = "Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance." %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% if policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
@@ -154,13 +154,13 @@
                             {# TODO: Rework icons #}
                             <div id="onboarding_btn_share"
                                  data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
-                                 data-share-text="Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out:">
+                                 data-share-text="Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out:">
                             </div>
                         </div>
                         <h5 class="text-zaffre">🔗 Share this link</h5>
                         <div class="custom-input-with-btn mb-4">
                             <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
-                            <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
+                            <div id="scode_share" class="sr-only">Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
                             <button class="btn btn-primary btn-copy btn-sm track-data"
                                 data-clipboard-target="#scode_share"
                                 data-toggle="tooltip"
