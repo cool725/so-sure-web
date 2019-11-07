@@ -20,6 +20,8 @@ $(function() {
     const addValidation = () => {
         validateForm.validate({
             debug: false,
+            validClass: 'is-valid-ss',
+            errorClass: 'is-invalid',
             onkeyup: false,
             focusCleanup: false,
             onclick: false,
@@ -175,7 +177,8 @@ $(function() {
     $('.date-picker').datetimepicker({
         useCurrent: false,
         format: 'DD/MM/YYYY',
-        minDate: claimLimit
+        minDate: claimLimit,
+        maxDate: moment()
     });
 
     // Mask date inputs incase manual entry
@@ -195,5 +198,14 @@ $(function() {
         $('#claimfnol_tab, #claimfnol').addClass('active');
         return false;
     });
+
+    // Starling
+    if ($('#claim_warning_modal').length) {
+        $('#claim_warning_modal').modal({
+            backdrop: 'static',
+            keyboard: false,
+            show: true
+        });
+    }
 
 });

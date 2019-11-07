@@ -50,13 +50,6 @@ Encore
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
     .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')
 
-    // Homepage A/B Exp
-    .addEntry('purchase-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-b.js')
-    .addEntry('purchase-personal-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal-b.js')
-    .addEntry('purchase-phone-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-phone-b.js')
-    .addEntry('purchase-pledge-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge-b.js')
-    .addEntry('purchase-payment-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment-b.js')
-
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')

@@ -83,6 +83,11 @@ class FOSUserController extends ResettingController
                 $response = new RedirectResponse($url);
             }
 
+            $this->addFlash(
+                'success',
+                'You have successfully changed your password, please login to proceed'
+            );
+
             /*
              * do not dispatch this event as it will login a user, which skips the 2fa for admin users
             $dispatcher->dispatch(
