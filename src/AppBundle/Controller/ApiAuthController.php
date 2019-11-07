@@ -208,7 +208,7 @@ class ApiAuthController extends BaseController
                 $paymentService->generateBacsReference($bacs, $this->getUser());
             }
 
-            if ($policy->isActive(true)) {
+            if ($policy->isActive()) {
                 $bacs->setStandardNotificationDate($policy->getBilling());
             } else {
                 // pending policies should assume a now billing date

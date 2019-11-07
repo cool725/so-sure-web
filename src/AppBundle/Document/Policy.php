@@ -2293,13 +2293,17 @@ abstract class Policy
         }
     }
 
-    public function isActive($includeUnpaid = true)
+    /**
+     * Tells you if this policy is currently active, as in the active, unpaid, or picsure-required status.
+     * @return boolean true if the policy is active and false if it is not.
+     */
+    public function isActive()
     {
-        if ($includeUnpaid) {
-            return in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]);
-        } else {
-            return in_array($this->getStatus(), [self::STATUS_ACTIVE]);
-        }
+        return in_array($this->getStatus(), [
+            self::STATUS_PICSURE_REQUIRED,
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID
+        ]);
     }
 
     public function getPolicyFiles()
@@ -4296,7 +4300,7 @@ abstract class Policy
     {
         // We should only bill policies that are active or unpaid
         // Doesn't make sense to bill expired or cancelled policies
-        return $this->isActive(true);
+        return $this->isActive();
     }
 
     public function getSentInvitations($onlyProcessed = true)
@@ -4480,11 +4484,11 @@ abstract class Policy
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
             /** @var Connection $connection */
             $renew = count($this->getRenewalConnections()) < $this->getMaxConnectionsLimit();
-            if ($connection->getLinkedPolicy()->isActive(true) &&
+            if ($connection->getLinkedPolicy()->isActive() &&
                 $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
                 $this->addRenewalConnection($connection->createRenewal($renew));
             } elseif ($connection->getLinkedPolicyRenewal() &&
-                $connection->getLinkedPolicyRenewal()->isActive(true) &&
+                $connection->getLinkedPolicyRenewal()->isActive() &&
                 $connection->getLinkedPolicyRenewal()->isConnected($this->getPreviousPolicy())
             ) {
                 $this->addRenewalConnection($connection->createRenewal($renew));
@@ -4664,7 +4668,7 @@ abstract class Policy
             throw new \Exception('Unable to expire a policy prior to its end date');
         }
 
-        if (!$this->isActive(true)) {
+        if (!$this->isActive()) {
             throw new \Exception('Unable to expire a policy if status is not active or unpaid');
         }
 
@@ -4765,7 +4769,7 @@ abstract class Policy
         //if ($this->isRenewed()) {
             foreach ($this->getAcceptedConnections() as $connection) {
                 if ($connection instanceof StandardConnection &&
-                    ($connection->getSourcePolicy()->isActive(true) ||
+                    ($connection->getSourcePolicy()->isActive() ||
                         $connection->getSourcePolicy()->getStatus() == Policy::STATUS_RENEWAL)
                 ) {
                     $connection->setLinkedPolicyRenewal($this->getNextPolicy());
@@ -5166,7 +5170,7 @@ abstract class Policy
         if ($this->hasMonetaryClaimed()) {
             return false;
         }
-        if (!$this->isActive(true)) {
+        if (!$this->isActive()) {
             return false;
         }
 
@@ -5915,7 +5919,7 @@ abstract class Policy
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if ($this->isActive(true)) {
+        if ($this->isActive()) {
             $diff = $this->getEnd()->diff($date);
             $notPastDate = $diff->days > 0 || ($diff->days == 0 && $diff->invert == 1);
             if ($diff->days <= self::RENEWAL_DAYS && $notPastDate) {
@@ -6353,7 +6357,7 @@ abstract class Policy
         foreach ($policies as $policy) {
             if ($policy->isValidPolicy($prefix)) {
                 $includePolicy = true;
-                if ($activeUnpaidOnly && !$policy->isActive(true)) {
+                if ($activeUnpaidOnly && !$policy->isActive()) {
                     $includePolicy = false;
                 }
                 if ($includePolicy) {

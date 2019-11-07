@@ -490,8 +490,8 @@ class BICommand extends ContainerAwareCommand
                 $attribution ? $attribution->getReferer() : '',
                 $policy->getPurchaseSdk(),
                 $policy->getUsedPaymentType(),
-                ($bankAccount && $policy->isActive(true)) ? $bankAccount->getMandateStatus() : '',
-                ($bankAccount && $policy->isActive(true) &&
+                ($bankAccount && $policy->isActive()) ? $bankAccount->getMandateStatus() : '',
+                ($bankAccount && $policy->isActive() &&
                     $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
                     $bankAccount->getMandateCancelledExplanation() : '',
                 count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no',

@@ -495,7 +495,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             $allowedVariance = 0;
             // allow up to 1 month difference for non-active policies
-            if (!$policy->isActive(true)) {
+            if (!$policy->isActive()) {
                 $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
             }
             // any pending payments should be excluded from calcs
@@ -576,7 +576,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             // bacs checks are only necessary on active policies
-            if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive(true)) {
+            if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive()) {
                 $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $bacsPayments = $policy->getPaymentsByType(BacsPayment::class);
