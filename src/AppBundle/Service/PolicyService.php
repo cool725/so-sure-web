@@ -1411,7 +1411,9 @@ class PolicyService
         if (!$this->mailer) {
             return;
         }
-
+        if ($policy->getCancelledReason() == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
+            return;
+        }
         if (!$baseTemplate) {
             $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
             if ($policy->isCancelledAndPaymentOwed()) {
