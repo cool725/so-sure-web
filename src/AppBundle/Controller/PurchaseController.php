@@ -138,15 +138,6 @@ class PurchaseController extends BaseController
             $purchase->setEmail($session->get('email'));
         }
 
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
-        //     ['regular-funnel-v2', 'new-funnel-v2'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
-
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
@@ -271,10 +262,6 @@ class PurchaseController extends BaseController
 
         $template = 'AppBundle:Purchase:purchaseStepPersonalAddress.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel-v2') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPersonalAddressB.html.twig';
-        // }
-
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
@@ -287,7 +274,6 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
         );
 
@@ -340,15 +326,6 @@ class PurchaseController extends BaseController
         if (!$policy && $user->hasPartialPolicy()) {
             $policy = $user->getPartialPolicies()[0];
         }
-
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
-        //     ['regular-funnel-v2', 'new-funnel-v2'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
 
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
@@ -524,10 +501,6 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel-v2') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPhoneB.html.twig';
-        // }
-
         $data = array(
             'policy' => $policy,
             'phone' => $phone,
@@ -539,7 +512,6 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
         );
 
@@ -812,10 +784,6 @@ class PurchaseController extends BaseController
 
         $template = 'AppBundle:Purchase:purchaseStepPledge.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel-v2') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPledgeB.html.twig';
-        // }
-
         $data = array(
             'policy' => $policy,
             'phone' => $policy->getPhone(),
@@ -827,7 +795,6 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
         );
 
@@ -884,15 +851,6 @@ class PurchaseController extends BaseController
             $phone = $policy->getPhone();
             $this->setSessionQuotePhone($request, $phone);
         }
-
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
-        //     ['regular-funnel-v2', 'new-funnel-v2'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
@@ -1003,10 +961,6 @@ class PurchaseController extends BaseController
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
 
-        // if ($homepageFunnelExp == 'new-funnel-v2') {
-        //     $template = 'AppBundle:Purchase:purchaseStepPaymentB.html.twig';
-        // }
-
         $now = \DateTime::createFromFormat('U', time());
         $billingDate = $this->adjustDayForBilling($now);
 
@@ -1025,7 +979,6 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
         );
 
