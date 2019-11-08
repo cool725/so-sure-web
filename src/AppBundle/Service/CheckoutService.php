@@ -102,6 +102,9 @@ class CheckoutService
     /** @var FeatureService */
     protected $featureService;
 
+    /** @var PriceService */
+    protected $priceService;
+
     /** @var ApiClient */
     protected $client;
 
@@ -125,6 +128,7 @@ class CheckoutService
      * @param EventDispatcherInterface $dispatcher
      * @param SmsService               $sms
      * @param FeatureService           $featureService
+     * @param PriceService             $priceService
      */
     public function __construct(
         DocumentManager $dm,
@@ -137,7 +141,8 @@ class CheckoutService
         \Domnikl\Statsd\Client $statsd,
         EventDispatcherInterface $dispatcher,
         SmsService $sms,
-        FeatureService $featureService
+        FeatureService $featureService,
+        PriceService $priceService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -148,6 +153,7 @@ class CheckoutService
         $this->statsd = $statsd;
         $this->environment = $environment;
         $this->featureService = $featureService;
+        $this->priceService = $priceService;
 
         $isProd = $environment == 'prod';
         $this->client = new ApiClient($apiSecret, $isProd ? 'live' : 'sandbox', !$isProd);
@@ -366,6 +372,7 @@ class CheckoutService
                     $payment->getAmount()
                 ));
                 $this->refund($payment, null, null, "Invalid price, not creating policy");
+                return false;
             }
         } else {
             // Existing policy - add payment + prevent duplicate billing
