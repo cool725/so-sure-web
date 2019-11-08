@@ -215,16 +215,15 @@ class PriceServiceTest extends WebTestCase
     {
         $data = $this->userData();
         $exceptions = 0;
-        $this->expectException(IncorrectPriceException::class);
         // Random numbers.
         try {
             self::$priceService->phonePolicyDeterminePremium($data["policy"], 3, new \DateTime("2019-03-19"));
-        } catch (InvalidPriceException $e) {
+        } catch (IncorrectPriceException $e) {
             $exceptions++;
         }
         try {
             self::$priceService->phonePolicyDeterminePremium($data["policy"], 71.23, new \DateTime("2019-06-11"));
-        } catch (InvalidPriceException $e) {
+        } catch (IncorrectPriceException $e) {
             $exceptions++;
         }
         // Yearly on A after B.
@@ -234,7 +233,7 @@ class PriceServiceTest extends WebTestCase
                 $data["priceA"]->getYearlyPremiumPrice(),
                 new \DateTime("2019-06-11")
             );
-        } catch (InvalidPriceException $e) {
+        } catch (IncorrectPriceException $e) {
             $exceptions++;
         }
         // Monthly on B
@@ -244,7 +243,7 @@ class PriceServiceTest extends WebTestCase
                 $data["priceB"]->getMonthlyPremiumPrice(),
                 new \DateTime("2019-06-11")
             );
-        } catch (InvalidPriceException $e) {
+        } catch (IncorrectPriceException $e) {
             $exceptions++;
         }
         $this->assertEquals(4, $exceptions);

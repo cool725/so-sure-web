@@ -13,6 +13,7 @@ use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\DuplicatePaymentException;
 use AppBundle\Exception\InvalidPaymentMethodException;
 use AppBundle\Exception\ScheduledPaymentException;
+use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
@@ -362,7 +363,9 @@ class CheckoutService
                 $date
             );
             try {
-                $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
+                if ($policy instanceof PhonePolicy) {
+                    $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
+                }
                 $this->policyService->create($policy, $date, true, null, $identityLog);
                 $this->dm->flush();
             } catch (IncorrectPriceException $e) {
