@@ -1301,8 +1301,9 @@ class Phone
 
     public function asQuoteApiArray(PostcodeService $postcodeService, User $user = null)
     {
-        $currentPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        if (!$currentPhonePrice) {
+        $monthlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        $yearlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY);
+        if (!($monthlyPhonePrice && $yearlyPhonePrice)) {
             if ($this->getActive()) {
                 return null;
             }
@@ -1326,11 +1327,11 @@ class Phone
         $promoAddition = 0;
         $isPromoLaunch = false;
 
-        $monthlyPremium = $currentPhonePrice->getMonthlyPremiumPrice();
+        $monthlyPremium = $monthlyPhonePrice->getMonthlyPremiumPrice();
         if ($user && !$user->allowedMonthlyPayments($postcodeService)) {
             $monthlyPremium = null;
         }
-        $yearlyPremium = $currentPhonePrice->getYearlyPremiumPrice();
+        $yearlyPremium = $yearlyPhonePrice->getYearlyPremiumPrice();
         if ($user && !$user->allowedYearlyPayments()) {
             $yearlyPremium = null;
         }
@@ -1341,16 +1342,16 @@ class Phone
             'yearly_premium' => $yearlyPremium,
             'yearly_loss' => 0,
             'phone' => $this->toApiArray(),
-            'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
-            'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
-            'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
+            'connection_value' => $monthlyPhonePrice->getInitialConnectionValue($promoAddition),
+            'max_connections' => $monthlyPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
+            'max_pot' => $monthlyPhonePrice->getMaxPot($isPromoLaunch),
             'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
             'can_purchase' => $this->getActive(),
-            'excesses' => $currentPhonePrice->getExcess() ?
-                $currentPhonePrice->getExcess()->toApiArray() :
+            'excesses' => $monthlyPhonePrice->getExcess() ?
+                $monthlyPhonePrice->getExcess()->toApiArray() :
                 [],
-            'picsure_excesses' => $currentPhonePrice->getPicSureExcess() ?
-                $currentPhonePrice->getPicSureExcess()->toApiArray() :
+            'picsure_excesses' => $monthlyPhonePrice->getPicSureExcess() ?
+                $monthlyPhonePrice->getPicSureExcess()->toApiArray() :
                 [],
         ];
     }

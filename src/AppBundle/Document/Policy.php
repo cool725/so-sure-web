@@ -6279,12 +6279,12 @@ abstract class Policy
         ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }
-
-
         $cardDetails = CheckoutPaymentMethod::emptyApiArray();
         if ($this->getCheckoutPaymentMethod()) {
             $cardDetails = $this->getCheckoutPaymentMethod()->toApiArray();
         }
+
+        $premium = $this->getPremium();
 
         $data = [
             'id' => $this->getId(),
@@ -6293,7 +6293,7 @@ abstract class Policy
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),
-            'monthly_premium' => $this->getPremium()->getMonthlyPremiumPrice(),
+            'monthly_premium' => $premium ? $premium->getMonthlyPremiumPrice() : null,
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
@@ -6308,7 +6308,7 @@ abstract class Policy
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
-            'yearly_premium' => $this->getPremium()->getYearlyPremiumPrice(),
+            'yearly_premium' => $premium ? $premium->getYearlyPremiumPrice() : null,
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
@@ -6319,8 +6319,8 @@ abstract class Policy
             'next_policy_id' => $this->hasNextPolicy() ? $this->getNextPolicy()->getId() : null,
             'billing_day' => $this->getBillingDay(),
             'cashback_status' => $this->getCashback() ? $this->getCashback()->getStatus() : null,
-            'adjusted_monthly_premium' => $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
-            'adjusted_yearly_premium' => $this->getPremium()->getAdjustedYearlyPremiumPrice(),
+            'adjusted_monthly_premium' => $premium ? $premium->getAdjustedStandardMonthlyPremiumPrice() : null,
+            'adjusted_yearly_premium' => $premium ? $premium->getAdjustedYearlyPremiumPrice() : null,
             'has_payment_method' => $this->hasValidPaymentMethod(),
             'payment_details' => $this->getPaymentMethod() ?
                 $this->getPaymentMethod()->__toString() :
