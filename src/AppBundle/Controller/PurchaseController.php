@@ -872,7 +872,6 @@ class PurchaseController extends BaseController
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
-            // TODO: stream should be decided upon.
             $price = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             /** @var PostcodeService $postcodeService */
             $postcodeService = $this->get('app.postcode');
