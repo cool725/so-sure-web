@@ -28,7 +28,7 @@ class RewardType extends AbstractType
 
     protected $dm;
 
-    protected $typesOptions;
+    protected $typesOptions = [];
 
     /**
      * @param DocumentManager $dm

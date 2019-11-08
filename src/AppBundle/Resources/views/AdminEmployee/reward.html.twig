@@ -96,10 +96,12 @@
                         <tr>
                             <td><a href="{{ path('admin_user', {'id': connection.sourceUser.id }) }}"><u>{{connection.sourceUser.email}}</u></a></td>
                             <td><a href="{{ path('admin_policy', {'id': connection.sourcePolicy.id }) }}"><u>{{connection.sourcePolicy.policyNumber}}</td>
-                            {% if connection.sourcePolicy.potValue > 0 %}
+                            {% if connection.sourcePolicy.status == 'cancelled' %}
+                                <td>Cancelled Policy</td>
+                            {% else %}
                                 {% set promoValue = connection.promoValue %}
+                                <td>£{{ promoValue|number_format(2, '.', ',') }}{% if connection.sourcePolicy.potValue == 0 %} | No Pot{% endif %}</td>
                             {% endif %}
-                            <td>£{{ promoValue|number_format(2, '.', ',') }}</td>
                         </tr>
                   {% endfor %}
                 </tbody>
