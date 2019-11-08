@@ -187,7 +187,7 @@ class PriceServiceTest extends WebTestCase
         $this->assertEquals($data["priceA"]->getYearlyPremiumPrice(), $data["policy"]->getYearlyPremiumPrice());
         // Monthly on price A.
         self::$priceService->phonePolicyDeterminePremium(
-            $data["policy"], 
+            $data["policy"],
             $data["priceA"]->getMonthlyPremiumPrice(),
             new \DateTime("2019-02-06 03:00")
         );
@@ -198,7 +198,7 @@ class PriceServiceTest extends WebTestCase
         );
         // Yearly on price B.
         self::$priceService->phonePolicyDeterminePremium(
-            $data["policy"], 
+            $data["policy"],
             $data["priceB"]->getYearlyPremiumPrice(),
             new \DateTime("2019-04-01")
         );
