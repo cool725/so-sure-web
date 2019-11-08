@@ -179,7 +179,7 @@ class PriceServiceTest extends WebTestCase
         $data = $this->userData();
         // Yearly on price A befoe price b starts.
         self::$priceService->phonePolicyDeterminePremium(
-            $data["policy"], 
+            $data["policy"],
             $data["priceA"]->getYearlyPremiumPrice(),
             new \DateTime("2019-02-21")
         );
