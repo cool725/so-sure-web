@@ -6285,6 +6285,7 @@ abstract class Policy
         }
 
         $premium = $this->getPremium();
+        $phone = $this->getPhone();
 
         $data = [
             'id' => $this->getId(),
