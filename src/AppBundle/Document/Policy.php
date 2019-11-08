@@ -6295,7 +6295,7 @@ abstract class Policy
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),
             'monthly_premium' => $premium ? $premium->getMonthlyPremiumPrice() :
-                ($phone ? $phone->getCurrentMonthlyPrice() : null),
+                ($phone ? $phone->getCurrentMonthlyPhonePrice() : null),
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
@@ -6311,7 +6311,7 @@ abstract class Policy
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
             'yearly_premium' => $premium ? $premium->getYearlyPremiumPrice() :
-                ($phone ? $phone->getCurrentYearlyPrice() : null),
+                ($phone ? $phone->getCurrentYearlyPhonePrice() : null),
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
