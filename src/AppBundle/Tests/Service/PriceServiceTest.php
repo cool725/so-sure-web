@@ -8,6 +8,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Document\Offer;
+use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Service\PriceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -166,6 +167,87 @@ class PriceServiceTest extends WebTestCase
         );
         $this->assertEquals("phone", $data["policy"]->getPremium()->getSource());
         $this->assertEquals(20, $data["policy"]->getPremium()->getGwp());
+        // Yearly on price A after price B starts.
+        // Monthly on price B.
+    }
+
+    /**
+     * Tests determine premium to make sure it works when there are valid inputs to it.
+     */
+    public function testPhonePolicyDeterminePremium()
+    {
+        $data = $this->userData();
+        // Yearly on price A befoe price b starts.
+        self::$priceService->phonePolicyDeterminePremium(
+            $data["policy"], 
+            $data["priceA"]->getYearlyPremiumPrice(),
+            new \DateTime("2019-02-21")
+        );
+        $this->assertEquals(1, $data["policy"]->getPremiumInstallments());
+        $this->assertEquals($data["priceA"]->getYearlyPremiumPrice(), $data["policy"]->getYearlyPremiumPrice());
+        // Monthly on price A.
+        self::$priceService->phonePolicyDeterminePremium(
+            $data["policy"], 
+            $data["priceA"]->getMonthlyPremiumPrice(),
+            new \DateTime("2019-02-06 03:00")
+        );
+        $this->assertEquals(12, $data["policy"]->getPremiumInstallments());
+        $this->assertEquals(
+            $data["priceA"]->getMonthlyPremiumPrice(),
+            $data["policy"]->getPremium()->getMonthlyPremiumPrice()
+        );
+        // Yearly on price B.
+        self::$priceService->phonePolicyDeterminePremium(
+            $data["policy"], 
+            $data["priceB"]->getYearlyPremiumPrice(),
+            new \DateTime("2019-04-01")
+        );
+        $this->assertEquals(1, $data["policy"]->getPremiumInstallments());
+        $this->assertEquals($data["priceB"]->getYearlyPremiumPrice(), $data["policy"]->getYearlyPremiumPrice());
+    }
+
+    /**
+     * Tests determine premium to make sure that when invalid inputs are sent to it it throws the right kind of
+     * exception. As ugly as all these try catches are, they are necessary because otherwise it can only test for one
+     * exception.
+     */
+    public function testPhonePolicyDeterminePremiumInvalid()
+    {
+        $data = $this->userData();
+        $exceptions = 0;
+        $this->expectException(IncorrectPriceException::class);
+        // Random numbers.
+        try {
+            self::$priceService->phonePolicyDeterminePremium($data["policy"], 3, new \DateTime("2019-03-19"));
+        } catch (InvalidPriceException $e) {
+            $exceptions++;
+        }
+        try {
+            self::$priceService->phonePolicyDeterminePremium($data["policy"], 71.23, new \DateTime("2019-06-11"));
+        } catch (InvalidPriceException $e) {
+            $exceptions++;
+        }
+        // Yearly on A after B.
+        try {
+            self::$priceService->phonePolicyDeterminePremium(
+                $data["policy"],
+                $data["priceA"]->getYearlyPremiumPrice(),
+                new \DateTime("2019-06-11")
+            );
+        } catch (InvalidPriceException $e) {
+            $exceptions++;
+        }
+        // Monthly on B
+        try {
+            self::$priceService->phonePolicyDeterminePremium(
+                $data["policy"],
+                $data["priceB"]->getMonthlyPremiumPrice(),
+                new \DateTime("2019-06-11")
+            );
+        } catch (InvalidPriceException $e) {
+            $exceptions++;
+        }
+        $this->assertEquals(4, $exceptions);
     }
 
     /**

@@ -171,4 +171,22 @@ class PhonePrice extends Price
             throw new \InvalidArgumentException("%d is not a valid number of premium installments");
         }
     }
+
+    /**
+     * Converts a stream to the number of installments to pay for that stream.
+     * @param string $stream is the stream to convert.
+     * @return int the number of installments.
+     */
+    public static function streamInstallments($stream)
+    {
+        if ($stream == self::STREAM_MONTHLY) {
+            return 12;
+        } elseif ($stream == self::STREAM_YEARLY) {
+            return 1;
+        }
+        throw new InvalidPriceStreamException(sprintf(
+            "%s is not a type of price stream to get installments",
+            $stream
+        ));
+    }
 }

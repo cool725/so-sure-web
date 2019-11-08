@@ -9,6 +9,8 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\Offer;
+use AppBundle\Document\CurrencyTrait;
+use AppBundle\Exception\IncorrectPriceException;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -17,6 +19,8 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  */
 class PriceService
 {
+    use CurrencyTrait;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -83,6 +87,34 @@ class PriceService
             $prices[$stream] = $this->userPhonePrice($user, $phone, $stream, $date);
         }
         return $prices;
+    }
+
+    /**
+     * Calculates the premium that a user has chosen to pay for their policy by checking what their options were. Also
+     * calculates their premium installments.
+     * @param PhonePolicy $policy is the policy.
+     * @param float       $amount is the amount they paid.
+     * @param \DateTime   $date   is the date iergerg
+     */
+    public function phonePolicyDeterminePremium(PhonePolicy $policy, $amount, \DateTime $date)
+    {
+        $prices = $this->userPhonePriceStreams($policy->getUser(), $policy->getPhone(), $date);
+        foreach ($prices as $stream => $price) {
+            $installments = PhonePrice::streamInstallments($stream);
+            $installmentPrice = $price->getYearlyPremiumPrice() / $installments;
+            if ($this->areEqualToTwoDp($amount, $installmentPrice)) {
+                $policy->setPremiumInstallments($installments);
+                $policy->setPremium($price->createPremium());
+                $this->dm->persist($policy);
+                $this->dm->flush();
+                return;
+            }
+        }
+        throw new IncorrectPriceException(sprintf(
+            "Policy '%s' paid invalid price of %f",
+            $policy->getId(),
+            $amount
+        ));
     }
 
     /**

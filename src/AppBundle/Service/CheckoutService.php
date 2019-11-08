@@ -355,9 +355,18 @@ class CheckoutService
                 $source,
                 $date
             );
-            // TODO: infer price from payment and validate.
-            $this->policyService->create($policy, $date, true, null, $identityLog);
-            $this->dm->flush();
+            try {
+                $priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), $date);
+                $this->policyService->create($policy, $date, true, null, $identityLog);
+                $this->dm->flush();
+            } catch (IncorrectPriceException $e) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' tried to purchase with invalid price %f",
+                    $policy->getId(),
+                    $payment->getAmount()
+                ));
+                $this->refund($payment, null, null, "Invalid price, not creating policy");
+            }
         } else {
             // Existing policy - add payment + prevent duplicate billing
             $payment = $this->createPayment(
