@@ -50,7 +50,7 @@
     {{ form_widget(purchase_form.next, {
         'label': 'Continue',
         'attr': {
-            'class': 'btn btn-success btn-green-gradient btn-block-xs',
+            'class': 'btn btn-success btn-block-xs',
             'hidden': 'hidden'
     }}) }}
 {{ form_end(purchase_form) }}
@@ -77,7 +77,7 @@
                 {{ form_widget(to_card_form.submit, {
                     'label': 'Pay Now',
                     'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-block-xs btn-card-pay'
+                        'class': 'btn btn-success btn-block-xs btn-card-pay'
                 }}) }}
             {{ form_end(to_card_form) }}
         {% endblock to_card_form %}

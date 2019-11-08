@@ -6,10 +6,10 @@
 {% set robots_noindex = true %}
 {% if phone %}
     {% set body_class = 'purchase' %}
-{% endif %}
-{% set make_desc = phone.make %}
-{% if phone.make == 'Apple' %}
-    {% set make_desc = '' %}
+    {% set make_desc = phone.make %}
+    {% if phone.make == 'Apple' %}
+        {% set make_desc = '' %}
+    {% endif %}
 {% endif %}
 
 {% block title %}Purchase | so-sure{% endblock %}

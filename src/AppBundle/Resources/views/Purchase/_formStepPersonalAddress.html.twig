@@ -68,7 +68,7 @@
             <div class="form-group text-md-right mt-5">
                 <a href="#"
                    id="step--validate"
-                   class="btn btn-success btn-green-gradient btn-block-xs"
+                   class="btn btn-success btn-block-xs"
                    data-csrf="{{ lead_csrf }}"
                    data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
                    Continue <i class="far fa-long-arrow-right fa-lg ml-2"></i>
@@ -95,7 +95,7 @@
         {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
         <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
             <div class="form-group {% if is_postback %}has-error{% endif %}">
-                <label class="">Billing Address</label>
+                <label class="">Address</label>
                 <input id="address-select" class="typeahead form-control" type="text" placeholder="Postcode (eg. 10, SW1A 2AA)" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
                 {% set display_error = false %}
                 {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
@@ -135,35 +135,35 @@
                 <label class="text-danger address-show-error-text error"></label>
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine1) %}has-error{% endif %}">
-                {{ form_label(purchase_form.addressLine1, 'Billing Address Line 1', { 'label_attr': {'class': ''} }) }}
+                {{ form_label(purchase_form.addressLine1, 'Address Line 1', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.addressLine1, {'attr':{'class':'form-control addressLine1', 'placeholder': 'Address Line 1', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.addressLine1) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine2) %}has-error{% endif %}">
-                {{ form_label(purchase_form.addressLine2, 'Billing Address Line 2', { 'label_attr': {'class': ''} }) }}
+                {{ form_label(purchase_form.addressLine2, 'Address Line 2', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.addressLine2, {'attr':{'class':'form-control addressLine2', 'placeholder': 'Address Line 2', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.addressLine2) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.addressLine3) %}has-error{% endif %}">
-                {{ form_label(purchase_form.addressLine3, 'Billing Address Line 3', { 'label_attr': {'class': ''} }) }}
+                {{ form_label(purchase_form.addressLine3, 'Address Line 3', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.addressLine3, {'attr':{'class':'form-control addressLine3', 'placeholder': 'Address Line 3', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.addressLine3) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.city) %}has-error{% endif %}">
-                {{ form_label(purchase_form.city, 'Billing Address City', { 'label_attr': {'class': ''} }) }}
+                {{ form_label(purchase_form.city, 'City', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.city, {'attr':{'class':'form-control city', 'placeholder': 'City', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.city) }}</div>
                 {% endif %}
             </div>
             <div class="form-group {% if showAddress and form_errors(purchase_form.postcode) %}has-error{% endif %}">
-                {{ form_label(purchase_form.postcode, 'Billing Address Postcode', { 'label_attr': {'class': ''} }) }}
+                {{ form_label(purchase_form.postcode, 'Postcode', { 'label_attr': {'class': ''} }) }}
                 {{ form_widget(purchase_form.postcode, {'attr':{'class':'form-control postcode', 'placeholder': 'Postcode', 'data-hj-suppress' : ''}}) }}
                 {% if showAddress %}
                     <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
@@ -175,7 +175,7 @@
                     'fa': 'far fa-long-arrow-right fa-lg ml-2',
                     'right': true,
                     'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                        'class': 'btn btn-success btn-block-xs'
                 }}) }}
             </div>
         </div>

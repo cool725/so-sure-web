@@ -1231,9 +1231,9 @@ class UserController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
+        // A/B UK Flag Test
+        // To Test use url param ?force=flag / ?force=no-flag
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_UK_FLAG);
 
         $template = 'AppBundle:User:onboarding.html.twig';
 

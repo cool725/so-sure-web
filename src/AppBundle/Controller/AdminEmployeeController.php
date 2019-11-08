@@ -39,6 +39,7 @@ use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PostcodeType;
 use AppBundle\Form\Type\PromotionType;
 use AppBundle\Form\Type\RewardType;
+use AppBundle\Form\Type\RewardEditType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -3085,7 +3086,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                                 );
                             }
                             $this->addFlash('success', sprintf(
-                                'Added reward connection'
+                                'Reward applied'
                             ));
 
                             return new RedirectResponse($this->generateUrl('admin_rewards'));
@@ -3141,7 +3142,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $dm->flush();
                         $this->addFlash('success', sprintf(
-                            'Added reward'
+                            'Reward added successfully'
                         ));
 
                         return new RedirectResponse($this->generateUrl('admin_rewards'));
@@ -3159,6 +3160,105 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'rewards' => $rewards,
+            'connectForm' => $connectForm->createView(),
+            'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/rewards/{id}", name="admin_reward")
+     * @Template("AppBundle:AdminEmployee:reward.html.twig")
+     */
+    public function rewardAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $rewardRepository = $dm->getRepository(Reward::class);
+        $reward = $rewardRepository->find($id);
+        $connectForm = $this->get('form.factory')
+            ->createNamedBuilder('connectForm')
+            ->add('email', EmailType::class)
+            ->add('amount', TextType::class)
+            ->add('rewardId', HiddenType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+        $rewardForm = $this->get('form.factory')
+            ->createNamedBuilder('rewardForm', RewardEditType::class, $reward)
+            ->getForm();
+        if ($reward->getScode()) {
+            $rewardForm->get('code')->setData($reward->getScode()->getCode());
+        }
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('connectForm')) {
+                    $userRepo = $dm->getRepository(User::class);
+                    $connectForm->handleRequest($request);
+                    if ($connectForm->isValid()) {
+                        if ($sourceUser = $userRepo->findOneBy([
+                            'emailCanonical' => mb_strtolower($connectForm->getData()['email'])
+                        ])) {
+                            $invitationService = $this->get('app.invitation');
+                            if ($sourceUser->getValidPolicies()) {
+                                foreach ($sourceUser->getValidPolicies() as $policy) {
+                                    $invitationService->addReward(
+                                        $policy,
+                                        $reward,
+                                        $this->toTwoDp($connectForm->getData()['amount'])
+                                    );
+                                }
+                                $this->addFlash('success', 'Reward successfully edited');
+                            } else {
+                                $this->addFlash('error', sprintf(
+                                    'Unable to add reward bonus. %s does not have a valid policy',
+                                    $connectForm->getData()['email']
+                                ));
+                            }
+
+                            return new RedirectResponse($this->generateUrl('admin_reward', ['id'=>$id]));
+                        } else {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Unable to add reward bonus. %s does not exist as a user',
+                                $connectForm->getData()['email']
+                            ));
+                        }
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add reward connection. %s',
+                            (string) $connectForm->getErrors()
+                        ));
+                    }
+                } elseif ($request->request->has('rewardForm')) {
+                    $rewardForm->handleRequest($request);
+
+                    if ($rewardForm->isValid()) {
+                        $dm->persist($reward);
+
+                        $code = $rewardForm->get('code')->getData();
+                        $scode = $reward->getScode();
+                        if (!($code === $scode->getCode())) {
+                            $scode->setCode($code);
+                            $dm->persist($scode);
+                        }
+
+                        $dm->flush();
+
+                        $this->addFlash('success', 'Reward successfully edited');
+
+                        return new RedirectResponse($this->generateUrl('admin_reward', ['id'=>$id]));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to edit reward. %s',
+                            (string) $rewardForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'reward' => $reward,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
         ];

@@ -678,7 +678,7 @@ class PolicyService
                     throw new \Exception(sprintf('Unknown policy in queue %s', json_encode($data)));
                 }
 
-                $this->generatePolicyFiles($policy);
+                $this->generatePolicyFiles($policy, true, 'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com');
 
                 $count = $count + 1;
             } catch (\Exception $e) {
@@ -1766,6 +1766,13 @@ class PolicyService
                     $this->logger->error($msg);
                 } elseif ($policy->shouldCancelPolicy($prefix)) {
                     $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                    $this->logger->error(sprintf(
+                        "Policy should allegedly be cancelled %s %s %s %s",
+                        $policy->getId(),
+                        $policy->getPolicyExpirationDate()->format("Y-m-d H:i"),
+                        \DateTime::createFromFormat("U", time())->format("Y-m-d H:i"),
+                        $policy->shouldCancelPolicy($prefix) ? "yes" : "no"
+                    ));
                     if (!$dryRun) {
                         $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
                     }

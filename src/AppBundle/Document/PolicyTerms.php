@@ -123,6 +123,19 @@ class PolicyTerms extends PolicyDocument
     }
 
     /**
+     * For pic-sure required policies
+     *
+     * @return bool
+     */
+    public function isPicSureRequired()
+    {
+        // If terms version with _R appended
+        return in_array($this->getVersion(), [
+            // self::VERSION_14_R,
+        ]);
+    }
+
+    /**
      * Can we attempt to collect the cost of the phone?
      *
      * @return bool

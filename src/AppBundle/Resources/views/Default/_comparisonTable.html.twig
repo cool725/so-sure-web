@@ -27,7 +27,7 @@
                             {{ competitor['GC']['name']|raw }}
                         </span>
                         <span class="td-swap">
-                            {{ competitor['LICI']['name']|raw }}
+                            {{ competitor['O2']['name']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -74,7 +74,7 @@
                             {{ competitor['GC']['days']|raw }}
                         </span>
                         <span class="td-swap">
-                            {{ competitor['LICI']['days']|raw }}
+                            {{ competitor['O2']['days']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -118,7 +118,7 @@
                             <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far {{ competitor['LICI']['cashback'] }} fa-2x"></i>
+                            <i class="far {{ competitor['O2']['cashback'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -162,7 +162,7 @@
                             <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far {{ competitor['LICI']['cover'] }} fa-2x"></i>
+                            <i class="far {{ competitor['O2']['cover'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -181,25 +181,25 @@
                 <div class="td-container">
                     {% if affiliate_page is defined %}
                         <span class="td-swap td-active">
-                            <i class="far {{ competitor[competitor1]['oldphones'] }} fa-2x"></i>
+                            {{ competitor[competitor1]['oldphones'] }}
                         </span>
                         <span class="td-swap">
-                            <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
+                            {{ competitor[competitor2]['oldphones'] }}
                         </span>
                         {% if competitor3 is defined %}
                             <span class="td-swap">
-                                <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
+                                {{ competitor[competitor3]['oldphones'] }}
                             </span>
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
+                            {{ competitor['PYB']['oldphones'] }}
                         </span>
                         <span class="td-swap">
-                            <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                            {{ competitor['GC']['oldphones'] }}
                         </span>
                         <span class="td-swap">
-                            <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
+                            {{ competitor['O2']['oldphones'] }}
                         </span>
                     {% endif %}
                 </div>
@@ -236,7 +236,7 @@
                             {{ competitor['GC']['phoneage']|raw }}
                         </span>
                         <span class="td-swap">
-                            {{ competitor['LICI']['phoneage']|raw }}
+                            {{ competitor['O2']['phoneage']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -280,7 +280,7 @@
                             <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
                         </span>
                         <span class="td-swap">
-                            <i class="far {{ competitor['LICI']['saveexcess'] }} fa-2x"></i>
+                            <i class="far {{ competitor['O2']['saveexcess'] }} fa-2x"></i>
                         </span>
                     {% endif %}
                 </div>
@@ -302,37 +302,49 @@
                 <div class="td-container">
                     {% if affiliate_page is defined %}
                         <span class="td-swap td-active">
-                            {% for i in 1..competitor[competitor1]['trustpilot'] %}
-                                <i class="fas fa-star"></i>
+                            {% set score1 = competitor[competitor1]['trustpilot'] %}
+                            {% for i in range(0, 4) %}
+                                {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                <i class="fas {{ starClass1 }}"></i>
                             {% endfor %}
                         </span>
                         <span class="td-swap">
-                            {% for i in 1..competitor[competitor2]['trustpilot'] %}
-                                <i class="fas fa-star"></i>
+                            {% set score2 = competitor[competitor2]['trustpilot'] %}
+                            {% for i in range(0, 4) %}
+                                {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                <i class="fas {{ starClass2 }}"></i>
                             {% endfor %}
                         </span>
                         {% if competitor3 is defined %}
                             <span class="td-swap">
-                                {% for i in 1..competitor[competitor3]['trustpilot'] %}
-                                    <i class="fas fa-star"></i>
+                                {% set score3 = competitor[competitor3]['trustpilot'] %}
+                                {% for i in range(0, 4) %}
+                                    {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                    <i class="fas {{ starClass3 }}"></i>
                                 {% endfor %}
                             </span>
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            {% for i in 1..competitor['PYB']['trustpilot'] %}
-                                <i class="fas fa-star"></i>
+                            {% set score1 = competitor['PYB']['trustpilot'] %}
+                            {% for i in range(0, 4) %}
+                                {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                <i class="fas {{ starClass1 }}"></i>
                             {% endfor %}
                         </span>
                         <span class="td-swap">
-                            {% for i in 1..competitor['GC']['trustpilot'] %}
-                                <i class="fas fa-star"></i>
+                            {% set score2 = competitor['GC']['trustpilot'] %}
+                            {% for i in range(0, 4) %}
+                                {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                <i class="fas {{ starClass2 }}"></i>
                             {% endfor %}
                         </span>
                         <span class="td-swap">
-                            {% for i in 1..competitor['LICI']['trustpilot'] %}
-                                <i class="fas fa-star"></i>
-                            {% endfor %}
+                                {% set score3 = competitor['O2']['trustpilot'] %}
+                                {% for i in range(0, 4) %}
+                                    {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                    <i class="fas {{ starClass3 }}"></i>
+                                {% endfor %}
                         </span>
                     {% endif %}
                 </div>
@@ -354,7 +366,7 @@
             {% else %}
                 <th width="19%" class="b4 bs-l">{{ competitor['PYB']['name']|raw }}</th>
                 <th width="19%" class="b4">{{ competitor['GC']['name']|raw }}</th>
-                <th width="19%" class="b4">{{ competitor['LICI']['name']|raw }}</th>
+                <th width="19%" class="b4">{{ competitor['O2']['name']|raw }}</th>
             {% endif %}
     </thead>
     <tbody>
@@ -414,7 +426,7 @@
                     <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor['LICI']['cashback'] }} fa-2x"></i>
+                    <i class="far {{ competitor['O2']['cashback'] }} fa-2x"></i>
                 </td>
             {% endif %}
         </tr>
@@ -452,7 +464,7 @@
                     <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
                 </td>
                 <td class="bb1">
-                   <i class="far {{ competitor['LICI']['cover'] }} fa-2x"></i>
+                   <i class="far {{ competitor['O2']['cover'] }} fa-2x"></i>
                 </td>
             {% endif %}
         </tr>
@@ -463,25 +475,25 @@
             </td>
             {% if affiliate_page is defined %}
                 <td class="wh bs-l">
-                    <i class="far {{ competitor[competitor1]['oldphones'] }} fa-2x"></i>
+                    {{ competitor[competitor1]['oldphones'] }}
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor[competitor2]['oldphones'] }} fa-2x"></i>
+                    {{ competitor[competitor2]['oldphones'] }}
                 </td>
                 {% if competitor3 is defined %}
                     <td class="wh">
-                        <i class="far {{ competitor[competitor3]['oldphones'] }} fa-2x"></i>
+                        {{ competitor[competitor3]['oldphones'] }}
                     </td>
                 {% endif %}
             {% else %}
                 <td class="wh bs-l">
-                    <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
+                    {{ competitor['PYB']['oldphones'] }}
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                    {{ competitor['GC']['oldphones'] }}
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
+                    {{ competitor['O2']['oldphones'] }}
                 </td>
             {% endif %}
         </tr>
@@ -497,7 +509,7 @@
             {% else %}
                 <td class="bb1 bs-l">{{ competitor['PYB']['phoneage']|raw }}</td>
                 <td class="bb1">{{ competitor['GC']['phoneage']|raw }}</td>
-                <td class="bb1">{{ competitor['LICI']['phoneage']|raw }}</td>
+                <td class="bb1">{{ competitor['O2']['phoneage']|raw }}</td>
             {% endif %}
         </tr>
         <tr>
@@ -526,13 +538,13 @@
                 {% endif %}
             {% else %}
                 <td class="wh bs-l">
-                    <i class="far {{ competitor['PYB']['oldphones'] }} fa-2x"></i>
+                    <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor['GC']['oldphones'] }} fa-2x"></i>
+                    <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
                 </td>
                 <td class="wh">
-                    <i class="far {{ competitor['LICI']['oldphones'] }} fa-2x"></i>
+                    <i class="far {{ competitor['O2']['saveexcess'] }} fa-2x"></i>
                 </td>
             {% endif %}
         </tr>
@@ -546,40 +558,46 @@
             </td>
             {% if affiliate_page is defined %}
                 <td class="bb1 bs-l">
-                    {% for i in 1..competitor[competitor1]['trustpilot'] %}
-                        <i class="fas fa-star"></i>
+                    {% for i in range(0, 4) %}
+                        {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
+                        <i class="fas {{ starClass1 }}"></i>
                     {% endfor %}
                 </td>
                 <td class="bb1">
-                    {% for i in 1..competitor[competitor2]['trustpilot'] %}
-                        <i class="fas fa-star"></i>
+                    {% for i in range(0, 4) %}
+                        {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
+                        <i class="fas {{ starClass2 }}"></i>
                     {% endfor %}
                 </td>
                 {% if competitor3 is defined %}
                     <td class="bb1">
-                        {% for i in 1..competitor[competitor3]['trustpilot'] %}
-                            <i class="fas fa-star"></i>
+                        {% for i in range(0, 4) %}
+                            {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
+                            <i class="fas {{ starClass3 }}"></i>
                         {% endfor %}
                     </td>
                 {% endif %}
             {% else %}
                 <td class="bb1 bs-l">
-                    {% for i in 1..competitor['PYB']['trustpilot'] %}
-                        <i class="fas fa-star"></i>
+                    {% for i in range(0, 4) %}
+                        {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
+                        <i class="fas {{ starClass1 }}"></i>
                     {% endfor %}
                 </td>
                 <td class="bb1">
-                    {% for i in 1..competitor['GC']['trustpilot'] %}
-                        <i class="fas fa-star"></i>
+                    {% for i in range(0, 4) %}
+                        {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
+                        <i class="fas {{ starClass2 }}"></i>
                     {% endfor %}
                 </td>
                 <td class="bb1">
-                    {% for i in 1..competitor['LICI']['trustpilot'] %}
-                        <i class="fas fa-star"></i>
+                    {% for i in range(0, 4) %}
+                        {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
+                        <i class="fas {{ starClass3 }}"></i>
                     {% endfor %}
                 </td>
             {% endif %}
         </tr>
     </tbody>
 </table>
-<p class="updated-text text-center mt-2"><small><em>Information checked on  November 18 2018</em></small></em>
+<p class="updated-text text-center mt-2"><small><em>Info correct as of Oct 24 2019 - data taken on a first phone covered basis</em></small></em>

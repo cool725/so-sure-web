@@ -5,9 +5,13 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\DateTrait;
+use AppBundle\Classes\SoSure;
 
 /**
  * Tests the behaviour of the policy document.
@@ -213,5 +217,6 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($c->getUpgradedFrom());
         $this->assertEquals($b, $d->getUpgradedFrom());
         $this->assertEquals($d, $e->getUpgradedFrom());
+        // TODO: this function must be updated to allow upgrade created before cancellation as well as after.
     }
 }

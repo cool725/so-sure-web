@@ -7,10 +7,10 @@
 {% set robots_noindex = true %}
 {% if phone %}
     {% set body_class = 'purchase' %}
-{% endif %}
-{% set make_desc = phone.make %}
-{% if phone.make == 'Apple' %}
-    {% set make_desc = '' %}
+    {% set make_desc = phone.make %}
+    {% if phone.make == 'Apple' %}
+        {% set make_desc = '' %}
+    {% endif %}
 {% endif %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}

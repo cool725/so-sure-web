@@ -923,6 +923,8 @@ class BICommand extends ContainerAwareCommand
                 foreach ($rewards as $reward) {
                     if ($reward->getSCode()) {
                         $retVal .= $reward->getSCode()->getCode() . ';';
+                    } else {
+                        $retVal .= 'BONUS;';
                     }
                 }
             }

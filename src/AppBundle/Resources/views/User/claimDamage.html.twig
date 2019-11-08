@@ -17,16 +17,13 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4">Complete your damage claim 💔</h1>
+            <h1 class="h2 mb-4 text-center">Complete your damage claim 💔</h1>
             <div class="row">
-                <div class="col-lg-5 order-lg-12">
-                    <div class="bg-selago p-4 mb-4 rounded">
-                        <h2 class="h3 mb-4">Important info ⚠️</h2>
+                <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                    <div class="alert-info p-4 mb-4 rounded">
                         <p>You can save your progress and come back at a later date if you need more time to get all of the required documents.</p>
                         <p>Once you've submitted all the required documents, we will review your claim and get back to you within a working day. Once the claim is approved we are normally able to get you back up and running in 24-72 hours, however some repairs may take a little longer.</p>
                     </div>
-                </div>
-                <div class="col-lg-7 order-lg-1">
                     {{ form_start(claim_form, { 'attr': {
                         'data-toggle': 'validator',
                         'class': 'validate-form',

@@ -24,7 +24,7 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4">Make a claim 💔</h1>
+            <h1 class="h2 mb-4 text-center">Make a claim 💔</h1>
             {# NOTE: This is hidden! Remove d-none for testing #}
             <ul class="nav nav-tabs d-none" id="fnol_sections" role="tablist">
                 <li class="nav-item">
@@ -53,24 +53,16 @@
                      id="claimfnol"
                      role="tabpanel"
                      aria-labelledby="claimfnol_tab">
+
                     <div class="row">
-                        <div class="col-lg-5 order-lg-12">
+                        <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
                             {% if warn_pay %}
                                 <div class="alert-danger p-4 mb-4 rounded">
-                                    <h2 class="h3 text-danger mb-4">Warning loss/theft claims</h2>
+                                    <h2 class="h4 text-danger mb-4">Warning loss/theft claims</h2>
                                     <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
                                     <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
                                 </div>
                             {% endif %}
-                            <div class="bg-selago p-4 mb-4 rounded">
-                                <h2 class="h3 mb-4">Important info ⚠️</h2>
-                                <p>Claims can only be made within <u>28 days</u> of the incident.</p>
-                                <p>If you've had your phone stolen or lost, please call your network to block your phone then request both proof of barring and proof of usage documents.</p>
-                                <p>🚨 You will need to get a crime reference number from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
-                                <p>If you're unsure of what to do please <a href="#" class="open-intercom"><u>get in touch</u></a>.</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-7 order-lg-1">
                             {{ form_start(claim_form, {'attr': {
                                 'data-toggle': 'validator',
                                 'class': 'validate-form',
@@ -195,30 +187,23 @@
                             {{ form_end(claim_form) }}
                         </div>
                     </div>
+
                 </div>
                 <div class="tab-pane {% if active_tab == 'claimfnol-confirm' %}active{% endif %}"
                      id="claimfnol_confirm"
                      role="tabpanel"
                      aria-labelledby="claimfnol_confirm_tab">
+
                     <div class="row">
-                        <div class="col-lg-5 order-lg-12">
-                            {% if warn_pay %}
-                                <div class="alert-danger p-4 mb-4 rounded">
-                                    <h2 class="h3 text-danger mb-4">Warning loss/theft claims</h2>
-                                    <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
-                                    <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
-                                </div>
-                            {% endif %}
-                            <div class="bg-selago p-4 mb-4 rounded">
-                                <h2 class="h3 mb-4">Important info ⚠️</h2>
-                                <p>Claims can only be made within <u>28 days</u> of the incident.</p>
-                                <p>If you've had your phone stolen or lost, please call your network to block your phone then request both proof of barring and proof of usage documents.</p>
-                                <p>🚨 You will need to get a crime reference number from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
-                                <p>If you're unsure of what to do please <a href="#" class="open-intercom"><u>get in touch</u></a>.</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-7 order-lg-1">
+                        <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
                             {% if current == 'claim-confirm' %}
+                                {% if warn_pay %}
+                                    <div class="alert-danger p-4 mb-4 rounded">
+                                        <h2 class="h4 text-danger mb-4">Warning loss/theft claims</h2>
+                                        <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
+                                        <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
+                                    </div>
+                                {% endif %}
                                 {{ form_start(claim_confirm_form) }}
                                     <div class="h5 mb-4">I, {{ username }} confirm that:</div>
                                     <div class="form-group">
@@ -244,12 +229,40 @@
                             {% endif %}
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </section>
 
     {# Page Modal #}
+    {% if active_tab == 'claimfnol' %}
+        <div class="modal fade"
+             id="claim_warning_modal"
+             tabindex="-1" role="dialog"
+             aria-labelledby="claim_warning_modal"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Important info</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>📱 Claims can only be made within <u>28 days</u> of the incident.</p>
+                        <p>📑 If you've had your phone stolen or lost, please call your network to block your phone then request both proof of barring and proof of usage documents.</p>
+                        <p>🚨 You will need to get a crime reference number from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
+                        <p>💬 If you're unsure of what to do please <a href="#" class="open-intercom"><u>get in touch</u></a>.</p>
+                        <p class="text-center mt-4"><small>By clicking 'Understood' I {{ username }} can confirm I have noted the above</small></p>
+                        <div class="text-center">
+                            <a href="#"
+                               class="btn btn-danger"
+                               data-dismiss="modal"
+                               aria-label="Close">Understood</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}
 

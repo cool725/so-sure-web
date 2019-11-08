@@ -1167,13 +1167,6 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
 
-    app.listener.trustpilot:
-        class:   AppBundle\Listener\TrustpilotListener
-        arguments:
-        - "@app.mailer"
-        tags:
-        -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
-
     app.listener.gocompare:
         class:   AppBundle\Listener\GoCompareListener
         arguments:
@@ -1562,6 +1555,18 @@ services:
     app.form.type.claimscheck:
         class: AppBundle\Form\Type\ClaimsCheckType
         arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.reward:
+        class: AppBundle\Form\Type\RewardType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.rewardedit:
+        class: AppBundle\Form\Type\RewardEditType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
         tags:
             - { name: form.type }
 

@@ -54,49 +54,73 @@ class PhoneInsuranceController extends BaseController
 
     /**
      * @Route("/phone-insurance/water-damage", name="phone_insurance_water_damage")
+     * @Route("/mobile-insurance/water-damage", name="mobile_insurance_water_damage")
      * @Template()
      */
-    public function waterDamageAction()
+    public function waterDamageAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_water_damage') {
+            return $this->redirectToRoute('phone_insurance_water_damage', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/theft", name="phone_insurance_theft")
+     * @Route("/mobile-insurance/theft", name="mobile_insurance_theft")
      * @Template()
      */
-    public function theftAction()
+    public function theftAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_theft') {
+            return $this->redirectToRoute('phone_insurance_theft', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/loss", name="phone_insurance_loss")
+     * @Route("/mobile-insurance/loss", name="mobile_insurance_loss")
      * @Template()
      */
-    public function lossAction()
+    public function lossAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_loss') {
+            return $this->redirectToRoute('phone_insurance_loss', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/cracked-screen", name="phone_insurance_cracked_screen")
+     * @Route("/mobile-insurance/cracked-screen", name="mobile_insurance_cracked_screen")
      * @Template()
      */
-    public function crackedScreenAction()
+    public function crackedScreenAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_cracked_screen') {
+            return $this->redirectToRoute('phone_insurance_cracked_screen', [], 301);
+        }
+
         return array();
     }
 
     /**
      * @Route("/phone-insurance/broken-phone", name="phone_insurance_broken_phone")
+     * @Route("/mobile-insurance/broken-phone", name="mobile_insurance_broken_phone")
      * @Template()
      */
-    public function brokenPhoneAction()
+    public function brokenPhoneAction(Request $request)
     {
+        if ($request->get('_route') == 'mobile_insurance_broken_phone') {
+            return $this->redirectToRoute('phone_insurance_broken_phone', [], 301);
+        }
+
         return array();
     }
-
 
     /**
      * SEO Pages - Phone Insurance
@@ -130,6 +154,10 @@ class PhoneInsuranceController extends BaseController
         $data = [
             'from_price' => $fromPrice,
             'from_phones' => $fromPhones,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
@@ -232,7 +260,11 @@ class PhoneInsuranceController extends BaseController
         $data = [
             'phone' => $phone,
             'top_phones' => $topPhones,
-            'from_price' => $fromPrice
+            'from_price' => $fromPrice,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -314,6 +346,10 @@ class PhoneInsuranceController extends BaseController
             'img_url' => $modelHyph,
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
 
         return $this->render($template, $data);
@@ -450,6 +486,10 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
+        // A/B UK Flag Test
+        // To Test use url param ?force=flag / ?force=no-flag
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_UK_FLAG);
+
         $data = [
             'phone' => $phone,
             'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
@@ -465,6 +505,10 @@ class PhoneInsuranceController extends BaseController
                 ['memory' => 'asc']
             ),
             'instore' => $instore,
+            'competitor' => $this->competitorsData(),
+            'competitor1' => 'PYB',
+            'competitor2' => 'GC',
+            'competitor3' => 'O2',
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }
@@ -647,5 +691,83 @@ class PhoneInsuranceController extends BaseController
         }
 
         return $phonesMem;
+    }
+
+    private function competitorsData()
+    {
+        $competitor = [
+            'PYB' => [
+                'name' => 'Protect Your Bubble',
+                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 4.5,
+            ],
+            'GC' => [
+                'name' => 'Gadget<br>Cover',
+                'days' => '<strong>5 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
+                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'SS' => [
+                'name' => 'Simplesurance',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'CC' => [
+                'name' => 'CloudCover',
+                'days' => '<strong>3 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 3,
+            ],
+            'END' => [
+                'name' => 'Endsleigh',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-check',
+                'oldphones' => '<i class="far fa-check fa-2x"></i>',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1,
+            ],
+            'LICI' => [
+                'name' => 'Loveit<br>coverIt.co.uk',
+                'days' => '<strong>1 - 5</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 2,
+            ],
+            'O2' => [
+                'name' => 'O2',
+                'days' => '<strong>1 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From 02 only',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1.5,
+            ],
+        ];
+
+        return $competitor;
     }
 }
