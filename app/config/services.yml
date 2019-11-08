@@ -139,6 +139,7 @@ services:
             - "@event_dispatcher"
             - "@app.sms"
             - "@app.feature"
+            - "@app.price"
 
     app.payment:
         alias: AppBundle\Service\PaymentService

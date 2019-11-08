@@ -362,7 +362,7 @@ class CheckoutService
                 $date
             );
             try {
-                $priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), $date);
+                $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
                 $this->policyService->create($policy, $date, true, null, $identityLog);
                 $this->dm->flush();
             } catch (IncorrectPriceException $e) {
@@ -371,8 +371,7 @@ class CheckoutService
                     $policy->getId(),
                     $payment->getAmount()
                 ));
-                $this->refund($payment, null, null, "Invalid price, not creating policy");
-                return false;
+                return true;
             }
         } else {
             // Existing policy - add payment + prevent duplicate billing
