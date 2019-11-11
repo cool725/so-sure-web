@@ -5,6 +5,10 @@
 {% if instore is not null %}
     {% set instore_mode = true %}
 {% endif %}
+{% if validation_required == true %}
+    {# Don't allow to be indexed if coming from agg #}
+    {% set robots_noindex = true %}
+{% endif %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
