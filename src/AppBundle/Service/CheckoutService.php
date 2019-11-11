@@ -1185,16 +1185,16 @@ class CheckoutService
             ));
         }
 
+        if (!$payment->getPolicy()) {
+            $payment->setPolicy($policy);
+        }
+
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
         if ($payment->getResult() != CheckoutPayment::RESULT_CAPTURED) {
             // We've recorded the payment - can return error now
             throw new PaymentDeclinedException();
-        }
-
-        if (!$payment->getPolicy()) {
-            $payment->setPolicy($policy);
         }
 
         if ($policy->getPremium()) {
@@ -1216,7 +1216,10 @@ class CheckoutService
     protected function validatePaymentAmount(CheckoutPayment $payment)
     {
         $premium = $payment->getPolicy()->getPremium();
-        if (!$premium && !in_array($policy->isGetStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+        if (!$premium && !in_array(
+            $payment->getPolicy()->getStatus(),
+            [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID]
+        )) {
             return;
         }
         if (!$premium->isEvenlyDivisible($payment->getAmount()) &&
