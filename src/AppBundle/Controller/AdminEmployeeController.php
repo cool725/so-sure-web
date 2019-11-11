@@ -3128,7 +3128,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $reward->setTermsAndConditions($createReward->getTermsAndConditions());
                         $dm->persist($reward);
                         if ($createReward->getCode()) {
-                            $code = $createReward->getCode();
+                            //Make all rewards scodes uppercase
+                            $code = mb_strtoupper($createReward->getCode());
                             if (mb_strlen($code) > 0) {
                                 $scode = new SCode();
                                 $scode->setCode($code);
@@ -3230,11 +3231,26 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     if ($rewardForm->isValid()) {
                         $dm->persist($reward);
 
-                        $code = $rewardForm->get('code')->getData();
+                        $code = mb_strtoupper($rewardForm->get('code')->getData());
                         $scode = $reward->getScode();
-                        if (!($code === $scode->getCode())) {
-                            $scode->setCode($code);
-                            $dm->persist($scode);
+                        if ($scode) {
+                            if (mb_strlen($code) > 0) {
+                                if (!($code === $scode->getCode())) {
+                                    $scode->setCode($code);
+                                    $dm->persist($scode);
+                                }
+                            } else {
+                                $dm->remove($scode);
+                                $reward->setScode(null);
+                            }
+                        } else {
+                            if (mb_strlen($code) > 0) {
+                                $scode = new SCode();
+                                $scode->setCode($code);
+                                $scode->setReward($reward);
+                                $scode->setType(SCode::TYPE_REWARD);
+                                $dm->persist($scode);
+                            }
                         }
 
                         $dm->flush();
