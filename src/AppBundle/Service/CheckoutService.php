@@ -354,6 +354,18 @@ class CheckoutService
             in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
             // New policy
             // Mark policy as pending for monitoring purposes
+            try {
+                if ($policy instanceof PhonePolicy) {
+                    $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
+                }
+            } catch (IncorrectPriceException $e) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' tried to purchase with invalid price %f",
+                    $policy->getId(),
+                    $payment->getAmount()
+                ));
+                return false;
+            }
             $policy->setStatus(PhonePolicy::STATUS_PENDING);
             $this->dm->flush();
             $payment = $this->createPayment(
@@ -362,20 +374,8 @@ class CheckoutService
                 $source,
                 $date
             );
-            try {
-                if ($policy instanceof PhonePolicy) {
-                    $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
-                }
-                $this->policyService->create($policy, $date, true, null, $identityLog);
-                $this->dm->flush();
-            } catch (IncorrectPriceException $e) {
-                $this->logger->error(sprintf(
-                    "Policy '%s' tried to purchase with invalid price %f",
-                    $policy->getId(),
-                    $payment->getAmount()
-                ));
-                return true;
-            }
+            $this->policyService->create($policy, $date, true, null, $identityLog);
+            $this->dm->flush();
         } else {
             // Existing policy - add payment + prevent duplicate billing
             $payment = $this->createPayment(
