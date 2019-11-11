@@ -278,7 +278,7 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
-            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
+            'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
             // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore
         );
