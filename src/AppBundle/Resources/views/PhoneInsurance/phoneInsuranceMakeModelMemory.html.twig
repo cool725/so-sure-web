@@ -205,7 +205,9 @@
                             </li>
                         </ul>
                         <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-                        {% if instore is null %}
+                        {% if validation_required == true or instore == true %}
+                            <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
+                        {% else %}
                             <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
                         {% endif %}
                         <div class="table-responsive">
@@ -225,7 +227,7 @@
                                         <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
                                         <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
                                     </tr>
-                                    {% if instore is null %}
+                                    {% if validation_required is null or instore in null %}
                                         <tr>
                                             <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
                                         </tr>
