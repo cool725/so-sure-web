@@ -1473,8 +1473,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('create_form')
             ->add('create', SubmitType::class)
             ->getForm();
-        $connectForm = $this->get('form.factory')
-            ->createNamedBuilder('connect_form')
+        $connectForm = $this->get('form.factory') ->createNamedBuilder('connect_form')
             ->add('email', EmailType::class)
             ->add('connect', SubmitType::class)
             ->getForm();
@@ -2149,7 +2148,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (count($previousInvalidPicSureStatuses) > 0) {
             $hadInvalidPicSureStatus = true;
         }
-
 
         return [
             'policy' => $policy,
