@@ -1163,11 +1163,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
-        $this->assertEquals($data['monthly_premium'], $data['adjusted_monthly_premium']);
-        $this->assertEquals($data['yearly_premium'], $data['adjusted_yearly_premium']);
         $this->assertEquals("Kelvin’s iPhone5", $data['phone_policy']['name']);
         $this->assertNull($data['phone_policy']['picsure_status']);
-        $this->assertTrue(count($data['phone_policy']['excesses']) > 0);
+        $this->assertEquals(0, count($data['phone_policy']['excesses']));
         foreach ($data['phone_policy']['excesses'] as $excess) {
             $excessMax = $policy->getPolicyTerms()->isPicSureEnabled() ? 150 : 70;
             $excessMin = $policy->getPolicyTerms()->isPicSureEnabled() ? 150 : 50;
