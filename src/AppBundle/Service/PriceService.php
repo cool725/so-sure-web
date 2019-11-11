@@ -99,6 +99,7 @@ class PriceService
     public function phonePolicyDeterminePremium(PhonePolicy $policy, $amount, \DateTime $date)
     {
         $prices = $this->userPhonePriceStreams($policy->getUser(), $policy->getPhone(), $date);
+        // TODO: Ideally should loop over prices that were valid in the last half hour even if not valid this moment.
         foreach ($prices as $stream => $price) {
             $installments = PhonePrice::streamInstallments($stream);
             $installmentPrice = $price->getYearlyPremiumPrice() / $installments;
