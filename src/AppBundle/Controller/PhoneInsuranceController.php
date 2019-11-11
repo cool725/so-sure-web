@@ -404,13 +404,14 @@ class PhoneInsuranceController extends BaseController
 
         // Aggregators
         $session = $this->get('session');
-        if ($request->query->has('validr')) {
-            $validationRequired = $request->get('validr');
-            $session->set('validr', $validationRequired);
+
+        if ($request->query->has('aggregator')) {
+            $validationRequired = $request->get('aggregator');
+            $session->set('aggregator', $validationRequired);
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');

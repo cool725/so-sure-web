@@ -259,7 +259,7 @@ class PurchaseController extends BaseController
         $priceService = $this->get('app.price');
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -281,14 +281,9 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
-<<<<<<< HEAD
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
             // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
-=======
-            'instore' => $instore,
             'validation_required' => $validationRequired,
->>>>>>> AGG Change copy on personal details page [ch16506]
         );
 
         return $this->render($template, $data);
@@ -509,7 +504,7 @@ class PurchaseController extends BaseController
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -799,8 +794,12 @@ class PurchaseController extends BaseController
         $priceService = $this->get('app.price');
 =======
         // Aggregators - Get session if coming back
+<<<<<<< HEAD
         $validationRequired = $this->get('session')->get('validr');
 >>>>>>> AGG Change copy on personal details page [ch16506]
+=======
+        $validationRequired = $this->get('session')->get('aggregator');
+>>>>>>> Use aggregator
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -988,7 +987,7 @@ class PurchaseController extends BaseController
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
