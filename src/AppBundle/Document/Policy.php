@@ -6294,8 +6294,8 @@ abstract class Policy
         } elseif ($this instanceof PhonePolicy) {
             $phone = $this->getPhone();
             if ($phone) {
-                $monthlyPremium = $phone->getCurrentMonthlyPremiumPrice();
-                $yearlyPremium = $phone->getCurrentYearlyPremiumPrice();
+                $monthlyPremium = $phone->getCurrentMonthlyPhonePrice();
+                $yearlyPremium = $phone->getCurrentYearlyPhonePrice();
             }
         }
 
