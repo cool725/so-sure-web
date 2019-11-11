@@ -79,8 +79,11 @@ class DefaultController extends BaseController
     public function indexAction(Request $request)
     {
         $referral = $request->get('referral');
+        $session = $this->get('session');
+
+        // For Referrals
         if ($referral) {
-            $session = $this->get('session');
+            // $session = $this->get('session');
             $session->set('referral', $referral);
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
@@ -88,9 +91,15 @@ class DefaultController extends BaseController
         // For Mobusi tracking
         if ($request->get('_route') == 'mb') {
             $clickid = $request->get('clickid');
-            $session = $this->get('session');
+            // $session = $this->get('session');
             $session->set('mobusi', $clickid);
             $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
+        }
+
+        // For Aggregators
+        if ($request->query->has('validr')) {
+            $validationRequired = $request->get('validr');
+            $session->set('validr', $validationRequired);
         }
 
         /** @var RequestService $requestService */
@@ -112,9 +121,10 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'referral'  => $referral,
-            'phone'     => $this->getQuerystringPhone($request),
+            'referral' => $referral,
+            'phone' => $this->getQuerystringPhone($request),
             'flag_exp' => $ukFlagTest,
+            'validation_required' => $validationRequired,
         );
 
         return $this->render($template, $data);
