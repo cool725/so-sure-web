@@ -68,7 +68,7 @@
           data-redirect-url="
           {% if instore is not null and instore == true %}
             {{ path('user_instore', {id: policy.id}) }}
-          {% elseif validation_required is not null and validation_required == true %}
+          {% elseif validation_required is not null and validation_required is not null %}
             {{ path('user_validation_required', {id: policy.id}) }}
           {% else %}
             {{ path('user_welcome', {id: policy.id}) }}
