@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Feature;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\PurchaseStepPayment;
 use AppBundle\Document\Form\PurchaseStepPledge;
@@ -30,6 +31,7 @@ use AppBundle\Security\PolicyVoter;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
+use AppBundle\Service\PriceService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RequestService;
@@ -254,6 +256,8 @@ class PurchaseController extends BaseController
             }
         }
 
+        $priceService = $this->get('app.price');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -274,7 +278,9 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'postcode' => 'comma',
-            'instore' => $instore,
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
+            // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore
         );
 
         return $this->render($template, $data);
@@ -500,7 +506,8 @@ class PurchaseController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
-
+        
+        $priceService = $this->get('app.price');
         $data = array(
             'policy' => $policy,
             'phone' => $phone,
@@ -512,7 +519,9 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'instore' => $instore,
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
+            // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore
         );
 
         return $this->render($template, $data);
@@ -779,6 +788,8 @@ class PurchaseController extends BaseController
             }
         }
 
+        $priceService = $this->get('app.price');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -795,7 +806,9 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'instore' => $instore,
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
+            // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore
         );
 
         return $this->render($template, $data);
@@ -834,12 +847,16 @@ class PurchaseController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
 
         $phone = $this->getSessionQuotePhone($request);
+        $priceService = $this->get('app.price');
 
         $purchase = new PurchaseStepPayment();
         $purchase->setUser($user);
         /** @var PhonePolicy $policy */
         $policy = $policyRepo->find($id);
         $purchase->setPolicy($policy);
+        foreach ($priceService->userPhonePriceStreams($user, $phone, new \DateTime()) as $price) {
+            $purchase->addPrice($price);
+        }
 
         if (!$policy) {
             return $this->redirectToRoute('purchase_step_phone');
@@ -854,7 +871,7 @@ class PurchaseController extends BaseController
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
-            $price = $policy->getPhone()->getCurrentPhonePrice();
+            $price = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             /** @var PostcodeService $postcodeService */
             $postcodeService = $this->get('app.postcode');
             if ($price && $user->allowedMonthlyPayments($postcodeService)) {
@@ -902,7 +919,7 @@ class PurchaseController extends BaseController
 
                 if ($purchaseFormValid) {
                     if ($allowPayment) {
-                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice();
+                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
                         $monthly = null;
                         $yearly = null;
                         if ($currentPrice) {
@@ -917,7 +934,6 @@ class PurchaseController extends BaseController
                         }
 
                         if ($monthly || $yearly) {
-                            $price = $purchase->getPolicy()->getPhone()->getCurrentPhonePrice();
                             if ($paymentProvider == SoSure::PAYMENT_PROVIDER_BACS) {
                                 return new RedirectResponse(
                                     $this->generateUrl('purchase_step_payment_bacs_id', [
@@ -979,7 +995,9 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
-            'instore' => $instore,
+            'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime()),
+            // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore
         );
 
         if ($toCardForm) {
@@ -1393,19 +1411,32 @@ class PurchaseController extends BaseController
             $token = $request->get("token");
             $pennies = $request->get("pennies");
             $freq = $request->get('premium');
-            if ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_MONTHLY) {
-                $policy->setPremiumInstallments(12);
-                $this->getManager()->flush();
-            } elseif ($request->get('_route') == 'purchase_checkout' && $freq == Policy::PLAN_YEARLY) {
-                $policy->setPremiumInstallments(1);
-                $this->getManager()->flush();
-            } elseif ($request->get('_route') == 'purchase_checkout') {
-                throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+            if ($request->get('_route') == 'purchase_checkout') {
+                $priceService = $this->get('app.price');
+                $additionalPremium = $policy->getUser()->getAdditionalPremium();
+                if ($freq == Policy::PLAN_MONTHLY) {
+                    $policy->setPremiumInstallments(12);
+                    $priceService->policySetPhonePremium(
+                        $policy,
+                        PhonePrice::STREAM_MONTHLY,
+                        $additionalPremium,
+                        new \DateTime()
+                    );
+                } elseif ($freq == Policy::PLAN_YEARLY) {
+                    $policy->setPremiumInstallments(1);
+                    $priceService->policySetPhonePremium(
+                        $policy,
+                        PhonePrice::STREAM_YEARLY,
+                        $additionalPremium,
+                        new \DateTime()
+                    );
+                } else {
+                    throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+                }
             }
             $csrf = $request->get("csrf");
             $publicKey = $request->get("cko-public-key");
             $cardToken = $request->get("cko-card-token");
-
             if ($token && $pennies && $csrf) {
                 $type = 'modal';
             } elseif ($publicKey && $cardToken) {

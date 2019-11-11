@@ -135,9 +135,9 @@
                     <tbody>
                         <tr>
                             <td class="h6">Excess</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.damage }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.loss }}</td>
-                            <td>&pound;{{ phone.currentPhonePrice.picsureexcess.theft }}</td>
+                            <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
+                            <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
+                            <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
                         </tr>
                         {% if instore is null %}
                             <tr>
@@ -177,9 +177,9 @@
                     <li>Instant cover from purchase</li>
                     <li>24-72 hour replacement once your claim is approved</li>
                     <li>Hassle-Free Claims</li>
-                    {% if instore is null %}
-                        <li>Low excess from just &pound;{{ phone.currentPhonePrice.picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ phone.currentPhonePrice.excess.damage }}</li>
-                    {% endif %}
+                        {% if instore is null %}
+                            <li>Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ prices['monthly'].excess.damage }}</li>
+                        {% endif %}
                     <li>Insure mobiles up to 3 years old</li>
                     <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
                     <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>

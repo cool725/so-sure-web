@@ -121,7 +121,7 @@ class DefaultControllerTest extends BaseControllerTest
         $this->setPhoneSession($phone);
 
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         $this->assertContains(
             sprintf("&pound;%.2f", $price->getMonthlyPremiumPrice()),
             $this->getClientResponseContent()

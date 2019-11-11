@@ -1,0 +1,76 @@
+{% block body %}
+    {{ form_start(form) }}
+        <div class="form-group col">
+            <div class="form-group col">
+                {{ form_label(form.name, 'Name') }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                <div class="with-errors">{{ form_errors(form.name) }}</div>
+            </div>
+        </div>
+        <h5>Price</h5>
+        <div class="form-row">
+            <div class="form-group col">
+                {{ form_label(form.gwp, 'GWP') }}
+                {{ form_widget(form.gwp, {'attr': {'class': 'form-control'}}) }}
+                <div class="with-errors">{{ form_errors(form.gwp) }}</div>
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.stream, 'Price Stream') }}
+                {{ form_widget(form.stream, {'attr': {'class': 'form-control'}}) }}
+                <div class="with-errors">{{ form_errors(form.stream) }}</div>
+            </div>
+        </div>
+        <div class="form-row">
+            This is the bit with all that stuff about IPT and Premium and other things and javascript hel;l yeah.
+        </div>
+        <h5>Excess</h5>
+        <div class="form-row">
+            <div class="form-group col">
+                {{ form_label(form.damage, 'Damage') }}
+                {{ form_widget(form.damage, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.warranty, 'Warranty') }}
+                {{ form_widget(form.warranty, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.extendedWarranty, 'Extended Warranty') }}
+                {{ form_widget(form.extendedWarranty, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.loss, 'Loss') }}
+                {{ form_widget(form.loss, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.theft, 'Theft') }}
+                {{ form_widget(form.theft, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <h5>Picsure Excess</h5>
+        <div class="form-row">
+            <div class="form-group col">
+                {{ form_label(form.picsureDamage, 'Damage') }}
+                {{ form_widget(form.picsureDamage, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.picsureWarranty, 'Warranty') }}
+                {{ form_widget(form.picsureWarranty, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.picsureExtendedWarranty, 'Extended Warranty') }}
+                {{ form_widget(form.picsureExtendedWarranty, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.picsureLoss, 'Loss') }}
+                {{ form_widget(form.picsureLoss, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="form-group col">
+                {{ form_label(form.picsureTheft, 'Theft') }}
+                {{ form_widget(form.picsureTheft, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_widget(form.add, {'attr': {'class': 'btn btn-success'}, 'label': 'Add Offer'}) }}
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

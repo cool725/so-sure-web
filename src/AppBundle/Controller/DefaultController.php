@@ -53,6 +53,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -994,7 +995,7 @@ class DefaultController extends BaseController
         }
 
         return new JsonResponse([
-            'price' => $phone->getCurrentPhonePrice(),
+            'price' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY),
         ]);
     }
 

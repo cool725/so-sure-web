@@ -7,6 +7,7 @@ use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
@@ -194,7 +195,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
             $adjusted[] = $phone->getId();
             /** @var PhonePremium $currentPrice */
-            $currentPrice = $phone->getCurrentPhonePrice();
+            $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             $adjustedPrice = $currentPrice->getGwp() - 0.01;
             if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $currentPrice->getGwp() - 0.30) {
                 $adjustedPrice = $currentPrice->getGwp() - 0.30;
@@ -205,7 +206,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 PolicyTerms::getHighExcess(),
                 PolicyTerms::getLowExcess(),
                 null,
-                $sevenMonthsAgo // jan
+                null,
+                $sevenMonthsAgo
             );
         }
         $manager->flush();
@@ -605,7 +607,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $phone = null;
         while ($phone == null) {
             $phone = $phones[random_int(0, count($phones) - 1)];
-            if (!$phone->getCurrentPhonePrice(new \DateTime('2016-01-01')) || $phone->getMake() == "ALL") {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01')) ||
+                $phone->getMake() == "ALL"
+            ) {
                 $phone = null;
             }
         }
@@ -679,7 +683,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setPaymentMethod(
             $this->getPaymentMethod($policy, ($isPaymentMethodBacs !== null) ? $isPaymentMethodBacs : (rand(0, 1) == 0))
         );
-        $policy->setPhone($phone, null, false);
+        $policy->setPhone($phone, null);
+        $policy->setPremium($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->createPremium());
         $policy->setImei($this->generateRandomImei());
         if ($picSure == self::PICSURE_NON_POLICY) {
             $policy->init($user, $nonPicSureTerms,false);
@@ -731,7 +736,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $payment = $this->newBacsPayment(
                     $manager,
                     $policy,
-                    $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate),
+                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getYearlyPremiumPrice(null, clone $startDate),
                     Salva::YEARLY_TOTAL_COMMISSION,
                     clone $paymentDate);
                 $policy->addPayment($payment);
@@ -743,7 +748,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $refund = $this->newBacsPayment(
                         $manager,
                         $policy,
-                        $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate)*-1,
+                        $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getYearlyPremiumPrice(null, clone $startDate)*-1,
                         Salva::YEARLY_TOTAL_COMMISSION,
                         clone $paymentDate);
                     $policy->addPayment($refund);
@@ -760,7 +765,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $this->receiptIds[] = $receiptId;
                 $payment->setReceipt($receiptId);
                 $payment->setDate($paymentDate);
-                $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
+                $payment->setAmount($phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getYearlyPremiumPrice(null, clone $startDate));
                 $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
                 $payment->setNotes('LoadSamplePolicyData');
                 $policy->addPayment($payment);
@@ -777,7 +782,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $payment = $this->newBacsPayment(
                         $manager,
                         $policy,
-                        $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate),
+                        $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMonthlyPremiumPrice(null, clone $startDate),
                         $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
                         clone $paymentDate);
                     $policy->addPayment($payment);
@@ -789,7 +794,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                         $refund = $this->newBacsPayment(
                             $manager,
                             $policy,
-                            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate)*-1,
+                            $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMonthlyPremiumPrice(null, clone $startDate)*-1,
                             $months == 12 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION,
                             clone $paymentDate);
                         $policy->addPayment($refund);
@@ -810,7 +815,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $this->receiptIds[] = $receiptId;
                     $payment->setReceipt($receiptId);
                     $payment->setDate(clone $paymentDate);
-                    $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
+                    $payment->setAmount(
+                        $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMonthlyPremiumPrice(null, clone $startDate)
+                    );
                     $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
                     if ($months == 12) {
                         $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);

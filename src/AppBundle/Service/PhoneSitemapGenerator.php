@@ -73,7 +73,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
                 $entries[$item->getDescription()] = $item;
             }
         }
-
+        
         return $entries;
     }
 }

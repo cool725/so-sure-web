@@ -22,6 +22,10 @@ abstract class Premium implements EqualsInterface
 {
     use CurrencyTrait;
 
+    const SOURCE_OFFER = "offer";
+    const SOURCE_RENEWAL = "renewal";
+    const SOURCE_PHONE = "phone";
+
     /**
      * @Assert\Range(min=0,max=200)
      * @MongoDB\Field(type="float")
@@ -56,6 +60,22 @@ abstract class Premium implements EqualsInterface
      * @var Excess|null
      */
     protected $excess;
+
+    /**
+     * Tells us the stream of pricing the originating price belonged to.
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $stream;
+
+    /**
+     * Tells us by what path did the premium get onto the policy.
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $source;
 
     public function __construct()
     {
@@ -195,6 +215,45 @@ abstract class Premium implements EqualsInterface
     public function clearExcess()
     {
         $this->excess = null;
+    }
+
+    /**
+     * Gets this premium's originating price's stream.
+     * @return string|null the stream if existent.
+     */
+    public function getStream()
+    {
+        return $this->stream;
+    }
+
+    /**
+     * Sets the premium's originating stream.
+     * @param string $stream is the stream to set it to.
+     */
+    public function setStream($stream)
+    {
+        if (!in_array($stream, PhonePrice::STREAM_POSITIONS)) {
+            throw new \InvalidArgumentException(sprintf("'%s' is not a stream position", $stream));
+        }
+        $this->stream = $stream;
+    }
+
+    /**
+     * Gives you the source of this premium.
+     * @return string the source.
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Sets the source of the premium.
+     * @param string $source is the source of the premium.
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
     }
 
     public function isEvenlyDivisible($amount, $accountInitial = false)
