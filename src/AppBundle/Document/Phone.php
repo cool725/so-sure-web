@@ -1356,14 +1356,6 @@ class Phone
         ];
     }
 
-    /**
-     * Makes an array of offers.
-     * @return array containing the offers TODO: be more specific.
-     */
-    public function toOfferArray()
-    {
-    }
-
     public function toAlternativeArray()
     {
         return [

@@ -1978,7 +1978,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($payPolicyForm->isValid()) {
                     $date = \DateTime::createFromFormat('U', time());
                     $phone = $policy->getPhone();
-                    // TODO: why would you query the phone in order to know what to pay on the policy?
                     $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
                     if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
                         $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);

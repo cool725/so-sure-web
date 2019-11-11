@@ -463,7 +463,6 @@ class PhoneInsuranceController extends BaseController
         }
 
         // if no price, will be sample policy of £100 annually
-        // TODO: decide whether this should be the lowest price or the monthly price.
         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         $maxPot = $price ? $price->getMaxPot() : 80;
         $maxConnections = $price ? $price->getMaxConnections() : 8;

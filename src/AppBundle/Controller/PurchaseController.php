@@ -571,7 +571,6 @@ class PurchaseController extends BaseController
         $bacs = new Bacs();
         $bacs->setValidateName($user->getLastName());
         $bacsConfirm = new Bacs();
-        // TODO: price stuff.
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
             $this->getManager()->flush();
@@ -1415,7 +1414,6 @@ class PurchaseController extends BaseController
             if ($request->get('_route') == 'purchase_checkout') {
                 $priceService = $this->get('app.price');
                 $additionalPremium = $policy->getUser()->getAdditionalPremium();
-                // TODO: would be nice to validate that premium paid is premium set and log if not or something.
                 if ($freq == Policy::PLAN_MONTHLY) {
                     $policy->setPremiumInstallments(12);
                     $priceService->policySetPhonePremium(
