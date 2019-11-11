@@ -83,7 +83,6 @@ class DefaultController extends BaseController
 
         // For Referrals
         if ($referral) {
-            // $session = $this->get('session');
             $session->set('referral', $referral);
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
@@ -91,7 +90,6 @@ class DefaultController extends BaseController
         // For Mobusi tracking
         if ($request->get('_route') == 'mb') {
             $clickid = $request->get('clickid');
-            // $session = $this->get('session');
             $session->set('mobusi', $clickid);
             $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
         }
