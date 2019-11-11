@@ -9,13 +9,12 @@
             {% if title is defined %}{{ title }}{% else %}Warning{% endif %}
         </h4>
       </div>
-
       {% if params is defined %}
         {{ render(controller(route, params)) }}
       {% elseif policy is defined %}
         {{ render(controller(route, {'id': policy.id})) }}
       {% else %}
-          {{ render(controller(route)) }}
+        {{ render(controller(route)) }}
       {% endif %}
     </div>
   </div>

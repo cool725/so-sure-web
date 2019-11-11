@@ -54,7 +54,7 @@ class QuoteService
             if ($phone->shouldBeRetired()) {
                 $anyRetired = true;
             }
-            if ($phone->getCurrentPhonePrice() && $phone->getCurrentPhonePrice()->getYearlyGwp() > 0) {
+            if ($phone->getCurrentMonthlyPhonePrice() || $phone->getCurrentYearlyPhonePrice()) {
                 $anyPricing = true;
             }
             if ($memory !== null && $memory <= $phone->getMemory()) {

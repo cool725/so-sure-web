@@ -41,17 +41,15 @@ class ChargebacksType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('add', SubmitType::class)
-        ;
+        $builder->add('add', SubmitType::class);
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             /** @var Chargebacks $chargeback */
             $chargeback = $event->getData();
+            $premium = $chargeback->getPolicy()->getPremium();
             $form = $event->getForm();
             $amount = $this->toTwoDp(
-                0 - $chargeback->getPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+                $premium ?  0 - $chargeback->getPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() : 0
             );
-
             $form->add('chargeback', DocumentType::class, [
                     'placeholder' => 'Select a chargeback',
                     'class' => 'AppBundle:Payment\ChargebackPayment',

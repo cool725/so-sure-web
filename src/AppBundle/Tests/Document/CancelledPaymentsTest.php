@@ -11,6 +11,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -132,8 +133,10 @@ class CancelledPaymentsTest extends WebTestCase
         self::$dm->flush();
 
         $price = 7.99;
-        if (self::$phone->getCurrentPhonePrice() && self::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()) {
-            $price = self::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        if (self::$phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY) &&
+            self::$phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getMonthlyPremiumPrice()
+        ) {
+            $price = self::$phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getMonthlyPremiumPrice();
         }
 
         $this->assertGreaterThan(0, $this->getOldUnpaid());

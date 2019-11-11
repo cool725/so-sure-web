@@ -471,6 +471,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $isBlacklisted = false;
 
+    /**
+     * Contains references to all the offers that are offered to this user.
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
+     */
+    protected $offers = [];
+
     protected $allowedMonthly = true;
 
     protected $allowedYearly = true;
@@ -1787,6 +1793,45 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->isBlacklisted = $isBlacklisted;
         return $this;
+    }
+
+    /**
+     * Gives you all of the offers that are applied to this user.
+     * @return ArrayCollection of the offers.
+     */
+    public function getOffers()
+    {
+        return $this->offers;
+    }
+
+    /**
+     * Links an offer to this user.
+     * @param Offer $offer is the offer to add to the user.
+     */
+    public function addOffer(Offer $offer)
+    {
+        $this->offers[] = $offer;
+    }
+
+    /**
+     * Finds an offer on this user that matches the required conditions.
+     * @param Phone     $phone  is the phone that the offer must be for.
+     * @param string    $stream is the stream of price the offer must be for.
+     * @param \DateTime $date   is the date at which the offer must be applicable.
+     * @return Offer|null the found offer if there is one.
+     */
+    public function getApplicableOffer(Phone $phone, $stream, \DateTime $date)
+    {
+        $phoneId = $phone->getId();
+        foreach ($this->getOffers() as $offer) {
+            $price = $offer->getPrice();
+            if ($offer->getPhone()->getId() == $phoneId && $price && $price->inStream($stream) &&
+                $price->getValidFrom() <= $date
+            ) {
+                return $offer;
+            }
+        }
+        return null;
     }
 
     public function hasEmail()

@@ -35,6 +35,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -138,17 +139,17 @@ class PhoneInsuranceController extends BaseController
         ]);
 
         $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice();
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         });
 
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+            return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $fromPhones[0]->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'from_price' => $fromPrice,
@@ -244,17 +245,17 @@ class PhoneInsuranceController extends BaseController
         ]);
 
         $fromPhones = array_filter($phones, function ($phone) {
-            return $phone->getCurrentPhonePrice();
+            return $phone->getCurrentMonthlyPhonePrice();
         });
 
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+            return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $fromPhones[0]->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'phone' => $phone,
@@ -341,7 +342,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
+            'phone_price' => $phone->getCurrentMonthlyPhonePrice(),
             'img_url' => $modelHyph,
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
@@ -461,18 +462,28 @@ class PhoneInsuranceController extends BaseController
             }
         }
 
+        // if no price, will be sample policy of £100 annually
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        $maxPot = $price ? $price->getMaxPot() : 80;
+        $maxConnections = $price ? $price->getMaxConnections() : 8;
+        $annualPremium = $price ? $price->getYearlyPremiumPrice() : 100;
+        $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
+        $expIntercom = null;
+
         // only need to run this once - if its a post, then ignore
-        if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
+        if ('GET' === $request->getMethod() && $price) {
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             $this->get('app.mixpanel')->queueTrackWithUtm($event, [
                 'Device Selected' => $phone->__toString(),
-                'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                'Monthly Cost' => $price->getMonthlyPremiumPrice(),
             ]);
             $this->get('app.mixpanel')->queuePersonProperties([
                 'First Device Selected' => $phone->__toString(),
-                'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
             ], true);
         }
+
+        $priceService = $this->get('app.price');
 
         // A/B UK Flag Test
         // To Test use url param ?force=flag / ?force=no-flag
@@ -480,7 +491,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
+            'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
             'buy_form_banner_two'   => $buyBannerTwoForm->createView(),
@@ -498,7 +509,6 @@ class PhoneInsuranceController extends BaseController
             'competitor2' => 'GC',
             'competitor3' => 'O2',
         ];
-
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }
 
@@ -587,15 +597,15 @@ class PhoneInsuranceController extends BaseController
             $response = new JsonResponse([
                 'phoneId' => $phone->getId(),
                 'price' => [
-                    'monthlyPremium' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentPhonePrice()->getYearlyPremiumPrice()
+                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
                 ],
                 'productOverrides' => [
-                    'excesses' => $phone->getCurrentPhonePrice()->getExcess() ?
-                        $phone->getCurrentPhonePrice()->getExcess()->toApiArray() :
+                    'excesses' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
                         [],
-                    'picsureExcesses' => $phone->getCurrentPhonePrice()->getPicSureExcess() ?
-                        $phone->getCurrentPhonePrice()->getPicSureExcess()->toApiArray() :
+                    'picsureExcesses' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
                         []
                 ],
                 'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.

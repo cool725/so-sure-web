@@ -517,15 +517,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
 
-            if ($data['validate-premiums'] && (!$policy->getStatus() ||
-                in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
-                if ($this->policyService->validatePremium($policy)) {
-                    $lines[] = sprintf(
-                        'WARNING!! - Policy %s has its premium updated',
-                        $policy->getPolicyNumber()
-                    );
-                }
-            }
             if ($data['warnClaim'] && $policy->hasOpenClaim()) {
                 $lines[] = sprintf(
                     'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
