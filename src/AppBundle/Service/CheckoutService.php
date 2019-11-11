@@ -354,18 +354,6 @@ class CheckoutService
             in_array($policy->getStatus(), [PhonePolicy::STATUS_PENDING, PhonePolicy::STATUS_MULTIPAY_REJECTED])) {
             // New policy
             // Mark policy as pending for monitoring purposes
-            try {
-                if ($policy instanceof PhonePolicy) {
-                    $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
-                }
-            } catch (IncorrectPriceException $e) {
-                $this->logger->error(sprintf(
-                    "Policy '%s' tried to purchase with invalid price %f",
-                    $policy->getId(),
-                    $payment->getAmount()
-                ));
-                return false;
-            }
             $policy->setStatus(PhonePolicy::STATUS_PENDING);
             $this->dm->flush();
             $payment = $this->createPayment(
@@ -374,8 +362,25 @@ class CheckoutService
                 $source,
                 $date
             );
-            $this->policyService->create($policy, $date, true, null, $identityLog);
-            $this->dm->flush();
+            try {
+                if ($policy instanceof PhonePolicy) {
+                    $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
+                }
+                try {
+                    $this->setCommission($payment, true);
+                } catch (CommissionException $e) {
+                    $this->logger->error($e->getMessage());
+                }
+                $this->policyService->create($policy, $date, true, null, $identityLog);
+                $this->dm->flush();
+            } catch (IncorrectPriceException $e) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' tried to purchase with invalid price %f",
+                    $policy->getId(),
+                    $payment->getAmount()
+                ));
+                return true;
+            }
         } else {
             // Existing policy - add payment + prevent duplicate billing
             $payment = $this->createPayment(
@@ -1192,15 +1197,17 @@ class CheckoutService
             $payment->setPolicy($policy);
         }
 
-        try {
-            $this->setCommission($payment, true);
-        } catch (CommissionException $e) {
-            /**
-             * At this point the commission has been set but is likely incorrect.
-             * We will log the error so that it can be manually dealt with,
-             * but for now we still want to continue with the rest of the code.
-             */
-            $this->logger->error($e->getMessage());
+        if ($policy->getPremium()) {
+            try {
+                $this->setCommission($payment, true);
+            } catch (CommissionException $e) {
+                /**
+                 * At this point the commission has been set but is likely incorrect.
+                 * We will log the error so that it can be manually dealt with,
+                 * but for now we still want to continue with the rest of the code.
+                 */
+                $this->logger->error($e->getMessage());
+            }
         }
 
         return $payment;
@@ -1208,8 +1215,10 @@ class CheckoutService
 
     protected function validatePaymentAmount(CheckoutPayment $payment)
     {
-        // TODO: Should we issue a refund in this case??
         $premium = $payment->getPolicy()->getPremium();
+        if (!$premium && !in_array($policy->isGetStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+            return;
+        }
         if (!$premium->isEvenlyDivisible($payment->getAmount()) &&
             !$premium->isEvenlyDivisible($payment->getAmount(), true) &&
             !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getOutstandingPremium())) {
@@ -1223,27 +1232,6 @@ class CheckoutService
             );
             $this->logger->error($errMsg);
         }
-
-        /* TODO: May want to validate this data??
-        if ($tokenPaymentDetails["type"] != 'Payment') {
-            $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
-            $this->logger->error($errMsg);
-            // save up to this point
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-        }
-        if ($payment->getId() != $tokenPaymentDetails["yourPaymentReference"]) {
-            $errMsg = sprintf(
-                'Payment ref mismatch. %s != %s',
-                $payment->getId(),
-                $tokenPaymentDetails["yourPaymentReference"]
-            );
-            $this->logger->error($errMsg);
-            // save up to this point
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-            throw new \Exception($errMsg);
-        }
-        */
     }
 
     protected function validateUser($user)
