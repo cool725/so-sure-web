@@ -1184,6 +1184,8 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Route("/complete", name="user_instore")
      * @Route("/complete/{id}", name="user_instore_id")
+     * @Route("/validation-required", name="user_validation_required")
+     * @Route("/validation-required/{id}", name="user_validation_required_id")
      * @Template
      */
     public function welcomeAction(Request $request, $id = null)
@@ -1247,6 +1249,8 @@ class UserController extends BaseController
 
         if ($request->get('_route') == 'user_instore') {
             $template = 'AppBundle:User:complete.html.twig';
+        } else if ($request->get('_route') == 'user_validation_required') {
+            $template = 'AppBundle:User:validationRequired.html.twig';
         }
 
         return $this->render($template, [
