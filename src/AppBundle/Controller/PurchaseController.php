@@ -255,7 +255,7 @@ class PurchaseController extends BaseController
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -499,7 +499,7 @@ class PurchaseController extends BaseController
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -779,7 +779,7 @@ class PurchaseController extends BaseController
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -958,7 +958,7 @@ class PurchaseController extends BaseController
         }
 
         // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('validr');
+        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
