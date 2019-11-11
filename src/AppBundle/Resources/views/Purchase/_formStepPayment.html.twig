@@ -65,7 +65,14 @@
           data-card-form-mode="cardTokenisation"
           data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
           data-url="{{ url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(purchase_form.amount.vars.value), 'premium': premium }) }}"
-          data-redirect-url=" {% if instore is not null %}{{ path('user_instore', {id: policy.id}) }}{% else %}{{ path('user_welcome', {id: policy.id}) }}{% endif %}"
+          data-redirect-url="
+          {% if instore is not null and instore == true %}
+            {{ path('user_instore', {id: policy.id}) }}
+          {% elseif validation_required is not null and validation_required == true %}
+            {{ path('user_validation_required', {id: policy.id}) }}
+          {% else %}
+            {{ path('user_welcome', {id: policy.id}) }}
+          {% endif %}"
           data-title="Pay now"
           data-subtitle="Please enter your card details">
     </form>
