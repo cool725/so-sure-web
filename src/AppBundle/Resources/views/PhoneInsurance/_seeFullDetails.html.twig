@@ -4,14 +4,6 @@
     {% set device = policy.phone %}
 {% endif %}
 
-{% if instore is defined %}
-    {{ dump('Store: ' ~ instore) }}
-{% endif %}
-
-{% if validation_required is defined %}
-    {{ dump(validation_required) }}
-{% endif %}
-
 <div class="policy__info mx-4 mx-lg-5 py-5">
     {% if body_class is defined and body_class != 'quote' %}
         <div class="h1 text-white">{{ make_desc }} {{ device.model }} <span class="sub">({{ device.memory }}GB)</span></div>
@@ -127,7 +119,7 @@
         </div>
         <div class="col-md-8">
             <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-            {% if validation_required == true or instore is not null %}
+            {% if validation_required is not null or instore is not null %}
                 <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
             {% else %}
                 <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
