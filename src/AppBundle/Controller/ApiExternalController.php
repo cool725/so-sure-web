@@ -225,8 +225,8 @@ class ApiExternalController extends BaseController
 
             $quotes = [];
             foreach ($phones as $phone) {
-                $monthlyPrice = $phone->getCurrentMonthlyPrice();
-                $yearlyPrice = $phone->getCurrentYearlyPrice();
+                $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
+                $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
                 if (!($monthlyPrice && $yearlyPrice)) {
                     continue;
                 }
