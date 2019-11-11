@@ -96,12 +96,6 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
         }
 
-        // For Aggregators
-        if ($request->query->has('validr')) {
-            $validationRequired = $request->get('validr');
-            $session->set('validr', $validationRequired);
-        }
-
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
@@ -124,7 +118,6 @@ class DefaultController extends BaseController
             'referral' => $referral,
             'phone' => $this->getQuerystringPhone($request),
             'flag_exp' => $ukFlagTest,
-            'validation_required' => $validationRequired,
         );
 
         return $this->render($template, $data);
