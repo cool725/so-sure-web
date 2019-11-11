@@ -6284,8 +6284,20 @@ abstract class Policy
             $cardDetails = $this->getCheckoutPaymentMethod()->toApiArray();
         }
 
+        // Figure out the right premiums to report even when none are actually set yet.
+        $monthlyPremium = null;
+        $yearlyPremium = null;
         $premium = $this->getPremium();
-        $phone = $this->getPhone();
+        if ($premium) {
+            $monthlyPremium = $premium->getMonthlyPremiumPrice();
+            $yearlyPremium = $premium->getYearlyPremiumPrice();
+        } elseif ($this instanceof PhonePolicy) {
+            $phone = $this->getPhone();
+            if ($phone) {
+                $monthlyPremium = $phone->getCurrentMonthlyPremiumPrice();
+                $yearlyPremium = $phone->getCurrentYearlyPremiumPrice();
+            }
+        }
 
         $data = [
             'id' => $this->getId(),
@@ -6294,8 +6306,7 @@ abstract class Policy
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),
-            'monthly_premium' => $premium ? $premium->getMonthlyPremiumPrice() :
-                ($phone ? $phone->getCurrentMonthlyPhonePrice() : null),
+            'monthly_premium' => $monthlyPremium,
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
@@ -6310,8 +6321,7 @@ abstract class Policy
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
-            'yearly_premium' => $premium ? $premium->getYearlyPremiumPrice() :
-                ($phone ? $phone->getCurrentYearlyPhonePrice() : null),
+            'yearly_premium' => $yearlyPremium,
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
