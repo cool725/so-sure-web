@@ -552,11 +552,11 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
-     * @Route("/quote-me/{id}", name="quote_me", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Route("/quote-me/{id}", name="quote_me", requirements={"id":"[0-9a-f]{1,24}"})
      * @Route("/quote-me/{make}+{model}+{memory}GB", name="quote_me_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
-    public function quoteMe($id = null, $make = null, $model = null, $memory = null)
+    public function quoteMe(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
         // For generic use by insurance aggregator sites
         $dm = $this->getManager();
@@ -564,9 +564,26 @@ class PhoneInsuranceController extends BaseController
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $decodedModel = Phone::decodeModel($model);
         $phone = null;
+
         if ($id) {
-            /** @var Phone $phone */
-            $phone = $repo->find($id);
+            if ($request->query->get('aggregator')) {
+                // If aggregator set, look for aggregator ID instead of phone ID
+                if ($request->query->get('aggregator') == 'GoCompare') {
+                    $goCompare = new GoCompare();
+                    if (array_key_exists($id, $goCompare::$models)) {
+                        /** @var Phone $phone */
+                        $phone = $repo->findOneBy([
+                            'active' => true,
+                            'makeCanonical' => mb_strtolower($goCompare::$models[$id]['make']),
+                            'modelCanonical' => mb_strtolower($goCompare::$models[$id]['model']),
+                            'memory' => (int) $goCompare::$models[$id]['memory']
+                        ]);
+                    }
+                }
+            } else {
+                /** @var Phone $phone */
+                $phone = $repo->find($id);
+            }
         }
         if ($memory) {
             $phone = $repo->findOneBy([
@@ -592,8 +609,11 @@ class PhoneInsuranceController extends BaseController
                         []
                 ],
                 'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
-                    str_replace(' ', '+', $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory())
-                    .'GB?skip=1'
+                    str_replace(
+                        ' ',
+                        '+',
+                        $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory()
+                    ).'GB'
             ]);
             return $response;
         }
