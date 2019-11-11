@@ -437,7 +437,7 @@ abstract class Payment
         // If this is the first payment the policy will not yet have a premium.
         $policyPremium = $this->getPolicy()->getPremium();
         $iptRate = $policyPremium ? $policyPremium->getIptRate() : $this->getCurrentIptRate(new \DateTime());
-        $gwp = $this->getAmount() / (1 + $this->getPolicy()->getPremium()->getIptRate());
+        $gwp = $this->getAmount() / (1 + $iptRate);
         $ipt = $this->getAmount() - $gwp;
         // We do not want to set to 2 dp here as we need to total the gwp across all months
         // and compare to yearly figure.  We would be off by several cent if rounded
