@@ -331,13 +331,21 @@ class UserController extends BaseController
                 $code = $scodeForm->getData()['scode'];
                 $scode = $scodeRepo->findOneBy(['code' => $code]);
                 if (!$scode || !SCode::isValidSCode($scode->getCode())) {
-                    $this->addFlash(
-                        'warning',
-                        sprintf("SCode %s is missing or been withdrawn", $code)
-                    );
-                    return new RedirectResponse(
-                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                    );
+                    $code = mb_strtoupper($code);
+                    $scode = $scodeRepo->findOneBy(['code' => $code]);
+                    if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                        $code = mb_strtolower($code);
+                        $scode = $scodeRepo->findOneBy(['code' => $code]);
+                        if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("SCode %s is missing or incorrect", $code)
+                            );
+                            return new RedirectResponse(
+                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                            );
+                        }
+                    }
                 }
                 if ($scode->isReward() && $scode->isActive()) {
                     $reward = $scode->getReward();
@@ -1118,23 +1126,23 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
         $amount = $policy->getOutstandingPremiumToDate();
-        // Validate unpaid policy.
+        // Validate unpaid policy and use rescheduled amount if no owed amount due to bacs timing or whatever.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-        if ($policy->isPolicyPaidToDate()) {
-            // If the policy is meant to be active then there is no harm in just making it active on the spot.
-            $this->get('logger')->warning(sprintf(
-                'Policy %s has unpaid status, but paid to date. Setting to active.',
-                $policy->getId()
-            ));
-            $policy->setStatus(Policy::STATUS_ACTIVE);
-            $this->getManager()->flush();
-            return new RedirectResponse($this->generateUrl('user_home'));
-        } elseif ($amount <= 0) {
-            $this->get('logger')->error(sprintf(
-                'Policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                $policy->getId(),
-                $amount
-            ));
+        if (!$this->greaterThanZero($amount)) {
+            $dm = $this->getManager();
+            $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+            $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
+            if ($this->greaterThanZero($rescheduledAmount)) {
+                $amount = $rescheduledAmount;
+            } else {
+                $this->get('logger')->warning(sprintf(
+                    'Policy %s has unpaid status, but paid to date. Setting to active.',
+                    $policy->getId()
+                ));
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                $this->getManager()->flush();
+                return new RedirectResponse($this->generateUrl('user_home'));
+            }
         }
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [

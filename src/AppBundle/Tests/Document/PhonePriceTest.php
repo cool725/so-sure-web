@@ -93,4 +93,29 @@ class PhonePriceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(4.67, $phonePrice->getAdjustedStandardMonthlyPremiumPrice(10, $date));
         $this->assertEquals(56, $phonePrice->getAdjustedYearlyPremiumPrice(10, $date));
     }
+
+    /**
+     * Makes sure price always attributes itself to the right stream of pricing.
+     */
+    public function testInStream()
+    {
+        $price = new PhonePrice;
+        // when price is in all channels everything should be true.
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_MONTHLY));
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_YEARLY));
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_ALL));
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_ANY));
+        // monthly channel
+        $price->setStream(PhonePrice::STREAM_MONTHLY);
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_MONTHLY));
+        $this->assertFalse($price->inStream(PhonePrice::STREAM_YEARLY));
+        $this->assertFalse($price->inStream(PhonePrice::STREAM_ALL));
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_ANY));
+        // yearly channel
+        $price->setStream(PhonePrice::STREAM_YEARLY);
+        $this->assertFalse($price->inStream(PhonePrice::STREAM_MONTHLY));
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_YEARLY));
+        $this->assertFalse($price->inStream(PhonePrice::STREAM_ALL));
+        $this->assertTrue($price->inStream(PhonePrice::STREAM_ANY));
+    }
 }

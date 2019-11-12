@@ -48,7 +48,7 @@ class PurchaseStepPhone
      *  maxMessage="This doesn't appear to be a valid serial number")
      */
     protected $serialNumber;
-    
+
     public function getPhone()
     {
         return $this->phone;
