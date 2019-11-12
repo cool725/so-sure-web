@@ -1249,7 +1249,7 @@ class UserController extends BaseController
 
         if ($request->get('_route') == 'user_instore') {
             $template = 'AppBundle:User:complete.html.twig';
-        } else if ($request->get('_route') == 'user_validation_required') {
+        } elseif ($request->get('_route') == 'user_validation_required') {
             $template = 'AppBundle:User:validationRequired.html.twig';
         }
 
