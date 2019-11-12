@@ -7,6 +7,13 @@
 
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
 
+    {# Set text for pic-sure required policies #}
+    {# TODO: Copy for Xiaomi or use this method to adjust fields #}
+    {% set excessText = 'I understand the standard excess is only reduced when validated with the so-sure app' %}
+    {% if validation_required is not null %}
+        {% set excessText = 'I understand my policy will NOT commence until you have verified the condition of phone with our app' %}
+    {% endif %}
+
     <h2 class="text-dodger-blue text-center">Pledge of Honesty</h2>
     <h6 class="text-center mb-4">Before you continue to payment...</h6>
 
@@ -33,7 +40,7 @@
         </div>
         <div class="form-group">
             {{ form_widget(purchase_form.agreedExcess, {
-                'label': 'I understand the standard excess is only reduced when validated with the so-sure app',
+                'label': excessText,
                 'attr': {'class':'custom-control-input'}}
             ) }}
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
