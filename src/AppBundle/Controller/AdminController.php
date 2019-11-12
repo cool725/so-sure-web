@@ -130,7 +130,6 @@ use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\BarclaysStatementFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
-use AppBundle\Helpers\PolicyPhonePriceHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -501,7 +500,7 @@ class AdminController extends BaseController
         $phone->setDevices($devices);
         $phone->setMemory($request->get('memory'));
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
         $price->setGwp($request->get('gwp'));
         $dm->persist($phone);
         $dm->flush();
@@ -530,6 +529,7 @@ class AdminController extends BaseController
             $gwp = $request->get('gwp');
             $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
+            $stream = $this->getRequestString($request, 'stream');
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
                 $excess = $policyTerms->getDefaultExcess();
@@ -564,7 +564,7 @@ class AdminController extends BaseController
                 if ($request->get('picsure-theft-excess')) {
                     $picsureExcess->setTheft($request->get('picsure-theft-excess'));
                 }
-                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes);
+                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
                 return new RedirectResponse($this->generateUrl('admin_phones'));
@@ -577,11 +577,12 @@ class AdminController extends BaseController
                 sprintf('Phone pricing update for %s', $phone),
                 'marketing@so-sure.com',
                 sprintf(
-                    'On %s, the price for %s will be updated to £%0.2f (£%0.2f GWP). Notes: %s',
+                    'On %s, the price for %s will be updated to £%0.2f (£%0.2f GWP) for "%s". Notes: %s',
                     $from->format(\DateTime::ATOM),
                     $phone,
                     $this->withIpt($gwp),
                     $gwp,
+                    $stream,
                     $notes
                 ),
                 null,

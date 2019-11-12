@@ -67,9 +67,9 @@
                             <span class="sub">For only</span>
                             <span id="purchase_price">
                                 {% if not app.user or app.user.allowedMonthly %}
-                                    &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                                    &pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
                                 {% else %}
-                                    &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                    &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                                 {% endif %}
                             </span>
                         </div>
