@@ -1126,23 +1126,23 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
         $amount = $policy->getOutstandingPremiumToDate();
-        // Validate unpaid policy.
+        // Validate unpaid policy and use rescheduled amount if no owed amount due to bacs timing or whatever.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-        if ($policy->isPolicyPaidToDate()) {
-            // If the policy is meant to be active then there is no harm in just making it active on the spot.
-            $this->get('logger')->warning(sprintf(
-                'Policy %s has unpaid status, but paid to date. Setting to active.',
-                $policy->getId()
-            ));
-            $policy->setStatus(Policy::STATUS_ACTIVE);
-            $this->getManager()->flush();
-            return new RedirectResponse($this->generateUrl('user_home'));
-        } elseif ($amount <= 0) {
-            $this->get('logger')->error(sprintf(
-                'Policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                $policy->getId(),
-                $amount
-            ));
+        if (!$this->greaterThanZero($amount)) {
+            $dm = $this->getManager();
+            $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+            $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
+            if ($this->greaterThanZero($rescheduledAmount)) {
+                $amount = $rescheduledAmount;
+            } else {
+                $this->get('logger')->warning(sprintf(
+                    'Policy %s has unpaid status, but paid to date. Setting to active.',
+                    $policy->getId()
+                ));
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                $this->getManager()->flush();
+                return new RedirectResponse($this->generateUrl('user_home'));
+            }
         }
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
