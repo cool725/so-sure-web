@@ -494,25 +494,27 @@ class UserController extends BaseController
                 } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
                     $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
                 }
-                if ($url) {
-                    $this->addFlash(
-                        'warning-raw',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
-                            $checkPolicy->getPolicyNumber(),
-                            $url
-                        )
-                    );
-                } else {
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'warning-raw',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
-                            $checkPolicy->getPolicyNumber()
-                        )
-                    );
-                    // @codingStandardsIgnoreEnd
+                if (!$checkPolicy->getPolicyTerms()->isPicsureRequired()) {
+                    if ($url) {
+                        $this->addFlash(
+                            'warning-raw',
+                            sprintf(
+                                'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
+                                $checkPolicy->getPolicyNumber(),
+                                $url
+                            )
+                        );
+                    } else {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'warning-raw',
+                            sprintf(
+                                'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
+                                $checkPolicy->getPolicyNumber()
+                            )
+                        );
+                        // @codingStandardsIgnoreEnd
+                    }
                 }
             }
         }
