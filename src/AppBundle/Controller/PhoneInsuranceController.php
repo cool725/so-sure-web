@@ -401,7 +401,7 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
-        // Aggregators
+        // Aggregators - validation required
         $session = $this->get('session');
 
         if ($request->query->has('aggregator')) {
