@@ -22,7 +22,32 @@
 {% block body %}
 
     {% if policy.policyTerms.isPicSureRequired and policy.picSureStatus != 'approved' %}
-        {# TODO: Add download links and content #}
+        <section class="hero">
+            <div class="container-large">
+                <div class="row">
+                    <div class="col-12 col-lg-8 offset-lg-2">
+                        <h1 class="h2">Almost there!</h1>
+                        <p class="mb-4">Please be aware that your policy will NOT commence until you have verified the condition of phone with our app. Install the app and follow the instructions.</p>
+                        {% if policy.phone.iTunes %}
+                            <a href="{{ apple_download('user-required-account') }}"
+                               class="btn btn-primary btn-block-xs ga-outbound-click"
+                               data-clicklabel="iTunes"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                        {% endif %}
+                        {% if policy.phone.googlePlay %}
+                            <a href="{{ google_download('user-required-account') }}"
+                               class="btn btn-primary btn-block-xs ga-outbound-click"
+                               data-clicklabel="PlayStore"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
     {% else %}
         <section class="hero">
             <div class="container-large">
