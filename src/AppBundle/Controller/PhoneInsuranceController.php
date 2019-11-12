@@ -625,7 +625,7 @@ class PhoneInsuranceController extends BaseController
                         ' ',
                         '+',
                         $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory()
-                    ).'GB'
+                    ).'GB?aggregator=true'
             ]);
             return $response;
         }
