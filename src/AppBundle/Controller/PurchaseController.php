@@ -526,17 +526,9 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-<<<<<<< HEAD
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
-            // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
-=======
             'instore' => $instore,
             'validation_required' => $validationRequired,
-<<<<<<< HEAD
->>>>>>> AGG Change copy on personal details page [ch16506]
-=======
->>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
         );
 
         return $this->render($template, $data);
@@ -794,21 +786,9 @@ class PurchaseController extends BaseController
             }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         $priceService = $this->get('app.price');
-=======
-        // Aggregators - Get session if coming back
-<<<<<<< HEAD
-        $validationRequired = $this->get('session')->get('validr');
->>>>>>> AGG Change copy on personal details page [ch16506]
-=======
+
         $validationRequired = $this->get('session')->get('aggregator');
->>>>>>> Use aggregator
-=======
-        // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('aggregator');
->>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -826,17 +806,9 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-<<<<<<< HEAD
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
-            // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
-=======
             'instore' => $instore,
             'validation_required' => $validationRequired,
-<<<<<<< HEAD
->>>>>>> AGG Change copy on personal details page [ch16506]
-=======
->>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
         );
 
         return $this->render($template, $data);
@@ -1026,17 +998,9 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
-<<<<<<< HEAD
             'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime()),
-            // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
-=======
             'instore' => $instore,
             'validation_required' => $validationRequired,
-<<<<<<< HEAD
->>>>>>> AGG Change copy on personal details page [ch16506]
-=======
->>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
         );
 
         if ($toCardForm) {
