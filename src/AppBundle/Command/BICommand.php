@@ -222,6 +222,7 @@ class BICommand extends ContainerAwareCommand
             '"Model"',
             '"Memory"',
             '"Current Monthly Cost"',
+            '"Current Yearly Cost"',
             '"Original Retail Price"',
             '"Current Retail Price"'
         ]);
@@ -231,7 +232,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $phone->getMake()),
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
-                sprintf('"%0.2f"', $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
+                sprintf('"%0.2f"', $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice()),
+                sprintf('"%0.2f"', $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()),
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice())
             ]);
