@@ -412,7 +412,11 @@ class AdminController extends BaseController
             ->getForm();
         // process the form.
         if ($request->getMethod() === 'POST') {
-            if (!in_array($policy->getStatus(), [$policy::STATUS_ACTIVE, $policy::STATUS_UNPAID])) {
+            if (!in_array($policy->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
+            ])) {
                 $this->addFlash(
                     'error',
                     "Cannot schedule payments for an inactive policy"

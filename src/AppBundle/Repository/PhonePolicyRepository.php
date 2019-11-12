@@ -82,7 +82,7 @@ class PhonePolicyRepository extends PolicyRepository
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
-                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID
+                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID, Policy::STATUS_PICSURE_REQUIRED
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
@@ -116,6 +116,7 @@ class PhonePolicyRepository extends PolicyRepository
             $qb->expr()->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
             ])
         );
         $qb->addAnd(
@@ -198,6 +199,7 @@ class PhonePolicyRepository extends PolicyRepository
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $prefix)));
 
@@ -236,6 +238,7 @@ class PhonePolicyRepository extends PolicyRepository
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
@@ -400,6 +403,7 @@ class PhonePolicyRepository extends PolicyRepository
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
+                Policy::STATUS_PICSURE_REQUIRED,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
@@ -462,11 +466,8 @@ class PhonePolicyRepository extends PolicyRepository
     public function getActiveInvalidPolicies()
     {
         $qb = $this->createQueryBuilder()
-            ->field('status')->in([
-                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID
-            ])
+            ->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID, Policy::STATUS_PICSURE_REQUIRED])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', Policy::PREFIX_INVALID)));
-
         return $qb->getQuery()->execute();
     }
 
@@ -521,7 +522,11 @@ class PhonePolicyRepository extends PolicyRepository
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
         if ($activeUnpaidOnly) {
-            $qb = $qb->field('status')->equals([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID]);
+            $qb = $qb->field('status')->equals([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
+            ]);
         }
 
         return $qb

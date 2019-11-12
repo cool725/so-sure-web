@@ -764,6 +764,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         foreach ($this->policies as $policy) {
             if (in_array($policy->getStatus(), [
                 Policy::STATUS_ACTIVE,
+                Policy::STATUS_PICSURE_REQUIRED,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,

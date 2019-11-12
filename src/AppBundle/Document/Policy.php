@@ -1469,6 +1469,12 @@ abstract class Policy
 
     public function setStatus($status)
     {
+        if ($this->getStatus() == Policy::STATUS_PICSURE_REQUIRED && $status == Policy::STATUS_UNPAID) {
+            throw new \InvalidArgumentException(sprintf(
+                "Trying to make picsure-required policy unpaid which is NOT allowed.\npolicyId: %s.",
+                $this->getId()
+            ));
+        }
         if ($status != $this->status) {
             $this->setStatusUpdated(\DateTime::createFromFormat('U', time()));
         }
@@ -3375,11 +3381,7 @@ abstract class Policy
         // From Dylan:
         // if paid , then payment accounted
         // if not paid/paying, then it should not show as outstanding amount due (as we won't be receiving it)
-        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
-            return $this->getOutstandingPremium();
-        } else {
-            return 0;
-        }
+        return $this->isActive() ? $this->getOutstandingPremium() : 0;
     }
 
     public function getOutstandingPremium()
@@ -5212,7 +5214,10 @@ abstract class Policy
                 }
             }
         }
-        if ($this->getStatus() == self::STATUS_RENEWAL) {
+        $fourteenDaysAgo = (clone $date)->sub(new \DateInterval("P14D"));
+        if ($this->getPolicyTerms()->isPicsureRequired() && $this->getStart() >= $fourteenDaysAgo) {
+            return $this->getStatus() == self::STATUS_PICSURE_REQUIRED;
+        } elseif ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
         } elseif ($this->isPolicyPaidToDate($date, true, false, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
@@ -5332,6 +5337,7 @@ abstract class Policy
             self::STATUS_ACTIVE,
             self::STATUS_UNPAID,
             self::STATUS_PENDING,
+            self::STATUS_PICSURE_REQUIRED
         ])) {
             return null;
         }
@@ -5816,7 +5822,11 @@ abstract class Policy
         // also if a policy has been cancelled and there is money owed
         if ($this->isCooloffCancelled()) {
             return 0;
-        } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
+        ])) {
             $expectedCommission = $expectedMonthlyCommission;
         } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
             // if there's a refund, the number of payments won't be equal and so we need to calculate based on received
@@ -6127,6 +6137,7 @@ abstract class Policy
             self::STATUS_PENDING_RENEWAL,
             self::STATUS_RENEWAL,
             self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
         ])) {
             return false;
         }
@@ -6277,6 +6288,7 @@ abstract class Policy
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [
             self::STATUS_ACTIVE,
             self::STATUS_CANCELLED,
+            self::STATUS_PICSURE_REQUIRED,
             self::STATUS_UNPAID,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
