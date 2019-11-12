@@ -283,6 +283,7 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
             // 'funnel_exp' => $homepageFunnelExp,
+            'instore' => $instore,
             'validation_required' => $validationRequired,
         );
 
@@ -532,7 +533,10 @@ class PurchaseController extends BaseController
 =======
             'instore' => $instore,
             'validation_required' => $validationRequired,
+<<<<<<< HEAD
 >>>>>>> AGG Change copy on personal details page [ch16506]
+=======
+>>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
         );
 
         return $this->render($template, $data);
@@ -791,6 +795,7 @@ class PurchaseController extends BaseController
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         $priceService = $this->get('app.price');
 =======
         // Aggregators - Get session if coming back
@@ -800,6 +805,10 @@ class PurchaseController extends BaseController
 =======
         $validationRequired = $this->get('session')->get('aggregator');
 >>>>>>> Use aggregator
+=======
+        // Aggregators - Get session if coming back
+        $validationRequired = $this->get('session')->get('aggregator');
+>>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
 
         // In-store
         $instore = $this->get('session')->get('store');
@@ -824,7 +833,10 @@ class PurchaseController extends BaseController
 =======
             'instore' => $instore,
             'validation_required' => $validationRequired,
+<<<<<<< HEAD
 >>>>>>> AGG Change copy on personal details page [ch16506]
+=======
+>>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
         );
 
         return $this->render($template, $data);
@@ -1021,7 +1033,10 @@ class PurchaseController extends BaseController
 =======
             'instore' => $instore,
             'validation_required' => $validationRequired,
+<<<<<<< HEAD
 >>>>>>> AGG Change copy on personal details page [ch16506]
+=======
+>>>>>>> ac2050325e3893c24bfb0eb9195fc1662132cebd
         );
 
         if ($toCardForm) {
