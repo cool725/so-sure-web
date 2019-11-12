@@ -803,8 +803,13 @@ class PhonePolicy extends Policy
     public function setPicSureStatus($picSureStatus, User $user = null)
     {
         $this->picSureStatus = $picSureStatus;
-        if ($picSureStatus == self::PICSURE_STATUS_APPROVED && !$this->getPicSureApprovedDate()) {
-            $this->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+        if ($picSureStatus == self::PICSURE_STATUS_APPROVED) {
+            if (!$this->getPicSureApprovedDate()) {
+                $this->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+            }
+            if ($this->getStatus() == Policy::STATUS_PICSURE_REQUIRED) {
+                $this->setStatus(Policy::STATUS_ACTIVE);
+            }
         }
 
         $picsureFiles = $this->getPolicyFilesByType(PicSureFile::class);

@@ -142,7 +142,7 @@ class UserController extends BaseController
                     );
                 }
             }
-        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
             // mainly for facebook registration, although makes sense for all users
             // check for canPurchasePolicy is necessary to prevent redirect loop
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {

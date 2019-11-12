@@ -1149,6 +1149,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
+    /**
+     * Tells you if this user has a picsure required policy.
+     * @return boolean true if they have a picsure required policy and false if not.
+     */
+    public function hasPicsureRequiredPolicy()
+    {
+        return $this->policyReduce(false, function ($current, $policy) {
+            return $current | $policy->getStatus() == Policy::STATUS_PICSURE_REQUIRED;
+        });
+    }
+
     public function hasUnpaidPolicy()
     {
         return $this->getUnpaidPolicy() !== null;
@@ -1209,13 +1220,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $policies = [];
         foreach ($this->getPolicies() as $policy) {
-            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_PICSURE_REQUIRED])) {
                 $policies[] = $policy;
             } elseif ($includeUnpaid && $policy->getStatus() == Policy::STATUS_UNPAID) {
                 $policies[] = $policy;
             }
         }
-
         return $policies;
     }
 
@@ -1343,12 +1353,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if (count($policies) == 0) {
             return null;
         }
-
-        // sort most recent to older
         usort($policies, function ($a, $b) {
             return $a->getStart() < $b->getStart();
         });
-
         return $policies[0];
     }
 
