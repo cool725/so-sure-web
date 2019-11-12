@@ -258,6 +258,9 @@ class PurchaseController extends BaseController
 
         $priceService = $this->get('app.price');
 
+        // Aggregators - Get session if coming back
+        $validationRequired = $this->get('session')->get('aggregator');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -280,7 +283,8 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
             // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
+            'instore' => $instore,
+            'validation_required' => $validationRequired,
         );
 
         return $this->render($template, $data);
@@ -500,13 +504,16 @@ class PurchaseController extends BaseController
             }
         }
 
+        // Aggregators - Get session if coming back
+        $validationRequired = $this->get('session')->get('aggregator');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         $template = 'AppBundle:Purchase:purchaseStepPhone.html.twig';
-        
+
         $priceService = $this->get('app.price');
         $data = array(
             'policy' => $policy,
@@ -520,8 +527,8 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
-            // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
+            'instore' => $instore,
+            'validation_required' => $validationRequired,
         );
 
         return $this->render($template, $data);
@@ -756,15 +763,6 @@ class PurchaseController extends BaseController
             $this->setSessionQuotePhone($request, $phone);
         }
 
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        // $homepageFunnelExp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
-        //     ['regular-funnel-v2', 'new-funnel-v2'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
-
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
@@ -790,6 +788,8 @@ class PurchaseController extends BaseController
 
         $priceService = $this->get('app.price');
 
+        $validationRequired = $this->get('session')->get('aggregator');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -807,8 +807,8 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
-            // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
+            'instore' => $instore,
+            'validation_required' => $validationRequired,
         );
 
         return $this->render($template, $data);
@@ -970,6 +970,9 @@ class PurchaseController extends BaseController
             }
         }
 
+        // Aggregators - Get session if coming back
+        $validationRequired = $this->get('session')->get('aggregator');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -996,8 +999,8 @@ class PurchaseController extends BaseController
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProvider,
             'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime()),
-            // 'funnel_exp' => $homepageFunnelExp,
-            'instore' => $instore
+            'instore' => $instore,
+            'validation_required' => $validationRequired,
         );
 
         if ($toCardForm) {

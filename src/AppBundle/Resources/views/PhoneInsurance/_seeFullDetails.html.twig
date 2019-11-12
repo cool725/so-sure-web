@@ -119,7 +119,9 @@
         </div>
         <div class="col-md-8">
             <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-            {% if instore is null %}
+            {% if validation_required is not null or instore is not null %}
+                <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
+            {% else %}
                 <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
             {% endif %}
             <div class="table-responsive">
@@ -140,9 +142,11 @@
                             <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
                         </tr>
                         {% if instore is null %}
-                            <tr>
-                                <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
-                            </tr>
+                            {% if validation_required is null %}
+                                <tr>
+                                    <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
+                                </tr>
+                            {% endif %}
                         {% endif %}
                     </tbody>
                 </table>
@@ -177,9 +181,11 @@
                     <li>Instant cover from purchase</li>
                     <li>24-72 hour replacement once your claim is approved</li>
                     <li>Hassle-Free Claims</li>
-                        {% if instore is null %}
+                    {% if instore is null %}
+                        {% if validation_required is null %}
                             <li>Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ prices['monthly'].excess.damage }}</li>
                         {% endif %}
+                    {% endif %}
                     <li>Insure mobiles up to 3 years old</li>
                     <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
                     <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>

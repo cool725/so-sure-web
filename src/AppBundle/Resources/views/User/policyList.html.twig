@@ -47,7 +47,11 @@
                                         {% endif %}
                                     </li>
                                 {% endif %}
-                                {% if not policyItem.isPicSureValidated %}
+                                {% if policy.policyTerms.isPicSureRequired and policy.picSureStatus != 'approved' %}
+                                    <li class="list-group-item">
+                                        <strong>Your cover does NOT start till you verify your device via our app</strong>
+                                    </li>
+                                {% elseif not policyItem.isPicSureValidated %}
                                     <li class="list-group-item">
                                         Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.
                                     </li>

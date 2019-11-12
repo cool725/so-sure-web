@@ -73,9 +73,6 @@
                                 &pound;{{ prices['yearly'].yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-                        {% if feature_enabled('apply-sign-up-bonus') %}
-                            <p class="text-white text-center text-lg-left mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
-                        {% endif %}
                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
                             <a href="#qpw-info-mobile"
                                id="qpw-info-btn"

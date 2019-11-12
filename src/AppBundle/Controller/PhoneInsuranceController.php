@@ -402,6 +402,17 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
+        // Aggregators - validation required
+        $session = $this->get('session');
+
+        if ($request->query->has('aggregator')) {
+            $validationRequired = $request->get('aggregator');
+            $session->set('aggregator', $validationRequired);
+        }
+
+        // Aggregators - Get session if coming back
+        $validationRequired = $this->get('session')->get('aggregator');
+
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -504,6 +515,7 @@ class PhoneInsuranceController extends BaseController
                 ['memory' => 'asc']
             ),
             'instore' => $instore,
+            'validation_required' => $validationRequired,
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
