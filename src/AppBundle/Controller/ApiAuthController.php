@@ -783,13 +783,6 @@ class ApiAuthController extends BaseController
                         'device' => $this->getDataString($data['phone_policy'], 'device'),
                         'memory' => $this->getDataString($data['phone_policy'], 'memory'),
                     ]));
-                    $additionalPremium = null;
-                    if ($policy->getUser()) {
-                        $additionalPremium = $policy->getUser()->getAdditionalPremium();
-                    }
-                    /** @var PhonePrice $price */
-                    $price = $phone->getCurrentPhonePrice(null);
-                    $policy->setPremium($price->createPremium($additionalPremium, null));
 
                     $needUpdate = true;
                 }

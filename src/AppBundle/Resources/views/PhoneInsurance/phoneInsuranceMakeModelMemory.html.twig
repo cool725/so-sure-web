@@ -44,13 +44,13 @@
 {% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
 {% set hide_quote_btn = true %}
 
-{% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance For &pound;{{ phone_price.monthlyPremiumPrice }} Monthly | so-sure{% endblock %}
+{% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance For &pound;{{ prices['monthly'].monthlyPremiumPrice }} Monthly | so-sure{% endblock %}
 
 {% block meta %}
     <meta name="description" content="{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ make_desc }} {{ with_phone }} Insurance that's simply better."/>
     <link rel="canonical" href="{{ canonical|url_decode }}" />
 {% endblock %}
-{% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance For £' ~ phone_price.monthlyPremiumPrice ~ ' Monthly | so-sure' %}
+{% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance For £' ~ prices['monthly'].monthlyPremiumPrice ~ ' Monthly | so-sure' %}
 {% set og_url = canonical|url_decode %}
 {% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
@@ -128,7 +128,7 @@
                                aria-expanded="false"
                                aria-controls="mem_sizes"
                                title="Not the phone you're looking for?">
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ phone_price.monthlyPremiumPrice }} per month</span>
+                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ prices['monthly'].monthlyPremiumPrice }} per month</span>
                             </a>
                         </h1>
                         <div class="collapse mb-4" id="mem_sizes">
@@ -221,9 +221,9 @@
                                 <tbody>
                                     <tr>
                                         <td class="h6">Excess</td>
-                                        <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
-                                        <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
-                                        <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
+                                        <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
+                                        <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
+                                        <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
                                     </tr>
                                     {% if instore is null %}
                                         <tr>
@@ -482,7 +482,7 @@
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
                     <div class="banner__text text-center text-lg-left ml-lg-4">
                         <h4 class="text-white">Insure your phone in minutes</h4>
-                        <p class="lead text-white">{{ make_desc }} {{ phone.model }} for just <strong>&pound;{{ phone_price.monthlyPremiumPrice }}</strong> per month</p>
+                        <p class="lead text-white">{{ make_desc }} {{ phone.model }} for just <strong>&pound;{{ prices['monthly'].monthlyPremiumPrice }}</strong> per month</p>
                     </div>
                 </div>
                 <div class="banner__controls text-center text-lg-left">

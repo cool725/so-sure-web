@@ -13,6 +13,7 @@ use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\DuplicatePaymentException;
 use AppBundle\Exception\InvalidPaymentMethodException;
 use AppBundle\Exception\ScheduledPaymentException;
+use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
@@ -102,6 +103,9 @@ class CheckoutService
     /** @var FeatureService */
     protected $featureService;
 
+    /** @var PriceService */
+    protected $priceService;
+
     /** @var ApiClient */
     protected $client;
 
@@ -125,6 +129,7 @@ class CheckoutService
      * @param EventDispatcherInterface $dispatcher
      * @param SmsService               $sms
      * @param FeatureService           $featureService
+     * @param PriceService             $priceService
      */
     public function __construct(
         DocumentManager $dm,
@@ -137,7 +142,8 @@ class CheckoutService
         \Domnikl\Statsd\Client $statsd,
         EventDispatcherInterface $dispatcher,
         SmsService $sms,
-        FeatureService $featureService
+        FeatureService $featureService,
+        PriceService $priceService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -148,6 +154,7 @@ class CheckoutService
         $this->statsd = $statsd;
         $this->environment = $environment;
         $this->featureService = $featureService;
+        $this->priceService = $priceService;
 
         $isProd = $environment == 'prod';
         $this->client = new ApiClient($apiSecret, $isProd ? 'live' : 'sandbox', !$isProd);
@@ -355,8 +362,25 @@ class CheckoutService
                 $source,
                 $date
             );
-            $this->policyService->create($policy, $date, true, null, $identityLog);
-            $this->dm->flush();
+            try {
+                if ($policy instanceof PhonePolicy) {
+                    $this->priceService->phonePolicyDeterminePremium($policy, $payment->getAmount(), new \DateTime());
+                }
+                try {
+                    $this->setCommission($payment, true);
+                } catch (CommissionException $e) {
+                    $this->logger->error($e->getMessage());
+                }
+                $this->policyService->create($policy, $date, true, null, $identityLog);
+                $this->dm->flush();
+            } catch (IncorrectPriceException $e) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' tried to purchase with invalid price %f",
+                    $policy->getId(),
+                    $payment->getAmount()
+                ));
+                return true;
+            }
         } else {
             // Existing policy - add payment + prevent duplicate billing
             $payment = $this->createPayment(
@@ -1161,6 +1185,10 @@ class CheckoutService
             ));
         }
 
+        if (!$payment->getPolicy()) {
+            $payment->setPolicy($policy);
+        }
+
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
 
@@ -1169,19 +1197,17 @@ class CheckoutService
             throw new PaymentDeclinedException();
         }
 
-        if (!$payment->getPolicy()) {
-            $payment->setPolicy($policy);
-        }
-
-        try {
-            $this->setCommission($payment, true);
-        } catch (CommissionException $e) {
-            /**
-             * At this point the commission has been set but is likely incorrect.
-             * We will log the error so that it can be manually dealt with,
-             * but for now we still want to continue with the rest of the code.
-             */
-            $this->logger->error($e->getMessage());
+        if ($policy->getPremium()) {
+            try {
+                $this->setCommission($payment, true);
+            } catch (CommissionException $e) {
+                /**
+                 * At this point the commission has been set but is likely incorrect.
+                 * We will log the error so that it can be manually dealt with,
+                 * but for now we still want to continue with the rest of the code.
+                 */
+                $this->logger->error($e->getMessage());
+            }
         }
 
         return $payment;
@@ -1189,8 +1215,13 @@ class CheckoutService
 
     protected function validatePaymentAmount(CheckoutPayment $payment)
     {
-        // TODO: Should we issue a refund in this case??
         $premium = $payment->getPolicy()->getPremium();
+        if (!$premium && !in_array(
+            $payment->getPolicy()->getStatus(),
+            [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID]
+        )) {
+            return;
+        }
         if (!$premium->isEvenlyDivisible($payment->getAmount()) &&
             !$premium->isEvenlyDivisible($payment->getAmount(), true) &&
             !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getOutstandingPremium())) {
@@ -1204,27 +1235,6 @@ class CheckoutService
             );
             $this->logger->error($errMsg);
         }
-
-        /* TODO: May want to validate this data??
-        if ($tokenPaymentDetails["type"] != 'Payment') {
-            $errMsg = sprintf('Payment type mismatch - expected payment, not %s', $tokenPaymentDetails["type"]);
-            $this->logger->error($errMsg);
-            // save up to this point
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-        }
-        if ($payment->getId() != $tokenPaymentDetails["yourPaymentReference"]) {
-            $errMsg = sprintf(
-                'Payment ref mismatch. %s != %s',
-                $payment->getId(),
-                $tokenPaymentDetails["yourPaymentReference"]
-            );
-            $this->logger->error($errMsg);
-            // save up to this point
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-            throw new \Exception($errMsg);
-        }
-        */
     }
 
     protected function validateUser($user)

@@ -225,23 +225,21 @@ class ApiExternalController extends BaseController
 
             $quotes = [];
             foreach ($phones as $phone) {
-                $currentPhonePrice = $phone->getCurrentPhonePrice();
-                if (!$currentPhonePrice) {
+                $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
+                $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
+                if (!($monthlyPrice && $yearlyPrice)) {
                     continue;
                 }
-
                 // If there is an end date, then quote should be valid until then
                 $quoteValidTo = \DateTime::createFromFormat('U', time());
                 $quoteValidTo->add(new \DateInterval('P1D'));
-
                 $promoAddition = 0;
                 $isPromoLaunch = false;
-
                 $quotes[] = ['rate' => [
                     'reference' => $phone->getId(),
                     'product_name' => $phone->__toString(),
-                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
-                    'annual_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
+                    'monthly_premium' => $monthlyPrice->getMonthlyPremiumPrice(),
+                    'annual_premium' => $yearlyPrice->getYearlyPremiumPrice(),
                     'additional_gadget' => 0,
                 ]];
             }

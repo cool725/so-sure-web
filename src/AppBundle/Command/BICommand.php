@@ -103,7 +103,9 @@ class BICommand extends ContainerAwareCommand
             "unpaidCalls",
             "leadSource",
             "checkoutTransactions",
-            "scodes"
+            "scodes",
+            "rewards",
+            "rewardsBudget"
         ];
         $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
         $this
@@ -189,6 +191,12 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$only || $only == 'scodes') {
             $lines = $this->exportScodes($skipS3, $timezone);
+        }
+        if (!$only || $only == 'rewards') {
+            $lines = $this->exportRewards($skipS3);
+        }
+        if (!$only || $only == 'rewardsBudget') {
+            $lines = $this->exportRewardsBudget($skipS3);
         }
         if ($debug) {
             foreach ($lines as $line) {
@@ -868,6 +876,216 @@ class BICommand extends ContainerAwareCommand
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'scodes.csv');
         }
+        return $lines;
+    }
+
+    /**
+     * Exports rewards distribution data per month
+     * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
+     */
+    private function exportRewards($skipS3)
+    {
+        /** @var RewardRepository */
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+
+        //Initialise data arrays
+        $headers = [];
+        $data = [];
+
+        //Initialise csv lines array
+        $lines = [];
+
+        //Set total variables
+        $monthTotal = ['Total','',''];
+
+        //initialise time period for budget
+        $end = strtotime(date("Y-m"));
+        $current = $start = strtotime("-11 month", $end);
+
+        //Set csv header
+        $headers[] = "Code";
+        $headers[] = "Code Category";
+        $headers[] = "Default Value";
+        while ($current <= $end) {
+            $headers[] = date('F-Y', $current);
+            $current = strtotime("+1 month", $current);
+        }
+        $current = $start;
+
+        //Get Codes and sort by Category
+        $rewards = $rewardRepo->findBy([], ['type'=>'DESC']);
+
+        //Generate data
+        foreach ($rewards as $key => $reward) {
+            $data[$key][0] = $reward->getScode() ? $reward->getScode()->getCode() : $reward->getUser()->getEmail();
+            $data[$key][1] = $reward->getType() ? $reward->getType() : "n/a";
+            $data[$key][2] = $reward->getDefaultValue() ? $reward->getDefaultValue() : "Custom";
+            $connections = $reward->getConnections();
+            $cm = 3;
+            while ($current <= $end) {
+                if (!isset($data[$key][$cm])) {
+                    $data[$key][$cm]=0;
+                }
+                if (!isset($monthTotal[$cm])) {
+                    $monthTotal[$cm]=0;
+                }
+                foreach ($connections as $connection) {
+                    $connectionDate = $connection->getDate()->format('Ym');
+                    $currentStr = date('Ym', $current);
+                    if ($connectionDate === $currentStr) {
+                            $data[$key][$cm] += 1;
+                            $monthTotal[$cm] += 1;
+                    }
+                }
+                $current = strtotime("+1 month", $current);
+                $cm++;
+            }
+            $current = $start;
+        }
+
+        //Transform data arrays tp csv lines
+        $lines[] = $this->makeLine(...$headers);
+        foreach ($data as $line) {
+            $lines[] = $this->makeLine(...$line);
+        }
+        $lines[] = $this->makeLine(...$monthTotal);
+
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'rewards.csv');
+        }
+
+        return $lines;
+
+    }
+
+    /**
+     * Exports rewards previsionnal budget data as well as reward code use analytics to a csv file.
+     * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
+     */
+    private function exportRewardsBudget($skipS3)
+    {
+
+        /** @var RewardRepository */
+        $rewardRepo = $this->dm->getRepository(Reward::class);
+
+        //Initialise data arrays
+        $headers = [];
+        $data = [];
+
+        //Set total variables
+        $monthPolicies = [];
+        $monthBudget = [];
+        $cpa = [];
+
+        //Initialise csv lines array
+        $lines = [];
+
+        //initialise time period for budget
+        $start = $current =  strtotime(date("Y-m"));
+        $end = strtotime("+24 month", $start);
+
+        //Set csv header
+        $headers[] = "Code Category";
+        while ($current < $end) {
+            $headers[] = date('F-Y', $current);
+            $current = strtotime("+1 month", $current);
+        }
+        $current = $start;
+
+        //Get all code categories
+        $categories = $this->dm->createQueryBuilder(Reward::class)
+            ->distinct('type')
+            ->getQuery()
+            ->execute();
+        $categories[] = "n/a";
+
+        foreach ($categories as $key => $category) {
+            if ($category == "n/a") {
+                $rewards = $this->dm->createQueryBuilder(Reward::class)
+                    ->field('type')
+                    ->exists(false)
+                    ->getQuery()
+                    ->execute()
+                    ->toArray();
+            } else {
+                $rewards = $rewardRepo->findBy(['type' => $category]);
+            }
+            if ($category == "") {
+                $category = "n/a";
+            }
+            if (count($rewards)) {
+                $data[$key][0] = $category;
+                $monthBudget[0] = "Total";
+                $monthPolicies[0] = "Policies";
+                $cpa[0] = "CPA";
+            }
+            foreach ($rewards as $reward) {
+                $connections = $reward->getConnections();
+                $cm = 1;
+                while ($current < $end) {
+                    $value = 0;
+                    if (!isset($monthPolicies[$cm])) {
+                        $monthPolicies[$cm]=0;
+                    }
+                    if (!isset($monthBudget[$cm])) {
+                        $monthBudget[$cm]=0;
+                    }
+                    if (!isset($cpa[$cm])) {
+                        $cpa[$cm]=0;
+                    }
+                    foreach ($connections as $connection) {
+                        $policy = $connection->getSourcePolicy();
+                        if ($policy->isActive() && !$policy->hasMonetaryClaimed()) {
+                            $policyend = $policy->getEnd()->format('Ym');
+                            $currentStr = date('Ym', $current);
+                            if ($policyend === $currentStr) {
+                                $value += $connection->getPromoValue();
+                                $monthBudget[$cm] += $connection->getPromoValue();
+                                $monthPolicies[$cm] += 1;
+                                $cpa[$cm] = $monthBudget[$cm]/$monthPolicies[$cm];
+                            }
+                        }
+                    }
+                    if (isset($data[$key][$cm])) {
+                        $data[$key][$cm] += $value;
+                    } else {
+                        $data[$key][$cm] = $value;
+                    }
+                    $current = strtotime("+1 month", $current);
+                    $cm++;
+                }
+                $current = $start;
+            }
+        }
+
+        //Transform data arrays in csv lines
+        $lines[] = $this->makeLine(...$headers);
+        foreach ($data as $line) {
+            foreach ($line as $key => $val) {
+                if (!$key==0) {
+                    $line[$key] = "£" . number_format(floatval($val), 2, '.', ',');
+                }
+            }
+            $lines[] = $this->makeLine(...$line);
+        }
+        foreach ($monthBudget as $key => $val) {
+            if (!$key==0) {
+                $monthBudget[$key] = "£" . number_format(floatval($val), 2, '.', ',');
+            }
+        }
+        foreach ($cpa as $key => $val) {
+            if (!$key==0) {
+                $cpa[$key] = "£" . number_format(floatval($val), 2, '.', ',');
+            }
+        }
+        $lines[] = $this->makeLine(...$monthBudget);
+        $lines[] = $this->makeLine(...$monthPolicies);
+        $lines[] = $this->makeLine(...$cpa);
+
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'rewardsbudget.csv');
+        }
+
         return $lines;
     }
 

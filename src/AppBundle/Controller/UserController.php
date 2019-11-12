@@ -331,13 +331,21 @@ class UserController extends BaseController
                 $code = $scodeForm->getData()['scode'];
                 $scode = $scodeRepo->findOneBy(['code' => $code]);
                 if (!$scode || !SCode::isValidSCode($scode->getCode())) {
-                    $this->addFlash(
-                        'warning',
-                        sprintf("SCode %s is missing or been withdrawn", $code)
-                    );
-                    return new RedirectResponse(
-                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                    );
+                    $code = mb_strtoupper($code);
+                    $scode = $scodeRepo->findOneBy(['code' => $code]);
+                    if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                        $code = mb_strtolower($code);
+                        $scode = $scodeRepo->findOneBy(['code' => $code]);
+                        if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("SCode %s is missing or incorrect", $code)
+                            );
+                            return new RedirectResponse(
+                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                            );
+                        }
+                    }
                 }
                 if ($scode->isReward() && $scode->isActive()) {
                     $reward = $scode->getReward();
