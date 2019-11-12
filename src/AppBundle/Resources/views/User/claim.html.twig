@@ -17,186 +17,48 @@
 
 {% block body %}
 
-    {% set active_tab = 'claimfnol' %}
-    {% if current == 'claim-confirm' %}
-        {% set active_tab = 'claimfnol-confirm' %}
-    {% endif %}
+    {% if policy.policyTerms.isPicSureRequired and policy.picSureStatus != 'approved' %}
+        {# TODO: Add download links and content #}
+    {% else %}
+        {% set active_tab = 'claimfnol' %}
+        {% if current == 'claim-confirm' %}
+            {% set active_tab = 'claimfnol-confirm' %}
+        {% endif %}
 
-    <section class="hero">
-        <div class="container-large">
-            <h1 class="h2 mb-4 text-center">Make a claim 💔</h1>
-            {# NOTE: This is hidden! Remove d-none for testing #}
-            <ul class="nav nav-tabs d-none" id="fnol_sections" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'claimfnol' %}active{% endif %}"
-                    id="claimfnol_tab"
-                    data-toggle="tab"
-                    href="#tab_claimfnol"
-                    role="tab"
-                    aria-controls="claimfnol"
-                    aria-selected="{% if active_tab == 'claimfnol' %}true{% else %}false{% endif %}">FNOL</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'claimfnol-confirm' %}active{% endif %}"
-                    id="claimfnol_confirm_tab"
-                    data-toggle="tab"
-                    href="#claimfnol_confirm"
-                    role="tab"
-                    aria-controls="claimfnol_confirm"
-                    aria-selected="{% if active_tab == 'claimfnol-confirm' %}true{% else %}false{% endif %}">CONFIRM FNOL</a>
-                </li>
-            </ul>
-            <div class="tab-content"
-                 id="fnol_sections_content"
-                 data-active="{{ active_tab }}">
-                <div class="tab-pane {% if active_tab == 'claimfnol' %}active{% endif %}"
-                     id="claimfnol"
-                     role="tabpanel"
-                     aria-labelledby="claimfnol_tab">
+        <section class="hero">
+            <div class="container-large">
+                <h1 class="h2 mb-4 text-center">Make a claim 💔</h1>
+                {# NOTE: This is hidden! Remove d-none for testing #}
+                <ul class="nav nav-tabs d-none" id="fnol_sections" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'claimfnol' %}active{% endif %}"
+                        id="claimfnol_tab"
+                        data-toggle="tab"
+                        href="#tab_claimfnol"
+                        role="tab"
+                        aria-controls="claimfnol"
+                        aria-selected="{% if active_tab == 'claimfnol' %}true{% else %}false{% endif %}">FNOL</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_tab == 'claimfnol-confirm' %}active{% endif %}"
+                        id="claimfnol_confirm_tab"
+                        data-toggle="tab"
+                        href="#claimfnol_confirm"
+                        role="tab"
+                        aria-controls="claimfnol_confirm"
+                        aria-selected="{% if active_tab == 'claimfnol-confirm' %}true{% else %}false{% endif %}">CONFIRM FNOL</a>
+                    </li>
+                </ul>
+                <div class="tab-content"
+                     id="fnol_sections_content"
+                     data-active="{{ active_tab }}">
+                    <div class="tab-pane {% if active_tab == 'claimfnol' %}active{% endif %}"
+                         id="claimfnol"
+                         role="tabpanel"
+                         aria-labelledby="claimfnol_tab">
 
-                    <div class="row">
-                        <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
-                            {% if warn_pay %}
-                                <div class="alert-danger p-4 mb-4 rounded">
-                                    <h2 class="h4 text-danger mb-4">Warning loss/theft claims</h2>
-                                    <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
-                                    <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
-                                </div>
-                            {% endif %}
-                            {{ form_start(claim_form, {'attr': {
-                                'data-toggle': 'validator',
-                                'class': 'validate-form',
-                                'data-client-validation': form_client_validation
-                            }}) }}
-                                <div class="form-group">
-                                    <p class="mb-4">I, {{ username }}, am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted 🖋️</p>
-                                    {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
-                                    <div class="with-errors">{{ form_errors(claim_form.signature) }}</div>
-                                    <input type="hidden" value="{{ username }}" id="username_signature">
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.name) }}
-                                        {{ form_widget(claim_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'First name Last name'}}) }}
-                                        <div class="with-error">{{ form_errors(claim_form.name) }}</div>
-                                    </div>
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.email) }}
-                                        {{ form_widget(claim_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Same email as your account'}}) }}
-                                        <div class="with-errors">{{ form_errors(claim_form.email) }}</div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(claim_form.policyNumber) }}
-                                    {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'e.g. Mob/2016/40000001'}}) }}
-                                    <div class="with-errors">{{ form_errors(claim_form.policyNumber) }}</div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.phone, 'Best number to reach you on?') }}
-                                        {{ form_widget(claim_form.phone, { 'attr': {'class': 'form-control'}}) }}
-                                        <small class="form-text">Only use your current mobile number if your phone is damaged, but able to receive calls</small>
-                                        <div class="with-errors">{{ form_errors(claim_form.phone) }}</div>
-                                    </div>
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.timeToReach, 'What\'s the best time to call?') }}
-                                        <div class="input-group time-picker"
-                                             id="time_picker_one"
-                                             data-target-input="nearest">
-                                            {{ form_widget(claim_form.timeToReach, { 'attr': {
-                                                'class': 'form-control datetimepicker-input error-after',
-                                                'data-target': '#time_picker_one',
-                                            }}) }}
-                                            <div class="input-group-append"
-                                                 data-target="#time_picker_one"
-                                                 data-toggle="datetimepicker">
-                                                <div class="input-group-text"><i class="fal fa-clock fa-fw"></i></div>
-                                            </div>
-                                        </div>
-                                        <div class="with-errors">{{ form_errors(claim_form.timeToReach) }}</div>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.type, 'My device is?') }}
-                                        {{ form_widget(claim_form.type, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="with-errors">{{ form_errors(claim_form.type) }}</div>
-                                    </div>
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.network, 'My network is?') }}
-                                        {{ form_widget(claim_form.network, { 'attr': {'class': 'form-control'}}) }}
-                                        <div class="with-errors">{{ form_errors(claim_form.network) }}</div>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.when, 'It happened on') }}
-                                        <div class="input-group date-picker"
-                                             id="date_picker_one"
-                                             data-target-input="nearest">
-                                            {{ form_widget(claim_form.when, { 'attr': {
-                                                'class': 'form-control datetimepicker-input date_mask',
-                                                'data-target': '#date_picker_one',
-                                            }}) }}
-                                            <div class="input-group-append"
-                                                 data-target="#date_picker_one"
-                                                 data-toggle="datetimepicker">
-                                                <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
-                                            </div>
-                                        </div>
-                                        <div class="with-errors">{{ form_errors(claim_form.when) }}</div>
-                                    </div>
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.time, 'At around') }}
-                                        <div class="input-group time-picker"
-                                             id="time_picker_two"
-                                             data-target-input="nearest">
-                                            {{ form_widget(claim_form.time, { 'attr': {
-                                                'class': 'form-control datetimepicker-input date_mask',
-                                                'data-target': '#time_picker_two',
-                                            }}) }}
-                                            <div class="input-group-append"
-                                                 data-target="#time_picker_two"
-                                                 data-toggle="datetimepicker">
-                                                <div class="input-group-text"><i class="fal fa-clock fa-fw"></i></div>
-                                            </div>
-                                        </div>
-                                        <div class="with-errors">{{ form_errors(claim_form.time) }}</div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    {{ form_label(claim_form.where, 'Where did it happen?') }}
-                                    {{ form_widget(claim_form.where, { 'attr': {'class': 'form-control', 'placeholder': 'e.g at home, at work, out shopping etc.'}}) }}
-                                    <div class="with-errors">{{ form_errors(claim_form.where) }}</div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md form-group">
-                                        {{ form_label(claim_form.message, 'What exactly happened?') }}
-                                        {{ form_widget(claim_form.message, { 'attr': {
-                                            'class': 'form-control',
-                                            'rows': '10',
-                                            'placeholder': 'In as much detail as you can remember what has happened to the device'
-                                        }}) }}
-                                        <small class="form-text text-right" id="claim_message_length"></small>
-                                        <div class="with-errors">{{ form_errors(claim_form.message) }}</div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    {{ form_widget(claim_form.submit, { 'label': 'Start my claim', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
-                                </div>
-                            {{ form_end(claim_form) }}
-                        </div>
-                    </div>
-
-                </div>
-                <div class="tab-pane {% if active_tab == 'claimfnol-confirm' %}active{% endif %}"
-                     id="claimfnol_confirm"
-                     role="tabpanel"
-                     aria-labelledby="claimfnol_confirm_tab">
-
-                    <div class="row">
-                        <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
-                            {% if current == 'claim-confirm' %}
+                        <div class="row">
+                            <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
                                 {% if warn_pay %}
                                     <div class="alert-danger p-4 mb-4 rounded">
                                         <h2 class="h4 text-danger mb-4">Warning loss/theft claims</h2>
@@ -204,64 +66,206 @@
                                         <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
                                     </div>
                                 {% endif %}
-                                {{ form_start(claim_confirm_form) }}
-                                    <div class="h5 mb-4">I, {{ username }} confirm that:</div>
+                                {{ form_start(claim_form, {'attr': {
+                                    'data-toggle': 'validator',
+                                    'class': 'validate-form',
+                                    'data-client-validation': form_client_validation
+                                }}) }}
                                     <div class="form-group">
-                                        {{ form_widget(claim_confirm_form.checkTruthful, {
-                                            'label': 'I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth',
-                                            'attr': {'class':'custom-control-input'}}
-                                        ) }}
-                                        <div class="with-errors">{{ form_errors(claim_confirm_form.checkTruthful) }}</div>
+                                        <p class="mb-4">I, {{ username }}, am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted 🖋️</p>
+                                        {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.signature) }}</div>
+                                        <input type="hidden" value="{{ username }}" id="username_signature">
                                     </div>
-                                    <div class="form-group mb-4">
-                                        {{ form_widget(claim_confirm_form.checkPermanent, {
-                                            'label': 'I acknowledge that once I have confirmed my claim, I will not be able to change the information I have provided.',
-                                            'attr': {'class':'custom-control-input'}}
-                                        ) }}
-                                        <div class="with-errors">{{ form_errors(claim_confirm_form.checkPermanent) }}</div>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.name) }}
+                                            {{ form_widget(claim_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'First name Last name'}}) }}
+                                            <div class="with-error">{{ form_errors(claim_form.name) }}</div>
+                                        </div>
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.email) }}
+                                            {{ form_widget(claim_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Same email as your account'}}) }}
+                                            <div class="with-errors">{{ form_errors(claim_form.email) }}</div>
+                                        </div>
                                     </div>
-                                    <a id="claim_back_btn"
-                                       href="#"
-                                       data-tab-to="#claimfnol_tab"
-                                       class="btn btn-outline-primary show-tab btn-block-xs mr-md-2">Back</a>
-                                    {{ form_widget(claim_confirm_form.submit, {'label': 'Proceed to next step', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
-                                {{ form_end(claim_confirm_form) }}
-                            {% endif %}
+                                    <div class="form-group">
+                                        {{ form_label(claim_form.policyNumber) }}
+                                        {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'e.g. Mob/2016/40000001'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.policyNumber) }}</div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.phone, 'Best number to reach you on?') }}
+                                            {{ form_widget(claim_form.phone, { 'attr': {'class': 'form-control'}}) }}
+                                            <small class="form-text">Only use your current mobile number if your phone is damaged, but able to receive calls</small>
+                                            <div class="with-errors">{{ form_errors(claim_form.phone) }}</div>
+                                        </div>
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.timeToReach, 'What\'s the best time to call?') }}
+                                            <div class="input-group time-picker"
+                                                 id="time_picker_one"
+                                                 data-target-input="nearest">
+                                                {{ form_widget(claim_form.timeToReach, { 'attr': {
+                                                    'class': 'form-control datetimepicker-input error-after',
+                                                    'data-target': '#time_picker_one',
+                                                }}) }}
+                                                <div class="input-group-append"
+                                                     data-target="#time_picker_one"
+                                                     data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fal fa-clock fa-fw"></i></div>
+                                                </div>
+                                            </div>
+                                            <div class="with-errors">{{ form_errors(claim_form.timeToReach) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.type, 'My device is?') }}
+                                            {{ form_widget(claim_form.type, { 'attr': {'class': 'form-control'}}) }}
+                                            <div class="with-errors">{{ form_errors(claim_form.type) }}</div>
+                                        </div>
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.network, 'My network is?') }}
+                                            {{ form_widget(claim_form.network, { 'attr': {'class': 'form-control'}}) }}
+                                            <div class="with-errors">{{ form_errors(claim_form.network) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.when, 'It happened on') }}
+                                            <div class="input-group date-picker"
+                                                 id="date_picker_one"
+                                                 data-target-input="nearest">
+                                                {{ form_widget(claim_form.when, { 'attr': {
+                                                    'class': 'form-control datetimepicker-input date_mask',
+                                                    'data-target': '#date_picker_one',
+                                                }}) }}
+                                                <div class="input-group-append"
+                                                     data-target="#date_picker_one"
+                                                     data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                                </div>
+                                            </div>
+                                            <div class="with-errors">{{ form_errors(claim_form.when) }}</div>
+                                        </div>
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.time, 'At around') }}
+                                            <div class="input-group time-picker"
+                                                 id="time_picker_two"
+                                                 data-target-input="nearest">
+                                                {{ form_widget(claim_form.time, { 'attr': {
+                                                    'class': 'form-control datetimepicker-input date_mask',
+                                                    'data-target': '#time_picker_two',
+                                                }}) }}
+                                                <div class="input-group-append"
+                                                     data-target="#time_picker_two"
+                                                     data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fal fa-clock fa-fw"></i></div>
+                                                </div>
+                                            </div>
+                                            <div class="with-errors">{{ form_errors(claim_form.time) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form_label(claim_form.where, 'Where did it happen?') }}
+                                        {{ form_widget(claim_form.where, { 'attr': {'class': 'form-control', 'placeholder': 'e.g at home, at work, out shopping etc.'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.where) }}</div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.message, 'What exactly happened?') }}
+                                            {{ form_widget(claim_form.message, { 'attr': {
+                                                'class': 'form-control',
+                                                'rows': '10',
+                                                'placeholder': 'In as much detail as you can remember what has happened to the device'
+                                            }}) }}
+                                            <small class="form-text text-right" id="claim_message_length"></small>
+                                            <div class="with-errors">{{ form_errors(claim_form.message) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form_widget(claim_form.submit, { 'label': 'Start my claim', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
+                                    </div>
+                                {{ form_end(claim_form) }}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane {% if active_tab == 'claimfnol-confirm' %}active{% endif %}"
+                         id="claimfnol_confirm"
+                         role="tabpanel"
+                         aria-labelledby="claimfnol_confirm_tab">
+
+                        <div class="row">
+                            <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                                {% if current == 'claim-confirm' %}
+                                    {% if warn_pay %}
+                                        <div class="alert-danger p-4 mb-4 rounded">
+                                            <h2 class="h4 text-danger mb-4">Warning loss/theft claims</h2>
+                                            <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
+                                            <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
+                                        </div>
+                                    {% endif %}
+                                    {{ form_start(claim_confirm_form) }}
+                                        <div class="h5 mb-4">I, {{ username }} confirm that:</div>
+                                        <div class="form-group">
+                                            {{ form_widget(claim_confirm_form.checkTruthful, {
+                                                'label': 'I acknowledge that not telling the truth would constitute insurance fraud, which is a criminal offence. I agree to this and I understand that I could be prosecuted if I were not telling the truth',
+                                                'attr': {'class':'custom-control-input'}}
+                                            ) }}
+                                            <div class="with-errors">{{ form_errors(claim_confirm_form.checkTruthful) }}</div>
+                                        </div>
+                                        <div class="form-group mb-4">
+                                            {{ form_widget(claim_confirm_form.checkPermanent, {
+                                                'label': 'I acknowledge that once I have confirmed my claim, I will not be able to change the information I have provided.',
+                                                'attr': {'class':'custom-control-input'}}
+                                            ) }}
+                                            <div class="with-errors">{{ form_errors(claim_confirm_form.checkPermanent) }}</div>
+                                        </div>
+                                        <a id="claim_back_btn"
+                                           href="#"
+                                           data-tab-to="#claimfnol_tab"
+                                           class="btn btn-outline-primary show-tab btn-block-xs mr-md-2">Back</a>
+                                        {{ form_widget(claim_confirm_form.submit, {'label': 'Proceed to next step', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
+                                    {{ form_end(claim_confirm_form) }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# Page Modal #}
+        {% if active_tab == 'claimfnol' %}
+            <div class="modal fade"
+                 id="claim_warning_modal"
+                 tabindex="-1" role="dialog"
+                 aria-labelledby="claim_warning_modal"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Important info</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>📱 Claims can only be made within <u>28 days</u> of the incident.</p>
+                            <p>📑 If you've had your phone stolen or lost, please call your network to block your phone then request both proof of barring and proof of usage documents.</p>
+                            <p>🚨 You will need to get a crime reference number from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
+                            <p>💬 If you're unsure of what to do please <a href="#" class="open-intercom"><u>get in touch</u></a>.</p>
+                            <p class="text-center mt-4"><small>By clicking 'Understood' I {{ username }} can confirm I have noted the above</small></p>
+                            <div class="text-center">
+                                <a href="#"
+                                   class="btn btn-danger"
+                                   data-dismiss="modal"
+                                   aria-label="Close">Understood</a></div>
                         </div>
                     </div>
-
                 </div>
             </div>
-        </div>
-    </section>
-
-    {# Page Modal #}
-    {% if active_tab == 'claimfnol' %}
-        <div class="modal fade"
-             id="claim_warning_modal"
-             tabindex="-1" role="dialog"
-             aria-labelledby="claim_warning_modal"
-             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Important info</h5>
-                    </div>
-                    <div class="modal-body">
-                        <p>📱 Claims can only be made within <u>28 days</u> of the incident.</p>
-                        <p>📑 If you've had your phone stolen or lost, please call your network to block your phone then request both proof of barring and proof of usage documents.</p>
-                        <p>🚨 You will need to get a crime reference number from your local police station. If lost, you can also declare it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
-                        <p>💬 If you're unsure of what to do please <a href="#" class="open-intercom"><u>get in touch</u></a>.</p>
-                        <p class="text-center mt-4"><small>By clicking 'Understood' I {{ username }} can confirm I have noted the above</small></p>
-                        <div class="text-center">
-                            <a href="#"
-                               class="btn btn-danger"
-                               data-dismiss="modal"
-                               aria-label="Close">Understood</a></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% endif %}
     {% endif %}
 
 {% endblock %}

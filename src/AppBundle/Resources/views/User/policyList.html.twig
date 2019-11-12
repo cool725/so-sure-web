@@ -13,112 +13,116 @@
 
 {% block body %}
 
-    <section class="hero">
-        <div class="container-large">
-            <h1 class="h2">My Policies</h1>
-            {% if policy is defined and policy %}
-                <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
-            {% endif %}
-
-            <div class="row">
-                {% for policyItem in user.getDisplayablePoliciesSorted %}
-                    <div class="col-12 col-md-6">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    {{ policyItem.phone }}
-                                    {% if policyItem.status == 'active' %}
-                                        <span class="badge badge-success ml-2">{{ policyItem.status|capitalize }}</span>
-                                    {% else %}
-                                        <span class="badge badge-primary  ml-2">{{ policyItem.status|capitalize }}</span>
-                                    {% endif %}
-                                </h5>
-                                <p class="card-text">{{ policyItem.policyNumber }}</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">{{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</li>
-                                {% if policyItem.isPicSurePolicy %}
-                                    <li class="list-group-item h5">
-                                        Phone validated
-                                        {% if policyItem.isPicSureValidated %}
-                                            <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i></span>
-                                        {% else %}
-                                            <span class="badge badge-pill badge-danger ml-2"><i class="far fa-times fa-fw"></i></span>
-                                        {% endif %}
-                                    </li>
-                                {% endif %}
-                                {% if not policyItem.isPicSureValidated %}
-                                    <li class="list-group-item">
-                                        Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.
-                                    </li>
-                                {% endif %}
-                                <li class="list-group-item">
-                                   Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
-                                </li>
-                                <li class="list-group-item">
-                                    Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
-                                </li>
-                                <li class="list-group-item">
-                                    Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
-                                </li>
-                            </ul>
-
-                            {% if policyItem.getPolicyTermsFiles|length > 0 or policyItem.getPolicyScheduleFiles|length > 0 %}
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        {% if policyItem.getPolicyTermsFiles|length > 0 %}
-                                            <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Terms</a>
-                                        {% endif %}
-                                        {% if policyItem.getPolicyScheduleFiles|length > 0 %}
-                                            <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Schedule</a>
-                                        {% endif %}
-                                    </li>
-                                </ul>
-                            {% endif %}
-                            {% if policyItem.displayRepurchase %}
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success">Repurchase Policy</a>
-                                    </li>
-                                </ul>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-                {% if user.getDisplayableCashbackSorted|length > 0 %}
-                    <div class="col-12 col-md-6">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Cashback</h5>
-                                <ul class="list-group list-group-flush">
-                                    {% for cashback in user.getDisplayableCashbackSorted %}
-                                        <li class="list-group-item">
-                                            {{ cashback.policy.policyNumber }} <span class="badge badge-pill badge-success">{{ cashback.getDisplayableStatus }}</span><br>
-                                            <span class="h3">&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</span>
-                                        </li>
-                                    {% endfor %}
-                                    {% if cashback.status == 'missing' or cashback.status == 'failed' %}
-                                        <li class="list-group-item">
-                                            <a href="{{ path('user_cashback', {'id': cashback.id }) }}" class="btn btn-success">Add/Update Bank Details</a>
-                                        </li>
-                                     {% endif %}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+    {% if policy.policyTerms.isPicSureRequired and policy.picSureStatus != 'approved' %}
+        {# TODO: Add download links and content #}
+    {% else %}
+        <section class="hero">
+            <div class="container-large">
+                <h1 class="h2">My Policies</h1>
+                {% if policy is defined and policy %}
+                    <h6 class="mb-4 text-grey">{{ policy.phone }} - <span class="sub">{{ policy.policyNumber }}</h6>
                 {% endif %}
-            </div>
 
-            <div class="row">
-                <div class="col">
-                     <a href="{{ path('user_data_portability') }}"
-                        target="_blank" rel="noopener noreferrer"
-                        class="btn btn-outline-primary"
-                        title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download my policy data</a>
+                <div class="row">
+                    {% for policyItem in user.getDisplayablePoliciesSorted %}
+                        <div class="col-12 col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {{ policyItem.phone }}
+                                        {% if policyItem.status == 'active' %}
+                                            <span class="badge badge-success ml-2">{{ policyItem.status|capitalize }}</span>
+                                        {% else %}
+                                            <span class="badge badge-primary  ml-2">{{ policyItem.status|capitalize }}</span>
+                                        {% endif %}
+                                    </h5>
+                                    <p class="card-text">{{ policyItem.policyNumber }}</p>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">{{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</li>
+                                    {% if policyItem.isPicSurePolicy %}
+                                        <li class="list-group-item h5">
+                                            Phone validated
+                                            {% if policyItem.isPicSureValidated %}
+                                                <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i></span>
+                                            {% else %}
+                                                <span class="badge badge-pill badge-danger ml-2"><i class="far fa-times fa-fw"></i></span>
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                    {% if not policyItem.isPicSureValidated %}
+                                        <li class="list-group-item">
+                                            Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.
+                                        </li>
+                                    {% endif %}
+                                    <li class="list-group-item">
+                                       Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                        Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                        Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                </ul>
+
+                                {% if policyItem.getPolicyTermsFiles|length > 0 or policyItem.getPolicyScheduleFiles|length > 0 %}
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                                                <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Terms</a>
+                                            {% endif %}
+                                            {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                                                <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="card-link"><i class="far fa-file-download"></i> Policy Schedule</a>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                {% endif %}
+                                {% if policyItem.displayRepurchase %}
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success">Repurchase Policy</a>
+                                        </li>
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if user.getDisplayableCashbackSorted|length > 0 %}
+                        <div class="col-12 col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Cashback</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for cashback in user.getDisplayableCashbackSorted %}
+                                            <li class="list-group-item">
+                                                {{ cashback.policy.policyNumber }} <span class="badge badge-pill badge-success">{{ cashback.getDisplayableStatus }}</span><br>
+                                                <span class="h3">&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</span>
+                                            </li>
+                                        {% endfor %}
+                                        {% if cashback.status == 'missing' or cashback.status == 'failed' %}
+                                            <li class="list-group-item">
+                                                <a href="{{ path('user_cashback', {'id': cashback.id }) }}" class="btn btn-success">Add/Update Bank Details</a>
+                                            </li>
+                                         {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                         <a href="{{ path('user_data_portability') }}"
+                            target="_blank" rel="noopener noreferrer"
+                            class="btn btn-outline-primary"
+                            title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download my policy data</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 
     {# Page Modals #}
 
