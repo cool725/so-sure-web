@@ -25,6 +25,12 @@ class PolicyDocument
      */
     protected $latest;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $aggregator;
+
     /** @MongoDB\Field(type="string") */
     protected $version;
 
@@ -45,6 +51,16 @@ class PolicyDocument
     public function setLatest($latest)
     {
         $this->latest = $latest;
+    }
+
+    public function getAggregator()
+    {
+        return $this->aggregator;
+    }
+
+    public function setAggregator($aggregator)
+    {
+        $this->aggregator = $aggregator;
     }
 
     public function getVersion()

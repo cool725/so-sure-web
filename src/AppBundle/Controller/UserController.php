@@ -1195,7 +1195,7 @@ class UserController extends BaseController
         $invitationService = $this->get('app.invitation');
         $policyService = $this->get('app.policy');
 
-        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
 

@@ -399,7 +399,10 @@ class PurchaseController extends BaseController
                                 $purchase->getPhone(),
                                 $purchase->getImei(),
                                 $purchase->getSerialNumber(),
-                                $this->getIdentityLogWeb($request)
+                                $this->getIdentityLogWeb($request),
+                                null,
+                                null,
+                                $this->get('session')->get('aggregator') ? true : false
                             );
                             $dm->persist($policy);
 

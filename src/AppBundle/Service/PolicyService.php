@@ -326,7 +326,8 @@ class PolicyService
         $serialNumber,
         IdentityLog $identityLog = null,
         $phoneData = null,
-        $modelNumber = null
+        $modelNumber = null,
+        $aggregator = false
     ) {
         try {
             $this->validateUser($user);
@@ -358,7 +359,7 @@ class PolicyService
 
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
-            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true, 'aggregator' => $aggregator]);
             $policy->init($user, $latestTerms);
             if ($checkmend) {
                 $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
@@ -559,7 +560,11 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                if ($policy->getPolicyTerms()->isPicsureRequired()) {
+                    $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
+                } else {
+                    $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                }
                 $this->dm->flush();
             }
 

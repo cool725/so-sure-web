@@ -55,6 +55,9 @@ class PolicyTerms extends PolicyDocument
     // Immediate Cancellation
     const VERSION_14 = 'Version 14 October 2019';
 
+    // Version 14 for Aggregators
+    const VERSION_14_R = 'Version 14 November 2019 Aggregator';
+
     // ensure that lastest version is last in the array
     public static $allVersions = [
         self::VERSION_0 => '1',
@@ -71,6 +74,7 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_11 => '11',
         self::VERSION_12 => '12',
         self::VERSION_13 => '13',
+        self::VERSION_14_R => '14_R',
         self::VERSION_14 => '14'
     ];
 
@@ -131,7 +135,7 @@ class PolicyTerms extends PolicyDocument
     {
         // If terms version with _R appended
         return in_array($this->getVersion(), [
-            // self::VERSION_14_R,
+            self::VERSION_14_R,
         ]);
     }
 
@@ -200,10 +204,12 @@ class PolicyTerms extends PolicyDocument
             return [
                 static::getHighExcess()
             ];
-        } else {
+        } elseif (!$this->isPicSureRequired()) {
             return [
                 static::getLowExcess()
             ];
+        } else {
+            return [];
         }
     }
 
@@ -223,7 +229,7 @@ class PolicyTerms extends PolicyDocument
      */
     public function getDefaultExcess()
     {
-        if ($this->isPicSureEnabled()) {
+        if ($this->isPicSureEnabled() && !$this->isPicSureRequired()) {
             return static::getHighExcess();
         } else {
             return static::getLowExcess();
