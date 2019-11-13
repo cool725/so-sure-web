@@ -3046,6 +3046,10 @@ abstract class Policy
             return false;
         }
 
+        if ($this->getCancelledReason() == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
+            return true;
+        }
+
         if ($this->getCancelledReason() == Policy::CANCELLED_UNPAID ||
             $this->getCancelledReason() == Policy::CANCELLED_ACTUAL_FRAUD ||
             $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
@@ -3085,8 +3089,8 @@ abstract class Policy
 
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
-
-        if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+        $reason = $this->getCancelledReason();
+        if ($reason == Policy::CANCELLED_COOLOFF || $reason == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
             return $this->getCooloffPremiumRefund($skipValidate) - $offset;
         } else {
             return $this->getProratedPremiumRefund($this->getEnd()) - $offset;
