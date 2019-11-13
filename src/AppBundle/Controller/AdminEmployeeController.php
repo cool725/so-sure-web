@@ -1463,7 +1463,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if ($policy->getPremium()) {
             $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
         } else {
-            $bacsPayment->setAmount($policy->getPhone()->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice());
+            /** @var PhonePrice $price */
+            $price = $policy->getPhone()->getCurrentYearlyPhonePrice();
+            $bacsPayment->setAmount($price->getYearlyPremiumPrice());
         }
         $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         if ($policy->getPolicyOrUserBacsBankAccount()) {
