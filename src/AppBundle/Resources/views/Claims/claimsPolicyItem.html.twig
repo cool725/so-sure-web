@@ -1,3 +1,10 @@
+{% set monthlyBacs = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+{% set yearlyBacs = policy.phone.currentYearlyPhonePrice.yearlyPremiumPrice %}
+{% if policy.isPolicy %}
+    {% set monthlyBacs = policy.premium.monthlyPremiumPrice %}
+    {% set yearlyBacs = policy.premium.yearlyPremiumPrice %}
+{% endif %}
+
 <div id="claimPolicyItem">
     <div class="text-center" style="{% if policy.active %}background-color: {{ policy.riskColour }}; color: white;{% endif %} font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Risk: {{ policy.riskReason }} ({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
@@ -1225,7 +1232,7 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Debt Collection</td>
                     <td>
-                        {% if policy.debtCollector %}
+                        {% if policy.debtCollector and policy.isPolicy %}
                             Debt Collector: {{ policy.debtCollector }}
                             <br>
                             Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
@@ -1496,7 +1503,7 @@
                 </tr>
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Create Policy</td>
-                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
+                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }}{% if policy.isPolicy %} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}{% endif%}
                     <br>(not necessarily bacs)<br>
                         {{ form_start(create_form)}}
                         {{ form_widget(create_form.create, {'attr': {'class': 'btn btn-danger'}})}}
@@ -1696,6 +1703,7 @@
                         </td>
                     </tr>
                   {% endfor %}
+                  {% if policy.isPolicy %}
                     <tr>
                         <td>Remaining Scheduled</td>
                         <td>£{{ totalScheduled | number_format(2, '.', ',') }}</td>
@@ -1705,6 +1713,7 @@
                         <td></td>
                         <td></td>
                     </tr>
+                  {% endif %}
               </tbody>
             </table>
           </div>
@@ -1862,7 +1871,7 @@
                         <div class="form-group col-sm-10">
                             {{ form_errors(bacs_form.amount) }}
                             {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
-                            (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
+                            (£{{ monthlyBacs| number_format(2, '.', ',') }} / £{{ yearlyBacs| number_format(2, '.', ',') }})
                             <br><strong>
                                 Non-manual payments will be scheduled assuming users have bacs details
                             </strong>
@@ -1945,7 +1954,7 @@
                                     {{ form_label(bacs_refund_form.amount) }}
                                     {{ form_errors(bacs_refund_form.amount) }}
                                     {{ form_widget(bacs_refund_form.amount) }}
-                                    <br>Enter positive figure <strong>£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / month or £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} / year</strong>
+                                    <br>Enter positive figure <strong>£{{ monthlyBacs| number_format(2, '.', ',') }} / month or £{{ yearlyBacs| number_format(2, '.', ',') }} / year</strong>
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(bacs_refund_form.totalCommission) }}
@@ -2040,9 +2049,11 @@
     {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:createScheduledPaymentForm', 'policy': policy, 'id': 'createScheduledPaymentForm'} %}
+        {% if policy.isPolicy %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
+        {% endif %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
