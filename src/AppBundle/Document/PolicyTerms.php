@@ -6,7 +6,7 @@ use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyTermsRepository")
  */
 class PolicyTerms extends PolicyDocument
 {

@@ -812,6 +812,7 @@ class PurchaseController extends BaseController
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
             'instore' => $instore,
             'validation_required' => $validationRequired,
+            'aggregator' => $this->get('session')->get('aggregator')
         );
 
         return $this->render($template, $data);
@@ -1022,6 +1023,9 @@ class PurchaseController extends BaseController
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
         $environment = $this->getParameter('kernel.environment');
         $file = 'sample-policy-terms.pdf';
+        if ($this->get('session')->get('aggregator')) {
+            $file = 'sample-policy-terms_R.pdf';
+        }
 
         if (!$filesystem->has($file)) {
             throw $this->createNotFoundException(sprintf('URL not found %s', $file));

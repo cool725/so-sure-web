@@ -1519,7 +1519,15 @@ class UserController extends BaseController
         $user = $this->getUser();
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
-            throw $this->createNotFoundException('No active policy found');
+            if ($user->hasPicsureRequiredPolicy()) {
+                $this->addFlash(
+                    "error",
+                    "Reminder: You can only claim once you have validated your phone."
+                );
+                return $this->redirectToRoute("user_home");
+            } else {
+                throw $this->createNotFoundException('No active policy found');
+            }
         }
         // If the user has an open claim on all of their policies then they can't make a claim right now so send them to
         // one of their open claims.
