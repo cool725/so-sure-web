@@ -69,7 +69,7 @@ class PhoneRepository extends DocumentRepository
 
         return $qb->getQuery()->execute();
     }
-    
+
     public function findActiveInactive()
     {
         $qb = $this->createQueryBuilder();

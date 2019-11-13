@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\Phone;
+use AppBundle\Classes\GoCompare;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Invitation\EmailInvitation;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -174,6 +175,26 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     public function testQuoteMe()
     {
         self::$client->request('GET', '/quote-me/Apple+iPhone+XS+256GB');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertArrayHasKey('phoneId', $decoded);
+        $this->assertArrayHasKey('price', $decoded);
+        $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('productOverrides', $decoded);
+        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
+        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
+        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+    }
+
+    public function testQuoteMeGoCompare()
+    {
+        $goCompare = new GoCompare();
+        self::$client->request(
+            'GET',
+            '/quote-me/'.array_keys($goCompare::$models)[2].'?aggregator=GoCompare'
+        );
         $decoded = (array) json_decode($this->getClientResponseContent());
         $this->assertArrayHasKey('phoneId', $decoded);
         $this->assertArrayHasKey('price', $decoded);
