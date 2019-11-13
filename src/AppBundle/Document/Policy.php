@@ -5219,7 +5219,7 @@ abstract class Policy
             }
         }
         $fourteenDaysAgo = (clone $date)->sub(new \DateInterval("P14D"));
-        if ($this->getPolicyTerms()->isPicsureRequired() && $this->getStart() >= $fourteenDaysAgo) {
+        if ($this->getPolicyTerms()->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
             return $this->getStatus() == self::STATUS_PICSURE_REQUIRED;
         } elseif ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;

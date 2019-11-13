@@ -9,6 +9,7 @@ use AppBundle\Document\Feature;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Repository\PolicyTermsRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -356,7 +357,7 @@ class PolicyService
             $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
             $policy->setPhoneData($phoneData);
-
+            /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
             $latestTerms = $policyTermsRepo->findLatestTerms($aggregator);
@@ -560,7 +561,7 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                if ($policy->getPolicyTerms()->isPicsureRequired()) {
+                if ($policy->getPolicyTerms()->isPicSureRequired()) {
                     $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
                 } else {
                     $policy->setStatus(PhonePolicy::STATUS_ACTIVE);

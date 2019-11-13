@@ -2,8 +2,7 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Document\Phone;
-use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\PolicyTerms;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
 /**
@@ -24,6 +23,8 @@ class PolicyTermsRepository extends DocumentRepository
         } else {
             $qb->field("aggregator")->notEqual(true);
         }
-        return $qb->getQuery()->getSingleResult();
+        /** @var PolicyTerms|null $policyTerms */
+        $policyTerms = $qb->getQuery()->getSingleResult();
+        return $policyTerms;
     }
 }
