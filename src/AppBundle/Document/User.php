@@ -1422,6 +1422,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['renewalMonthlyPremiumNoPot'] = 0;
         $data['renewalMonthlyPremiumWithPot'] = 0;
         $data['hasOutstandingPicSurePolicy'] = false;
+        $data['picsureRequired'] = false;
         $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
 
@@ -1452,6 +1453,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 null,
             ])) {
                 $data['hasOutstandingPicSurePolicy'] = true;
+                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                    $data['picsureRequired'] = true;
+                }
             }
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
