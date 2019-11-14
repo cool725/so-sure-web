@@ -1,0 +1,31 @@
+
+😢 We're sorry. We've had to cancel your insurance policy
+
+Hi {{ policy.user.firstName }},
+
+We're really sorry - but a condition of our insurance policy is that we can verify your phone is in good working order at the point at which you take out cover. We have a simple app that allows you to do this - but we see that you still haven’t completed this step, despite our reminders over the past 13 days.
+
+Unfortunately this means that we are unable to cover your phone 😢
+
+If you would still like to benefit from so-sure’s great prices, comprehensive cover and cashback programme, please login to your account and head to the 'My policies' section to repurchase your cover. Please also download our app and follow the verification process so we can get your policy started for you this time 😀
+
+Repurchase here: {{ url('user_repurchase_policy', {'id': policy.id }) }}
+
+If you are in any doubt, please email us at info@wearesosure.com.
+
+Katie Booth so-sure customer 😎
+"This insurance is your peace of mind when you spend so much on technology these days it’s better to insure them"
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

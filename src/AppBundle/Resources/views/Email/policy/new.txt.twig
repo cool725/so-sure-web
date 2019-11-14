@@ -1,6 +1,16 @@
 
 Welcome to so-sure 🎉
 
+{% if policy.policyTerms.isPicSureRequired %}
+Almost there! Your policy details are below, however your policy will NOT commence until you have verified the condition of phone with our app. Click the link below to install the app and follow the instructions.
+
+{% if policy.phone.isITunes %}
+Download the app: {{ url('download_apple', {'medium': 'pic-sure-required-welcome-email'}) }}
+{% elseif policy.phone.isGooglePlay %}
+Download the app: {{ url('download_google', {'medium': 'pic-sure-required-welcome-email'}) }}
+{% endif %}
+
+{% else %}
 Nice to have you on board {{ policy.user.firstName }} 🥳
 
 Your phone is now covered and the policy details are below.
@@ -11,6 +21,7 @@ Head to your dashboard to start earning rewards: {{ url('user_home', {'id': poli
 
 Katie Booth so-sure customer 😎
 "This insurance is your peace of mind when you spend so much on technology these days it’s better to insure them"
+{% endif %}
 
 Important boring bits:
 
@@ -26,17 +37,19 @@ Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Acces
 
 Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions please don't hesitate to contact us.
 
-{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
-    Your excess is currently &pound;{{ policy.premium.excess.damage }} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss), you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
-    {% if policy.phone.isITunes %}
-    Download our iOS App, login, and complete the validation process.
-    {{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}
-    {% elseif policy.phone.isGooglePlay %}
-    Download our Android App</a>, login, and complete the validation process.
-    {{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}
-    {% else %}
-    Just email a picture of your phone's screen in the mirror to support@wearesosure.com and we'll get started on that process.
-    {% endif %}
+{% if policy.policyTerms.isPicSureRequired %}
+Don't forget to download the app and verify the condition of your phone to start your policy.
+{% elseif policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
+Your excess is currently &pound;{{ policy.premium.excess.damage }} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss), you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
+{% if policy.phone.isITunes %}
+Download our iOS App, login, and complete the validation process.
+{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}
+{% elseif policy.phone.isGooglePlay %}
+Download our Android App</a>, login, and complete the validation process.
+{{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}
+{% else %}
+Just email a picture of your phone's screen in the mirror to support@wearesosure.com and we'll get started on that process.
+{% endif %}
 {% endif %}
 
 If your phone is already broken 👮
