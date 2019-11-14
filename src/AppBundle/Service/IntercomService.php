@@ -453,6 +453,55 @@ class IntercomService
         return null;
     }
 
+
+    public function updateScode(User $user)
+    {
+        if (!$user->hasEmail()) {
+            return ['skipped' => true];
+        }
+        if ($user->hasSoSureEmail()) {
+            return ['skipped' => true];
+        }
+        if ($this->isDeleted($user)) {
+            return ['deleted' => true];
+        }
+        if (!$user->hasActivePolicy()) {
+            return ['skipped' => true];
+        }
+
+        if ($user->getStandardSCode() === null) {
+            $this->logger->debug(sprintf(
+                'Intercom can\'t find scode for user (userid %s)',
+                $user->getEmail()
+            ));
+            return ['skipped' => true];
+        }
+
+        $data = array(
+            'email' => $user->getEmail(),
+            'user_id' => $user->getIntercomUserIdOrId()
+        );
+
+        if ($user->getIntercomId()) {
+            $data['id'] = $user->getIntercomId();
+        }
+
+        $data['custom_attributes']['Scode'] = $user->getStandardSCode()->getCode();
+
+        $this->checkRateLimit();
+        $resp = $this->client->users->update($data);
+        $this->storeRateLimit();
+
+        $this->logger->debug(sprintf(
+            'Intercom updated scode for user (userid %s) %s',
+            $user->getIntercomUserIdOrId(),
+            json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)
+        ));
+
+        return $resp;
+
+    }
+
     private function updateUser(User $user, $isConverted = false)
     {
         if (!$user->hasEmail()) {
@@ -486,6 +535,7 @@ class IntercomService
         $data['custom_attributes']['Max Pot'] = $analytics['maxPot'];
         $data['custom_attributes']['Displayable Max Pot'] = (string) sprintf('%.2f', $analytics['maxPot']);
         $data['custom_attributes']['Has Full Pot'] = $analytics['hasFullPot'];
+        $data['custom_attributes']['Scode'] = $analytics['scode'];
         $data['custom_attributes']['Connections'] = $analytics['connections'];
         $data['custom_attributes']['Approved Claims'] = $analytics['approvedClaims'];
         $data['custom_attributes']['Approved Network Claims'] = $analytics['approvedNetworkClaims'];
