@@ -792,7 +792,7 @@ class PolicyService
         $template = sprintf(
             'AppBundle:Pdf:policyScheduleV%d%s.html.twig',
             $policy->getPolicyTerms()->getVersionNumber(),
-            $policxy->getPolicyTerms()->isPicSureRequired() ? "_R" : ""
+            $policy->getPolicyTerms()->isPicSureRequired() ? "_R" : ""
         );
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
