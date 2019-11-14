@@ -4011,9 +4011,10 @@ abstract class Policy
         $successes = $this->getPremium()->getNumberOfMonthlyPayments(
             $this->getTotalSuccessfulPayments($date, true)
         ) ?: 0;
-        $billingDate->add(new \DateInterval("P{$successes}M"));
-        // and business rule of 30 days unpaid before auto cancellation
-        $billingDate->add(new \DateInterval('P30D'));
+        if ($successes < 0) {
+            $successes = 0;
+        }
+        $billingDate->add(new \DateInterval("P{$successes}M30D"));
         $billingDate = $this->startOfDay($billingDate);
 
         // Unpaid policies with a cancellation date after the end of policy, should be adjusted to cancel
