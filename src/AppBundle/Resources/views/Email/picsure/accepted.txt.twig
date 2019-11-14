@@ -3,7 +3,11 @@ Phone validation successful ✅
 
 Congratulations {{ policy.user.firstName }},
 
-Your {{ policy.phone }} is now successfully validated and your excess has dropped by a whopping &pound;100!
+{% if policy.policyTerms.isPicSureRequired %}
+Your {{ policy.phone }} is now successfully verified and your cover has now started!
+{% else %}
+Your {{ policy.phone }} is now successfully verified and your excess has dropped by a whopping &pound;100!
+{% endif %}
 
 😎 How cool is that?
 

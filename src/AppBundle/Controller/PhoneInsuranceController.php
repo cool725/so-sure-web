@@ -576,9 +576,11 @@ class PhoneInsuranceController extends BaseController
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $decodedModel = Phone::decodeModel($model);
         $phone = null;
+        $aggregator = '';
 
         if ($id) {
             if ($request->query->get('aggregator')) {
+                $aggregator = '?aggregator=true';
                 // If aggregator set, look for aggregator ID instead of phone ID
                 if ($request->query->get('aggregator') == 'GoCompare') {
                     $goCompare = new GoCompare();
@@ -625,7 +627,7 @@ class PhoneInsuranceController extends BaseController
                         ' ',
                         '+',
                         $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory()
-                    ).'GB'
+                    ).'GB'.$aggregator
             ]);
             return $response;
         }

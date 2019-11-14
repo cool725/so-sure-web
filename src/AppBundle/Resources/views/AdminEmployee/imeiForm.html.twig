@@ -42,7 +42,13 @@
                 <div class="form-group">
                     <label>Current Phone</label>
                     <p>{{ policy.phone }}</p>
-                    <p>Current premium: <strong>&pound;<span id="old_premium" data-old-premium="{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}">{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}</span></strong></p>
+                    <p>Current premium: <strong>
+                        {% set phonePrice = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+                        {% if policy.isPolicy %}
+                            {% set phonePrice = policy.premium.monthlyPremiumPrice %}
+                        {% endif %}
+                        &pound;<span id="old_premium" data-old-premium="{{ phonePrice|number_format(2, '.', ',') }}">{{ phonePrice|number_format(2, '.', ',') }}</span>
+                    </strong></p>
                 </div>
             </div>
         </div>
