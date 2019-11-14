@@ -219,4 +219,67 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($d, $e->getUpgradedFrom());
         // TODO: this function must be updated to allow upgrade created before cancellation as well as after.
     }
+
+    /**
+     * Makes sure that get policy expiry date gives the right date and does not crash in weird circumstances or
+     * anything of that nature.
+     */
+    public function testGetPolicyExpiryDate()
+    {
+        $premium = new PhonePremium();
+        $premium->setGwp(12.34);
+        $premium->setIpt(0.66);
+        $date = new \DateTime();
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->setStart(clone $date);
+        $policy->setEnd((clone $date)->add(new \DateInterval("P1Y")));
+        $policy->setBilling(clone $date);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        for ($i = 0; $i < 3; $i++) {
+            $payment = new CheckoutPayment();
+            $payment->setAmount($premium->getMonthlyPremiumPrice());
+            $payment->setSuccess(true);
+            $payment->setDate((clone $date)->add(new \DateInterval("P{$i}M")));
+            $policy->addPayment($payment);
+        }
+        // make sure the date is indeed 30 days after the missing payment.
+        $this->assertEquals(
+            $this->startOfDay((clone $date)->add(new \DateInterval("P3M30D"))),
+            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))
+        );
+        // Add a refund and it should be a month sooner.
+        $refund = new CheckoutPayment();
+        $refund->setAmount(0 - $premium->getMonthlyPremiumPrice());
+    }
+
+    /**
+     * We shall add a lot of refunds and then test getting the expiry date and make sure it does not crash or behave
+     * strangely.
+     */
+    public function testGetPolicyExpiryDateWithHeavyRefunds()
+    {
+        $premium = new PhonePremium();
+        $premium->setGwp(2.34);
+        $premium->setIpt(0.66);
+        $date = new \DateTime();
+        $policy = new PhonePolicy();
+        $policy->setPremium($premium);
+        $policy->setStart(clone $date);
+        $policy->setEnd((clone $date)->add(new \DateInterval("P1Y")));
+        $policy->setBilling(clone $date);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        for ($i = 0; $i < 8; $i++) {
+            $payment = new CheckoutPayment();
+            $payment->setAmount(0 - $premium->getMonthlyPremiumPrice());
+            $payment->setSuccess(true);
+            $payment->setDate(clone $date);
+            $policy->addPayment($payment);
+        }
+        // make sure the date is indeed 30 days after the missing payment.
+        $this->assertEquals(
+            $this->startOfDay((clone $date)->add(new \DateInterval("P30D"))),
+            $policy->getPolicyExpirationDate($date)
+        );
+    }
 }
