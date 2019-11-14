@@ -4010,7 +4010,7 @@ abstract class Policy
         $billingDate = clone $this->getBilling();
         $successes = $this->getPremium()->getNumberOfMonthlyPayments(
             $this->getTotalSuccessfulPayments($date, true)
-        );
+        ) ?: 0;
         $billingDate->add(new \DateInterval("P{$successes}M"));
         // and business rule of 30 days unpaid before auto cancellation
         $billingDate->add(new \DateInterval('P30D'));
