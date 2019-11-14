@@ -187,12 +187,21 @@
                             <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
                             <li class="text-white mb-5">
                                 <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-                                <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="track-data text-white"
-                                   data-event="user-download-ipid"
-                                   data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
+                                {% if validation_required is not null %}
+                                    <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="track-data text-white"
+                                       data-event="user-download-ipid-agg"
+                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u>Download a copy of our IPID</u></a>
+                                {% else %}
+                                    <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="track-data text-white"
+                                       data-event="user-download-ipid"
+                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
+                                {% endif %}
                             </li>
                         </ul>
                         <h2 class="h4 text-columbia-blue-e my-4">Our Policy Document:</h2>
@@ -200,12 +209,21 @@
                             <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> See our policy document for full details.</li>
                             <li class="text-white mb-5">
                                 <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-                                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="track-data text-white"
-                                   data-event="user-download-sample-policy-doc-quote"
-                                   data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"><u>Download a copy of our Policy Document</u></a>
+                                {% if validation_required is not null %}
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="track-data text-white"
+                                       data-event="user-download-sample-policy-doc-quote-agg"
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf"><u>Download a copy of our Policy Document</u></a>
+                                {% else %}
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="track-data text-white"
+                                       data-event="user-download-sample-policy-doc-quote"
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"><u>Download a copy of our Policy Document</u></a>
+                                {% endif %}
                             </li>
                         </ul>
                         <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
