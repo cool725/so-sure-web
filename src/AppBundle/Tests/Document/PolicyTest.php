@@ -251,6 +251,12 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // Add a refund and it should be a month sooner.
         $refund = new CheckoutPayment();
         $refund->setAmount(0 - $premium->getMonthlyPremiumPrice());
+        $refund->setSuccess(true);
+        $policy->addPayment($refund);
+        $this->assertEquals(
+            $this->startOfDay((clone $date)->add(new \DateInterval("P2M30D"))),
+            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))
+        );
     }
 
     /**
