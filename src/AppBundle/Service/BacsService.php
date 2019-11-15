@@ -781,6 +781,7 @@ class BacsService
         $elementList = $xpath->query(
             '//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem'
         );
+        $processed = [];
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['records']++;
@@ -828,17 +829,16 @@ class BacsService
             }
 
             $foundPayments = 0;
-            $processed = [];
             foreach ($submittedPayments as $submittedPayment) {
                 /** @var BacsPayment $submittedPayment */
                 $policy = $submittedPayment->getPolicy();
                 if (($referencePolicy && $referencePolicy->getId() == $policy->getId()) ||
                     ($referenceUser && $referenceUser->getId() == $policy->getUser()->getId())) {
-                    $foundPayments++;
                     if (in_array($submittedPayment->getId(), $processed)) {
                         continue;
                     }
                     $processed[] = $submittedPayment->getId();
+                    $foundPayments++;
 
                     $debitPayment = new BacsPayment();
                     $debitPayment->setAmount(0 - $submittedPayment->getAmount());
