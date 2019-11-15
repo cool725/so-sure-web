@@ -15,7 +15,7 @@ class PolicyTermsRepository extends DocumentRepository
      * @param boolean $aggregator is whether to find aggregator terms or normal terms.
      * @return PolicyTerms|null the latest policy terms or null if none exist.
      */
-    public function findLatestTerms($aggregator=false)
+    public function findLatestTerms($aggregator = false)
     {
         $qb = $this->createQueryBuilder()->field("latest")->equals(true);
         if ($aggregator) {
