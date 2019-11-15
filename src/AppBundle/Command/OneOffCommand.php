@@ -16,6 +16,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\FacebookService;
 use AppBundle\Service\IntercomService;
 use AppBundle\Service\MixpanelService;
