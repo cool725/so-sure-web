@@ -330,6 +330,9 @@ class PolicyService
         $modelNumber = null,
         $aggregator = false
     ) {
+        if (mb_strtolower($phone->getMake()) != 'apple') {
+            $aggregator = false;
+        }
         try {
             $this->validateUser($user);
             $this->validateImei($imei);
