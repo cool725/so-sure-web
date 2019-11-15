@@ -2,137 +2,102 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Looking back and forward{% endblock %}
+{% block title %}Looking back and forward - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="2019 feels like a significant year in our development. We know that we’ll only achieve our goals as a company if we are meeting the needs of our customers, and that means working hard every day to try and fix the broken model of insurance."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Looking back and forward</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Looking back and forward</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Susan</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">Looking back and forward</span>
-                                            <meta property="position" content="3">
+                                            <time>Jan 29, 2019</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">Looking back and forward</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Jan 29, 2019</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>Of course, January is the perfect month to look forward and plan what’s to come, but it’s also a great time to take stock. This week we took a moment to catch our breath and consider what we accomplished in 2018 and map out what we hope to achieve in the coming 12 months.</p>
-                        <p>2019 feels like a significant year in our development. We know that we’ll only achieve our goals as a company if we are meeting the needs of our customers, and that means working hard every day to try and <a href="{{ path('how_to_fix_a_problem_like_insurance') }}">fix the broken model of insurance</a>. We believe that the problems of the industry can be fixed, but it’s going to take a heck of a lot of hard work.</p>
-                        <p>Last year was all about getting our service sorted so that every customer who used so-sure to insure their mobile phone had a first-class customer experience when interacting with our product. That could have been at the point of purchase, if they had any questions during their time with us or if they had to make a claim. The customer experience is everything.</p>
-                        <p>We’re pleased to report that our efforts paid off, and we ended 2018 with a score of 7.9 out of 10, a 4-star offering, on <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank" rel="noopener noreferrer">Trustpilot</a>. This number continues to rise and we think that an enhanced level of customer satisfaction was one of the reasons why our customer base grew in 2018 too. We now know that we have happy customers. Now we’re looking to acquire more of them.</p>
-                        <p>We’ve also focused on improving our customers’ experience when using our app, looking closely at how we detect and deter fraud. A problem at the core of insurance is that all customers are made to feel like a fraud at some point during the claims process and charged for the fraudulent behaviour of others. We’re focused on eliminating fraud so our customers have a pleasant experience when they claim, one where they’re made to feel like a valued customer, rather than a criminal. And of course, this helps to keep premiums down.</p>
-                        <p>Finally, we’ve worked hard to hone our social insurance model, enabling our customers to share common risks. This means that our customers receive up to 80% of the value of their premium back each year if they don’t claim. That is a model of insurance that we think is fair for us and for our customers, and we are adamant that this is how all insurance should be undertaken.</p>
-                        <p>2018 was also important because we were lucky enough to secure one of Europe’s largest ever seed funding round, raising €3 million from Breega Capital, 7% Ventures, Gauss Ventures, as well as several senior European insurance executives. This was a real statement of intent and believe in our mission - a message that other people believe in what we’re doing just as much as we do and it’s this message of support that we’re carrying into 2019.</p>
-                        <p>So whilst 2018 was productive, 2019/20 looks set to be exciting too. Our focus for the coming 12 months will be firmly upon two elements. First, we’re looking to take our offering international, launching into the US or Asia-Pacific. Second, we’re going to be launching a home and contents insurance product, building upon the model that we’ve pioneered with mobile phone insurance with great success. If you need us in 2018, that’s where we’ll be!</p>
-                        <p>So here’s to 2019 and beyond. We’ve much to do. And it’s great to have you with us.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>Of course, January is the perfect month to look forward and plan what’s to come, but it’s also a great time to take stock. This week we took a moment to catch our breath and consider what we accomplished in 2018 and map out what we hope to achieve in the coming 12 months.</p>
+                                <p>2019 feels like a significant year in our development. We know that we’ll only achieve our goals as a company if we are meeting the needs of our customers, and that means working hard every day to try and <a href="{{ path('how_to_fix_a_problem_like_insurance') }}">fix the broken model of insurance</a>. We believe that the problems of the industry can be fixed, but it’s going to take a heck of a lot of hard work.</p>
+                                <p>Last year was all about getting our service sorted so that every customer who used so-sure to insure their mobile phone had a first-class customer experience when interacting with our product. That could have been at the point of purchase, if they had any questions during their time with us or if they had to make a claim. The customer experience is everything.</p>
+                                <p>We’re pleased to report that our efforts paid off, and we ended 2018 with a score of 7.9 out of 10, a 4-star offering, on <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank" rel="noopener noreferrer">Trustpilot</a>. This number continues to rise and we think that an enhanced level of customer satisfaction was one of the reasons why our customer base grew in 2018 too. We now know that we have happy customers. Now we’re looking to acquire more of them.</p>
+                                <p>We’ve also focused on improving our customers’ experience when using our app, looking closely at how we detect and deter fraud. A problem at the core of insurance is that all customers are made to feel like a fraud at some point during the claims process and charged for the fraudulent behaviour of others. We’re focused on eliminating fraud so our customers have a pleasant experience when they claim, one where they’re made to feel like a valued customer, rather than a criminal. And of course, this helps to keep premiums down.</p>
+                                <p>Finally, we’ve worked hard to hone our social insurance model, enabling our customers to share common risks. This means that our customers receive up to 80% of the value of their premium back each year if they don’t claim. That is a model of insurance that we think is fair for us and for our customers, and we are adamant that this is how all insurance should be undertaken.</p>
+                                <p>2018 was also important because we were lucky enough to secure one of Europe’s largest ever seed funding round, raising €3 million from Breega Capital, 7% Ventures, Gauss Ventures, as well as several senior European insurance executives. This was a real statement of intent and believe in our mission - a message that other people believe in what we’re doing just as much as we do and it’s this message of support that we’re carrying into 2019.</p>
+                                <p>So whilst 2018 was productive, 2019/20 looks set to be exciting too. Our focus for the coming 12 months will be firmly upon two elements. First, we’re looking to take our offering international, launching into the US or Asia-Pacific. Second, we’re going to be launching a home and contents insurance product, building upon the model that we’ve pioneered with mobile phone insurance with great success. If you need us in 2018, that’s where we’ll be!</p>
+                                <p>So here’s to 2019 and beyond. We’ve much to do. And it’s great to have you with us.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
