@@ -364,6 +364,12 @@ class OneOffCommand extends ContainerAwareCommand
                 $yearlyPrice->setGwp(($currentPrice->getGwp() * 11) / 12);
                 $yearlyPrice->setValidFrom($date);
                 $yearlyPrice->setStream(PhonePrice::STREAM_YEARLY);
+                if ($currentPrice->getExcess()) {
+                    $yearlyPrice->setExcess($currentPrice->getExcess());
+                }
+                if ($currentPrice->getPicSureExcess()) {
+                    $yearlyPrice->setPicSureExcess($currentPrice->getPicSureExcess());
+                }
                 $phone->addPhonePrice($yearlyPrice);
                 $this->dm->persist($phone);
                 $nSuccessful++;
