@@ -402,16 +402,21 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
-        // Aggregators - validation required
-        $session = $this->get('session');
+        if(mb_strtolower($phone->getMake()) == "apple") {
+            // iphone only
+            // Aggregators - validation required
+            $session = $this->get('session');
 
-        if ($request->query->has('aggregator')) {
-            $validationRequired = $request->get('aggregator');
-            $session->set('aggregator', $validationRequired);
+            if ($request->query->has('aggregator')) {
+                $validationRequired = $request->get('aggregator');
+                $session->set('aggregator', $validationRequired);
+            }
+
+            // Aggregators - Get session if coming back
+            $validationRequired = $this->get('session')->get('aggregator');
+        } else {
+            $validationRequired = null;
         }
-
-        // Aggregators - Get session if coming back
-        $validationRequired = $this->get('session')->get('aggregator');
 
         // In-store
         $instore = $this->get('session')->get('store');
