@@ -47,20 +47,33 @@
                                         {% endif %}
                                     </li>
                                 {% endif %}
-                                {% if not policyItem.isPicSureValidated %}
+                                {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                                    <li class="list-group-item">
+                                        <strong>Your cover does NOT start till you verify your device via our app</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                       Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.premium.picsureExcess.damage|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                        Excess for Loss <strong>&pound;{{ policyItem.premium.picsureExcess.loss|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                        Excess for Theft <strong>&pound;{{ policyItem.premium.picsureExcess.theft|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                {% else %}
                                     <li class="list-group-item">
                                         Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.
                                     </li>
+                                    <li class="list-group-item">
+                                       Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                        Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
+                                    </li>
+                                    <li class="list-group-item">
+                                        Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
+                                    </li>
                                 {% endif %}
-                                <li class="list-group-item">
-                                   Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
-                                </li>
-                                <li class="list-group-item">
-                                    Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
-                                </li>
-                                <li class="list-group-item">
-                                    Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
-                                </li>
                             </ul>
 
                             {% if policyItem.getPolicyTermsFiles|length > 0 or policyItem.getPolicyScheduleFiles|length > 0 %}

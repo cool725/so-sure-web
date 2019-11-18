@@ -6,7 +6,7 @@
 {% set intercom_enabled = false %}
 {% set hide_devbar = true %}
 
-{% block title %}Welcome | so-sure{% endblock %}
+{% block title %}Next Steps | so-sure{% endblock %}
 
 {# Set Meta #}
 {% set og_title = 'Sign up and save' %}
@@ -41,24 +41,6 @@
     {% endif %}
 {% endblock %}
 
-{% block pixel %}
-    {# Pixels #}
-    {% if environment == 'prod' %}
-        <img src="https://tapjoy.go2cloud.org/SL2Qs" width="1" height="1" class="position-absolute invisible" />
-
-        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" class="position-absolute invisible" />
-
-        {% if app.session.get('mobusi') %}
-            <img src="https://pixel.leadzu.com/pixel.php?hash={{ app.session.get('mobusi') }}&service=4602&type=EVENT&transaction_id={{ policy.id }}&id_event=1&fc=1" alt="">
-        {% endif %}
-
-        {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
-            <img src='https://www.tagserve.com/saleServlet?MID=357&PID=513&CRID=&ORDERID={{ policy.id }}&ORDERAMNT=10&NUMOFITEMS=1&CUR=GBP' border="0" width="1" height="1" class="position-absolute invisible">
-        {% endif %}
-    {% endif %}
-
-{% endblock %}
-
 {% block body %}
 
     <section class="onboarding">
@@ -76,7 +58,7 @@
                    data-slide-to="1"
                    data-target="#onboarding_carousel">
                     <div class="onboarding-nav__number h6 mb-0">2</div>
-                    <div class="onboarding-nav__title h6 ml-3 mb-0">Reduce your excess</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Your excess</div>
                 </a>
                 <a href="#"
                    class="onboarding-nav__link py-4"
@@ -107,16 +89,17 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Welcome" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">{{ policy.user.firstname }}, you're all covered 🎉</h2>
+                            <h2 class="h4 text-primary mb-3">Thanks for choosing so-sure, {{ policy.user.firstname }} 🎉</h2>
                                 {% if device_category() == 'Mobile' %}
-                                    <p class="mb-5">Thanks for choosing so-sure, you'll shortly receive a confirmation email but for now your payment is all set up and your policy is active. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
+                                    <p>You will receive a confirmation email soon and your payment is all set up.</p>
+                                    <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
                                     {% if policy.phone.iTunes %}
                                         <a href="{{ apple_download('onboarding-mobile-one') }}"
                                            class="btn btn-primary btn-block-xs ga-outbound-click"
                                            data-clicklabel="iTunes"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download our App</a>
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
                                     {% endif %}
                                     {% if policy.phone.googlePlay %}
                                         <a href="{{ google_download('onboarding-mobile-one') }}"
@@ -124,10 +107,11 @@
                                            data-clicklabel="PlayStore"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            <i class="fab fa-android mr-2 fa-lg"></i> Download our App</a>
+                                            <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
                                     {% endif %}
                                 {% else %}
-                                    <p class="mb-5">Thanks for choosing so-sure, you'll shortly receive a confirmation email but for now your payment is all set up and your phone is insured. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
+                                    <p>You will receive a confirmation email soon and your payment is all set up.</p>
+                                    <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
                                     <a href="#"
                                        class="btn btn-primary"
                                        role="button"
@@ -141,14 +125,14 @@
                                                data-clicklabel="iTunes"
                                                target="_blank"
                                                rel="noopener noreferrer">
-                                                <i class="fab fa-apple mr-2 fa-lg"></i>Download our App</a>
+                                                <i class="fab fa-apple mr-2 fa-lg"></i>Download the App to verify</a>
                                         {% endif %}
                                         {% if policy.phone.googlePlay %}
                                             <a href="{{ google_download('onboarding-desktop-one') }}"  class="link-subtle ga-outbound-click"
                                                data-clicklabel="PlayStore"
                                                target="_blank"
                                                rel="noopener noreferrer">
-                                                <i class="fab fa-android mr-2 fa-lg"></i>Download our App</a>
+                                                <i class="fab fa-android mr-2 fa-lg"></i>Download the App to verify </a>
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -161,9 +145,9 @@
                             <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone" width="180px">
                         </div>
                         <div class="onboarding__body">
-                            <h2 class="h4 text-primary mb-3">Reduce your excess 📉</h2>
+                            <h2 class="h4 text-primary mb-3">Your excess 📉</h2>
                             {% if device_category() == 'Mobile' %}
-                                <p>Download the so-sure app and validate your phone to reduce your excess</p>
+                                <p>The excess for your {{ policy.phone.make }} {{ policy.phone.model }} is:</p>
                                 <div class="table-responsive mb-2">
                                     <table class="table table-sm table-bordered">
                                         <thead>
@@ -176,27 +160,22 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td align="left"><small>Validated</small></td>
+                                                <td align="left"><small>Excess</small></td>
                                                 <td>&pound;{{ policy.premium.picsureexcess.damage }}</td>
                                                 <td>&pound;{{ policy.premium.picsureexcess.loss }}</td>
                                                 <td>&pound;{{ policy.premium.picsureexcess.theft }}</td>
                                             </tr>
-                                            <tr>
-                                                <td align="left"><small>Not validated</small></td>
-                                                <td>&pound;{{ policy.premium.excess.damage }}</td>
-                                                <td>&pound;{{ policy.premium.excess.loss }}</td>
-                                                <td>&pound;{{ policy.premium.excess.theft }}</td>
-                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
+                                <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
                                 {% if policy.phone.iTunes %}
                                     <a href="{{ apple_download('onboarding-mobile-one') }}"
                                        class="btn btn-primary btn-block-xs ga-outbound-click"
                                        data-clicklabel="iTunes"
                                        target="_blank"
                                        rel="noopener noreferrer">
-                                        <i class="fab fa-apple mr-2 fa-lg"></i> Download our App</a>
+                                        <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
                                 {% endif %}
                                 {% if policy.phone.googlePlay %}
                                     <a href="{{ google_download('onboarding-mobile-one') }}"
@@ -204,10 +183,10 @@
                                        data-clicklabel="PlayStore"
                                        target="_blank"
                                        rel="noopener noreferrer">
-                                        <i class="fab fa-android mr-2 fa-lg"></i> Download our App</a>
+                                        <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
                                 {% endif %}
                             {% else %}
-                                <p>Download the so-sure app and validate your phone to reduce your excess</p>
+                                <p>The excess for your {{ policy.phone.make }} {{ policy.phone.model }} is:</p>
                                 <div class="table-responsive mb-5">
                                     <table class="table table-sm table-bordered">
                                         <thead>
@@ -220,21 +199,15 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td align="left">Validated</td>
+                                                <td align="left">Excess</td>
                                                 <td>&pound;{{ policy.premium.picsureexcess.damage }}</td>
                                                 <td>&pound;{{ policy.premium.picsureexcess.loss }}</td>
                                                 <td>&pound;{{ policy.premium.picsureexcess.theft }}</td>
                                             </tr>
-                                            <tr>
-                                                <td align="left">Not validated</td>
-                                                <td>&pound;{{ policy.premium.excess.damage }}</td>
-                                                <td>&pound;{{ policy.premium.excess.loss }}</td>
-                                                <td>&pound;{{ policy.premium.excess.theft }}</td>
-                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
-
+                                <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
                                 <div class="d-flex justify-content-center">
                                     <a href="#"
                                        class="btn btn-outline-grey opacity-50"
@@ -257,14 +230,14 @@
                                            data-clicklabel="iTunes"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            <i class="fab fa-apple mr-2 fa-lg"></i>Download our App</a>
+                                            <i class="fab fa-apple mr-2 fa-lg"></i>Download the App to verify</a>
                                     {% endif %}
                                     {% if policy.phone.googlePlay %}
                                         <a href="{{ google_download('onboarding-desktop-two') }}"  class="link-subtle ga-outbound-click"
                                            data-clicklabel="PlayStore"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            <i class="fab fa-android mr-2 fa-lg"></i>Download our App</a>
+                                            <i class="fab fa-android ml-2 fa-lg"></i>Download the App to verify </a>
                                     {% endif %}
                                 </div>
                             {% endif %}
@@ -400,7 +373,7 @@
                 <div class="carousel-item">
                     <div class="onboarding__item pt-4 px-4 mx-lg-auto">
                         <div class="onboarding__body">
-                            <h2 class="h3 text-primary mb-3">Thanks for choosing <span class="text-nowrap">so-sure 😊</span></h2>
+                            <h2 class="h3 text-primary mb-3">Almost there 😊</h2>
                             <div class="summary-cardbox">
                                 <div class="summary-cardbox__header">
                                     <h4 class="text-primary mb-0">Policy Summary</h4>
@@ -431,15 +404,27 @@
                                             </div>
                                             <div class="col-lg-6">
                                                 <h5 class="text-primary">Start/End Date:</h5>
-                                                <p>{{ policy.start|date('d/m/y', 'Europe/London') }} - {{ policy.end|date('d/m/y', 'Europe/London') }}</p>
+                                                <p><strong>Your cover does NOT start till you verify your device via our app</strong></p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="summary-cardbox__cta">
-                                    <a id="policy_download" href="#" data-path="{{ path('json_policyterms') }}" class="disabled">
-                                        Preparing Policy Details
-                                        <i class="fas fa-circle-notch fa-spin"></i></a>
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('onboarding-desktop-two') }}"
+                                           class="ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the App to verify</a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('onboarding-desktop-two') }}"  class="ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-android ml-2 fa-lg"></i> Download the App to verify </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -489,10 +474,6 @@
     </section>
 
     {# Page Modal #}
-    {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
-        {% include 'AppBundle::User/_starlingModal.html.twig' %}
-    {% endif %}
-
 {% endblock %}
 
 {% block footer %}

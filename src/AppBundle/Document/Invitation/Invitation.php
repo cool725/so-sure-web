@@ -297,6 +297,7 @@ abstract class Invitation
         if (!$this->getPolicy() || !in_array($this->getPolicy()->getStatus(), [
             Policy::STATUS_ACTIVE,
             Policy::STATUS_UNPAID,
+            Policy::STATUS_PICSURE_REQUIRED
         ])) {
             return false;
         }

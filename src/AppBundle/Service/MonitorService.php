@@ -342,13 +342,13 @@ class MonitorService
                         'Intercom out of sync: %s is missing a premium attribute.',
                         $policy->getUser()->getEmail()
                     );
-                } elseif ($policy->isActive(true) && $attributes->Premium <= 0) {
+                } elseif ($policy->isActive() && $attributes->Premium <= 0) {
                     $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s has a 0 premium in intercom, yet has a policy. Requeued.',
                         $policy->getUser()->getEmail()
                     );
-                } elseif (!$policy->isActive(true) && $attributes->Premium > 0) {
+                } elseif (!$policy->isActive() && $attributes->Premium > 0) {
                     // check what the expected premium for the user should be
                     // to ensure we're not checking an older expired policy where the is a renewal in place
                     if ($policy->getUser()->getAnalytics()['annualPremium'] > 0) {

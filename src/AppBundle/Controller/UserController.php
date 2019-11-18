@@ -142,7 +142,7 @@ class UserController extends BaseController
                     );
                 }
             }
-        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
             // mainly for facebook registration, although makes sense for all users
             // check for canPurchasePolicy is necessary to prevent redirect loop
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
@@ -494,25 +494,27 @@ class UserController extends BaseController
                 } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
                     $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
                 }
-                if ($url) {
-                    $this->addFlash(
-                        'warning-raw',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
-                            $checkPolicy->getPolicyNumber(),
-                            $url
-                        )
-                    );
-                } else {
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'warning-raw',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
-                            $checkPolicy->getPolicyNumber()
-                        )
-                    );
-                    // @codingStandardsIgnoreEnd
+                if (!$checkPolicy->getPolicyTerms()->isPicsureRequired()) {
+                    if ($url) {
+                        $this->addFlash(
+                            'warning-raw',
+                            sprintf(
+                                'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
+                                $checkPolicy->getPolicyNumber(),
+                                $url
+                            )
+                        );
+                    } else {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'warning-raw',
+                            sprintf(
+                                'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
+                                $checkPolicy->getPolicyNumber()
+                            )
+                        );
+                        // @codingStandardsIgnoreEnd
+                    }
                 }
             }
         }
@@ -1184,6 +1186,8 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Route("/complete", name="user_instore")
      * @Route("/complete/{id}", name="user_instore_id")
+     * @Route("/validation-required", name="user_validation_required")
+     * @Route("/validation-required/{id}", name="user_validation_required_id")
      * @Template
      */
     public function welcomeAction(Request $request, $id = null)
@@ -1193,7 +1197,7 @@ class UserController extends BaseController
         $invitationService = $this->get('app.invitation');
         $policyService = $this->get('app.policy');
 
-        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
 
@@ -1247,6 +1251,8 @@ class UserController extends BaseController
 
         if ($request->get('_route') == 'user_instore') {
             $template = 'AppBundle:User:complete.html.twig';
+        } elseif ($request->get('_route') == 'user_validation_required') {
+            $template = 'AppBundle:User:validationRequired.html.twig';
         }
 
         return $this->render($template, [
@@ -1513,7 +1519,15 @@ class UserController extends BaseController
         $user = $this->getUser();
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
-            throw $this->createNotFoundException('No active policy found');
+            if ($user->hasPicsureRequiredPolicy()) {
+                $this->addFlash(
+                    "error",
+                    "Reminder: You can only claim once you have validated your phone."
+                );
+                return $this->redirectToRoute("user_home");
+            } else {
+                throw $this->createNotFoundException('No active policy found');
+            }
         }
         // If the user has an open claim on all of their policies then they can't make a claim right now so send them to
         // one of their open claims.
