@@ -172,6 +172,28 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
+    public function testPhoneByIdAndAggregatorTrue()
+    {
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
+        $phone =  $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 7']);
+        $url = sprintf('/phone-insurance/%s?aggregator=true', $phone->getId());
+        $redirectUrl = sprintf(
+            '/phone-insurance/%s+%s+%sGB?aggregator=true',
+            $phone->getMakeCanonical(),
+            $phone->getEncodedModelCanonical(),
+            $phone->getMemory()
+        );
+        $crawler = self::$client->request('GET', $url);
+
+        // should be redirected to redirect url
+        $this->assertEquals(301, $this->getClientResponseStatusCode());
+        $this->assertEquals($redirectUrl, $this->getClientResponseTargetUrl());
+        $crawler = self::$client->followRedirect();
+
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
+    }
+
     public function testQuoteMe()
     {
         self::$client->request('GET', '/quote-me/Apple+iPhone+XS+256GB');
