@@ -2,152 +2,117 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Samsung Galaxy S9 versus the S9+{% endblock %}
+{% block title %}Samsung Galaxy S9 versus the S9+ - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Firstly they are even more brilliant than the previous Galaxy phones. Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ..festivals here we come! Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place)."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Samsung Galaxy S9 versus the S9+</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Samsung Galaxy S9 versus the S9+</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Fiona</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">Samsung Galaxy S9 versus the S9+</span>
-                                            <meta property="position" content="3">
+                                            <time>Jul 24, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">Samsung Galaxy S9 versus the S9+</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Fiona</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Jul 24, 2018</time>
-                                    </li>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                {# image #}
+                                <h2>So what do you need to know about this latest beaut from Samsung?</h2>
+                                <p>Firstly they are even more brilliant than the previous Galaxy phones.  Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ...festivals here we come!  Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place).</p>
+                                <h2>So what's the difference between the Galaxy S9 ad the S9+?</h2>
+                                <h4>Size - does it matter 😉?</h4>
+                                <p>The S9 is 5.8 inches and the S9+ is 6.2 inches.</p>
+                                <h4>Battery Life</h4>
+                                <p>The S9 has slightly less battery life than the S9+ (3,000 mAh - which in layman's terms is well over 10 hours) versus the S9+ which has 3,50 mAh.  We think both of these have wicked battery life so you shouldn't be caught short before you get home to a charger on the way home from work</p>
+                                <h4>RAM</h4>
+                                <p>The S9 has 4GB of RAM and the S9+ 6GB of RAM</p>
+                                <h4>The Camera</h4>
+                                <p>Ok so lets be honest, we use our phones mainly for Whats App, Instagram, Snapchat, Facebook, taking pictures, videos and boomerangs... did we miss any? So knowing that, the S9+ stand out feature is the camera.  It features a dual lens that offers super slow mo, optical image stabilisation, and a fantastic zoom (2x). The S9 on the other had, although still brilliant offers a single camera lens.</p>
+                                <h4>Other Features</h4>
+                                <p>They are both water resistant and can be submerged in up to 1.5 meters of water for 30 minutes (although we don't recommend trying it as we are insurers after all).</p>
+                                <p>Both phones also have MicroSD card slots and now they come in both 64GB and 256GB.</p>
+                                <p>Lastly they have improved the design, they are now much more comfortable to hold and the fingerprint sensor has been moved below the camera module, so it's even easier to access your phone.</p>
+                                <h2>Where do I buy one?</h2>
+                                <p>The Galaxy S9 and S9+ are available at most of the major UK networks and retailers (EE, O2, Three, GiffGaff, Vodafone, Carphone Warehouse etc).  It's worth shopping about to get a great deal but here are a few deals we found for you:</p>
+                                <ul>
+                                    <li>EE are saving you £200 on the Sunrise Gold Model</li>
+                                    <li>Carphone Warehouse are giving you a free sim card</li>
                                 </ul>
-                            </hgroup>
-                        </header>
-                        {# image #}
-                        <h2>So what do you need to know about this latest beaut from Samsung?</h2>
-                        <p>Firstly they are even more brilliant than the previous Galaxy phones.  Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ...festivals here we come!  Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place).</p>
-                        <h2>So what's the difference between the Galaxy S9 ad the S9+?</h2>
-                        <h4>Size - does it matter 😉?</h4>
-                        <p>The S9 is 5.8 inches and the S9+ is 6.2 inches.</p>
-                        <h4>Battery Life</h4>
-                        <p>The S9 has slightly less battery life than the S9+ (3,000 mAh - which in layman's terms is well over 10 hours) versus the S9+ which has 3,50 mAh.  We think both of these have wicked battery life so you shouldn't be caught short before you get home to a charger on the way home from work</p>
-                        <h4>RAM</h4>
-                        <p>The S9 has 4GB of RAM and the S9+ 6GB of RAM</p>
-                        <h4>The Camera</h4>
-                        <p>Ok so lets be honest, we use our phones mainly for Whats App, Instagram, Snapchat, Facebook, taking pictures, videos and boomerangs... did we miss any? So knowing that, the S9+ stand out feature is the camera.  It features a dual lens that offers super slow mo, optical image stabilisation, and a fantastic zoom (2x). The S9 on the other had, although still brilliant offers a single camera lens.</p>
-                        <h4>Other Features</h4>
-                        <p>They are both water resistant and can be submerged in up to 1.5 meters of water for 30 minutes (although we don't recommend trying it as we are insurers after all).</p>
-                        <p>Both phones also have MicroSD card slots and now they come in both 64GB and 256GB.</p>
-                        <p>Lastly they have improved the design, they are now much more comfortable to hold and the fingerprint sensor has been moved below the camera module, so it's even easier to access your phone.</p>
-                        <h2>Where do I buy one?</h2>
-                        <p>The Galaxy S9 and S9+ are available at most of the major UK networks and retailers (EE, O2, Three, GiffGaff, Vodafone, Carphone Warehouse etc).  It's worth shopping about to get a great deal but here are a few deals we found for you:</p>
-                        <ul>
-                            <li>EE are saving you £200 on the Sunrise Gold Model</li>
-                            <li>Carphone Warehouse are giving you a free sim card</li>
-                        </ul>
-                        <h2>Are you insured?</h2>
-                        <p>The Galaxy S9 might be water resistant, but if you're planning on buying it you should also think about getting insurance <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy S9'}) }}">Galaxy S9 insurance</a> or <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy S9+'}) }}">Galaxy S9+ insurance</a>. so-sure can cover you instantly for loss, theft, accidental damage, and out of warranty breakdown from just &pound;10.49 per month - so get peace of mind and get a quote today for your shiny new Samsung Galaxy.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                <h2>Are you insured?</h2>
+                                <p>The Galaxy S9 might be water resistant, but if you're planning on buying it you should also think about getting insurance <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy S9'}) }}">Galaxy S9 insurance</a> or <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy S9+'}) }}">Galaxy S9+ insurance</a>. so-sure can cover you instantly for loss, theft, accidental damage, and out of warranty breakdown from just &pound;10.49 per month - so get peace of mind and get a quote today for your shiny new Samsung Galaxy.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

@@ -991,8 +991,6 @@ class PolicyService
         $date->setTimezone(SoSure::getSoSureTimezone());
         $date->setTime(3, 0);
 
-        $minDate = (clone $now)->sub(new \DateInterval("P4D"));
-
         $paymentItem = null;
         if (!$numPayments) {
             if ($policy->getPremiumInstallments()) {
@@ -1089,14 +1087,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $minDate) {
-                $policy->addScheduledPayment($scheduledPayment);
-            } else {
-                $this->logger->error(sprintf(
-                    'Attempted to set scheduled payment for before today for policy \'%s\'.',
-                    $policy->getId()
-                ));
-            }
+            $policy->addScheduledPayment($scheduledPayment);
         }
         $this->dm->flush();
     }
