@@ -32,7 +32,7 @@ Encore
     .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
     .addEntry('purchase-remainder', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-remainder.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
-    .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
+    .addEntry('content-pages', './src/AppBundle/Resources/public/rebrand/js/pages/content-pages.js')
     .addEntry('onboarding', './src/AppBundle/Resources/public/rebrand/js/pages/onboarding.js')
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')

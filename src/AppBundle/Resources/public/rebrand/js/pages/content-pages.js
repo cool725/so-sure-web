@@ -1,6 +1,6 @@
 // faq.js
 
-require('../../sass/pages/faq.scss');
+require('../../sass/pages/content-pages.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/scrollspy');
@@ -14,7 +14,7 @@ $(function() {
     // Init scrollspy
     $('body').scrollspy({
         target: '#faq-nav',
-        offset: 55
+        offset: 200
     });
 
     $('#faq-nav a').on('click', function(e) {

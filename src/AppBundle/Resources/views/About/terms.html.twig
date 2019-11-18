@@ -2,145 +2,126 @@
 
 {# Set vars #}
 {% set body_class = 'privacy-policy' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Terms &amp; Conditions{% endblock %}
+{% block title %}Terms &amp; Conditions | so-sure{% endblock %}
 {% block meta %}
 
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="faq">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="faq__main__container">
-                <div class="faq__main px-4 px-lg-5">
-                    <div class="breadcrumbs">
-                        <ul class="list-inline"
-                            vocab="https://schema.org/"
-                            typeof="BreadcrumbList">
-                            <li class="list-inline-item"
-                                property="itemListElement"
-                                typeof="ListItem">
-                                <a href="{{ path('homepage') }}"
-                                   class="text-primary"
-                                   property="item"
-                                   typeof="WebPage">
-                                   <span property="name">Home</span>
-                                </a>
-                                <meta property="position" content="1">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cp__content">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-primary"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-zaffre"></i>
+                                </li>
+                                <li class="list-inline-item text-zaffre"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Terms &amp; Conditions</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
+                        <h1 class="text-primary mb-4">Terms &amp; Conditions</h1>
+                        <p class="mb-5">The following terminology applies to this Terms of Use, Cookies and Privacy Policy and any or all Agreements: “You” and “Your” refers to you, the person accessing this website and accepting the Company’s terms and conditions. "The Company", “Ourselves”, “We” and "Us", refers to so-sure Limited. “Party”, “Parties”, or “Us”, refers to both You and ourselves, or either You or ourselves.</p>
+                        <h2 class="h5 text-zaffre">Terms of Use</h2>
+                        <p>These Terms of Use (together with the documents referred to in it) tell you the terms on which you may make use of our website, <a href="https://www.wearesosure.com">https://www.wearesosure.com</a>, whether as a guest or a registered user. Use of our website includes accessing, browsing, or registering to use our website.</p>
+                        <p class="mb-4">Please read these Terms of Use carefully before you start to use our website. By using our website, you confirm that you accept these Terms of Use and that you agree to comply with them. If you do not agree to these Terms of Use, you must not use our website.</p>
+                        <h2 class="h5 text-zaffre">Other Applicable Terms</h2>
+                        <p>These Terms of Use refer to the following additional terms, which also apply to your use of our website:</p>
+                        <ul class="mb-4">
+                            <li>Our Cookies and Privacy Policy, which sets out the terms on which we process any personal data we collect from you, or that you provide to us and which gives you information about the cookies on our website. By using our website, you consent to such processing and use of cookies and you warrant that all data provided by you is accurate.</li>
+                            <li>If you purchase a so-sure insurance policy, our Policy T&amp;Cs will apply.</li>
+                        </ul>
+                        <h2 class="h5 text-zaffre">Information About Us</h2>
+                        <p class="mb-4"><a href="https://www.wearesosure.com">https://www.wearesosure.com</a> is a website operated by so-sure Limited. We are registered in England and Wales under company number 9365669 and have our registered office at {{ business_address|replace({'\n':','}) }}. We are a limited company.</p>
+                        <h2 class="h5 text-zaffre">Changes to These Terms</h2>
+                        <p>The Company reserves the right to change these conditions from time to time as it sees fit and your continued use of the website will signify your acceptance of any adjustment to these terms.</p>
+                        <p class="mb-4">We do not guarantee that our website, or any content on it, will be free from errors or omissions.</p>
+                        <h2 class="h5 text-zaffre">Availability</h2>
+                        <p>Our site is made available free of charge.</p>
+                        <p>We do not guarantee that our website, or any content on it, will always be available or be uninterrupted. Access to our site is permitted on a temporary basis. We may suspend, withdraw, discontinue or change all or any part of our website without notice. We will not be liable to you if for any reason our website is unavailable at any time or for any period.</p>
+                        <p>You are responsible for making all arrangements necessary for you to have access to our website.</p>
+                        <p>You are also responsible for ensuring that all persons who access our website through your internet connection are aware of these Terms of Use and other applicable terms and conditions, and that they comply with them.</p>
+                        <h2 class="h5 text-zaffre">Your Account and Password</h2>
+                        <p>If you are provided with, a user identification code, password or any other piece of information as part of our security procedures, you must treat such information as confidential. You must not disclose it to any third party.</p>
+                        <p>We have the right to disable any user identification code or password, whether chosen by you or allocated by us, at any time, if in our reasonable opinion you have failed to comply with any of the provisions of these Terms of Use.</p>
+                        <p class="mb-4">If you know or suspect that anyone other than you knows your user identification code or password, you must promptly notify us at <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">hello</a>.</p>
+                        <h2 class="h5 text-zaffre">Copyright Notice and Intellectual Property Rights</h2>
+                        <p>Copyright and other relevant intellectual property rights exist on all text relating to the Company’s services and the full content of this website. You may print off a copy, and may download extracts, of any page(s) from our website for your personal use and you may draw the attention of others within your organisation to content posted on our website.</p>
+                        <p>You must not modify the paper or digital copies of any materials you have printed off or downloaded in any way.</p>
+                        <p>Redistribution or republication of any part of this website or its content is prohibited, including such by framing or other similar or any other means, without the express written consent of the company.</p>
+                        <p class="mb-4">If you print off, copy or download any part of our website in breach of these Terms of Use, your right to use our website will cease immediately and you must, at our option, return or destroy any copies of the materials you have made.</p>
+                        <h2 class="h5 text-zaffre">Trade Marks</h2>
+                        <p class="mb-4">o-sure is registered as a trade mark of so-sure Limited within the European Union.</p>
+                        <h2 class="h5 text-zaffre">Exclusions and Limitations</h2>
+                        <p>The information on this website is provided on an "as is" basis. To the fullest extent permitted by law, this Company:</p>
+                        <ul>
+                            <li>
+                                excludes all representations and warranties relating to this website and its contents or which is or may be provided by any affiliates or any other third party, including in relation to any inaccuracies or omissions in this website and/or the Company’s literature; and
                             </li>
-                            <li class="list-inline-item text-white">
-                                <i class="fal fa-angle-right text-zaffre"></i>
-                            </li>
-                            <li class="list-inline-item text-zaffre"
-                                property="itemListElement"
-                                typeof="ListItem">
-                                <span property="name">Terms &amp; Conditions</span>
-                                <meta property="position" content="2">
+                            <li>
+                                excludes all liability for damages arising out of or in connection with your use of this website. This includes, without limitation, direct loss, loss of business or profits (whether or not the loss of such profits was foreseeable, arose in the normal course of things or you have advised this Company of the possibility of such potential loss), damage caused to your computer, computer software, systems and programs and the data thereon or any other direct or indirect, consequential and incidental damages.
                             </li>
                         </ul>
+                        <p class="mb-4">Nothing in these Terms of Use excludes or limits liability for death or personal injury caused by our negligence, or our fraud, or any other liability that cannot be excluded or limited by English law. None of your statutory rights as a consumer are affected.</p>
+                        <h2 class="h5 text-zaffre">Force Majeure</h2>
+                        <p class="mb-4">Neither party shall be liable to the other for any failure to perform any obligation under any Terms of Use or Policy Terms &amp; Conditions which is due to an event beyond the control of such party including but not limited to any Act of God, terrorism, war, political insurgence, insurrection, riot, civil unrest, act of civil or military authority, uprising, earthquake, flood or any other natural or man-made eventuality outside of our control, which causes the termination of any contract entered into, nor which could have been reasonably foreseen. Any Party affected by such event shall forthwith inform the other Party of the same and shall use all reasonable endeavours to comply with the terms and conditions of any Terms of Use or Policy Terms &amp; Conditions contained herein.</p>
+                        <h2 class="h5 text-zaffre">No Waiver</h2>
+                        <p class="mb-4">Failure of either Party to insist upon strict performance of any provision of this or any Terms of Use or the failure of either Party to exercise any right or remedy to which it, he or they are entitled hereunder shall not constitute a waiver thereof and shall not cause a diminution of the obligations under this or any Terms of Use. No waiver of any of the provisions of this or any Terms of Use shall be effective unless it is expressly stated to be such and signed by both Parties.</p>
+                        <h2 class="h5 text-zaffre">Links to This Website</h2>
+                        <p>If you create a link to a page of this website you do so at your own risk and the exclusions and limitations set out above will apply to your use of this website by linking to it.</p>
+                        <p class="mb-4">We do not endorse and cannot be held responsible for any views expressed by third parties linking to our website.</p>
+                        <h2 class="h5 text-zaffre">Links from This Website</h2>
+                        <p class="mb-4">Where our website contains links to other websites and resources provided by third parties, these links are provided for your information only. We have no control over the contents of those websites or resources.</p>
+                        <h2 class="h5 text-zaffre">Applicable Law</h2>
+                        <p class="mb-4">These Terms of Use, its subject matter and its formation, are governed by English law. You and we both agree to that the courts of England and Wales will have non-exclusive jurisdiction.</p>
+                        <h2 class="h5 text-zaffre">Severability</h2>
+                        <p class="mb-4">Each of the paragraphs of these Terms of Use operates separately. If any court or relevant authority decides that any of them are unlawful, the remaining paragraphs will remain in full force and effect.</p>
+                        <h2 class="h5 text-zaffre">Contact Us</h2>
+                        <p class="mb-5">We can be contacted at <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">hello</a> or by using the forms available on the Contact Us section of our website.</p>
+                        <br><br>
                     </div>
-                    <h1 class="text-primary mb-4">Terms &amp; Conditions</h1>
-                    <p class="mb-5">The following terminology applies to this Terms of Use, Cookies and Privacy Policy and any or all Agreements: “You” and “Your” refers to you, the person accessing this website and accepting the Company’s terms and conditions. "The Company", “Ourselves”, “We” and "Us", refers to so-sure Limited. “Party”, “Parties”, or “Us”, refers to both You and ourselves, or either You or ourselves.</p>
-                    <h2 class="h5 text-zaffre">Terms of Use</h2>
-                    <p>These Terms of Use (together with the documents referred to in it) tell you the terms on which you may make use of our website, <a href="https://www.wearesosure.com">https://www.wearesosure.com</a>, whether as a guest or a registered user. Use of our website includes accessing, browsing, or registering to use our website.</p>
-                    <p class="mb-4">Please read these Terms of Use carefully before you start to use our website. By using our website, you confirm that you accept these Terms of Use and that you agree to comply with them. If you do not agree to these Terms of Use, you must not use our website.</p>
-                    <h2 class="h5 text-zaffre">Other Applicable Terms</h2>
-                    <p>These Terms of Use refer to the following additional terms, which also apply to your use of our website:</p>
-                    <ul class="mb-4">
-                        <li>Our Cookies and Privacy Policy, which sets out the terms on which we process any personal data we collect from you, or that you provide to us and which gives you information about the cookies on our website. By using our website, you consent to such processing and use of cookies and you warrant that all data provided by you is accurate.</li>
-                        <li>If you purchase a so-sure insurance policy, our Policy T&amp;Cs will apply.</li>
-                    </ul>
-                    <h2 class="h5 text-zaffre">Information About Us</h2>
-                    <p class="mb-4"><a href="https://www.wearesosure.com">https://www.wearesosure.com</a> is a website operated by so-sure Limited. We are registered in England and Wales under company number 9365669 and have our registered office at {{ business_address|replace({'\n':','}) }}. We are a limited company.</p>
-                    <h2 class="h5 text-zaffre">Changes to These Terms</h2>
-                    <p>The Company reserves the right to change these conditions from time to time as it sees fit and your continued use of the website will signify your acceptance of any adjustment to these terms.</p>
-                    <p class="mb-4">We do not guarantee that our website, or any content on it, will be free from errors or omissions.</p>
-                    <h2 class="h5 text-zaffre">Availability</h2>
-                    <p>Our site is made available free of charge.</p>
-                    <p>We do not guarantee that our website, or any content on it, will always be available or be uninterrupted. Access to our site is permitted on a temporary basis. We may suspend, withdraw, discontinue or change all or any part of our website without notice. We will not be liable to you if for any reason our website is unavailable at any time or for any period.</p>
-                    <p>You are responsible for making all arrangements necessary for you to have access to our website.</p>
-                    <p>You are also responsible for ensuring that all persons who access our website through your internet connection are aware of these Terms of Use and other applicable terms and conditions, and that they comply with them.</p>
-                    <h2 class="h5 text-zaffre">Your Account and Password</h2>
-                    <p>If you are provided with, a user identification code, password or any other piece of information as part of our security procedures, you must treat such information as confidential. You must not disclose it to any third party.</p>
-                    <p>We have the right to disable any user identification code or password, whether chosen by you or allocated by us, at any time, if in our reasonable opinion you have failed to comply with any of the provisions of these Terms of Use.</p>
-                    <p class="mb-4">If you know or suspect that anyone other than you knows your user identification code or password, you must promptly notify us at <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">hello</a>.</p>
-                    <h2 class="h5 text-zaffre">Copyright Notice and Intellectual Property Rights</h2>
-                    <p>Copyright and other relevant intellectual property rights exist on all text relating to the Company’s services and the full content of this website. You may print off a copy, and may download extracts, of any page(s) from our website for your personal use and you may draw the attention of others within your organisation to content posted on our website.</p>
-                    <p>You must not modify the paper or digital copies of any materials you have printed off or downloaded in any way.</p>
-                    <p>Redistribution or republication of any part of this website or its content is prohibited, including such by framing or other similar or any other means, without the express written consent of the company.</p>
-                    <p class="mb-4">If you print off, copy or download any part of our website in breach of these Terms of Use, your right to use our website will cease immediately and you must, at our option, return or destroy any copies of the materials you have made.</p>
-                    <h2 class="h5 text-zaffre">Trade Marks</h2>
-                    <p class="mb-4">o-sure is registered as a trade mark of so-sure Limited within the European Union.</p>
-                    <h2 class="h5 text-zaffre">Exclusions and Limitations</h2>
-                    <p>The information on this website is provided on an "as is" basis. To the fullest extent permitted by law, this Company:</p>
-                    <ul>
-                        <li>
-                            excludes all representations and warranties relating to this website and its contents or which is or may be provided by any affiliates or any other third party, including in relation to any inaccuracies or omissions in this website and/or the Company’s literature; and
-                        </li>
-                        <li>
-                            excludes all liability for damages arising out of or in connection with your use of this website. This includes, without limitation, direct loss, loss of business or profits (whether or not the loss of such profits was foreseeable, arose in the normal course of things or you have advised this Company of the possibility of such potential loss), damage caused to your computer, computer software, systems and programs and the data thereon or any other direct or indirect, consequential and incidental damages.
-                        </li>
-                    </ul>
-                    <p class="mb-4">Nothing in these Terms of Use excludes or limits liability for death or personal injury caused by our negligence, or our fraud, or any other liability that cannot be excluded or limited by English law. None of your statutory rights as a consumer are affected.</p>
-                    <h2 class="h5 text-zaffre">Force Majeure</h2>
-                    <p class="mb-4">Neither party shall be liable to the other for any failure to perform any obligation under any Terms of Use or Policy Terms &amp; Conditions which is due to an event beyond the control of such party including but not limited to any Act of God, terrorism, war, political insurgence, insurrection, riot, civil unrest, act of civil or military authority, uprising, earthquake, flood or any other natural or man-made eventuality outside of our control, which causes the termination of any contract entered into, nor which could have been reasonably foreseen. Any Party affected by such event shall forthwith inform the other Party of the same and shall use all reasonable endeavours to comply with the terms and conditions of any Terms of Use or Policy Terms &amp; Conditions contained herein.</p>
-                    <h2 class="h5 text-zaffre">No Waiver</h2>
-                    <p class="mb-4">Failure of either Party to insist upon strict performance of any provision of this or any Terms of Use or the failure of either Party to exercise any right or remedy to which it, he or they are entitled hereunder shall not constitute a waiver thereof and shall not cause a diminution of the obligations under this or any Terms of Use. No waiver of any of the provisions of this or any Terms of Use shall be effective unless it is expressly stated to be such and signed by both Parties.</p>
-                    <h2 class="h5 text-zaffre">Links to This Website</h2>
-                    <p>If you create a link to a page of this website you do so at your own risk and the exclusions and limitations set out above will apply to your use of this website by linking to it.</p>
-                    <p class="mb-4">We do not endorse and cannot be held responsible for any views expressed by third parties linking to our website.</p>
-                    <h2 class="h5 text-zaffre">Links from This Website</h2>
-                    <p class="mb-4">Where our website contains links to other websites and resources provided by third parties, these links are provided for your information only. We have no control over the contents of those websites or resources.</p>
-                    <h2 class="h5 text-zaffre">Applicable Law</h2>
-                    <p class="mb-4">These Terms of Use, its subject matter and its formation, are governed by English law. You and we both agree to that the courts of England and Wales will have non-exclusive jurisdiction.</p>
-                    <h2 class="h5 text-zaffre">Severability</h2>
-                    <p class="mb-4">Each of the paragraphs of these Terms of Use operates separately. If any court or relevant authority decides that any of them are unlawful, the remaining paragraphs will remain in full force and effect.</p>
-                    <h2 class="h5 text-zaffre">Contact Us</h2>
-                    <p class="mb-5">We can be contacted at <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">hello</a> or by using the forms available on the Contact Us section of our website.</p>
-                    <br><br>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block">
+                    <div class="px-4 pb-4 pt-5 p-lg-5 text-center">
+                        <div class="cp__nav">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
+                            <h2 class="text-dodger-blue mb-5">Terms &amp; Conditions 🔏</h2>
+                            <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            {# Sub Content #}
-            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="faq__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="faq__sub text-center">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
-                    <h2 class="text-dodger-blue mb-5">Terms &amp; Conditions 🔏</h2>
-                    <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
-                </div>
-            </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/faq.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
 
