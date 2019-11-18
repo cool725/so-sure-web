@@ -73,8 +73,8 @@
                                 &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
-                        {% if feature_enabled('apply-sign-up-bonus') %}
-                            <p class="text-white text-center text-lg-left mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
+                        {% if validation_required is not null %}
+                            <p class="text-white text-center text-lg-left mb-lg-4">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
                         {% endif %}
                         <div class="qpw__h5 h5 d-block d-lg-none text-center">
                             <a href="#qpw-info-mobile"
@@ -83,7 +83,7 @@
                                 see full details <i class="fas fa-caret-down ml-2"></i>
                             </a>
                         </div>
-                        <div class="qpw__footer d-none d-lg-block mt-5 pt-lg-5">
+                        <div class="qpw__footer d-none d-lg-block">
                             <div class="purchase__footer__text">
                                 <h2 class="h4 text-columbia-blue-e">An amazing level of cover:</h2>
                                 <ul class="list-unstyled icn-fa-list">

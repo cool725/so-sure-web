@@ -142,6 +142,19 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
 
+        // Picsure Required Policies - Cancel
+        $cancelled = $this->policyService->cancelOverduePicsurePolicies($dryRun);
+        $copy = 'Required Picsure overdue cancelled policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - should cancel policy (picsure overdue)';
+        }
+        foreach ($cancelled as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%d picsure required overdue policies processed', count($cancelled));
+        $ignoreLineCount += 2;
+        $lines[] = '';
+
         // Pending Cancellation Policies - Cancel
         $pendingCancellation = $this->policyService->cancelPoliciesPendingCancellation($prefix, $dryRun);
         $copy = 'User Requested Cancellation Policy';

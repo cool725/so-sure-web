@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
@@ -8,6 +9,7 @@ use AppBundle\Document\Feature;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Repository\PolicyTermsRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -15,7 +17,8 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
-use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use AppBundle\Document\LogEntry;
+use AppBundle\Repository\LogEntryRepository;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
@@ -67,7 +70,6 @@ use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\AlreadyParticipatingException;
 
-use Gedmo\Loggable\Document\LogEntry;
 use Symfony\Component\Templating\EngineInterface;
 
 class PolicyService
@@ -325,8 +327,12 @@ class PolicyService
         $serialNumber,
         IdentityLog $identityLog = null,
         $phoneData = null,
-        $modelNumber = null
+        $modelNumber = null,
+        $aggregator = false
     ) {
+        if (mb_strtolower($phone->getMake()) != 'apple') {
+            $aggregator = false;
+        }
         try {
             $this->validateUser($user);
             $this->validateImei($imei);
@@ -354,10 +360,10 @@ class PolicyService
             $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
             $policy->setPhoneData($phoneData);
-
+            /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
-            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $latestTerms = $policyTermsRepo->findLatestTerms($aggregator);
             $policy->init($user, $latestTerms);
             if ($checkmend) {
                 $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
@@ -558,7 +564,11 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                    $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
+                } else {
+                    $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                }
                 $this->dm->flush();
             }
 
@@ -783,8 +793,9 @@ class PolicyService
         }
 
         $template = sprintf(
-            'AppBundle:Pdf:policyScheduleV%d.html.twig',
-            $policy->getPolicyTerms()->getVersionNumber()
+            'AppBundle:Pdf:policyScheduleV%d%s.html.twig',
+            $policy->getPolicyTerms()->getVersionNumber(),
+            $policy->getPolicyTerms()->isPicSureRequired() ? "_R" : ""
         );
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
@@ -1147,14 +1158,13 @@ class PolicyService
         $skipUnpaidMinTimeframeCheck = false,
         $fullRefund = false
     ) {
-        if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
+        if ($reason == Policy::CANCELLED_UNPAID && $policy->getStatus() == Policy::STATUS_UNPAID &&
+            !$skipUnpaidMinTimeframeCheck
+        ) {
             /** @var LogEntryRepository $logRepo */
             $logRepo = $this->dm->getRepository(LogEntry::class);
-            /** @var LogEntry $history */
-            $history = $logRepo->findOneBy([
-                'objectId' => $policy->getId(),
-                'data.status' => Policy::STATUS_UNPAID,
-            ], ['loggedAt' => 'desc']);
+            /** @var LogEntry|null $history */
+            $history = $logRepo->findRecentStatus($policy);
             $now = $date;
             if (!$now) {
                 $now = \DateTime::createFromFormat('U', time());
@@ -1403,7 +1413,9 @@ class PolicyService
         if (!$this->mailer) {
             return;
         }
-
+        if ($policy->getCancelledReason() == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
+            return;
+        }
         if (!$baseTemplate) {
             $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
             if ($policy->isCancelledAndPaymentOwed()) {
@@ -1770,7 +1782,39 @@ class PolicyService
                 $this->logger->error($msg, ['exception' => $e]);
             }
         }
+        return $cancelled;
+    }
 
+    /**
+     * Cancels all policies that entered the picsure required stage 14 days ago or more.
+     * @param boolean $dry is whether to not really cancel them but just pretend.
+     * @return array containing the ids and policy numbers of the cancelled or pretend cancelled policies.
+     */
+    public function cancelOverduePicsurePolicies($dry)
+    {
+        /** @var LogEntryRepository $logEntryRepo */
+        $logEntryRepo = $this->dm->getRepository(LogEntry::class);
+        $cutoffDate = (new \DateTime())->sub(new \DateInterval("P14D"));
+        $cancelled = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_PICSURE_REQUIRED]);
+        foreach ($policies as $policy) {
+            /** @var LogEntry|null $history */
+            $history = $logEntryRepo->findRecentStatus($policy);
+            if (!$history) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' is in picsure-required status, but there is no relevant log entry",
+                    $policy->getId()
+                ));
+                continue;
+            }
+            if ($history->getLoggedAt() <= $cutoffDate) {
+                $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                if (!$dry) {
+                    $this->cancel($policy, Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, true);
+                }
+            }
+        }
         return $cancelled;
     }
 

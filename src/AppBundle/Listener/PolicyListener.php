@@ -46,6 +46,7 @@ class PolicyListener
         if (!in_array($connection->getSourcePolicy()->getStatus(), [
             Policy::STATUS_ACTIVE,
             Policy::STATUS_UNPAID,
+            Policy::STATUS_PICSURE_REQUIRED
         ])) {
             return;
         }

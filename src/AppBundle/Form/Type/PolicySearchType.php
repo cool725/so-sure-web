@@ -46,6 +46,7 @@ class PolicySearchType extends BaseType
             'Current w/Discount' => 'current-discounted',
             Policy::STATUS_PENDING => Policy::STATUS_PENDING,
             Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
+            Policy::STATUS_PICSURE_REQUIRED => Policy::STATUS_PICSURE_REQUIRED,
             Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
             Policy::STATUS_EXPIRED => Policy::STATUS_EXPIRED,
             Policy::STATUS_EXPIRED_CLAIMABLE => Policy::STATUS_EXPIRED_CLAIMABLE,

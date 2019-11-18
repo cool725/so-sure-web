@@ -346,6 +346,12 @@ class CheckoutService
                 'Non-token payment is being applied to active policy %s',
                 $policy->getId()
             ));
+        } elseif ($policy->getStatus() == PhonePolicy::STATUS_PICSURE_REQUIRED) {
+            // This shouldn't happen but if it does we must credit it anyway. It should not cause any harm.
+            $this->logger->error(sprintf(
+                "Picsure-required policy made non-token payment.\npolicyId: %s",
+                $policy->getId()
+            ));
         }
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
