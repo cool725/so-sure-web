@@ -91,7 +91,7 @@ class UnpaidListener
         }
         if ($number < 1) {
             $this->logger->error(sprintf(
-                "Unpaid sequence calculated at %d which is impossible.\npolicyId: %s",
+                "Unpaid sequence calculated at 0 which is impossible.\npolicyId: %s",
                 $policy->getId()
             ));
             return;
