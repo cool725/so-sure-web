@@ -1342,6 +1342,7 @@ services:
             - "@app.mailer"
             - "@app.sms"
             - "@app.feature"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.scheduledPayment.failed, method: onUnpaidEvent }
 

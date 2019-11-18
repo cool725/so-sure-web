@@ -20,6 +20,7 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use Psr\Log\LoggerInterface;
 
 /**
  * Tests that the unpaid listener sends out the right emails at the right times.
@@ -238,7 +239,13 @@ class UnpaidListenerTest extends WebTestCase
         $feature->expects($this->any())->method("isEnabled")->willReturn(false);
         /** @var FeatureService $feature */
         $feature = $feature;
-        return new UnpaidListener(self::$dm, $mailer, $smser, $feature);
+        $logger = $this->getMockBuilder(LoggerInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["error"])
+            ->getMock();
+        /** @var LoggerInterface $logger */
+        $logger = $logger;
+        return new UnpaidListener(self::$dm, $mailer, $smser, $feature, $logger);
     }
 
     /**
