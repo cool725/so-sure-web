@@ -167,33 +167,33 @@ class PhoneInsuranceController extends BaseController
      * Route for Quote ID
      * @Route("/phone-insurance/{id}", name="quote_phone", requirements={"id":"[0-9a-f]{24,24}"})
     */
-    public function phoneInsuranceIdAction($id = null, $make = null, $model = null, $memory = null)
+    public function phoneInsuranceIdAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $phone = null;
-        $decodedModel = Phone::decodeModel($model);
+
+        $data = [];
+        if ($request->get('aggregator') && $request->get('aggregator') == 'true') {
+            $data['aggregator'] = 'true';
+        }
 
         if ($id) {
             /** @var Phone $phone */
             $phone = $repo->find($id);
-            return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                'make' => $phone->getMakeCanonical(),
-                'model' => $phone->getEncodedModelCanonical(),
-                'memory' => $phone->getMemory(),
-            ], 301);
+            $data['make'] = $phone->getMakeCanonical();
+            $data['model'] = $phone->getEncodedModelCanonical();
+            $data['memory'] = $phone->getMemory();
+            return $this->redirectToRoute('phone_insurance_make_model_memory', $data, 301);
         }
 
         if (!$phone) {
             $this->get('logger')->info(sprintf(
-                'Failed to find phone for id: %s make: %s model: %s mem: %s',
-                $id,
-                $make,
-                $model,
-                $memory
+                'Failed to find phone for id: %s',
+                $id
             ));
-            return new RedirectResponse($this->generateUrl('phone_insurance'));
+            return new RedirectResponse($this->generateUrl('phone_insurance', $data));
         }
     }
 
