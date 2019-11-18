@@ -95,8 +95,9 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
 
     public function countUnpaidScheduledPayments(Policy $policy)
     {
-        if ($policy->getLastSuccessfulUserPaymentCredit()) {
-            $date = clone $policy->getLastSuccessfulUserPaymentCredit()->getDate();
+        $latestSuccessful = $policy->getLatestSuccessfulScheduledPayment();
+        if ($latestSuccessful) {
+            $date = clone $latestSuccessful->getScheduled();
         } else {
             $date = clone $policy->getStart();
         }

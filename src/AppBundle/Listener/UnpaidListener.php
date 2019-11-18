@@ -30,6 +30,8 @@ class UnpaidListener
     protected $smsService;
     /** @var FeatureService */
     protected $featureService;
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * Constructs the listener.
@@ -37,13 +39,15 @@ class UnpaidListener
      * @param MailerService   $mailerService  is the service's mail sender.
      * @param SmsService      $smsService     is the service's sms sender.
      * @param FeatureService  $featureService is used to tell the listener what features should be used.
+     * @param LoggerInterface $logger         is used to emit logging information.
      */
-    public function __construct($dm, $mailerService, $smsService, $featureService)
+    public function __construct($dm, $mailerService, $smsService, $featureService, $logger)
     {
         $this->dm = $dm;
         $this->mailerService = $mailerService;
         $this->smsService = $smsService;
         $this->featureService = $featureService;
+        $this->logger = $logger;
     }
 
     /**
@@ -82,7 +86,14 @@ class UnpaidListener
      */
     public function emailNotification(Policy $policy, $number, ScheduledPayment $nextScheduledPayment = null)
     {
-        if ($number < 1 || $number > 4) {
+        if ($number > 4) {
+            return;
+        }
+        if ($number < 1) {
+            $this->logger->error(sprintf(
+                "Unpaid sequence calculated at %d which is impossible.\npolicyId: %s",
+                $policy->getId()
+            ));
             return;
         }
         $baseTemplate = $this->selectBaseEmail($policy);

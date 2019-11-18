@@ -44,29 +44,24 @@ class ScheduledPaymentRepositoryTest extends KernelTestCase
     public function testCountUnpaidScheduledPayments()
     {
         // Two after no successful scheduled payments.
-        $a = new PhonePolicy();
-        self::$dm->persist($a);
+        $a = $this->eligiblePolicy("2019-01-01");
         $this->makeScheduledPayment($a, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-02-03");
         $this->makeScheduledPayment($a, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-02-10");
         // One after a successful scheduled payment.
-        $b = new PhonePolicy();
-        self::$dm->persist($b);
+        $b = $this->eligiblePolicy("2019-01-01");
         $this->makeScheduledPayment($b, ScheduledPayment::TYPE_SCHEDULED, true, "2018-08-03");
         $this->makeScheduledPayment($b, ScheduledPayment::TYPE_RESCHEDULED, false, "2018-08-04");
         // Three after a successful rescheduled payment.
-        $c = new PhonePolicy();
-        self::$dm->persist($c);
-        $this->makeScheduledPayment($c, ScheduledPayment::TYPE_RESCHEDULED, true, "2019-08-01");
+        $c = $this->eligiblePolicy("2019-01-01");
+        $this->makeScheduledPayment($c, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-08-01");
         $this->makeScheduledPayment($c, ScheduledPayment::TYPE_RESCHEDULED, true, "2019-08-07");
         $this->makeScheduledPayment($c, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-08-14");
         $this->makeScheduledPayment($c, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-08-21");
         $this->makeScheduledPayment($c, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-08-28");
         // Zero when there is nothing there.
-        $d = new PhonePolicy();
-        self::$dm->persist($d);
+        $d = $this->eligiblePolicy("2019-01-01");
         // Zero when there are successful payments.
-        $e = new PhonePolicy();
-        self::$dm->persist($e);
+        $e = $this->eligiblePolicy("2019-01-01");
         $this->makeScheduledPayment($e, ScheduledPayment::TYPE_SCHEDULED, true, "2019-02-01");
         $this->makeScheduledPayment($e, ScheduledPayment::TYPE_RESCHEDULED, false, "2019-02-01");
         $this->makeScheduledPayment($e, ScheduledPayment::TYPE_RESCHEDULED, true, "2019-02-01");
@@ -89,6 +84,7 @@ class ScheduledPaymentRepositoryTest extends KernelTestCase
         $policy = new PhonePolicy();
         $policy->setStart($start);
         $policy->setEnd((clone $start)->add(new \DateInterval("P1Y")));
+        $policy->setPolicyNumber("VAGRANT/2019/".rand());
         self::$dm->persist($policy);
         return $policy;
     }
