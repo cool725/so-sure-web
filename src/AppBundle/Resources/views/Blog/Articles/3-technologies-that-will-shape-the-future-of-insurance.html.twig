@@ -2,165 +2,130 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Blog title{% endblock %}
+{% block title %}3 Technologies That Will Shape The Future of Insurance - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers.<"/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">3 Technologies That Will Shape The Future of Insurance</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">3 Technologies That Will Shape The Future of Insurance</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Susan</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">3 Technologies That Will Shape The Future of Insurance</span>
-                                            <meta property="position" content="3">
+                                            <time>Oct 24, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">3 Technologies That Will Shape The Future of Insurance</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Oct 24, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>We recently looked back at the <a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">origins</a> of insurance and its <a href="{{ path('the_development_of_insurance_as_we_know_it') }}">development</a> up to the present day.</p>
-                        <p>Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers.</p>
-                        <h2>Big Data Analytics</h2>
-                        <p>Big data analytics is a computer’s ability to examine huge amounts of data in order to uncover insights. Today, it’s possible for a computer to examine and order more data than ever before and present answers to the user in seconds. This can save the user hours of manpower and resources.</p>
-                        <h4><em>How does it affect insurance?</em></h4>
-                        <p>The insurance industry is making a significant investment in integrating big data analytics and modelling techniques that are slowly but surely improving every aspect of the industry.</p>
-                        <p>For example, whether analysing weather patterns or examining huge swathes of social media for institutional insurers, big data is allowing insurers to be more targeted with what risk they want to underwrite and provider cheaper insurance for the customers they want. It will also help with criminal investigators seeking out fraud.</p>
-                        <p>However, the true impact of big data will be felt through integration with narrow AI algorithms.</p>
-                        <h4><em>When?</em></h4>
-                        <p>Big data analytics is already working hard behind the scenes at an institutional level.</p>
-                        <h4><em>How will it affect consumers?</em></h4>
-                        <p>The benefits of big data analytics might take time to be felt by consumers but expect costs for lower risk end users to fall and experience to improve as it improves all aspects of insurance.</p>
-                        <p>In time, we expect it to affect premiums in creating a bigger divide between the lower risk customers (cheaper premium) and the higher risks one (more expensive). There’s a chance that some may be left having to pay such high premiums that as a society no longers accept that Big Data differentiates, and as a result the regulator will cap the maximum premium paid... But that.</p>
-                        <h2>Artificial Intelligence</h2>
-                        <p>For now, artificial intelligence (AI) in insurance means ‘narrow AI’ only. Our smartphones, air traffic control and social networks are already run by narrow AI via human-designed algorithms. A computer then works within these parameters for sustained, error-free periods.</p>
-                        <h4><em>How will it affect insurance?</em></h4>
-                        <p>Many elements of insurance are set to be impacted by narrow AI.</p>
-                        <p>The biggest advantage will be in the smoothing of inefficiencies in claims processing. Until now, this has been manual, time-consuming and prone to human error. Robotic Process Automation (RPA) is helping with data entry, data access and data retrieval, which is both satisfying regulatory compliance and offering a better service to customers. With AI, we will have claims automatically and quickly processed.</p>
-                        <p>In the future, narrow AI will help with the pricing process. Until now, the pricing of a policy or a large number of policies has been done by humans providing inputs for computers to work out premiums and payouts. With human oversight, AI is now beginning to automate this process.</p>
-                        <p>A further real-world example shows how AI will change insurance and the world around us. In industry, equipment is being fitted with sensors linked to an increasing number of devices, such as cars, smartphones and watches. Data generated will be used by providers to help better understand customers so they offer better products and service. We’re seeing this in health insurance, where providers are linking to user’s health records via smartphones and watches.</p>
-                        <h4><em>When?</em></h4>
-                        <p>Narrow AI is already being used in consumer-facing insurance, as per the health insurance industry’s utilisation of smart technology. Deeper integration will be developed over time.</p>
-                        <h4><em>How will it affect consumers?</em></h4>
-                        <p>From targeted advertising and marketing to automating the claims process, consumers should feel benefits from the integration of narrow AI. It will also improve how we shop for insurance.</p>
-                        <p>In time, efficiencies at institutional level should pass cost savings to consumers.</p>
-                        <h2>Augmented Reality</h2>
-                        <p>Augmented reality (AR) adds to the reality you would ordinarily see. For example, Google Glass is a kind of augmented reality, as it adds elements to - and improves - your field of vision.</p>
-                        <h4><em>How does it affect insurance?</em></h4>
-                        <p>Unlike big data analytics, AR will not have a transformational impact. However, it could transform the way insurance is marketed and sold to consumers.</p>
-                        <p>For example, AR is being used to offer interactive user experiences (for example, helping to identify and quantify items that need insuring) and promote customer engagement in an industry that is notoriously lacking in customer appeal. Companies are also using AR to warn clients about dangers, estimate damage, give training and explain plans. If a customer follows and engages with AR, it could lead to them having to pay lower premiums.</p>
-                        <h4><em>When?</em></h4>
-                        <p>Still some way off. Forward-thinking providers and insurtech companies are experimenting with its implementation but, at present, it’s a gimmick rather than a core proposition.</p>
-                        <p>Here at so-sure, we’re integrating augmented reality to improve the experience for customers who are looking to purchase content insurance. Watch this space for further updates.</p>
-                        <h4><em>How will it affect consumers?</em></h4>
-                        <p>The benefits will be significant throughout the market all for all types of insurance, especially in the way that insurance will be marketed to consumers.</p>
-                        <p>It’s an exciting time of great change in insurance. At <a href="{{ path('homepage') }}">so-sure</a>, we’re here to help you make sense of the future.</p>
-                        <p>Look out for more in-depth analysis of these technologies on the blog. In the meantime, we’d love to hear your thoughts on the future of insurance, so <a href="{{ path('about_how_to_contact_so_sure') }}">drop us a line</a>.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>We recently looked back at the <a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">origins</a> of insurance and its <a href="{{ path('the_development_of_insurance_as_we_know_it') }}">development</a> up to the present day.</p>
+                                <p>Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers.</p>
+                                <h2>Big Data Analytics</h2>
+                                <p>Big data analytics is a computer’s ability to examine huge amounts of data in order to uncover insights. Today, it’s possible for a computer to examine and order more data than ever before and present answers to the user in seconds. This can save the user hours of manpower and resources.</p>
+                                <h4><em>How does it affect insurance?</em></h4>
+                                <p>The insurance industry is making a significant investment in integrating big data analytics and modelling techniques that are slowly but surely improving every aspect of the industry.</p>
+                                <p>For example, whether analysing weather patterns or examining huge swathes of social media for institutional insurers, big data is allowing insurers to be more targeted with what risk they want to underwrite and provider cheaper insurance for the customers they want. It will also help with criminal investigators seeking out fraud.</p>
+                                <p>However, the true impact of big data will be felt through integration with narrow AI algorithms.</p>
+                                <h4><em>When?</em></h4>
+                                <p>Big data analytics is already working hard behind the scenes at an institutional level.</p>
+                                <h4><em>How will it affect consumers?</em></h4>
+                                <p>The benefits of big data analytics might take time to be felt by consumers but expect costs for lower risk end users to fall and experience to improve as it improves all aspects of insurance.</p>
+                                <p>In time, we expect it to affect premiums in creating a bigger divide between the lower risk customers (cheaper premium) and the higher risks one (more expensive). There’s a chance that some may be left having to pay such high premiums that as a society no longers accept that Big Data differentiates, and as a result the regulator will cap the maximum premium paid... But that.</p>
+                                <h2>Artificial Intelligence</h2>
+                                <p>For now, artificial intelligence (AI) in insurance means ‘narrow AI’ only. Our smartphones, air traffic control and social networks are already run by narrow AI via human-designed algorithms. A computer then works within these parameters for sustained, error-free periods.</p>
+                                <h4><em>How will it affect insurance?</em></h4>
+                                <p>Many elements of insurance are set to be impacted by narrow AI.</p>
+                                <p>The biggest advantage will be in the smoothing of inefficiencies in claims processing. Until now, this has been manual, time-consuming and prone to human error. Robotic Process Automation (RPA) is helping with data entry, data access and data retrieval, which is both satisfying regulatory compliance and offering a better service to customers. With AI, we will have claims automatically and quickly processed.</p>
+                                <p>In the future, narrow AI will help with the pricing process. Until now, the pricing of a policy or a large number of policies has been done by humans providing inputs for computers to work out premiums and payouts. With human oversight, AI is now beginning to automate this process.</p>
+                                <p>A further real-world example shows how AI will change insurance and the world around us. In industry, equipment is being fitted with sensors linked to an increasing number of devices, such as cars, smartphones and watches. Data generated will be used by providers to help better understand customers so they offer better products and service. We’re seeing this in health insurance, where providers are linking to user’s health records via smartphones and watches.</p>
+                                <h4><em>When?</em></h4>
+                                <p>Narrow AI is already being used in consumer-facing insurance, as per the health insurance industry’s utilisation of smart technology. Deeper integration will be developed over time.</p>
+                                <h4><em>How will it affect consumers?</em></h4>
+                                <p>From targeted advertising and marketing to automating the claims process, consumers should feel benefits from the integration of narrow AI. It will also improve how we shop for insurance.</p>
+                                <p>In time, efficiencies at institutional level should pass cost savings to consumers.</p>
+                                <h2>Augmented Reality</h2>
+                                <p>Augmented reality (AR) adds to the reality you would ordinarily see. For example, Google Glass is a kind of augmented reality, as it adds elements to - and improves - your field of vision.</p>
+                                <h4><em>How does it affect insurance?</em></h4>
+                                <p>Unlike big data analytics, AR will not have a transformational impact. However, it could transform the way insurance is marketed and sold to consumers.</p>
+                                <p>For example, AR is being used to offer interactive user experiences (for example, helping to identify and quantify items that need insuring) and promote customer engagement in an industry that is notoriously lacking in customer appeal. Companies are also using AR to warn clients about dangers, estimate damage, give training and explain plans. If a customer follows and engages with AR, it could lead to them having to pay lower premiums.</p>
+                                <h4><em>When?</em></h4>
+                                <p>Still some way off. Forward-thinking providers and insurtech companies are experimenting with its implementation but, at present, it’s a gimmick rather than a core proposition.</p>
+                                <p>Here at so-sure, we’re integrating augmented reality to improve the experience for customers who are looking to purchase content insurance. Watch this space for further updates.</p>
+                                <h4><em>How will it affect consumers?</em></h4>
+                                <p>The benefits will be significant throughout the market all for all types of insurance, especially in the way that insurance will be marketed to consumers.</p>
+                                <p>It’s an exciting time of great change in insurance. At <a href="{{ path('homepage') }}">so-sure</a>, we’re here to help you make sense of the future.</p>
+                                <p>Look out for more in-depth analysis of these technologies on the blog. In the meantime, we’d love to hear your thoughts on the future of insurance, so <a href="{{ path('about_how_to_contact_so_sure') }}">drop us a line</a>.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

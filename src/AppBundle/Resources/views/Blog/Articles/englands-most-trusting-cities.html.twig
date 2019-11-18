@@ -2,156 +2,121 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - England's Most Trusting Cities{% endblock %}
+{% block title %}England's Most Trusting Cities - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Are English cities really untrusting and detached from their neighbours? According to our latest research survey, we suggest urban neighbours trust and know one another better than you might think."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">England's Most Trusting Cities</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">England's Most Trusting Cities</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Susane</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">England's Most Trusting Cities</span>
-                                            <meta property="position" content="3">
+                                            <time>Oct 23, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">England's Most Trusting Cities</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susane</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Oct 23, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>Are English cities really untrusting and detached from their neighbours? According to our latest research survey, we suggest urban neighbours trust and know one another better than you might think.</p>
-                        <p>The YouGov survey carried out on our half asked a sample of residents in seven major English cities (Brighton and Hove, Bristol, London, Birmingham, Leeds, Manchester and Newcastle) questions on how well they knew their closest neighbours and whether or not they trusted them.</p>
-                        <h2>Neighbourly Trust</h2>
-                        <p>Bristolians consistently polled highest overall when asked if they trusted their neighbours* to look after their pets, or home, or home’s spare keys. For example, 56% of people from Bristol with a pet would trust their neighbour to look after it, but this reduces to 30% in Birmingham.</p>
-                        {# image #}
-                        <p>Manchester was the least trusting when it comes to asking their neighbours to take care of these things: they were the least keen to trust their neighbours to look after spare keys (33%), their home (36%) or pets (30% of those with a pet). For example, nearly 50% of Mancunians would not trust their neighbours to look after any of the above, compared to 39% of respondents from London who answered the same question.</p>
-                        {# image #}
-                        <h2>Name thy neighbour</h2>
-                        <p>The survey found that a large number of the respondents of the seven cities knew the name of at least one of their five closest neighbours*. Bristol again came top; this time for knowing the name of at least one of their neighbours (86%).</p>
-                        {# image #}
-                        <p>Perhaps surprisingly, 84% of Londoners knew the name of at least one neighbour, more than Manchester (75%), Birmingham (82%), Leeds (83%) and Newcastle (78%).</p>
-                        <h2>Know thy neighbour</h2>
-                        <p>Knowing names is one thing, but being good friends with your neighbours is quite another. Leeds came top when it came to considering at least one of their neighbours as a ‘good friend’ - a total of 43% polled. More Londoners would consider at least one of their neighbours a good friend than in Manchester (34% vs 29%). Almost 7 in 10 (69%) of people from Manchester wouldn’t consider any of their five closest neighbours as good friends!</p>
-                        <p>It is more common for people to know the names of at least one person from their five closest neighbours in most cities, than to know none at all.</p>
-                        <p>But what is particularly heartening, is that around two in five residents polled in each city said they would like to interact with their neighbours more that they currently do.</p>
-                        {# image #}
-                        <p>But how trusting are theses cities’ residents when it comes to strangers?</p>
-                        <p>Don’t be a stranger.</p>
-                        <p>Respondents were asked how likely (or unlikely) they would you be to let a stranger borrow their mobile phone to make a call in the area they live in.</p>
-                        <p>Well, if you desperately needed to, the ‘best place’ to ask would be in Bristol as 40% of them said they would let a stranger use their phone. This decreases to just 19% in Birmingham.However, overall the English city dwellers are still more cautious about trusting strangers (at least with their mobile phones). Around 6 to 7 out of 10 people in the seven cities said they would be unlikely to let a stranger borrow their phone to make a call.</p>
-                        {# image #}
-                        <p>*When we say neighbour we mean five closest houses to where the respondent lives</p>
-                        <h2>About so-sure</h2>
-                        <p>Launched in 2016, our mission is to turn the mobile phone insurance industry on its head.  so-sure provides a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re protecting customers when they claim and rewarding them when they don't; by joining forces our members can receive 80% of their insurance premium reimbursed every year.</p>
-                        <h2>About the research</h2>
-                        <p>All figures, unless otherwise stated, are from YouGov Plc. Total sample size was 1012 adults. Fieldwork was undertaken between 31st August - 6th September 2018.  The survey was carried out online. The figures have been weighted and are representative of each city.</p>
-                        <p>- YouGov is registered with the Information Commissioner</p>
-                        <p>- YouGov is a member of the British Polling Council</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>Are English cities really untrusting and detached from their neighbours? According to our latest research survey, we suggest urban neighbours trust and know one another better than you might think.</p>
+                                <p>The YouGov survey carried out on our half asked a sample of residents in seven major English cities (Brighton and Hove, Bristol, London, Birmingham, Leeds, Manchester and Newcastle) questions on how well they knew their closest neighbours and whether or not they trusted them.</p>
+                                <h2>Neighbourly Trust</h2>
+                                <p>Bristolians consistently polled highest overall when asked if they trusted their neighbours* to look after their pets, or home, or home’s spare keys. For example, 56% of people from Bristol with a pet would trust their neighbour to look after it, but this reduces to 30% in Birmingham.</p>
+                                {# image #}
+                                <p>Manchester was the least trusting when it comes to asking their neighbours to take care of these things: they were the least keen to trust their neighbours to look after spare keys (33%), their home (36%) or pets (30% of those with a pet). For example, nearly 50% of Mancunians would not trust their neighbours to look after any of the above, compared to 39% of respondents from London who answered the same question.</p>
+                                {# image #}
+                                <h2>Name thy neighbour</h2>
+                                <p>The survey found that a large number of the respondents of the seven cities knew the name of at least one of their five closest neighbours*. Bristol again came top; this time for knowing the name of at least one of their neighbours (86%).</p>
+                                {# image #}
+                                <p>Perhaps surprisingly, 84% of Londoners knew the name of at least one neighbour, more than Manchester (75%), Birmingham (82%), Leeds (83%) and Newcastle (78%).</p>
+                                <h2>Know thy neighbour</h2>
+                                <p>Knowing names is one thing, but being good friends with your neighbours is quite another. Leeds came top when it came to considering at least one of their neighbours as a ‘good friend’ - a total of 43% polled. More Londoners would consider at least one of their neighbours a good friend than in Manchester (34% vs 29%). Almost 7 in 10 (69%) of people from Manchester wouldn’t consider any of their five closest neighbours as good friends!</p>
+                                <p>It is more common for people to know the names of at least one person from their five closest neighbours in most cities, than to know none at all.</p>
+                                <p>But what is particularly heartening, is that around two in five residents polled in each city said they would like to interact with their neighbours more that they currently do.</p>
+                                {# image #}
+                                <p>But how trusting are theses cities’ residents when it comes to strangers?</p>
+                                <p>Don’t be a stranger.</p>
+                                <p>Respondents were asked how likely (or unlikely) they would you be to let a stranger borrow their mobile phone to make a call in the area they live in.</p>
+                                <p>Well, if you desperately needed to, the ‘best place’ to ask would be in Bristol as 40% of them said they would let a stranger use their phone. This decreases to just 19% in Birmingham.However, overall the English city dwellers are still more cautious about trusting strangers (at least with their mobile phones). Around 6 to 7 out of 10 people in the seven cities said they would be unlikely to let a stranger borrow their phone to make a call.</p>
+                                {# image #}
+                                <p>*When we say neighbour we mean five closest houses to where the respondent lives</p>
+                                <h2>About so-sure</h2>
+                                <p>Launched in 2016, our mission is to turn the mobile phone insurance industry on its head.  so-sure provides a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re protecting customers when they claim and rewarding them when they don't; by joining forces our members can receive 80% of their insurance premium reimbursed every year.</p>
+                                <h2>About the research</h2>
+                                <p>All figures, unless otherwise stated, are from YouGov Plc. Total sample size was 1012 adults. Fieldwork was undertaken between 31st August - 6th September 2018.  The survey was carried out online. The figures have been weighted and are representative of each city.</p>
+                                <p>- YouGov is registered with the Information Commissioner</p>
+                                <p>- YouGov is a member of the British Polling Council</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
