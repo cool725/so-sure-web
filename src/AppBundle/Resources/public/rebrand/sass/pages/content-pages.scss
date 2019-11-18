@@ -13,86 +13,29 @@ body {
     overflow-y: scroll;
 }
 
-.faq {
+.cp {
     position: relative;
 
-    // Containers & Curves
-    &__main__container {
-        position: relative;
-        z-index: 4;
-
-        // Curve
-        svg {
-            transform: translateY(-1px);
-            position: absolute;
-            top: 100%; left: 0;
-        }
-
-        &-stuck {
-            position: sticky;
-            top: 0;
-        }
-
-        @include media-breakpoint-up(lg) {
-            width: 60vw; height: 100vh;
-            position: static;
-
-            // Scroll stuff
-            // overflow-y: scroll;
-
-            // // IE
-            // -ms-overflow-style: none;
-
-            // // Webkit
-            // &::-webkit-scrollbar {
-            //     width: 0;
-            //     background: transparent;
-            // }
-        }
-
-    }
-
-    &__main {
-        padding-top: 12rem;
-        padding-bottom: 1.5rem;
-
-        @include media-breakpoint-up(lg) {
-            height: 70vh;
+    h2 {
+        &:before {
+            display: block;
+            content: '';
+            margin-top: -100px;
+            height: 100px;
+            visibility: hidden;
         }
     }
 
-    &__curve {
-        position: relative;
+    &__content {
+        padding-top: 4rem;
+
+        @include media-breakpoint-up(md) {
+            padding-top: 0rem;
+        }
 
         @include media-breakpoint-up(lg) {
-            width: 5vw; height: 100vh;
-
-            svg {
-                height: 100vh;
-                position: absolute;
-                z-index: 4;
-                left: 0; top: 0;
-                // transform: translateX(1px);
-            }
+            padding-bottom: 10rem;
         }
-    }
-
-    &__sub__container {
-        background-color: $lily-white;
-
-        @include media-breakpoint-up(lg) {
-            width: 40vw; height: 100vh;
-            position: fixed;
-            right: 0;
-
-            // Scroll stuff
-            overflow: hidden;
-        }
-    }
-
-    &__sub {
-        width: 100%;
-        padding-top: 8rem;
     }
 
     &__nav {

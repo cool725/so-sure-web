@@ -3,151 +3,122 @@
 
 {# Set vars #}
 {% set body_class = 'contact-us' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Contact Us{% endblock %}
+{% block title %}Contact Us | so-sure{% endblock %}
 {% block meta %}
 
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/contact.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="faq">
-        <div class="d-lg-flex">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-primary"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-zaffre"></i>
+                                </li>
+                                <li class="list-inline-item text-zaffre"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Contact Us</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="text-zaffre h5 mb-0">We are always happy to talk</div>
+                        <h1 class="text-primary mb-4">Contact Us</h1>
+                        <p>We understand that everyone is different, that's why there's many ways to contact us here at so-sure. Our friendly, helpful customer service team will aim to get back to you within a few business hours. In the meantime why not check out our handy <a href="{{ path('faq') }}">faq</a> section, you can find most of the answers to the top questions we get there.</p>
+                        <p class="mb-4"><strong>Live chat available {{ support_hours }}</strong>. <br>Live chat is not available on bank holidays.</p>
+                        <div class="contact__options mb-4">
+                            <div class="row">
+                                <div class="col-sm">
+                                    <a href="#" class="btn btn-primary btn-block mb-4 open-intercom">
+                                        <i class="fas fa-comments fa-lg mr-2"></i>
+                                        Live Chat
+                                    </a>
+                                </div>
+                                <div class="col-sm">
+                                    <a href="mailto:hello@spam.so-sure.net" class="btn btn-secondary btn-block mb-4 mailto">
+                                        <i class="fal fa-envelope fa-lg mr-2"></i>
+                                        Email
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
 
-            {# Main Content #}
-            <div class="faq__main__container">
-                <div class="faq__main px-4 px-lg-5">
-                    <div class="breadcrumbs">
-                        <ul class="list-inline"
-                            vocab="https://schema.org/"
-                            typeof="BreadcrumbList">
-                            <li class="list-inline-item"
-                                property="itemListElement"
-                                typeof="ListItem">
-                                <a href="{{ path('homepage') }}"
-                                   class="text-primary"
-                                   property="item"
-                                   typeof="WebPage">
-                                   <span property="name">Home</span>
-                                </a>
-                                <meta property="position" content="1">
-                            </li>
-                            <li class="list-inline-item text-white">
-                                <i class="fal fa-angle-right text-zaffre"></i>
-                            </li>
-                            <li class="list-inline-item text-zaffre"
-                                property="itemListElement"
-                                typeof="ListItem">
-                                <span property="name">Contact Us</span>
-                                <meta property="position" content="2">
-                            </li>
-                        </ul>
+                        <div class="h5 text-zaffre mb-3">Or drop us a note via the form below:</div>
+
+                        {{ form_start(contact_form, {'attr':{
+                            'data-toggle': 'validator',
+                            'class': 'validate-form ',
+                            'data-client-validation': form_client_validation,
+                            'autocomplete': 'off'
+                        }}) }}
+                            <div class="row">
+                                <div class="form-group col-sm">
+                                    {{ form_label(contact_form.name, 'Name', { 'label_attr': {'class': ''} }) }}
+                                    {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Enter your name'}}) }}
+                                </div>
+                                <div class="form-group col-sm">
+                                    {{ form_label(contact_form.email, 'Email', { 'label_attr': {'class': ''} }) }}
+                                    {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(contact_form.phone, 'Phone number', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Best Phone Number we can reach you on'}}) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_label(contact_form.message, 'Your message', { 'label_attr': {'class': ''} }) }}
+                                {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '10', 'placeholder': 'Enter your message...'}}) }}
+                            </div>
+
+                            <div class="form-group">
+                                {{ form_widget(contact_form.recaptcha) }}
+                                <div class="help-block with-errors">{{ form_errors(contact_form.recaptcha) }}</div>
+                            </div>
+
+                            <div class="form-group text-right">
+                                {{ form_widget(contact_form.submit, {
+                                    'label': 'Contact us',
+                                    'fa': 'far fa-long-arrow-right fa-lg ml-2',
+                                    'right': true,
+                                    'attr': {
+                                        'class': 'btn btn-success btn-green-gradient btn-block-xs'
+                                }}) }}
+                            </div>
+                        {{ form_end(contact_form) }}
                     </div>
-                    <div class="text-zaffre h5 mb-0">We are always happy to talk</div>
-                    <h1 class="text-primary mb-4">Contact Us</h1>
-                    <p>We understand that everyone is different, that's why there's many ways to contact us here at so-sure. Our friendly, helpful customer service team will aim to get back to you within a few business hours. In the meantime why not check out our handy <a href="{{ path('faq') }}">faq</a> section, you can find most of the answers to the top questions we get there.</p>
-                    <p class="mb-4"><strong>Live chat available {{ support_hours }}</strong>. <br>Live chat is not available on bank holidays.</p>
-                    <div class="contact__options mb-4">
-                        <div class="row">
-                            <div class="col-sm">
-                                <a href="#" class="btn btn-primary btn-block mb-4 open-intercom">
-                                    <i class="fas fa-comments fa-lg mr-2"></i>
-                                    Live Chat
-                                </a>
-                            </div>
-                            <div class="col-sm">
-                                <a href="mailto:hello@spam.so-sure.net" class="btn btn-secondary btn-block mb-4 mailto">
-                                    <i class="fal fa-envelope fa-lg mr-2"></i>
-                                    Email
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="h5 text-zaffre mb-3">Or drop us a note via the form below:</div>
-
-                    {{ form_start(contact_form, {'attr':{
-                        'data-toggle': 'validator',
-                        'class': 'validate-form ',
-                        'data-client-validation': form_client_validation,
-                        'autocomplete': 'off'
-                    }}) }}
-                        <div class="row">
-                            <div class="form-group col-sm">
-                                {{ form_label(contact_form.name, 'Name', { 'label_attr': {'class': ''} }) }}
-                                {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Enter your name'}}) }}
-                            </div>
-                            <div class="form-group col-sm">
-                                {{ form_label(contact_form.email, 'Email', { 'label_attr': {'class': ''} }) }}
-                                {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(contact_form.phone, 'Phone number', { 'label_attr': {'class': ''} }) }}
-                            {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Best Phone Number we can reach you on'}}) }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_label(contact_form.message, 'Your message', { 'label_attr': {'class': ''} }) }}
-                            {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '10', 'placeholder': 'Enter your message...'}}) }}
-                        </div>
-
-                        <div class="form-group">
-                            {{ form_widget(contact_form.recaptcha) }}
-                            <div class="help-block with-errors">{{ form_errors(contact_form.recaptcha) }}</div>
-                        </div>
-
-                        <div class="form-group text-right">
-                            {{ form_widget(contact_form.submit, {
-                                'label': 'Contact us',
-                                'fa': 'far fa-long-arrow-right fa-lg ml-2',
-                                'right': true,
-                                'attr': {
-                                    'class': 'btn btn-success btn-green-gradient btn-block-xs'
-                            }}) }}
-                        </div>
-                    {{ form_end(contact_form) }}
                 </div>
             </div>
-
-            {# Sub Content #}
-            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="faq__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="faq__sub text-center">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
-                    <h2 class="text-dodger-blue mb-5">Contact Us 🤓</h2>
-                    {# <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
-                </div>
-            </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/contact.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
