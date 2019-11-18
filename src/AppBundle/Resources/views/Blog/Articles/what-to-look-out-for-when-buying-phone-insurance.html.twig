@@ -2,162 +2,127 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - What To Look Out For When Buying Phone Insurance{% endblock %}
+{% block title %}What To Look Out For When Buying Phone Insurance - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Buying phone insurance can be a real pain. But it doesn’t have to be. Here’s 3 simple tips for making phone insurance as stress free as possible."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">What To Look Out For When Buying Phone Insurance</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">What To Look Out For When Buying Phone Insurance</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Susan</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">What To Look Out For When Buying Phone Insurance</span>
-                                            <meta property="position" content="3">
+                                            <time>Aug 24, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">What To Look Out For When Buying Phone Insurance</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Aug 24, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>Phones keep us connected, they enable us to work on the fly, they entertain us… they can also annoy us. Whichever way you look at it, they’re a big part of our lives.</p>
-                        <p>They can be expensive, too. Especially when they break, get stolen, or lost, or stop working due to wear, tear and excessive Instagram usage!</p>
-                        <p>Buying phone insurance can be a real pain. But it doesn’t have to be. Here’s 3 simple tips for making phone insurance as stress free as possible.</p>
-                        <h2>Do You Need Insurance?</h2>
-                        <p>For most people, a damaged or lost phone is inevitable. The cost of a new phone is now often &pound;600-&pound;1200, which most of us can't afford to payout every time the phone is lost or stolen. The cost of repairs used to be &pound;50 but now, it can be &pound;250 just for a cracked screen, and that happens more frequently than loss/thefts.</p>
-                        <p>For those who are particularly careful or don’t use their phone very much, traditional insurance might not be good value and <a href="{{ path('homepage') }}">so-sure's</a> insurance can finally make insurance worthwhile.</p>
-                        <h2>Are You Already Covered?</h2>
-                        <p>It’s worth checking if your phone is covered by your home insurance, credit card or premium bank account. You must also check what is really covered.</p>
-                        <p>Indeed, most home insurance standard policies only cover phones if they're lost as part of a burglary or fire, which is pretty useless if you leave your phone in the pub or smash it on the pavement outside the pub. Also, if your home insurance covers you 'out of home', bear in mind that your Excess is likely to be that of your home policy (&pound;200?) and enquire whether that will impact your home insurance premium the following year.</p>
-                        <p>With regards to phone insurance that comes for ‘free’ with your credit card or bank account, beware that in insurance, you often get what you pay for. For example, Lloyds bank account will likely take 14 days to repair your phone - if you can live without your phone for 14 days, that‘s great, if not, you might consider buying insurance.</p>
-                        <h2>Price, Cover and Service</h2>
-                        <p>The comparison sites have educated us to believe that price is the main differentiator of insurance. Sadly, all insurance policies are not created equal.</p>
-                        <h4>1. Price Includes Excess</h4>
-                        <p>Price is not just the headline price. It is also the Excess. When looking at buying insurance, you need to consider both in your purchase decision.</p>
-                        <p>However, the cost of buying cheap insurance that doesn’t cover you or that is unusable is probably the most expensive cost of insurance. So review the Cover and the Service in detail.</p>
-                        <h4>2. Cover Varies Widely</h4>
-                        <p>Most people take out phone insurance because they’re worried about losing their phone, damaging it, or having it stolen. But insurance can cover you for a whole bunch of other risks, too. These include unauthorised calls, lost or broken accessories and valuable content stored on the phone. As with everything, you need to know if you need it - because you will pay for it.  For example, the backing up of your content might be something you don’t need as most of us have our phones backed-up via apps or virtual drives (GoogleDrive, DropBox, iTune,OneDrive, etc.).</p>
-                        <p>What the policy covers is as important as what it doesn’t. You need to figure out what it excludes. Policies vary and it’s not always clear what you’re paying for, so look for insurance providers who word their terms and conditions clearly. This is easier said than done, since the insurance industry can include a lot of jargon! However, asking for the percentage of declined claims in the last year will be a good indicator: typical rates are rumoured to be 4-8% for mobile networks and 10-15% for the independents. However, you will find independents who are declining fewer claims that the mobile networks.</p>
-                        <h4>3. Service Is What You Really Buy</h4>
-                        <p>Let’s face it, we buy insurance to be put back on our feet as quickly as possible. So it is important to check how long the claim will take; there are 2 steps to this process: claim processing and claim fulfillment.</p>
-                        <p>Depending on providers, and your circumstances, the claim processing can take a few hours up to several days. Due to fraud, which is rampant in insurance and leads to higher premium for consumers, insurers will require you to provide additional documents to corroborate your story. Sometimes, insurers take this as an excuse to make it hard for you, e.g provide the receipt of your phone purchase.</p>
-                        <p>The claim fulfilment is where insurers can save a lot of money and so many decide to increase profits rather than deliver on a prompt claim fulfilment. Typically most insurers will ensure you have a replacement phone for theft or loss the next working day, however, for damage claims, this can vary dramatically. Few insurers will aim to get your cracked screen repaired in 3 working days (pick-up, repair, deliver) and some insurers might take up to 14 days, which, let’s face it, is not an option for most.</p>
-                        <h2>Shop Around For The Right Deal</h2>
-                        <p>When buying a new phone or contract, you’ll be offered phone insurance with it. Before taking the plunge, shop around (online) for the right deal.</p>
-                        <p>You have a lot of perceived choice when it comes to buying insurance, since there are tonnes of providers, but it is hard to figure out what each provider really covers - they just don’t make it easy for us.</p>
-                        <p>Avoid the comparison sites. It is tempting to believe that they can list the main options, however, they only add another layer of cost (that you end up paying for) and they don’t give you a comparison the important features that will ensure that your cover is appropriate.</p>
-                        <p>You could go to a broker albeit many won’t necessarily advise on mobile phone insurance (not enough money for them) and they might only have deals with a few players.</p>
-                        <p>Don’t check prices (premium and excess) of every provider in the market, but don’t go for the first you find. Look at a handful of options and make an informed decision, checkout their reviews - albeit be mindful that people who have not experienced claims might not be best to provide advice and fraudsters tend to put really bad reviews for claims. Your bank account will thank you for it.</p>
-                        <p>It’s worth bearing in mind that expensive policies with a good level of cover might give you better value for money than cheap policies that fail to provide adequate protection. So look beyond the headline price (premium and excess) and try to figure out exactly what you’re paying for: cover and service.</p>
-                        <p>Remember, price is what you pay, value is what you get.</p>
-                        <h2>Consider Social Insurance</h2>
-                        <p>There was once a time when insurance was designed around the customer. If you didn’t claim, you got your money back. And if you needed to claim, it was painless.</p>
-                        <p>At <a href="{{ path('homepage') }}">so-sure</a> we believe that this kind of social insurance is the future. So we’re bringing it back, with the help of slick technology and a business model engineered around customers rather than profits.</p>
-                        <p>We’re starting with phone insurance, because too many consumers are being overcharged and underserved by the insurance industry. We take a completely different approach, protecting you when you need to claim and rewarding you when you don't. In doing so, we’re helping to make insurance fair, reliable and rewarding for all people.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>Phones keep us connected, they enable us to work on the fly, they entertain us… they can also annoy us. Whichever way you look at it, they’re a big part of our lives.</p>
+                                <p>They can be expensive, too. Especially when they break, get stolen, or lost, or stop working due to wear, tear and excessive Instagram usage!</p>
+                                <p>Buying phone insurance can be a real pain. But it doesn’t have to be. Here’s 3 simple tips for making phone insurance as stress free as possible.</p>
+                                <h2>Do You Need Insurance?</h2>
+                                <p>For most people, a damaged or lost phone is inevitable. The cost of a new phone is now often &pound;600-&pound;1200, which most of us can't afford to payout every time the phone is lost or stolen. The cost of repairs used to be &pound;50 but now, it can be &pound;250 just for a cracked screen, and that happens more frequently than loss/thefts.</p>
+                                <p>For those who are particularly careful or don’t use their phone very much, traditional insurance might not be good value and <a href="{{ path('homepage') }}">so-sure's</a> insurance can finally make insurance worthwhile.</p>
+                                <h2>Are You Already Covered?</h2>
+                                <p>It’s worth checking if your phone is covered by your home insurance, credit card or premium bank account. You must also check what is really covered.</p>
+                                <p>Indeed, most home insurance standard policies only cover phones if they're lost as part of a burglary or fire, which is pretty useless if you leave your phone in the pub or smash it on the pavement outside the pub. Also, if your home insurance covers you 'out of home', bear in mind that your Excess is likely to be that of your home policy (&pound;200?) and enquire whether that will impact your home insurance premium the following year.</p>
+                                <p>With regards to phone insurance that comes for ‘free’ with your credit card or bank account, beware that in insurance, you often get what you pay for. For example, Lloyds bank account will likely take 14 days to repair your phone - if you can live without your phone for 14 days, that‘s great, if not, you might consider buying insurance.</p>
+                                <h2>Price, Cover and Service</h2>
+                                <p>The comparison sites have educated us to believe that price is the main differentiator of insurance. Sadly, all insurance policies are not created equal.</p>
+                                <h4>1. Price Includes Excess</h4>
+                                <p>Price is not just the headline price. It is also the Excess. When looking at buying insurance, you need to consider both in your purchase decision.</p>
+                                <p>However, the cost of buying cheap insurance that doesn’t cover you or that is unusable is probably the most expensive cost of insurance. So review the Cover and the Service in detail.</p>
+                                <h4>2. Cover Varies Widely</h4>
+                                <p>Most people take out phone insurance because they’re worried about losing their phone, damaging it, or having it stolen. But insurance can cover you for a whole bunch of other risks, too. These include unauthorised calls, lost or broken accessories and valuable content stored on the phone. As with everything, you need to know if you need it - because you will pay for it.  For example, the backing up of your content might be something you don’t need as most of us have our phones backed-up via apps or virtual drives (GoogleDrive, DropBox, iTune,OneDrive, etc.).</p>
+                                <p>What the policy covers is as important as what it doesn’t. You need to figure out what it excludes. Policies vary and it’s not always clear what you’re paying for, so look for insurance providers who word their terms and conditions clearly. This is easier said than done, since the insurance industry can include a lot of jargon! However, asking for the percentage of declined claims in the last year will be a good indicator: typical rates are rumoured to be 4-8% for mobile networks and 10-15% for the independents. However, you will find independents who are declining fewer claims that the mobile networks.</p>
+                                <h4>3. Service Is What You Really Buy</h4>
+                                <p>Let’s face it, we buy insurance to be put back on our feet as quickly as possible. So it is important to check how long the claim will take; there are 2 steps to this process: claim processing and claim fulfillment.</p>
+                                <p>Depending on providers, and your circumstances, the claim processing can take a few hours up to several days. Due to fraud, which is rampant in insurance and leads to higher premium for consumers, insurers will require you to provide additional documents to corroborate your story. Sometimes, insurers take this as an excuse to make it hard for you, e.g provide the receipt of your phone purchase.</p>
+                                <p>The claim fulfilment is where insurers can save a lot of money and so many decide to increase profits rather than deliver on a prompt claim fulfilment. Typically most insurers will ensure you have a replacement phone for theft or loss the next working day, however, for damage claims, this can vary dramatically. Few insurers will aim to get your cracked screen repaired in 3 working days (pick-up, repair, deliver) and some insurers might take up to 14 days, which, let’s face it, is not an option for most.</p>
+                                <h2>Shop Around For The Right Deal</h2>
+                                <p>When buying a new phone or contract, you’ll be offered phone insurance with it. Before taking the plunge, shop around (online) for the right deal.</p>
+                                <p>You have a lot of perceived choice when it comes to buying insurance, since there are tonnes of providers, but it is hard to figure out what each provider really covers - they just don’t make it easy for us.</p>
+                                <p>Avoid the comparison sites. It is tempting to believe that they can list the main options, however, they only add another layer of cost (that you end up paying for) and they don’t give you a comparison the important features that will ensure that your cover is appropriate.</p>
+                                <p>You could go to a broker albeit many won’t necessarily advise on mobile phone insurance (not enough money for them) and they might only have deals with a few players.</p>
+                                <p>Don’t check prices (premium and excess) of every provider in the market, but don’t go for the first you find. Look at a handful of options and make an informed decision, checkout their reviews - albeit be mindful that people who have not experienced claims might not be best to provide advice and fraudsters tend to put really bad reviews for claims. Your bank account will thank you for it.</p>
+                                <p>It’s worth bearing in mind that expensive policies with a good level of cover might give you better value for money than cheap policies that fail to provide adequate protection. So look beyond the headline price (premium and excess) and try to figure out exactly what you’re paying for: cover and service.</p>
+                                <p>Remember, price is what you pay, value is what you get.</p>
+                                <h2>Consider Social Insurance</h2>
+                                <p>There was once a time when insurance was designed around the customer. If you didn’t claim, you got your money back. And if you needed to claim, it was painless.</p>
+                                <p>At <a href="{{ path('homepage') }}">so-sure</a> we believe that this kind of social insurance is the future. So we’re bringing it back, with the help of slick technology and a business model engineered around customers rather than profits.</p>
+                                <p>We’re starting with phone insurance, because too many consumers are being overcharged and underserved by the insurance industry. We take a completely different approach, protecting you when you need to claim and rewarding you when you don't. In doing so, we’re helping to make insurance fair, reliable and rewarding for all people.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
