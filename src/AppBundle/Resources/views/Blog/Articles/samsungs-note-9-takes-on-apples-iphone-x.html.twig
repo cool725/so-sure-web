@@ -2,213 +2,178 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Samsung's Note 9 takes on Apple's iPhone X{% endblock %}
+{% block title %}Samsung's Note 9 takes on Apple's iPhone X - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="The battle for smartphone supremacy hots up this month, with the Samsung Note 9 arriving on the scene to take on Apple’s titan, the iPhone X."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Samsung's Note 9 takes on Apple's iPhone X</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Samsung's Note 9 takes on Apple's iPhone X</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Susan</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">Samsung's Note 9 takes on Apple's iPhone X</span>
-                                            <meta property="position" content="3">
+                                            <time>Sep 4, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">Samsung's Note 9 takes on Apple's iPhone X</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Sep 4, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        {# image #}
-                        <p>The battle for smartphone supremacy hots up this month, with the Samsung Note 9 arriving on the scene to take on Apple’s titan, the iPhone X.</p>
-                        <p>It looks to be an evenly matched encounter between the two tech giants, so we’ve done the hard work and broken down what to look out for if you’re in the market for a new phone and which of these fine new handsets should win your hard earned cash.</p>
-                        <h2>The Basics</h2>
-                        <p>First things first, let’s compare the basics…</p>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th class="h6">Galaxy Note 9</th>
-                                    <th class="h6">iPhone X</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="h6">Weight</td>
-                                    <td>7.1 ounces</td>
-                                    <td>6.1 ounces</td>
-                                </tr>
-                                <tr>
-                                    <td class="h6">Size</td>
-                                    <td>6.3 x 3 x 0.34 inches</td>
-                                    <td>5.7 x 2.8 x 0.3 inches</td>
-                                </tr>
-                                <tr>
-                                    <td class="h6">Screen Size</td>
-                                    <td>6.4 inches</td>
-                                    <td>5.8 inches</td>
-                                </tr>
-                                <tr>
-                                    <td class="h6">Storage</td>
-                                    <td>128GB/512GB</td>
-                                    <td>64GB/256GB</td>
-                                </tr>
-                                <tr>
-                                    <td class="h6">Battery Life</td>
-                                    <td>11 hours 26 mins</td>
-                                    <td>10 hours 49 mins</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p>The Note is bigger in almost every respect, which is a good thing if you’re looking for extra battery life but a bad thing if you’re looking for something slightly lighter for your pocket.</p>
-                        <p>If you need a phone that’s going to offer you maximum storage whilst giving you the chance to view TV and photos on a bigger screen, it’s the Note. But if you want a slimmer design and a big phone that fits better in your pocket, the iPhone wins hands down.</p>
-                        <p><strong>Verdict:</strong> A draw. Looking for slim, iPhone. Looking for size, Note.</p>
-                        <h2>Specification</h2>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th class="h6">Galaxy Note 9</th>
-                                    <th class="h6">iPhone X</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="h6">Processor</td>
-                                    <td>Snapdragon 845</td>
-                                    <td>A11 Bionic</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <p>Even though it might be smaller in size, the iPhone X continues to take its Android rivals to the cleaners when it comes to specification and pure power.</p>
-                        <p>The Galaxy’s Snapdragon 845 processor may be one of the fastest Android devices around, but its performance simply can’t compete with the incredibly powerful iPhone X. To be fair to Samsung, there are few out there at the moment that can compete with Apple’s A11 Bionic operating system. The Galaxy tries admirably but fails to get even close.</p>
-                        <p><strong>Verdict:</strong> Apple powers to victory.</p>
-                        <h2>Looks and Design</h2>
-                        <p>This is a really even match. Both phones are covered from top to bottom in glass, and finished with ultra-premium designs. In short, they’re both beautiful.</p>
-                        <p>The Note 9 isn’t actually too different from the Note 8. It’s a touch bigger perhaps, but the iPhone X is clearly a huge upgrade from its predecessors and a real shot in the arm for the industry as a whole. Apple’s new TrueDepth camera is also a big change, with a new notch on the front panel providing a real distinctive and new look that hasn’t been seen before in the market. This latest release from Apple is really something new.</p>
-                        <p>If you’re comparing colours, the Note can be yours in lively lavender, purple and ocean blue, whilst the X is delivered in Apple-cool (but boring?) silver and space grey.</p>
-                        <p><strong>Verdict:</strong> Apple do something new… and it works well.</p>
-                        <h2>Camera</h2>
-                        <p>Our phones are our cameras, so in deciding what phone to buy, you’re also deciding on the quality of the photos you can take.</p>
-                        <p>This feature is a big win for Samsung, who’ve rolled a great camera into the Note. They’ve introduced a variable aperture on one of its rear lenses which allows users to shoot in low-light circumstances as well as introducing an artificial intelligence feature, a Scene Optimiser, that adjusts settings automatically as you prepare to shoot so you can take the best possible picture. Cool, huh?</p>
-                        <p>The iPhone X camera is solid - if unremarkable - and you’ve likely have seen the features before on existing handsets. Samsung’s camera delivers new features that take phone photography to the next level.</p>
-                        <p><strong>Verdict:</strong> In a word, Samsung. Enough said.</p>
-                        <h2>Special Features</h2>
-                        <p>Yet again, Samsung are having a go with their S Pen, which allows you to write on-screen, turning your writings into text. One cool new twist for the Note is the ability to wire it up to an external monitor, essentially turning your phone into a desktop PC.</p>
-                        <p>But for truly new innovations, Apple and its iPhone X does what it has been doing for decades with a batch of new releases that truly separate it from the competition. Face ID for unlocking and payment features are a really welcome addition to the security side of the phone, whilst the new Animojis provide some much needed fun.</p>
-                        <p><strong>Verdict:</strong> Apple does what Apple does and blows the rest away.</p>
-                        <h2>The Verdict</h2>
-                        <p>It’s close but, for us, Apple’s iPhone X has it by a fraction. Of course, which you prefer will depend on what you want your phone for.</p>
-                        <p>If you want an amazing camera and a big screen, the Note delivers without a doubt. But the iPhone delivers beautiful design and a host of new features that keep it ahead of the competition…especially if the latest media gossip is true.</p>
-                        <p>Rumours are swirling that Apple will launch a new phone at its annual conference on 12th September. Details are still sketchy, but it seems the company will release 5.8-inch and 6.5-inch models of the new iPhone which will be named iPhone XS.</p>
-                        <p>As well as tweaking designs and adding in some new features, Apple will announce new build materials and colours, quicker processing speeds, higher screen resolution and extended battery life. It always does.</p>
-                        <p>All this sounds great, but <a href="https://www.cnet.com/news/iphone-xs-iphone-xr-iphone-xs-max-apple-three-new-iphones-replace-iphone-x/" target="_blank" rel="noopener noreferrer">CNET is claiming that the new iPhone could be slower than Android phones</a>, since Qualcomm is on record saying it isn’t supplying modems to the new iPhone and and its chips are reported to be faster than Intel chips at downloading data.</p>
-                        <p>So, if you’re in the market for a new phone, it might pay to wait and try the new iPhone, which is slated to hit the shops as soon as October and could blow the Samsung Note and the iPhone X out of the water. That’s if you can wait that long.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                {# image #}
+                                <p>The battle for smartphone supremacy hots up this month, with the Samsung Note 9 arriving on the scene to take on Apple’s titan, the iPhone X.</p>
+                                <p>It looks to be an evenly matched encounter between the two tech giants, so we’ve done the hard work and broken down what to look out for if you’re in the market for a new phone and which of these fine new handsets should win your hard earned cash.</p>
+                                <h2>The Basics</h2>
+                                <p>First things first, let’s compare the basics…</p>
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th class="h6">Galaxy Note 9</th>
+                                            <th class="h6">iPhone X</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="h6">Weight</td>
+                                            <td>7.1 ounces</td>
+                                            <td>6.1 ounces</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="h6">Size</td>
+                                            <td>6.3 x 3 x 0.34 inches</td>
+                                            <td>5.7 x 2.8 x 0.3 inches</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="h6">Screen Size</td>
+                                            <td>6.4 inches</td>
+                                            <td>5.8 inches</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="h6">Storage</td>
+                                            <td>128GB/512GB</td>
+                                            <td>64GB/256GB</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="h6">Battery Life</td>
+                                            <td>11 hours 26 mins</td>
+                                            <td>10 hours 49 mins</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p>The Note is bigger in almost every respect, which is a good thing if you’re looking for extra battery life but a bad thing if you’re looking for something slightly lighter for your pocket.</p>
+                                <p>If you need a phone that’s going to offer you maximum storage whilst giving you the chance to view TV and photos on a bigger screen, it’s the Note. But if you want a slimmer design and a big phone that fits better in your pocket, the iPhone wins hands down.</p>
+                                <p><strong>Verdict:</strong> A draw. Looking for slim, iPhone. Looking for size, Note.</p>
+                                <h2>Specification</h2>
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th class="h6">Galaxy Note 9</th>
+                                            <th class="h6">iPhone X</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="h6">Processor</td>
+                                            <td>Snapdragon 845</td>
+                                            <td>A11 Bionic</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p>Even though it might be smaller in size, the iPhone X continues to take its Android rivals to the cleaners when it comes to specification and pure power.</p>
+                                <p>The Galaxy’s Snapdragon 845 processor may be one of the fastest Android devices around, but its performance simply can’t compete with the incredibly powerful iPhone X. To be fair to Samsung, there are few out there at the moment that can compete with Apple’s A11 Bionic operating system. The Galaxy tries admirably but fails to get even close.</p>
+                                <p><strong>Verdict:</strong> Apple powers to victory.</p>
+                                <h2>Looks and Design</h2>
+                                <p>This is a really even match. Both phones are covered from top to bottom in glass, and finished with ultra-premium designs. In short, they’re both beautiful.</p>
+                                <p>The Note 9 isn’t actually too different from the Note 8. It’s a touch bigger perhaps, but the iPhone X is clearly a huge upgrade from its predecessors and a real shot in the arm for the industry as a whole. Apple’s new TrueDepth camera is also a big change, with a new notch on the front panel providing a real distinctive and new look that hasn’t been seen before in the market. This latest release from Apple is really something new.</p>
+                                <p>If you’re comparing colours, the Note can be yours in lively lavender, purple and ocean blue, whilst the X is delivered in Apple-cool (but boring?) silver and space grey.</p>
+                                <p><strong>Verdict:</strong> Apple do something new… and it works well.</p>
+                                <h2>Camera</h2>
+                                <p>Our phones are our cameras, so in deciding what phone to buy, you’re also deciding on the quality of the photos you can take.</p>
+                                <p>This feature is a big win for Samsung, who’ve rolled a great camera into the Note. They’ve introduced a variable aperture on one of its rear lenses which allows users to shoot in low-light circumstances as well as introducing an artificial intelligence feature, a Scene Optimiser, that adjusts settings automatically as you prepare to shoot so you can take the best possible picture. Cool, huh?</p>
+                                <p>The iPhone X camera is solid - if unremarkable - and you’ve likely have seen the features before on existing handsets. Samsung’s camera delivers new features that take phone photography to the next level.</p>
+                                <p><strong>Verdict:</strong> In a word, Samsung. Enough said.</p>
+                                <h2>Special Features</h2>
+                                <p>Yet again, Samsung are having a go with their S Pen, which allows you to write on-screen, turning your writings into text. One cool new twist for the Note is the ability to wire it up to an external monitor, essentially turning your phone into a desktop PC.</p>
+                                <p>But for truly new innovations, Apple and its iPhone X does what it has been doing for decades with a batch of new releases that truly separate it from the competition. Face ID for unlocking and payment features are a really welcome addition to the security side of the phone, whilst the new Animojis provide some much needed fun.</p>
+                                <p><strong>Verdict:</strong> Apple does what Apple does and blows the rest away.</p>
+                                <h2>The Verdict</h2>
+                                <p>It’s close but, for us, Apple’s iPhone X has it by a fraction. Of course, which you prefer will depend on what you want your phone for.</p>
+                                <p>If you want an amazing camera and a big screen, the Note delivers without a doubt. But the iPhone delivers beautiful design and a host of new features that keep it ahead of the competition…especially if the latest media gossip is true.</p>
+                                <p>Rumours are swirling that Apple will launch a new phone at its annual conference on 12th September. Details are still sketchy, but it seems the company will release 5.8-inch and 6.5-inch models of the new iPhone which will be named iPhone XS.</p>
+                                <p>As well as tweaking designs and adding in some new features, Apple will announce new build materials and colours, quicker processing speeds, higher screen resolution and extended battery life. It always does.</p>
+                                <p>All this sounds great, but <a href="https://www.cnet.com/news/iphone-xs-iphone-xr-iphone-xs-max-apple-three-new-iphones-replace-iphone-x/" target="_blank" rel="noopener noreferrer">CNET is claiming that the new iPhone could be slower than Android phones</a>, since Qualcomm is on record saying it isn’t supplying modems to the new iPhone and and its chips are reported to be faster than Intel chips at downloading data.</p>
+                                <p>So, if you’re in the market for a new phone, it might pay to wait and try the new iPhone, which is slated to hit the shops as soon as October and could blow the Samsung Note and the iPhone X out of the water. That’s if you can wait that long.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

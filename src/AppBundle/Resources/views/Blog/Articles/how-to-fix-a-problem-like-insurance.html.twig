@@ -2,142 +2,107 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - How To Fix A Problem Like Insurance{% endblock %}
+{% block title %}How To Fix A Problem Like Insurance - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers. In the long run, what’s good for customers is good for insurers. But short-term thinking has blighted the industry and created a needless asymmetry between buyers and sellers."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
-                                    <ul class="list-inline"
-                                        vocab="https://schema.org/"
-                                        typeof="BreadcrumbList">
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('homepage') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Home</span>
-                                            </a>
-                                            <meta property="position" content="1">
-                                        </li>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">How To Fix A Problem Like Insurance</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">How To Fix A Problem Like Insurance</h1>
+                                    <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
+                                            <div rel="author">Dylan Bourguignon</div>
                                         </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <a href="{{ path('blog_index') }}"
-                                               class="text-primary"
-                                               property="item"
-                                               typeof="WebPage">
-                                               <span property="name">Blog</span>
-                                            </a>
-                                            <meta property="position" content="2">
-                                        </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item"
-                                            property="itemListElement"
-                                            typeof="ListItem">
-                                            <span property="name">How To Fix A Problem Like Insurance</span>
-                                            <meta property="position" content="3">
+                                            <time>Aug 10, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">How To Fix A Problem Like Insurance</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Dylan Bourguignon</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Aug 10, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        {# image #}
-                        <p>Insurance has an image problem.</p>
-                        <p>It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers.</p>
-                        <p>In the long run, what’s good for customers is good for insurers. But short-term thinking has blighted the industry and created a needless asymmetry between buyers and sellers. There’s now a widespread perception amongst consumers that what’s good for insurers is not good for them, and vice-versa.</p>
-                        <p>This threatens to undermine the entire industry and damage its long term prospects. This, in turn, undermines the ability of people everywhere to manage risk and achieve their financial goals.</p>
-                        <p>The solution doesn’t lie in superficial re-branding or shiny new tech. After all, negative perceptions exist for a reason. Insurers are perceived as stitching customers up from day one with onerous terms and conditions. Ripping us off by pushing up premiums year on year. Subsidising new business by punishing loyal customers. Slowing the claims process down with painful process, excessive paperwork and holding out on payouts. The list goes on.</p>
-                        <p>The root cause of the insurance industry’s lacklustre reputation is poor customer experience. This applies to all stages of the process - buying, renewing and claiming. <a href="https://www.bain.com/insights/customer-behavior-loyalty-in-insurance-global-2017" target="_blank" rel="noopener noreferrer">As Bain &amp; Co point out</a>, the quality of customer interaction matters. Those delighted by an interaction reward insurance providers with positive Net Promoter Scores. Those dissatisfied, vote with their feet.</p>
-                        <p>CEO platitudes aren't going to tackle a problem as fundamental and deep-rooted as that. What’s needed is a fundamental rethink about the way insurance works, and the relationship between consumers and insurers. Then, we need concerted action to make change a reality.</p>
-                        <p>The Financial Times recently ran a piece highlighting how <a href="https://www.ft.com/content/2916c128-918d-11e8-b639-7680cedcc421" target="_blank" rel="noopener noreferrer">insurance firms are adapting their business models in order to provide services</a>. The focus on solving consumer problems is a great and welcome step in the right direction, but it appears that insurers are seeking to regain consumer trust via association with peripheral services, rather than addressing the lack of trust in their own core service and product range. Surely it would be better to focus on fixing this, rather than hope for the halo effect of bolt-ons?</p>
-                        <p>The traditional system is broken. A top-down approach of bolting on services and swish apps to the conventional offering isn’t going to fix it. We need to go back to first principles and reform the insurance model from the ground up before worrying about how to optimise it through technology.</p>
-                        <p>Social insurance offers a solution that can transform the way insurance works and deliver on its promise to consumers. In short, it enables people to club together to diversify and mutualise common risks. It’s a simpler, fairer, clearer model that reduces friction and results in a cheaper and better service for customers.</p>
-                        <p>I founded <a href="{{ path('homepage') }}">so-sure</a> to address this by pioneering social insurance. We offer a new type of phone insurance that’s reliable, rewarding and simply better. Customers earn rewards for each friend that takes up a mobile phone insurance policy, and receive to 80% of the value of their premium back each year if no-one claims. We’re up to 40% cheaper than network offerings and we provide excellent customer support &amp; service, our claims NPS is in the 70s which is unheard of in insurance. We control everything, from sales to claims handling, because we believe that without owning the entire claim experience from start to finish we can’t deliver a service that leads to happy and loyal customers.</p>
-                        <p>This might sound innovative, perhaps even disruptive, but it’s actually a return to the roots of the insurance industry back in the 17th Century, when <a href="https://en.wikipedia.org/wiki/Mutual_insurance" target="_blank" rel="noopener noreferrer">mutual insurance companies</a> originated in the aftermath of the Great Fire Of London to pool resources and help people cover losses. Unlike traditional mutual models, which pool large numbers of individuals, social insurance is based on people and their personal networks. This allows our customers to share upside and get rewarded when they (and those they know and trust) don’t claim.</p>
-                        <p>InsurTech is hugely exciting and we’re proud to be part of the movement, standing shoulder to shoulder with forward-thinking companies striving to make insurance better. Technology has the potential to optimise operations, leveraging technology to reduce complexity, stress and inefficiencies. However, it’s just a tool. It takes more than tech to rebuild trust with customers. To do that, we need to go back to basics and reform the underlying model. By championing social insurance we can make insurance work harder - and better - for everyone.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                {# image #}
+                                <p>Insurance has an image problem.</p>
+                                <p>It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers.</p>
+                                <p>In the long run, what’s good for customers is good for insurers. But short-term thinking has blighted the industry and created a needless asymmetry between buyers and sellers. There’s now a widespread perception amongst consumers that what’s good for insurers is not good for them, and vice-versa.</p>
+                                <p>This threatens to undermine the entire industry and damage its long term prospects. This, in turn, undermines the ability of people everywhere to manage risk and achieve their financial goals.</p>
+                                <p>The solution doesn’t lie in superficial re-branding or shiny new tech. After all, negative perceptions exist for a reason. Insurers are perceived as stitching customers up from day one with onerous terms and conditions. Ripping us off by pushing up premiums year on year. Subsidising new business by punishing loyal customers. Slowing the claims process down with painful process, excessive paperwork and holding out on payouts. The list goes on.</p>
+                                <p>The root cause of the insurance industry’s lacklustre reputation is poor customer experience. This applies to all stages of the process - buying, renewing and claiming. <a href="https://www.bain.com/insights/customer-behavior-loyalty-in-insurance-global-2017" target="_blank" rel="noopener noreferrer">As Bain &amp; Co point out</a>, the quality of customer interaction matters. Those delighted by an interaction reward insurance providers with positive Net Promoter Scores. Those dissatisfied, vote with their feet.</p>
+                                <p>CEO platitudes aren't going to tackle a problem as fundamental and deep-rooted as that. What’s needed is a fundamental rethink about the way insurance works, and the relationship between consumers and insurers. Then, we need concerted action to make change a reality.</p>
+                                <p>The Financial Times recently ran a piece highlighting how <a href="https://www.ft.com/content/2916c128-918d-11e8-b639-7680cedcc421" target="_blank" rel="noopener noreferrer">insurance firms are adapting their business models in order to provide services</a>. The focus on solving consumer problems is a great and welcome step in the right direction, but it appears that insurers are seeking to regain consumer trust via association with peripheral services, rather than addressing the lack of trust in their own core service and product range. Surely it would be better to focus on fixing this, rather than hope for the halo effect of bolt-ons?</p>
+                                <p>The traditional system is broken. A top-down approach of bolting on services and swish apps to the conventional offering isn’t going to fix it. We need to go back to first principles and reform the insurance model from the ground up before worrying about how to optimise it through technology.</p>
+                                <p>Social insurance offers a solution that can transform the way insurance works and deliver on its promise to consumers. In short, it enables people to club together to diversify and mutualise common risks. It’s a simpler, fairer, clearer model that reduces friction and results in a cheaper and better service for customers.</p>
+                                <p>I founded <a href="{{ path('homepage') }}">so-sure</a> to address this by pioneering social insurance. We offer a new type of phone insurance that’s reliable, rewarding and simply better. Customers earn rewards for each friend that takes up a mobile phone insurance policy, and receive to 80% of the value of their premium back each year if no-one claims. We’re up to 40% cheaper than network offerings and we provide excellent customer support &amp; service, our claims NPS is in the 70s which is unheard of in insurance. We control everything, from sales to claims handling, because we believe that without owning the entire claim experience from start to finish we can’t deliver a service that leads to happy and loyal customers.</p>
+                                <p>This might sound innovative, perhaps even disruptive, but it’s actually a return to the roots of the insurance industry back in the 17th Century, when <a href="https://en.wikipedia.org/wiki/Mutual_insurance" target="_blank" rel="noopener noreferrer">mutual insurance companies</a> originated in the aftermath of the Great Fire Of London to pool resources and help people cover losses. Unlike traditional mutual models, which pool large numbers of individuals, social insurance is based on people and their personal networks. This allows our customers to share upside and get rewarded when they (and those they know and trust) don’t claim.</p>
+                                <p>InsurTech is hugely exciting and we’re proud to be part of the movement, standing shoulder to shoulder with forward-thinking companies striving to make insurance better. Technology has the potential to optimise operations, leveraging technology to reduce complexity, stress and inefficiencies. However, it’s just a tool. It takes more than tech to rebuild trust with customers. To do that, we need to go back to basics and reform the underlying model. By championing social insurance we can make insurance work harder - and better - for everyone.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
