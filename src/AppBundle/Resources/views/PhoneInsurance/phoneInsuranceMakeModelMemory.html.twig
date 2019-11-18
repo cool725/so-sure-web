@@ -167,6 +167,9 @@
                                 Watch our Video
                             </a>
                         {{ form_end(buy_form) }}
+                        {% if validation_required is not null %}
+                            <p class="text-white">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
+                        {% endif %}
                         <h2 class="h4 text-columbia-blue-e mb-4">What's covered:</h2>
                         <ul class="list-unstyled icn-fa-list mb-0">
                             <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Loss &amp; Theft</li>
