@@ -181,7 +181,7 @@ class PhonePolicy extends Policy
     protected $imeiCircumvention;
 
     /**
-     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved", null},
+     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved", ""},
      *     strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
