@@ -402,7 +402,7 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
-        if(mb_strtolower($phone->getMake()) == "apple") {
+        if (mb_strtolower($phone->getMake()) == "apple") {
             // iphone only
             // Aggregators - validation required
             $session = $this->get('session');
