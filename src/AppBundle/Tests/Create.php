@@ -7,6 +7,9 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\LogEntry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -61,11 +64,10 @@ class Create
      * @param User             $user   is the user who owns the policy.
      * @param \DateTime|string $start  is either a date or a string defining a date that the policy starts. The policy
      *                                 end will be a year after this date.
-     * @param float            $gwp    is the gwp value that the policy's premium will have.
      * @param string           $status is the status that the policy will have.
      * @return Policy the newly created policy.
      */
-    public static function policy($user, $start, $gwp, $status)
+    public static function policy($user, $start, $status)
     {
         $policy = new PhonePolicy();
         $policy->setUser($user);
@@ -73,7 +75,7 @@ class Create
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $premium = new PhonePremium();
-        $premium->setGwp($gwp);
+        $premium->setGwp(rand(20, 100) / 8);
         $policy->setPremium($premium);
         $policy->setStatus($status);
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
@@ -95,5 +97,40 @@ class Create
         $logEntry->setData(["status" => $status]);
         $logEntry->setLoggedAtSpecifically($date);
         return $logEntry;
+    }
+
+    /**
+     * Create a payment of one month's premium and put it on the given policy.
+     * @param Policy           $policy  is the policy to add the payment to.
+     * @param \DateTime|string $date    is the date of the payment.
+     * @param boolean          $success is the success of the payment.
+     * @return Payment the created payment.
+     */
+    public static function standardPayment($policy, $date, $success)
+    {
+        $payment = new CheckoutPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setSuccess($success);
+        $payment->setDate(is_string($date) ? new \DateTime($date) : $date);
+        $policy->addPayment($payment);
+        return $payment;
+    }
+
+    /**
+     * Create a scheduled payment of one month's premium and put it on the given policy.
+     * @param Policy    $policy is the policy to add the scheduled payment to.
+     * @param \DateTime $date   is the scheduled date of the scheduled payment.
+     * @param string    $status is the status to give the scheduled payment.
+     * @param string    $type   is the type to give the scheduled payment.
+     * @return ScheduledPayment the scheduled payment that was created.
+     */
+    public static function standardScheduledPayment($policy, $date, $status, $type)
+    {
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setScheduled(is_string($date) ? new \DateTime($date) : $date);
+        $scheduledPayment->setStatus($status);
+        $scheduledPayment->setType($type);
+        $policy->addScheduledPayment($scheduledPayment);
+        return $scheduledPayment;
     }
 }
