@@ -34,9 +34,9 @@ class SixpackService
     // Exp 4
     // const EXPERIMENT_APP_LINK_SMS = 'app-link-sms';
     // Exp 5
-    const EXPERIMENT_UK_FLAG = 'UK flag';
+    // const EXPERIMENT_UK_FLAG = 'UK flag';
     // Exp 6
-    //
+    const EXPERIMENT_HOMEPAGE_TAGLINE = 'Homepage Tagline';
     // Exp 7
     //
     // Exp 8
@@ -117,7 +117,8 @@ class SixpackService
         'app-request-picsure-location',
         'app-link-sms',
         'New Funnel',
-        'New Funnel V2'
+        'New Funnel V2',
+        'UK flag'
     ];
 
     public static $unauthExperiments = [
@@ -126,9 +127,9 @@ class SixpackService
         // Exp 2
         // self::EXPERIMENT_NEW_FUNNEL_V2,
         // Exp 3
-        self::EXPERIMENT_UK_FLAG,
+        // self::EXPERIMENT_UK_FLAG,
         // Exp 4
-        //
+        self::EXPERIMENT_HOMEPAGE_TAGLINE,
         // Exp 5
         //
         // Exp 6
@@ -241,9 +242,9 @@ class SixpackService
         // Exp 1
         // self::EXPERIMENT_NEW_FUNNEL,
         // Exp 2
-        self::EXPERIMENT_UK_FLAG,
+        // self::EXPERIMENT_UK_FLAG,
         // Exp 3
-        //
+        self::EXPERIMENT_HOMEPAGE_TAGLINE,
         // Exp 4
         //
         // Exp 5
