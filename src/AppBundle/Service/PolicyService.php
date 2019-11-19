@@ -323,8 +323,8 @@ class PolicyService
     public function init(
         User $user,
         Phone $phone,
-        $imei,
-        $serialNumber,
+        $imei = null,
+        $serialNumber = null,
         IdentityLog $identityLog = null,
         $phoneData = null,
         $modelNumber = null,
@@ -335,7 +335,9 @@ class PolicyService
         }
         try {
             $this->validateUser($user);
-            $this->validateImei($imei);
+            if ($imei) {
+                $this->validateImei($imei);
+            }
 
             if ($identityLog && $identityLog->isSessionDataPresent()) {
                 if (!$this->rateLimit->allowedByDevice(
@@ -348,14 +350,16 @@ class PolicyService
             }
 
             $checkmend = null;
-            if (!$user->hasSoSureEmail()) {
+            if ($imei && !$user->hasSoSureEmail()) {
                 $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
             }
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
             $policy->setPhone($phone);
-            $policy->setImei($imei);
+            if ($imei) {
+                $policy->setImei($imei);
+            }
             $policy->setSerialNumber($serialNumber);
             $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);

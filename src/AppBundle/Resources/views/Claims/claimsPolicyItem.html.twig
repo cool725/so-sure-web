@@ -1,8 +1,11 @@
-{% set monthlyBacs = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
-{% set yearlyBacs = policy.phone.currentYearlyPhonePrice.yearlyPremiumPrice %}
 {% if policy.isPolicy %}
     {% set monthlyBacs = policy.premium.monthlyPremiumPrice %}
     {% set yearlyBacs = policy.premium.yearlyPremiumPrice %}
+{% else %}
+    {% set monthlyBacsMonthly = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+    {% set monthlyBacsYearly = policy.phone.currentMonthlyPhonePrice.yearlyPremiumPrice %}
+    {% set yearlyBacsMonthly = policy.phone.currentYearlyPhonePrice.monthlyPremiumPrice %}
+    {% set yearlyBacsYearly = policy.phone.currentYearlyPhonePrice.yearlyPremiumPrice %}
 {% endif %}
 
 <div id="claimPolicyItem">
@@ -1871,7 +1874,12 @@
                         <div class="form-group col-sm-10">
                             {{ form_errors(bacs_form.amount) }}
                             {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
-                            (£{{ monthlyBacs| number_format(2, '.', ',') }} / £{{ yearlyBacs| number_format(2, '.', ',') }})
+                            {% if policy.isPolicy %}
+                                (£{{ monthlyBacs| number_format(2, '.', ',') }} / £{{ yearlyBacs| number_format(2, '.', ',') }})
+                            {% else %}
+                                Monthly Price: (£{{ monthlyBacsMonthly| number_format(2, '.', ',') }} / £{{ monthlyBacsYearly| number_format(2, '.', ',') }})
+                                Yearly Price: (£{{ yearlyBacsMonthly| number_format(2, '.', ',') }} / £{{ yearlyBacsYearly| number_format(2, '.', ',') }})
+                            {% endif %}
                             <br><strong>
                                 Non-manual payments will be scheduled assuming users have bacs details
                             </strong>
@@ -1954,7 +1962,10 @@
                                     {{ form_label(bacs_refund_form.amount) }}
                                     {{ form_errors(bacs_refund_form.amount) }}
                                     {{ form_widget(bacs_refund_form.amount) }}
-                                    <br>Enter positive figure <strong>£{{ monthlyBacs| number_format(2, '.', ',') }} / month or £{{ yearlyBacs| number_format(2, '.', ',') }} / year</strong>
+                                    <br>Enter positive figure 
+                                    {% if policy.isPolicy %}
+                                        <strong>£{{ monthlyBacs| number_format(2, '.', ',') }} / month or £{{ yearlyBacs| number_format(2, '.', ',') }} / year</strong>
+                                    {% endif %}
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(bacs_refund_form.totalCommission) }}
