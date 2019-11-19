@@ -1738,6 +1738,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                                 $policy->getId()
                             ));
                         }
+                    } elseif (!$policy->getPremium()) {
+                        $priceService = $this->get("app.price");
+                        $priceService->phonePolicyDeterminePremium(
+                            $policy,
+                            $bacsPayment->getAmount(),
+                            new \DateTime()
+                        );
                     }
                     $policy->addPayment($bacsPayment);
 
