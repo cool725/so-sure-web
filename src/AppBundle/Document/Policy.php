@@ -1039,6 +1039,26 @@ abstract class Policy
     }
 
     /**
+     * Gives you the policy's successful scheduled payment with the greatest schedule date even if this date is greater
+     * than the current time.
+     * @return ScheduledPayment|null the latest successful scheduled payment or null if there are no successful
+     *                               scheduled payments at all.
+     */
+    public function getLatestSuccessfulScheduledPayment()
+    {
+        $latest = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() != ScheduledPayment::STATUS_SUCCESS) {
+                continue;
+            }
+            if (!$latest || $latest->getScheduled() < $scheduledPayment->getScheduled()) {
+                $latest = $scheduledPayment;
+            }
+        }
+        return $latest;
+    }
+
+    /**
      * @return Payment|null
      */
     public function getLastSuccessfulUserPaymentCredit()

@@ -285,7 +285,6 @@ class PhoneInsuranceController extends BaseController
         $decodedModelHyph = Phone::decodedModelHyph($model);
 
         $phones = $repo->findBy([
-            'active' => true,
             'makeCanonical' => mb_strtolower($make),
             'modelCanonical' => mb_strtolower($decodedModel)
         ]);
@@ -294,7 +293,6 @@ class PhoneInsuranceController extends BaseController
             $phone = $phones[0];
         } else {
             $phone = $repo->findOneBy([
-                'active' => true,
                 'makeCanonical' => mb_strtolower($make),
                 'modelCanonical' => mb_strtolower($decodedModelHyph),
             ]);
@@ -502,9 +500,9 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
-        // A/B UK Flag Test
-        // To Test use url param ?force=flag / ?force=no-flag
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_UK_FLAG);
+        // A/B Tagline Test
+        // To Test use url param ?force=current-tagline / ?force=new-tagline
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE);
 
         $data = [
             'phone' => $phone,
@@ -528,6 +526,49 @@ class PhoneInsuranceController extends BaseController
             'competitor3' => 'O2',
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
+    }
+
+    /**
+     * SEO Pages Redirect - Phone Insurance > Make > Model
+     * @Route("/phone-insurance/{make}+{model}", name="phone_insurance_make_model_old",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     */
+    public function phoneInsuranceMakeModelRedirect($make = null, $model = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+        $decodedModel = Phone::decodeModel($model);
+        $decodedModelHyph = Phone::decodedModelHyph($model);
+
+        $phones = $repo->findBy([
+            'makeCanonical' => mb_strtolower($make),
+            'modelCanonical' => mb_strtolower($decodedModel)
+        ]);
+
+        if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
+            $phone = $phones[0];
+        } else {
+            $phone = $repo->findOneBy([
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModelHyph),
+            ]);
+        }
+
+        if (!$phone) {
+            $this->get('logger')->info(sprintf(
+                'Failed to find phone for old make/model page - make: %s model: %s',
+                $make,
+                $model
+            ));
+            return new RedirectResponse($this->generateUrl('phone_insurance'));
+        }
+
+        return $this->redirectToRoute('phone_insurance_make_model', [
+            'make' => $phone->getMakeCanonical(),
+            'model' => $phone->getEncodedModelCanonical(),
+        ], 301);
     }
 
 

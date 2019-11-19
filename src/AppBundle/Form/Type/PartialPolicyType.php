@@ -26,7 +26,7 @@ class PartialPolicyType extends AbstractType
                         return sprintf('%s%s', $phone->getActive() ? '' : '(OLD) ', $phone);
                     }
             ])
-            ->add('imei', TextType::class)
+            ->add('imei', TextType::class, ['required' => false])
             ->add('serialNumber', TextType::class, ['required' => false])
             ->add('add', SubmitType::class);
     }

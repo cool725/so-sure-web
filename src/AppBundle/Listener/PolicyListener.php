@@ -3,9 +3,12 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\SmsService;
 use Psr\Log\LoggerInterface;
 use AppBundle\Event\ConnectionEvent;
+use AppBundle\Event\PolicyEvent;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Charge;
 
 class PolicyListener
 {
@@ -15,15 +18,21 @@ class PolicyListener
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var SmsService */
+    protected $smsService;
+
     /**
      * @param PolicyService   $policyService
+     * @param SmsService      $smsService
      * @param LoggerInterface $logger
      */
     public function __construct(
         PolicyService $policyService,
+        SmsService $smsService,
         LoggerInterface $logger
     ) {
         $this->policyService = $policyService;
+        $this->smsService = $smsService;
         $this->logger = $logger;
     }
 
@@ -52,5 +61,27 @@ class PolicyListener
         }
 
         $this->policyService->connectionReduced($connection);
+    }
+
+    /**
+     * @param PolicyEvent $event
+     */
+    public function onPolicyCreatedEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        if ($policy != null) {
+            $policyTerms = $policy->getPolicyTerms();
+            if ($policyTerms != null) {
+                if ($policyTerms->isPicSureRequired()) {
+                    $smsTemplate = "AppBundle:Sms:picsure-required/picsureReminderOne.txt.twig";
+                    $this->smsService->sendUser(
+                        $event->getPolicy(),
+                        $smsTemplate,
+                        ["policy" => $policy],
+                        Charge::TYPE_SMS_PAYMENT
+                    );
+                }
+            }
+        }
     }
 }
