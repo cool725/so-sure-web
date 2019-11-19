@@ -41,6 +41,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Document\LogEntry;
 use AppBundle\Tests\Create;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\LogEntryRepository;
 use Symfony\Component\Validator\Constraints\Date;
 
@@ -6139,46 +6140,36 @@ class PolicyServiceTest extends WebTestCase
      */
     public function testCancelOverduePicsurePolicies()
     {
+        $date = new \DateTime();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = static::$dm->getRepository(Policy::class);
         /** @var LogEntryRepository $logEntryRepo */
         $logEntryRepo = static::$dm->getRepository(LogEntry::class);
-        $date = new \DateTime();
-        $user = Create::user()->save(static::$dm);
-        $a = Create::policy($user, $date, 1.2, Policy::STATUS_PICSURE_REQUIRED)->save(static::$dm);
-        $b = Create::policy($user, $date, 2.1, Policy::STATUS_PICSURE_REQUIRED)->save(static::$dm);
-        $c = Create::policy($user, $date, 3.77, Policy::STATUS_UNPAID)->save(static::$dm);
-        static::$dm->flush();
+        $user = Create::user();
+        $a = Create::policy($user, $date, 2.2, Policy::STATUS_PICSURE_REQUIRED);
+        $b = Create::policy($user, $date, 2.1, Policy::STATUS_PICSURE_REQUIRED);
+        $c = Create::policy($user, $date, 3.77, Policy::STATUS_UNPAID);
+        Create::save(static::$dm, $user, $a, $b, $c);
         // Don't want creation logs as they are at the current date and time.
         $logEntryRepo->createQueryBuilder()->remove()->getQuery()->execute();
         // create new update logs.
-        Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12)->save(static::$dm);
-        Create::logEntry($a, Policy::STATUS_UNPAID, 51)->save(static::$dm);
-        Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60)->save(static::$dm);
-        Create::logEntry($a, Policy::STATUS_ACTIVE, 39)->save(static::$dm);
-        Create::logEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30)->save(static::$dm);
-        Create::logEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30)->save(static::$dm);
-        Create::logEntry($c, Policy::STATUS_UNPAID, 31)->save(static::$dm);
-        static::$dm->flush();
+        $lA = Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12);
+        $lB = Create::logEntry($a, Policy::STATUS_UNPAID, 51);
+        $lC = Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60);
+        $lD = Create::logEntry($a, Policy::STATUS_ACTIVE, 39);
+        $lE = Create::logEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30);
+        $lF = Create::logEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30);
+        $lG = Create::logEntry($c, Policy::STATUS_UNPAID, 31);
+        Create::save(static::$dm, $lA, $lB, $lC, $lD, $lE, $lF, $lG);
         // Make sure a dry run is dry.
         $cancelled = static::$policyService->cancelOverduePicsurePolicies(true);
-        /** @var Policy $a */
-        $a = $policyRepo->findOneBy(["id" => $a->getId()]);
-        /** @var Policy $b */
-        $b = $policyRepo->findOneBy(["id" => $b->getId()]);
-        /** @var Policy $c */
-        $c = $policyRepo->findOneBy(["id" => $c->getId()]);
+        Create::refresh(static::$dm, $a, $b, $c);
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $b->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
         // Now do a wet run
         $cancelledAgain = static::$policyService->cancelOverduePicsurePolicies(false);
-        /** @var Policy $a */
-        $a = $policyRepo->findOneBy(["id" => $a->getId()]);
-        /** @var Policy $b */
-        $b = $policyRepo->findOneBy(["id" => $b->getId()]);
-        /** @var Policy $c */
-        $c = $policyRepo->findOneBy(["id" => $c->getId()]);
+        Create::refresh(static::$dm, $a, $b, $c);
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
         $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
         $this->assertEquals(Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, $b->getCancelledReason());
@@ -6198,17 +6189,13 @@ class PolicyServiceTest extends WebTestCase
     public function testCheckOwedPremium()
     {
         // Create test data.
-        $user = Create::user()->save(static::$dm);
-        $a = Create::policy($user, "2019-01-01", 1.5, Policy::STATUS_UNPAID)->save(static::$dm);
-        $b = Create::policy($user, "2019-01-01", 2.4, Policy::STATUS_UNPAID)->save(static::$dm);
-        $c = Create::policy($user, "2019-01-01", 3.7, Policy::STATUS_ACTIVE)->save(static::$dm);
-        static::$dm->flush();
+        $user = Create::user();
+        $a = Create::policy($user, "2019-01-01", 1.5, Policy::STATUS_UNPAID);
+        $b = Create::policy($user, "2019-01-01", 2.4, Policy::STATUS_UNPAID);
+        $c = Create::policy($user, "2019-01-01", 3.7, Policy::STATUS_ACTIVE);
+        Create::save(static::$dm, $user, $a, $b, $c);
         // now make sure they show TheRightStuff.
-        $policyRepo = static::$dm->getRepository(Policy::class);
-        $this->assertEquals(
-            0,
-            static::$policyService->checkOwedPremium($c, new \DateTime())
-        );
+        $this->assertEquals(0, static::$policyService->checkOwedPremium($c, new \DateTime()));
     }
 
 

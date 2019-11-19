@@ -17,41 +17,35 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  */
 class Create
 {
-    /** @var Object $item */
-    private $item;
-
     /**
-     * Private constructor so it can only be created from within it's static methods.
-     * @param Object $item is the item that the create object contains.
+     * Refreshes the passed things from the document manager.
+     * @param DocumentManager $dm       is the document manager used to refresh the item.
+     * @param mixed           ...$items is the set of the passed items.
      */
-    private function __construct($item)
+    public static function refresh($dm, ...$items)
     {
-        $this->item = $item;
+        foreach ($items as $item) {
+            $dm->persist($item);
+        }
+        $dm->flush();
     }
 
     /**
-     * Persists the contained object with the given document manager and then returns the object.
-     * @param DocumentManager $dm is the document manager.
-     * @return Object the thing that was created and now saved.
+     * Persists and flushes a collection of items to the database in a single operation.
+     * @param DocumentManager $dm       is the document manager to use to persist to the database.
+     * @param mixed           ...$items is the set of all items to persist.
      */
-    public function save($dm)
+    public static function save($dm, ...$items)
     {
-        $dm->persist($this->item);
-        return $this->item;
-    }
-
-    /**
-     * Gives you the item stored within the create object which should always be present.
-     * @return Object the content.
-     */
-    public function open()
-    {
-        return $this->item;
+        foreach ($items as $item) {
+            $dm->persist($item);
+        }
+        $dm->flush();
     }
 
     /**
      * Creates a new user document that can be safely persisted.
-     * @return Create containing the created user.
+     * @return User the created user.
      */
     public static function user()
     {
@@ -59,7 +53,7 @@ class Create
         $user->setFirstName("John");
         $user->setLastName("Fogle");
         $user->setEmail(uniqid()."@hotmail.com");
-        return new Create($user);
+        return $user;
     }
 
     /**
@@ -69,7 +63,7 @@ class Create
      *                                 end will be a year after this date.
      * @param float            $gwp    is the gwp value that the policy's premium will have.
      * @param string           $status is the status that the policy will have.
-     * @return Create containing the newly created policy.
+     * @return Policy the newly created policy.
      */
     public static function policy($user, $start, $gwp, $status)
     {
@@ -83,7 +77,7 @@ class Create
         $policy->setPremium($premium);
         $policy->setStatus($status);
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
-        return new Create($policy);
+        return $policy;
     }
 
     /**
@@ -91,7 +85,7 @@ class Create
      * @param Policy $policy  is the policy the entry should be for.
      * @param string $status  is the status the policy is having set in the entry.
      * @param int    $daysAgo is the number of days ago this log entry should have occurred.
-     * @return Create containing the created log entry.
+     * @return LogEntry the created log entry.
      */
     public static function logEntry($policy, $status, $daysAgo)
     {
@@ -100,6 +94,6 @@ class Create
         $logEntry->setObjectId($policy->getId());
         $logEntry->setData(["status" => $status]);
         $logEntry->setLoggedAtSpecifically($date);
-        return new Create($logEntry);
+        return $logEntry;
     }
 }
