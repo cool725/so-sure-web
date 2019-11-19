@@ -2712,6 +2712,20 @@ class PolicyService
         if ($policy->getStatus() != Policy::STATUS_UNPAID) {
             return 0;
         }
-
+        $amount = $policy->getOutstandingPremiumToDate($date);
+        if ($this->greaterThanZero($amount)) {
+            return $amount;
+        }
+        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+        $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
+        if (!$this->greaterThanZero($rescheduledAmount)) {
+            $this->logger->error(sprintf(
+                'Policy %s has unpaid status, but paid to date. Setting to active.',
+                $policy->getId()
+            ));
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $this->dm->flush();
+        }
+        return $rescheduledAmount;
     }
 }

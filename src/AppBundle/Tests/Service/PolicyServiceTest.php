@@ -6146,9 +6146,9 @@ class PolicyServiceTest extends WebTestCase
         /** @var LogEntryRepository $logEntryRepo */
         $logEntryRepo = static::$dm->getRepository(LogEntry::class);
         $user = Create::user();
-        $a = Create::policy($user, $date, Policy::STATUS_PICSURE_REQUIRED);
-        $b = Create::policy($user, $date, Policy::STATUS_PICSURE_REQUIRED);
-        $c = Create::policy($user, $date, Policy::STATUS_UNPAID);
+        $a = Create::policy($user, $date, Policy::STATUS_PICSURE_REQUIRED, 12);
+        $b = Create::policy($user, $date, Policy::STATUS_PICSURE_REQUIRED, 12);
+        $c = Create::policy($user, $date, Policy::STATUS_UNPAID, 12);
         Create::save(static::$dm, $user, $a, $b, $c);
         // Don't want creation logs as they are at the current date and time.
         $logEntryRepo->createQueryBuilder()->remove()->getQuery()->execute();
@@ -6192,10 +6192,10 @@ class PolicyServiceTest extends WebTestCase
     {
         // Create test data.
         $user = Create::user();
-        $a = Create::policy($user, "2019-01-01", Policy::STATUS_UNPAID);
-        $b = Create::policy($user, "2019-02-04", Policy::STATUS_UNPAID);
-        $c = Create::policy($user, "2019-01-01", Policy::STATUS_UNPAID);
-        $d = Create::policy($user, "2019-01-01", Policy::STATUS_ACTIVE);
+        $a = Create::policy($user, "2019-01-01", Policy::STATUS_UNPAID, 12);
+        $b = Create::policy($user, "2019-02-04", Policy::STATUS_UNPAID, 12);
+        $c = Create::policy($user, "2019-01-01", Policy::STATUS_UNPAID, 12);
+        $d = Create::policy($user, "2019-01-01", Policy::STATUS_ACTIVE, 12);
         Create::save(static::$dm, $user, $a, $b, $c, $d);
         Create::save(
             static::$dm,
