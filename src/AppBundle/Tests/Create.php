@@ -120,10 +120,10 @@ class Create
 
     /**
      * Create a scheduled payment of one month's premium and put it on the given policy.
-     * @param Policy    $policy is the policy to add the scheduled payment to.
-     * @param \DateTime $date   is the scheduled date of the scheduled payment.
-     * @param string    $status is the status to give the scheduled payment.
-     * @param string    $type   is the type to give the scheduled payment.
+     * @param Policy           $policy is the policy to add the scheduled payment to.
+     * @param \DateTime|string $date   is the scheduled date of the scheduled payment.
+     * @param string           $status is the status to give the scheduled payment.
+     * @param string           $type   is the type to give the scheduled payment.
      * @return ScheduledPayment the scheduled payment that was created.
      */
     public static function standardScheduledPayment($policy, $date, $status, $type)

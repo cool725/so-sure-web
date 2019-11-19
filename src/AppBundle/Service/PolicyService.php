@@ -10,6 +10,7 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\PolicyTermsRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -2716,6 +2717,7 @@ class PolicyService
         if ($this->greaterThanZero($amount)) {
             return $amount;
         }
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
         if (!$this->greaterThanZero($rescheduledAmount)) {
