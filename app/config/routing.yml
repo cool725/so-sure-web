@@ -189,6 +189,16 @@ redirect_learn_more_make_model_memory:
         route: phone_insurance_make_model_memory
         permanent: true
 
+redirect_make_model_phone_insurance:
+    path: /phone-insurance/{make}+{model}
+    requirements:
+        make: "[a-zA-Z]+"
+        model: "[+-.a-zA-Z0-9() ]+"
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: phone_insurance_make_model
+        permanent: true
+
 redirect_make_model_insure:
     path: /insure/{make}+{model}
     requirements:
@@ -725,13 +735,6 @@ redirect_seo_mobile_insurance_oneplus_6:
         path: /phone-insurance/oneplus/6
         permanent: true
 
-redirect_seo_mobile_insurance_oneplus_67:
-    path: /mobile-insurance/oneplus-67
-    defaults:
-        _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /phone-insurance/oneplus
-        permanent: true
-
 redirect_seo_phone_insurance_oneplus_6:
     path: /phone-insurance/oneplus-6
     defaults:
@@ -760,7 +763,7 @@ redirect_seo_mobile_insurance_pixel_3:
         path: /phone-insurance/google/pixel-3
         permanent: true
 
-redirect_seo_mobile_insurance_galaxy_a5_2017:
+redirect_seo_mobile_insurance_galaxy_s5:
     path: /mobile-insurance/samsung-galaxy-a5-2017
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
@@ -790,13 +793,6 @@ redirect_seo_mobile_insurance_galaxy_j5_2017:
 
 redirect_seo_mobile_insurance_galaxy_a5:
     path: /mobile-insurance/samsung-galaxy-a5
-    defaults:
-        _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /phone-insurance/samsung
-        permanent: true
-
-redirect_seo_mobile_insurance_galaxy_s5:
-    path: /mobile-insurance/samsung-galaxy-s5
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /phone-insurance/samsung

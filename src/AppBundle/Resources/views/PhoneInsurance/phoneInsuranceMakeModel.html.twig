@@ -117,23 +117,14 @@
                             </ul>
                         </div>
                         <h1 class="text-white h1m mb-0">
-                            {% if phone.active %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price.monthlyPremiumPrice }} per month
-                            {% else %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance
-                            {% endif %}
+                            {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price.monthlyPremiumPrice }} per month
                         </h1>
-                        {% if not phone.active %}
-                            <p class="text-white my-4">Unfortunately we no longer insure this device as it's either over three years old or replacements/parts are hard to source. We aim to provide you the best possible claims experience and make sure we only cover devices with good replacement/parts availability.</p>
-                            <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Get a Quote</a>
+                        {% if phone is defined and phone %}
+                            {{ render(controller('AppBundle:Search:memorySearchDropdown', {
+                                'id': phone.id,
+                            }|merge(app.request.query.all))) }}
                         {% else %}
-                            {% if phone is defined and phone %}
-                                {{ render(controller('AppBundle:Search:memorySearchDropdown', {
-                                    'id': phone.id,
-                                }|merge(app.request.query.all))) }}
-                            {% else %}
-                                {{ render(controller('AppBundle:Search:memorySearchDropdown', { }|merge(app.request.query.all))) }}
-                            {% endif %}
+                            {{ render(controller('AppBundle:Search:memorySearchDropdown', { }|merge(app.request.query.all))) }}
                         {% endif %}
                     </div>
                 </div>
