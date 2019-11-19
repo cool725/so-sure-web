@@ -502,9 +502,9 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
-        // A/B UK Flag Test
-        // To Test use url param ?force=flag / ?force=no-flag
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_UK_FLAG);
+        // A/B Tagline Test
+        // To Test use url param ?force=current-tagline / ?force=new-tagline
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE);
 
         $data = [
             'phone' => $phone,
