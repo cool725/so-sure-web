@@ -5,7 +5,9 @@ namespace AppBundle\Document\Form;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\File\PicSureFile;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 class PicSureStatus
 {
@@ -26,6 +28,12 @@ class PicSureStatus
 
     public function setPicSureStatus($picSureStatus)
     {
+        if ($picSureStatus === null) {
+            // remove pic-sure files
+            foreach ($this->policy->getPolicyFilesByType(PicSureFile) as $file) {
+                $this->policy->removePolicyFile($file);
+            }
+        }
         $this->picSureStatus = $picSureStatus;
     }
 
