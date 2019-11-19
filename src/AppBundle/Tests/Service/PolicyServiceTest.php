@@ -6198,7 +6198,6 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(0, static::$policyService->checkOwedPremium($c, new \DateTime()));
     }
 
-
     private function getFormattedWeekendsForOneYear($fromDate = null)
     {
         if (!$fromDate) {

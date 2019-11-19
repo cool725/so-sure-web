@@ -2703,8 +2703,8 @@ class PolicyService
      * Calculates the amount of money owed by an unpaid policy. If it has a normal owed amount that is returned, but if
      * it has no owed calculation but some rescheduled payments it returns the sum of them, and if there is really no
      * source of owed money it sets the policy from unpaid to active.
-     * @param Policy $policy is the policy to check.
-     * @param \DateTime $date is the date at which the amount is owed.
+     * @param Policy    $policy is the policy to check.
+     * @param \DateTime $date   is the date at which the amount is owed.
      * @return float the owed amount.
      */
     public function checkOwedPremium(Policy $policy, \DateTime $date)
