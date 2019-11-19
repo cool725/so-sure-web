@@ -2337,7 +2337,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $policyForm->handleRequest($request);
                 if ($policyForm->isValid()) {
                     $imeiValidator = $this->get('app.imei');
-                    if (!$imeiValidator->isImei($policyData->getImei()) ||
+                    if ($policyData->getImei() && !$imeiValidator->isImei($policyData->getImei()) ||
                         $imeiValidator->isLostImei($policyData->getImei()) ||
                         $imeiValidator->isDuplicatePolicyImei($policyData->getImei())) {
                         $this->addFlash(
