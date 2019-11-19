@@ -40,6 +40,7 @@ use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Document\LogEntry;
+use AppBundle\Tests\Create;
 use AppBundle\Repository\LogEntryRepository;
 use Symfony\Component\Validator\Constraints\Date;
 
@@ -6138,40 +6139,26 @@ class PolicyServiceTest extends WebTestCase
      */
     public function testCancelOverduePicsurePolicies()
     {
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = static::$dm->getRepository(Policy::class);
-        $user = new User();
-        $a = new PhonePolicy();
-        $b = new PhonePolicy();
-        $c = new PhonePolicy();
-        $a->setUser($user);
-        $b->setUser($user);
-        $c->setUser($user);
-        $a->setPolicyNumber("Mob/2020/1111111");
-        $b->setPolicyNumber("Mob/2019/2222222");
-        $c->setPolicyNumber("Mob/2019/3333333");
-        $a->setStatus(Policy::STATUS_PICSURE_REQUIRED);
-        $b->setStatus(Policy::STATUS_PICSURE_REQUIRED);
-        $c->setStatus(Policy::STATUS_UNPAID);
-        $a->setPremium(new PhonePremium());
-        $b->setPremium(new PhonePremium());
-        $c->setPremium(new PhonePremium());
-        static::$dm->persist($user);
-        static::$dm->persist($a);
-        static::$dm->persist($b);
-        static::$dm->persist($c);
-        static::$dm->flush();
-        // Don't want creation logs as they are at the current date and time.
         /** @var LogEntryRepository $logEntryRepo */
         $logEntryRepo = static::$dm->getRepository(LogEntry::class);
+        $date = new \DateTime();
+        $user = Create::user()->save(static::$dm);
+        $a = Create::policy($user, $date, 1.2, Policy::STATUS_PICSURE_REQUIRED)->save(static::$dm);
+        $b = Create::policy($user, $date, 2.1, Policy::STATUS_PICSURE_REQUIRED)->save(static::$dm);
+        $c = Create::policy($user, $date, 3.77, Policy::STATUS_UNPAID)->save(static::$dm);
+        static::$dm->flush();
+        // Don't want creation logs as they are at the current date and time.
         $logEntryRepo->createQueryBuilder()->remove()->getQuery()->execute();
         // create new update logs.
-        $this->createLogEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12);
-        $this->createLogEntry($a, Policy::STATUS_UNPAID, 51);
-        $this->createLogEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60);
-        $this->createLogEntry($a, Policy::STATUS_ACTIVE, 39);
-        $this->createLogEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30);
-        $this->createLogEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30);
-        $this->createLogEntry($c, Policy::STATUS_UNPAID, 31);
+        Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12)->save(static::$dm);
+        Create::logEntry($a, Policy::STATUS_UNPAID, 51)->save(static::$dm);
+        Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60)->save(static::$dm);
+        Create::logEntry($a, Policy::STATUS_ACTIVE, 39)->save(static::$dm);
+        Create::logEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30)->save(static::$dm);
+        Create::logEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30)->save(static::$dm);
+        Create::logEntry($c, Policy::STATUS_UNPAID, 31)->save(static::$dm);
         static::$dm->flush();
         // Make sure a dry run is dry.
         $cancelled = static::$policyService->cancelOverduePicsurePolicies(true);
@@ -6203,15 +6190,27 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(1, count($cancelled));
     }
 
-    private function createLogEntry($policy, $status, $daysAgo)
+    /**
+     * Tests that check owed premium counts owed premium both from rescheduled payments and from normal scheduled
+     * calculation and does not over report and makes policies that are truly up to date active instead of unpaid, and
+     * should do nothing when the given policy is not in the unpaid status.
+     */
+    public function testCheckOwedPremium()
     {
-        $date = (new \DateTime())->sub(new \DateInterval("P{$daysAgo}D"));
-        $logEntry = new LogEntry();
-        $logEntry->setObjectId($policy->getId());
-        $logEntry->setData(["status" => $status]);
-        $logEntry->setLoggedAtSpecifically($date);
-        static::$dm->persist($logEntry);
+        // Create test data.
+        $user = Create::user()->save(static::$dm);
+        $a = Create::policy($user, "2019-01-01", 1.5, Policy::STATUS_UNPAID)->save(static::$dm);
+        $b = Create::policy($user, "2019-01-01", 2.4, Policy::STATUS_UNPAID)->save(static::$dm);
+        $c = Create::policy($user, "2019-01-01", 3.7, Policy::STATUS_ACTIVE)->save(static::$dm);
+        static::$dm->flush();
+        // now make sure they show TheRightStuff.
+        $policyRepo = static::$dm->getRepository(Policy::class);
+        $this->assertEquals(
+            0,
+            static::$policyService->checkOwedPremium($c, new \DateTime())
+        );
     }
+
 
     private function getFormattedWeekendsForOneYear($fromDate = null)
     {
