@@ -6234,6 +6234,15 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_UNPAID, $b->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $c->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $d->getStatus());
+        // Also check that the results of this function coincide with the results of the self contained version except
+        // for in the case of the already active policy.
+        $this->assertEquals($a->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-03-22")), $resultA);
+        $this->assertEquals($b->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-05-03")), $resultB);
+        $this->assertEquals($c->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-02-15")), $resultC);
+        $this->assertEquals(
+            $d->getPremium()->getMonthlyPremiumPrice() * 5,
+            $d->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-05-12"))
+        );
     }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)
