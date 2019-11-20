@@ -41,6 +41,8 @@ use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Document\LogEntry;
+use AppBundle\Tests\Create;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\LogEntryRepository;
 use Symfony\Component\Validator\Constraints\Date;
 
@@ -6128,60 +6130,38 @@ class PolicyServiceTest extends WebTestCase
      */
     public function testCancelOverduePicsurePolicies()
     {
+        $date = new \DateTime();
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = static::$dm->getRepository(Policy::class);
-        $user = new User();
-        $a = new PhonePolicy();
-        $b = new PhonePolicy();
-        $c = new PhonePolicy();
-        $a->setUser($user);
-        $b->setUser($user);
-        $c->setUser($user);
-        $a->setPolicyNumber("Mob/2020/1111111");
-        $b->setPolicyNumber("Mob/2019/2222222");
-        $c->setPolicyNumber("Mob/2019/3333333");
-        $a->setStatus(Policy::STATUS_PICSURE_REQUIRED);
-        $b->setStatus(Policy::STATUS_PICSURE_REQUIRED);
-        $c->setStatus(Policy::STATUS_UNPAID);
-        $a->setPremium(new PhonePremium());
-        $b->setPremium(new PhonePremium());
-        $c->setPremium(new PhonePremium());
-        static::$dm->persist($user);
-        static::$dm->persist($a);
-        static::$dm->persist($b);
-        static::$dm->persist($c);
-        static::$dm->flush();
-        // Don't want creation logs as they are at the current date and time.
         /** @var LogEntryRepository $logEntryRepo */
         $logEntryRepo = static::$dm->getRepository(LogEntry::class);
+        $user = Create::user();
+        $a = Create::policy($user, $date, Policy::STATUS_PICSURE_REQUIRED, 12);
+        $b = Create::policy($user, $date, Policy::STATUS_PICSURE_REQUIRED, 12);
+        $c = Create::policy($user, $date, Policy::STATUS_UNPAID, 12);
+        Create::save(static::$dm, $user, $a, $b, $c);
+        // Don't want creation logs as they are at the current date and time.
         $logEntryRepo->createQueryBuilder()->remove()->getQuery()->execute();
         // create new update logs.
-        $this->createLogEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12);
-        $this->createLogEntry($a, Policy::STATUS_UNPAID, 51);
-        $this->createLogEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60);
-        $this->createLogEntry($a, Policy::STATUS_ACTIVE, 39);
-        $this->createLogEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30);
-        $this->createLogEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30);
-        $this->createLogEntry($c, Policy::STATUS_UNPAID, 31);
-        static::$dm->flush();
+        Create::save(
+            static::$dm,
+            Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 12),
+            Create::logEntry($a, Policy::STATUS_UNPAID, 51),
+            Create::logEntry($a, Policy::STATUS_PICSURE_REQUIRED, 60),
+            Create::logEntry($a, Policy::STATUS_ACTIVE, 39),
+            Create::logEntry($b, Policy::STATUS_PICSURE_REQUIRED, 30),
+            Create::logEntry($c, Policy::STATUS_PICSURE_REQUIRED, 30),
+            Create::logEntry($c, Policy::STATUS_UNPAID, 31)
+        );
         // Make sure a dry run is dry.
         $cancelled = static::$policyService->cancelOverduePicsurePolicies(true);
-        /** @var Policy $a */
-        $a = $policyRepo->findOneBy(["id" => $a->getId()]);
-        /** @var Policy $b */
-        $b = $policyRepo->findOneBy(["id" => $b->getId()]);
-        /** @var Policy $c */
-        $c = $policyRepo->findOneBy(["id" => $c->getId()]);
+        Create::refresh(static::$dm, $a, $b, $c);
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $b->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $c->getStatus());
         // Now do a wet run
         $cancelledAgain = static::$policyService->cancelOverduePicsurePolicies(false);
-        /** @var Policy $a */
-        $a = $policyRepo->findOneBy(["id" => $a->getId()]);
-        /** @var Policy $b */
-        $b = $policyRepo->findOneBy(["id" => $b->getId()]);
-        /** @var Policy $c */
-        $c = $policyRepo->findOneBy(["id" => $c->getId()]);
+        Create::refresh(static::$dm, $a, $b, $c);
         $this->assertEquals(Policy::STATUS_PICSURE_REQUIRED, $a->getStatus());
         $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
         $this->assertEquals(Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, $b->getCancelledReason());
@@ -6193,14 +6173,66 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(1, count($cancelled));
     }
 
-    private function createLogEntry($policy, $status, $daysAgo)
+    /**
+     * Tests that check owed premium counts owed premium both from rescheduled payments and from normal scheduled
+     * calculation and does not over report and makes policies that are truly up to date active instead of unpaid, and
+     * should do nothing when the given policy is not in the unpaid status.
+     */
+    public function testCheckOwedPremium()
     {
-        $date = (new \DateTime())->sub(new \DateInterval("P{$daysAgo}D"));
-        $logEntry = new LogEntry();
-        $logEntry->setObjectId($policy->getId());
-        $logEntry->setData(["status" => $status]);
-        $logEntry->setLoggedAtSpecifically($date);
-        static::$dm->persist($logEntry);
+        // Create test data.
+        $user = Create::user();
+        $a = Create::policy($user, "2019-01-01", Policy::STATUS_UNPAID, 12);
+        $b = Create::policy($user, "2019-02-04", Policy::STATUS_UNPAID, 12);
+        $c = Create::policy($user, "2019-01-01", Policy::STATUS_UNPAID, 12);
+        $d = Create::policy($user, "2019-01-01", Policy::STATUS_ACTIVE, 12);
+        Create::save(static::$dm, $user, $a, $b, $c, $d);
+        Create::save(
+            static::$dm,
+            Create::standardPayment($a, "2019-01-01", true),
+            Create::standardPayment($b, "2019-02-04", true),
+            Create::standardPayment($b, "2019-03-04", true),
+            Create::standardPayment($b, "2019-04-04", true),
+            Create::standardScheduledPayment(
+                $b,
+                "2019-05-10",
+                ScheduledPayment::STATUS_SCHEDULED,
+                ScheduledPayment::TYPE_RESCHEDULED
+            ),
+            Create::standardScheduledPayment(
+                $b,
+                "2019-04-10",
+                ScheduledPayment::STATUS_CANCELLED,
+                ScheduledPayment::TYPE_RESCHEDULED
+            ),
+            Create::standardPayment($c, "2019-01-01", true),
+            Create::standardPayment($c, "2019-02-01", true)
+        );
+        // Run on the policies.
+        $resultA = static::$policyService->checkOwedPremium($a, new \DateTime("2019-03-22"));
+        $resultB = static::$policyService->checkOwedPremium($b, new \DateTime("2019-05-03"));
+        $resultC = static::$policyService->checkOwedPremium($c, new \DateTime("2019-02-15"));
+        $resultD = static::$policyService->checkOwedPremium($d, new \DateTime("2019-05-12"));
+        // Check the numeric results.
+        $this->assertEquals(2 * $a->getPremium()->getMonthlyPremiumPrice(), $resultA);
+        $this->assertEquals($b->getPremium()->getMonthlyPremiumPrice(), $resultB);
+        $this->assertEquals(0, $resultC);
+        $this->assertEquals(0, $resultD);
+        // Check the statuses.
+        Create::refresh(static::$dm, $a, $b, $c, $d);
+        $this->assertEquals(Policy::STATUS_UNPAID, $a->getStatus());
+        $this->assertEquals(Policy::STATUS_UNPAID, $b->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $c->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $d->getStatus());
+        // Also check that the results of this function coincide with the results of the self contained version except
+        // for in the case of the already active policy.
+        $this->assertEquals($a->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-03-22")), $resultA);
+        $this->assertEquals($b->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-05-03")), $resultB);
+        $this->assertEquals($c->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-02-15")), $resultC);
+        $this->assertEquals(
+            $d->getPremium()->getMonthlyPremiumPrice() * 5,
+            $d->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-05-12"))
+        );
     }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)
