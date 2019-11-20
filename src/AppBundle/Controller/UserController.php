@@ -1127,24 +1127,12 @@ class UserController extends BaseController
             $this->get('logger')->error(sprintf('Unable to locate unpaid policy for user %s.', $user->getId()));
             return new RedirectResponse($this->generateUrl('user_home'));
         }
-        $amount = $policy->getOutstandingPremiumToDate();
         // Validate unpaid policy and use rescheduled amount if no owed amount due to bacs timing or whatever.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-        if (!$this->greaterThanZero($amount)) {
-            $dm = $this->getManager();
-            $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
-            $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
-            if ($this->greaterThanZero($rescheduledAmount)) {
-                $amount = $rescheduledAmount;
-            } else {
-                $this->get('logger')->warning(sprintf(
-                    'Policy %s has unpaid status, but paid to date. Setting to active.',
-                    $policy->getId()
-                ));
-                $policy->setStatus(Policy::STATUS_ACTIVE);
-                $this->getManager()->flush();
-                return new RedirectResponse($this->generateUrl('user_home'));
-            }
+        $policyService = $this->get('app.policy');
+        $amount = $policyService->checkOwedPremium($policy, new \DateTime());
+        if ($amount == 0) {
+            return new RedirectResponse($this->generateUrl('user_home'));
         }
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
