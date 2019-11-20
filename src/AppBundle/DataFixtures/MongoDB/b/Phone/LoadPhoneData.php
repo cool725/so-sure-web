@@ -7,6 +7,7 @@ use AppBundle\Service\MailerService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -115,7 +116,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $linesWithPrice[] = sprintf(
                 '"%s for £%0.2f / month',
                 $phone,
-                $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()
+                $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->getMonthlyPremiumPrice()
             );
             $linesWithDevice[] = sprintf('"%s %s" as "%s"', $phone->getMake(), $phone->getModel(), $device);
         }
@@ -333,7 +334,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             $manager->persist($phone);
             $manager->flush();
-            if (!$phone->getCurrentPhonePrice() && $premium > 0) {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY) && $premium > 0) {
                 throw new \Exception('Failed to init phone');
             }
 
@@ -358,13 +359,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         // Validate that the regex for quote make model is working for all the data
         if ($make != "ALL") {
             if ($memory) {
-                $router->generate('quote_make_model_memory', [
+                $router->generate('phone_insurance_make_model_memory', [
                     'make' => mb_strtolower($make),
                     'model' => mb_strtolower($model),
                     'memory' => $memory,
                 ]);
             } else {
-                $router->generate('quote_make_model', [
+                $router->generate('phone_insurance_make_model', [
                     'make' => mb_strtolower($make),
                     'model' => mb_strtolower($model),
                 ]);
@@ -375,12 +376,12 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         $phone->init($make, $model, $policyPrice + 1.5, $latestTerms, $memory, $devices);
         $manager->persist($phone);
 
-        if (!$phone->getCurrentPhonePrice()) {
+        if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)) {
             throw new \Exception('Failed to init phone');
         }
         /*
         \Doctrine\Common\Util\Debug::dump($phone->getCurrentPhonePrice());
-        
+
         $repo = $manager->getRepository(Phone::class);
         $compare = $repo->find($phone->getId());
         \Doctrine\Common\Util\Debug::dump($compare->getCurrentPhonePrice());

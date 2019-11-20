@@ -1,3 +1,13 @@
+{% if policy.isPolicy %}
+    {% set monthlyBacs = policy.premium.monthlyPremiumPrice %}
+    {% set yearlyBacs = policy.premium.yearlyPremiumPrice %}
+{% else %}
+    {% set monthlyBacsMonthly = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+    {% set monthlyBacsYearly = policy.phone.currentMonthlyPhonePrice.yearlyPremiumPrice %}
+    {% set yearlyBacsMonthly = policy.phone.currentYearlyPhonePrice.monthlyPremiumPrice %}
+    {% set yearlyBacsYearly = policy.phone.currentYearlyPhonePrice.yearlyPremiumPrice %}
+{% endif %}
+
 <div id="claimPolicyItem">
     <div class="text-center" style="{% if policy.active %}background-color: {{ policy.riskColour }}; color: white;{% endif %} font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Risk: {{ policy.riskReason }} ({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
@@ -299,10 +309,6 @@
                                                 {{ connection.linkedUser.name }};
                                             {% endfor %}
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Current Pot Value</td>
-                                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
                                     </tr>
                                     <tr>
                                         <td>Current Pot Value</td>
@@ -898,6 +904,21 @@
                     <td>Chase Payment<br> (Policy Cancelled w/Successful Claim)</td>
                     <td>{% if policy.user.hasPolicyCancelledAndPaymentOwed %}Yes{% else %}No{% endif %}</td>
                 </tr>
+                {# Offers not yet implemented.
+                <tr>
+                    <td>Offers</td>
+                    <td>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userOffers">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            View Eligible Offers
+                        </button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#createOfferForm">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            Create Offer
+                        </button>
+                    </td>
+                </tr>
+                #}
             </table>
             {% if policy.namedUser %}
             <h2>Additional Named User</h2>
@@ -1214,7 +1235,7 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Debt Collection</td>
                     <td>
-                        {% if policy.debtCollector %}
+                        {% if policy.debtCollector and policy.isPolicy %}
                             Debt Collector: {{ policy.debtCollector }}
                             <br>
                             Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
@@ -1485,7 +1506,7 @@
                 </tr>
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Create Policy</td>
-                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
+                    <td>Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }}{% if policy.isPolicy %} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}{% endif%}
                     <br>(not necessarily bacs)<br>
                         {{ form_start(create_form)}}
                         {{ form_widget(create_form.create, {'attr': {'class': 'btn btn-danger'}})}}
@@ -1512,7 +1533,7 @@
     {% include 'AppBundle::Claims/phoneAlternativesModal.html.twig' %}
 
     <div class="modal fade" id="paymentsModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -1685,6 +1706,7 @@
                         </td>
                     </tr>
                   {% endfor %}
+                  {% if policy.isPolicy %}
                     <tr>
                         <td>Remaining Scheduled</td>
                         <td>£{{ totalScheduled | number_format(2, '.', ',') }}</td>
@@ -1694,6 +1716,7 @@
                         <td></td>
                         <td></td>
                     </tr>
+                  {% endif %}
               </tbody>
             </table>
           </div>
@@ -1851,7 +1874,12 @@
                         <div class="form-group col-sm-10">
                             {{ form_errors(bacs_form.amount) }}
                             {{ form_widget(bacs_form.amount, {'attr': {'placeholder': 'Amount to credit policy'}}) }}
-                            (£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }})
+                            {% if policy.isPolicy %}
+                                (£{{ monthlyBacs| number_format(2, '.', ',') }} / £{{ yearlyBacs| number_format(2, '.', ',') }})
+                            {% else %}
+                                Monthly Price: (£{{ monthlyBacsMonthly| number_format(2, '.', ',') }} / £{{ monthlyBacsYearly| number_format(2, '.', ',') }})
+                                Yearly Price: (£{{ yearlyBacsMonthly| number_format(2, '.', ',') }} / £{{ yearlyBacsYearly| number_format(2, '.', ',') }})
+                            {% endif %}
                             <br><strong>
                                 Non-manual payments will be scheduled assuming users have bacs details
                             </strong>
@@ -1934,7 +1962,10 @@
                                     {{ form_label(bacs_refund_form.amount) }}
                                     {{ form_errors(bacs_refund_form.amount) }}
                                     {{ form_widget(bacs_refund_form.amount) }}
-                                    <br>Enter positive figure <strong>£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / month or £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} / year</strong>
+                                    <br>Enter positive figure 
+                                    {% if policy.isPolicy %}
+                                        <strong>£{{ monthlyBacs| number_format(2, '.', ',') }} / month or £{{ yearlyBacs| number_format(2, '.', ',') }} / year</strong>
+                                    {% endif %}
                                 </div>
                                 <div class="form-group">
                                     {{ form_label(bacs_refund_form.totalCommission) }}
@@ -2008,7 +2039,7 @@
     {% endif %}
 
     {% if is_granted('ROLE_EMPLOYEE') %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:imeiForm', 'policy': policy, 'id': 'imeiForm', 'title': 'Upgrade/IMEI Update'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:serialNumberForm', 'policy': policy, 'id': 'serialNumberForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:detectedImeiForm', 'params': {'id': policy.id, 'detected-imei': app.request.get('detected-imei')}, 'id': 'detectedImeiForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:AdminEmployee:picsureForm', 'policy': policy, 'id': 'picsureForm'} %}
@@ -2029,9 +2060,11 @@
     {% if is_granted('ROLE_ADMIN') %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:createScheduledPaymentForm', 'policy': policy, 'id': 'createScheduledPaymentForm'} %}
+        {% if policy.isPolicy %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
+        {% endif %}
     {% endif %}
 
     {% if is_granted('ROLE_CUSTOMER_SERVICES') %}

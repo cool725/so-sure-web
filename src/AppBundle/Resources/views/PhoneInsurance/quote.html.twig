@@ -15,7 +15,7 @@
     {% if phone.canonicalPath|length > 0 %}
     <link rel="canonical" href="{{ web_base_url }}{{ phone.canonicalPath }}" />
     {% else %}
-    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
+    <link rel="canonical" href="{{ url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
     {% endif %}
 {% endblock %}
 
@@ -52,7 +52,7 @@
                                 {% if phones | length > 1 %}
                                     {% for phone_mem in phones %}
                                         {% if phone_mem.id != phone.id  %}
-                                            <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6 mb-0" href="#">
+                                            <a href="{{ path('phone_insurance_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class="dropdown-item h6 mb-0" href="#">
                                                 {{ phone_mem.memory }}GB <br>
                                                 <small class="sub">{{ phone.make }} {{ phone.model }}</small>
                                             </a>
@@ -70,9 +70,6 @@
                         <span class="sub">For only</span>
                         &pound;{{ phone_price.monthlyPremiumPrice }} a month
                     </div>
-                    {% if feature_enabled('apply-sign-up-bonus') %}
-                        <p class="text-white mb-4 h6">Instant &pound;5 cashback bonus when you sign up 💰</p>
-                    {% endif %}
                     {{ form_start(buy_form) }}
                         {{ form_widget(buy_form.buy_tablet, {
                             'label': cta_txt,

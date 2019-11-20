@@ -495,7 +495,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             $allowedVariance = 0;
             // allow up to 1 month difference for non-active policies
-            if (!$policy->isActive(true)) {
+            if (!$policy->isActive()) {
                 $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
             }
             // any pending payments should be excluded from calcs
@@ -517,15 +517,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
 
-            if ($data['validate-premiums'] && (!$policy->getStatus() ||
-                in_array($policy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))) {
-                if ($this->policyService->validatePremium($policy)) {
-                    $lines[] = sprintf(
-                        'WARNING!! - Policy %s has its premium updated',
-                        $policy->getPolicyNumber()
-                    );
-                }
-            }
             if ($data['warnClaim'] && $policy->hasOpenClaim()) {
                 $lines[] = sprintf(
                     'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
@@ -576,7 +567,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             // bacs checks are only necessary on active policies
-            if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive(true)) {
+            if ($policy->hasPolicyOrUserBacsPaymentMethod() && $policy->isActive()) {
                 $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
                 if ($bankAccount && $bankAccount->getMandateStatus() == BankAccount::MANDATE_SUCCESS) {
                     $bacsPayments = $policy->getPaymentsByType(BacsPayment::class);

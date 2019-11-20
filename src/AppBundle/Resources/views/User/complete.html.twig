@@ -1,0 +1,34 @@
+{% extends 'base_portal.html.twig' %}
+
+{# Set vars #}
+{% set body_class = '' %}
+{% set quote_mode = true %}
+
+{% block title %}Complete | so-sure{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/pos.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="portal d-flex align-items-center justify-content-center">
+        <div class="portal__inner w-75">
+            <div class="text-center">
+                <div class="h4 text-white mb-4">Congratulations {{ policy.user.firstname }}, your brand new <span>{{ policy.phone.make }} {{ policy.phone.model }}</span> is now covered.</div>
+                <div class="h4 text-white mb-4">We will send your policy documents to your email.</div>
+                <div class="h4 text-white mb-4">Don't forget to download our app to share and earn rewards. You should recieve a download link via text shortly.</div>
+                <a href="#" class="btn btn-success btn-block-xs">Finish</a>
+            </div>
+        </div>
+        <span class="portal__phone__background animated fadeInLeft"></span>
+        <span class="portal__money__background animated jackInTheBox"></span>
+    </section>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/pos.js') }}"></script>
+{% endblock %}

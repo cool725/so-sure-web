@@ -3,123 +3,116 @@
 {# Set vars #}
 {% set body_class = 'blog' %}
 
-{% block title %}so-sure - The Insurtech Revolution{% endblock %}
+{% block title %}The Insurtech Revolution - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Insurtech is everywhere. And it’s only getting bigger. At so-sure we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">The Insurtech Revolution</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">The Insurtech Revolution</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Dylan Bourguignon</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            The Insurtech Revolution
+                                            <time>Aug 1, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">The Insurtech Revolution</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Dylan Bourguignon</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Aug 1, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        {# image #}
-                        <p>Insurtech is everywhere. And it’s only getting bigger.</p>
-                        <p>At <a href="{{ path('homepage') }}">so-sure</a>, we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market.</p>
-                        <p>Given the headlines and hype, it’s not always clear what insurtech entails. To provide a little clarity, we’re shining a light on the fast-moving, technology-led sector that’s disintermediating an industry worth trillions of dollars.</p>
-                        <h2>An Intro to Insurtech</h2>
-                        <p>In just a few short years, the application of tech to the traditional insurance market has caused industry-wide change. A great number of exciting businesses now offer alternatives to traditional providers. The threat to their dominance is real, highlighted by the fact that <a href="https://www.pwc.com/gx/en/financial-services/assets/fintech-insurance-report.pdf" target="_blank" rel="noopener noreferrer">three in four</a> insurers believe their business is at risk of disruption from insurtech. <a href="https://www.accenture.com/gb-en/insight-rise-insurtech" target="_blank" rel="noopener noreferrer">86%</a> know they must innovate to remain competitive. Staying the same is not an option.</p>
-                        <p>Traditional providers, who offered all types of insurance, are being challenged by providers who cater for niche needs. Typical insurtech users are digitally-savvy consumers, so insurtech businesses are focusing on the retail segment, with <a href="https://www.mckinsey.com/industries/financial-services/our-insights/insurtech-the-threat-that-inspires" target="_blank" rel="noopener noreferrer">75%</a> servicing this sector. As <a href="https://www.mckinsey.com/industries/financial-services/our-insights/insurtech-the-threat-that-inspires" target="_blank" rel="noopener noreferrer">McKinsey</a> says, <em>“for plugged-in cohorts, the use of 24/7 digital channels to receive an insurance quote or submit a claim is infinitely preferable to a branch visit”</em>. And these needs are being met by insurtech businesses delivering highly personalised, engaging, digital solutions.</p>
-                        <p>Excitingly, insurtech is embracing innovative new technologies, too. In time, <a href="https://hackernoon.com/ai-the-weapon-of-the-insurtechs-7d51c2dac1ca" target="_blank" rel="noopener noreferrer">AI</a> and <a href="https://www.ey.com/gl/en/industries/financial-services/insurance/ey-tech-trends-insurtech-and-blockchain" target="_blank" rel="noopener noreferrer">blockchain</a> will offer peerless security and trust, making them even more compelling for a generation of users who have grown up using tech for everything from banking to transportation to dating.</p>
-                        <h2>Examples to Follow</h2>
-                        <p>History shows that the correct application of technology, in industries like transport, finance and property, benefits consumer. Tech lowers costs whilst offering more choice and flexibility. In short, it empowers consumers. Insurance is no different.</p>
-                        <p>Retail banking is a sector that has been enhanced by tech. The likes of <a href="https://monzo.com/" target="_blank" rel="noopener noreferrer">Monzo</a> and <a href="https://www.revolut.com/?lang=en" target="_blank" rel="noopener noreferrer">Revolut</a> leveraged tech, lowered costs and friction, worked hard on brand and communications and delivered consumer-friendly products that are winning market share from banks. The sector is a year or two ahead of insurtech. Hence, lessons can be learned from its successes, and failures.</p>
-                        <p>Born out of the financial crisis of 2008, banking apps gained market share and, crucially, trust amongst new users by putting their interests at the heart of business. As Monzo founder, <a href="https://11fs.com/interview/tom-blomfield-on-monzos-1000-growth-and-taking-on-the-tech-giants/" target="_blank" rel="noopener noreferrer">Tom Blomfield</a>, says, <em>“Start with the customer. Actually go and talk to the customer, and have a conversation about their life, and the challenges they face. It works.”</em> Insurtech can learn from this. If consumer interests remain at the centre of the solution, start ups and scale ups will grow.</p>
-                        <h2>Friends and Peers</h2>
-                        <p>The insurtech sector is buzzing. But given the level of excitement, it can be hard to discern <a href="https://en.wikipedia.org/wiki/Unicorn_(finance)" target="_blank" rel="noopener noreferrer">unicorns</a> from <a href="https://en.wikipedia.org/wiki/White_elephant" target="_blank" rel="noopener noreferrer">white elephants</a>. To help, here are a few insurtech companies that we believe are leading the way:</p>
-                        <p><a href="https://www.wrisk.co/" target="_blank" rel="noopener noreferrer">Wrisk’s</a> tag - <em>flexible insurance that adapts to fit your life</em> - could be applied to the entire sector. A first-class application of technology means users are never underinsured nor overcharged. Their one-plan approach to insurance means that all insurance needs are taken care of in one place.</p>
-                        <p>If insurtech is the application of tech to give choice and flexibility at low cost, <a href="https://www.cuvva.com/" target="_blank" rel="noopener noreferrer">Cuvva</a> is the definition of insurtech. Offering car insurance by the hour (rather than by the year), their smart proposition gives you cover when you need it. A great brand which is putting users first.</p>
-                        <p><a href="https://boughtbymany.com/about/" target="_blank" rel="noopener noreferrer">Bought By Many</a> is another great, growing brand, currently focused on revolutionising the way that we insure our pets and gain travel insurance, before they begin to build out their group insurance model in other markets, all underpinned by their dedication to customers.</p>
-                        <p>As niche providers go, few are more cutting-edge, cool and compelling than <a href="https://flockcover.com/" target="_blank" rel="noopener noreferrer">Flock Cover</a> who spotted the opportunity to provide pay-as-you-fly drone insurance. Nothing could be further from the old, traditional insurance world than insuring your drone by the hour via their first class app!</p>
-                        <p>Having said that, it’s heartening to see traditional providers embracing tech, too. <a href="https://www.vitality.co.uk/" target="_blank" rel="noopener noreferrer">Vitality</a> spun out of Prudential in the mid-2000s and offers cutting-edge health insurance at affordable rates with the aim of making the world a healthier and happier place. They have a great app, through which they offer deals on gym membership and sportswear. As they say, they’re “positively different” by offering good, old-fashioned insurance in a modern, cool, user-centric way.</p>
-                        <p>A final excellent example of the shifting insurance landscape is <a href="https://www.spixii.com/" target="_blank" rel="noopener noreferrer">Spixii</a>, who employ AI to build scalable insurance chatbots for insurance companies. Proof if more proof were needed that the whole sector, not just the consumer end of the market, is being revolutionised by insurtech.</p>
-                        <h2>A Shared Future</h2>
-                        <p>It will be interesting to see how incumbents react to the challengers. If we look to banking, it would be no surprise to see them looking to partner. Fintech believes in accumulation through collaboration. Incumbents who refuse to accept this offer from innovators get left behind. Insurtech’s market share is yet to threaten big players’ dominance. In time, this will change and incumbents must react to inexorable market shifts. If they don’t, they’ll become extinct.</p>
-                        <p>UK insurtech is more than a sector. It’s an ecosystem supporting startups and scale ups, helping consumers access insurance services more efficiently via technology. And it’s a threat to the traditional model - but this threat should be seen as an opportunity by the wider industry.</p>
-                        <p>At <a href="{{ path('homepage') }}">so-sure</a>, we find it hard to overstate the importance of insurtech to the health of the insurance industry. Competition is increasing internationally, too, so it’s essential that founders, leaders, regulators and all participants work together to build on successes already achieved. Judging by our peers, that future is in safe hands and it’s one we’re proud to be shaping.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                {# image #}
+                                <p>Insurtech is everywhere. And it’s only getting bigger.</p>
+                                <p>At <a href="{{ path('homepage') }}">so-sure</a>, we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market.</p>
+                                <p>Given the headlines and hype, it’s not always clear what insurtech entails. To provide a little clarity, we’re shining a light on the fast-moving, technology-led sector that’s disintermediating an industry worth trillions of dollars.</p>
+                                <h2>An Intro to Insurtech</h2>
+                                <p>In just a few short years, the application of tech to the traditional insurance market has caused industry-wide change. A great number of exciting businesses now offer alternatives to traditional providers. The threat to their dominance is real, highlighted by the fact that <a href="https://www.pwc.com/gx/en/financial-services/assets/fintech-insurance-report.pdf" target="_blank" rel="noopener noreferrer">three in four</a> insurers believe their business is at risk of disruption from insurtech. <a href="https://www.accenture.com/gb-en/insights/insurance/rise-insurtech" target="_blank" rel="noopener noreferrer">86%</a> know they must innovate to remain competitive. Staying the same is not an option.</p>
+                                <p>Traditional providers, who offered all types of insurance, are being challenged by providers who cater for niche needs. Typical insurtech users are digitally-savvy consumers, so insurtech businesses are focusing on the retail segment, with <a href="https://www.mckinsey.com/industries/financial-services/our-insights/insurtech-the-threat-that-inspires" target="_blank" rel="noopener noreferrer">75%</a> servicing this sector. As <a href="https://www.mckinsey.com/industries/financial-services/our-insights/insurtech-the-threat-that-inspires" target="_blank" rel="noopener noreferrer">McKinsey</a> says, <em>“for plugged-in cohorts, the use of 24/7 digital channels to receive an insurance quote or submit a claim is infinitely preferable to a branch visit”</em>. And these needs are being met by insurtech businesses delivering highly personalised, engaging, digital solutions.</p>
+                                <p>Excitingly, insurtech is embracing innovative new technologies, too. In time, <a href="https://hackernoon.com/ai-the-weapon-of-the-insurtechs-7d51c2dac1ca" target="_blank" rel="noopener noreferrer">AI</a> and <a href="https://www.ey.com/en_gl/insurance" target="_blank" rel="noopener noreferrer">blockchain</a> will offer peerless security and trust, making them even more compelling for a generation of users who have grown up using tech for everything from banking to transportation to dating.</p>
+                                <h2>Examples to Follow</h2>
+                                <p>History shows that the correct application of technology, in industries like transport, finance and property, benefits consumer. Tech lowers costs whilst offering more choice and flexibility. In short, it empowers consumers. Insurance is no different.</p>
+                                <p>Retail banking is a sector that has been enhanced by tech. The likes of <a href="https://monzo.com/" target="_blank" rel="noopener noreferrer">Monzo</a> and <a href="https://www.revolut.com/?lang=en" target="_blank" rel="noopener noreferrer">Revolut</a> leveraged tech, lowered costs and friction, worked hard on brand and communications and delivered consumer-friendly products that are winning market share from banks. The sector is a year or two ahead of insurtech. Hence, lessons can be learned from its successes, and failures.</p>
+                                <p>Born out of the financial crisis of 2008, banking apps gained market share and, crucially, trust amongst new users by putting their interests at the heart of business. As Monzo founder, <a href="https://11fs.com/careers" target="_blank" rel="noopener noreferrer">Tom Blomfield</a>, says, <em>“Start with the customer. Actually go and talk to the customer, and have a conversation about their life, and the challenges they face. It works.”</em> Insurtech can learn from this. If consumer interests remain at the centre of the solution, start ups and scale ups will grow.</p>
+                                <h2>Friends and Peers</h2>
+                                <p>The insurtech sector is buzzing. But given the level of excitement, it can be hard to discern <a href="https://en.wikipedia.org/wiki/Unicorn_(finance)" target="_blank" rel="noopener noreferrer">unicorns</a> from <a href="https://en.wikipedia.org/wiki/White_elephant" target="_blank" rel="noopener noreferrer">white elephants</a>. To help, here are a few insurtech companies that we believe are leading the way:</p>
+                                <p><a href="https://www.wrisk.co/" target="_blank" rel="noopener noreferrer">Wrisk’s</a> tag - <em>flexible insurance that adapts to fit your life</em> - could be applied to the entire sector. A first-class application of technology means users are never underinsured nor overcharged. Their one-plan approach to insurance means that all insurance needs are taken care of in one place.</p>
+                                <p>If insurtech is the application of tech to give choice and flexibility at low cost, <a href="https://www.cuvva.com/" target="_blank" rel="noopener noreferrer">Cuvva</a> is the definition of insurtech. Offering car insurance by the hour (rather than by the year), their smart proposition gives you cover when you need it. A great brand which is putting users first.</p>
+                                <p><a href="https://boughtbymany.com/about/" target="_blank" rel="noopener noreferrer">Bought By Many</a> is another great, growing brand, currently focused on revolutionising the way that we insure our pets and gain travel insurance, before they begin to build out their group insurance model in other markets, all underpinned by their dedication to customers.</p>
+                                <p>As niche providers go, few are more cutting-edge, cool and compelling than <a href="https://flockcover.com/" target="_blank" rel="noopener noreferrer">Flock Cover</a> who spotted the opportunity to provide pay-as-you-fly drone insurance. Nothing could be further from the old, traditional insurance world than insuring your drone by the hour via their first class app!</p>
+                                <p>Having said that, it’s heartening to see traditional providers embracing tech, too. <a href="https://www.vitality.co.uk/" target="_blank" rel="noopener noreferrer">Vitality</a> spun out of Prudential in the mid-2000s and offers cutting-edge health insurance at affordable rates with the aim of making the world a healthier and happier place. They have a great app, through which they offer deals on gym membership and sportswear. As they say, they’re “positively different” by offering good, old-fashioned insurance in a modern, cool, user-centric way.</p>
+                                <p>A final excellent example of the shifting insurance landscape is <a href="https://www.spixii.com/" target="_blank" rel="noopener noreferrer">Spixii</a>, who employ AI to build scalable insurance chatbots for insurance companies. Proof if more proof were needed that the whole sector, not just the consumer end of the market, is being revolutionised by insurtech.</p>
+                                <h2>A Shared Future</h2>
+                                <p>It will be interesting to see how incumbents react to the challengers. If we look to banking, it would be no surprise to see them looking to partner. Fintech believes in accumulation through collaboration. Incumbents who refuse to accept this offer from innovators get left behind. Insurtech’s market share is yet to threaten big players’ dominance. In time, this will change and incumbents must react to inexorable market shifts. If they don’t, they’ll become extinct.</p>
+                                <p>UK insurtech is more than a sector. It’s an ecosystem supporting startups and scale ups, helping consumers access insurance services more efficiently via technology. And it’s a threat to the traditional model - but this threat should be seen as an opportunity by the wider industry.</p>
+                                <p>At <a href="{{ path('homepage') }}">so-sure</a>, we find it hard to overstate the importance of insurtech to the health of the insurance industry. Competition is increasing internationally, too, so it’s essential that founders, leaders, regulators and all participants work together to build on successes already achieved. Judging by our peers, that future is in safe hands and it’s one we’re proud to be shaping.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

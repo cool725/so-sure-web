@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Controller;
 
 use AppBundle\Document\Phone;
+use AppBundle\Classes\GoCompare;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Invitation\EmailInvitation;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -171,9 +172,51 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertHasFormAction($crawler, '/phone-search-dropdown');
     }
 
+    public function testPhoneByIdAndAggregatorTrue()
+    {
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
+        $phone =  $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 7']);
+        $url = sprintf('/phone-insurance/%s?aggregator=true', $phone->getId());
+        $redirectUrl = sprintf(
+            '/phone-insurance/%s+%s+%sGB?aggregator=true',
+            $phone->getMakeCanonical(),
+            $phone->getEncodedModelCanonical(),
+            $phone->getMemory()
+        );
+        $crawler = self::$client->request('GET', $url);
+
+        // should be redirected to redirect url
+        $this->assertEquals(301, $this->getClientResponseStatusCode());
+        $this->assertEquals($redirectUrl, $this->getClientResponseTargetUrl());
+        $crawler = self::$client->followRedirect();
+
+        $this->assertHasFormAction($crawler, '/phone-search-dropdown');
+    }
+
     public function testQuoteMe()
     {
         self::$client->request('GET', '/quote-me/Apple+iPhone+XS+256GB');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertArrayHasKey('phoneId', $decoded);
+        $this->assertArrayHasKey('price', $decoded);
+        $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('productOverrides', $decoded);
+        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
+        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
+        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+    }
+
+    public function testQuoteMeGoCompare()
+    {
+        $goCompare = new GoCompare();
+        self::$client->request(
+            'GET',
+            '/quote-me/'.array_keys($goCompare::$models)[2].'?aggregator=GoCompare'
+        );
         $decoded = (array) json_decode($this->getClientResponseContent());
         $this->assertArrayHasKey('phoneId', $decoded);
         $this->assertArrayHasKey('price', $decoded);
@@ -203,6 +246,27 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('id', (array) $decoded[0]);
         $this->assertArrayHasKey('make', (array) $decoded[0]);
         $this->assertArrayHasKey('model', (array) $decoded[0]);
+        $this->assertArrayHasKey('aggregatorId', (array) $decoded[0]);
+    }
+
+    public function testListPhonesWithAggregatorGoCompare()
+    {
+        self::$client->request('GET', '/list-phones?aggregator=GoCompare');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertGreaterThan(0, count($decoded));
+        // Check first phone in list is valid
+        $this->assertArrayHasKey('id', (array) $decoded[0]);
+        $this->assertArrayHasKey('make', (array) $decoded[0]);
+        $this->assertArrayHasKey('model', (array) $decoded[0]);
         $this->assertArrayHasKey('memory', (array) $decoded[0]);
+        $this->assertArrayHasKey('aggregatorId', (array) $decoded[0]);
+        // Make sure at least one of the phones has an aggregator ID
+        $found = false;
+        foreach ($decoded as $phone) {
+            if ($phone->aggregatorId != '') {
+                $found = true;
+            }
+        }
+        $this->assertEquals(true, $found);
     }
 }

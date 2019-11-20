@@ -175,13 +175,13 @@ class SearchService
     private function addStatusQuery($status)
     {
         if ($status == 'current') {
-            $this->policyQb->addAnd(
-                $this->policyQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
-            );
+            $this->policyQb->addAnd($this->policyQb->expr()->field('status')->in([
+                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID, Policy::STATUS_PICSURE_REQUIRED
+            ]));
         } elseif ($status == 'current-discounted') {
-            $this->policyQb->addAnd(
-                $this->policyQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
-            );
+            $this->policyQb->addAnd($this->policyQb->expr()->field('status')->in([
+                Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID, Policy::STATUS_PICSURE_REQUIRED
+            ]));
             $this->policyQb->addAnd(
                 $this->policyQb->expr()->field('policyDiscountPresent')->equals(true)
             );

@@ -1,74 +1,85 @@
 {% block body %}
 
-    {{ form_start(form) }}
-    <div class="modal-body">
-        <div class="container-fluid">
-            <div class="form-row">
-                <div class="col">
-                    <p>Are you sure you want to update this IMEI? Common cases for this would be:</p>
-                    <div class="list-group cases">
-                        <a class="list-group-item list-group-item-action">User mistyped their IMEI during purchase</a>
-                        <a class="list-group-item list-group-item-action">User entered the 2nd IMEI number instead of the first in the case of a dual sim card</a>
-                        <a class="list-group-item list-group-item-action">IMEI was updated by claims team but the system could not auto-update the IMEI number</a>
-                        <a class="list-group-item list-group-item-action">Voucher was issued by the claims team</a>
-                        <a class="list-group-item list-group-item-action">User had a warranty issue that was handled outside the claims process - same make/model, just different IMEI.</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" required> I've read the list of common reasons above
-                    </label>
-                </div>
-
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" required> If it is not a common reason, I have verified the exception is allowed
-                    </label>
-                </div>
-            </div>
-
+{{ form_start(form) }}
+    <div class="modal-body modal-upgrade">
+        <div class="alert alert-info" role="alert">
+            <h5>Steps for upgrade:</h5>
             <hr>
-
-            <div class="row">
-                <div class="col-xs-6">
+            <ol>
+                <li><strong>Check if upgrade is allowed</strong> (if not revert to old method)</li>
+                <br>
+                <li>Select correct reason from list, Choose Device (will validate if can upgrade), Update IMEI > Update</li>
+                <br>
+                <li><strong>Following upgrade - Change pic-sure status to 'NOT STARTED'</strong> (User will need to redo pic-sure following upgrade)</li>
+                <br>
+                <li><strong>Following upgrade - Apple devices ONLY need serial number updating too following upgrade</strong> (The app won't work otherwise)</li>
+            </ol>
+        </div>
+        <div class="alert alert-info" role="alert">
+            <h5>Steps for imei update:</h5>
+            <hr>
+            <ol>
+                <li>Select correct reason from list, Choose Device (will validate if can upgrade), Update IMEI > Update</li>
+                <br>
+            </ol>
+        </div>
+        <div class="list-group cases">
+            <a class="list-group-item list-group-item-action">User mistyped their IMEI during purchase</a>
+            <a class="list-group-item list-group-item-action">User entered the 2nd IMEI number instead of the first in the case of a dual sim card</a>
+            <a class="list-group-item list-group-item-action">IMEI was updated by claims team but the system could not auto-update the IMEI number</a>
+            <a class="list-group-item list-group-item-action">Voucher was issued by the claims team</a>
+            <a class="list-group-item list-group-item-action">User had a warranty issue that was handled outside the claims process - same make/model, just different IMEI.</a>
+            <a class="list-group-item list-group-item-action bg-danger"><span class="text-danger">Upgraded device - within premium price</span></a>
+        </div>
+        <div class="row">
+            <div class="col-xs-6">
+                <div class="form-group">
                     <label>Current IMEI</label>
                     <p>{{ policy.imei }}</p>
                 </div>
-                <div class="col-xs-6">
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
                     <label>Current Phone</label>
                     <p>{{ policy.phone }}</p>
+                    <p>Current premium: <strong>
+                        {% set phonePrice = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+                        {% if policy.isPolicy %}
+                            {% set phonePrice = policy.premium.monthlyPremiumPrice %}
+                        {% endif %}
+                        &pound;<span id="old_premium" data-old-premium="{{ phonePrice|number_format(2, '.', ',') }}">{{ phonePrice|number_format(2, '.', ',') }}</span>
+                    </strong></p>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-xs-6">
+        </div>
+        <div class="row">
+            <div class="col-xs-6 ">
+                <div class="form-group">
                     <label>New IMEI</label>
                     {{ form_widget(form.imei, {'attr': {'class': 'form-control'}}) }}
                 </div>
-
-                <div class="col-xs-6">
-                    <label>Insured Phone</label>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label>Upgrade/Insured Phone</label>
                     {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
                 </div>
-
-                <p class="col-xs-12 help-block">Ok to update only 1 field whilst keeping the other field at the default (same) value</p>
-                <p class="col-xs-12 help-block">Changing the Imei or phone will trigger a salva policy update</p>
+                <p>New premium price: <strong>&pound;<span id="new_premium">-</span></strong></p>
+                <p>Is valid upgrade: <strong id="valid_upgrade"></strong></p>
+                <p>Premium diff: <strong id="diff_premium"></strong></p>
             </div>
-
-            <div class="form-row">
-                <label>Justification</label>
-                {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label>Justification</label>
+                    {{ form_widget(form.note, {'attr': {'class': 'form_note form-control'}}) }}
+                </div>
             </div>
         </div>
     </div>
-
     <div class="modal-footer">
         {{ form_widget(form.update, { 'attr': {'class': 'btn btn-danger', 'disabled': 'true'} }) }}
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
     </div>
-    {{ form_end(form) }}
+{{ form_end(form) }}
 
 {% endblock %}

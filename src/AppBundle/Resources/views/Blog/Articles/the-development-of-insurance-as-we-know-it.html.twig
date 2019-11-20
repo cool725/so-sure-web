@@ -2,121 +2,112 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - The Development of Insurance as we know it{% endblock %}
+{% block title %}The Development of Insurance as we know it - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too."/>
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">The Development of Insurance as we know it</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">The Development of Insurance as we know it</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Susan</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            The Development of Insurance as we know it
+                                            <time>Sep 13, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">The Development of Insurance as we know it</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Sep 13, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        {# image #}
-                        <h2>From Edward Lloyd To Electronification</h2>
-                        <p>We’ve already traced the origins of insurance <a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">from the Babylonians to Benjamin Franklin</a>, visiting Ancient Rome, merchant Venice and the Great Fire of London along the way.</p>
-                        <p>By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too.</p>
-                        <h2>The Insurance of Business</h2>
-                        <p>What Edward Lloyd famously started in City coffee houses, the business community of London continued. Lloyd’s coffee shop on Tower Street had become the world’s premier spot for traders and ship owners to meet to arrange insurance for the transportation of their cargoes all over the world. As the Empire grew, so did the insurance market, especially of the maritime variety.</p>
-                        <p>After Lloyd died in 1713, the many members who had met with Lloyd to arrange insurance for voyages formed a permanent society, moving their business to the Royal Exchange on Cornhill and named themselves the Society of Lloyds, who insured all sorts of business on sea and land.</p>
-                        <h2>Insurance for Life</h2>
-                        <p>By the mid 1700s, you could insure your home and your business. It wasn’t long before you could insure your life too, as the first life insurance policies were issued in London by the Amicable Society for a Perpetual Assurance Office. Each member contributed a fixed fee and stipends were paid at the end of each year to the wives and children of deceased members.</p>
-                        <p><a href="https://en.wikipedia.org/wiki/Edmund_Halley" target="_blank" rel="noopener noreferrer">Halley</a> created a <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/nationallifetablesunitedkingdom/previousReleases" target="_blank" rel="noopener noreferrer">life table</a> in 1693 and his methods were developed throughout the 1700s, with the first mutual life insurer offering age-based premiums in 1762. Founded by <a href="https://en.wikipedia.org/wiki/Edward_Rowe_Mores" target="_blank" rel="noopener noreferrer">Edward Rowe Mores</a> and based upon advanced life tables, it was the first to use the term “actuary”. The first, William Morgan, presided over the Society for Equitable Assurances on Lives and Survivorship. For variable premiums, the Society issued life insurance to anyone, whatever age and health.</p>
-                        <p>What had started in London soon spread to the US, with dozens of life insurance companies appearing in the mid-1700s, many based upon the teachings of the church.</p>
-                        <h2>Nationally Insured</h2>
-                        <p>As policy-based insurance grew in popularity, insuring against old age and ill health grew in popularity. In Germany, a country built on Prussians traditions, pensions as well as accident and medical insurance became prevalent, with Chancellor von Bismarck introducing public pensions in 1889.</p>
-                        <p>Britain followed Germany’s lead. The 1911 National Insurance Act gave the British working class the first contributory system of insurance against illness and unemployment. The Act meant workers could take sick and maternity leave and receive free treatment for tuberculosis.</p>
-                        <p>Within a matter of years, 2 million workers were insured for unemployment benefits and 15 million insured against sickness.The system expanded after the World War II, forming the first modern welfare state, as instructed by the <a href="http://www.bbc.co.uk/history/ww2peopleswar/timeline/factfiles/nonflash/a1143578.shtml" target="_blank" rel="noopener noreferrer">Beveridge Report</a>, which also formulated the NHS.</p>
-                        <p>Across the pond in the US, the 1935 Social Security Act gave financial security to those in need, which rose in popularity following the end of World War II. The US military also introduced GI Life Insurance that aimed to ease the burden for families who suffered losses in military service.</p>
-                        <h2>Electric Dreams Become Reality</h2>
-                        <p>The theory of insurance was - almost - developed. But the advent of computers and the Internet revolutionised everything once again.</p>
-                        <p>Computers had long been used in insurance to maintain data and financial accounts. But the personal computer - and, lately, mobile - changed the way insurance was bought and sold and how policies were priced. Actuarial work became more advanced with the rise of the spreadsheet. Financial insurance, coupled with the growth of the derivatives market, gave rise to a whole new breed of insurance, too.</p>
-                        <p>Look out for our upcoming blog post on the electronification of the insurance market as we bring the story of insurance into the 21st Century.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                {# image #}
+                                <h2>From Edward Lloyd To Electronification</h2>
+                                <p>We’ve already traced the origins of insurance <a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">from the Babylonians to Benjamin Franklin</a>, visiting Ancient Rome, merchant Venice and the Great Fire of London along the way.</p>
+                                <p>By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too.</p>
+                                <h2>The Insurance of Business</h2>
+                                <p>What Edward Lloyd famously started in City coffee houses, the business community of London continued. Lloyd’s coffee shop on Tower Street had become the world’s premier spot for traders and ship owners to meet to arrange insurance for the transportation of their cargoes all over the world. As the Empire grew, so did the insurance market, especially of the maritime variety.</p>
+                                <p>After Lloyd died in 1713, the many members who had met with Lloyd to arrange insurance for voyages formed a permanent society, moving their business to the Royal Exchange on Cornhill and named themselves the Society of Lloyds, who insured all sorts of business on sea and land.</p>
+                                <h2>Insurance for Life</h2>
+                                <p>By the mid 1700s, you could insure your home and your business. It wasn’t long before you could insure your life too, as the first life insurance policies were issued in London by the Amicable Society for a Perpetual Assurance Office. Each member contributed a fixed fee and stipends were paid at the end of each year to the wives and children of deceased members.</p>
+                                <p><a href="https://en.wikipedia.org/wiki/Edmund_Halley" target="_blank" rel="noopener noreferrer">Halley</a> created a <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/bulletins/nationallifetablesunitedkingdom/previousReleases" target="_blank" rel="noopener noreferrer">life table</a> in 1693 and his methods were developed throughout the 1700s, with the first mutual life insurer offering age-based premiums in 1762. Founded by <a href="https://en.wikipedia.org/wiki/Edward_Rowe_Mores" target="_blank" rel="noopener noreferrer">Edward Rowe Mores</a> and based upon advanced life tables, it was the first to use the term “actuary”. The first, William Morgan, presided over the Society for Equitable Assurances on Lives and Survivorship. For variable premiums, the Society issued life insurance to anyone, whatever age and health.</p>
+                                <p>What had started in London soon spread to the US, with dozens of life insurance companies appearing in the mid-1700s, many based upon the teachings of the church.</p>
+                                <h2>Nationally Insured</h2>
+                                <p>As policy-based insurance grew in popularity, insuring against old age and ill health grew in popularity. In Germany, a country built on Prussians traditions, pensions as well as accident and medical insurance became prevalent, with Chancellor von Bismarck introducing public pensions in 1889.</p>
+                                <p>Britain followed Germany’s lead. The 1911 National Insurance Act gave the British working class the first contributory system of insurance against illness and unemployment. The Act meant workers could take sick and maternity leave and receive free treatment for tuberculosis.</p>
+                                <p>Within a matter of years, 2 million workers were insured for unemployment benefits and 15 million insured against sickness.The system expanded after the World War II, forming the first modern welfare state, as instructed by the <a href="http://www.bbc.co.uk/history/ww2peopleswar/timeline/factfiles/nonflash/a1143578.shtml" target="_blank" rel="noopener noreferrer">Beveridge Report</a>, which also formulated the NHS.</p>
+                                <p>Across the pond in the US, the 1935 Social Security Act gave financial security to those in need, which rose in popularity following the end of World War II. The US military also introduced GI Life Insurance that aimed to ease the burden for families who suffered losses in military service.</p>
+                                <h2>Electric Dreams Become Reality</h2>
+                                <p>The theory of insurance was - almost - developed. But the advent of computers and the Internet revolutionised everything once again.</p>
+                                <p>Computers had long been used in insurance to maintain data and financial accounts. But the personal computer - and, lately, mobile - changed the way insurance was bought and sold and how policies were priced. Actuarial work became more advanced with the rise of the spreadsheet. Financial insurance, coupled with the growth of the derivatives market, gave rise to a whole new breed of insurance, too.</p>
+                                <p>Look out for our upcoming blog post on the electronification of the insurance market as we bring the story of insurance into the 21st Century.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

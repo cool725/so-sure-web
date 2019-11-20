@@ -225,23 +225,21 @@ class ApiExternalController extends BaseController
 
             $quotes = [];
             foreach ($phones as $phone) {
-                $currentPhonePrice = $phone->getCurrentPhonePrice();
-                if (!$currentPhonePrice) {
+                $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
+                $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
+                if (!($monthlyPrice && $yearlyPrice)) {
                     continue;
                 }
-
                 // If there is an end date, then quote should be valid until then
                 $quoteValidTo = \DateTime::createFromFormat('U', time());
                 $quoteValidTo->add(new \DateInterval('P1D'));
-
                 $promoAddition = 0;
                 $isPromoLaunch = false;
-
                 $quotes[] = ['rate' => [
                     'reference' => $phone->getId(),
                     'product_name' => $phone->__toString(),
-                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
-                    'annual_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
+                    'monthly_premium' => $monthlyPrice->getMonthlyPremiumPrice(),
+                    'annual_premium' => $yearlyPrice->getYearlyPremiumPrice(),
                     'additional_gadget' => 0,
                 ]];
             }
@@ -296,10 +294,17 @@ class ApiExternalController extends BaseController
 
         $this->setPhoneSession($request, $phone);
 
+        $data = [
+            'id' => $phone->getId()
+        ];
+        if ($request->get('aggregator') && $request->get('aggregator') == 'true') {
+            $data['aggregator'] = 'true';
+        }
+
         $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if ($user) {
-            return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
+            return $this->redirectToRoute('quote_phone', $data);
         }
 
         $alphaValidator = new AlphanumericValidator();
@@ -381,7 +386,7 @@ class ApiExternalController extends BaseController
             $user
         );
 
-        return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
+        return $this->redirectToRoute('quote_phone', $data);
     }
 
     /**

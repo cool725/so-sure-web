@@ -30,6 +30,8 @@ class UnpaidListener
     protected $smsService;
     /** @var FeatureService */
     protected $featureService;
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * Constructs the listener.
@@ -37,13 +39,15 @@ class UnpaidListener
      * @param MailerService   $mailerService  is the service's mail sender.
      * @param SmsService      $smsService     is the service's sms sender.
      * @param FeatureService  $featureService is used to tell the listener what features should be used.
+     * @param LoggerInterface $logger         is used to emit logging information.
      */
-    public function __construct($dm, $mailerService, $smsService, $featureService)
+    public function __construct($dm, $mailerService, $smsService, $featureService, $logger)
     {
         $this->dm = $dm;
         $this->mailerService = $mailerService;
         $this->smsService = $smsService;
         $this->featureService = $featureService;
+        $this->logger = $logger;
     }
 
     /**
@@ -82,7 +86,14 @@ class UnpaidListener
      */
     public function emailNotification(Policy $policy, $number, ScheduledPayment $nextScheduledPayment = null)
     {
-        if ($number < 1 || $number > 4) {
+        if ($number > 4) {
+            return;
+        }
+        if ($number < 1) {
+            $this->logger->error(sprintf(
+                "Unpaid sequence calculated at 0 which is impossible.\npolicyId: %s",
+                $policy->getId()
+            ));
             return;
         }
         $baseTemplate = $this->selectBaseEmail($policy);
@@ -105,22 +116,18 @@ class UnpaidListener
     }
 
     /**
-     * Sends an sms warning the user that they are unpaid with special copy based on bacs vs judo. Only sends on the
-     * second to fourth failures.
+     * Sends an sms warning the user that they are unpaid with special copy based on bacs vs judo. Only sends between
+     * the first and fourth failures.
      * @param Policy $policy is the policy for which we are notifying.
      * @param int    $number is the number of times failure has occurred including this time.
      */
     private function smsNotification($policy, $number)
     {
-        // TODO: Bacs sms copy
-        if ($policy->getPolicyOrUserBacsPaymentMethod()) {
-            return;
+        $bacs = $policy->getBacsPaymentMethod() && true;
+        if ($number >= 1 && $number <= 4) {
+            $smsTemplate = sprintf("AppBundle:Sms:%s/failedPayment-%d.txt.twig", $bacs ? "bacs" : "card", $number);
+            $this->smsService->sendUser($policy, $smsTemplate, ["policy" => $policy], Charge::TYPE_SMS_PAYMENT);
         }
-        if ($number < 2 || $number > 4) {
-            return;
-        }
-        $smsTemplate = sprintf("AppBundle:Sms:card/failedPayment-%d.txt.twig", $number);
-        $this->smsService->sendUser($policy, $smsTemplate, ["policy" => $policy], Charge::TYPE_SMS_PAYMENT);
     }
 
     /**

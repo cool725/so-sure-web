@@ -2,127 +2,119 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Broken Promises{% endblock %}
+{% block title %}Broken Promises - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="The news last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building "/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Broken Promises</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Broken Promises</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Dylan Bourguignon</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            Broken Promises
+                                            <time>Nov 26, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">Broken Promises</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Dylan Bourguignon</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Nov 26, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>The <a href="https://www.bbc.co.uk/news/business-46274918" target="_blank" rel="noopener noreferrer">news</a> last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building <a href="{{ path('homepage') }}">so-sure</a>.</p>
-                        <p>In this case, doctors working for Travel Insurance Facilities (TIF), the claims operator for a range of high street pharmacists like Boots, are being investigated by the General Medical Council following allegations that they denied care to claimants. Holidaymakers were made a promise. It seems that promise was broken.</p>
-                        <p>If the allegations are found to be true - and it’s worth noting that TIF denies any misconduct - this is a shocking case of negligence and mis-selling. However, this case is not unique. In fact, it’s symptomatic of the insurance industry as a whole. If found guilty, of course, we should be highly critical of TIF, but bad actors are not solely to blame. The industry is responsible and until we address the problems at its heart, we’ll continue to read awful news like this.</p>
-                        <h2>A broken system</h2>
-                        <p>It’s no wonder that <a href="https://www.insurancetimes.co.uk/only-half-of-british-consumers-trust-insurance-companies-to-pay-claims/1425151.article" target="_blank" rel="noopener noreferrer">only half of consumers</a> trust insurance. For an industry that’s supposed to be built on trust, this is a damning indictment. But consumers, knowing they need insurance more than they can afford to be without it, continue to buy despite a lack of faith in the system.</p>
-                        <p>Insurance relies on the premise that when the proverbial hits the fan, an insurance company has your back. It’s all about trust. When something went wrong for holidaymakers, they assumed their insurer would look after them. The fact they did not sums up the rotten core of the insurance industry. What the industry is promising and selling is not being delivered.</p>
-                        <p>Worse still, problems are so deeply entrenched and the interests of stakeholders and consumers so misaligned, that only radical action will avert a crisis, let alone plot a course towards a more sustainable, fairer future.</p>
-                        <h2>The state of play</h2>
-                        <p>The alleged TIF fraud acutely demonstrates the disconnect between the interests of insurers and their customers. The insurance industry is not providing the service that customers deserve and here’s why:</p>
-                        <h4>1. Insurance is designed to suit the balance sheet and investors - not the consumer</h4>
-                        <p>Across the industry, profit is everything, with little attention given to the needs of the consumer. Nobody has the consumer’s back. The heart of insurance has been ripped out and the only people being rewarded are insurance executives and shareholders, who are paid well if they sell as many policies as possible and pay out as few as possible. Insurance is now a product, not a service.</p>
-                        <h4>2. The industry’s primary concern - if not their only concern - is fraud.</h4>
-                        <p>Fraud is estimated to represent between 15 and 20% of your premium cost, so it costs us all. Because of this, all claimants are treated like fraudsters until they have proven themselves innocent. This leads to a terrible customer experience. The bizarre adage of, <em>“Make the claims process difficult and only true claims come through”</em>, is eroding trust and destroying an entire industry.</p>
-                        <h4>3. Insurance is designed to be product-centric rather than consumer-centric.</h4>
-                        <p>The industry’s focus is entirely on the product. The customer always comes second and this is leading to terrible experiences throughout the sales and claims process. Again, this is all done in an attempt to squeeze margins and do what is the right for the provider, the investors and the shareholders, not the consumer. The consumer experience is last.</p>
-                        <p>It’ll take a heck of a lot of effort to change this mindset as it is endemic throughout the industry. But let’s be clear, it’s the system’s fault that alleged frauds like this can occur - it’s not the fault of individuals. What’s concerning is that insurance executives don’t seem to want to act to fix their broken system.</p>
-                        <h2>Executive apathy</h2>
-                        <p>The primary reason why nobody seems to care about the loss of trust is that the industry continues to make handsome margins for all members of the value chain. If people fail to read the small print and buy travel insurance from Boots, why should Boots or TIF care? Where’s their incentive to change? If the balance sheet remains healthy, the Titanic sails on.</p>
-                        <p>Furthermore, the personal interests of the key decision makers at incumbent insurance giants - the only individuals who could cause industry-wide change but who are approaching retirement and generous pensions - are completely misaligned with consumer needs. It’s comfortable for all passengers on the Titanic, so why take any personal, financial or reputational risk that will cause the ship to change course and miss the ‘record breaking arrival time’, despite the risk of icebergs? It’s a sad but true analogy.</p>
-                        <p>The insurance industry is in crisis due to problems that most participants know exist. But they are not going to be fixed from the inside. Incumbents have no incentive to change a system that is making handsome profits. If change is going to come, it’s going to have to come from outside.</p>
-                        <h2>It doesn’t have to be this way</h2>
-                        <p>After what you’ve read above, it may surprise you to learn that I am an ardent optimist. I believe there’s plenty of hope for insurance. It’s an ideal that has survived centuries and it will survive many more. But we must return to first principles and take collective action.</p>
-                        <p>Three years ago, there was a positive change. Insurtech was born, which, in theory, combined the best of the old world of insurance theory with the best of new world technology. It proposed that the consumer would be placed at the centre of insurance once again.</p>
-                        <p>Insurtech offered a change in mindset, a fresh start. But revolutions are slow, uphill battles as turning something powerful, like a cruise liner or the insurance industry, takes great effort. Incumbents still don’t consider insurtech to be a solution that can offer radical change. They prefer to focus on incremental operational improvements. However, these will not restore trust. Something more revolutionary must be done.</p>
-                        <p>Our business is at the heart of this revolution. We’re designing a form of insurance that is, first and foremost, consumer-centric. We pay out if you and your connected friends don’t claim. We treat you like people, not fraudsters. We aspire to offer you first class customer experience if you do claim. We believe in keeping our promises. In short, our incentives are aligned with our customers’.</p>
-                        <p>In a future series of posts, I’m going to set out how we’re going to restore trust in the insurance industry. With these good intentions, my team at <a href="{{ path('homepage') }}">so-sure</a> and I hope to redesign insurance and make tragedies like the alleged Boots/TIF fraud a thing of the past. Why don’t you join us?</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>The <a href="https://www.bbc.co.uk/news/business-46274918" target="_blank" rel="noopener noreferrer">news</a> last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building <a href="{{ path('homepage') }}">so-sure</a>.</p>
+                                <p>In this case, doctors working for Travel Insurance Facilities (TIF), the claims operator for a range of high street pharmacists like Boots, are being investigated by the General Medical Council following allegations that they denied care to claimants. Holidaymakers were made a promise. It seems that promise was broken.</p>
+                                <p>If the allegations are found to be true - and it’s worth noting that TIF denies any misconduct - this is a shocking case of negligence and mis-selling. However, this case is not unique. In fact, it’s symptomatic of the insurance industry as a whole. If found guilty, of course, we should be highly critical of TIF, but bad actors are not solely to blame. The industry is responsible and until we address the problems at its heart, we’ll continue to read awful news like this.</p>
+                                <h2>A broken system</h2>
+                                <p>It’s no wonder that <a href="https://www.insurancetimes.co.uk/only-half-of-british-consumers-trust-insurance-companies-to-pay-claims/1425151.article" target="_blank" rel="noopener noreferrer">only half of consumers</a> trust insurance. For an industry that’s supposed to be built on trust, this is a damning indictment. But consumers, knowing they need insurance more than they can afford to be without it, continue to buy despite a lack of faith in the system.</p>
+                                <p>Insurance relies on the premise that when the proverbial hits the fan, an insurance company has your back. It’s all about trust. When something went wrong for holidaymakers, they assumed their insurer would look after them. The fact they did not sums up the rotten core of the insurance industry. What the industry is promising and selling is not being delivered.</p>
+                                <p>Worse still, problems are so deeply entrenched and the interests of stakeholders and consumers so misaligned, that only radical action will avert a crisis, let alone plot a course towards a more sustainable, fairer future.</p>
+                                <h2>The state of play</h2>
+                                <p>The alleged TIF fraud acutely demonstrates the disconnect between the interests of insurers and their customers. The insurance industry is not providing the service that customers deserve and here’s why:</p>
+                                <h4>1. Insurance is designed to suit the balance sheet and investors - not the consumer</h4>
+                                <p>Across the industry, profit is everything, with little attention given to the needs of the consumer. Nobody has the consumer’s back. The heart of insurance has been ripped out and the only people being rewarded are insurance executives and shareholders, who are paid well if they sell as many policies as possible and pay out as few as possible. Insurance is now a product, not a service.</p>
+                                <h4>2. The industry’s primary concern - if not their only concern - is fraud.</h4>
+                                <p>Fraud is estimated to represent between 15 and 20% of your premium cost, so it costs us all. Because of this, all claimants are treated like fraudsters until they have proven themselves innocent. This leads to a terrible customer experience. The bizarre adage of, <em>“Make the claims process difficult and only true claims come through”</em>, is eroding trust and destroying an entire industry.</p>
+                                <h4>3. Insurance is designed to be product-centric rather than consumer-centric.</h4>
+                                <p>The industry’s focus is entirely on the product. The customer always comes second and this is leading to terrible experiences throughout the sales and claims process. Again, this is all done in an attempt to squeeze margins and do what is the right for the provider, the investors and the shareholders, not the consumer. The consumer experience is last.</p>
+                                <p>It’ll take a heck of a lot of effort to change this mindset as it is endemic throughout the industry. But let’s be clear, it’s the system’s fault that alleged frauds like this can occur - it’s not the fault of individuals. What’s concerning is that insurance executives don’t seem to want to act to fix their broken system.</p>
+                                <h2>Executive apathy</h2>
+                                <p>The primary reason why nobody seems to care about the loss of trust is that the industry continues to make handsome margins for all members of the value chain. If people fail to read the small print and buy travel insurance from Boots, why should Boots or TIF care? Where’s their incentive to change? If the balance sheet remains healthy, the Titanic sails on.</p>
+                                <p>Furthermore, the personal interests of the key decision makers at incumbent insurance giants - the only individuals who could cause industry-wide change but who are approaching retirement and generous pensions - are completely misaligned with consumer needs. It’s comfortable for all passengers on the Titanic, so why take any personal, financial or reputational risk that will cause the ship to change course and miss the ‘record breaking arrival time’, despite the risk of icebergs? It’s a sad but true analogy.</p>
+                                <p>The insurance industry is in crisis due to problems that most participants know exist. But they are not going to be fixed from the inside. Incumbents have no incentive to change a system that is making handsome profits. If change is going to come, it’s going to have to come from outside.</p>
+                                <h2>It doesn’t have to be this way</h2>
+                                <p>After what you’ve read above, it may surprise you to learn that I am an ardent optimist. I believe there’s plenty of hope for insurance. It’s an ideal that has survived centuries and it will survive many more. But we must return to first principles and take collective action.</p>
+                                <p>Three years ago, there was a positive change. Insurtech was born, which, in theory, combined the best of the old world of insurance theory with the best of new world technology. It proposed that the consumer would be placed at the centre of insurance once again.</p>
+                                <p>Insurtech offered a change in mindset, a fresh start. But revolutions are slow, uphill battles as turning something powerful, like a cruise liner or the insurance industry, takes great effort. Incumbents still don’t consider insurtech to be a solution that can offer radical change. They prefer to focus on incremental operational improvements. However, these will not restore trust. Something more revolutionary must be done.</p>
+                                <p>Our business is at the heart of this revolution. We’re designing a form of insurance that is, first and foremost, consumer-centric. We pay out if you and your connected friends don’t claim. We treat you like people, not fraudsters. We aspire to offer you first class customer experience if you do claim. We believe in keeping our promises. In short, our incentives are aligned with our customers’.</p>
+                                <p>In a future series of posts, I’m going to set out how we’re going to restore trust in the insurance industry. With these good intentions, my team at <a href="{{ path('homepage') }}">so-sure</a> and I hope to redesign insurance and make tragedies like the alleged Boots/TIF fraud a thing of the past. Why don’t you join us?</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

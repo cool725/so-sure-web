@@ -89,6 +89,7 @@ abstract class Policy
     const STATUS_PENDING_RENEWAL = 'pending-renewal';
     const STATUS_DECLINED_RENEWAL = 'declined-renewal';
     const STATUS_UNRENEWED = 'unrenewed';
+    const STATUS_PICSURE_REQUIRED = 'picsure-required';
 
     const CANCELLED_UNPAID = 'unpaid';
     const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
@@ -99,6 +100,7 @@ abstract class Policy
     const CANCELLED_DISPOSSESSION = 'dispossession';
     const CANCELLED_WRECKAGE = 'wreckage';
     const CANCELLED_UPGRADE = 'upgrade';
+    const CANCELLED_PICSURE_REQUIRED_EXPIRED = 'picsure-required-expired';
 
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
@@ -248,7 +250,7 @@ abstract class Policy
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "expired-wait-claim",
      *                  "unpaid", "multipay-requested", "multipay-rejected", "renewal",
-     *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
+     *                  "pending-renewal", "declined-renewal", "unrenewed", "picsure-required"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      * @DataChange(categories="hubspot")
@@ -272,7 +274,7 @@ abstract class Policy
     /**
      * @Assert\Choice({
      *  "unpaid", "actual-fraud", "suspected-fraud", "user-requested",
-     *  "cooloff", "badrisk", "dispossession", "wreckage", "upgrade"
+     *  "cooloff", "badrisk", "dispossession", "wreckage", "upgrade", "picsure-required-expired"
      * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -1035,6 +1037,26 @@ abstract class Policy
     }
 
     /**
+     * Gives you the policy's successful scheduled payment with the greatest schedule date even if this date is greater
+     * than the current time.
+     * @return ScheduledPayment|null the latest successful scheduled payment or null if there are no successful
+     *                               scheduled payments at all.
+     */
+    public function getLatestSuccessfulScheduledPayment()
+    {
+        $latest = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() != ScheduledPayment::STATUS_SUCCESS) {
+                continue;
+            }
+            if (!$latest || $latest->getScheduled() < $scheduledPayment->getScheduled()) {
+                $latest = $scheduledPayment;
+            }
+        }
+        return $latest;
+    }
+
+    /**
      * @return Payment|null
      */
     public function getLastSuccessfulUserPaymentCredit()
@@ -1465,6 +1487,12 @@ abstract class Policy
 
     public function setStatus($status)
     {
+        if ($this->getStatus() == Policy::STATUS_PICSURE_REQUIRED && $status == Policy::STATUS_UNPAID) {
+            throw new \InvalidArgumentException(sprintf(
+                "Trying to make picsure-required policy unpaid which is NOT allowed.\npolicyId: %s.",
+                $this->getId()
+            ));
+        }
         if ($status != $this->status) {
             $this->setStatusUpdated(\DateTime::createFromFormat('U', time()));
         }
@@ -2289,13 +2317,17 @@ abstract class Policy
         }
     }
 
-    public function isActive($includeUnpaid = true)
+    /**
+     * Tells you if this policy is currently active, as in the active, unpaid, or picsure-required status.
+     * @return boolean true if the policy is active and false if it is not.
+     */
+    public function isActive()
     {
-        if ($includeUnpaid) {
-            return in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]);
-        } else {
-            return in_array($this->getStatus(), [self::STATUS_ACTIVE]);
-        }
+        return in_array($this->getStatus(), [
+            self::STATUS_PICSURE_REQUIRED,
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID
+        ]);
     }
 
     public function getPolicyFiles()
@@ -2865,9 +2897,6 @@ abstract class Policy
         $this->setEnd($nextYear);
         $this->setStaticEnd($nextYear);
 
-        // Premium and/or IPT rate may have changed
-        $this->validatePremium(true, $startDate);
-
         $initialPolicyNumber = 5500000;
         $this->setPolicyNumber(sprintf(
             "%s/%s/%d",
@@ -3035,16 +3064,17 @@ abstract class Policy
             return false;
         }
 
+        if ($this->getCancelledReason() == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
+            return true;
+        }
+
         if ($this->getCancelledReason() == Policy::CANCELLED_UNPAID ||
             $this->getCancelledReason() == Policy::CANCELLED_ACTUAL_FRAUD ||
             $this->getCancelledReason() == Policy::CANCELLED_SUSPECTED_FRAUD) {
             // Never refund for certain cancellation reasons
             return false;
-        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED) {
-            // user has 30 days from when they requested cancellation
-            // however, as we don't easily have a scheduled cancellation
-            // we will start with a manual cancellation that should be done
-            // 30 days after they requested, such that the cancellation will be immediate then
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED &&
+            !$this->getPolicyTerms()->isInstantUserCancellationEnabled()) {
             return true;
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return true;
@@ -3054,6 +3084,7 @@ abstract class Policy
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_BADRISK) {
             throw new \UnexpectedValueException('Badrisk is not implemented');
         }
+        return false;
     }
 
     public function getRefundAmount($skipAllowedCheck = false, $skipValidate = false, $countScheduled = false)
@@ -3076,8 +3107,8 @@ abstract class Policy
 
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
-
-        if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+        $reason = $this->getCancelledReason();
+        if ($reason == Policy::CANCELLED_COOLOFF || $reason == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
             return $this->getCooloffPremiumRefund($skipValidate) - $offset;
         } else {
             return $this->getProratedPremiumRefund($this->getEnd()) - $offset;
@@ -3372,11 +3403,7 @@ abstract class Policy
         // From Dylan:
         // if paid , then payment accounted
         // if not paid/paying, then it should not show as outstanding amount due (as we won't be receiving it)
-        if (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
-            return $this->getOutstandingPremium();
-        } else {
-            return 0;
-        }
+        return $this->isActive() ? $this->getOutstandingPremium() : 0;
     }
 
     public function getOutstandingPremium()
@@ -3948,7 +3975,7 @@ abstract class Policy
         }
 
         if ($date == null) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         return $date >= $this->getPolicyExpirationDate($date);
@@ -3988,7 +4015,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
 
         // Yearly payments are a bit different
@@ -4010,41 +4037,14 @@ abstract class Policy
             }
         }
 
-        $billingDate = $this->getNextBillingDate($date);
-        if (!$billingDate || !$this->getBilling()) {
-            throw new \Exception(sprintf(
-                'Failed to find a next billing date. Policy %s/%s',
-                $this->getPolicyNumber(),
-                $this->getId()
-            ));
+        $billingDate = clone $this->getBilling();
+        $successes = $this->getPremium()->getNumberOfMonthlyPayments(
+            $this->getTotalSuccessfulPayments($date, true)
+        ) ?: 0;
+        if ($successes < 0) {
+            $successes = 0;
         }
-        $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
-
-        // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-        while ($this->greaterThanZero($this->getOutstandingPremiumToDate($billingDate))) {
-            $billingDate = $billingDate->sub(new \DateInterval('P1M'));
-            // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-            // print $this->getOutstandingPremiumToDate($billingDate) . PHP_EOL;
-
-            // Ensure we don't loop indefinitely
-            $maxCount--;
-            if ($maxCount < 0) {
-                throw new \Exception(sprintf(
-                    'Failed to find a date with a 0 outstanding premium (%f). Policy %s/%s',
-                    $this->getOutstandingPremiumToDate($billingDate),
-                    $this->getPolicyNumber(),
-                    $this->getId()
-                ));
-                // Older method of using the last payment recevied date to determine expiration
-                // $billingDate = clone $this->getLastSuccessfulUserPaymentCredit()->getDate();
-                // $billingDate->add(new \DateInterval('P1M'));
-                // break;
-            }
-        }
-        // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-
-        // and business rule of 30 days unpaid before auto cancellation
-        $billingDate->add(new \DateInterval('P30D'));
+        $billingDate->add(new \DateInterval("P{$successes}M30D"));
         $billingDate = $this->startOfDay($billingDate);
 
         // Unpaid policies with a cancellation date after the end of policy, should be adjusted to cancel
@@ -4294,7 +4294,7 @@ abstract class Policy
     {
         // We should only bill policies that are active or unpaid
         // Doesn't make sense to bill expired or cancelled policies
-        return $this->isActive(true);
+        return $this->isActive();
     }
 
     public function getSentInvitations($onlyProcessed = true)
@@ -4478,11 +4478,11 @@ abstract class Policy
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
             /** @var Connection $connection */
             $renew = count($this->getRenewalConnections()) < $this->getMaxConnectionsLimit();
-            if ($connection->getLinkedPolicy()->isActive(true) &&
+            if ($connection->getLinkedPolicy()->isActive() &&
                 $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
                 $this->addRenewalConnection($connection->createRenewal($renew));
             } elseif ($connection->getLinkedPolicyRenewal() &&
-                $connection->getLinkedPolicyRenewal()->isActive(true) &&
+                $connection->getLinkedPolicyRenewal()->isActive() &&
                 $connection->getLinkedPolicyRenewal()->isConnected($this->getPreviousPolicy())
             ) {
                 $this->addRenewalConnection($connection->createRenewal($renew));
@@ -4662,7 +4662,7 @@ abstract class Policy
             throw new \Exception('Unable to expire a policy prior to its end date');
         }
 
-        if (!$this->isActive(true)) {
+        if (!$this->isActive()) {
             throw new \Exception('Unable to expire a policy if status is not active or unpaid');
         }
 
@@ -4763,7 +4763,7 @@ abstract class Policy
         //if ($this->isRenewed()) {
             foreach ($this->getAcceptedConnections() as $connection) {
                 if ($connection instanceof StandardConnection &&
-                    ($connection->getSourcePolicy()->isActive(true) ||
+                    ($connection->getSourcePolicy()->isActive() ||
                         $connection->getSourcePolicy()->getStatus() == Policy::STATUS_RENEWAL)
                 ) {
                     $connection->setLinkedPolicyRenewal($this->getNextPolicy());
@@ -5076,7 +5076,7 @@ abstract class Policy
         }
 
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
         //$date->setTimezone(new \DateTimeZone(self::TIMEZONE));
         $date = $this->adjustDayForBilling($date, true);
@@ -5118,7 +5118,7 @@ abstract class Policy
         $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
 
         $diff = $expectedPaid - $totalPaid;
-        //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
+        // print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
         if (!$allowNegative && $diff < 0) {
             return 0;
         }
@@ -5164,7 +5164,7 @@ abstract class Policy
         if ($this->hasMonetaryClaimed()) {
             return false;
         }
-        if (!$this->isActive(true)) {
+        if (!$this->isActive()) {
             return false;
         }
 
@@ -5209,7 +5209,10 @@ abstract class Policy
                 }
             }
         }
-        if ($this->getStatus() == self::STATUS_RENEWAL) {
+        $fourteenDaysAgo = (clone $date)->sub(new \DateInterval("P14D"));
+        if ($this->getPolicyTerms()->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
+            return $this->getStatus() == self::STATUS_PICSURE_REQUIRED;
+        } elseif ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
         } elseif ($this->isPolicyPaidToDate($date, true, false, true)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
@@ -5329,6 +5332,7 @@ abstract class Policy
             self::STATUS_ACTIVE,
             self::STATUS_UNPAID,
             self::STATUS_PENDING,
+            self::STATUS_PICSURE_REQUIRED
         ])) {
             return null;
         }
@@ -5525,6 +5529,9 @@ abstract class Policy
 
     public function isCancelledAndPaymentOwed()
     {
+        if (!$this->getPremium()) {
+            return false;
+        }
         if (!$this->isFullyPaid() &&
             count($this->getApprovedClaims(true, true)) > 0 &&
             $this->getStatus() == self::STATUS_CANCELLED &&
@@ -5559,11 +5566,6 @@ abstract class Policy
         }
 
         $outstandingPremium = $this->getOutstandingPremiumToDate($date);
-        if ($this->areEqualToTwoDp(0, $outstandingPremium)) {
-            return self::UNPAID_PAID;
-        }
-
-
         $nextScheduledPayment = $this->getNextScheduledPayment();
         $lastPaymentCredit = $this->getLastPaymentCredit();
         $lastPaymentInProgress = false;
@@ -5810,7 +5812,11 @@ abstract class Policy
         // also if a policy has been cancelled and there is money owed
         if ($this->isCooloffCancelled()) {
             return 0;
-        } elseif (in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID])) {
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
+        ])) {
             $expectedCommission = $expectedMonthlyCommission;
         } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
             // if there's a refund, the number of payments won't be equal and so we need to calculate based on received
@@ -5913,7 +5919,7 @@ abstract class Policy
             $date = \DateTime::createFromFormat('U', time());
         }
 
-        if ($this->isActive(true)) {
+        if ($this->isActive()) {
             $diff = $this->getEnd()->diff($date);
             $notPastDate = $diff->days > 0 || ($diff->days == 0 && $diff->invert == 1);
             if ($diff->days <= self::RENEWAL_DAYS && $notPastDate) {
@@ -6121,6 +6127,7 @@ abstract class Policy
             self::STATUS_PENDING_RENEWAL,
             self::STATUS_RENEWAL,
             self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
         ])) {
             return false;
         }
@@ -6271,6 +6278,7 @@ abstract class Policy
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [
             self::STATUS_ACTIVE,
             self::STATUS_CANCELLED,
+            self::STATUS_PICSURE_REQUIRED,
             self::STATUS_UNPAID,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
@@ -6279,11 +6287,26 @@ abstract class Policy
         ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }
-
-
         $cardDetails = CheckoutPaymentMethod::emptyApiArray();
         if ($this->getCheckoutPaymentMethod()) {
             $cardDetails = $this->getCheckoutPaymentMethod()->toApiArray();
+        }
+
+        // Figure out the right premiums to report even when none are actually set yet.
+        $monthlyPremium = null;
+        $yearlyPremium = null;
+        $premium = $this->getPremium();
+        if ($premium) {
+            $monthlyPremium = $premium->getMonthlyPremiumPrice();
+            $yearlyPremium = $premium->getYearlyPremiumPrice();
+        } elseif ($this instanceof PhonePolicy) {
+            $phone = $this->getPhone();
+            if ($phone) {
+                $monthlyPhonePrice = $phone->getCurrentMonthlyPhonePrice();
+                $yearlyPhonePrice = $phone->getCurrentYearlyPhonePrice();
+                $monthlyPremium = $monthlyPhonePrice ? $monthlyPhonePrice->getMonthlyPremiumPrice() : null;
+                $yearlyPremium = $yearlyPhonePrice ? $yearlyPhonePrice->getYearlyPremiumPrice() : null;
+            }
         }
 
         $data = [
@@ -6293,7 +6316,10 @@ abstract class Policy
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),
-            'monthly_premium' => $this->getPremium()->getMonthlyPremiumPrice(),
+            'monthly_premium' => $monthlyPremium,
+            'yearly_premium' => $yearlyPremium,
+            'adjusted_monthly_premium' => $premium ? $premium->getAdjustedStandardMonthlyPremiumPrice() : null,
+            'adjusted_yearly_premium' => $premium ? $premium->getAdjustedYearlyPremiumPrice() : null,
             'policy_terms_id' => $this->getPolicyTerms() ? $this->getPolicyTerms()->getId() : null,
             'pot' => [
                 'connections' => count($this->getConnections()),
@@ -6308,7 +6334,6 @@ abstract class Policy
             'has_claim' => $this->hasMonetaryClaimed(),
             'has_network_claim' => $this->hasNetworkClaim(true),
             'claim_dates' => $this->eachApiMethod($this->getMonetaryClaimed(), 'getClosedDate'),
-            'yearly_premium' => $this->getPremium()->getYearlyPremiumPrice(),
             'premium' => $this->getPremiumInstallmentPrice(),
             'premium_plan' => $this->getPremiumPlan(),
             'scodes' => $this->eachApiArray($this->getActiveSCodes()),
@@ -6319,8 +6344,6 @@ abstract class Policy
             'next_policy_id' => $this->hasNextPolicy() ? $this->getNextPolicy()->getId() : null,
             'billing_day' => $this->getBillingDay(),
             'cashback_status' => $this->getCashback() ? $this->getCashback()->getStatus() : null,
-            'adjusted_monthly_premium' => $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
-            'adjusted_yearly_premium' => $this->getPremium()->getAdjustedYearlyPremiumPrice(),
             'has_payment_method' => $this->hasValidPaymentMethod(),
             'payment_details' => $this->getPaymentMethod() ?
                 $this->getPaymentMethod()->__toString() :
@@ -6351,7 +6374,7 @@ abstract class Policy
         foreach ($policies as $policy) {
             if ($policy->isValidPolicy($prefix)) {
                 $includePolicy = true;
-                if ($activeUnpaidOnly && !$policy->isActive(true)) {
+                if ($activeUnpaidOnly && !$policy->isActive()) {
                     $includePolicy = false;
                 }
                 if ($includePolicy) {

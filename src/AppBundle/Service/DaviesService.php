@@ -407,7 +407,11 @@ class DaviesService extends S3EmailService
         // Only for active/unpaid policies with a theft/lost claim that have been repudiated
         if ($daviesClaim->miStatus === DaviesHandlerClaim::MISTATUS_REPUDIATED &&
             in_array($claim->getType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT]) &&
-            in_array($claim->getPolicy()->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+            in_array($claim->getPolicy()->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID
+            ])
+        ) {
             $body = sprintf(
                 'Verify that policy %s / %s has a rejected claim and if so, policy should be cancelled',
                 $claim->getPolicy()->getPolicyNumber(),

@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'landing' %}
+{% set robots_noindex = true %}
 
 {% block title %}so-sure - Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %}{% endblock %}
 {% block meta %}
@@ -17,12 +18,38 @@
     <section class="hero">
         <div class="container-large">
             <div class="hero__intro">
+                <div class="breadcrumbs">
+                    <ul class="list-inline"
+                        vocab="https://schema.org/"
+                        typeof="BreadcrumbList">
+                        <li class="list-inline-item"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <a href="{{ path('homepage') }}"
+                               class="text-columbia-blue-e"
+                               property="item"
+                               typeof="WebPage">
+                               <span property="name">Home</span>
+                            </a>
+                            <meta property="position" content="1">
+                        </li>
+                        <li class="list-inline-item text-white">
+                            <i class="fal fa-angle-right text-white"></i>
+                        </li>
+                        <li class="list-inline-item text-white"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <span property="name">Compare Cover</span>
+                            <meta property="position" content="2">
+                        </li>
+                    </ul>
+                </div>
                 {% if affiliate_page == 'comparison' %}
                     <h1 class="mb-2 text-white h2">{{ titleH1 }}</h1>
-                    <h4 class="text-zaffre mb-4">{{ leadP|raw }}</h4>
+                    <h2 class="h4 text-zaffre mb-4">{{ leadP|raw }}</h2>
                 {% elseif affiliate_page == 'so-sure-compared' or affiliate_page == 'reward-gateway' %}
                     <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                    <h4 class="text-zaffre">Simple terms, pain-free claims, premium cover</h4>
+                    <h2 class="h4 text-zaffre">Simple terms, pain-free claims, premium cover</h2>
                     <p class="mb-4 lead text-white">We're a new type of insurer that you can rely on. <br class="d-none d-lg-inline"> We protect you when you need to claim and reward you when you don't.</p>
                 {% elseif affiliate_page == 'moneyback' %}
                     <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
@@ -64,19 +91,19 @@
                 <div class="col-md-4">
                     <div class="why__container">
                         <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px" class="lozad">
-                        <h4 class="text-dodger-blue">24-72 hour replace or repair</h4>
+                        <h3 class="h4 text-dodger-blue">24-72 hour replace or repair</h3>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="why__container">
                         <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back" width="180px" class="lozad">
-                        <h4 class="text-dodger-blue">Up to 80% money back</h4>
+                        <h3 class="h4 text-dodger-blue">Up to 80% money back</h3>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="why__container">
                         <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px" class="lozad">
-                        <h4 class="text-dodger-blue">Low excess from just &pound;50</h4>
+                        <h3 class="h4 text-dodger-blue">Low excess from just &pound;50</h3>
                     </div>
                 </div>
             </div>

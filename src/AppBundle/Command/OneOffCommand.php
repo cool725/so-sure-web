@@ -16,6 +16,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Service\FacebookService;
 use AppBundle\Service\IntercomService;
 use AppBundle\Service\MixpanelService;
@@ -75,29 +76,33 @@ class OneOffCommand extends ContainerAwareCommand
 
     protected function configure()
     {
-        $this
-            ->setName('sosure:oneoff')
+        $this->setName('sosure:oneoff')
             ->setDescription('Run one off functionality')
             ->addArgument(
                 'method',
                 InputArgument::REQUIRED,
                 'command to run'
             )
-        ;
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Date at which to do things that require a date'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $method = $input->getArgument('method');
         if (method_exists($this, $method)) {
-            call_user_func([$this, $method], $output);
+            call_user_func([$this, $method], $input, $output);
         } else {
             throw new \Exception(sprintf('Unknown command %s', $method));
         }
         $output->writeln('Finished');
     }
 
-    private function goCompareAttribution(OutputInterface $output)
+    private function goCompareAttribution(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(User::class);
         $users = $repo->findBy(['attribution.goCompareQuote' => ['$ne' => null]]);
@@ -117,7 +122,7 @@ class OneOffCommand extends ContainerAwareCommand
         $output->writeln(sprintf('%d attributions requeued', $count));
     }
 
-    private function migratePaymentMethod(OutputInterface $output)
+    private function migratePaymentMethod(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findAll();
@@ -133,12 +138,12 @@ class OneOffCommand extends ContainerAwareCommand
         $output->writeln(sprintf('%d policies updated with user payment method', $count));
     }
 
-    private function facebookAds(OutputInterface $output)
+    private function facebookAds(InputInterface $input, OutputInterface $output)
     {
         $this->facebookService->monthlyLookalike(new \DateTime(), 'VAGRANT');
     }
 
-    private function intercomConversation(OutputInterface $output)
+    private function intercomConversation(InputInterface $input, OutputInterface $output)
     {
         $adminId = $this->intercomService->getAdminIdForConversationId(20387006809);
         $output->writeln($adminId);
@@ -147,7 +152,7 @@ class OneOffCommand extends ContainerAwareCommand
         $output->writeln($userId);
     }
 
-    private function removeTwoFactor(OutputInterface $output)
+    private function removeTwoFactor(InputInterface $input, OutputInterface $output)
     {
         if (!in_array($this->environment, ['vagrant', 'staging', 'testing'])) {
             throw new \Exception('Only able to run in vagrant/testing/staging environments');
@@ -165,7 +170,7 @@ class OneOffCommand extends ContainerAwareCommand
         $output->writeln('Removed 2fa for all admins');
     }
 
-    private function cancelScheduledPayments(OutputInterface $output)
+    private function cancelScheduledPayments(InputInterface $input, OutputInterface $output)
     {
         $count = 0;
         $repo = $this->dm->getRepository(ScheduledPayment::class);
@@ -183,7 +188,7 @@ class OneOffCommand extends ContainerAwareCommand
         $output->writeln(sprintf("%d updated", $count));
     }
 
-    private function updateClaimExcess(OutputInterface $output)
+    private function updateClaimExcess(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findAll();
@@ -197,7 +202,7 @@ class OneOffCommand extends ContainerAwareCommand
         $this->dm->flush();
     }
 
-    private function updatePhoneExcess(OutputInterface $output)
+    private function updatePhoneExcess(InputInterface $input, OutputInterface $output)
     {
         // technically should compare the price dates to see if pic-sure excess should be set, but it doesn't add
         // any current value and is time consuming
@@ -215,7 +220,7 @@ class OneOffCommand extends ContainerAwareCommand
         $this->dm->flush();
     }
 
-    private function updatePolicyExcess(OutputInterface $output)
+    private function updatePolicyExcess(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAll();
@@ -233,7 +238,7 @@ class OneOffCommand extends ContainerAwareCommand
         $this->dm->flush();
     }
 
-    private function updateNotes(OutputInterface $output)
+    private function updateNotes(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(Policy::class);
         $userRepo = $this->dm->getRepository(User::class);
@@ -268,7 +273,7 @@ class OneOffCommand extends ContainerAwareCommand
         }
     }
 
-    private function removeOrphanUsersOnCharges(OutputInterface $output)
+    private function removeOrphanUsersOnCharges(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(Charge::class);
         foreach ($repo->findAll() as $charge) {
@@ -286,7 +291,7 @@ class OneOffCommand extends ContainerAwareCommand
         }
     }
 
-    private function birthday(OutputInterface $output)
+    private function birthday(InputInterface $input, OutputInterface $output)
     {
         $repo = $this->dm->getRepository(User::class);
         $count = 0;
@@ -326,6 +331,62 @@ class OneOffCommand extends ContainerAwareCommand
 
         $this->dm->flush();
         $output->writeln(sprintf('%d records updated', $count));
+    }
+
+    /**
+     * Adds a new yearly price to all active phones which is the current monthly price * 11.
+     * @param InputInterface  $input  is used to get the date at which the price should start.
+     * @param OutputInterface $output is used to write info to the user.
+     */
+    private function oneMonthFree(InputInterface $input, OutputInterface $output)
+    {
+        // validate the arguments.
+        $dateString = $input->getOption("date");
+        if (!$dateString) {
+            $output->writeln("<error>Date must be provided to oneMonthFree</error>");
+            return;
+        }
+        $date = \DateTime::createFromFormat("Y-m-d", $dateString);
+        // Begin adding the prices on the phones.
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $this->dm->getRepository(Phone::class);
+        $phones = $phoneRepo->findActive()->getQuery()->execute();
+        $nSuccessful = 0;
+        $nCrashed = 0;
+        $nPriceless = 0;
+        foreach ($phones as $phone) {
+            $currentPrice = $phone->getCurrentMonthlyPhonePrice();
+            if (!$currentPrice) {
+                $nPriceless++;
+                continue;
+            }
+            try {
+                $yearlyPrice = new PhonePrice();
+                $yearlyPrice->setGwp(($currentPrice->getGwp() * 11) / 12);
+                $yearlyPrice->setValidFrom($date);
+                $yearlyPrice->setStream(PhonePrice::STREAM_YEARLY);
+                if ($currentPrice->getExcess()) {
+                    $yearlyPrice->setExcess($currentPrice->getExcess());
+                }
+                if ($currentPrice->getPicSureExcess()) {
+                    $yearlyPrice->setPicSureExcess($currentPrice->getPicSureExcess());
+                }
+                $phone->addPhonePrice($yearlyPrice);
+                $this->dm->persist($phone);
+                $nSuccessful++;
+            } catch (\Exception $e) {
+                $output->writeln($e->getMessage());
+                $nCrashed++;
+            }
+        }
+        $this->dm->flush();
+        $output->writeln("Successful: {$nSuccessful}");
+        if ($nCrashed > 0) {
+            $output->writeln("Errored: {$nCrashed}");
+        }
+        if ($nPriceless > 0) {
+            $output->writeln("No Price: {$nPriceless}");
+        }
     }
 
     private function getDataChangeAnnotation($object, $category)

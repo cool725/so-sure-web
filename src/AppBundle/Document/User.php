@@ -471,6 +471,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $isBlacklisted = false;
 
+    /**
+     * Contains references to all the offers that are offered to this user.
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
+     */
+    protected $offers = [];
+
     protected $allowedMonthly = true;
 
     protected $allowedYearly = true;
@@ -758,6 +764,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         foreach ($this->policies as $policy) {
             if (in_array($policy->getStatus(), [
                 Policy::STATUS_ACTIVE,
+                Policy::STATUS_PICSURE_REQUIRED,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
@@ -1142,6 +1149,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
+    /**
+     * Tells you if this user has a picsure required policy.
+     * @return boolean true if they have a picsure required policy and false if not.
+     */
+    public function hasPicsureRequiredPolicy()
+    {
+        return $this->policyReduce(false, function ($current, $policy) {
+            return $current | $policy->getStatus() == Policy::STATUS_PICSURE_REQUIRED;
+        });
+    }
+
     public function hasUnpaidPolicy()
     {
         return $this->getUnpaidPolicy() !== null;
@@ -1202,13 +1220,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $policies = [];
         foreach ($this->getPolicies() as $policy) {
-            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE])) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_PICSURE_REQUIRED])) {
                 $policies[] = $policy;
             } elseif ($includeUnpaid && $policy->getStatus() == Policy::STATUS_UNPAID) {
                 $policies[] = $policy;
             }
         }
-
         return $policies;
     }
 
@@ -1336,12 +1353,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if (count($policies) == 0) {
             return null;
         }
-
-        // sort most recent to older
         usort($policies, function ($a, $b) {
             return $a->getStart() < $b->getStart();
         });
-
         return $policies[0];
     }
 
@@ -1406,6 +1420,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['paymentsReceived'] = 0;
         $data['lastPaymentReceived'] = null;
         $data['lastConnection'] = null;
+        $data['scode'] = null;
         $data['connections'] = 0;
         $data['rewardPot'] = 0;
         $data['maxPot'] = 0;
@@ -1416,6 +1431,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['renewalMonthlyPremiumNoPot'] = 0;
         $data['renewalMonthlyPremiumWithPot'] = 0;
         $data['hasOutstandingPicSurePolicy'] = false;
+        $data['picsureRequired'] = false;
         $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
 
@@ -1446,8 +1462,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 null,
             ])) {
                 $data['hasOutstandingPicSurePolicy'] = true;
+                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                    $data['picsureRequired'] = true;
+                }
             }
             $data['connections'] += count($policy->getConnections());
+            $data['scode'] = ($this->getStandardSCode() === null) ? "" : $this->getStandardSCode()->getCode();
             $data['rewardPot'] += $policy->getPotValue();
             $data['approvedClaims'] += count($policy->getApprovedClaims());
             $data['approvedNetworkClaims'] += count($policy->getNetworkClaims(true));
@@ -1787,6 +1807,45 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->isBlacklisted = $isBlacklisted;
         return $this;
+    }
+
+    /**
+     * Gives you all of the offers that are applied to this user.
+     * @return ArrayCollection of the offers.
+     */
+    public function getOffers()
+    {
+        return $this->offers;
+    }
+
+    /**
+     * Links an offer to this user.
+     * @param Offer $offer is the offer to add to the user.
+     */
+    public function addOffer(Offer $offer)
+    {
+        $this->offers[] = $offer;
+    }
+
+    /**
+     * Finds an offer on this user that matches the required conditions.
+     * @param Phone     $phone  is the phone that the offer must be for.
+     * @param string    $stream is the stream of price the offer must be for.
+     * @param \DateTime $date   is the date at which the offer must be applicable.
+     * @return Offer|null the found offer if there is one.
+     */
+    public function getApplicableOffer(Phone $phone, $stream, \DateTime $date)
+    {
+        $phoneId = $phone->getId();
+        foreach ($this->getOffers() as $offer) {
+            $price = $offer->getPrice();
+            if ($offer->getPhone()->getId() == $phoneId && $price && $price->inStream($stream) &&
+                $price->getValidFrom() <= $date
+            ) {
+                return $offer;
+            }
+        }
+        return null;
     }
 
     public function hasEmail()

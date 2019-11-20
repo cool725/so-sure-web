@@ -16,7 +16,6 @@ Encore
     // List all files here
     .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
-    .addEntry('cookie', './src/AppBundle/Resources/public/rebrand/js/cookie.js')
     .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')
     .addEntry('error', './src/AppBundle/Resources/public/rebrand/js/pages/error.js')
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
@@ -33,7 +32,7 @@ Encore
     .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
     .addEntry('purchase-remainder', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-remainder.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
-    .addEntry('faq', './src/AppBundle/Resources/public/rebrand/js/pages/faq.js')
+    .addEntry('content-pages', './src/AppBundle/Resources/public/rebrand/js/pages/content-pages.js')
     .addEntry('onboarding', './src/AppBundle/Resources/public/rebrand/js/pages/onboarding.js')
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')
     .addEntry('contact', './src/AppBundle/Resources/public/rebrand/js/pages/contact.js')
@@ -51,13 +50,6 @@ Encore
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
     .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')
 
-    // Homepage A/B Exp
-    .addEntry('purchase-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-b.js')
-    .addEntry('purchase-personal-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal-b.js')
-    .addEntry('purchase-phone-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-phone-b.js')
-    .addEntry('purchase-pledge-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-pledge-b.js')
-    .addEntry('purchase-payment-b', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-payment-b.js')
-
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
     .addEntry('picsure', './src/AppBundle/Resources/public/rebrand/js/pages/admin/picsure.js')
@@ -69,6 +61,7 @@ Encore
     .addEntry('admin-users', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin-users.js')
     .addEntry('features', './src/AppBundle/Resources/public/rebrand/js/pages/admin/features.js')
     .addEntry('phone', './src/AppBundle/Resources/public/rebrand/js/pages/admin/phone.js')
+    .addEntry('offer', './src/AppBundle/Resources/public/rebrand/js/pages/admin/offer.js')
     .addEntry('kpi', './src/AppBundle/Resources/public/rebrand/js/pages/admin/kpi.js')
     .addEntry('bacs', './src/AppBundle/Resources/public/rebrand/js/pages/admin/bacs.js')
     .addEntry('policy-validations', './src/AppBundle/Resources/public/rebrand/js/pages/admin/policy-validations.js')
@@ -138,6 +131,12 @@ Encore
 ;
 
 var config = Encore.getWebpackConfig();
+
+// enable file system polling.
+config.watchOptions = {
+    poll: true,
+    ignored: /node_modules/
+};
 
 // disable amd, for datatable
 config.module.rules.unshift({

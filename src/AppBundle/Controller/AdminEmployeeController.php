@@ -7,11 +7,14 @@ use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
+use AppBundle\Document\Offer;
+use AppBundle\Document\Excess\PhoneExcess;
+use AppBundle\Document\Excess\Excess;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Document\Promotion;
 use AppBundle\Document\Participation;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
-use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\Postcode;
-use AppBundle\Document\Promotion;
 use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
@@ -27,6 +30,7 @@ use AppBundle\Form\Type\DetectedImeiType;
 use AppBundle\Form\Type\InvalidImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
+use AppBundle\Form\Type\OfferType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\PicSureStatusType;
 use AppBundle\Form\Type\SerialNumberType;
@@ -35,6 +39,7 @@ use AppBundle\Form\Type\UserHandlingTeamType;
 use AppBundle\Form\Type\PostcodeType;
 use AppBundle\Form\Type\PromotionType;
 use AppBundle\Form\Type\RewardType;
+use AppBundle\Form\Type\RewardEditType;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -573,6 +578,169 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         return $response;
+    }
+
+    /**
+     * @Route("/offer/phone/{id}", name="admin_phone_offers")
+     * @Template("AppBundle::AdminEmployee/adminPhoneOffers.html.twig")
+     */
+    public function adminPhoneOffersAction($id)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = $phoneRepo->find($id);
+        return [
+            "phone" => $phone
+        ];
+    }
+
+    /**
+     * @Route("/offer/create/{id}", name="admin_offer_create")
+     * @Template
+     */
+    public function offerFormAction(Request $request, $id)
+    {
+        $offerForm = $this->get("form.factory")
+            ->createNamedBuilder("offer_form", OfferType::class)
+            ->setAction($this->generateUrl("admin_offer_create", ["id" => $id]))
+            ->getForm();
+        if ("POST" === $request->getMethod()) {
+            if ($request->request->has("offer_form")) {
+                $offerForm->handleRequest($request);
+                if ($offerForm->isValid()) {
+                    $dm = $this->getManager();
+                    $phoneRepo = $dm->getRepository(Phone::class);
+                    $phone = $phoneRepo->find($id);
+                    if (!$phone) {
+                        throw new \Exception("trying to create offer for nonexistent phone");
+                    }
+                    $date = new \DateTime();
+                    $data = $offerForm->getData();
+                    $offer = new Offer();
+                    $offer->setName($data["name"]);
+                    $offer->setCreated($date);
+                    $phone->addOffer($offer);
+                    $excess = new PhoneExcess();
+                    $picsureExcess = new PhoneExcess();
+                    $excess->setDamage($data["damage"]);
+                    $excess->setWarranty($data["warranty"]);
+                    $excess->setExtendedWarranty($data["extendedWarranty"]);
+                    $excess->setLoss($data["loss"]);
+                    $excess->setTheft($data["theft"]);
+                    $picsureExcess->setDamage($data["picsureDamage"]);
+                    $picsureExcess->setWarranty($data["picsureWarranty"]);
+                    $picsureExcess->setExtendedWarranty($data["picsureExtendedWarranty"]);
+                    $picsureExcess->setLoss($data["picsureLoss"]);
+                    $picsureExcess->setTheft($data["picsureTheft"]);
+                    $price = new PhonePrice();
+                    $price->setStream($data["stream"]);
+                    $price->setValidFrom($date);
+                    $price->setGwp($data["gwp"]);
+                    $price->setExcess($excess);
+                    $price->setPicSureExcess($picsureExcess);
+                    $offer->setPrice($price);
+                    $offer->setActive(true);
+                    $dm->persist($offer);
+                    $dm->persist($phone);
+                    $dm->flush();
+                    $this->addFlash("success", "Created Offer");
+                    return new RedirectResponse($this->generateUrl("admin_phone_offers", ["id" => $id]));
+                } else {
+                    $this->addFlash("error", sprintf(
+                        "Unable to add offer. %s",
+                        (string) $offerForm->getErrors()
+                    ));
+                }
+                return new RedirectResponse($this->generateUrl("admin_phone_offers", ["id" => $id]));
+            }
+        }
+        return ["form" => $offerForm->createView()];
+    }
+
+    /**
+     * Gives the details on an offer including a list of all users and policies using it as JSON.
+     * @Route("/offer/{id}/details", name="admin_offer_details")
+     */
+    public function offerDetailsAction($id)
+    {
+        $dm = $this->getManager();
+        $offerRepo = $dm->getRepository(Offer::class);
+        $offer = $offerRepo->find($id);
+        if (!$offer) {
+            throw new \Exception("No offer with id '{$id}'");
+        }
+        return $this->json($offer->toDetailsArray());
+    }
+
+    /**
+     * Adds a given user to the given offer. The offer id must be passed as a POST parameter as well as the email for
+     * this request.
+     * @param Request $request is the http request.
+     * @return Response to send back to the client.
+     * @Route("/offer/add-user", name="admin_offer_add_user")
+     * @Method({"POST"})
+     */
+    public function offerAddUserAction(Request $request)
+    {
+        $offerId = $request->request->get("offer_id");
+        $email = $request->request->get("user_email");
+        $dm = $this->getManager();
+        $offerRepo = $dm->getRepository(Offer::class);
+        $userRepo = $dm->getRepository(User::class);
+        $offer = $offerRepo->find($offerId);
+        $user = $userRepo->findOneBy(["emailCanonical" => mb_strtolower($email)]);
+        if (!$offer) {
+            throw new \Exception(sprintf(
+                "'%s' is not a valid offer id",
+                $offerId
+            ));
+        } elseif (!$user) {
+            $this->addFlash("error", sprintf(
+                "'%s' is not a user email in our system",
+                $email
+            ));
+        } else {
+            $offer->addUser($user);
+            $dm->persist($offer);
+            $dm->flush();
+            $this->addFlash("success", "Added user to offer");
+        }
+        return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
+    }
+
+    /**
+     * Turns an offer on or off.
+     * @param Request $request is the http request.
+     * @param string  $id      is the id of the offer we are requesting information on.
+     * @return Response to send back to the client.
+     * @Route("/offer/{id}/enable", name="admin_offer_able")
+     * @Method({"POST"})
+     */
+    public function offerAbleAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $offerRepo = $dm->getRepository(Offer::class);
+        $offer = $offerRepo->find($id);
+        $ableText = $request->request->get("able");
+        if (!$offer) {
+            throw new \Exception("No offer with id '{$id}'");
+        }
+        $able = false;
+        if ($ableText == "enable") {
+            $able = true;
+        } elseif ($ableText != "disable") {
+            $this->addFlash("error", "Request to change offer state was invalid");
+            return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
+        }
+        $offer->setActive($able);
+        $dm->persist($offer);
+        $dm->flush();
+        $this->addFlash("success", sprintf(
+            "%s %s",
+            $offer->getName(),
+            $able ? "reenabled" : "disabled"
+        ));
+        return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
     }
 
     /**
@@ -1292,7 +1460,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
-        $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        if ($policy->getPremium()) {
+            $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        } else {
+            /** @var PhonePrice $price */
+            $price = $policy->getPhone()->getCurrentYearlyPhonePrice();
+            $bacsPayment->setAmount($price->getYearlyPremiumPrice());
+        }
         $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         if ($policy->getPolicyOrUserBacsBankAccount()) {
             $bacsPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
@@ -1305,8 +1479,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('create_form')
             ->add('create', SubmitType::class)
             ->getForm();
-        $connectForm = $this->get('form.factory')
-            ->createNamedBuilder('connect_form')
+        $connectForm = $this->get('form.factory') ->createNamedBuilder('connect_form')
             ->add('email', EmailType::class)
             ->add('connect', SubmitType::class)
             ->getForm();
@@ -1565,6 +1738,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                                 $policy->getId()
                             ));
                         }
+                    } elseif (!$policy->getPremium()) {
+                        $priceService = $this->get("app.price");
+                        $priceService->phonePolicyDeterminePremium(
+                            $policy,
+                            $bacsPayment->getAmount(),
+                            new \DateTime()
+                        );
                     }
                     $policy->addPayment($bacsPayment);
 
@@ -1811,7 +1991,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($payPolicyForm->isValid()) {
                     $date = \DateTime::createFromFormat('U', time());
                     $phone = $policy->getPhone();
-                    $currentPrice = $phone->getCurrentPhonePrice();
+                    $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
                     if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
                         $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);
                     } elseif ($currentPrice && $payPolicyForm->get('yearly')->isClicked()) {
@@ -1980,7 +2160,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (count($previousInvalidPicSureStatuses) > 0) {
             $hadInvalidPicSureStatus = true;
         }
-
 
         return [
             'policy' => $policy,
@@ -2165,7 +2344,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $policyForm->handleRequest($request);
                 if ($policyForm->isValid()) {
                     $imeiValidator = $this->get('app.imei');
-                    if (!$imeiValidator->isImei($policyData->getImei()) ||
+                    if ($policyData->getImei() && !$imeiValidator->isImei($policyData->getImei()) ||
                         $imeiValidator->isLostImei($policyData->getImei()) ||
                         $imeiValidator->isDuplicatePolicyImei($policyData->getImei())) {
                         $this->addFlash(
@@ -2917,7 +3096,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                                 );
                             }
                             $this->addFlash('success', sprintf(
-                                'Added reward connection'
+                                'Reward applied'
                             ));
 
                             return new RedirectResponse($this->generateUrl('admin_rewards'));
@@ -2946,6 +3125,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->flush();
                         $reward = new Reward();
                         $reward->setUser($user);
+                        $reward->setType($createReward->getType());
+                        $reward->setTarget($createReward->getTarget());
                         $reward->setDefaultValue($createReward->getDefaultValue());
                         $reward->setExpiryDate($createReward->getExpiryDate());
                         $reward->setPolicyAgeMin($createReward->getPolicyAgeMin());
@@ -2960,7 +3141,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $reward->setTermsAndConditions($createReward->getTermsAndConditions());
                         $dm->persist($reward);
                         if ($createReward->getCode()) {
-                            $code = $createReward->getCode();
+                            //Make all rewards scodes uppercase
+                            $code = mb_strtoupper($createReward->getCode());
                             if (mb_strlen($code) > 0) {
                                 $scode = new SCode();
                                 $scode->setCode($code);
@@ -2971,7 +3153,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         }
                         $dm->flush();
                         $this->addFlash('success', sprintf(
-                            'Added reward'
+                            'Reward added successfully'
                         ));
 
                         return new RedirectResponse($this->generateUrl('admin_rewards'));
@@ -2989,6 +3171,120 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
         return [
             'rewards' => $rewards,
+            'connectForm' => $connectForm->createView(),
+            'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/rewards/{id}", name="admin_reward")
+     * @Template("AppBundle:AdminEmployee:reward.html.twig")
+     */
+    public function rewardAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $rewardRepository = $dm->getRepository(Reward::class);
+        $reward = $rewardRepository->find($id);
+        $connectForm = $this->get('form.factory')
+            ->createNamedBuilder('connectForm')
+            ->add('email', EmailType::class)
+            ->add('amount', TextType::class)
+            ->add('rewardId', HiddenType::class)
+            ->add('next', SubmitType::class)
+            ->getForm();
+        $rewardForm = $this->get('form.factory')
+            ->createNamedBuilder('rewardForm', RewardEditType::class, $reward)
+            ->getForm();
+        if ($reward->getScode()) {
+            $rewardForm->get('code')->setData($reward->getScode()->getCode());
+        }
+
+        try {
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('connectForm')) {
+                    $userRepo = $dm->getRepository(User::class);
+                    $connectForm->handleRequest($request);
+                    if ($connectForm->isValid()) {
+                        if ($sourceUser = $userRepo->findOneBy([
+                            'emailCanonical' => mb_strtolower($connectForm->getData()['email'])
+                        ])) {
+                            $invitationService = $this->get('app.invitation');
+                            if ($sourceUser->getValidPolicies()) {
+                                foreach ($sourceUser->getValidPolicies() as $policy) {
+                                    $invitationService->addReward(
+                                        $policy,
+                                        $reward,
+                                        $this->toTwoDp($connectForm->getData()['amount'])
+                                    );
+                                }
+                                $this->addFlash('success', 'Reward successfully edited');
+                            } else {
+                                $this->addFlash('error', sprintf(
+                                    'Unable to add reward bonus. %s does not have a valid policy',
+                                    $connectForm->getData()['email']
+                                ));
+                            }
+
+                            return new RedirectResponse($this->generateUrl('admin_reward', ['id'=>$id]));
+                        } else {
+                            throw new \InvalidArgumentException(sprintf(
+                                'Unable to add reward bonus. %s does not exist as a user',
+                                $connectForm->getData()['email']
+                            ));
+                        }
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to add reward connection. %s',
+                            (string) $connectForm->getErrors()
+                        ));
+                    }
+                } elseif ($request->request->has('rewardForm')) {
+                    $rewardForm->handleRequest($request);
+
+                    if ($rewardForm->isValid()) {
+                        $dm->persist($reward);
+
+                        $code = mb_strtoupper($rewardForm->get('code')->getData());
+                        $scode = $reward->getScode();
+                        if ($scode) {
+                            if (mb_strlen($code) > 0) {
+                                if (!($code === $scode->getCode())) {
+                                    $scode->setCode($code);
+                                    $dm->persist($scode);
+                                }
+                            } else {
+                                $dm->remove($scode);
+                                $reward->setScode(null);
+                            }
+                        } else {
+                            if (mb_strlen($code) > 0) {
+                                $scode = new SCode();
+                                $scode->setCode($code);
+                                $scode->setReward($reward);
+                                $scode->setType(SCode::TYPE_REWARD);
+                                $dm->persist($scode);
+                            }
+                        }
+
+                        $dm->flush();
+
+                        $this->addFlash('success', 'Reward successfully edited');
+
+                        return new RedirectResponse($this->generateUrl('admin_reward', ['id'=>$id]));
+                    } else {
+                        throw new \InvalidArgumentException(sprintf(
+                            'Unable to edit reward. %s',
+                            (string) $rewardForm->getErrors()
+                        ));
+                    }
+                }
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return [
+            'reward' => $reward,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
         ];

@@ -1,0 +1,63 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.5;
+            font-size: 12px;
+            margin-bottom: 20mm;
+            margin-left: 20mm;
+            margin-right: 20mm;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-blue.png" width="140mm" />
+    <h4>Mobile Phone Insurance Policy Schedule</h4>
+    <p>
+        {{ policy.user.name }}<br />
+        {{ policy.user.billingAddress.line1 }}<br />
+        {% if policy.user.billingAddress.line2 %}
+            {{ policy.user.billingAddress.line2 }}<br />
+        {% endif %}
+        {% if policy.user.billingAddress.line3 %}
+            {{ policy.user.billingAddress.line3 }}<br />
+        {% endif %}
+        {{ policy.user.billingAddress.city }} {{ policy.user.billingAddress.postcode }}<br />
+        United Kingdom
+    </p>
+    <p>Date of Birth: {{ policy.user.birthday|date('d M Y') }}</p>
+    <h4>Policy Reference</h4>
+    <ul>
+        <li>Policy Number: {{ policy.policyNumber }}</li>
+        <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
+        <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }} [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]</li>
+        <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
+        {% if policy.premiumPlan == 'monthly' %}
+        <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.</li>
+        {% else %}
+        <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.</li>
+        {% endif %}
+    </ul>
+    <p>Once you have validated your phone through the so-sure App your excess will be:</p>
+    <ul>
+        <li>
+            Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+        </li>
+        <li>
+            Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+        </li>
+        <li>
+            Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+        </li>
+        <li>
+            Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+        </li>
+    </ul>
+    <p>You can only claim once you have validated your phone.</p>
+    <p>Validation is only done through the so-sure app, unless requested otherwise in writing by the so-sure team.</p>
+    <p>Confirmation of validation will be sent by email to the registered email address and within the so-sure App.</p>
+    <p style="font-size: 12px; margin-top: 20mm"><em>The insurance cover is underwritten by Salva Kindlustuse AS, which is authorised by the Financial Conduct Authority under registration number 622523 with registered office Pärnu road 16, 10141 Tallinn, Estonia.</em></p>
+</body>
+</html>

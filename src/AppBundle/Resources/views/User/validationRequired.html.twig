@@ -1,0 +1,485 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'oboarding' %}
+{% set onboarding_mode = true %}
+{% set intercom_enabled = false %}
+{% set hide_devbar = true %}
+
+{% block title %}Next Steps | so-sure{% endblock %}
+
+{# Set Meta #}
+{% set og_title = 'Sign up and save' %}
+{% set og_description = 'Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance.' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/onboarding.css') }}">
+{% endblock %}
+
+{% block gtm_data %}
+    ,
+    'policy': {
+        'id': '{{ policy.id }}'
+    },
+    'affilinet': {
+        'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
+        'gwp': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %}
+    },
+    {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
+        'transactionId': '{{ policy.policyNumber }}',
+        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+        'transactionProducts': [{
+            'name': '{{ policy.phone.name }}',
+            'sku':  '{{ policy.phone.make }}-{{ policy.phone.model }}',
+            'category': '{{ policy.phone.make }}',
+            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}
+        }]
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="onboarding">
+        {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
+            <div class="onboarding-nav__desktop d-flex">
+                <a href="#"
+                   class="onboarding-nav__link active py-4"
+                   data-slide-to="0"
+                   data-target="#onboarding_carousel">
+                    <div class="onboarding-nav__number h6 mb-0">1</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Welcome to so-sure </div>
+                </a>
+                <a href="#"
+                   class="onboarding-nav__link py-4"
+                   data-slide-to="1"
+                   data-target="#onboarding_carousel">
+                    <div class="onboarding-nav__number h6 mb-0">2</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Your excess</div>
+                </a>
+                <a href="#"
+                   class="onboarding-nav__link py-4"
+                   data-slide-to="2"
+                   data-secondary-page="3"
+                   data-target="#onboarding_carousel">
+                    <div class="onboarding-nav__number h6 mb-0">3</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Invite and get cashback</div>
+                </a>
+                <a href="#"
+                   class="onboarding-nav__link py-4"
+                   data-slide-to="4"
+                   data-target="#onboarding_carousel">
+                    <div class="onboarding-nav__number h6 mb-0">4</div>
+                    <div class="onboarding-nav__title h6 ml-3 mb-0">Policy details</div>
+                </a>
+            </div>
+        {% endif %}
+        <div id="onboarding_carousel"
+             class="carousel slide"
+             data-ride="carousel"
+             data-interval="false"
+             data-wrap="false">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Welcome" width="180px">
+                        </div>
+                        <div class="onboarding__body">
+                            <h2 class="h4 text-primary mb-3">Thanks for choosing so-sure, {{ policy.user.firstname }} 🎉</h2>
+                                {% if device_category() == 'Mobile' %}
+                                    <p>You will receive a confirmation email soon and your payment is all set up.</p>
+                                    <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('onboarding-mobile-one') }}"
+                                           class="btn btn-primary btn-block-xs ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('onboarding-mobile-one') }}"
+                                           class="btn btn-primary btn-block-xs ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                                    {% endif %}
+                                {% else %}
+                                    <p>You will receive a confirmation email soon and your payment is all set up.</p>
+                                    <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
+                                    <a href="#"
+                                       class="btn btn-primary"
+                                       role="button"
+                                       data-target="#onboarding_carousel"
+                                       data-slide="next">Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+
+                                    <div class="mt-4 onboarding__download-app-link">
+                                        {% if policy.phone.iTunes %}
+                                            <a href="{{ apple_download('onboarding-desktop-one') }}"
+                                               class="link-subtle ga-outbound-click"
+                                               data-clicklabel="iTunes"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                <i class="fab fa-apple mr-2 fa-lg"></i>Download the App to verify</a>
+                                        {% endif %}
+                                        {% if policy.phone.googlePlay %}
+                                            <a href="{{ google_download('onboarding-desktop-one') }}"  class="link-subtle ga-outbound-click"
+                                               data-clicklabel="PlayStore"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                <i class="fab fa-android mr-2 fa-lg"></i>Download the App to verify </a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Verify your phone" width="180px">
+                        </div>
+                        <div class="onboarding__body">
+                            <h2 class="h4 text-primary mb-3">Your excess 📉</h2>
+                            {% if device_category() == 'Mobile' %}
+                                <p>The excess for your {{ policy.phone.make }} {{ policy.phone.model }} is:</p>
+                                <div class="table-responsive mb-2">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="25%"></th>
+                                                <th width="25%">Damage</th>
+                                                <th width="25%">Loss</th>
+                                                <th width="25%">Theft</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td align="left"><small>Excess</small></td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.damage }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.loss }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.theft }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
+                                {% if policy.phone.iTunes %}
+                                    <a href="{{ apple_download('onboarding-mobile-one') }}"
+                                       class="btn btn-primary btn-block-xs ga-outbound-click"
+                                       data-clicklabel="iTunes"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                                {% endif %}
+                                {% if policy.phone.googlePlay %}
+                                    <a href="{{ google_download('onboarding-mobile-one') }}"
+                                       class="btn btn-primary btn-block-xs ga-outbound-click"
+                                       data-clicklabel="PlayStore"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                                {% endif %}
+                            {% else %}
+                                <p>The excess for your {{ policy.phone.make }} {{ policy.phone.model }} is:</p>
+                                <div class="table-responsive mb-5">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="25%"></th>
+                                                <th width="25%">Damage</th>
+                                                <th width="25%">Loss</th>
+                                                <th width="25%">Theft</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td align="left">Excess</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.damage }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.loss }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.theft }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="mb-5"><strong>Please be aware that your policy will NOT commence until you have verified the condition of phone with our app.</strong></p>
+                                <div class="d-flex justify-content-center">
+                                    <a href="#"
+                                       class="btn btn-outline-grey opacity-50"
+                                       role="button"
+                                       data-target="#onboarding_carousel"
+                                       data-slide="prev">
+                                        <i class="far fa-arrow-left"></i>
+                                        <span class="sr-only">Back</span></a>
+                                    <a href="#"
+                                       class="btn btn-primary ml-3"
+                                       role="button"
+                                       data-target="#onboarding_carousel"
+                                       data-slide="next">
+                                       Next <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                                </div>
+                                <div class="mt-4 onboarding__download-app-link">
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('onboarding-desktop-two') }}"
+                                           class="link-subtle ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-apple mr-2 fa-lg"></i>Download the App to verify</a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('onboarding-desktop-two') }}"  class="link-subtle ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-android ml-2 fa-lg"></i>Download the App to verify </a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - Invite your friends and get  rewarded" width="180px">
+                        </div>
+                        <div class="onboarding__body">
+                            <h2 class="h4 text-primary mb-3">Get up to 80% money back 💰</h2>
+                            {% if device_category() == 'Mobile' %}
+                                <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, <strong>when you and your connections haven’t claimed</strong>, your Reward Pot is paid out to you. Simple!</p>
+                                <a href="#"
+                                   class="btn btn-success btn-block-xs"
+                                   role="button"
+                                   data-target="#onboarding_carousel"
+                                   data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                                <a href="#"
+                                   class="btn btn-outline-primary watch-video btn-block-xs"
+                                   data-event="watch-video-onboarding-mobile"
+                                   data-toggle="modal"
+                                   data-target="#sosure-video-modal"
+                                   data-src="https://www.youtube.com/embed/2AjD09ZQhQ4">
+                                    <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                                    How it works
+                                </a>
+                            {% else %}
+                                <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you, simple!
+                                <a href="#"
+                                   class="watch-video"
+                                   data-event="watch-video-onboarding-desktop"
+                                   data-toggle="modal"
+                                   data-target="#sosure-video-modal"
+                                   data-src="https://www.youtube.com/embed/2AjD09ZQhQ4">
+                                    <u>Watch our video</u>
+                                </a> to find out more.</p>
+                                <div class="d-flex justify-content-center mb-4">
+                                    <a href="#"
+                                       class="btn btn-outline-grey opacity-50"
+                                       role="button"
+                                       data-target="#onboarding_carousel"
+                                       data-slide="prev">
+                                        <i class="far fa-arrow-left"></i>
+                                        <span class="sr-only">Back</span></a>
+                                    <a href="#"
+                                       class="btn btn-success ml-3"
+                                       role="button"
+                                       data-target="#onboarding_carousel"
+                                       data-slide="next">Let's get inviting <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+
+                                </div>
+                                <a href="#"
+                                   class="link-subtle"
+                                   role="button"
+                                   data-target="#onboarding_carousel"
+                                   data-slide-to="4">
+                                   Skip step</a>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
+                        <div class="onboarding__image">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_reward-pot.png" alt="so-sure - Choose how you’d like to invite" width="180px">
+                        </div>
+                        <div class="onboarding__body">
+                            <h2 class="h4 text-primary mb-4">Choose how you’d like to invite</h2>
+                            {% if device_category() == 'Mobile' %}
+                                <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                                    <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                                    {# TODO: Rework icons #}
+                                    <div id="onboarding_btn_share"
+                                         data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
+                                         data-share-text="Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out:">
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <div class="d-lg-flex justify-content-lg-center">
+                                <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
+                                <div class="custom-input-with-btn mb-4">
+                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                                    <div id="scode_share" class="sr-only">Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
+                                    <button class="btn btn-primary btn-copy btn-sm track-data"
+                                        data-clipboard-target="#scode_share"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        data-event="user-welcome-copy-scode">
+                                        copy</button>
+                                </div>
+                                <h5 class="text-zaffre d-lg-none">📨 Invite via email</h5>
+                                <form id="invite_form" autocomplete="nope">
+                                    <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                                    <div class="custom-input-with-btn mb-4  ml-lg-4">
+                                        <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
+                                        <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                            Invite</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
+                            <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                                <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
+                                {# TODO: Rework icons #}
+                                <div id="onboarding_btn_share"
+                                     data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
+                                     data-share-text="Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out:">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <a href="#"
+                                   class="btn btn-outline-grey opacity-50"
+                                   role="button"
+                                   data-target="#onboarding_carousel"
+                                   data-slide="prev">
+                                    <i class="far fa-arrow-left"></i>
+                                    <span class="sr-only">Back</span></a>
+                                <a href="#"
+                                   class="btn btn-success ml-3"
+                                   role="button"
+                                   data-target="#onboarding_carousel"
+                                   data-slide-to="4">
+                                   Finish <i class="far fa-long-arrow-right fa-lg ml-2"></i></a></a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="onboarding__item pt-4 px-4 mx-lg-auto">
+                        <div class="onboarding__body">
+                            <h2 class="h3 text-primary mb-3">Almost there 😊</h2>
+                            <div class="summary-cardbox">
+                                <div class="summary-cardbox__header">
+                                    <h4 class="text-primary mb-0">Policy Summary</h4>
+                                </div>
+                                <div class="summary-cardbox__body d-lg-flex align-items-lg-center">
+                                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - super quick cover" width="160px" class="d-none d-lg-inline mr-4">
+                                    <div class="summary-cardbox__body-sub">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Phone:</h5>
+                                                <p>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</p>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Policy number:</h5>
+                                                <p>{{ policy.policyNumber }}</p>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Cost:</h5>
+                                                <p>
+                                                    {% if policy.getPremiumPlan == 'monthly'%}
+                                                        &pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month
+                                                    {% elseif policy.getPremiumPlan == 'yearly' %}
+                                                        &pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                                    {% else %}
+                                                        Unknown
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5 class="text-primary">Start/End Date:</h5>
+                                                <p><strong>Your cover does NOT start till you verify your device via our app</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="summary-cardbox__cta">
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('onboarding-desktop-two') }}"
+                                           class="ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the App to verify</a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('onboarding-desktop-two') }}"  class="ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-android ml-2 fa-lg"></i> Download the App to verify </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
+                            <div class="d-flex justify-content-center mt-5">
+                                <a href="#"
+                                   class="btn btn-outline-grey opacity-50"
+                                   role="button"
+                                   data-target="#onboarding_carousel"
+                                   data-slide-to="2">
+                                    <i class="far fa-arrow-left"></i>
+                                    <span class="sr-only">Back</span></a>
+                                <a href="{{ path('user_home') }}"
+                                   class="btn btn-outline-primary ml-3"
+                                   role="button">
+                                   Customer login <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if device_category() == 'Mobile' %}
+                <div class="onboarding-controls__mobile p-4 d-flex justify-content-between align-items-center">
+                    <a href="#"
+                       id="onboarding-btn--left"
+                       class="onboarding-controls__btn disabled"
+                       role="button"
+                       data-target="#onboarding_carousel">
+                       BACK</a>
+                    <ol class="carousel-indicators">
+                        <li data-target="#onboarding_carousel" class="active"></li>
+                        <li data-target="#onboarding_carousel"></li>
+                        <li data-target="#onboarding_carousel"></li>
+                        <li data-target="#onboarding_carousel"></li>
+                        <li data-target="#onboarding_carousel"></li>
+                    </ol>
+                    <a href="#"
+                       id="onboarding-btn--right"
+                       class="onboarding-controls__btn"
+                       role="button"
+                       data-href="{{ path('user_home') }}"
+                       data-target="#onboarding_carousel">
+                       NEXT</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# Page Modal #}
+{% endblock %}
+
+{% block footer %}
+    {# TODO: Fix footer #}
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/onboarding.js') }}"></script>
+{% endblock %}

@@ -17,6 +17,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
  * @group functional-net
+ * @group nick
  */
 class DefaultControllerTest extends BaseControllerTest
 {
@@ -54,7 +55,7 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testQuotePhoneRouteMakeModelMemory()
     {
-        $url = self::$router->generate('quote_make_model_memory', [
+        $url = self::$router->generate('phone_insurance_make_model_memory', [
             'make' => 'apple',
             'model' => 'iphone+6s',
             'memory' => 64,
@@ -66,14 +67,14 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testQuotePhoneSpaceRouteMakeModelMemory()
     {
-        $url = self::$router->generate('quote_make_model_memory', [
+        $url = self::$router->generate('phone_insurance_make_model_memory', [
             'make' => 'apple',
             'model' => 'iphone 6s',
             'memory' => 64,
         ]);
-        $redirectUrl = self::$router->generate('quote_make_model_memory', [
+        $redirectUrl = self::$router->generate('phone_insurance_make_model_memory', [
             'make' => 'apple',
-            'model' => 'iphone+6s',
+            'model' => 'iphone-6s',
             'memory' => 64,
         ]);
 
@@ -86,22 +87,22 @@ class DefaultControllerTest extends BaseControllerTest
 
     public function testQuotePhoneRouteMakeModel()
     {
-        $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
+        $crawler = self::$client->request('GET', self::$router->generate('phone_insurance_make_model', [
             'make' => 'apple',
-            'model' => 'iphone+6s',
+            'model' => 'iphone-6s',
         ]));
         self::verifyResponse(200);
     }
 
     public function testQuotePhoneSpaceRouteMakeModel()
     {
-        $url = self::$router->generate('quote_make_model', [
+        $url = self::$router->generate('phone_insurance_make_model', [
             'make' => 'apple',
             'model' => 'iphone 6s',
         ]);
-        $redirectUrl = self::$router->generate('quote_make_model', [
+        $redirectUrl = self::$router->generate('phone_insurance_make_model', [
             'make' => 'apple',
-            'model' => 'iphone+6s',
+            'model' => 'iphone-6s',
         ]);
 
         $crawler = self::$client->request('GET', $url);
@@ -120,7 +121,7 @@ class DefaultControllerTest extends BaseControllerTest
         $this->setPhoneSession($phone);
 
         /** @var PhonePrice $price */
-        $price = $phone->getCurrentPhonePrice();
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         $this->assertContains(
             sprintf("&pound;%.2f", $price->getMonthlyPremiumPrice()),
             $this->getClientResponseContent()

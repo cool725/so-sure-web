@@ -272,7 +272,7 @@ sosure.purchaseStepAddress = (function() {
           prepare: function (query, settings) {
               if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
                   sosure.purchaseStepAddress.showAddress();
-                  self.setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
+                  self.setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'BX1 1LT'});
                   $('.typeahead .with-errors').html('');
               }
               settings.type = "POST";
@@ -369,6 +369,11 @@ sosure.purchaseStepAddress = (function() {
             $('.address-search').removeClass('has-error');
             let addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
+
+            $('.qpw__sub__container').animate({
+                scrollTop: $('.address-search').offset().top,
+            }, 250);
+
             $.ajax({
                 method: "POST",
                 url: "/ops/postcode",
@@ -420,6 +425,10 @@ $(function(){
 
             return false;
         }
+
+        $('.qpw__sub__container').animate({
+            scrollTop: $('.address-show').offset().top,
+        }, 250);
 
         return true;
     });

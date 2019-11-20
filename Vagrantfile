@@ -74,14 +74,15 @@ Vagrant.configure("2") do |config|
     dev1804_config.vm.network "private_network", ip: "10.0.4.2"
     #dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
     dev1804_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
+    # dev1804_config.vm.synced_folder "/System/Volumes/Data/Users/nickwaller/Web/so-sure-web", "/vagrant", type: "nfs", nfs_export: false
     #dev1804_config.vm.synced_folder ".", "/vagrant"
     dev1804_config.ssh.forward_agent = true
     dev1804_config.vm.provision "shell",
-    	inline: $script
+        inline: $script
 
     dev1804_config.vm.provision "shell",
-    	inline: $github_ops,
-		privileged: false
+        inline: $github_ops,
+        privileged: false
 
     # Patch for https://github.com/mitchellh/vagrant/issues/6793
     dev1804_config.vm.provision "shell" do |s|
@@ -98,7 +99,7 @@ Vagrant.configure("2") do |config|
     end
 
     dev1804_config.vm.provision "shell",
-    	inline: $deploy
+        inline: $deploy
 
     dev1804_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
@@ -130,7 +131,7 @@ Vagrant.configure("2") do |config|
     dev1804_nonfs_config.ssh.forward_agent = true
 
     dev1804_nonfs_config.vm.provision "shell",
-    	inline: $script
+        inline: $script
 
     # Patch for https://github.com/mitchellh/vagrant/issues/6793
     dev1804_nonfs_config.vm.provision "shell" do |s|
@@ -147,7 +148,7 @@ Vagrant.configure("2") do |config|
     end
 
     dev1804_nonfs_config.vm.provision "shell",
-    	inline: $deploy
+        inline: $deploy
 
     dev1804_nonfs_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
@@ -168,9 +169,9 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "dev1604", primary: false, autostart: false do |dev1604_config|
-	# https://github.com/geerlingguy/packer-ubuntu-1604/issues/1
-	# edit /etc/network/interfaces and remove
-	#   auto eth1
+    # https://github.com/geerlingguy/packer-ubuntu-1604/issues/1
+    # edit /etc/network/interfaces and remove
+    #   auto eth1
     #   iface eth1 inet manual
     dev1604_config.vm.box = "geerlingguy/ubuntu1604"
     dev1604_config.vm.box_check_update = false
@@ -184,18 +185,18 @@ Vagrant.configure("2") do |config|
     #dev1604_config.vm.synced_folder ".", "/vagrant"
     dev1604_config.ssh.forward_agent = true
     dev1604_config.vm.provision "shell",
-    	inline: $script
+        inline: $script
 
     dev1604_config.vm.provision "shell",
-    	inline: $github_ops,
-		privileged: false
+        inline: $github_ops,
+        privileged: false
 
     # Patch for https://github.com/mitchellh/vagrant/issues/6793
     dev1604_config.vm.provision "shell" do |s|
         s.inline = '[[ ! -f $1 ]] || grep -F -q "$2" $1 || sed -i "/__main__/a \\    $2" $1'
         s.args = ['/usr/bin/ansible-galaxy', "if sys.argv == ['/usr/bin/ansible-galaxy', '--help']: sys.argv.insert(1, 'info')"]
     end
-	
+
     dev1604_config.vm.provision "ansible_local" do |a|
         a.playbook = "vagrant1604.yml"
         a.provisioning_path = "/var/ops/ansible"
@@ -205,24 +206,24 @@ Vagrant.configure("2") do |config|
     end
 
     dev1604_config.vm.provision "shell",
-    	inline: $deploy
-    	
+        inline: $deploy
+
     dev1604_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
       v.customize ["modifyvm", :id, "--cpus", 1]
-      
+
       # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
       v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
 
       # if you ever need the gui
       # v.gui = true
-      
+
       # This setting makes it so that network access from the vagrant guest is able to
       # resolve connections using the hosts VPN connection
       # it means we can DNS resolve internal.vpn domains
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-    end      
+    end
   end
 
   config.vm.define "dev1604_nonfs", primary: false, autostart: false do |dev1604_nonfs_config|
@@ -236,7 +237,7 @@ Vagrant.configure("2") do |config|
     dev1604_nonfs_config.ssh.forward_agent = true
 
     dev1604_nonfs_config.vm.provision "shell",
-    	inline: $script
+        inline: $script
 
     # Patch for https://github.com/mitchellh/vagrant/issues/6793
     dev1604_nonfs_config.vm.provision "shell" do |s|
@@ -253,24 +254,24 @@ Vagrant.configure("2") do |config|
     end
 
     dev1604_nonfs_config.vm.provision "shell",
-    	inline: $deploy
+        inline: $deploy
 
     dev1604_nonfs_config.vm.provider "virtualbox" do |v|
       v.customize ["modifyvm", :id, "--memory", 1200]
       v.customize ["modifyvm", :id, "--cpus", 1]
-      
+
       # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
       v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
 
       # if you ever need the gui
       # v.gui = true
-      
+
       # This setting makes it so that network access from the vagrant guest is able to
       # resolve connections using the hosts VPN connection
       # it means we can DNS resolve internal.vpn domains
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-    end      
+    end
   end
 
   config.vm.define "ubuntu1804", autostart: false do |ubuntu1804_config|

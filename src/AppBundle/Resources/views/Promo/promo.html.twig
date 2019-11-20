@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'promo' %}
+{% set robots_noindex = true %}
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
@@ -31,8 +32,6 @@
     {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a special code to get cash back if you dont\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% endif %}
-
-{% set robots_noindex = true %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/promo.css') }}">
@@ -83,9 +82,25 @@
                                     <div class="h4 text-white">Use code <span class="promo-code">{{ scode.code }}</span> to claim your voucher 😎</div>
                                 </div>
                             </div>
+                        {% elseif custom == 'xiaomi' %}
+                            <div class="hero__intro">
+                                <h1 class="mb-4 text-white fit">Mobile Phone Insurance <br><span class="sub text-columbia-blue-e">in partnership with Xiaomi</h1>
+                                <div class="hero__step mb-4">
+                                    <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div></span>
+                                    <div class="h4 text-white">Instant quote</div>
+                                </div>
+                                <div class="hero__step mb-4">
+                                    <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">2</div></span>
+                                    <div class="h4 text-white">Covered in minutes</div>
+                                </div>
+                                <div class="hero__step mb-5">
+                                    <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div></span>
+                                    <div class="h4 text-white">Get an extra &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cash back with the code <span class="promo-code">{{ scode.code }}</span></div>
+                                </div>
+                            </div>
                         {% else %}
                             <div class="hero__intro">
-                                <h1 class="mb-4 text-white fit">Mobile Insurance <br><span class="sub text-columbia-blue-e">Get money back if I don't claim? <br class="d-md-none"> Yes Please!</span></h1>
+                                <h1 class="mb-4 text-white fit">Mobile Phone Insurance <br><span class="sub text-columbia-blue-e">Get money back if I don't claim? <br class="d-md-none"> Yes Please!</span></h1>
                                 <div class="hero__step mb-4">
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div></span>
                                     <div class="h4 text-white">Instant quote</div>
@@ -113,7 +128,7 @@
                             </p>
                         </div>
                     {% else %}
-                        <h1 class="my-5 text-white fit">Promotion not found 😕 <br><span class="sub text-columbia-blue-e">however still want excellent cover?</span></h1>
+                        <h1 class="my-5 text-white fit">Sorry, this promotion has ended 😕 ...but,<br><span class="sub text-columbia-blue-e">it’s not too late to insure your beloved phone!</span></h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
@@ -141,6 +156,8 @@
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% elseif custom == 'pizzaexpress' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
+                {% elseif custom == 'xiaomi' %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-reward-pot-mobile-xiaomi.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% else %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% endif %}
@@ -151,6 +168,8 @@
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% elseif custom == 'pizzaexpress' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
+            {% elseif custom == 'xiaomi' %}
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-reward-pot-desktop-xiaomi.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% else %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% endif %}

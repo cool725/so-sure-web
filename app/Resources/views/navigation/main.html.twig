@@ -8,10 +8,6 @@
 {% endif %}
 {% set menu_breakpoint = 'd-xl-block' %}
 {% set menu_show = 'd-xl-none' %}
-{% set hide_quote_btn = '' %}
-{% if funnel_exp is defined and funnel_exp == 'new-funnel' %}
-    {% set hide_quote_btn = 'd-none' %}
-{% endif %}
 
 <nav id="main-nav" class="navbar {{ navbar_class }} {% if admin_mode is defined and admin_mode == true or quote_mode is defined and quote_mode == true or onboarding_mode is defined and onboarding_mode == true %}justify-content-between flex-nowrap flex-row{% endif %}">
 
@@ -37,6 +33,14 @@
                 <span class="sr-only">so-sure</span>
             </a>
         </div>
+    {% elseif instore_mode is defined and instore_mode == true %}
+        <div class="container-large d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="{{ app.request.uri }}" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+        </div>
     {% elseif onboarding_mode is defined and onboarding_mode == true %}
         {# Logo #}
         <a href="/" class="navbar-brand show-in-nav show-in-quote">
@@ -45,7 +49,7 @@
         </a>
         {% include '::navigation/onboarding.html.twig' %}
     {% else %}
-        <div class="{% if split_mode is defined and split_mode %}w-100{% else %}container-large{% endif %} d-flex justify-content-between align-items-center">
+        <div class="container-large d-flex justify-content-between align-items-center">
             {# Logo #}
             <a href="/" class="navbar-brand show-in-nav show-in-quote">
                 <div class="navbar-brand__logo"></div>
@@ -53,14 +57,80 @@
             </a>
             {# Navs #}
             <ul class="nav navbar-nav flex-row align-items-center">
-                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
+                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-4">
+                    <a href="{{ path('phone_insurance') }}"
+                       class="nav-link dropdown-toggle"
+                       id="phone_insurance_nav"
+                       role="button"
+                       {# data-toggle="dropdown" #}
+                       aria-haspopup="true"
+                       aria-expanded="false">Phone Insurance <i class="far fa-sm text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+                    <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="phone_insurance_nav">
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance_make', {'make': 'apple'}) }}">
+                            <img src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_half-iphone-x-img.png" alt="so-sure - iPhone insurance" width="50px" class="mr-4">
+                            <span>
+                                iPhone <br>
+                                <small class="sub text-zaffre">Insurance</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}">
+                            <img src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_half-galaxy-s9-img.png" alt="so-sure - Samsung insurance" width="50px" class="mr-4">
+                            <span>
+                                Samsung <br>
+                                <small class="sub text-zaffre">Insurance</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance_make', {'make': 'lg'}) }}">
+                            <img src="{{ cdn_url }}/images/rebrand/phones/lg/so-sure_half-k30-img.png" alt="so-sure - LG insurance" width="50px" class="mr-4">
+                            <span>
+                                LG <br>
+                                <small class="sub text-zaffre">Insurance</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance_make', {'make': 'google'}) }}">
+                            <img src="{{ cdn_url }}/images/rebrand/phones/google/so-sure_half-pixel-3-img.png" alt="so-sure - Google Pixel insurance" width="50px" class="mr-4">
+                            <span>
+                                Google Pixel <br>
+                                <small class="sub text-zaffre">Insurance</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance_make', {'make': 'huawei'}) }}">
+                            <img src="{{ cdn_url }}/images/rebrand/phones/huawei/so-sure_half-mate-20-pro-img.png" alt="so-sure - Huawei insurance" width="50px" class="mr-4">
+                            <span>
+                                Huawei <br>
+                                <small class="sub text-zaffre">Insurance</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance_make', {'make': 'sony'}) }}">
+                            <img src="{{ cdn_url }}/images/rebrand/phones/sony/so-sure_half-xperia-10-plus-img.png" alt="so-sure - Sony insurance" width="50px" class="mr-4">
+                            <span>
+                                Sony <br>
+                                <small class="sub text-zaffre">Insurance</small>
+                            </span>
+                        </a>
+                        <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                           href="{{ path('phone_insurance') }}#other_manufacturers">
+                           <img src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png" alt="so-sure - Phone insurance" width="50px" class="mr-4">
+                            <span>
+                                View all
+                            </span>
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-4">
                     <a href="#"
                        class="nav-link dropdown-toggle"
                        id="why_so_sure_nav"
                        role="button"
                        {# data-toggle="dropdown" #}
                        aria-haspopup="true"
-                       aria-expanded="false">Why so-sure? <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+                       aria-expanded="false">Why so-sure? <i class="far fa-sm text-columbia-blue-f fa-chevron-down ml-2"></i></a>
                     <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="why_so_sure_nav">
                         <a class="dropdown-item dropdown-item-nav h6 mb-0"
                            href="{{ path('social_insurance') }}">
@@ -80,14 +150,14 @@
                         </a>
                     </div>
                 </li>
-                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-5">
+                <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-4">
                     <a href="#"
                        class="nav-link dropdown-toggle"
                        id="about_us_nav"
                        role="button"
                        {# data-toggle="dropdown" #}
                        aria-haspopup="true"
-                       aria-expanded="false">About us <i class="far text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+                       aria-expanded="false">About us <i class="far fa-sm text-columbia-blue-f fa-chevron-down ml-2"></i></a>
                     <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="about_us_nav">
                         <a class="dropdown-item dropdown-item-nav h6 mb-0"
                            href="{{ path('faq') }}">
@@ -123,27 +193,40 @@
                         </a>
                     </div>
                 </li>
-                <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-                    <a href="{{ path('phone_insurance') }}"
-                       class="nav-link">
-                        Phone Insurance</a>
-                </li>
                 {% if hide_login is not defined %}
-                    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+                    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
                         <a href="{{ path('claim') }}"
                            class="nav-link {{ app.request.get('_route') == 'claim' ? 'nav-active' }}">
                             Make a Claim
                         </a>
                     </li>
                 {% endif %}
-                {% if user_mode is not defined %}
-                    <li class="nav-item pr-xl-5 {{ hide_quote_btn }}">
-                        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
-                    </li>
+                {% if hide_quote_btn is not defined %}
+                    {% if user_mode is not defined %}
+                        <li class="nav-item pr-xl-4">
+                            {% if app.user is not null and app.user %}
+                                {% if not app.user.hasPolicy and app.user.hasPartialPolicy %}
+                                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE') or is_granted('ROLE_CLAIMS') %}
+                                        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                                    {% else %}
+                                        <a href="{{ path('purchase') }}"
+                                           class="btn btn-sm py-1 btn-white btn-swap"
+                                           title="Resume insuring your {{ app.user.policies|first.phone }}">
+                                           Resume <span class="ml-1 badge badge-success">{{ app.user.getPartialPolicies|length }}</span>
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                                {% endif %}
+                            {% else %}
+                                <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                            {% endif %}
+                        </li>
+                    {% endif %}
                 {% endif %}
                 {# Mobile Login #}
                 {% if hide_login is not defined %}
-                    <li class="nav-item d-none-xxs {{ menu_show }} pr-xl-5">
+                    <li class="nav-item d-none-xxs {{ menu_show }} pr-xl-4">
                         {% if app.user is not null and app.user %}
                             {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                                 <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}"
@@ -165,7 +248,7 @@
                 {# End Mobile Login #}
                 {# If Logged in #}
                 {% if app.user is not null and app.user %}
-                    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+                    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
                         {% if is_granted('ROLE_ADMIN') %}
                             <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
                         {% elseif is_granted('ROLE_EMPLOYEE') %}

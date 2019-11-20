@@ -40,6 +40,20 @@ class Reward
     protected $connections = array();
 
     /**
+     * @Assert\Length(min="1", max="150")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $type;
+
+     /**
+      * @Assert\Length(min="1", max="150")
+      * @MongoDB\Field(type="string")
+      * @Gedmo\Versioned
+      */
+    protected $target;
+
+    /**
      * @MongoDB\Field(type="float", nullable=false)
      * @Gedmo\Versioned
      */
@@ -147,6 +161,26 @@ class Reward
     public function setSCode($scode)
     {
         $this->scode = $scode;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function getTarget()
+    {
+        return $this->target;
+    }
+
+    public function setTarget($target)
+    {
+        $this->target = $target;
     }
 
     public function getConnections()

@@ -290,8 +290,11 @@ class MailerService
 
         return $this->send(
             'Data Export',
-            'f9e2e9f7ce@invite.trustpilot.com',
-            $body
+            $policy->getUser()->getEmail(),
+            $body,
+            null,
+            null,
+            'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com'
         );
     }
 

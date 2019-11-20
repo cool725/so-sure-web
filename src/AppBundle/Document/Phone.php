@@ -5,6 +5,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\Excess\PhoneExcess;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Tests\Document\PhoneExcessTest;
+use AppBundle\Exception\InvalidPriceStreamException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
@@ -109,6 +110,11 @@ class Phone
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
      */
     protected $phonePrices = [];
+
+    /**
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
+     */
+    protected $annualPhonePrices = [];
 
     /**
      * List of the phone's retail prices over time. Not guaranteed to be in order.
@@ -264,6 +270,12 @@ class Phone
     protected $newHighDemand;
 
     /**
+     * The offers that pertain to this phone.
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
+     */
+    protected $offers = [];
+
+    /**
      * If set, then use this path for the canonical link
      *
      * @Assert\Length(min="1", max="200")
@@ -300,7 +312,7 @@ class Phone
         $this->initialPriceUrl = mb_strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
         if ($premium > 0) {
-            $phonePrice = $this->getCurrentPhonePrice();
+            $phonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             if (!$phonePrice) {
                 $phonePrice = new PhonePrice();
                 $phonePrice->setValidFrom($date);
@@ -512,7 +524,7 @@ class Phone
     {
         $model = str_replace('+', '-plus', $this->getModelCanonical());
 
-        return str_replace(' ', '+', $model);
+        return str_replace(' ', '-', $model);
     }
 
     /**
@@ -527,9 +539,18 @@ class Phone
 
     public static function decodeModel($encodedModel)
     {
-        $decodedModel = str_replace('+', ' ', $encodedModel);
+        $decodedModel = str_replace(['+','-'], ' ', $encodedModel);
         $decodedModel = str_replace('-Plus', '+', $decodedModel);
         $decodedModel = str_replace('-plus', '+', $decodedModel);
+
+        return $decodedModel;
+    }
+
+    public static function decodedModelHyph($encodedModel)
+    {
+        $decodedModel = str_replace(['+','-'], ' ', $encodedModel);
+        $decodedModel = str_replace(' Plus', '+', $decodedModel);
+        $decodedModel = str_replace(' plus', '+', $decodedModel);
 
         return $decodedModel;
     }
@@ -608,6 +629,16 @@ class Phone
         $this->phonePrices[] = $phonePrice;
     }
 
+    public function getAnnualPhonePrices()
+    {
+        return $this->annualPhonePrices;
+    }
+
+    public function addAnnualPhonePrice(PhonePrice $phonePrice)
+    {
+        $this->annualPhonePrices[] = $phonePrice;
+    }
+
     public function getInitialPrice()
     {
         return $this->toTwoDp($this->initialPrice);
@@ -621,6 +652,46 @@ class Phone
     public function getReplacementPrice()
     {
         return $this->toTwoDp($this->replacementPrice);
+    }
+
+    /**
+     * Adds an offer into the phone's list of offers and sets a pointer to this phone on the offer.
+     * @param Offer $offer is the offer to add.
+     */
+    public function addOffer($offer)
+    {
+        $this->offers[] = $offer;
+        $offer->setPhone($this);
+    }
+
+    /**
+     * Gives a list of all offers associated with this phone.
+     * @return array containing all offers.
+     */
+    public function getOffers()
+    {
+        if (is_array($this->offers)) {
+            return $this->offers;
+        }
+        return $this->offers->toArray();
+    }
+
+    public function getActiveOffers()
+    {
+        foreach ($this->getOffers() as $offer) {
+            if ($offer->getActive()) {
+                yield $offer;
+            }
+        }
+    }
+
+    public function getInactiveOffers()
+    {
+        foreach ($this->getOffers() as $offer) {
+            if (!$offer->getActive()) {
+                yield $offer;
+            }
+        }
     }
 
     /**
@@ -870,7 +941,16 @@ class Phone
         return null;
     }
 
-    public function policyProfit($claimFrequency, $consumerPayout, $iptRebate)
+    /**
+     * Gives you the amount of profit that policies on this phone should yield under some assumed variables.
+     * @param string $stream         is the price stream we are calculating this for.
+     * @param float  $claimFrequency is the assumed frequency of claims.
+     * @param float  $consumerPayout is an assumed amount removed from earned money after underwriter commission.
+     * @param float  $iptRebate      is the assumed amount of IPT rebated.
+     * @return float|null the amount of profit that there should be per policy on this phone under the given
+     *                    assumptions or null if it cannot be calculated.
+     */
+    public function policyProfit($stream, $claimFrequency, $consumerPayout, $iptRebate)
     {
         $price = $this->getReplacementPrice();
         if (!$price && $this->getSuggestedReplacement()) {
@@ -879,26 +959,26 @@ class Phone
         if (!$price || $price == 0) {
             return null;
         }
-
         // Avg Excess + Expected Recycling - Claims handling fee - Claims Check fee - replacement phone price
         $netCostOfClaims = 56 + 19 - 14 - 1 - $price;
-
         /** @var PhonePrice $price */
-        $price = $this->getCurrentPhonePrice();
+        $price = $this->getCurrentPhonePrice($stream);
+        if (!$price) {
+            return null;
+        }
         $uwReceived = $price->getYearlyGwp() - Salva::YEARLY_COVERHOLDER_COMMISSION;
         $nwp = $uwReceived - $consumerPayout;
         $uwPrefReturn = ($nwp * 0.08);
-
         $profit = $nwp + $iptRebate + ($netCostOfClaims * $claimFrequency) - $uwPrefReturn;
-
         return $this->toTopTwoDp($profit);
     }
 
     /**
-     * Gives you all of the phone's prices in descending order of when they become valid.
+     * Gives you all of the phone's prices in the given stream in descending order of when they become valid.
+     * @param string $stream is the stream of prices we are trying to get.
      * @return array of the prices.
      */
-    public function getOrderedPhonePrices()
+    public function getOrderedPhonePrices($stream)
     {
         $prices = $this->getPhonePrices();
         if (!is_array($prices)) {
@@ -914,25 +994,97 @@ class Phone
             }
             return 0;
         });
-        return $prices;
+        return array_values(array_filter($prices, function ($price) use ($stream) {
+            return $price->inStream($stream);
+        }));
     }
 
     /**
      * Returns the price that is current.
-     * @param \DateTime|null $date the date at which the price should be current. Null for now.
+     * @param string         $stream is the price stream that we want the current price for.
+     * @param \DateTime|null $date   the date at which the price should be current. Null for now.
      * @return PhonePrice|null the found price or null if there is no price current at that time.
      */
-    public function getCurrentPhonePrice(\DateTime $date = null)
+    public function getCurrentPhonePrice($stream, \DateTime $date = null)
     {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+        if ($stream == PhonePrice::STREAM_ALL) {
+            throw new InvalidPriceStreamException("Can't get current price occupying all streams");
         }
-        foreach ($this->getOrderedPhonePrices() as $price) {
+        $date = $date ?: new \DateTime();
+        foreach ($this->getOrderedPhonePrices($stream) as $price) {
             if ($price->getValidFrom() <= $date) {
                 return $price;
             }
         }
         return null;
+    }
+
+    /**
+     * Convenience method for getting the current monthly price without needing to pass a stream name.
+     * @param \DateTime|null $date is the date at which the given price should be current. null for the present.
+     * @return PhonePrice|null the found price or null if there is no such price.
+     */
+    public function getCurrentMonthlyPhonePrice(\DateTime $date = null)
+    {
+        return $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date ?: new \DateTime());
+    }
+
+    /**
+     * Convenience method for getting the current yearly price without needing to pass a stream name.
+     * @param \DateTime|null $date is the date at which the given price should be current. null for the present.
+     * @return PhonePrice|null the found price or null if there is no such price.
+     */
+    public function getCurrentYearlyPhonePrice(\DateTime $date = null)
+    {
+        return $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date ?: new \DateTime());
+    }
+
+    /**
+     * Gets all the phone prices that are current in different streams and then returns the one that is the cheapest.
+     * @param \DateTime|null $date is the date at which the prices should be current or null for current time.
+     * @return PhonePrice|null the lowest current phone price or null if no phone prices are current at all.
+     */
+    public function getLowestCurrentPhonePrice(\DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        $prices = [];
+        foreach (PhonePrice::STREAMS as $stream) {
+            $price = $this->getCurrentPhonePrice($stream, $date);
+            if ($price) {
+                $prices[] = $price;
+            }
+        }
+        if (count($prices) == 0) {
+            return null;
+        }
+        usort($prices, function ($a, $b) {
+            return ($a->getGwp() < $b->getGwp()) ? -1 : 1;
+        });
+        return $prices[0];
+    }
+
+    /**
+     * Gets all the phone prices that are current in different streams and then returns the one that is the oldest.
+     * @param \DateTime|null $date is the date at which the prices should be current or null to use the current time.
+     * @return PhonePrice|null the oldest current phone price or null if there are no current prices.
+     */
+    public function getOldestCurrentPhonePrice(\DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        $prices = [];
+        foreach (PhonePrice::STREAMS as $stream) {
+            $price = $this->getCurrentPhonePrice($stream, $date);
+            if ($price) {
+                $prices[] = $price;
+            }
+        }
+        if (count($prices) == 0) {
+            return null;
+        }
+        usort($prices, function ($a, $b) {
+            return ($a->getValidFrom() < $b->getValidFrom()) ? -1 : 1;
+        });
+        return $prices[0];
     }
 
     /**
@@ -943,12 +1095,10 @@ class Phone
      */
     public function getPreviousPhonePrices(\DateTime $date = null)
     {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
-        }
+        $date = $date ?: new \DateTime();
         $previous = [];
         $old = false;
-        foreach ($this->getOrderedPhonePrices() as $price) {
+        foreach ($this->getOrderedPhonePrices(PhonePrice::STREAM_ANY) as $price) {
             if ($old) {
                 $previous[] = $price;
             } elseif ($price->getValidFrom() <= $date) {
@@ -961,15 +1111,13 @@ class Phone
     /**
      * Gives all phone prices that are yet in the future.
      * @param \DateTime|null $date is the date which is to be considered the present.
-     * @return array containing the prices.
+     * @return array containing the prices in descending order of date.
      */
     public function getFuturePhonePrices(\DateTime $date = null)
     {
-        if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
-        }
+        $date = $date ?: new \DateTime();
         $future = [];
-        foreach ($this->getPhonePrices() as $price) {
+        foreach ($this->getOrderedPhonePrices(PhonePrice::STREAM_ANY) as $price) {
             if ($price->getValidFrom() > $date) {
                 $future[] = $price;
             }
@@ -979,20 +1127,34 @@ class Phone
 
     /**
      * Gives a list of all phone prices that have been valid since the given number of minutes from right now.
-     * @param int $minutes is the number of minutes deviance within which to find the prices.
-     * @return array with all the prices within it.
+     * @param string    $stream  is the price stream that we want the recent prices for.
+     * @param int       $minutes is the number of minutes deviance within which to find the prices.
+     * @param \DateTime $date    is the date from which the prices must be recent.
+     * @return array with all the prices within it in descending order of date.
      */
-    public function getRecentPhonePrices(int $minutes)
+    public function getRecentPhonePrices($stream, int $minutes, \DateTime $date = null)
     {
-        $date = new \DateTime();
+        if ($stream == PhonePrice::STREAM_ALL) {
+            throw new InvalidPriceStreamException("Can't get recent prices occupying all streams");
+        }
+        $date = $date ?: new \DateTime();
         $line = (clone $date)->sub(new \DateInterval(sprintf('PT%dM', $minutes)));
         $recent = [];
-        foreach ($this->getPhonePrices() as $price) {
-            $validFrom = $price->getValidFrom();
-            if ($validFrom >= $line && $validFrom < $date) {
-                $recent[] = $price;
+        foreach (PhonePrice::subStreams($stream) as $subStream) {
+            $end = $date;
+            foreach ($this->getOrderedPhonePrices($subStream) as $price) {
+                $validFrom = $price->getValidFrom();
+                if ($end >= $line && $validFrom < $date) {
+                    $end = $validFrom;
+                    if (!in_array($price, $recent)) {
+                        $recent[] = $price;
+                    }
+                }
             }
         }
+        usort($recent, function ($a, $b) {
+            return $a->getValidFrom() < $b->getValidFrom() ? 1 : -1;
+        });
         return $recent;
     }
 
@@ -1011,9 +1173,10 @@ class Phone
         $lines = ['Assumes current IPT Rate!'];
         foreach ($prices as $price) {
             $lines[] = sprintf(
-                "%s @ £%.2f",
+                "%s @ £%.2f - %s",
                 $price->getValidFrom()->format(\DateTime::ATOM),
-                $price->getMonthlyPremiumPrice()
+                $price->getMonthlyPremiumPrice(),
+                $price->getStream()
             );
         }
         return implode(PHP_EOL, $lines);
@@ -1104,14 +1267,23 @@ class Phone
 
     public function toPriceArray(\DateTime $date = null)
     {
+        // sort out phone price list.
+        $apiPrices = [];
+        $prices = $this->getPhonePrices();
+        foreach ($prices as $price) {
+            $priceArray = $price->toPriceArray($date);
+            $priceArray["stream"] = $price->getStream();
+            $apiPrices[] = $priceArray;
+        }
+        // send all of the things.
         return [
             'make' => $this->getMake(),
             'model' => $this->getModel(),
             'devices' => $this->getDevices(),
             'memory' => $this->getMemory(),
-            'gwp' => $this->getCurrentPhonePrice() ? $this->getCurrentPhonePrice()->getGwp() : null,
+            'gwp' => $this->getLowestCurrentPhonePrice() ? $this->getLowestCurrentPhonePrice()->getGwp() : null,
             'active' => $this->getActive(),
-            'prices' => $this->eachApiMethod($this->getPhonePrices(), 'toPriceArray', $date),
+            'prices' => $apiPrices
         ];
     }
 
@@ -1129,8 +1301,9 @@ class Phone
 
     public function asQuoteApiArray(PostcodeService $postcodeService, User $user = null)
     {
-        $currentPhonePrice = $this->getCurrentPhonePrice();
-        if (!$currentPhonePrice) {
+        $monthlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        $yearlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY);
+        if (!($monthlyPhonePrice && $yearlyPhonePrice)) {
             if ($this->getActive()) {
                 return null;
             }
@@ -1154,11 +1327,11 @@ class Phone
         $promoAddition = 0;
         $isPromoLaunch = false;
 
-        $monthlyPremium = $currentPhonePrice->getMonthlyPremiumPrice();
+        $monthlyPremium = $monthlyPhonePrice->getMonthlyPremiumPrice();
         if ($user && !$user->allowedMonthlyPayments($postcodeService)) {
             $monthlyPremium = null;
         }
-        $yearlyPremium = $currentPhonePrice->getYearlyPremiumPrice();
+        $yearlyPremium = $yearlyPhonePrice->getYearlyPremiumPrice();
         if ($user && !$user->allowedYearlyPayments()) {
             $yearlyPremium = null;
         }
@@ -1169,16 +1342,16 @@ class Phone
             'yearly_premium' => $yearlyPremium,
             'yearly_loss' => 0,
             'phone' => $this->toApiArray(),
-            'connection_value' => $currentPhonePrice->getInitialConnectionValue($promoAddition),
-            'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
-            'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
+            'connection_value' => $monthlyPhonePrice->getInitialConnectionValue($promoAddition),
+            'max_connections' => $monthlyPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
+            'max_pot' => $monthlyPhonePrice->getMaxPot($isPromoLaunch),
             'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
             'can_purchase' => $this->getActive(),
-            'excesses' => $currentPhonePrice->getExcess() ?
-                $currentPhonePrice->getExcess()->toApiArray() :
+            'excesses' => $monthlyPhonePrice->getExcess() ?
+                $monthlyPhonePrice->getExcess()->toApiArray() :
                 [],
-            'picsure_excesses' => $currentPhonePrice->getPicSureExcess() ?
-                $currentPhonePrice->getPicSureExcess()->toApiArray() :
+            'picsure_excesses' => $monthlyPhonePrice->getPicSureExcess() ?
+                $monthlyPhonePrice->getPicSureExcess()->toApiArray() :
                 [],
         ];
     }
@@ -1321,11 +1494,13 @@ class Phone
 
     public function getMaxComparision()
     {
-        if (!$this->getCurrentPhonePrice()) {
+        $yearlyPrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
+        if (!$yearlyPrice) {
             return null;
         }
-
-        $maxComparision = $this->getCurrentPhonePrice()->getYearlyPremiumPrice();
+        /** @var PhonePrice */
+        $yearlyPrice = $yearlyPrice;
+        $maxComparision = $yearlyPrice->getYearlyPremiumPrice();
         $comparision = $this->getComparisions();
         if (count($comparision) > 0) {
             $maxComparision = 0;
@@ -1335,7 +1510,6 @@ class Phone
                 }
             }
         }
-
         return $maxComparision;
     }
 
@@ -1345,6 +1519,7 @@ class Phone
         PhoneExcess $excess,
         PhoneExcess $picSureExcess,
         $notes = null,
+        $stream = null,
         \DateTime $date = null
     ) {
         if (!$date) {
@@ -1374,6 +1549,9 @@ class Phone
         $price->setGwp($gwp);
         $price->setValidFrom($from);
         $price->setNotes($notes);
+        if ($stream) {
+            $price->setStream($stream);
+        }
         if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',
@@ -1381,12 +1559,12 @@ class Phone
                 $this->getSalvaMiniumumBinderMonthlyPremium()
             ));
         }
-        if ($this->getCurrentPhonePrice()) {
-            if ($this->getCurrentPhonePrice()->getValidFrom() > $from) {
+        if ($this->getOldestCurrentPhonePrice()) {
+            if ($this->getOldestCurrentPhonePrice()->getValidFrom() > $from) {
                 throw new \Exception(sprintf(
                     '%s must be after current pricing start date %s',
                     $from->format(\DateTime::ATOM),
-                    $this->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
+                    $this->getOldestCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
                 ));
             }
         }

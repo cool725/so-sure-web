@@ -43,6 +43,7 @@ class MiscTwigExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFilter('json_decode', [$this, 'jsonDecode']),
+            new \Twig_SimpleFilter('url_decode', [$this, 'urlDecode']),
         );
     }
 
@@ -69,6 +70,11 @@ class MiscTwigExtension extends \Twig_Extension
     public function jsonDecode($json)
     {
         return json_decode($json);
+    }
+
+    public function urlDecode($url)
+    {
+        return urldecode($url);
     }
 
     public function pathInfo($path)

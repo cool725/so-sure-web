@@ -16,6 +16,7 @@ parameters:
     report_excluded_policy_ids:
         - 57d829aa04e76f403c74ab39 # Dylan
         - 57ef7c67a6b37e5b2359e995 # Patrick
+        - 5daef79dd8102f6edb5342ee # Nick
     roles:
         - ROLE_ADMIN
         - ROLE_CLAIMS
@@ -101,6 +102,7 @@ twig:
         checkout_public_key: "%checkout_apipublic%"
         business_address: "Relay Building\n 114 Whitechapel High Street\n London\n E1 7PT\n UK"
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
+        broker_name: "Shepherd Compello Ltd"
 
 doctrine_mongodb:
     connections:
@@ -545,6 +547,8 @@ nelmio_security:
                 - http://smct.co
                 - https://ep.smct.co
                 - https://*.eu-west-1.amazonaws.com
+                - http://*.oribi.io
+                - http://hits-i.iubenda.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -858,6 +862,8 @@ nelmio_security:
                 - http://widget.trustpilot.com
                 - https://widget.trustpilot.com
                 - https://track.omguk.com
+                - http://www.iubenda.com
+                - https://www.iubenda.com
                 - 'data:'
                 - https://bat.bing.com
                 - https://www.gstatic.com
@@ -876,6 +882,8 @@ nelmio_security:
                 - https://smct.co
                 - http://smct.co
                 - https://cdn.smct.co
+                - http://*.oribi.io
+                - https://js.smct.io
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1405,7 +1413,7 @@ fos_oauth_server:
     service:
         user_provider: fos_user.user_provider
         options:
-            supported_scopes: user.starling.summary
+            supported_scopes: user.starling.summary user.starling_business.summary
             # Changing tokens and authcode lifetime
             # 6 months
             access_token_lifetime: 15768000
@@ -1413,4 +1421,3 @@ fos_oauth_server:
             refresh_token_lifetime: 1209600
             # initial request to getting a token
             auth_code_lifetime: 120
-

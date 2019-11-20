@@ -2,489 +2,474 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Blog{% endblock %}
+{% block title %}Insurance & Mobile Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Stay up to date with the latest insurance and mobile phone news, or subscribe to receive updates on new information and latest product releases."/>
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-primary"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-zaffre"></i>
+                                </li>
+                                <li class="list-inline-item text-zaffre"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Blog</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
+                        <h1 class="text-primary mb-5">so-sure Blog</h1>
+                        {# Jan 29, 2019 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('looking_back_and_forward') }}">Looking back and forward</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jan 29, 2019</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Of course, January is the perfect month to look forward and plan what’s to come, but it’s also a great time to take stock...</p>
+                            <p><a href="{{ path('looking_back_and_forward') }}">Read more</a></p>
+                        </article>
 
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__index px-4 px-lg-5">
-                    {# <p class="text-zaffre mb-0 h5">Welcome to the so-sure blog</p> #}
-                    <h1 class="text-primary mb-5">Blog</h1>
+                        {# Jan 16, 2019 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('what_to_do_if_you_break_your_phone_screen') }}">What to do if you break your phone</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jan 16, 2019</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Breaking your phone screen is a right pain...</p>
+                            <p><a href="{{ path('what_to_do_if_you_break_your_phone_screen') }}">Read more</a></p>
+                        </article>
 
-                    {# Jan 29, 2019 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('looking_back_and_forward') }}">Looking back and forward</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jan 29, 2019</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Of course, January is the perfect month to look forward and plan what’s to come, but it’s also a great time to take stock...</p>
-                        <p><a href="{{ path('looking_back_and_forward') }}">Read more</a></p>
-                    </article>
+                        {# Jan 7, 2019 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('5_great_gadgets_from_2018_for_the_january_sales') }}">5 Great Gadgets from 2018 for the January Sales</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jan 7, 2019</time>
+                                </li>
+                            </ul>
+                            <p class="lead">2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales...</p>
+                            <p><a href="{{ path('5_great_gadgets_from_2018_for_the_january_sales') }}">Read more</a></p>
+                        </article>
 
-                    {# Jan 16, 2019 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('what_to_do_if_you_break_your_phone_screen') }}">What to do if you break your phone</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jan 16, 2019</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Breaking your phone screen is a right pain...</p>
-                        <p><a href="{{ path('what_to_do_if_you_break_your_phone_screen') }}">Read more</a></p>
-                    </article>
+                        {# Dec 17, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('all_i_want_for_christmas_is_a_new_phone') }}">All I want for Christmas is a new phone</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Dec 17, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">It’s that time of year...</p>
+                            <p><a href="{{ path('all_i_want_for_christmas_is_a_new_phone') }}">Read more</a></p>
+                        </article>
 
-                    {# Jan 7, 2019 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('5_great_gadgets_from_2018_for_the_january_sales') }}">5 Great Gadgets from 2018 for the January Sales</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jan 7, 2019</time>
-                            </li>
-                        </ul>
-                        <p class="lead">2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales...</p>
-                        <p><a href="{{ path('5_great_gadgets_from_2018_for_the_january_sales') }}">Read more</a></p>
-                    </article>
+                        {# Nov 29, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('our_top_5_winter_sports_insurance_tips') }}">Our Top 5 Winter Sports Insurance Tips</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Nov 29, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Tis the season to go skiing. Fa-la-la-la-la, la-la-la-la. A trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance...</p>
+                            <p><a href="{{ path('our_top_5_winter_sports_insurance_tips') }}">Read more</a></p>
+                        </article>
 
-                    {# Dec 17, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('all_i_want_for_christmas_is_a_new_phone') }}">All I want for Christmas is a new phone</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Dec 17, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">It’s that time of year...</p>
-                        <p><a href="{{ path('all_i_want_for_christmas_is_a_new_phone') }}">Read more</a></p>
-                    </article>
+                        {# Nov 26, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('broken_promises') }}">Broken Promises</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Dylan Bourguignon</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Nov 26, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">The news last week that the company behind Boots’ travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building so-sure...</p>
+                            <p><a href="{{ path('broken_promises') }}">Read more</a></p>
+                        </article>
 
-                    {# Nov 29, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('our_top_5_winter_sports_insurance_tips') }}">Our Top 5 Winter Sports Insurance Tips</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Nov 29, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Tis the season to go skiing. Fa-la-la-la-la, la-la-la-la. A trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance...</p>
-                        <p><a href="{{ path('our_top_5_winter_sports_insurance_tips') }}">Read more</a></p>
-                    </article>
+                        {# Nov 16, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('so_sure_people_dylan_bourguignon') }}">so-sure people: Dylan Bourguignon</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Nov 16, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">As the resident marketing guru here at so-sure, I think it’s important for our customers - and those who are weighing up whether to trust us with their phone insurance - to get to know the people behind the brand...</p>
+                            <p><a href="{{ path('so_sure_people_dylan_bourguignon') }}">Read more</a></p>
+                        </article>
 
-                    {# Nov 26, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('broken_promises') }}">Broken Promises</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Dylan Bourguignon</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Nov 26, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">The news last week that the company behind Boots’ travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building so-sure...</p>
-                        <p><a href="{{ path('broken_promises') }}">Read more</a></p>
-                    </article>
+                        {# Nov 7, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('5_ways_to_protect_your_valuables_abroad') }}">5 ways to protect your valuables abroad</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Nov 7, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Today, we’re offering a little bit of advice for the lucky ones heading off to find some winter sun...</p>
+                            <p><a href="{{ path('5_ways_to_protect_your_valuables_abroad') }}">Read more</a></p>
+                        </article>
 
-                    {# Nov 16, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('so_sure_people_dylan_bourguignon') }}">so-sure people: Dylan Bourguignon</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Nov 16, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">As the resident marketing guru here at so-sure, I think it’s important for our customers - and those who are weighing up whether to trust us with their phone insurance - to get to know the people behind the brand...</p>
-                        <p><a href="{{ path('so_sure_people_dylan_bourguignon') }}">Read more</a></p>
-                    </article>
+                        {# Oct 24, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('3_technologies_that_will_shape_the_future_of_insurance') }}">3 Technologies That Will Shape The Future of Insurance</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Oct 24, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">We recently looked back at the origins of insurance and its development up to the present day. Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers...</p>
+                            <p><a href="{{ path('3_technologies_that_will_shape_the_future_of_insurance') }}">Read more</a></p>
+                        </article>
 
-                    {# Nov 7, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('5_ways_to_protect_your_valuables_abroad') }}">5 ways to protect your valuables abroad</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Nov 7, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Today, we’re offering a little bit of advice for the lucky ones heading off to find some winter sun...</p>
-                        <p><a href="{{ path('5_ways_to_protect_your_valuables_abroad') }}">Read more</a></p>
-                    </article>
+                        {# Oct 23, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('englands_most_trusting_cities') }}">England's Most Trusting Cities</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susane</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Oct 23, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Are English cities really untrusting and detached from their neighbours? According to our latest research survey, we suggest urban neighbours trust and know one another better than you might think...</p>
+                            <p><a href="{{ path('englands_most_trusting_cities') }}">Read more</a></p>
+                        </article>
 
-                    {# Oct 24, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('3_technologies_that_will_shape_the_future_of_insurance') }}">3 Technologies That Will Shape The Future of Insurance</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Oct 24, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">We recently looked back at the origins of insurance and its development up to the present day. Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers...</p>
-                        <p><a href="{{ path('3_technologies_that_will_shape_the_future_of_insurance') }}">Read more</a></p>
-                    </article>
+                        {# Oct 9, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('starling_bank_and_so_sure_team_up_to_offer_mobile_phone_insurance_through_the_starling_marketplace') }}">Starling Bank and so-sure team up to offer mobile phone insurance through the Starling Marketplace</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Oct 9, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Starling Bank today welcomes so-sure, the pioneering start-up mobile insurance company, to its in-app Marketplace. The partnership will mean that Starling customers will now be able apply for mobile phone insurance within minutes, directly from their Starling app...</p>
+                            <p><a href="{{ path('starling_bank_and_so_sure_team_up_to_offer_mobile_phone_insurance_through_the_starling_marketplace') }}">Read more</a></p>
+                        </article>
 
-                    {# Oct 23, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('englands_most_trusting_cities') }}">England's Most Trusting Cities</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susane</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Oct 23, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Are English cities really untrusting and detached from their neighbours? According to our latest research survey, we suggest urban neighbours trust and know one another better than you might think...</p>
-                        <p><a href="{{ path('englands_most_trusting_cities') }}">Read more</a></p>
-                    </article>
+                        {# Oct 8, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('dirty_tricks_to_watch_out_for_when_buying_insurance') }}">Dirty Tricks To Watch Out For When Buying Insurance</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Oct 8, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">The insurance industry has a bad rep, for good reason...</p>
+                            <p><a href="{{ path('dirty_tricks_to_watch_out_for_when_buying_insurance') }}">Read more</a></p>
+                        </article>
 
-                    {# Oct 9, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('starling_bank_and_so_sure_team_up_to_offer_mobile_phone_insurance_through_the_starling_marketplace') }}">Starling Bank and so-sure team up to offer mobile phone insurance through the Starling Marketplace</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Oct 9, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Starling Bank today welcomes so-sure, the pioneering start-up mobile insurance company, to its in-app Marketplace. The partnership will mean that Starling customers will now be able apply for mobile phone insurance within minutes, directly from their Starling app...</p>
-                        <p><a href="{{ path('starling_bank_and_so_sure_team_up_to_offer_mobile_phone_insurance_through_the_starling_marketplace') }}">Read more</a></p>
-                    </article>
+                        {# Sep 24, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('googles_pixel_3_takes_on_apples_iphone_xs') }}">Google’s Pixel 3 takes on Apple’s iPhone XS</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Sep 24, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Last month on the blog, we took a close look at the heavyweight battle between the Samsung Note 9 and Apple’s, iPhone X...</p>
+                            <p><a href="{{ path('googles_pixel_3_takes_on_apples_iphone_xs') }}">Read more</a></p>
+                        </article>
 
-                    {# Oct 8, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('dirty_tricks_to_watch_out_for_when_buying_insurance') }}">Dirty Tricks To Watch Out For When Buying Insurance</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Oct 8, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">The insurance industry has a bad rep, for good reason...</p>
-                        <p><a href="{{ path('dirty_tricks_to_watch_out_for_when_buying_insurance') }}">Read more</a></p>
-                    </article>
+                        {# Sep 13, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('the_development_of_insurance_as_we_know_it') }}">The Development of Insurance as we know it</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Sep 13, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">We’ve already traced the origins of insurance from the Babylonians to Benjamin Franklin, visiting Ancient Rome, merchant Venice and the Great Fire of London along the way...</p>
+                            <p><a href="{{ path('the_development_of_insurance_as_we_know_it') }}">Read more</a></p>
+                        </article>
 
-                    {# Sep 24, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('googles_pixel_3_takes_on_apples_iphone_xs') }}">Google’s Pixel 3 takes on Apple’s iPhone XS</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Sep 24, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Last month on the blog, we took a close look at the heavyweight battle between the Samsung Note 9 and Apple’s, iPhone X...</p>
-                        <p><a href="{{ path('googles_pixel_3_takes_on_apples_iphone_xs') }}">Read more</a></p>
-                    </article>
+                        {# Sep 11, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('introducing_social_insurance') }}">Introducing Social Insurance</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Sep 10, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Social insurance is often referred to as a revolutionary new type of insurance. A sea-change shift in the way that consumers and insurers approach risk...</p>
+                            <p><a href="{{ path('introducing_social_insurance') }}">Read more</a></p>
+                        </article>
 
-                    {# Sep 13, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('the_development_of_insurance_as_we_know_it') }}">The Development of Insurance as we know it</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Sep 13, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">We’ve already traced the origins of insurance from the Babylonians to Benjamin Franklin, visiting Ancient Rome, merchant Venice and the Great Fire of London along the way...</p>
-                        <p><a href="{{ path('the_development_of_insurance_as_we_know_it') }}">Read more</a></p>
-                    </article>
+                        {# Sep 4, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('samsungs_note_9_takes_on_apples_iphone_x') }}">Samsung's Note 9 takes on Apple's iPhone X</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Sep 4, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">The battle for smartphone supremacy hots up this month, with the Samsung Note 9 arriving on the scene to take on Apple’s titan, the iPhone X...</p>
+                            <p><a href="{{ path('samsungs_note_9_takes_on_apples_iphone_x') }}">Read more</a></p>
+                        </article>
 
-                    {# Sep 11, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('introducing_social_insurance') }}">Introducing Social Insurance</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Sep 10, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Social insurance is often referred to as a revolutionary new type of insurance. A sea-change shift in the way that consumers and insurers approach risk...</p>
-                        <p><a href="{{ path('introducing_social_insurance') }}">Read more</a></p>
-                    </article>
+                        {# Aug 24, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('what_to_look_out_for_when_buying_phone_insurance') }}">What To Look Out For When Buying Phone Insurance</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Aug 24, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Phones keep us connected, they enable us to work on the fly, they entertain us… they can also annoy us. Whichever way you look at it, they’re a big part of our lives...</p>
+                            <p><a href="{{ path('what_to_look_out_for_when_buying_phone_insurance') }}">Read more</a></p>
+                        </article>
 
-                    {# Sep 4, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('samsungs_note_9_takes_on_apples_iphone_x') }}">Samsung's Note 9 takes on Apple's iPhone X</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Sep 4, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">The battle for smartphone supremacy hots up this month, with the Samsung Note 9 arriving on the scene to take on Apple’s titan, the iPhone X...</p>
-                        <p><a href="{{ path('samsungs_note_9_takes_on_apples_iphone_x') }}">Read more</a></p>
-                    </article>
+                        {# Aug 20, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">The Weird And Wonderful Origins Of Insurance... From the Babylonians to Benjamin Franklin</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Aug 20, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Benjamin Franklin’s famous words are an apt starting point for a look at the long, colourful history of insurance...</p>
+                            <p><a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">Read more</a></p>
+                        </article>
 
-                    {# Aug 24, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('what_to_look_out_for_when_buying_phone_insurance') }}">What To Look Out For When Buying Phone Insurance</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Aug 24, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Phones keep us connected, they enable us to work on the fly, they entertain us… they can also annoy us. Whichever way you look at it, they’re a big part of our lives...</p>
-                        <p><a href="{{ path('what_to_look_out_for_when_buying_phone_insurance') }}">Read more</a></p>
-                    </article>
+                        {# Aug 10, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('how_to_fix_a_problem_like_insurance') }}">How To Fix A Problem Like Insurance</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Dylan Bourguignon</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Aug 10, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Insurance has an image problem. It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers...</p>
+                            <p><a href="{{ path('how_to_fix_a_problem_like_insurance') }}">Read more</a></p>
+                        </article>
 
-                    {# Aug 20, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">The Weird And Wonderful Origins Of Insurance... From the Babylonians to Benjamin Franklin</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Susan</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Aug 20, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Benjamin Franklin’s famous words are an apt starting point for a look at the long, colourful history of insurance...</p>
-                        <p><a href="{{ path('the_weird_and_wonderful_origins_of_insurance_from_the_babylonians_to_benjamin_franklin') }}">Read more</a></p>
-                    </article>
+                        {# Aug 1, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('the_insurtech_revolution') }}">The Insurtech Revolution</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Dylan Bourguignon</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Aug 1, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Insurtech is everywhere. And it’s only getting bigger. At so-sure, we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market...</p>
+                            <p><a href="{{ path('the_insurtech_revolution') }}">Read more</a></p>
+                        </article>
 
-                    {# Aug 10, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('how_to_fix_a_problem_like_insurance') }}">How To Fix A Problem Like Insurance</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Dylan Bourguignon</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Aug 10, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Insurance has an image problem. It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers...</p>
-                        <p><a href="{{ path('how_to_fix_a_problem_like_insurance') }}">Read more</a></p>
-                    </article>
+                        {# Jul 24, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('samsung_galaxy_s9_versus_the_s9_plus') }}">Samsung Galaxy S9 versus the S9+</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jul 24, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">So what do you need to know about this latest beaut from Samsung? Firstly they are even more brilliant than the previous Galaxy phones...</p>
+                            <p><a href="{{ path('samsung_galaxy_s9_versus_the_s9_plus') }}">Read more</a></p>
+                        </article>
 
-                    {# Aug 1, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('the_insurtech_revolution') }}">The Insurtech Revolution</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Dylan Bourguignon</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Aug 1, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Insurtech is everywhere. And it’s only getting bigger. At so-sure, we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market...</p>
-                        <p><a href="{{ path('the_insurtech_revolution') }}">Read more</a></p>
-                    </article>
+                        {# Jun 29, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('the_internet_of_things') }}">The Internet Of Things</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jun 29, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">You’ve probably heard of the Internet of Things (IoT) even if you only have a passing interest in new technology. However, for those that haven’t, it’s essentially a system of interconnected ‘things’ or devices, which are able to send each other information without human instruction...</p>
+                            <p><a href="{{ path('the_internet_of_things') }}">Read more</a></p>
+                        </article>
 
-                    {# Jul 24, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('samsung_galaxy_s9_versus_the_s9_plus') }}">Samsung Galaxy S9 versus the S9+</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jul 24, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">So what do you need to know about this latest beaut from Samsung? Firstly they are even more brilliant than the previous Galaxy phones...</p>
-                        <p><a href="{{ path('samsung_galaxy_s9_versus_the_s9_plus') }}">Read more</a></p>
-                    </article>
+                        {# Jun 29, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('mwc_2018_preview') }}">Mobile World Congress</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jun 29, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Hallelujah! It’s that time of year again. Mobile World Congress is the biggest mobile phone event of the year and is popping off next Monday in the beautiful city of Barcelona. The event is pretty much Christmas for people like us...</p>
+                            <p><a href="{{ path('mwc_2018_preview') }}">Read more</a></p>
+                        </article>
 
-                    {# Jun 29, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('the_internet_of_things') }}">The Internet Of Things</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jun 29, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">You’ve probably heard of the Internet of Things (IoT) even if you only have a passing interest in new technology. However, for those that haven’t, it’s essentially a system of interconnected ‘things’ or devices, which are able to send each other information without human instruction...</p>
-                        <p><a href="{{ path('the_internet_of_things') }}">Read more</a></p>
-                    </article>
+                        {# Jun 29, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('money_saving_tips') }}">Money Saving Tips</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jun 29, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">How to pocket yourself a little extra cash from now up until (dare I say it) Christmas 2018 😳...</p>
+                            <p><a href="{{ path('money_saving_tips') }}">Read more</a></p>
+                        </article>
 
-                    {# Jun 29, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('mwc_2018_preview') }}">Mobile World Congress</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jun 29, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Hallelujah! It’s that time of year again. Mobile World Congress is the biggest mobile phone event of the year and is popping off next Monday in the beautiful city of Barcelona. The event is pretty much Christmas for people like us...</p>
-                        <p><a href="{{ path('mwc_2018_preview') }}">Read more</a></p>
-                    </article>
+                        {# Jun 29, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('mobile_phone_insurance_buying_guide') }}">Mobile Phone Insurance Buying Guide</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Sam</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jun 29, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">Insurance is dull and boring. We know. For exactly that reason, we’ve put together some handy info to help guide you through the mind numbingly dull world of insurance for your phone...</p>
+                            <p><a href="{{ path('mobile_phone_insurance_buying_guide') }}">Read more</a></p>
+                        </article>
 
-                    {# Jun 29, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('money_saving_tips') }}">Money Saving Tips</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jun 29, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">How to pocket yourself a little extra cash from now up until (dare I say it) Christmas 2018 😳...</p>
-                        <p><a href="{{ path('money_saving_tips') }}">Read more</a></p>
-                    </article>
-
-                    {# Jun 29, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('mobile_phone_insurance_buying_guide') }}">Mobile Phone Insurance Buying Guide</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Sam</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jun 29, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">Insurance is dull and boring. We know. For exactly that reason, we’ve put together some handy info to help guide you through the mind numbingly dull world of insurance for your phone...</p>
-                        <p><a href="{{ path('mobile_phone_insurance_buying_guide') }}">Read more</a></p>
-                    </article>
-
-                    {# Jun 29, 2018 #}
-                    <article class="my-5">
-                        <h2><a href="{{ path('disruptive_technology_what_is_it') }}">Disruptive Technology - what is it?</a></h2>
-                        <ul class="list-inline">
-                            <li class="list-inline-item">
-                                <div rel="author">Fiona</div>
-                            </li>
-                            <li class="list-inline-item">|</li>
-                            <li class="list-inline-item">
-                                <time>Jun 29, 2018</time>
-                            </li>
-                        </ul>
-                        <p class="lead">In short, a disruptive technology is something that transforms a historically expensive product, which only a few people with a lot of money and a lot of skill have access to, by making it more affordable and available to a wider group of people...</p>
-                        <p><a href="{{ path('disruptive_technology_what_is_it') }}">Read more</a></p>
-                    </article>
-
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                        {# Jun 29, 2018 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('disruptive_technology_what_is_it') }}">Disruptive Technology - what is it?</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Fiona</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Jun 29, 2018</time>
+                                </li>
+                            </ul>
+                            <p class="lead">In short, a disruptive technology is something that transforms a historically expensive product, which only a few people with a lot of money and a lot of skill have access to, by making it more affordable and available to a wider group of people...</p>
+                            <p><a href="{{ path('disruptive_technology_what_is_it') }}">Read more</a></p>
+                        </article>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

@@ -42,7 +42,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             $url,
             ['user_token' => $user->getId()]
         );
-        
+
         $data = $this->verifyResponse(200);
         $this->assertTrue(mb_strlen($data['jwt']) > 20);
     }
@@ -732,6 +732,54 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
         //print_r($data);
         $this->assertEquals('text', $data['canvas']['content']['components'][0]['type']);
+    }
+
+    public function testGoCompareDeeplinkAggregator()
+    {
+        $email = static::generateEmail('testGoCompareDeeplink', $this);
+        $repo = static::$dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNull($user);
+
+        $url = sprintf(
+            '/external/gocompare/deeplink?aggregator=true'
+        );
+        $data  = [
+            'first_name' => 'foo',
+            'surname' => 'bar',
+            'email_address' => $email,
+            'dob' => '2018-01-01',
+            'reference' => static::$phone->getId(),
+            'aggragator' => 'true'
+        ];
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            $data
+        );
+
+        $data = $this->verifyResponse(
+            302,
+            null,
+            null,
+            sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
+        );
+        $redirectUrl = self::$router->generate('quote_phone', [
+            'id' => static::$phone->getId(),
+            'aggregator' => 'true'
+        ]);
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+
+        $dm = $this->getDocumentManager(true);
+        $repo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
+        $updatedUser = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($updatedUser);
+
+        $this->assertEquals('foo', $updatedUser->getFirstName());
+        $this->assertEquals('bar', $updatedUser->getLastName());
+        $this->assertEquals(new \DateTime('2018-01-01'), $updatedUser->getBirthday());
     }
 
     private function getDpaAppSignature($data)

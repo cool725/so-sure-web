@@ -2,133 +2,125 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - 5 ways to protect your valuables abroad{% endblock %}
+{% block title %}5 ways to protect your valuables abroad - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="There’s nothing better than a winter holiday… but nothing’s more stressful than when something goes wrong whilst you’re on it. It might sound boring and, of course, you can get ripped off anywhere, but planning ahead and being careful whilst travelling can help reduce the risks and keep your valuables safe."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">5 ways to protect your valuables abroad</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">5 ways to protect your valuables abroad</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Susan</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            5 ways to protect your valuables abroad
+                                            <time>Nov 7, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">5 ways to protect your valuables abroad</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Nov 7, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>Today, we’re offering a little bit of advice for the lucky ones heading off to find some winter sun.</p>
-                        <p>There’s nothing better than a winter holiday… but nothing’s more stressful than when something goes wrong whilst you’re on it. It might sound boring and, of course, you can get ripped off anywhere, but planning ahead and being careful whilst travelling can help reduce the risks and keep your valuables safe.</p>
-                        <p>So, if you’re lucky enough to be jetting off somewhere outrageously hot, or cold, here’s what you can do to keep your items safe whilst abroad.</p>
-                        <h4>1. Consider what you really need to take</h4>
-                        <p>Holidays are all about flaunting it, so who wants to pack light?</p>
-                        <p>Hate to break this to you, but leaving valuable non-essentials at home can actually make sense and reduce a lot of stress. Taking a laptop might mean you can respond to work and catch up on Netflix but that’s probably not the point of the holiday. And unless you’re still using a Nokia brick, your phone does all of that anyway.</p>
-                        <p>Holidays should be about switching off, so the less expensive electrical items you take, the better, so you can focus on winding down and chilling out. So leave the iPad at home and take a couple of paperbacks instead. Not only are they a lot better for your mind, but they’re also a lot cheaper to replace should you lose them.</p>
-                        <p><em><strong>Top tip:</strong> Leave expensive electrics at home. Take a phone and a stack of paperbacks instead.</em></p>
-                        <h4>2. Check out where you’re going</h4>
-                        <p>Who doesn't love adventure? Getting outside your comfort zone is what some holidays are about. However, there can be trouble off the beaten track. So be adventurous, but be prepared.</p>
-                        <p>Look up where you’re going in advance and check any online forums or reviews that mention dangers, frauds or scams. Of course, these happen at home too, but tourists who run into trouble have often ended up where travellers don’t go, so make sure the path you take is safe.</p>
-                        <p>Local knowledge is great too. Asking hostel or hotel staff about where and where not to explore is important. They have experience of anything dodgy to look out for in the area. With some prep - before or whilst travelling - you can stay safe and have an exciting time of discovery.</p>
-                        <p><em><strong>Top tip:</strong> Go somewhere different but prepare by researching about where you’re headed.</em></p>
-                        <h4>3. Buy a few safety bits and bobs</h4>
-                        <p>A few simple pre-travel purchases can keep you and your valuables safe.</p>
-                        <p>Obviously, you’re going to want to keep your money safe, so a secure money belt or purse may look a bit naff, but it will save you from the immense hassle of being pick pocketed. Also, a simple padlock for your suitcase is a low cost-high return piece of kit that allows you to safely leave luggage in your room or stored on public transport.</p>
-                        <p>It’s also worth using the security provided in hotels and hostels. If possible don’t leave your passport in your bedside drawer or take it out and about with you. Any really valuable items, such as jewellery, passports and large wads of cash, should go in the safe.</p>
-                        <p><em><strong>Top tip:</strong> Do what you can by buying a few simple bits of security. And always use the safe.</em></p>
-                        <h4>4. Protect your money… be it cash or cards</h4>
-                        <p>It’s now possible to use your credit and debit cards almost anywhere on earth… but that’s not to say you always should. Fraud involving plastic is quite a common occurrence overseas, so be sure to only use your cards where you feel truly secure. Also, regularly check your balances whilst away, making sure that your card hasn’t been cloned and defrauded.</p>
-                        <p>Cash is a safer alternative. To avoid having to use too many cash machines (which also incur charges) either take cash from the UK or withdraw large amounts. Of course, this means you will have a large amount of cash on you, so use a money belt and the hotel safe.</p>
-                        <p>It’s also worth investigating whether prepaid travel credit cards and currency cards. These are secure and give you a good idea of your budget and also allows you to secure a good rate of exchange which you can arrange before you travel. Check out <a href="https://www.revolut.com" target="_blank" rel="noopener noreferrer">Revolut</a> and <a href="https://www.fairfx.com/" target="_blank" rel="noopener noreferrer">FairFX</a>.</p>
-                        <p><em><strong>Top tip:</strong> Pay cash. And stick to your budget. But payment schemes can help if need be.</em></p>
-                        <h4>5. Protect yourself, your items and your phone with insurance</h4>
-                        <p>The best way to protect your valuables is to get high-quality travel insurance.</p>
-                        <p>Also, before you travel, look into any UK insurance policies you have and check if they apply overseas. For example, some UK contents insurance policies are multi-geography. If they don’t cover you, for an additional fee, you can add items and geographies to your policy.</p>
-                        <p>One item that is also always in the firing line when overseas is your mobile phone. It’s important that you make sure this is insured, as it’s your best friend when travelling and because you always have it on you, it has the highest chance of being stolen or broken.</p>
-                        <p>We can help with this at <a href="{{ path('homepage') }}">so-sure</a>, covering your mobile phone for up to 90 days travel anywhere in the world, whether you’re backpacking or on business. To learn more, <a href="{{ path('about_how_to_contact_so_sure') }}">drop us a line</a>.</p>
-                        <p>Not only will insuring items abroad help you if something goes wrong, but it will also give you great peace of mind, allowing you to enjoy your holiday to the max.</p>
-                        <p><em><strong>Top tip:</strong> Get decent insurance for your valuables. And so-sure can help with your mobile phone.</em></p>
-                        <p>Planning a holiday should be one the most enjoyable tasks you have to do all year. And, what’s more, with a few simple, careful precautions, you can stay secure whilst minimising the possibility of anything going wrong whilst you’re away.</p>
-                        <p>Happy and safe travels from all of us at <a href="{{ path('homepage') }}">so-sure</a>!</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>Today, we’re offering a little bit of advice for the lucky ones heading off to find some winter sun.</p>
+                                <p>There’s nothing better than a winter holiday… but nothing’s more stressful than when something goes wrong whilst you’re on it. It might sound boring and, of course, you can get ripped off anywhere, but planning ahead and being careful whilst travelling can help reduce the risks and keep your valuables safe.</p>
+                                <p>So, if you’re lucky enough to be jetting off somewhere outrageously hot, or cold, here’s what you can do to keep your items safe whilst abroad.</p>
+                                <h4>1. Consider what you really need to take</h4>
+                                <p>Holidays are all about flaunting it, so who wants to pack light?</p>
+                                <p>Hate to break this to you, but leaving valuable non-essentials at home can actually make sense and reduce a lot of stress. Taking a laptop might mean you can respond to work and catch up on Netflix but that’s probably not the point of the holiday. And unless you’re still using a Nokia brick, your phone does all of that anyway.</p>
+                                <p>Holidays should be about switching off, so the less expensive electrical items you take, the better, so you can focus on winding down and chilling out. So leave the iPad at home and take a couple of paperbacks instead. Not only are they a lot better for your mind, but they’re also a lot cheaper to replace should you lose them.</p>
+                                <p><em><strong>Top tip:</strong> Leave expensive electrics at home. Take a phone and a stack of paperbacks instead.</em></p>
+                                <h4>2. Check out where you’re going</h4>
+                                <p>Who doesn't love adventure? Getting outside your comfort zone is what some holidays are about. However, there can be trouble off the beaten track. So be adventurous, but be prepared.</p>
+                                <p>Look up where you’re going in advance and check any online forums or reviews that mention dangers, frauds or scams. Of course, these happen at home too, but tourists who run into trouble have often ended up where travellers don’t go, so make sure the path you take is safe.</p>
+                                <p>Local knowledge is great too. Asking hostel or hotel staff about where and where not to explore is important. They have experience of anything dodgy to look out for in the area. With some prep - before or whilst travelling - you can stay safe and have an exciting time of discovery.</p>
+                                <p><em><strong>Top tip:</strong> Go somewhere different but prepare by researching about where you’re headed.</em></p>
+                                <h4>3. Buy a few safety bits and bobs</h4>
+                                <p>A few simple pre-travel purchases can keep you and your valuables safe.</p>
+                                <p>Obviously, you’re going to want to keep your money safe, so a secure money belt or purse may look a bit naff, but it will save you from the immense hassle of being pick pocketed. Also, a simple padlock for your suitcase is a low cost-high return piece of kit that allows you to safely leave luggage in your room or stored on public transport.</p>
+                                <p>It’s also worth using the security provided in hotels and hostels. If possible don’t leave your passport in your bedside drawer or take it out and about with you. Any really valuable items, such as jewellery, passports and large wads of cash, should go in the safe.</p>
+                                <p><em><strong>Top tip:</strong> Do what you can by buying a few simple bits of security. And always use the safe.</em></p>
+                                <h4>4. Protect your money… be it cash or cards</h4>
+                                <p>It’s now possible to use your credit and debit cards almost anywhere on earth… but that’s not to say you always should. Fraud involving plastic is quite a common occurrence overseas, so be sure to only use your cards where you feel truly secure. Also, regularly check your balances whilst away, making sure that your card hasn’t been cloned and defrauded.</p>
+                                <p>Cash is a safer alternative. To avoid having to use too many cash machines (which also incur charges) either take cash from the UK or withdraw large amounts. Of course, this means you will have a large amount of cash on you, so use a money belt and the hotel safe.</p>
+                                <p>It’s also worth investigating whether prepaid travel credit cards and currency cards. These are secure and give you a good idea of your budget and also allows you to secure a good rate of exchange which you can arrange before you travel. Check out <a href="https://www.revolut.com" target="_blank" rel="noopener noreferrer">Revolut</a> and <a href="https://www.fairfx.com/" target="_blank" rel="noopener noreferrer">FairFX</a>.</p>
+                                <p><em><strong>Top tip:</strong> Pay cash. And stick to your budget. But payment schemes can help if need be.</em></p>
+                                <h4>5. Protect yourself, your items and your phone with insurance</h4>
+                                <p>The best way to protect your valuables is to get high-quality travel insurance.</p>
+                                <p>Also, before you travel, look into any UK insurance policies you have and check if they apply overseas. For example, some UK contents insurance policies are multi-geography. If they don’t cover you, for an additional fee, you can add items and geographies to your policy.</p>
+                                <p>One item that is also always in the firing line when overseas is your mobile phone. It’s important that you make sure this is insured, as it’s your best friend when travelling and because you always have it on you, it has the highest chance of being stolen or broken.</p>
+                                <p>We can help with this at <a href="{{ path('homepage') }}">so-sure</a>, covering your mobile phone for up to 90 days travel anywhere in the world, whether you’re backpacking or on business. To learn more, <a href="{{ path('about_how_to_contact_so_sure') }}">drop us a line</a>.</p>
+                                <p>Not only will insuring items abroad help you if something goes wrong, but it will also give you great peace of mind, allowing you to enjoy your holiday to the max.</p>
+                                <p><em><strong>Top tip:</strong> Get decent insurance for your valuables. And so-sure can help with your mobile phone.</em></p>
+                                <p>Planning a holiday should be one the most enjoyable tasks you have to do all year. And, what’s more, with a few simple, careful precautions, you can stay secure whilst minimising the possibility of anything going wrong whilst you’re away.</p>
+                                <p>Happy and safe travels from all of us at <a href="{{ path('homepage') }}">so-sure</a>!</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

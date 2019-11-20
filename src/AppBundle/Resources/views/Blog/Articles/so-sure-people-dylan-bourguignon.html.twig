@@ -2,115 +2,107 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - so-sure people: Dylan Bourguignon{% endblock %}
+{% block title %}so-sure people: Dylan Bourguignon - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Dylan is a down to earth kind of guy who would rather get his head down, manage the team and deal with customers that write blog posts extolling his virtues. But he’s happy for me to do it! I recently sat down with him to hear the story behind so-sure."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">so-sure people: Dylan Bourguignon</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">so-sure people: Dylan Bourguignon</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Fiona</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            so-sure people: Dylan Bourguignon
+                                            <time>Nov 16, 2018</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">so-sure people: Dylan Bourguignon</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Fiona</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Nov 16, 2018</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>As the resident marketing guru here at <a href="{{ path('homepage') }}">so-sure</a>, I think it’s important for our customers - and those who are weighing up whether to trust us with their phone insurance - to get to know the people behind the brand.</p>
-                        <p>And what better place to start than with our glorious leader? I’m talking, of course, about our founder and CEO <a href="https://www.linkedin.com/in/dylanbourguignon/" target="_blank" rel="noopener noreferrer">Dylan Bourguignon</a>, a self-confessed insurtech aficionado  and someone described by one of our investors as having the “tenacity of a honey badger”!</p>
-                        <p>Dylan is a down to earth kind of guy who would rather get his head down, manage the team and deal with customers that write blog posts extolling his virtues. But he’s happy for me to do it! I recently sat down with him to hear the story behind so-sure.</p>
-                        <p><em>“Insurance is not the first thing that people think about when they get out of bed in the morning,” he said. “But I do.”</em></p>
-                        <p>Dylan believes the insurance industry is broken. If you’re looking for evidence of that, consider that <a href="https://www.ey.com/Publication/vwLUAssets/EY-the-EY-global-consumer-insurance-survey-2014/$FILE/EY-the-EY-global-consumer-insurance-survey-2014.pdf" target="_blank" rel="noopener noreferrer">consumers trust insurers less than they do banks</a>, which let’s face it, are blamed for the global financial crisis and generally loathed by large sections of society.</p>
-                        <p><em>“Something’s gone seriously wrong,”</em> says Dylan. <em>“Insurance is a promise that when things go wrong, you're covered. If we were to all go round and break our promises, then we'd up with no friends. And that's what's happened to insurance companies.”</em></p>
-                        <p>Trust is one thing that our industry is getting wrong. Value is another. There’s a glaring disparity between the money that insurance companies make and the policyholder experience. And of course, the experience of buying insurance and making claims is utterly painful. Price comparison sites only exacerbate distrust of insurance companies, since they encourage cheaper policies that fail to cover people in a comprehensive and meaningful way.</p>
-                        <p>These insights drove Dylan to launch so-sure, in order to restore trust in insurance by refocusing everything around the consumer. He explains, <em>“Our approach is simple. We are building the insurance experience around customers, not products.”</em></p>
-                        <p><a href="{{ path('homepage') }}">so-sure</a> is revolutionising insurance with an approach that seems new, but is actually old, well established and foolishly overlooked in favour of complex value chains that introduce unnecessary friction and costs that are ultimately borne by customers.</p>
-                        <p>Social insurance takes insurance back to how it all started, connecting careful people to each other so they know they’re covered if misfortunes happen. If you don’t claim, you get most of your money back. It really is that simple. To make this happen, Dylan has built a team of like-minded colleagues, investors and advisors fired up by the mission and determined to deliver.</p>
-                        <p>Dylan comes to the insurtech business with ten years of investment and business development experience across bunch of different industries. He’s been a strategy consultant, a private equity investor and an entrepreneur, diverse roles which have given him the sense of perspective that’s so often lacking in insurance executives. In fact, his previous business - peer to peer alternative to bicycle insurance - laid the groundwork for so-sure and our innovative social insurance model. <em>“It made me realise the importance of refocusing insurance around the customer,”</em> he explains. <em>“We're here when we’re needed, and when they don't need us, they get rewarded.”</em></p>
-                        <p>Dylan is also excited about the broader insurtech movement and working to help raise its profile in the mainstream media. He’s excited about where the industry is headed. <em>“It wasn’t long ago that entrepreneurs couldn't find funding for insurance startups, struggled to attract talent, were hampered by regulatory constraints and ignored by incumbents. Slowly this is changing.”</em></p>
-                        <p>so-sure’s recent capital raise was a watershed moment. We secured Europe’s largest insurtech seed funding round, raising €3 million, to execute on our unique approach to re-imagining insurance. Like any CEO, Dylan is always reminding the team that there’s much work to be done! But it feels like we’ve reached a tipping point in terms of investment in the sector. Incumbents are taking notice, and the opportunity to collaborate with established insurers will undoubtedly accelerate the transformation of insurance.</p>
-                        <p>With the right fundamentals now in place, the future looks bright for so-sure and insurtech in general, but most importantly, it looks bright for consumers.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>As the resident marketing guru here at <a href="{{ path('homepage') }}">so-sure</a>, I think it’s important for our customers - and those who are weighing up whether to trust us with their phone insurance - to get to know the people behind the brand.</p>
+                                <p>And what better place to start than with our glorious leader? I’m talking, of course, about our founder and CEO <a href="https://www.linkedin.com/in/dylanbourguignon/" target="_blank" rel="noopener noreferrer">Dylan Bourguignon</a>, a self-confessed insurtech aficionado  and someone described by one of our investors as having the “tenacity of a honey badger”!</p>
+                                <p>Dylan is a down to earth kind of guy who would rather get his head down, manage the team and deal with customers that write blog posts extolling his virtues. But he’s happy for me to do it! I recently sat down with him to hear the story behind so-sure.</p>
+                                <p><em>“Insurance is not the first thing that people think about when they get out of bed in the morning,” he said. “But I do.”</em></p>
+                                <p>Dylan believes the insurance industry is broken. If you’re looking for evidence of that, consider that <a href="https://www.ey.com/Publication/vwLUAssets/EY-the-EY-global-consumer-insurance-survey-2014/$FILE/EY-the-EY-global-consumer-insurance-survey-2014.pdf" target="_blank" rel="noopener noreferrer">consumers trust insurers less than they do banks</a>, which let’s face it, are blamed for the global financial crisis and generally loathed by large sections of society.</p>
+                                <p><em>“Something’s gone seriously wrong,”</em> says Dylan. <em>“Insurance is a promise that when things go wrong, you're covered. If we were to all go round and break our promises, then we'd up with no friends. And that's what's happened to insurance companies.”</em></p>
+                                <p>Trust is one thing that our industry is getting wrong. Value is another. There’s a glaring disparity between the money that insurance companies make and the policyholder experience. And of course, the experience of buying insurance and making claims is utterly painful. Price comparison sites only exacerbate distrust of insurance companies, since they encourage cheaper policies that fail to cover people in a comprehensive and meaningful way.</p>
+                                <p>These insights drove Dylan to launch so-sure, in order to restore trust in insurance by refocusing everything around the consumer. He explains, <em>“Our approach is simple. We are building the insurance experience around customers, not products.”</em></p>
+                                <p><a href="{{ path('homepage') }}">so-sure</a> is revolutionising insurance with an approach that seems new, but is actually old, well established and foolishly overlooked in favour of complex value chains that introduce unnecessary friction and costs that are ultimately borne by customers.</p>
+                                <p>Social insurance takes insurance back to how it all started, connecting careful people to each other so they know they’re covered if misfortunes happen. If you don’t claim, you get most of your money back. It really is that simple. To make this happen, Dylan has built a team of like-minded colleagues, investors and advisors fired up by the mission and determined to deliver.</p>
+                                <p>Dylan comes to the insurtech business with ten years of investment and business development experience across bunch of different industries. He’s been a strategy consultant, a private equity investor and an entrepreneur, diverse roles which have given him the sense of perspective that’s so often lacking in insurance executives. In fact, his previous business - peer to peer alternative to bicycle insurance - laid the groundwork for so-sure and our innovative social insurance model. <em>“It made me realise the importance of refocusing insurance around the customer,”</em> he explains. <em>“We're here when we’re needed, and when they don't need us, they get rewarded.”</em></p>
+                                <p>Dylan is also excited about the broader insurtech movement and working to help raise its profile in the mainstream media. He’s excited about where the industry is headed. <em>“It wasn’t long ago that entrepreneurs couldn't find funding for insurance startups, struggled to attract talent, were hampered by regulatory constraints and ignored by incumbents. Slowly this is changing.”</em></p>
+                                <p>so-sure’s recent capital raise was a watershed moment. We secured Europe’s largest insurtech seed funding round, raising €3 million, to execute on our unique approach to re-imagining insurance. Like any CEO, Dylan is always reminding the team that there’s much work to be done! But it feels like we’ve reached a tipping point in terms of investment in the sector. Incumbents are taking notice, and the opportunity to collaborate with established insurers will undoubtedly accelerate the transformation of insurance.</p>
+                                <p>With the right fundamentals now in place, the future looks bright for so-sure and insurtech in general, but most importantly, it looks bright for consumers.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

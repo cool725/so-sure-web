@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
@@ -8,6 +9,7 @@ use AppBundle\Document\Feature;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Repository\PolicyTermsRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -15,7 +17,8 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
-use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use AppBundle\Document\LogEntry;
+use AppBundle\Repository\LogEntryRepository;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
@@ -52,6 +55,7 @@ use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\File\S3File;
 
 use AppBundle\Service\SalvaExportService;
+use AppBundle\Service\PriceService;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\UserPaymentEvent;
 
@@ -66,7 +70,6 @@ use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\AlreadyParticipatingException;
 
-use Gedmo\Loggable\Document\LogEntry;
 use Symfony\Component\Templating\EngineInterface;
 
 class PolicyService
@@ -150,6 +153,9 @@ class PolicyService
     /** @var FeatureService */
     protected $featureService;
 
+    /** @var PriceService */
+    protected $priceService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -208,6 +214,7 @@ class PolicyService
      * @param SCodeService             $scodeService
      * @param SixpackService           $sixpackService
      * @param FeatureService           $featureService
+     * @param PriceService             $priceService
      */
     public function __construct(
         DocumentManager $dm,
@@ -232,7 +239,8 @@ class PolicyService
         SmsService $sms,
         SCodeService $scodeService,
         SixpackService $sixpackService,
-        FeatureService $featureService
+        FeatureService $featureService,
+        PriceService $priceService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -257,6 +265,7 @@ class PolicyService
         $this->scodeService = $scodeService;
         $this->sixpackService = $sixpackService;
         $this->featureService = $featureService;
+        $this->priceService = $priceService;
     }
 
     public function validateUser(User $user)
@@ -314,15 +323,21 @@ class PolicyService
     public function init(
         User $user,
         Phone $phone,
-        $imei,
-        $serialNumber,
+        $imei = null,
+        $serialNumber = null,
         IdentityLog $identityLog = null,
         $phoneData = null,
-        $modelNumber = null
+        $modelNumber = null,
+        $aggregator = false
     ) {
+        if (mb_strtolower($phone->getMake()) != 'apple') {
+            $aggregator = false;
+        }
         try {
             $this->validateUser($user);
-            $this->validateImei($imei);
+            if ($imei) {
+                $this->validateImei($imei);
+            }
 
             if ($identityLog && $identityLog->isSessionDataPresent()) {
                 if (!$this->rateLimit->allowedByDevice(
@@ -335,22 +350,24 @@ class PolicyService
             }
 
             $checkmend = null;
-            if (!$user->hasSoSureEmail()) {
+            if ($imei && !$user->hasSoSureEmail()) {
                 $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
             }
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
             $policy->setPhone($phone);
-            $policy->setImei($imei);
+            if ($imei) {
+                $policy->setImei($imei);
+            }
             $policy->setSerialNumber($serialNumber);
             $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
             $policy->setPhoneData($phoneData);
-
+            /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
-            $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+            $latestTerms = $policyTermsRepo->findLatestTerms($aggregator);
             $policy->init($user, $latestTerms);
             if ($checkmend) {
                 $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
@@ -486,12 +503,6 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            if ($policy->getLastSuccessfulUserPaymentCredit()) {
-                $this->validatePremium($policy, $policy->getLastSuccessfulUserPaymentCredit()->getAmount());
-            } else {
-                $this->validatePremium($policy);
-            }
-
             if ($numPayments === null) {
                 $dateToBill = $date;
                 if ($billing) {
@@ -557,7 +568,11 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                    $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
+                } else {
+                    $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+                }
                 $this->dm->flush();
             }
 
@@ -582,7 +597,7 @@ class PolicyService
             $rewardService = new RewardService($this->dm, $this->logger);
             /** @var Reward $reward */
             $reward = $rewardService->getSignUpBonus();
-            if (null != $reward) {
+            if (null != $reward && !$policy->getCompany()) {
                 $connection = new RewardConnection();
                 $policy->addConnection($connection);
                 $connection->setLinkedUser($reward->getUser());
@@ -677,7 +692,7 @@ class PolicyService
                     throw new \Exception(sprintf('Unknown policy in queue %s', json_encode($data)));
                 }
 
-                $this->generatePolicyFiles($policy);
+                $this->generatePolicyFiles($policy, true, 'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com');
 
                 $count = $count + 1;
             } catch (\Exception $e) {
@@ -782,8 +797,9 @@ class PolicyService
         }
 
         $template = sprintf(
-            'AppBundle:Pdf:policyScheduleV%d.html.twig',
-            $policy->getPolicyTerms()->getVersionNumber()
+            'AppBundle:Pdf:policyScheduleV%d%s.html.twig',
+            $policy->getPolicyTerms()->getVersionNumber(),
+            $policy->getPolicyTerms()->isPicSureRequired() ? "_R" : ""
         );
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
@@ -979,8 +995,6 @@ class PolicyService
         $date->setTimezone(SoSure::getSoSureTimezone());
         $date->setTime(3, 0);
 
-        $minDate = (clone $now)->sub(new \DateInterval("P4D"));
-
         $paymentItem = null;
         if (!$numPayments) {
             if ($policy->getPremiumInstallments()) {
@@ -1077,14 +1091,7 @@ class PolicyService
             } else {
                 $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
             }
-            if ($scheduledDate >= $minDate) {
-                $policy->addScheduledPayment($scheduledPayment);
-            } else {
-                $this->logger->error(sprintf(
-                    'Attempted to set scheduled payment for before today for policy \'%s\'.',
-                    $policy->getId()
-                ));
-            }
+            $policy->addScheduledPayment($scheduledPayment);
         }
         $this->dm->flush();
     }
@@ -1155,14 +1162,13 @@ class PolicyService
         $skipUnpaidMinTimeframeCheck = false,
         $fullRefund = false
     ) {
-        if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
+        if ($reason == Policy::CANCELLED_UNPAID && $policy->getStatus() == Policy::STATUS_UNPAID &&
+            !$skipUnpaidMinTimeframeCheck
+        ) {
             /** @var LogEntryRepository $logRepo */
             $logRepo = $this->dm->getRepository(LogEntry::class);
-            /** @var LogEntry $history */
-            $history = $logRepo->findOneBy([
-                'objectId' => $policy->getId(),
-                'data.status' => Policy::STATUS_UNPAID,
-            ], ['loggedAt' => 'desc']);
+            /** @var LogEntry|null $history */
+            $history = $logRepo->findRecentStatus($policy);
             $now = $date;
             if (!$now) {
                 $now = \DateTime::createFromFormat('U', time());
@@ -1411,7 +1417,9 @@ class PolicyService
         if (!$this->mailer) {
             return;
         }
-
+        if ($policy->getCancelledReason() == Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED) {
+            return;
+        }
         if (!$baseTemplate) {
             $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
             if ($policy->isCancelledAndPaymentOwed()) {
@@ -1778,7 +1786,39 @@ class PolicyService
                 $this->logger->error($msg, ['exception' => $e]);
             }
         }
+        return $cancelled;
+    }
 
+    /**
+     * Cancels all policies that entered the picsure required stage 14 days ago or more.
+     * @param boolean $dry is whether to not really cancel them but just pretend.
+     * @return array containing the ids and policy numbers of the cancelled or pretend cancelled policies.
+     */
+    public function cancelOverduePicsurePolicies($dry)
+    {
+        /** @var LogEntryRepository $logEntryRepo */
+        $logEntryRepo = $this->dm->getRepository(LogEntry::class);
+        $cutoffDate = (new \DateTime())->sub(new \DateInterval("P14D"));
+        $cancelled = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_PICSURE_REQUIRED]);
+        foreach ($policies as $policy) {
+            /** @var LogEntry|null $history */
+            $history = $logEntryRepo->findRecentStatus($policy);
+            if (!$history) {
+                $this->logger->error(sprintf(
+                    "Policy '%s' is in picsure-required status, but there is no relevant log entry",
+                    $policy->getId()
+                ));
+                continue;
+            }
+            if ($history->getLoggedAt() <= $cutoffDate) {
+                $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+                if (!$dry) {
+                    $this->cancel($policy, Policy::CANCELLED_PICSURE_REQUIRED_EXPIRED, true);
+                }
+            }
+        }
         return $cancelled;
     }
 
@@ -2632,60 +2672,6 @@ class PolicyService
             $textTemplate,
             $data
         );
-    }
-
-    public function validatePremium(Policy $policy, $amount = null, \DateTime $date = null)
-    {
-        $hasUpdatedPremium = false;
-        /** @var PhonePolicy $phonePolicy */
-        $phonePolicy = $policy;
-        if (!$date) {
-            $date =  \DateTime::createFromFormat('U', time());
-        }
-        if ((!$phonePolicy->getStatus() ||
-            in_array($phonePolicy->getStatus(), [Policy::STATUS_PENDING, Policy::STATUS_MULTIPAY_REJECTED]))
-        ) {
-            $policyPremium = $phonePolicy->getPremium();
-            if (!$amount) {
-                $currentPhonePrice = $phonePolicy->getPhone()->getCurrentPhonePrice($date);
-                if ($currentPhonePrice &&
-                    $currentPhonePrice->getMonthlyPremiumPrice() != $policyPremium->getMonthlyPremiumPrice()) {
-                    $newPremium = $currentPhonePrice->createPremium();
-                    $phonePolicy->setPremium($newPremium);
-                    $this->dm->flush();
-                    $hasUpdatedPremium = true;
-                }
-            } else {
-                if ($phonePolicy->getPremiumPlan() == Policy::PLAN_YEARLY) {
-                    if ($amount != $policyPremium->getYearlyPremiumPrice()) {
-                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
-                        foreach ($phonePrices as $price) {
-                            if ($price->getYearlyPremiumPrice() == $amount) {
-                                $newPremium = $price->createPremium();
-                                $phonePolicy->setPremium($newPremium);
-                                $this->dm->flush();
-                                $hasUpdatedPremium = true;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    if ($amount != $policyPremium->getMonthlyPremiumPrice()) {
-                        $phonePrices = $phonePolicy->getPhone()->getRecentPhonePrices(30);
-                        foreach ($phonePrices as $price) {
-                            if ($price->getMonthlyPremiumPrice() == $amount) {
-                                $newPremium = $price->createPremium();
-                                $phonePolicy->setPremium($newPremium);
-                                $this->dm->flush();
-                                $hasUpdatedPremium = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $hasUpdatedPremium;
     }
 
     /**

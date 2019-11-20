@@ -53,6 +53,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -69,16 +70,20 @@ class DefaultController extends BaseController
     use \Symfony\Component\Security\Http\Util\TargetPathTrait;
 
     /**
-     * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     * @Route("/", name="homepage", options={"sitemap" = true})
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/mb", name="mb")
+     * @Route("/reimagined", name="reimagined")
+     * @Route("/hasslefree", name="hasslefree")
      */
     public function indexAction(Request $request)
     {
         $referral = $request->get('referral');
+        $session = $this->get('session');
+
+        // For Referrals
         if ($referral) {
-            $session = $this->get('session');
             $session->set('referral', $referral);
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
@@ -86,7 +91,6 @@ class DefaultController extends BaseController
         // For Mobusi tracking
         if ($request->get('_route') == 'mb') {
             $clickid = $request->get('clickid');
-            $session = $this->get('session');
             $session->set('mobusi', $clickid);
             $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
         }
@@ -94,32 +98,16 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        $homepageFunnelExp = $this->sixpack(
+        // A/B Tagline Test
+        // To Test use url param ?force=current-tagline / ?force=new-tagline
+        $homepageTaglineTest = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_NEW_FUNNEL_V2,
-            ['regular-funnel-v2', 'new-funnel-v2'],
+            SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE,
+            ['current-tagline', 'new-tagline'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
         $template = 'AppBundle:Default:index.html.twig';
-
-        if ($homepageFunnelExp == 'new-funnel-v2') {
-            // Set Test Template
-            $template = 'AppBundle:Default:indexB.html.twig';
-            // Track Test
-            $this->get('app.mixpanel')->queueTrack(
-                MixpanelService::EVENT_TEST,
-                ['Test Name' => 'New Funnel V2']
-            );
-        } else {
-            // Track Test - Just incase so we can filter funnels
-            $this->get('app.mixpanel')->queueTrack(
-                MixpanelService::EVENT_TEST,
-                ['Test Name' => 'Regular Funnel V2']
-            );
-        }
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -128,7 +116,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'funnel_exp' => $homepageFunnelExp,
+            'tagline_exp' => $homepageTaglineTest,
         );
 
         return $this->render($template, $data);
@@ -201,7 +189,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/social-insurance", name="social_insurance", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/social-insurance", name="social_insurance", options={"sitemap" = true})
      */
     public function socialInsurance()
     {
@@ -309,7 +297,7 @@ class DefaultController extends BaseController
      */
     public function termsTest()
     {
-        return $this->render('AppBundle:Pdf:policyTermsV13.html.twig');
+        return $this->render('AppBundle:Pdf:policyTermsV14.html.twig');
     }
 
     private function competitorsData()
@@ -320,17 +308,17 @@ class DefaultController extends BaseController
                 'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
-                'trustpilot' => 4
+                'trustpilot' => 4.5,
             ],
             'GC' => [
                 'name' => 'Gadget<br>Cover',
                 'days' => '<strong>5 - 7</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => 'From approved retailers only',
                 'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 2,
@@ -340,7 +328,7 @@ class DefaultController extends BaseController
                 'days' => '<strong>3 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 1,
@@ -350,7 +338,7 @@ class DefaultController extends BaseController
                 'days' => '<strong>3 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 3,
@@ -360,7 +348,7 @@ class DefaultController extends BaseController
                 'days' => '<strong>1 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-check',
-                'oldphones' => 'fa-check',
+                'oldphones' => '<i class="far fa-check fa-2x"></i>',
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 1,
@@ -370,11 +358,21 @@ class DefaultController extends BaseController
                 'days' => '<strong>1 - 5</strong> <div>working days</div>',
                 'cashback' => 'fa-times',
                 'cover' => 'fa-times',
-                'oldphones' => 'fa-times',
+                'oldphones' => '<i class="far fa-times fa-2x"></i>',
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
                 'saveexcess' => 'fa-times',
                 'trustpilot' => 2,
-            ]
+            ],
+            'O2' => [
+                'name' => 'O2',
+                'days' => '<strong>1 - 7</strong> <div>working days</div>',
+                'cashback' => 'fa-times',
+                'cover' => 'fa-times',
+                'oldphones' => 'From 02 only',
+                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
+                'saveexcess' => 'fa-times',
+                'trustpilot' => 1.5,
+            ],
         ];
 
         return $competitor;
@@ -389,6 +387,7 @@ class DefaultController extends BaseController
      * @Route("/money", name="money")
      * @Route("/money-free-phone-case", name="money_free_phone_case")
      * @Route("/starling-bank", name="starling_bank")
+     * @Route("/starling-business", name="starling_business")
      * @Route("/comparison", name="comparison")
      * @Route("/vendi-app", name="vendi_app")
      * @Route("/so-sure-compared", name="so_sure_compared")
@@ -439,7 +438,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [
@@ -458,7 +457,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [
@@ -468,7 +467,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'starling_bank') {
             $data = [
@@ -478,9 +477,21 @@ class DefaultController extends BaseController
                 // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
             $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            $this->starlingOAuthSession($request);
+        } elseif ($request->get('_route') == 'starling_business') {
+            $data = [
+                'competitor' => $this->competitorsData(),
+                'affiliate_page' => 'starling-business',
+                // 'affiliate_company' => 'Starling Bank',
+                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'competitor1' => 'PYB',
+                'competitor2' => 'GC',
+                'competitor3' => 'O2',
+            ];
+            $template = 'AppBundle:Default:starlingBusiness.html.twig';
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'comparison') {
             $data = [
@@ -490,7 +501,7 @@ class DefaultController extends BaseController
                 'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'vendi_app') {
             $data = [
@@ -500,7 +511,7 @@ class DefaultController extends BaseController
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'so_sure_compared') {
             $data = [
@@ -508,7 +519,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'so-sure-compared',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'moneyback') {
             $data = [
@@ -516,7 +527,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'moneyback',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
-                'competitor3' => 'LICI',
+                'competitor3' => 'O2',
             ];
         }
 
@@ -525,38 +536,6 @@ class DefaultController extends BaseController
 
         return $this->render($template, $data);
     }
-
-    /**
-     * @Route("/reimagined", name="reimagined")
-     * @Route("/hasslefree", name="hasslefree")
-     * @Template
-     */
-    public function homepageLanding()
-    {
-        // $data = [];
-        // if ($request->get('_route') == "reimagined") {
-        //     $data = array(
-        //         'main'              => 'Mobile Insurance',
-        //         'main_cont'         => 'Re-Imagined',
-        //         'sub'               => 'Quicker. Easier. Jargon Free.',
-        //         // 'sub_cont'  => '',
-        //     );
-        // } elseif ($request->get('_route') == "hasslefree") {
-        //     $data = array(
-        //         'main'              => 'Hassle Free',
-        //         'main_cont'         => 'Mobile Insurance',
-        //         'sub'               => 'We dont give you the run around when you claim.',
-        //         // 'sub_cont'  => '',
-        //     );
-        // }
-
-        // $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-        //     'Page' => $request->get('_route'),
-        // ]);
-
-        return $this->render('AppBundle:Default:index.html.twig');
-    }
-
 
     /**
      * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
@@ -608,13 +587,13 @@ class DefaultController extends BaseController
                         throw $this->createNotFoundException('Invalid id');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -679,13 +658,13 @@ class DefaultController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     if ($phone->getMemory()) {
-                        return $this->redirectToRoute('quote_make_model_memory', [
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
                         ]);
                     } else {
-                        return $this->redirectToRoute('quote_make_model', [
+                        return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                         ]);
@@ -725,7 +704,7 @@ class DefaultController extends BaseController
             }
 
             // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_phone');
+            return $this->redirectToRoute('purchase_step_phone', [], 301);
         }
 
         return [
@@ -779,7 +758,22 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/faq", name="faq")
+     * @Route("/help", name="help")
+     * @Route("/help/{section}", name="help_section", requirements={"section"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/help/{section}/{article}", name="help_section_article",
+     * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/help/{section}/{article}/{sub}", name="help_section_article_sub",
+     * requirements={"section"="[\+\-\.a-zA-Z0-9() ]+", "article"="[\+\-\.a-zA-Z0-9() ]+",
+     * "sub"="[\+\-\.a-zA-Z0-9() ]+"})
+     * @Template
+     */
+    public function helpAction()
+    {
+        return $this->redirectToRoute('faq', [], 301);
+    }
+
+    /**
+     * @Route("/faq", name="faq", options={"sitemap" = true})
      * @Template
      */
     public function faqAction(Request $request)
@@ -819,8 +813,7 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/company-phone-insurance",
-     *  name="company_phone_insurance",
-     *  options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     *  name="company_phone_insurance", options={"sitemap" = true})
      * @Route("/company-phone-insurance/thank-you",
      *  name="company_phone_insurance_thanks")
      */
@@ -878,7 +871,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/claim", name="claim")
+     * @Route("/claim", name="claim", options={"sitemap" = true})
      * @Route("/claim/login", name="claim_login")
      */
     public function claimAction(Request $request)
@@ -1003,7 +996,7 @@ class DefaultController extends BaseController
         }
 
         return new JsonResponse([
-            'price' => $phone->getCurrentPhonePrice(),
+            'price' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY),
         ]);
     }
 
@@ -1226,7 +1219,7 @@ class DefaultController extends BaseController
      */
     public function iPhone8RedirectAction()
     {
-        return new RedirectResponse($this->generateUrl('quote_make_model', [
+        return new RedirectResponse($this->generateUrl('phone_insurance_make_model', [
             'make' => 'apple',
             'model' => 'iphone+8',
             'utm_medium' => 'flyer',

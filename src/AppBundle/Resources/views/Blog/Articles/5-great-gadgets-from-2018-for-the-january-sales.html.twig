@@ -2,123 +2,115 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - 5 Great Gadgets from 2018 for the January Sales{% endblock %}
+{% block title %}5 Great Gadgets from 2018 for the January Sales - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">5 Great Gadgets from 2018 for the January Sales</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">5 Great Gadgets from 2018 for the January Sales</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Susan</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            5 Great Gadgets from 2018 for the January Sales
+                                            <time>Jan 7, 2019</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">5 Great Gadgets from 2018 for the January Sales</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Jan 7, 2019</time>
-                                    </li>
-                                </ul>
-                            </hgroup>
-                        </header>
-                        <p>2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales.</p>
-                        <p>Below is our pick of 5 of the best gadgets from 2018 that you might be lucky enough to find in the sales as we move into the New Year.</p>
-                        <h2>Apple iPad 9.7 inch</h2>
-                        <p>The iPad 9.7 inch is almost every bit as good as the iPad Pro in terms of performance and design... but it’s a heck of a lot cheaper. And because of that, for us this is the best available iPad, offering a balance of power and size, along with Apple’s best-in-class software and apps. It’s still fair to say that no other platform or manufacturer really gets close to Apple’s tablets.</p>
-                        <p>The most recent edition of the iPad also comes with the new Apple Pencil, one of the Pro's key features, which can be bolted onto the 9.7 for a low price. Starting at £319, this iPad is great value even when full price. But given that Apple will be preparing for the release of the next iPad in its range in late 2019, this could well be one to look out for in the sales.</p>
-                        <h2>Kindle Paperwhite</h2>
-                        <p>The e-reader market has exploded in 2018 and there is a really great selection on the market. But the Amazon Kindle is still the best of the bunch and we think that their Paperwhite model is the most perfect e-reader released to date.</p>
-                        <p>Light but still with enough storage for plenty of books, the Paperwhite’s unique built-in light will give you perfect clarity whether you’re sitting in bed or lounging on a beach. If you’re on a beach, be aware that this Kindle isn’t waterproof but it’s extremely hard wearing, whilst being lightweight enough to hold comfortably in one hand.</p>
-                        <p>Priced at only &pound;120, this is a really well priced, high-quality gadget that should last for many happy years of reading. </p>
-                        <h2>Samsung Galaxy S9 Plus</h2>
-                        <p>The smartphone of the year gong is always hotly contested, and this was especially so in 2018 when all the big players, from Apple to Samsung to Google, released new handsets.</p>
-                        <p>And whilst opinion is never definitive, the Samsung Galaxy S9 Plus seems to have won the popular vote versus the rest of the competition. The design of this beautiful phone is more aesthetically pleasing than even Apple’s latest incarnations and it goes against the grain by offering options that rivals have retired. It has a headphone jack, for example, and a camera that competes, if not betters, the iPhone X.</p>
-                        <p>Of course, like all top of the range smartphones, this Samsung isn’t cheap, starting at £869. In January, your best best is to look for a decent mobile phone package that providers will be offering in the sales. Make sure to pick up shiny new insurance from <a href="{{ path('homepage') }}">so-sure</a> too!</p>
-                        <h2>Sony WH-1000XM3 headphones</h2>
-                        <p>Headphones are always breaking or getting lost but, given the amount of time we spend listening to music or watching entertainment on our phones and tablets, a decent pair of ear cans is essential. For quality and value, Sony wins, beating Bose and Beats to the top spot.</p>
-                        <p>The WH-1000XM3 headphones have been awarded the best noise-cancelling headphones in the world for the last two years. Not only do these headphones provide amazing sound quality but they are noise cancelling, which means that they use actual technology (hardware and software) to block external noise. Thanks to that equipment, you’ve likely never heard anything like the silence that these headphones have to offer.</p>
-                        <p>Given the tech, they’re expensive, starting north of &pound;350. But, headphones are an item that tends to go into the reduced section come January. There’s also always a chance that someone may have been given a pair of these for Christmas and they’d rather the cash, so keep take a look at marketplace websites too.</p>
-                        <h2>Moov Now</h2>
-                        <p>January means one thing… exercise, right? And one way to keep track of your New Year fitness goals is to buy a decent fitness tracker. And the best in class that we’ll be seeking out in the sales isn’t the one you might expect. It’s not the Fitbit or the Apple Watch… it’s the Moov Now.</p>
-                        <p>The Moov Now doesn’t have flashing lights and shiny screens like some of its competitors. Surprisingly, it doesn’t even have a GPS tracker. What it does have is a very attractive price tag and an immense battery life that can last up to 6 months.</p>
-                        <p>And during those 6 months the Moov Nov can track your steps, your sleep, your fitness goals all with 3D motion sensor technology, which it uses to track and analyse all of your activity, all connected to the Moov Now app. It also looks really, really cool.</p>
-                        <p>And the best part? The price. Starting at &pound;65, the Moov now doesn’t even need the January sales to make buying it worthwhile because it’s already such good value. With one of these on your wrist, you’ve really no excuse come January 1st to lace up your trainers and hit the roads. Sorry about that!</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales.</p>
+                                <p>Below is our pick of 5 of the best gadgets from 2018 that you might be lucky enough to find in the sales as we move into the New Year.</p>
+                                <h2>Apple iPad 9.7 inch</h2>
+                                <p>The iPad 9.7 inch is almost every bit as good as the iPad Pro in terms of performance and design... but it’s a heck of a lot cheaper. And because of that, for us this is the best available iPad, offering a balance of power and size, along with Apple’s best-in-class software and apps. It’s still fair to say that no other platform or manufacturer really gets close to Apple’s tablets.</p>
+                                <p>The most recent edition of the iPad also comes with the new Apple Pencil, one of the Pro's key features, which can be bolted onto the 9.7 for a low price. Starting at £319, this iPad is great value even when full price. But given that Apple will be preparing for the release of the next iPad in its range in late 2019, this could well be one to look out for in the sales.</p>
+                                <h2>Kindle Paperwhite</h2>
+                                <p>The e-reader market has exploded in 2018 and there is a really great selection on the market. But the Amazon Kindle is still the best of the bunch and we think that their Paperwhite model is the most perfect e-reader released to date.</p>
+                                <p>Light but still with enough storage for plenty of books, the Paperwhite’s unique built-in light will give you perfect clarity whether you’re sitting in bed or lounging on a beach. If you’re on a beach, be aware that this Kindle isn’t waterproof but it’s extremely hard wearing, whilst being lightweight enough to hold comfortably in one hand.</p>
+                                <p>Priced at only &pound;120, this is a really well priced, high-quality gadget that should last for many happy years of reading. </p>
+                                <h2>Samsung Galaxy S9 Plus</h2>
+                                <p>The smartphone of the year gong is always hotly contested, and this was especially so in 2018 when all the big players, from Apple to Samsung to Google, released new handsets.</p>
+                                <p>And whilst opinion is never definitive, the Samsung Galaxy S9 Plus seems to have won the popular vote versus the rest of the competition. The design of this beautiful phone is more aesthetically pleasing than even Apple’s latest incarnations and it goes against the grain by offering options that rivals have retired. It has a headphone jack, for example, and a camera that competes, if not betters, the iPhone X.</p>
+                                <p>Of course, like all top of the range smartphones, this Samsung isn’t cheap, starting at £869. In January, your best best is to look for a decent mobile phone package that providers will be offering in the sales. Make sure to pick up shiny new insurance from <a href="{{ path('homepage') }}">so-sure</a> too!</p>
+                                <h2>Sony WH-1000XM3 headphones</h2>
+                                <p>Headphones are always breaking or getting lost but, given the amount of time we spend listening to music or watching entertainment on our phones and tablets, a decent pair of ear cans is essential. For quality and value, Sony wins, beating Bose and Beats to the top spot.</p>
+                                <p>The WH-1000XM3 headphones have been awarded the best noise-cancelling headphones in the world for the last two years. Not only do these headphones provide amazing sound quality but they are noise cancelling, which means that they use actual technology (hardware and software) to block external noise. Thanks to that equipment, you’ve likely never heard anything like the silence that these headphones have to offer.</p>
+                                <p>Given the tech, they’re expensive, starting north of &pound;350. But, headphones are an item that tends to go into the reduced section come January. There’s also always a chance that someone may have been given a pair of these for Christmas and they’d rather the cash, so keep take a look at marketplace websites too.</p>
+                                <h2>Moov Now</h2>
+                                <p>January means one thing… exercise, right? And one way to keep track of your New Year fitness goals is to buy a decent fitness tracker. And the best in class that we’ll be seeking out in the sales isn’t the one you might expect. It’s not the Fitbit or the Apple Watch… it’s the Moov Now.</p>
+                                <p>The Moov Now doesn’t have flashing lights and shiny screens like some of its competitors. Surprisingly, it doesn’t even have a GPS tracker. What it does have is a very attractive price tag and an immense battery life that can last up to 6 months.</p>
+                                <p>And during those 6 months the Moov Nov can track your steps, your sleep, your fitness goals all with 3D motion sensor technology, which it uses to track and analyse all of your activity, all connected to the Moov Now app. It also looks really, really cool.</p>
+                                <p>And the best part? The price. Starting at &pound;65, the Moov now doesn’t even need the January sales to make buying it worthwhile because it’s already such good value. With one of these on your wrist, you’ve really no excuse come January 1st to lace up your trainers and hit the roads. Sorry about that!</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

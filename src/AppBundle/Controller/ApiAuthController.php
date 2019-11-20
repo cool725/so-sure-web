@@ -208,7 +208,7 @@ class ApiAuthController extends BaseController
                 $paymentService->generateBacsReference($bacs, $this->getUser());
             }
 
-            if ($policy->isActive(true)) {
+            if ($policy->isActive()) {
                 $bacs->setStandardNotificationDate($policy->getBilling());
             } else {
                 // pending policies should assume a now billing date
@@ -783,13 +783,6 @@ class ApiAuthController extends BaseController
                         'device' => $this->getDataString($data['phone_policy'], 'device'),
                         'memory' => $this->getDataString($data['phone_policy'], 'memory'),
                     ]));
-                    $additionalPremium = null;
-                    if ($policy->getUser()) {
-                        $additionalPremium = $policy->getUser()->getAdditionalPremium();
-                    }
-                    /** @var PhonePrice $price */
-                    $price = $phone->getCurrentPhonePrice(null);
-                    $policy->setPremium($price->createPremium($additionalPremium, null));
 
                     $needUpdate = true;
                 }

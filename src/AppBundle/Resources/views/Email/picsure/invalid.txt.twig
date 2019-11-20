@@ -11,7 +11,11 @@ Hi {{ policy.user.firstName }},
 {{ additional_message }}
 {% endif %}
 
+{% if policy.policyTerms.isPicSureRequired %}
+Your cover will NOT start until you have successfully validated your phone!
+{% else %}
 Have another go to reduce your excess by &pound;100! 😆
+{% endif %}
 
 Open the app: {{ branch_pot_url }}
 
@@ -30,4 +34,4 @@ Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
 {% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
 
 Our mailing address is:
-so-sure, Relay Building, 114 Whitechapel High Street, London, E1 7PT, UK
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

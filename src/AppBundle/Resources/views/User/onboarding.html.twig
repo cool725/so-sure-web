@@ -3,16 +3,14 @@
 {# Set vars #}
 {% set body_class = 'oboarding' %}
 {% set onboarding_mode = true %}
-{% set include_emoji = true %}
 {% set intercom_enabled = false %}
-{# {% set starling = false %} #}
 {% set hide_devbar = true %}
 
-{% block title %}Welcome to Social Insurance{% endblock %}
+{% block title %}Welcome | so-sure{% endblock %}
 
 {# Set Meta #}
 {% set og_title = 'Sign up and save' %}
-{% set og_description = 'Hey, I just insured my mobile phone with so-sure. They give you 80% of your cash back if we are connected and don\'t claim!' %}
+{% set og_description = 'Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance.' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% if policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
@@ -118,7 +116,7 @@
                                            data-clicklabel="iTunes"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download our App</a>
                                     {% endif %}
                                     {% if policy.phone.googlePlay %}
                                         <a href="{{ google_download('onboarding-mobile-one') }}"
@@ -126,7 +124,7 @@
                                            data-clicklabel="PlayStore"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
+                                            <i class="fab fa-android mr-2 fa-lg"></i> Download our App</a>
                                     {% endif %}
                                 {% else %}
                                     <p class="mb-5">Thanks for choosing so-sure, you'll shortly receive a confirmation email but for now your payment is all set up and your phone is insured. Download our app and <strong>reduce your excess by up to &pound;100</strong>.</p>
@@ -143,14 +141,14 @@
                                                data-clicklabel="iTunes"
                                                target="_blank"
                                                rel="noopener noreferrer">
-                                                Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
+                                                <i class="fab fa-apple mr-2 fa-lg"></i>Download our App</a>
                                         {% endif %}
                                         {% if policy.phone.googlePlay %}
                                             <a href="{{ google_download('onboarding-desktop-one') }}"  class="link-subtle ga-outbound-click"
                                                data-clicklabel="PlayStore"
                                                target="_blank"
                                                rel="noopener noreferrer">
-                                                Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
+                                                <i class="fab fa-android mr-2 fa-lg"></i>Download our App</a>
                                         {% endif %}
                                     </div>
                                 {% endif %}
@@ -179,15 +177,15 @@
                                         <tbody>
                                             <tr>
                                                 <td align="left"><small>Validated</small></td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.theft }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.damage }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.loss }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.theft }}</td>
                                             </tr>
                                             <tr>
                                                 <td align="left"><small>Not validated</small></td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.damage }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.loss }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.theft }}</td>
+                                                <td>&pound;{{ policy.premium.excess.damage }}</td>
+                                                <td>&pound;{{ policy.premium.excess.loss }}</td>
+                                                <td>&pound;{{ policy.premium.excess.theft }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -198,7 +196,7 @@
                                        data-clicklabel="iTunes"
                                        target="_blank"
                                        rel="noopener noreferrer">
-                                        Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
+                                        <i class="fab fa-apple mr-2 fa-lg"></i> Download our App</a>
                                 {% endif %}
                                 {% if policy.phone.googlePlay %}
                                     <a href="{{ google_download('onboarding-mobile-one') }}"
@@ -206,7 +204,7 @@
                                        data-clicklabel="PlayStore"
                                        target="_blank"
                                        rel="noopener noreferrer">
-                                        Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
+                                        <i class="fab fa-android mr-2 fa-lg"></i> Download our App</a>
                                 {% endif %}
                             {% else %}
                                 <p>Download the so-sure app and validate your phone to reduce your excess</p>
@@ -223,15 +221,15 @@
                                         <tbody>
                                             <tr>
                                                 <td align="left">Validated</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.damage }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.loss }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.picsureexcess.theft }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.damage }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.loss }}</td>
+                                                <td>&pound;{{ policy.premium.picsureexcess.theft }}</td>
                                             </tr>
                                             <tr>
                                                 <td align="left">Not validated</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.damage }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.loss }}</td>
-                                                <td>&pound;{{ policy.phone.currentPhonePrice.excess.theft }}</td>
+                                                <td>&pound;{{ policy.premium.excess.damage }}</td>
+                                                <td>&pound;{{ policy.premium.excess.loss }}</td>
+                                                <td>&pound;{{ policy.premium.excess.theft }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -259,14 +257,14 @@
                                            data-clicklabel="iTunes"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            Download our App <i class="fab fa-apple ml-2 fa-lg"></i></a>
+                                            <i class="fab fa-apple mr-2 fa-lg"></i>Download our App</a>
                                     {% endif %}
                                     {% if policy.phone.googlePlay %}
                                         <a href="{{ google_download('onboarding-desktop-two') }}"  class="link-subtle ga-outbound-click"
                                            data-clicklabel="PlayStore"
                                            target="_blank"
                                            rel="noopener noreferrer">
-                                            Download our App <i class="fab fa-android ml-2 fa-lg"></i></a>
+                                            <i class="fab fa-android mr-2 fa-lg"></i>Download our App</a>
                                     {% endif %}
                                 </div>
                             {% endif %}
@@ -281,9 +279,6 @@
                         <div class="onboarding__body">
                             <h2 class="h4 text-primary mb-3">Get up to 80% money back 💰</h2>
                             {% if device_category() == 'Mobile' %}
-                                {% if feature_enabled('apply-sign-up-bonus') %}
-                                    <p>We've added <strong>&pound;5</strong> in your reward pot to get you started 🤑</p>
-                                {% endif %}
                                 <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, <strong>when you and your connections haven’t claimed</strong>, your Reward Pot is paid out to you. Simple!</p>
                                 <a href="#"
                                    class="btn btn-success btn-block-xs"
@@ -300,9 +295,6 @@
                                     How it works
                                 </a>
                             {% else %}
-                                {% if feature_enabled('apply-sign-up-bonus') %}
-                                    <p>We've added <strong>&pound;5</strong> in your reward pot to get you started 🤑</p>
-                                {% endif %}
                                 <p class="mb-5">Invite as many people as you want. Connect with your mum, dad, grandparents, or your mate Bob. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you, simple!
                                 <a href="#"
                                    class="watch-video"
@@ -351,7 +343,7 @@
                                     {# TODO: Rework icons #}
                                     <div id="onboarding_btn_share"
                                          data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
-                                         data-share-text="Hey, I just insured my mobile phone with so-sure. They give you 80% of your cash back if we are connected and don't claim! Here's the link to check them out:">
+                                         data-share-text="Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out:">
                                     </div>
                                 </div>
                             {% endif %}
@@ -359,7 +351,7 @@
                                 <h5 class="text-zaffre d-lg-none">🔗 Share this link</h5>
                                 <div class="custom-input-with-btn mb-4">
                                     <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
-                                    <div id="scode_share" class="sr-only">Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
+                                    <div id="scode_share" class="sr-only">Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
                                     <button class="btn btn-primary btn-copy btn-sm track-data"
                                         data-clipboard-target="#scode_share"
                                         data-toggle="tooltip"
@@ -384,7 +376,7 @@
                                 {# TODO: Rework icons #}
                                 <div id="onboarding_btn_share"
                                      data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
-                                     data-share-text="Hey, I just insured my mobile phone with so-sure. They give you up to 80% of your cash back if we are connected and don't claim! Here's the link to check them out:">
+                                     data-share-text="Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance. Here's the link to check them out:">
                                 </div>
                             </div>
                             <div class="d-flex justify-content-center">

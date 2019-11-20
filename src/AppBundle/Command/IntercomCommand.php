@@ -137,6 +137,12 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Delete all intercom records & create new ids. Required email.'
             )
+            ->addOption(
+                'scode',
+                null,
+                InputOption::VALUE_NONE,
+                'Update Scode for a user or all users'
+            )
         ;
     }
 
@@ -159,6 +165,7 @@ class IntercomCommand extends ContainerAwareCommand
         $resetUserId = true === $input->getOption('reset-user-id');
         $resetIntercomId = true === $input->getOption('reset-intercom-id');
         $destroy = true === $input->getOption('destroy');
+        $scode = true === $input->getOption('scode');
 
         if ($email) {
             $user = $this->getUser($email);
@@ -201,6 +208,11 @@ class IntercomCommand extends ContainerAwareCommand
                 if ($lead) {
                     $this->intercom->destroyLead($lead);
                     $output->writeln(sprintf('Lead %s was deleted & has a new intercom user id.', $lead->getId()));
+                }
+            } elseif ($scode) {
+                if ($user) {
+                    $this->intercom->updateScode($user);
+                    $output->writeln(sprintf('User %s Scode was Updated', $user->getId()));
                 }
             } else {
                 if (!$user) {
@@ -260,6 +272,13 @@ class IntercomCommand extends ContainerAwareCommand
                 $count++;
             }
             $output->writeln(sprintf("Queued %d Pending Invitations", $count));
+        } elseif ($scode) {
+            $count = 0;
+            foreach ($this->getAllUsers() as $user) {
+                $this->intercom->updateScode($user);
+                $count++;
+            }
+            $output->writeln(sprintf("Updated %s scodes", $count));
         } else {
             $count = $this->intercom->process($process);
             $output->writeln(sprintf("Sent %s updates", $count));

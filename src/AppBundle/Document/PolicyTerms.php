@@ -6,7 +6,7 @@ use AppBundle\Document\Excess\PhoneExcess;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyTermsRepository")
  */
 class PolicyTerms extends PolicyDocument
 {
@@ -52,6 +52,12 @@ class PolicyTerms extends PolicyDocument
     // New Status Disclosure
     const VERSION_13 = 'Version 13 May 2019';
 
+    // Immediate Cancellation
+    const VERSION_14 = 'Version 14 October 2019';
+
+    // Version 14 for Aggregators
+    const VERSION_14_R = 'Version 14 November 2019 Aggregator';
+
     // ensure that lastest version is last in the array
     public static $allVersions = [
         self::VERSION_0 => '1',
@@ -68,6 +74,8 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_11 => '11',
         self::VERSION_12 => '12',
         self::VERSION_13 => '13',
+        self::VERSION_14_R => '14_R',
+        self::VERSION_14 => '14'
     ];
 
     public static function getLowExcess()
@@ -115,6 +123,19 @@ class PolicyTerms extends PolicyDocument
             self::VERSION_0,
             self::VERSION_1,
             self::VERSION_3,
+        ]);
+    }
+
+    /**
+     * For pic-sure required policies
+     *
+     * @return bool
+     */
+    public function isPicSureRequired()
+    {
+        // If terms version with _R appended
+        return in_array($this->getVersion(), [
+            self::VERSION_14_R,
         ]);
     }
 
@@ -168,16 +189,27 @@ class PolicyTerms extends PolicyDocument
         return $this->getVersionNumber() < static::getVersionNumberByVersion(self::VERSION_13);
     }
 
+    /**
+     * Tells you if users can request cancellation instantly at any time (but always with no refund).
+     * @return boolean true if they can be cancelled instantly without refund, and false if you must wait.
+     */
+    public function isInstantUserCancellationEnabled()
+    {
+        return $this->getVersionNumber() >= static::getVersionNumberByVersion(self::VERSION_14);
+    }
+
     public function getAllowedExcesses()
     {
         if ($this->isPicSureEnabled()) {
             return [
                 static::getHighExcess()
             ];
-        } else {
+        } elseif (!$this->isPicSureRequired()) {
             return [
                 static::getLowExcess()
             ];
+        } else {
+            return [];
         }
     }
 
@@ -197,7 +229,7 @@ class PolicyTerms extends PolicyDocument
      */
     public function getDefaultExcess()
     {
-        if ($this->isPicSureEnabled()) {
+        if ($this->isPicSureEnabled() && !$this->isPicSureRequired()) {
             return static::getHighExcess();
         } else {
             return static::getLowExcess();

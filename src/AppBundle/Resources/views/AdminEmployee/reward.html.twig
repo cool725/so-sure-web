@@ -1,0 +1,319 @@
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{% form_theme rewardForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
+
+{# Set vars #}
+{% set body_class = 'admin-reward' %}
+{% set terms_and_conditions_example = '<p>Terms and Conditions apply: Enter the code XXXXX into your customer dashboard within XX days once you have bought your policy and £XX will be added to your account reward pot. Cashback is redeemable at the end of your policy year term if you (and your connections if you have any) have not made any claim. This offer is only available to new so-sure customers.</p>
+<p>Promotion valid from DAY MONTH YEAR until DAY MONTH YEAR. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time. Promotion code cannot be used in conjunction with any other promotional offer.</p>
+<p>This offer is available to UK residents only. By redeeming the code provided, you agree to these terms and conditions.</p>' %}
+
+{% block title %}so-sure - Reward{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+<section class="py-4 px-md-4">
+    <div class="container-fluid">
+        {# TODO: Heading area #}
+        <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+            <h1 class="h2"> Reward - {% if reward.scode %} {{ reward.scode.code }} {% else %} Custom : {{ reward.user.email }} {% endif %} </h1>
+        </div>
+        {# TODO: Content area #}
+        <div class="table-responsive-sm mb-5">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                      <th>Bonus Type</th>
+                      <th>Code</th>
+                      <th>Category</th>
+                      <th>Target</th>
+                      <th>Default value</th>
+                      <th>Used</th>
+                      <th>Total</th>
+                      <th>Limit</th>
+                      <th>Expires</th>
+                      <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  <tr class="{% if reward.expiryDate %}{% if date(reward.expiryDate) < date() %}table-danger{% else %}table-success{% endif %}{% else %}table-info{% endif %}">
+                      <td>{{ reward.user.name }} ({{ reward.user.email }})</td>
+                      <td>
+                          {% if reward.sCode %}
+                              <a href="{{ url('promo', {'code': reward.sCode.code}) }}" target="_blank"><u>{{ reward.sCode.code }}</u></a>
+                          {% else %}
+                              n/a
+                          {% endif %}
+                      </td>
+                      <td>{% if reward.type %}{{ reward.type }}{% else %}n/a{% endif %}</td>
+                      <td>{% if reward.target %}{{ reward.target }}{% else %}n/a{% endif %}</td>
+                      <td>{% if reward.defaultValue %}£{{ reward.defaultValue|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                      <td>{{ reward.connections|length }}</td>
+                      <td>£{{ reward.potValue|number_format(2, '.', ',') }}</td>
+                      <td>{% if reward.usageLimit %}{{ reward.usageLimit }}{% else %}n/a{% endif %}</td>
+                      <td>{% if reward.expiryDate %}{{ reward.expiryDate|date('d-m-T H:i') }}{% else %}n/a{% endif %}</td>
+                      <td>{% if reward.expiryDate %}<i class="far {% if date(reward.expiryDate) < date() %}fa-times text-danger{% else %}fa-check text-success{% endif %} fa-lg fa-fw"></i>{% else %}n/a{% endif %}</td>
+                  </tr>
+                </tbody>
+            </table>
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <div>
+                    <a href="#"
+                       class="btn btn-primary"
+                       data-toggle="modal"
+                       data-target="#reward_modal"><i class="fal fa-edit fa-fw"></i> Edit</a>
+                    <a href="#"
+                       class="btn btn-primary"
+                       data-toggle="modal"
+                       data-target="#connect_modal"><i class="fal fa-user fa-fw"></i> Apply</a>
+                </div>
+                <div>
+                    <a href="{{ url('admin_rewards')}}"
+                       class="btn btn-outline-primary"></i> Back to Rewards</a>
+                </div>
+            </div>
+        </div>
+
+        {% if reward.connections is not empty %}
+        <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+            <h3 class="h3">Users</h3>
+        </div>
+        <div class="table-responsive-sm mb-5">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>User</th>
+                        <th>Policy</th>
+                        <th>Redeem date</th>
+                        <th>Value applied</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for connection in reward.connections %}
+                        <tr>
+                            <td><a href="{{ path('admin_user', {'id': connection.sourceUser.id }) }}"><u>{{ connection.sourceUser.email }}</u></a></td>
+                            <td><a href="{{ path('admin_policy', {'id': connection.sourcePolicy.id }) }}"><u>{{ connection.sourcePolicy.policyNumber }}</td>
+                            <td>{{ connection.date|date('d-m-Y T H:i') }}</td>
+                            {% if connection.sourcePolicy.status == 'cancelled' %}
+                                <td>Cancelled Policy</td>
+                            {% else %}
+                                {% set promoValue = connection.promoValue %}
+                                <td>£{{ promoValue|number_format(2, '.', ',') }}{% if connection.sourcePolicy.potValue == 0 %} | No Pot{% endif %}</td>
+                            {% endif %}
+                        </tr>
+                  {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{# Page Modals #}
+
+<div class="modal fade"
+     id="reward_modal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="reward_modal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add reward bonus type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(rewardForm, {'attr': {'id':'reward_form'}}) }}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                {{ form_label(rewardForm.code, 'SCode ') }}
+                                {{ form_widget(rewardForm.code, {'attr': {'placeholder':'8 character scode', 'class': 'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.code) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(rewardForm.type, 'Category ') }}
+                                {{ form_widget(rewardForm.type, {'attr': {'placeholder':'Reward\'s type', 'class': 'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.type) }}</div>
+                            </div>
+                            <div class="form-group">
+                                <small class="form-text text-primary">New category</small>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="text" id="new-cat" class="form-control form-control-sm" value="">
+                                    </div>
+                                    <div class="col">
+                                        <button type="button" id="add-cat" class="btn btn-secondary btn-sm">Add</button>
+                                    </div>
+                                </div>
+                                <small id="error-cat"class="form-text text-danger"></small>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(rewardForm.target, 'Target ') }}
+                                {{ form_widget(rewardForm.target, {'attr': {'placeholder':'Reward\'s target', 'class': 'form-control'}}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.target) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(rewardForm.policyAgeMin, 'Policy Age Min - Days') }}
+                                {{ form_widget(rewardForm.policyAgeMin, {'attr': {'class': 'form-control', 'placeholder': 'Min policy age i.e. if you don\'t want new users to use it' }}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.policyAgeMin) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(rewardForm.policyAgeMax, 'Policy Age Max - Days') }}
+                                {{ form_widget(rewardForm.policyAgeMax, {'attr': {'class': 'form-control', 'placeholder': 'Max policy age i.e. 7 to allow new users a week to use'}}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.policyAgeMax) }}</div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                {{ form_label(rewardForm.defaultValue, 'Default Value *') }}
+                                {{ form_widget(rewardForm.defaultValue, {'attr': {'placeholder':'Amount added to reward pot when redeemed', 'class': 'form-control','required': ''}}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.defaultValue) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(rewardForm.usageLimit, 'Usage Limit') }}
+                                {{ form_widget(rewardForm.usageLimit, {'attr': {'class': 'form-control', 'placeholder': 'Limit the code i.e. 10 people'}}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.usageLimit) }}</div>
+                            </div>
+                            <div class="form-group">
+                                {{ form_label(rewardForm.expiryDate, 'Expiry Date *') }}
+                                <div class="input-group date-picker"
+                                     id="date_picker_one"
+                                     data-target-input="nearest">
+                                    {{ form_widget(rewardForm.expiryDate, { 'attr': {
+                                        'class': 'form-control datetimepicker-input date_mask',
+                                        'data-target': '#date_picker_one',
+                                        'placeholder': 'When code expires',
+                                        'required': ''
+                                    }}) }}
+                                    <div class="input-group-append"
+                                         data-target="#date_picker_one"
+                                         data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                    </div>
+                                </div>
+                                <div class="with-errors">{{ form_errors(rewardForm.expiryDate) }}</div>
+                            </div>
+                            <div class="form-group">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    {{ form_label(rewardForm.termsAndConditions, 'Terms & Conditions *') }}
+                                    <small class="form-text mb-2"><a href="#" id="default_terms" class="btn btn-outline-primary btn-sm">Add default terms</a></small>
+                                </div>
+                                {{ form_widget(rewardForm.termsAndConditions, { 'attr': {
+                                    'class': 'form-control',
+                                    'rows': '5',
+                                    'data-example': terms_and_conditions_example,
+                                    'required': '',
+                                    'minlength': 50,
+                                    'maxlength': 1000
+
+                                }}) }}
+                                <div class="with-errors">{{ form_errors(rewardForm.termsAndConditions) }}</div>
+                            </div>
+                            <div class="form-group d-flex">
+                                <div class="mr-2">
+                                    {{ form_widget(rewardForm.hasNotClaimed, {
+                                        'label': 'Has No Claims',
+                                        'attr': {'class':'custom-control-input'}}
+                                    ) }}
+                                </div>
+                                <div class="mr-2">
+                                    {{ form_widget(rewardForm.hasRenewed, {
+                                        'label': 'Has Renewed Policy',
+                                        'attr': {'class':'custom-control-input'}}
+                                    ) }}
+                                </div>
+                                <div class="mr-2">
+                                    {{ form_widget(rewardForm.isSignUpBonus, {
+                                        'label': 'Sign up Bonus',
+                                        'attr': {'class': 'custom-control-input'}}
+                                    ) }}
+                                </div>
+                                <div class="mr-2">
+                                    {{ form_widget(rewardForm.isConnectionBonus, {
+                                        'label': 'Connection Bonus',
+                                        'attr': {'class': 'custom-control-input'}}
+                                    ) }}
+                                </div>
+                            </div>
+                            <div class="form-group d-flex">
+                                <div class="mr-2">
+                                    {{ form_widget(rewardForm.hasCancelled, {
+                                        'label': 'Previous Cancelled Policy',
+                                        'attr': {'class': 'custom-control-input'}}
+                                    ) }}
+                                </div>
+                                <div class="mr-2">
+                                    {{ form_widget(rewardForm.isFirst, {
+                                        'label': 'Must Be First Policy',
+                                        'attr': {'class': 'custom-control-input'}}
+                                    ) }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                {# Errors for above #}
+                                <div class="with-errors">{{ form_errors(rewardForm.hasNotClaimed) }}</div>
+                                <div class="with-errors">{{ form_errors(rewardForm.hasRenewed) }}</div>
+                                <div class="with-errors">{{ form_errors(rewardForm.hasCancelled) }}</div>
+                                <div class="with-errors">{{ form_errors(rewardForm.isFirst) }}</div>
+                            </div>
+                            <div class="form-group text-right">
+                                {{ form_widget(rewardForm.submit, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                {{ form_end(rewardForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="connect_modal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="connect_modal"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Bonus To User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(connectForm) }}
+                    <div class="form-group">
+                        {{ form_label(connectForm.email, 'Email') }}
+                        {{ form_widget(connectForm.email, { 'attr': { 'class': 'form-control' }}) }}
+                        <div class="with-errors">{{ form_errors(connectForm.email) }}</div>
+                    </div>
+                    <h5>Warning! If user has multiple policies, currently implementation will add bonus to each policy!</h5>
+                    <div class="form-group">
+                        {{ form_label(connectForm.amount, 'Bonus Amount') }}
+                        {{ form_widget(connectForm.amount, { 'attr': { 'class': 'form-control' }}) }}
+                        <div class="with-errors">{{ form_errors(connectForm.amount) }}</div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(connectForm.rewardId) }}
+                        {{ form_widget(connectForm.next, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                {{ form_end(connectForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/rewards.js') }}"></script>
+{% endblock %}

@@ -521,9 +521,9 @@
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.2.0.tgz#50cd9856774351c56c0b1b0db4efe122d7913e58"
 
-"@fortawesome/fontawesome-pro@^5.5.0":
-  version "5.5.0"
-  resolved "https://npm.fontawesome.com/@fortawesome/fontawesome-pro/-/fontawesome-pro-5.5.0.tgz#ee612da62e482d05ab4e2f1a6a30eb88797eaeb4"
+"@fortawesome/fontawesome-pro@^5.11.2":
+  version "5.11.2"
+  resolved "https://npm.fontawesome.com/@fortawesome/fontawesome-pro/-/fontawesome-pro-5.11.2.tgz#4c055b486f2ec488ef982133703879176efa7f54"
 
 "@symfony/webpack-encore@git://github.com/symfony/webpack-encore.git#master":
   version "0.20.1"
@@ -2060,10 +2060,6 @@ cookie-signature@1.0.6:
 cookie@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
-
-cookieconsent@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/cookieconsent/-/cookieconsent-3.1.0.tgz#2c718b304d0e71a6e0d159cac8adf4205fdca152"
 
 copy-concurrently@^1.0.0:
   version "1.0.5"

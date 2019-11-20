@@ -3,11 +3,13 @@
 {# Set vars #}
 {% set body_class = 'phone-insurance' %}
 
-{% block title %}so-sure - phone insurance{% endblock %}
+{% block title %}Mobile Phone Insurance From &pound;{{ from_price }} Monthly | so-sure{% endblock %}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
-    <link rel="canonical" href="{{ path('phone_insurance') }}" />
+    <meta name="description" content="Choose Phone Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today."/>
 {% endblock %}
+{% set og_title = 'Mobile Phone Insurance From £' ~ from_price ~ ' Monthly | so-sure' %}
+{% set og_description = "Choose Phone Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today." %}
+{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
@@ -18,26 +20,39 @@
     <section class="hero">
         <div class="container-large">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-lg-2">
                     <div class="hero__intro">
                         <div class="breadcrumbs">
-                            <ul class="list-inline">
-                                <li class="list-inline-item">
-                                    <a class="text-deep-sky-blue-d" href="{{ path('homepage') }}">Home</a>
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-columbia-blue-e"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
                                 </li>
                                 <li class="list-inline-item text-white">
                                     <i class="fal fa-angle-right text-white"></i>
                                 </li>
-                                <li class="list-inline-item text-white">
-                                    Mobile Insurance
+                                <li class="list-inline-item text-white"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Phone Insurance</span>
+                                    <meta property="position" content="2">
                                 </li>
                             </ul>
                         </div>
-                        <h1 class="text-white fit">Mobile phone insurance <br><span class="sub text-columbia-blue-e">Done properly</span></h1>
+                        <h1 class="text-white fit">Mobile Phone Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
                         <p class="my-4 text-white">Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re here protecting customers when they claim and rewarding them when they don’t.</p>
                     </div>
                     <div class="hero__controls pb-3">
-                        <a href="#" class="btn btn-white btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
                         <a href="#"
                            class="btn btn-outline-white watch-video btn-block-xs"
                            data-event="watch-video-index-hero"
@@ -49,7 +64,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-lg-1">
                    <div class="hero__illustration hero__illustration-generic text-center">
                          <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png" alt="so-sure - social insurance" class="img-fluid lozad animated bounceInUp">
                     </div>
@@ -64,33 +79,38 @@
     {# Intro #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_intro.html.twig' %}
 
+    {# Top Manufacturers #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_topManufacturers.html.twig' %}
+
     {# Why Insure #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_whyInsure.html.twig' %}
 
-    {# Cover #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_coverSEO.html.twig' %}
-
-    {# Why Insure Continued #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_whyInsureContinued.html.twig' %}
+    {# Top Models #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}
 
     {# Reviews #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_reviews.html.twig' %}
 
-    {# Articles #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_articles.html.twig' %}
+    {# Cover #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_coverSEO.html.twig' %}
 
     {# Comparison #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
 
-    {# Other phones #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_otherPhones.html.twig' %}
+    {# Other Manufacturers #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_otherManufacturers.html.twig' %}
+
+    {# Why Insure Continued #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_whyInsureContinued.html.twig' %}
 
     {# Mini FAQ #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_miniFaq.html.twig' %}
 
+    {# Articles #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_articles.html.twig' %}
+
     {# Banner #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_banner.html.twig' %}
-
 
     {# Page Modals #}
 

@@ -28,6 +28,11 @@
             data-salva-min="{{ phone.getSalvaMiniumumBinderMonthlyPremium }}"
             data-phone="{{ phone.toPriceArray()|json_encode }}">
         <i class="far fa-pound-sign fa-fw"></i></button>
+    {#<button title="Offer Pricing"
+            type="button"
+            class="btn btn-primary btn-sm mb-2 mr-2"
+            onclick="window.location.href='{{ path('admin_phone_offers', {'id': phone.id}) }}'">
+        <i class="far fa-handshake fa-fw"></i></button>#}
     {# Edit Phone Details #}
     <button title="Edit Phone Details"
             type="button"
@@ -214,7 +219,8 @@
                             </thead>
                             <tbody>
                                 {% for phone in phones %}
-                                    {% set phoneProfit = phone.policyProfit(expected_claim_frequency, consumer_payout, ipt_rebate) %}
+                                    {# TODO: consider if this should show all prices #}
+                                    {% set phoneProfit = phone.policyProfit('monthly', expected_claim_frequency, consumer_payout, ipt_rebate) %}
                                     <tr class="{% if not phone.active %}table-danger{% endif %}">
                                         <td>
                                             <a href="{{ path('quote_phone', {'id': phone.id}) }}">{{ phone }}</a>
@@ -223,10 +229,11 @@
                                                 data-toggle="tooltip"></i>
                                             {% endif %}
                                         </td>
-                                        {% if phone.currentPhonePrice %}
+                                        {# TODO: should show all price streams #}
+                                        {% if phone.currentPhonePrice('any') %}
                                             <td>
                                                 {# Current premium #}
-                                                &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                                &pound;{{ phone.currentPhonePrice('any').monthlyPremiumPrice|number_format(2, '.', ',') }}
                                                 {# Previous premium #}
                                                 {% if phone.previousPhonePrices | length > 0 %}
                                                     <i class="fas fa-history fa-fw"
@@ -244,8 +251,8 @@
                                                 &pound;{{ phone.getSalvaBinderMonthlyPremium|number_format(2, '.', ',') }} <br>
                                                 <small>(&pound;{{ phone.getSalvaMiniumumBinderMonthlyPremium|number_format(2, '.', ',') }})</small>
                                             </td>
-                                            <td>&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
-                                            <td>&pound;{{ phone.currentPhonePrice.maxPot|number_format(2, '.', ',') }} / {{ phone.currentPhonePrice.maxConnections }}</td>
+                                            <td>&pound;{{ phone.currentPhonePrice('any').yearlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                                            <td>&pound;{{ phone.currentPhonePrice('any').maxPot|number_format(2, '.', ',') }} / {{ phone.currentPhonePrice('any').maxConnections }}</td>
                                             <td class="{% if phoneProfit > 0 %}table-success{% else %}table-warning{% endif %}">
                                                 {% if phoneProfit is null %}Unknown{% else %}{{ phoneProfit|number_format(2, '.', ',') }}{% endif %}
                                             </td>
@@ -610,7 +617,25 @@
                                                      class="form-control">
                                             </div>
                                         </div>
-                                        <div class="h6">Salva Std/Min: <span class="phone_salva"></span></div>
+                                        <div class="h6">Salva Std/Min: <span id="phone_salva"></span></div>
+                                        <div class="form-group">
+                                            <label>Price Stream</label>
+                                            <div class="input-group">
+                                                <select type="select"
+                                                     id="phone_stream"
+                                                     name="stream"
+                                                     class="form-control">
+                                                    <option value="all">ALL</option>
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="yearly">Yearly</option>
+                                                </select>
+                                            </div>
+                                            <small class="form-text">
+                                                Determines whether this price is exclusively for monthly premiums,
+                                                yearly premiums, or is applied to both (in which case the ALL option is
+                                                chosen), which is the default behaviour.
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -771,10 +796,48 @@
                         </div>
                         <table id="prices"
                                class="table table-striped mb-5"
-                               data-sorting="true"
+                               data-sortinlg="true"
                                data-empty="No data">{# Prices Table #}</table>
                         <input type="hidden" name="token" value="{{ csrf_token('default') }}" />
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Offer Modal #}
+    <div class="modal fade modal-fullscreen"
+         id="offer_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="phone_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-dialog" role="document">
+            <div class="modal-content modal-fullscreen-content">
+                <div class="modal-header modal-fullscreen-header">
+                    <h5 class="modal-title h3 text-zaffre">Offers</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times fa-lg fa-fw text-primary"></i>
+                    </button>
+                </div>
+                <div class="modal-body modal-fullscreen-body">
+                    <div class="row mt-5">
+                        <div class="col-lg">
+                            <div class="card">
+                                <div class="card-header h5">Existing Offers</div>
+                                <div class="card-body">
+                                    <p>Table</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg">
+                            <div class="card">
+                                <div class="card-header h5">New Offer</div>
+                                <div class="card-body">
+                                    <p>Form</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -810,7 +873,7 @@
                         </div>
                         <div class="form-group">
                             <label>Canonical Path</label>
-                            <input type="url" class="form-control" id="details_canonical_path" name="canonical-path" placeholder="/mobile-insurance/iphone-7">
+                            <input type="url" class="form-control" id="details_canonical_path" name="canonical-path" placeholder="/phone-insurance/iphone-7">
                             <small class="form-text">This will set the canonical path on the quote page as well as adjust the sitemap entries.</small>
                         </div>
                         <div class="form-group">

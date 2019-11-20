@@ -1,10 +1,5 @@
 $('.confirm-cancel').on("click",function() {
-    if ($('.cancellation-reason').val() == 'user-requested') {
-        var confirm_cancel = prompt('Are you sure you want to cancel this policy immediately? User Requested cancellations typically are set one month in advance.  Type YES to cancel immediately.');
-        return confirm_cancel === "YES";
-    } else {
-        return confirm('Are you sure you want to cancel this policy?');
-    }
+    return confirm('Are you sure you want to cancel this policy?');
 });
 
 $('.confirm-submit').on("click",function(e) {

@@ -181,7 +181,7 @@ class PhonePolicy extends Policy
     protected $imeiCircumvention;
 
     /**
-     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved"},
+     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved", ""},
      *     strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -240,27 +240,18 @@ class PhonePolicy extends Policy
         return $this->makeModelValidatedStatus;
     }
 
-    public function setPhone(Phone $phone, \DateTime $date = null, $validateExcess = true)
+    /**
+     * Sets the policy's phone.
+     * @param Phone          $phone is the phone to give to the policy.
+     * @param \DateTime|null $date  is the date at which they are having the phone set and at which their new
+     *                              price should be valid.
+     */
+    public function setPhone(Phone $phone, \DateTime $date = null)
     {
         $this->phone = $phone;
-        if (!$phone->getCurrentPhonePrice($date)) {
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
+        if (!$price) {
             throw new \Exception('Phone must have a price');
-        }
-
-        // Only set premium if not already present
-        if (!$this->getPremium()) {
-            $additionalPremium = null;
-            if ($this->getUser()) {
-                $additionalPremium = $this->getUser()->getAdditionalPremium();
-            }
-            /** @var PhonePrice $price */
-            $price = $phone->getCurrentPhonePrice($date);
-            $this->setPremium($price->createPremium($additionalPremium, $date));
-            // in the normal flow we should have policy terms before setting the phone
-            // however, many test cases do not have it
-            if ($this->getPolicyTerms() && $validateExcess) {
-                $this->validateAllowedExcess();
-            }
         }
     }
 
@@ -702,7 +693,7 @@ class PhonePolicy extends Policy
      */
     public function validatePremium($adjust, \DateTime $date = null)
     {
-        $phonePrice = $this->getPhone()->getCurrentPhonePrice($date);
+        $phonePrice = $this->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
         if (!$phonePrice) {
             throw new \UnexpectedValueException(sprintf('Missing phone price'));
         }
@@ -812,8 +803,13 @@ class PhonePolicy extends Policy
     public function setPicSureStatus($picSureStatus, User $user = null)
     {
         $this->picSureStatus = $picSureStatus;
-        if ($picSureStatus == self::PICSURE_STATUS_APPROVED && !$this->getPicSureApprovedDate()) {
-            $this->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+        if ($picSureStatus == self::PICSURE_STATUS_APPROVED) {
+            if (!$this->getPicSureApprovedDate()) {
+                $this->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
+            }
+            if ($this->getStatus() == Policy::STATUS_PICSURE_REQUIRED) {
+                $this->setStatus(Policy::STATUS_ACTIVE);
+            }
         }
 
         $picsureFiles = $this->getPolicyFilesByType(PicSureFile::class);
@@ -985,8 +981,8 @@ class PhonePolicy extends Policy
         $picSureValidated = $this->isPicSureValidated();
         /** @var PhonePremium $phonePremium */
         $phonePremium = $this->getPremium();
-        $excess = $phonePremium->getExcess();
-        $picsureExcess = $phonePremium->getPicSureExcess();
+        $excess = $phonePremium ? $phonePremium->getExcess() : null;
+        $picsureExcess = $phonePremium ? $phonePremium->getPicSureExcess() : null;
         return array_merge(parent::toApiArray(), [
             'phone_policy' => [
                 'imei' => $this->getImei(),

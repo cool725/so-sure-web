@@ -21,7 +21,7 @@
     </ul>
     <h4 class="text-columbia-blue-e my-4">What's not covered:</h4>
     <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+        <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> A claim where you have knowingly put your phone at risk</li>
         <li class="text-white mb-5"><i class="far fa-times text-columbia-blue-e fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
     </ul>
     <h4 class="text-columbia-blue-e my-4">Insurance Product Information Document:</h4>
@@ -78,7 +78,7 @@
         <table class="table-list mx-auto table-list__so-sure">
             <thead>
                 <tr>
-                    <th class="table-list__header h4 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" width="130px"></th>
+                    <th class="table-list__header h4 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" alt="so-sure" width="130px"></th>
                 </tr>
             </thead>
             <tbody>
@@ -119,29 +119,26 @@
         </div>
         <div class="col-md-8">
             <h4 class="my-4 text-columbia-blue-e">Excess</h4>
-            <p class="mb-5 text-white">Prove your {{ device.make }} {{ device.model }} isn't already damaged and save on your excess by validating with our app before you claim.</p>
+            <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
             <div class="table-responsive">
                 <table class="table table-bordered text-white">
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Damage</th>
-                            <th>Loss</th>
-                            <th>Theft</th>
+                            <th class="h6">Damage</th>
+                            <th class="h6">Loss</th>
+                            <th class="h6">Theft</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Validated with app</td>
+                            <td class="h6">Excess</td>
                             <td>&pound;{{ phone_price.picsureexcess.damage }}</td>
                             <td>&pound;{{ phone_price.picsureexcess.loss }}</td>
                             <td>&pound;{{ phone_price.picsureexcess.theft }}</td>
                         </tr>
                         <tr>
-                            <td>Not validated with app</td>
-                            <td>&pound;{{ phone_price.excess.damage }}</td>
-                            <td>&pound;{{ phone_price.excess.loss }}</td>
-                            <td>&pound;{{ phone_price.excess.theft }}</td>
+                            <td colspan="4">⚠️ if you don't verify the condition of your phone your excess will be &pound;100 more expensive</td>
                         </tr>
                     </tbody>
                 </table>

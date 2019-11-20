@@ -7,7 +7,7 @@
 
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
 
-    {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}
+    {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
         {% set premium = 'monthly' %}
     {% else %}
         {% set premium = 'yearly' %}
@@ -23,20 +23,22 @@
             <div class="row">
                 {% if app.user.allowedMonthly %}
                     <div class="col-6">
-                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month" data-premium-param="monthly">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}"
+                            data-value="{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month" data-premium-param="monthly">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Monthly</h6>
-                                <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                <div class="radio-btn__price">&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
                             </div>
                         </div>
                     </div>
                 {% endif %}
                 {% if app.user.allowedYearlyPayments %}
                     <div class="col-6">
-                        <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">
+                        <div class="radio-btn {% if purchase_form.vars.value.amount ==
+                            phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Yearly</h6>
-                                <div class="radio-btn__price">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                <div class="radio-btn__price">&pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
                             </div>
                         </div>
                     </div>
@@ -48,7 +50,7 @@
     {{ form_widget(purchase_form.next, {
         'label': 'Continue',
         'attr': {
-            'class': 'btn btn-success btn-green-gradient btn-block-xs',
+            'class': 'btn btn-success btn-block-xs',
             'hidden': 'hidden'
     }}) }}
 {{ form_end(purchase_form) }}
@@ -65,7 +67,14 @@
           data-card-form-mode="cardTokenisation"
           data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
           data-url="{{ url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(purchase_form.amount.vars.value), 'premium': premium }) }}"
-          data-redirect-url="{{ path('user_welcome', {id: policy.id}) }}"
+          data-redirect-url="
+          {% if instore is not null and instore == true %}
+            {{ path('user_instore', {id: policy.id}) }}
+          {% elseif validation_required is not null and validation_required is not null %}
+            {{ path('user_validation_required', {id: policy.id}) }}
+          {% else %}
+            {{ path('user_welcome', {id: policy.id}) }}
+          {% endif %}"
           data-title="Pay now"
           data-subtitle="Please enter your card details">
     </form>
@@ -75,7 +84,7 @@
                 {{ form_widget(to_card_form.submit, {
                     'label': 'Pay Now',
                     'attr': {
-                        'class': 'btn btn-success btn-green-gradient btn-block-xs btn-card-pay'
+                        'class': 'btn btn-success btn-block-xs btn-card-pay'
                 }}) }}
             {{ form_end(to_card_form) }}
         {% endblock to_card_form %}

@@ -304,7 +304,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->repairSupplier = $this->nullIfBlank($data[++$i]);
             $this->supplierStatus = $this->nullIfBlank($data[++$i]);
             // todo: Supplier pick up date
-            $this->excelDate($data[++$i]);
+            $this->excelDate($data[++$i], true);
             // todo: Supplier repair date
             $this->excelDate($data[++$i]);
             $this->replacementReceivedDate = $this->excelDate($data[++$i]);

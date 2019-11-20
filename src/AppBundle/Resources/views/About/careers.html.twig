@@ -3,25 +3,53 @@
 {# Set vars #}
 {% set body_class = 'careers' %}
 
-{% block title %}so-sure - Careers{% endblock %}
+{% block title %}Careers | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/careers.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="intro py-lg-5">
-        <div class="container container-xtra py-5">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-8">
-                    <h5 class="text-zaffre mb-0">Want to work for us?</h5>
-                    <h1 class="text-primary mb-4">Careers</h1>
-                    <p class="mb-4">We are revolutionising insurance by providing consumers with a better, easier and up to 80% cheaper solution. We call this <strong>Social Insurance</strong>. Starting with mobile phones, so-sure’s ambition is to expand rapidly across consumer lines and geographies over the next few years. If you're keen to help us out, please do send us a note to <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">jobs</a>.</p>
-                    <div class="mb-4"><script data-startup="so-sure" src="https://angel.co/javascripts/embed_jobs.js" id="angellist_embed" async></script></div>
+                    <div class="cp__content">
+                        <div class="breadcrumbs">
+                            <ul class="list-inline"
+                                vocab="https://schema.org/"
+                                typeof="BreadcrumbList">
+                                <li class="list-inline-item"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <a href="{{ path('homepage') }}"
+                                       class="text-primary"
+                                       property="item"
+                                       typeof="WebPage">
+                                       <span property="name">Home</span>
+                                    </a>
+                                    <meta property="position" content="1">
+                                </li>
+                                <li class="list-inline-item text-white">
+                                    <i class="fal fa-angle-right text-zaffre"></i>
+                                </li>
+                                <li class="list-inline-item text-zaffre"
+                                    property="itemListElement"
+                                    typeof="ListItem">
+                                    <span property="name">Careers</span>
+                                    <meta property="position" content="2">
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="text-zaffre h5 mb-0">Want to work for us?</div>
+                        <h1 class="text-primary mb-4">Careers</h1>
+                        <p class="mb-4">We are revolutionising insurance by providing consumers with a better, easier and up to 80% cheaper solution. We call this <strong>Social Insurance</strong>. Starting with mobile phones, so-sure’s ambition is to expand rapidly across consumer lines and geographies over the next few years. If you're keen to help us out, please do send us a note to <a href="mailto:hello@spam.so-sure.net" class="mailto append-email">jobs</a>.</p>
+                        <div class="mb-4"><script data-startup="so-sure" src="https://angel.co/javascripts/embed_jobs.js" id="angellist_embed" async></script></div>
+                    </div>
                 </div>
             </div>
         </div>

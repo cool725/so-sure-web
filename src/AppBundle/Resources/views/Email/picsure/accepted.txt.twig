@@ -3,7 +3,11 @@ Phone validation successful ✅
 
 Congratulations {{ policy.user.firstName }},
 
-Your {{ policy.phone }} is now successfully validated and your excess has dropped by a whopping &pound;100!
+{% if policy.policyTerms.isPicSureRequired %}
+Your {{ policy.phone }} is now successfully verified and your cover has now started!
+{% else %}
+Your {{ policy.phone }} is now successfully verified and your excess has dropped by a whopping &pound;100!
+{% endif %}
 
 😎 How cool is that?
 
@@ -36,4 +40,4 @@ Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
 {% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
 
 Our mailing address is:
-so-sure, Relay Building, 114 Whitechapel High Street, London, E1 7PT, UK
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

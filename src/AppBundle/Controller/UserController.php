@@ -142,7 +142,7 @@ class UserController extends BaseController
                     );
                 }
             }
-        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
             // mainly for facebook registration, although makes sense for all users
             // check for canPurchasePolicy is necessary to prevent redirect loop
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
@@ -181,6 +181,7 @@ class UserController extends BaseController
         }
 
         $scode = null;
+        $codeMessage = null;
 
         if ($session = $this->get('session')) {
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
@@ -330,13 +331,21 @@ class UserController extends BaseController
                 $code = $scodeForm->getData()['scode'];
                 $scode = $scodeRepo->findOneBy(['code' => $code]);
                 if (!$scode || !SCode::isValidSCode($scode->getCode())) {
-                    $this->addFlash(
-                        'warning',
-                        sprintf("SCode %s is missing or been withdrawn", $code)
-                    );
-                    return new RedirectResponse(
-                        $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                    );
+                    $code = mb_strtoupper($code);
+                    $scode = $scodeRepo->findOneBy(['code' => $code]);
+                    if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                        $code = mb_strtolower($code);
+                        $scode = $scodeRepo->findOneBy(['code' => $code]);
+                        if (!$scode || !SCode::isValidSCode($scode->getCode())) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("SCode %s is missing or incorrect", $code)
+                            );
+                            return new RedirectResponse(
+                                $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
+                            );
+                        }
+                    }
                 }
                 if ($scode->isReward() && $scode->isActive()) {
                     $reward = $scode->getReward();
@@ -455,22 +464,11 @@ class UserController extends BaseController
             }
         } elseif ($scode) {
             if ($scode->isStandard()) {
-                $this->addFlash(
-                    'success-raw',
-                    sprintf(
-                        '%s has invited you to connect. Connect below',
-                        $scode->getUser()->getName()
-                    )
-                );
+                $codeMessage = sprintf('%s has invited you to connect. Connect below', $scode->getUser()->getName());
             } elseif ($scode->isReward()) {
-                $this->addFlash(
-                    'success-raw',
-                    sprintf(
-                        'Get your £%0.2f reward bonus from %s. Apply below',
-                        $scode->getReward()->getDefaultValue(),
-                        $scode->getUser()->getName()
-                    )
-                );
+                // @codingStandardsIgnoreStart
+                $codeMessage = sprintf('Apply your £%0.2f reward bonus from %s', $scode->getReward()->getDefaultValue(), $scode->getUser()->getName());
+                // @codingStandardsIgnoreEnd
             }
         }
 
@@ -496,25 +494,27 @@ class UserController extends BaseController
                 } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
                     $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
                 }
-                if ($url) {
-                    $this->addFlash(
-                        'warning-raw',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
-                            $checkPolicy->getPolicyNumber(),
-                            $url
-                        )
-                    );
-                } else {
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'warning-raw',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
-                            $checkPolicy->getPolicyNumber()
-                        )
-                    );
-                    // @codingStandardsIgnoreEnd
+                if (!$checkPolicy->getPolicyTerms()->isPicsureRequired()) {
+                    if ($url) {
+                        $this->addFlash(
+                            'warning-raw',
+                            sprintf(
+                                'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
+                                $checkPolicy->getPolicyNumber(),
+                                $url
+                            )
+                        );
+                    } else {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'warning-raw',
+                            sprintf(
+                                'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
+                                $checkPolicy->getPolicyNumber()
+                            )
+                        );
+                        // @codingStandardsIgnoreEnd
+                    }
                 }
             }
         }
@@ -538,6 +538,7 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'friends' => $fbFriends,
+            'code_message' => $codeMessage,
         );
     }
 
@@ -1127,23 +1128,23 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
         $amount = $policy->getOutstandingPremiumToDate();
-        // Validate unpaid policy.
+        // Validate unpaid policy and use rescheduled amount if no owed amount due to bacs timing or whatever.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-        if ($policy->isPolicyPaidToDate()) {
-            // If the policy is meant to be active then there is no harm in just making it active on the spot.
-            $this->get('logger')->warning(sprintf(
-                'Policy %s has unpaid status, but paid to date. Setting to active.',
-                $policy->getId()
-            ));
-            $policy->setStatus(Policy::STATUS_ACTIVE);
-            $this->getManager()->flush();
-            return new RedirectResponse($this->generateUrl('user_home'));
-        } elseif ($amount <= 0) {
-            $this->get('logger')->error(sprintf(
-                'Policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
-                $policy->getId(),
-                $amount
-            ));
+        if (!$this->greaterThanZero($amount)) {
+            $dm = $this->getManager();
+            $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
+            $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
+            if ($this->greaterThanZero($rescheduledAmount)) {
+                $amount = $rescheduledAmount;
+            } else {
+                $this->get('logger')->warning(sprintf(
+                    'Policy %s has unpaid status, but paid to date. Setting to active.',
+                    $policy->getId()
+                ));
+                $policy->setStatus(Policy::STATUS_ACTIVE);
+                $this->getManager()->flush();
+                return new RedirectResponse($this->generateUrl('user_home'));
+            }
         }
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
@@ -1183,6 +1184,10 @@ class UserController extends BaseController
      *
      * @Route("/welcome", name="user_welcome")
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
+     * @Route("/complete", name="user_instore")
+     * @Route("/complete/{id}", name="user_instore_id")
+     * @Route("/validation-required", name="user_validation_required")
+     * @Route("/validation-required/{id}", name="user_validation_required_id")
      * @Template
      */
     public function welcomeAction(Request $request, $id = null)
@@ -1192,7 +1197,7 @@ class UserController extends BaseController
         $invitationService = $this->get('app.invitation');
         $policyService = $this->get('app.policy');
 
-        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
 
@@ -1235,17 +1240,29 @@ class UserController extends BaseController
             parse_str($query, $oauth2FlowParams);
         }
 
-        // A/B Funnel Test
-        // To Test use url param ?force=regular-funnel / ?force=new-funnel
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_FUNNEL_V2);
+        // In-store
+        $instore = $this->get('session')->get('store');
 
-        return $this->render('AppBundle:User:onboarding.html.twig', [
+        // A/B Tagline Test
+        // To Test use url param ?force=current-tagline / ?force=new-tagline
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE);
+
+        $template = 'AppBundle:User:onboarding.html.twig';
+
+        if ($request->get('_route') == 'user_instore') {
+            $template = 'AppBundle:User:complete.html.twig';
+        } elseif ($request->get('_route') == 'user_validation_required') {
+            $template = 'AppBundle:User:validationRequired.html.twig';
+        }
+
+        return $this->render($template, [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
             'has_visited_welcome_page' => $pageVisited,
             'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
+            'instore' => $instore,
         ]);
     }
 
@@ -1502,7 +1519,15 @@ class UserController extends BaseController
         $user = $this->getUser();
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
-            throw $this->createNotFoundException('No active policy found');
+            if ($user->hasPicsureRequiredPolicy()) {
+                $this->addFlash(
+                    "error",
+                    "Reminder: You can only claim once you have validated your phone."
+                );
+                return $this->redirectToRoute("user_home");
+            } else {
+                throw $this->createNotFoundException('No active policy found');
+            }
         }
         // If the user has an open claim on all of their policies then they can't make a claim right now so send them to
         // one of their open claims.

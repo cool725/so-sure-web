@@ -18,7 +18,9 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use Psr\Log\LoggerInterface;
 
 /**
  * Tests that the unpaid listener sends out the right emails at the right times.
@@ -52,32 +54,56 @@ class UnpaidListenerTest extends WebTestCase
     }
 
     /**
-     * Tests the bacs unpaid comms with and without claims, and makes sure that scheduled payments are rescheduled to
-     * the right dates.
-     * Note that this currently expects no smses to be sent because that has not been implemented yet.
+     * Tests the bacs unpaid comms with and without claims, and makes sure that scheduled payments
+     * are rescheduled to the right dates.
      */
     public function testBacsUnpaid()
     {
         $policy = $this->payingPolicy(new BacsPaymentMethod());
         $scheduledPayment = $this->payment($policy, new \DateTime(), ScheduledPayment::STATUS_REVERTED);
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-1.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-1.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-1.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
+
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
         self::$dm->flush();
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-2.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-2.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-2.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
+
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
         self::$dm->flush();
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-3.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-3.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-3.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
+
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
         self::$dm->flush();
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:bacs/bacsPaymentFailed-4.html.twig");
+        $listener = $this->mockedListener(
+            1,
+            1,
+            "AppBundle:Email:bacs/bacsPaymentFailed-4.html.twig",
+            "AppBundle:Sms:bacs/failedPayment-4.txt.twig"
+        );
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
     }
+
+    // TODO: testCheckoutUnpaid()
 
     /**
      * Tests the judo unpaid comms with no claims and a card.
@@ -213,7 +239,13 @@ class UnpaidListenerTest extends WebTestCase
         $feature->expects($this->any())->method("isEnabled")->willReturn(false);
         /** @var FeatureService $feature */
         $feature = $feature;
-        return new UnpaidListener(self::$dm, $mailer, $smser, $feature);
+        $logger = $this->getMockBuilder(LoggerInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(["error"])
+            ->getMock();
+        /** @var LoggerInterface $logger */
+        $logger = $logger;
+        return new UnpaidListener(self::$dm, $mailer, $smser, $feature, $logger);
     }
 
     /**

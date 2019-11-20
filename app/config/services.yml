@@ -139,6 +139,7 @@ services:
             - "@event_dispatcher"
             - "@app.sms"
             - "@app.feature"
+            - "@app.price"
 
     app.payment:
         alias: AppBundle\Service\PaymentService
@@ -732,6 +733,7 @@ services:
             - "@app.scode"
             - "@app.sixpack"
             - "@app.feature"
+            - "@app.price"
 
     app.quote:
         alias: AppBundle\Service\QuoteService
@@ -1118,9 +1120,11 @@ services:
         class:   AppBundle\Listener\PolicyListener
         arguments:
             - "@app.policy"
+            - "@app.sms"
             - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
     app.listener.user:
         class:   AppBundle\Listener\UserListener
@@ -1164,13 +1168,6 @@ services:
             - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
-
-    app.listener.trustpilot:
-        class:   AppBundle\Listener\TrustpilotListener
-        arguments:
-        - "@app.mailer"
-        tags:
-        -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
     app.listener.gocompare:
         class:   AppBundle\Listener\GoCompareListener
@@ -1347,6 +1344,7 @@ services:
             - "@app.mailer"
             - "@app.sms"
             - "@app.feature"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.scheduledPayment.failed, method: onUnpaidEvent }
 
@@ -1535,7 +1533,7 @@ services:
 
     app.form.type.purchasesteppayment:
         class: AppBundle\Form\Type\PurchaseStepPaymentType
-        arguments: ["@request_stack", "%form_required%", "@logger", "@app.postcode"]
+        arguments: ["@request_stack", "%form_required%", "@logger", "@app.postcode", "@app.price"]
         tags:
             - { name: form.type }
 
@@ -1560,6 +1558,18 @@ services:
     app.form.type.claimscheck:
         class: AppBundle\Form\Type\ClaimsCheckType
         arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.reward:
+        class: AppBundle\Form\Type\RewardType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.rewardedit:
+        class: AppBundle\Form\Type\RewardEditType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
         tags:
             - { name: form.type }
 
@@ -1730,3 +1740,14 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
+
+    AppBundle\Service\PriceService:
+        arguments:
+            - "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+
+    app.price:
+        alias: AppBundle\Service\PriceService
+        public: true
+
+

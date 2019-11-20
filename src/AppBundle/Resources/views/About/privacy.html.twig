@@ -2,488 +2,495 @@
 
 {# Set vars #}
 {% set body_class = 'privacy-policy' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - Privacy Policy{% endblock %}
+{% block title %}Privacy Policy | so-sure{% endblock %}
 {% block meta %}
 
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/faq.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="faq">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="faq__main__container">
-                <div class="faq__main px-4 px-lg-5">
-                    {%  if not hide_title %}
-                        <h5 class="text-zaffre mb-0">Welcome to the so-sure's privacy notice</h5>
-                        <h1 class="text-primary mb-4">Website Privacy Policy</h1>
-                    {% endif %}
-                    <p>so-sure respects your privacy and is committed to protecting your personal data. This privacy notice will inform you as to how we look after your personal data when you visit our website (regardless of where you visit it from) and tell you about your privacy rights and how the law protects you.</p>
-                    <p class="mb-5">This privacy notice is provided in a layered format so you can click through to the specific areas set out below. Please also use the Glossary to understand the meaning of some of the terms used in this privacy notice.</p>
-                    <div id="important-information-and-who-we-are" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                1. Important information and who we are <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <h5 class="text-zaffre">Purpose of this privacy notice</h5>
-                                <p>This privacy notice aims to give you information on how so-sure collects and processes your personal data through your use of this website, including any data you may provide through this website when you request a quote, purchase a product or service or take part in a competition.</p>
-                                <p>This website is not intended for children and we do not knowingly collect data relating to children.</p>
-                                <p class="mb-4">It is important that you read this privacy notice together with any other privacy notice or fair processing notice we may provide on specific occasions when we are collecting or processing personal data about you so that you are fully aware of how and why we are using your data. This privacy notice supplements the other notices and is not intended to override them.</p>
-                                <h5 class="text-zaffre">Controller</h5>
-                                <p>so-sure Limited is the controller and responsible for your personal data (collectively referred to as "so-sure", "we", "us" or "our" in this privacy notice).</p>
-                                <p class="mb-4">We have appointed a data privacy manager who is responsible for overseeing questions in relation to this privacy notice. If you have any questions about this privacy notice, including any requests to exercise your legal rights, please contact the data privacy manager using the details set out below.</p>
-                                <h5 class="text-zaffre">Contact details</h5>
-                                <p>Our full details are:</p>
-                                <ul class="list-unstyled mb-4">
-                                    <li class="mb-2">Data Privacy Manager - <span class="append-email">privacy</span></li>
-                                    <li>
-                                        <address>
-                                            Data Privacy Manager<br>
-                                            so-sure Limited<br>
-                                            {{ business_address|nl2br }}
-                                        </address>
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="cp__content">
+                        {%  if not hide_title %}
+                            <div class="breadcrumbs">
+                                <ul class="list-inline"
+                                    vocab="https://schema.org/"
+                                    typeof="BreadcrumbList">
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('homepage') }}"
+                                           class="text-primary"
+                                           property="item"
+                                           typeof="WebPage">
+                                           <span property="name">Home</span>
+                                        </a>
+                                        <meta property="position" content="1">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-zaffre"></i>
+                                    </li>
+                                    <li class="list-inline-item text-zaffre"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <span property="name">Privacy Policy</span>
+                                        <meta property="position" content="2">
                                     </li>
                                 </ul>
-                                <p class="mb-4">You have the right to make a complaint at any time to the Information Commissioner’s Office (ICO), the UK supervisory authority for data protection issues (www.ico.org.uk). We would, however, appreciate the chance to deal with your concerns before you approach the ICO so please <a href="{{ path('about_how_to_contact_so_sure') }}">contact us</a> in the first instance.</p>
-                                <h5 class="text-zaffre">Changes to the privacy notice and your duty to inform us of changes</h5>
-                                <p>This version was last updated on 14 May 2018</p>
-                                <p>The data protection law in the UK will change on 25 May 2018. Although this privacy notice sets out most of your rights under the new laws, we may not yet be able to respond to some of your requests (for example, a request for the transfer of your personal data) until May 2018 as we are still working towards getting our systems ready for some of these changes.</p>
-                                <p class="mb-4">It is important that the personal data we hold about you is accurate and current. Please keep us informed if your personal data changes during your relationship with us.</p>
-                                <h5 class="text-zaffre">Third-party links</h5>
-                                <p>This website may include links to third-party websites, plug-ins and applications. Clicking on those links or enabling those connections may allow third parties to collect or share data about you. We do not control these third-party websites and are not responsible for their privacy statements. When you leave our website, we encourage you to read the privacy notice of every website you visit.</p>
+                            </div>
+                            <div class="text-zaffre h3 mb-0">Welcome to the so-sure's privacy notice</div>
+                            <h1 class="text-primary mb-4">Website Privacy Policy</h1>
+                        {% endif %}
+                        <p>so-sure respects your privacy and is committed to protecting your personal data. This privacy notice will inform you as to how we look after your personal data when you visit our website (regardless of where you visit it from) and tell you about your privacy rights and how the law protects you.</p>
+                        <p class="mb-5">This privacy notice is provided in a layered format so you can click through to the specific areas set out below. Please also use the Glossary to understand the meaning of some of the terms used in this privacy notice.</p>
+                        <div id="important-information-and-who-we-are" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    1. Important information and who we are <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <h3 class="h5 text-zaffre">Purpose of this privacy notice</h3>
+                                    <p>This privacy notice aims to give you information on how so-sure collects and processes your personal data through your use of this website, including any data you may provide through this website when you request a quote, purchase a product or service or take part in a competition.</p>
+                                    <p>This website is not intended for children and we do not knowingly collect data relating to children.</p>
+                                    <p class="mb-4">It is important that you read this privacy notice together with any other privacy notice or fair processing notice we may provide on specific occasions when we are collecting or processing personal data about you so that you are fully aware of how and why we are using your data. This privacy notice supplements the other notices and is not intended to override them.</p>
+                                    <h3 class="text-zaffre">Controller</h3>
+                                    <p>so-sure Limited is the controller and responsible for your personal data (collectively referred to as "so-sure", "we", "us" or "our" in this privacy notice).</p>
+                                    <p class="mb-4">We have appointed a data privacy manager who is responsible for overseeing questions in relation to this privacy notice. If you have any questions about this privacy notice, including any requests to exercise your legal rights, please contact the data privacy manager using the details set out below.</p>
+                                    <h3 class="h5 text-zaffre">Contact details</h3>
+                                    <p>Our full details are:</p>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="mb-2">Data Privacy Manager - <span class="append-email">privacy</span></li>
+                                        <li>
+                                            <address>
+                                                Data Privacy Manager<br>
+                                                so-sure Limited<br>
+                                                {{ business_address|nl2br }}
+                                            </address>
+                                        </li>
+                                    </ul>
+                                    <p class="mb-4">You have the right to make a complaint at any time to the Information Commissioner’s Office (ICO), the UK supervisory authority for data protection issues (www.ico.org.uk). We would, however, appreciate the chance to deal with your concerns before you approach the ICO so please <a href="{{ path('about_how_to_contact_so_sure') }}">contact us</a> in the first instance.</p>
+                                    <h3 class="h5 text-zaffre">Changes to the privacy notice and your duty to inform us of changes</h3>
+                                    <p>This version was last updated on 14 May 2018</p>
+                                    <p>The data protection law in the UK will change on 25 May 2018. Although this privacy notice sets out most of your rights under the new laws, we may not yet be able to respond to some of your requests (for example, a request for the transfer of your personal data) until May 2018 as we are still working towards getting our systems ready for some of these changes.</p>
+                                    <p class="mb-4">It is important that the personal data we hold about you is accurate and current. Please keep us informed if your personal data changes during your relationship with us.</p>
+                                    <h3 class="h5 text-zaffre">Third-party links</h3>
+                                    <p>This website may include links to third-party websites, plug-ins and applications. Clicking on those links or enabling those connections may allow third parties to collect or share data about you. We do not control these third-party websites and are not responsible for their privacy statements. When you leave our website, we encourage you to read the privacy notice of every website you visit.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="the-data-we-collect-about-you" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                2. The data we collect about you <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <h5 class="text-zaffre">Purpose of this privacy notice</h5>
-                                <p>Personal data, or personal information, means any information about an individual from which that person can be identified. It does not include data where the identity has been removed (anonymous data).</p>
-                                <p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped together follows:</p>
-                                <p><strong>Identity Data</strong> includes first name, maiden name, last name, username or similar identifier, marital status, title, date of birth and gender.</p>
-                                <p><strong>Contact Data</strong> includes billing address, delivery address, email address and telephone numbers.</p>
-                                <p><strong>Financial Data</strong> includes bank account and payment card details.</p>
-                                <p><strong>Transaction Data</strong> includes details about payments to and from you and other details of products and services you have purchased from us.</p>
-                                <p><strong>Technical Data</strong> includes IMEI, serial number, internet protocol (IP) address, your login data, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform and other technology on the devices you use to access this website.</p>
-                                <p><strong>Profile Data</strong> includes your username and password, purchases or orders made by you, your interests, preferences, feedback and survey responses.</p>
-                                <p><strong>Usage Data</strong> includes information about how you use our website, products and services.</p>
-                                <p><strong>Marketing and Communications Data</strong> includes your preferences in receiving marketing from us and our third parties and your communication preferences.</p>
-                                <p>We also collect, use and share <strong>Aggregated Data</strong> such as statistical or demographic data for any purpose. Aggregated Data may be derived from your personal data but is not considered personal data in law as this data does not directly or indirectly reveal your identity. For example, we may aggregate your Usage Data to calculate the percentage of users accessing a specific website feature. However, if we combine or connect Aggregated Data with your personal data so that it can directly or indirectly identify you, we treat the combined data as personal data which will be used in accordance with this privacy notice.</p>
-                                <p>We do not collect any <strong>Special Categories of Personal Data</strong> about you (this includes details about your race or ethnicity, religious or philosophical beliefs, sex life, sexual orientation, political opinions, trade union membership, information about your health and genetic and biometric data). Nor do we collect any information about criminal convictions and offences.</p>
-                                <h5 class="text-zaffre">If you fail to provide personal data</h5>
-                                <p>Where we need to collect personal data by law, or under the terms of a contract we have with you and you fail to provide that data when requested, we may not be able to perform the contract we have or are trying to enter into with you (for example, to provide you with goods or services). In this case, we may have to cancel a product or service you have with us but we will notify you if this is the case at the time.</p>
+                        <div id="the-data-we-collect-about-you" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    2. The data we collect about you <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <h3 class="h5 text-zaffre">Purpose of this privacy notice</h3>
+                                    <p>Personal data, or personal information, means any information about an individual from which that person can be identified. It does not include data where the identity has been removed (anonymous data).</p>
+                                    <p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped together follows:</p>
+                                    <p><strong>Identity Data</strong> includes first name, maiden name, last name, username or similar identifier, marital status, title, date of birth and gender.</p>
+                                    <p><strong>Contact Data</strong> includes billing address, delivery address, email address and telephone numbers.</p>
+                                    <p><strong>Financial Data</strong> includes bank account and payment card details.</p>
+                                    <p><strong>Transaction Data</strong> includes details about payments to and from you and other details of products and services you have purchased from us.</p>
+                                    <p><strong>Technical Data</strong> includes IMEI, serial number, internet protocol (IP) address, your login data, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform and other technology on the devices you use to access this website.</p>
+                                    <p><strong>Profile Data</strong> includes your username and password, purchases or orders made by you, your interests, preferences, feedback and survey responses.</p>
+                                    <p><strong>Usage Data</strong> includes information about how you use our website, products and services.</p>
+                                    <p><strong>Marketing and Communications Data</strong> includes your preferences in receiving marketing from us and our third parties and your communication preferences.</p>
+                                    <p>We also collect, use and share <strong>Aggregated Data</strong> such as statistical or demographic data for any purpose. Aggregated Data may be derived from your personal data but is not considered personal data in law as this data does not directly or indirectly reveal your identity. For example, we may aggregate your Usage Data to calculate the percentage of users accessing a specific website feature. However, if we combine or connect Aggregated Data with your personal data so that it can directly or indirectly identify you, we treat the combined data as personal data which will be used in accordance with this privacy notice.</p>
+                                    <p>We do not collect any <strong>Special Categories of Personal Data</strong> about you (this includes details about your race or ethnicity, religious or philosophical beliefs, sex life, sexual orientation, political opinions, trade union membership, information about your health and genetic and biometric data). Nor do we collect any information about criminal convictions and offences.</p>
+                                    <h3 class="h5 text-zaffre">If you fail to provide personal data</h3>
+                                    <p>Where we need to collect personal data by law, or under the terms of a contract we have with you and you fail to provide that data when requested, we may not be able to perform the contract we have or are trying to enter into with you (for example, to provide you with goods or services). In this case, we may have to cancel a product or service you have with us but we will notify you if this is the case at the time.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="how-is-your-personal-data-collected" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                3. How is your personal data collected <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <p>We use different methods to collect data from and about you including through:</p>
-                                <p><strong>Direct interactions.</strong> You may give us your Identity, Contact and Financial Data by filling in forms or by corresponding with us by post, phone, email or otherwise. This includes personal data you provide when you:</p>
-                                <ul class="mb-4">
-                                    <li class="mb-2">apply for our products or services;</li>
-                                    <li class="mb-2">create an account on our website;</li>
-                                    <li class="mb-2">request marketing to be sent to you;</li>
-                                    <li class="mb-2">enter a competition, promotion or survey; or</li>
-                                    <li class="mb-2">give us some feedback.</li>
-                                </ul>
-                                <p><strong>Automated technologies or interactions.</strong> As you interact with our website, we may automatically collect Technical Data about your equipment, browsing actions and patterns. We collect this personal data by using cookies, server logs and other similar technologies. We may also receive Technical Data about you if you visit other websites employing our cookies. Please see our <a href="{{ cookie_url }}">cookie policy</a> for further details.</p>
-                                <p><strong>Third parties or publicly available sources.</strong> We may receive personal data about you from various third parties and public sources as set out below:</p>
-                                <ul>
-                                    <li class="mb-2">
-                                        Technical Data from the following parties:
-                                        <ul>
-                                            <li class="mb-2">(a) analytics providers such as Google based outside the EU;</li>
-                                            <li class="mb-2">(b) advertising networks such as Facebook based outside the EU; and</li>
-                                            <li class="mb-2">(c) search information providers such as Google based outside the EU.</li>
-                                        </ul>
-                                    </li>
-                                    <li class="mb-2">Contact, Financial and Transaction Data from providers of technical, payment and delivery services such as Judopay based inside the EU and Accesspay based inside the EU.</li>
-                                    <li class="mb-2">Identity and Contact Data from data brokers or aggregators.</li>
-                                </ul>
+                        <div id="how-is-your-personal-data-collected" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    3. How is your personal data collected <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </23>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <p>We use different methods to collect data from and about you including through:</p>
+                                    <p><strong>Direct interactions.</strong> You may give us your Identity, Contact and Financial Data by filling in forms or by corresponding with us by post, phone, email or otherwise. This includes personal data you provide when you:</p>
+                                    <ul class="mb-4">
+                                        <li class="mb-2">apply for our products or services;</li>
+                                        <li class="mb-2">create an account on our website;</li>
+                                        <li class="mb-2">request marketing to be sent to you;</li>
+                                        <li class="mb-2">enter a competition, promotion or survey; or</li>
+                                        <li class="mb-2">give us some feedback.</li>
+                                    </ul>
+                                    <p><strong>Automated technologies or interactions.</strong> As you interact with our website, we may automatically collect Technical Data about your equipment, browsing actions and patterns. We collect this personal data by using cookies, server logs and other similar technologies. We may also receive Technical Data about you if you visit other websites employing our cookies. Please see our <a href="{{ cookie_url }}">cookie policy</a> for further details.</p>
+                                    <p><strong>Third parties or publicly available sources.</strong> We may receive personal data about you from various third parties and public sources as set out below:</p>
+                                    <ul>
+                                        <li class="mb-2">
+                                            Technical Data from the following parties:
+                                            <ul>
+                                                <li class="mb-2">(a) analytics providers such as Google based outside the EU;</li>
+                                                <li class="mb-2">(b) advertising networks such as Facebook based outside the EU; and</li>
+                                                <li class="mb-2">(c) search information providers such as Google based outside the EU.</li>
+                                            </ul>
+                                        </li>
+                                        <li class="mb-2">Contact, Financial and Transaction Data from providers of technical, payment and delivery services such as Judopay based inside the EU and Accesspay based inside the EU.</li>
+                                        <li class="mb-2">Identity and Contact Data from data brokers or aggregators.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="how-we-use-your-personal-data" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                4. How we use your personal data <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
-                                <ul class="mb-4">
-                                    <li class="mb-2">Where we need to perform the contract we are about to enter into or have entered into with you.</li>
-                                    <li class="mb-2">Where it is necessary for our legitimate interests (or those of a third party) and your interests and fundamental rights do not override those interests.</li>
-                                    <li class="mb-2">Where we need to comply with a legal or regulatory obligation.</li>
-                                </ul>
-                                <p><a href="#legal-purposes">Click here</a> to find out more about the types of lawful basis that we will rely on to process your personal data.</p>
-                                <p class="md-4">Generally we do not rely on consent as a legal basis for processing your personal data other than in relation to sending third party direct marketing communications to you via email or text message. You have the right to withdraw consent to marketing at any time by Contacting us.</p>
-                                <h5 id="legal-purposes" class="text-zaffre">Purposes for which we will use your personal data</h5>
-                                <p>We have set out below, in a table format, a description of all the ways we plan to use your personal data, and which of the legal bases we rely on to do so. We have also identified what our legitimate interests are where appropriate.</p>
-                                <p class="mb-4">Note that we may process your personal data for more than one lawful ground depending on the specific purpose for which we are using your data. Please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a> if you need details about the specific legal ground we are relying on to process your personal data where more than one ground has been set out in the table below.</p>
-                                <table class="table mb-4">
-                                    <tr>
-                                        <th>
-                                            Purpose/Activity
-                                        </th>
-                                        <th>
-                                            Type of data
-                                        </th>
-                                        <th>
-                                            Lawful basis for processing including basis of legitimate interest
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To register you as a new customer
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact
-                                        </td>
-                                        <td>
-                                            Performance of a contract with you
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To process and deliver your order including:<br>
-                                            (a) Manage payments, fees and charges<br>
-                                            (b) Collect and recover money owed to us
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact<br>
-                                            (c) Financial<br>
-                                            (d) Transaction<br>
-                                            (e) Marketing and Communications
-                                        </td>
-                                        <td>
-                                            (a) Performance of a contract with you<br>
-                                            (b) Necessary for our legitimate interests (to recover debts due to us)
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To manage our relationship with you which will include:<br>
-                                            (a) Notifying you about changes to our terms or privacy policy<br>
-                                            (b) Asking you to leave a review or take a survey
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact<br>
-                                            (c) Profile<br>
-                                            (d) Marketing and Communications
-                                        </td>
-                                        <td>
-                                            (a) Performance of a contract with you<br>
-                                            (b) Necessary to comply with a legal obligation<br>
-                                            (c) Necessary for our legitimate interests (to keep our records updated and to study how customers use our products/services)
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To enable you to partake in a prize draw, competition or complete a survey
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact<br>
-                                            (c) Profile<br>
-                                            (d) Usage<br>
-                                            (e) Marketing and Communications
-                                        </td>
-                                        <td>
-                                            (a) Performance of a contract with you<br>
-                                            (b) Necessary for our legitimate interests (to study how customers use our products/services, to develop them and grow our business)
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To administer and protect our business and this website (including troubleshooting, data analysis, testing, system maintenance, support, reporting and hosting of data)
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact<br>
-                                            (c) Technical
-                                        </td>
-                                        <td>
-                                            (a) Necessary for our legitimate interests (for running our business, provision of administration and IT services, network security, to prevent fraud and in the context of a business reorganisation or group restructuring exercise)<br>
-                                            (b) Necessary to comply with a legal obligation
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To deliver relevant website content and advertisements to you and measure or understand the effectiveness of the advertising we serve to you
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact<br>
-                                            (c) Profile<br>
-                                            (d) Usage<br>
-                                            (e) Marketing and Communications<br>
-                                            (f) Technical
-                                        </td>
-                                        <td>
-                                            Necessary for our legitimate interests (to study how customers use our products/services, to develop them, to grow our business and to inform our marketing strategy)
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To use data analytics to improve our website, products/services, marketing, customer relationships and experiences
-                                        </td>
-                                        <td>
-                                            (a) Technical<br>
-                                            (b) Usage
-                                        </td>
-                                        <td>
-                                            Necessary for our legitimate interests (to define types of customers for our products and services, to keep our website updated and relevant, to develop our business and to inform our marketing strategy)
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            To make suggestions and recommendations to you about goods or services that may be of interest to you
-                                        </td>
-                                        <td>
-                                            (a) Identity<br>
-                                            (b) Contact<br>
-                                            (c) Technical<br>
-                                            (d) Usage<br>
-                                            (e) Profile
-                                        </td>
-                                        <td>
-                                            Necessary for our legitimate interests (to develop our products/services and grow our business)
-                                        </td>
-                                    </tr>
-                                </table>
-                                <h5 class="text-zaffre">Marketing</h5>
-                                <p class="mb-4">We strive to provide you with choices regarding certain personal data uses, particularly around marketing and advertising. We have established a <a href="{{ path('optout') }}">privacy centre</a> where you can view and make certain decisions about your personal data use.</p>
-                                <h5 class="text-zaffre">Promotional offers from us</h5>
-                                <p>We may use your Identity, Contact, Technical, Usage and Profile Data to form a view on what we think you may want or need, or what may be of interest to you. This is how we decide which products, services and offers may be relevant for you (we call this marketing).</p>
-                                <p class="mb-4">You will receive marketing communications from us if you have requested information from us or purchased goods or services from us or if you provided us with your details when you entered a competition or registered for a promotion and, in each case, you have not opted out of receiving that marketing.</p>
-                                <h5 class="text-zaffre">Third-party marketing</h5>
-                                <p class="mb-4">We will get your express opt-in consent before we share your personal data with any company outside the so-sure group of companies for marketing purposes.</p>
-                                <h5 class="text-zaffre">Opting out</h5>
-                                <p>You can ask us or third parties to stop sending you marketing messages at any time by logging into the website and checking or unchecking relevant boxes to adjust your marketing preferences or by following the opt-out links on any marketing message sent to you or by Contacting us at any time.</p>
-                                <p class="mb-4">Where you opt out of receiving these marketing messages, this will not apply to personal data provided to us as a result of a product/service purchase, warranty registration, product/service experience or other transactions.</p>
-                                <h5 class="text-zaffre">Cookies</h5>
-                                <p class="mb-4">You can set your browser to refuse all or some browser cookies, or to alert you when websites set or access cookies. If you disable or refuse cookies, please note that some parts of this website may become inaccessible or not function properly. For more information about the cookies we use, please see <a href="{{ cookie_url }}" target="_blank" rel="noopener noreferrer">our cookie policy</a>.</p>
-                                <h5 class="text-zaffre">Change of purpose</h5>
-                                <p>We will only use your personal data for the purposes for which we collected it, unless we reasonably consider that we need to use it for another reason and that reason is compatible with the original purpose. If you wish to get an explanation as to how the processing for the new purpose is compatible with the original purpose, please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a>.</p>
-                                <p>If we need to use your personal data for an unrelated purpose, we will notify you and we will explain the legal basis which allows us to do so.</p>
-                                <p>Please note that we may process your personal data without your knowledge or consent, in compliance with the above rules, where this is required or permitted by law.</p>
+                        <div id="how-we-use-your-personal-data" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    4. How we use your personal data <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
+                                    <ul class="mb-4">
+                                        <li class="mb-2">Where we need to perform the contract we are about to enter into or have entered into with you.</li>
+                                        <li class="mb-2">Where it is necessary for our legitimate interests (or those of a third party) and your interests and fundamental rights do not override those interests.</li>
+                                        <li class="mb-2">Where we need to comply with a legal or regulatory obligation.</li>
+                                    </ul>
+                                    <p><a href="#legal-purposes">Click here</a> to find out more about the types of lawful basis that we will rely on to process your personal data.</p>
+                                    <p class="md-4">Generally we do not rely on consent as a legal basis for processing your personal data other than in relation to sending third party direct marketing communications to you via email or text message. You have the right to withdraw consent to marketing at any time by Contacting us.</p>
+                                    <h3 id="legal-purposes" class="h5 text-zaffre">Purposes for which we will use your personal data</h3>
+                                    <p>We have set out below, in a table format, a description of all the ways we plan to use your personal data, and which of the legal bases we rely on to do so. We have also identified what our legitimate interests are where appropriate.</p>
+                                    <p class="mb-4">Note that we may process your personal data for more than one lawful ground depending on the specific purpose for which we are using your data. Please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a> if you need details about the specific legal ground we are relying on to process your personal data where more than one ground has been set out in the table below.</p>
+                                    <table class="table mb-4">
+                                        <tr>
+                                            <th>
+                                                Purpose/Activity
+                                            </th>
+                                            <th>
+                                                Type of data
+                                            </th>
+                                            <th>
+                                                Lawful basis for processing including basis of legitimate interest
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To register you as a new customer
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact
+                                            </td>
+                                            <td>
+                                                Performance of a contract with you
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To process and deliver your order including:<br>
+                                                (a) Manage payments, fees and charges<br>
+                                                (b) Collect and recover money owed to us
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact<br>
+                                                (c) Financial<br>
+                                                (d) Transaction<br>
+                                                (e) Marketing and Communications
+                                            </td>
+                                            <td>
+                                                (a) Performance of a contract with you<br>
+                                                (b) Necessary for our legitimate interests (to recover debts due to us)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To manage our relationship with you which will include:<br>
+                                                (a) Notifying you about changes to our terms or privacy policy<br>
+                                                (b) Asking you to leave a review or take a survey
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact<br>
+                                                (c) Profile<br>
+                                                (d) Marketing and Communications
+                                            </td>
+                                            <td>
+                                                (a) Performance of a contract with you<br>
+                                                (b) Necessary to comply with a legal obligation<br>
+                                                (c) Necessary for our legitimate interests (to keep our records updated and to study how customers use our products/services)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To enable you to partake in a prize draw, competition or complete a survey
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact<br>
+                                                (c) Profile<br>
+                                                (d) Usage<br>
+                                                (e) Marketing and Communications
+                                            </td>
+                                            <td>
+                                                (a) Performance of a contract with you<br>
+                                                (b) Necessary for our legitimate interests (to study how customers use our products/services, to develop them and grow our business)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To administer and protect our business and this website (including troubleshooting, data analysis, testing, system maintenance, support, reporting and hosting of data)
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact<br>
+                                                (c) Technical
+                                            </td>
+                                            <td>
+                                                (a) Necessary for our legitimate interests (for running our business, provision of administration and IT services, network security, to prevent fraud and in the context of a business reorganisation or group restructuring exercise)<br>
+                                                (b) Necessary to comply with a legal obligation
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To deliver relevant website content and advertisements to you and measure or understand the effectiveness of the advertising we serve to you
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact<br>
+                                                (c) Profile<br>
+                                                (d) Usage<br>
+                                                (e) Marketing and Communications<br>
+                                                (f) Technical
+                                            </td>
+                                            <td>
+                                                Necessary for our legitimate interests (to study how customers use our products/services, to develop them, to grow our business and to inform our marketing strategy)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To use data analytics to improve our website, products/services, marketing, customer relationships and experiences
+                                            </td>
+                                            <td>
+                                                (a) Technical<br>
+                                                (b) Usage
+                                            </td>
+                                            <td>
+                                                Necessary for our legitimate interests (to define types of customers for our products and services, to keep our website updated and relevant, to develop our business and to inform our marketing strategy)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                To make suggestions and recommendations to you about goods or services that may be of interest to you
+                                            </td>
+                                            <td>
+                                                (a) Identity<br>
+                                                (b) Contact<br>
+                                                (c) Technical<br>
+                                                (d) Usage<br>
+                                                (e) Profile
+                                            </td>
+                                            <td>
+                                                Necessary for our legitimate interests (to develop our products/services and grow our business)
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <h3 class="h5 text-zaffre">Marketing</h3>
+                                    <p class="mb-4">We strive to provide you with choices regarding certain personal data uses, particularly around marketing and advertising. We have established a <a href="{{ path('optout') }}">privacy centre</a> where you can view and make certain decisions about your personal data use.</p>
+                                    <h3 class="h5 text-zaffre">Promotional offers from us</h3>
+                                    <p>We may use your Identity, Contact, Technical, Usage and Profile Data to form a view on what we think you may want or need, or what may be of interest to you. This is how we decide which products, services and offers may be relevant for you (we call this marketing).</p>
+                                    <p class="mb-4">You will receive marketing communications from us if you have requested information from us or purchased goods or services from us or if you provided us with your details when you entered a competition or registered for a promotion and, in each case, you have not opted out of receiving that marketing.</p>
+                                    <h3 class="h5 text-zaffre">Third-party marketing</h3>
+                                    <p class="mb-4">We will get your express opt-in consent before we share your personal data with any company outside the so-sure group of companies for marketing purposes.</p>
+                                    <h3 class="h5 text-zaffre">Opting out</h3>
+                                    <p>You can ask us or third parties to stop sending you marketing messages at any time by logging into the website and checking or unchecking relevant boxes to adjust your marketing preferences or by following the opt-out links on any marketing message sent to you or by Contacting us at any time.</p>
+                                    <p class="mb-4">Where you opt out of receiving these marketing messages, this will not apply to personal data provided to us as a result of a product/service purchase, warranty registration, product/service experience or other transactions.</p>
+                                    <h3 class="h5 text-zaffre">Cookies</h3>
+                                    <p class="mb-4">You can set your browser to refuse all or some browser cookies, or to alert you when websites set or access cookies. If you disable or refuse cookies, please note that some parts of this website may become inaccessible or not function properly. For more information about the cookies we use, please see <a href="{{ cookie_url }}" target="_blank" rel="noopener noreferrer">our cookie policy</a>.</p>
+                                    <h3 class="h5 text-zaffre">Change of purpose</h3>
+                                    <p>We will only use your personal data for the purposes for which we collected it, unless we reasonably consider that we need to use it for another reason and that reason is compatible with the original purpose. If you wish to get an explanation as to how the processing for the new purpose is compatible with the original purpose, please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a>.</p>
+                                    <p>If we need to use your personal data for an unrelated purpose, we will notify you and we will explain the legal basis which allows us to do so.</p>
+                                    <p>Please note that we may process your personal data without your knowledge or consent, in compliance with the above rules, where this is required or permitted by law.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="disclosures-of-your-personal-data" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                5. Disclosures of your personal data <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <p>We may have to share your personal data with the parties set out below for the purposes set out in the table in paragraph 4 above.</p>
-                                <ul>
-                                    <li class="mb-2">
-                                        External Third Parties as set out in the
-                                        <a href="#third-party-external"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#third-party-external">
-                                            Glossary</a>.
-                                    </li>
-                                    <li class="mb-2">Third parties to whom we may choose to sell, transfer, or merge parts of our business or our assets. Alternatively, we may seek to acquire other businesses or merge with them. If a change happens to our business, then the new owners may use your personal data in the same way as set out in this privacy notice.</li>
-                                    <li class="mb-2">We require all third parties to respect the security of your personal data and to treat it in accordance with the law. We do not allow our third-party service providers to use your personal data for their own purposes and only permit them to process your personal data for specified purposes and in accordance with our instructions.</li>
-                                </ul>
+                        <div id="disclosures-of-your-personal-data" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    5. Disclosures of your personal data <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <p>We may have to share your personal data with the parties set out below for the purposes set out in the table in paragraph 4 above.</p>
+                                    <ul>
+                                        <li class="mb-2">
+                                            External Third Parties as set out in the
+                                            <a href="#third-party-external"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#third-party-external">
+                                                Glossary</a>.
+                                        </li>
+                                        <li class="mb-2">Third parties to whom we may choose to sell, transfer, or merge parts of our business or our assets. Alternatively, we may seek to acquire other businesses or merge with them. If a change happens to our business, then the new owners may use your personal data in the same way as set out in this privacy notice.</li>
+                                        <li class="mb-2">We require all third parties to respect the security of your personal data and to treat it in accordance with the law. We do not allow our third-party service providers to use your personal data for their own purposes and only permit them to process your personal data for specified purposes and in accordance with our instructions.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="international-transfers" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                6. International transfers <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <p>Many of our external third parties are based outside the European Economic Area (EEA) so their processing of your personal data will involve a transfer of data outside the EEA.</p>
-                                <p>Whenever we transfer your personal data out of the EEA, we ensure a similar degree of protection is afforded to it by ensuring at least one of the following safeguards is implemented:</p>
-                                <ul>
-                                    <li class="mb-2">We will only transfer your personal data to countries that have been deemed to provide an adequate level of protection for personal data by the European Commission. For further details, see European Commission: Adequacy of the protection of personal data in non-EU countries.</li>
-                                    <li class="mb-2">Where we use certain service providers, we may use specific contracts approved by the European Commission which give personal data the same protection it has in Europe. For further details, see European Commission: Model contracts for the transfer of personal data to third countries.</li>
-                                    <li class="mb-2">Where we use providers based in the US, we may transfer data to them if they are part of the Privacy Shield which requires them to provide similar protection to personal data shared between the Europe and the US. For further details, see European Commission: EU-US Privacy Shield.</li>
-                                    <li class="mb-2">Please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a> if you want further information on the specific mechanism used by us when transferring your personal data out of the EEA.</li>
-                                </ul>
+                        <div id="international-transfers" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    6. International transfers <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <p>Many of our external third parties are based outside the European Economic Area (EEA) so their processing of your personal data will involve a transfer of data outside the EEA.</p>
+                                    <p>Whenever we transfer your personal data out of the EEA, we ensure a similar degree of protection is afforded to it by ensuring at least one of the following safeguards is implemented:</p>
+                                    <ul>
+                                        <li class="mb-2">We will only transfer your personal data to countries that have been deemed to provide an adequate level of protection for personal data by the European Commission. For further details, see European Commission: Adequacy of the protection of personal data in non-EU countries.</li>
+                                        <li class="mb-2">Where we use certain service providers, we may use specific contracts approved by the European Commission which give personal data the same protection it has in Europe. For further details, see European Commission: Model contracts for the transfer of personal data to third countries.</li>
+                                        <li class="mb-2">Where we use providers based in the US, we may transfer data to them if they are part of the Privacy Shield which requires them to provide similar protection to personal data shared between the Europe and the US. For further details, see European Commission: EU-US Privacy Shield.</li>
+                                        <li class="mb-2">Please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a> if you want further information on the specific mechanism used by us when transferring your personal data out of the EEA.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="data-security" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                7. Data security <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <p>We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorised way, altered or disclosed. In addition, we limit access to your personal data to those employees, agents, contractors and other third parties who have a business need to know. They will only process your personal data on our instructions and they are subject to a duty of confidentiality.</p><p>We have put in place procedures to deal with any suspected personal data breach and will notify you and any applicable regulator of a breach where we are legally required to do so.</p>
+                        <div id="data-security" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    7. Data security <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <p>We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorised way, altered or disclosed. In addition, we limit access to your personal data to those employees, agents, contractors and other third parties who have a business need to know. They will only process your personal data on our instructions and they are subject to a duty of confidentiality.</p><p>We have put in place procedures to deal with any suspected personal data breach and will notify you and any applicable regulator of a breach where we are legally required to do so.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="data-retention" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                8. Data retention <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <h5 class="text-zaffre">How long will you use my personal data for?</h5>
-                                <p>By law we have to keep basic information about our customers (including Contact, Identity, Financial and Transaction Data) for seven and a half years after they cease being customers for regulatory purposes.</p>
-                                <p>
-                                    In some circumstances you can ask us to delete your data: see
-                                    <a href="#rights-request-erasure"
-                                       data-cardbox-target="#glossary"
-                                       data-cardbox-anchor="#rights-request-erasure">
-                                        Request erasure</a>
-                                    below for further information.
-                                </p>
-                                <p>In some circumstances we may anonymise your personal data (so that it can no longer be associated with you) for research or statistical purposes in which case we may use this information indefinitely without further notice to you.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="your-legal-rights" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                9. Your legal rights <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <p>Under certain circumstances, you have rights under data protection laws in relation to your personal data. Please click on the links below to find out more about these rights:</p>
-                                <ul class="mb-4">
-                                    <li class="mb-2">
-                                        <a href="#rights-request-correction"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-request-correction">
-                                            Request access to your personal data</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="#rights-request-correction"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-request-correction">
-                                            Request correction of your personal data</a>
-                                    </li>
-                                    <li class="mb-2">
+                        <div id="data-retention" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    8. Data retention <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <h3 class="h5 text-zaffre">How long will you use my personal data for?</h3>
+                                    <p>By law we have to keep basic information about our customers (including Contact, Identity, Financial and Transaction Data) for seven and a half years after they cease being customers for regulatory purposes.</p>
+                                    <p>
+                                        In some circumstances you can ask us to delete your data: see
                                         <a href="#rights-request-erasure"
                                            data-cardbox-target="#glossary"
                                            data-cardbox-anchor="#rights-request-erasure">
-                                            Request erasure of your personal data</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="#rights-object-processing"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-object-processing">
-                                            Object to processing of your personal data</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="#rights-request-restriction-processing"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-request-restriction-processing">
-                                            Request restriction of processing your personal data</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="#rights-request-transfer"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-request-transfer">
-                                            Request transfer of your personal data</a>
-                                    </li>
-                                    <li class="mb-2">
-                                        <a href="#rights-withdraw-consent"
-                                           data-cardbox-target="#glossary"
-                                           data-cardbox-anchor="#rights-withdraw-consent">
-                                            Right to withdraw consent</a>
-                                    </li>
-                                </ul>
-                                <p>If you wish to exercise any of the rights set out above, please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a>.</p>
-                                <h5 class="text-zaffre">No fee usually required</h5>
-                                <p class="mb-4">You will not have to pay a fee to access your personal data (or to exercise any of the other rights). However, we may charge a reasonable fee if your request is clearly unfounded, repetitive or excessive. Alternatively, we may refuse to comply with your request in these circumstances.</p>
-                                <h5 class="text-zaffre">What we may need from you</h5>
-                                <p class="mb-4">We may need to request specific information from you to help us confirm your identity and ensure your right to access your personal data (or to exercise any of your other rights). This is a security measure to ensure that personal data is not disclosed to any person who has no right to receive it. We may also contact you to ask you for further information in relation to your request to speed up our response.</p>
-                                <h5 class="text-zaffre">Time limit to respond</h5>
-                                <p>We try to respond to all legitimate requests within one month. Occasionally it may take us longer than a month if your request is particularly complex or you have made a number of requests. In this case, we will notify you and keep you updated.</p>
+                                            Request erasure</a>
+                                        below for further information.
+                                    </p>
+                                    <p>In some circumstances we may anonymise your personal data (so that it can no longer be associated with you) for research or statistical purposes in which case we may use this information indefinitely without further notice to you.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="your-legal-rights" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    9. Your legal rights <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <p>Under certain circumstances, you have rights under data protection laws in relation to your personal data. Please click on the links below to find out more about these rights:</p>
+                                    <ul class="mb-4">
+                                        <li class="mb-2">
+                                            <a href="#rights-request-correction"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-request-correction">
+                                                Request access to your personal data</a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#rights-request-correction"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-request-correction">
+                                                Request correction of your personal data</a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#rights-request-erasure"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-request-erasure">
+                                                Request erasure of your personal data</a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#rights-object-processing"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-object-processing">
+                                                Object to processing of your personal data</a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#rights-request-restriction-processing"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-request-restriction-processing">
+                                                Request restriction of processing your personal data</a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#rights-request-transfer"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-request-transfer">
+                                                Request transfer of your personal data</a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a href="#rights-withdraw-consent"
+                                               data-cardbox-target="#glossary"
+                                               data-cardbox-anchor="#rights-withdraw-consent">
+                                                Right to withdraw consent</a>
+                                        </li>
+                                    </ul>
+                                    <p>If you wish to exercise any of the rights set out above, please <a href="{{ path('about_how_to_contact_so_sure') }}">Contact us</a>.</p>
+                                    <h3 class="h5 text-zaffre">No fee usually required</h3>
+                                    <p class="mb-4">You will not have to pay a fee to access your personal data (or to exercise any of the other rights). However, we may charge a reasonable fee if your request is clearly unfounded, repetitive or excessive. Alternatively, we may refuse to comply with your request in these circumstances.</p>
+                                    <h3 class="h5 text-zaffre">What we may need from you</h3>
+                                    <p class="mb-4">We may need to request specific information from you to help us confirm your identity and ensure your right to access your personal data (or to exercise any of your other rights). This is a security measure to ensure that personal data is not disclosed to any person who has no right to receive it. We may also contact you to ask you for further information in relation to your request to speed up our response.</p>
+                                    <h3 class="h5 text-zaffre">Time limit to respond</h3>
+                                    <p>We try to respond to all legitimate requests within one month. Occasionally it may take us longer than a month if your request is particularly complex or you have made a number of requests. In this case, we will notify you and keep you updated.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="glossary" class="expanding-cardbox mb-4">
+                            <div class="expanding-cardbox__body">
+                                <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                                    10. Glossary <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                </h2>
+                                <div class="expanding-cardbox__expand mt-4">
+                                    <h3 class="h5 text-zaffre">Lawful basis</h3>
+                                    <p><strong>Legitimate Interest</strong> means the interest of our business in conducting and managing our business to enable us to give you the best service/product and the best and most secure experience. We make sure we consider and balance any potential impact on you (both positive and negative) and your rights before we process your personal data for our legitimate interests. We do not use your personal data for activities where our interests are overridden by the impact on you (unless we have your consent or are otherwise required or permitted to by law). You can obtain further information about how we assess our legitimate interests against any potential impact on you in respect of specific activities by Contacting us</p>
+                                    <p><strong>Performance of Contract</strong> means processing your data where it is necessary for the performance of a contract to which you are a party or to take steps at your request before entering into such a contract.</p>
+                                    <p class="mb-4"><strong>Comply with a legal or regulatory obligation</strong> means processing your personal data where it is necessary for compliance with a legal or regulatory obligation that we are subject to.</p>
+                                    <h3 id="third-party-external" class="h5 text-zaffre">External third parties</h3>
+                                    <ul class="mb-4">
+                                        <li class="mb-2">Professional advisers acting as processors or joint controllers including lawyers, bankers, auditors and insurers based in the United Kingdom who provide consultancy, banking, legal, insurance and accounting services.</li>
+                                        <li class="mb-2">HM Revenue &amp; Customs, regulators and other authorities acting as processors or joint controllers based in the United Kingdom who require reporting of processing activities in certain circumstances.</li>
+                                        <li class="mb-2">Software as a service (SAAS) providers acting as processors based in the United Kingdom, other EU countries, and the USA.</li>
+                                        <li class="mb-2">Claims handlers acting as processors or joint controllers based in the United Kingdom.</li>
+                                        <li class="mb-2">Other insurance and fraud prevention agencies acting as processors or joint controllers based in the United Kingdom.</li>
+                                        <li class="mb-2">Payment gateway, merchant services, and banking services acting as processors or joint controllers based in the United Kingdom.</li>
+                                    </ul>
+                                    <h3 class="h5 text-zaffre">Your legal rights</h3>
+                                    <p>You have the right to:</p>
+                                    <ul>
+                                        <li id="rights-request-access" class="mb-2"><strong>Request access</strong> to your personal data (commonly known as a “data subject access request”). This enables you to receive a copy of the personal data we hold about you and to check that we are lawfully processing it.</li>
+                                        <li id="rights-request-correction" class="mb-2"><strong>Request correction</strong> of the personal data that we hold about you. This enables you to have any incomplete or inaccurate data we hold about you corrected, though we may need to verify the accuracy of the new data you provide to us.</li>
+                                        <li id="rights-request-erasure" class="mb-2"><strong>Request erasure</strong> of your personal data. This enables you to ask us to delete or remove personal data where there is no good reason for us continuing to process it. You also have the right to ask us to delete or remove your personal data where you have successfully exercised your right to object to processing (see below), where we may have processed your information unlawfully or where we are required to erase your personal data to comply with local law. Note, however, that we may not always be able to comply with your request of erasure for specific legal reasons which will be notified to you, if applicable, at the time of your request.</li>
+                                        <li id="rights-object-processing" class="mb-2"><strong>Object to processing</strong> of your personal data where we are relying on a legitimate interest (or those of a third party) and there is something about your particular situation which makes you want to object to processing on this ground as you feel it impacts on your fundamental rights and freedoms. You also have the right to object where we are processing your personal data for direct marketing purposes. In some cases, we may demonstrate that we have compelling legitimate grounds to process your information which override your rights and freedoms.</li>
+                                        <li id="rights-request-restriction-processing" class="mb-2"><strong>Request restriction of processing</strong> of your personal data. This enables you to ask us to suspend the processing of your personal data in the following scenarios: (a) if you want us to establish the data’s accuracy; (b) where our use of the data is unlawful but you do not want us to erase it; (c) where you need us to hold the data even if we no longer require it as you need it to establish, exercise or defend legal claims; or (d) you have objected to our use of your data but we need to verify whether we have overriding legitimate grounds to use it.</li>
+                                        <li id="rights-request-transfer" class="mb-2"><strong>Request the transfer</strong> of your personal data to you or to a third party. We will provide to you, or a third party you have chosen, your personal data in a structured, commonly used, machine-readable format. Note that this right only applies to automated information which you initially provided consent for us to use or where we used the information to perform a contract with you.</li>
+                                        <li id="rights-withdraw-consent" class="mb-2"><strong>Withdraw consent at any time</strong> where we are relying on consent to process your personal data. However, this will not affect the lawfulness of any processing carried out before you withdraw your consent. If you withdraw your consent, we may not be able to provide certain products or services to you. We will advise you if this is the case at the time you withdraw your consent.</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div id="glossary" class="expanding-cardbox mb-4">
-                        <div class="expanding-cardbox__body">
-                            <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                                10. Glossary <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                            </h5>
-                            <div class="expanding-cardbox__expand mt-4">
-                                <h5 class="text-zaffre">Lawful basis</h5>
-                                <p><strong>Legitimate Interest</strong> means the interest of our business in conducting and managing our business to enable us to give you the best service/product and the best and most secure experience. We make sure we consider and balance any potential impact on you (both positive and negative) and your rights before we process your personal data for our legitimate interests. We do not use your personal data for activities where our interests are overridden by the impact on you (unless we have your consent or are otherwise required or permitted to by law). You can obtain further information about how we assess our legitimate interests against any potential impact on you in respect of specific activities by Contacting us</p>
-                                <p><strong>Performance of Contract</strong> means processing your data where it is necessary for the performance of a contract to which you are a party or to take steps at your request before entering into such a contract.</p>
-                                <p class="mb-4"><strong>Comply with a legal or regulatory obligation</strong> means processing your personal data where it is necessary for compliance with a legal or regulatory obligation that we are subject to.</p>
-                                <h5 id="third-party-external" class="text-zaffre">External third parties</h5>
-                                <ul class="mb-4">
-                                    <li class="mb-2">Professional advisers acting as processors or joint controllers including lawyers, bankers, auditors and insurers based in the United Kingdom who provide consultancy, banking, legal, insurance and accounting services.</li>
-                                    <li class="mb-2">HM Revenue &amp; Customs, regulators and other authorities acting as processors or joint controllers based in the United Kingdom who require reporting of processing activities in certain circumstances.</li>
-                                    <li class="mb-2">Software as a service (SAAS) providers acting as processors based in the United Kingdom, other EU countries, and the USA.</li>
-                                    <li class="mb-2">Claims handlers acting as processors or joint controllers based in the United Kingdom.</li>
-                                    <li class="mb-2">Other insurance and fraud prevention agencies acting as processors or joint controllers based in the United Kingdom.</li>
-                                    <li class="mb-2">Payment gateway, merchant services, and banking services acting as processors or joint controllers based in the United Kingdom.</li>
-                                </ul>
-                                <h5 class="text-zaffre">Your legal rights</h5>
-                                <p>You have the right to:</p>
-                                <ul>
-                                    <li id="rights-request-access" class="mb-2"><strong>Request access</strong> to your personal data (commonly known as a “data subject access request”). This enables you to receive a copy of the personal data we hold about you and to check that we are lawfully processing it.</li>
-                                    <li id="rights-request-correction" class="mb-2"><strong>Request correction</strong> of the personal data that we hold about you. This enables you to have any incomplete or inaccurate data we hold about you corrected, though we may need to verify the accuracy of the new data you provide to us.</li>
-                                    <li id="rights-request-erasure" class="mb-2"><strong>Request erasure</strong> of your personal data. This enables you to ask us to delete or remove personal data where there is no good reason for us continuing to process it. You also have the right to ask us to delete or remove your personal data where you have successfully exercised your right to object to processing (see below), where we may have processed your information unlawfully or where we are required to erase your personal data to comply with local law. Note, however, that we may not always be able to comply with your request of erasure for specific legal reasons which will be notified to you, if applicable, at the time of your request.</li>
-                                    <li id="rights-object-processing" class="mb-2"><strong>Object to processing</strong> of your personal data where we are relying on a legitimate interest (or those of a third party) and there is something about your particular situation which makes you want to object to processing on this ground as you feel it impacts on your fundamental rights and freedoms. You also have the right to object where we are processing your personal data for direct marketing purposes. In some cases, we may demonstrate that we have compelling legitimate grounds to process your information which override your rights and freedoms.</li>
-                                    <li id="rights-request-restriction-processing" class="mb-2"><strong>Request restriction of processing</strong> of your personal data. This enables you to ask us to suspend the processing of your personal data in the following scenarios: (a) if you want us to establish the data’s accuracy; (b) where our use of the data is unlawful but you do not want us to erase it; (c) where you need us to hold the data even if we no longer require it as you need it to establish, exercise or defend legal claims; or (d) you have objected to our use of your data but we need to verify whether we have overriding legitimate grounds to use it.</li>
-                                    <li id="rights-request-transfer" class="mb-2"><strong>Request the transfer</strong> of your personal data to you or to a third party. We will provide to you, or a third party you have chosen, your personal data in a structured, commonly used, machine-readable format. Note that this right only applies to automated information which you initially provided consent for us to use or where we used the information to perform a contract with you.</li>
-                                    <li id="rights-withdraw-consent" class="mb-2"><strong>Withdraw consent at any time</strong> where we are relying on consent to process your personal data. However, this will not affect the lawfulness of any processing carried out before you withdraw your consent. If you withdraw your consent, we may not be able to provide certain products or services to you. We will advise you if this is the case at the time you withdraw your consent.</li>
-                                </ul>
-                            </div>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block">
+                    <div class="px-4 pb-4 pt-5 p-lg-5 text-center">
+                        <div class="cp__nav">
+                            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
+                            <h2 class="text-dodger-blue mb-5">Privacy Policy 🕵️</h2>
+                            <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {# Sub Content #}
-            <div class="faq__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="faq__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="faq__sub text-center">
-                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" alt="so-sure - contract" width="200px" class="d-block mx-auto">
-                    <h2 class="text-dodger-blue mb-5">Privacy Policy 🕵️</h2>
-                    <a id="back-to-top-faq" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a>
-                </div>
-            </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/faq.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

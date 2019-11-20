@@ -17,16 +17,41 @@
     <section class="hero">
         <div class="container-large">
             <div class="hero__intro">
-                <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
+                <div class="breadcrumbs">
+                    <ul class="list-inline"
+                        vocab="https://schema.org/"
+                        typeof="BreadcrumbList">
+                        <li class="list-inline-item"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <a href="{{ path('homepage') }}"
+                               class="text-columbia-blue-e"
+                               property="item"
+                               typeof="WebPage">
+                               <span property="name">Home</span>
+                            </a>
+                            <meta property="position" content="1">
+                        </li>
+                        <li class="list-inline-item text-white">
+                            <i class="fal fa-angle-right text-white"></i>
+                        </li>
+                        <li class="list-inline-item text-white"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <span property="name">Starling Bank</span>
+                            <meta property="position" content="2">
+                        </li>
+                    </ul>
+                </div>
+                <h1 class="mb-2 text-white h2">Mobile Phone Insurance that's Simply Better</h1>
                 <p class="lead text-columbia-blue-e mb-4">in partnership with</p>
                 <img data-src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="280px" class="d-block mb-4 mx-auto lozad">
             </div>
             <div class="hero__controls mb-4">
                 <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
-                <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-columbia-blue-e btn-block-xs ml-md-2">Already have a so-sure policy ?</a>
+                <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-columbia-blue-e btn-block-xs ml-md-2">Link Starling Account</a>
             </div>
             {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
-            <p class="updated-text mt-2"><em class="text-center"><small>Information checked on September 1st 2018</small></em>
         </div>
         <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <defs></defs>

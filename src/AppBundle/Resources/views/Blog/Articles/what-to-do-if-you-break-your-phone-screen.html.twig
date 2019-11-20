@@ -2,125 +2,118 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
-{% set split_mode = true %}
 
-{% block title %}so-sure - What to do if you break your phone screen{% endblock %}
+{% block title %}What to do if you break your phone screen - Blog | so-sure
+{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="description" content="Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage."/>
 {% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="blog">
-        <div class="d-lg-flex">
-
-            {# Main Content #}
-            <div class="blog__main__container">
-                <div class="blog__main px-4 px-lg-5">
-                    <article>
-                        <header class="mb-5">
-                            <hgroup>
-                                <div class="breadcrumbs">
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">What to do if you break your phone screen</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">What to do if you break your phone screen</h1>
                                     <ul class="list-inline">
                                         <li class="list-inline-item">
-                                            <a href="{{ path('blog_index') }}">Blog</a>
+                                            <div rel="author">Susan</div>
                                         </li>
+                                        <li class="list-inline-item">|</li>
                                         <li class="list-inline-item">
-                                            <i class="fal fa-angle-right"></i>
-                                        </li>
-                                        <li class="list-inline-item">
-                                            What to do if you break your phone screen
+                                            <time>Jan 16, 2019</time>
                                         </li>
                                     </ul>
-                                </div>
-                                <h1 class="text-primary mb-4">What to do if you break your phone screen</h1>
-                                <ul class="list-inline">
-                                    <li class="list-inline-item">
-                                        <div rel="author">Susan</div>
-                                    </li>
-                                    <li class="list-inline-item">|</li>
-                                    <li class="list-inline-item">
-                                        <time>Jan 16, 2019</time>
-                                    </li>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <h2>Breaking your phone screen is a right pain</h2>
+                                <p>Not only do you have to cope with the acute social embarrassment that comes with carrying around a piece of scrap metal, but there also’s the small matter of not actually being able to see your screen - or perform basic tasks like messaging, ordering Deliveroo and using your camera to check your hair is behaving itself.</p>
+                                <p>It doesn’t have to be like this. There is another way.</p>
+                                <h2>Check your warranty and insurance</h2>
+                                <p>If your phone is still under warranty and the cracked screen was caused by a manufacturing defect, you’ll likely be covered under consumer law. But really, how many screens crack due to manufacturing defects?</p>
+                                <p>Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage.</p>
+                                <p>Truth be told, the reason most people are walking around with cracked phones is not that they’ve exceeded their warranty and don’t have insurance. Rather it’s because their warranty and insurance don’t cover them for accidental damage.</p>
+                                <p>Even if you are covered, it can take insurance companies ages to get it sorted, sometimes as long as 10 days. I know, it seems totally mad, but it’s a common issue.</p>
+                                <h2>Get it repaired yourself</h2>
+                                <p>Don’t lose heart if your insurance doesn’t cover accidental damage. It’s time to take a deep breath and get creative.First things first, make sure you back up your phone so you don’t lose your photos, contacts and other data if something goes wrong. Also bear in mind that some manufacturers won’t honour warranties if phones have been repaired by third parties, meaning that serious problems further down the line - like manufacturing defects - won’t be covered. If that’s a risk you’re willing to take, it’s time to hit the high street in search of a repair outfit.</p>
+                                <p>There are tonnes of places that offer phone repairs. Some will even do it whilst you wait. Just make sure you shop around and get a quote in writing before handing over your phone and committing to having the work carried out.</p>
+                                <ul>
+                                    <li><a href="https://www.imend.com/landing_page/" target="_blank" rel="noopener noreferrer">iMend</a> has 30 stores nationwide, many in railway stations and shopping centres. They’ll repair your phone in 30 minutes and prices start from £20. All repairs come with a lifetime warranty, too. Plus they are a partner of ours too!</li>
+                                    <li>If you’re in London, check out <a href="https://www.lovefone.co.uk/" target="_blank" rel="noopener noreferrer">Lovefone</a>, who offer repairs while you wait.</li>
+                                    <li>If you’re willing to send your phone off in the post, try <a href="https://www.mobiledeviceworkshop.co.uk/about-us-1-w.asp" target="_blank" rel="noopener noreferrer">Mobile Device Workshop</a>.</li>
+                                    <li><a href="https://www.squaretrade.com/go/" target="_blank" rel="noopener noreferrer">iCracked.com</a> is perhaps the most convenient option - they come out to you.</li>
                                 </ul>
-                            </hgroup>
-                        </header>
-                        <h2>Breaking your phone screen is a right pain</h2>
-                        <p>Not only do you have to cope with the acute social embarrassment that comes with carrying around a piece of scrap metal, but there also’s the small matter of not actually being able to see your screen - or perform basic tasks like messaging, ordering Deliveroo and using your camera to check your hair is behaving itself.</p>
-                        <p>It doesn’t have to be like this. There is another way.</p>
-                        <h2>Check your warranty and insurance</h2>
-                        <p>If your phone is still under warranty and the cracked screen was caused by a manufacturing defect, you’ll likely be covered under consumer law. But really, how many screens crack due to manufacturing defects?</p>
-                        <p>Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage.</p>
-                        <p>Truth be told, the reason most people are walking around with cracked phones is not that they’ve exceeded their warranty and don’t have insurance. Rather it’s because their warranty and insurance don’t cover them for accidental damage.</p>
-                        <p>Even if you are covered, it can take insurance companies ages to get it sorted, sometimes as long as 10 days. I know, it seems totally mad, but it’s a common issue.</p>
-                        <h2>Get it repaired yourself</h2>
-                        <p>Don’t lose heart if your insurance doesn’t cover accidental damage. It’s time to take a deep breath and get creative.First things first, make sure you back up your phone so you don’t lose your photos, contacts and other data if something goes wrong. Also bear in mind that some manufacturers won’t honour warranties if phones have been repaired by third parties, meaning that serious problems further down the line - like manufacturing defects - won’t be covered. If that’s a risk you’re willing to take, it’s time to hit the high street in search of a repair outfit.</p>
-                        <p>There are tonnes of places that offer phone repairs. Some will even do it whilst you wait. Just make sure you shop around and get a quote in writing before handing over your phone and committing to having the work carried out.</p>
-                        <ul>
-                            <li><a href="https://www.imend.com/" target="_blank" rel="noopener noreferrer">iMend</a> has 30 stores nationwide, many in railway stations and shopping centres. They’ll repair your phone in 30 minutes and prices start from £20. All repairs come with a lifetime warranty, too. Plus they are a partner of ours too!</li>
-                            <li>If you’re in London, check out <a href="https://www.lovefone.co.uk/" target="_blank" rel="noopener noreferrer">Lovefone</a>, who offer repairs while you wait.</li>
-                            <li>If you’re willing to send your phone off in the post, try <a href="https://www.mobiledeviceworkshop.co.uk/about-us-1-w.asp" target="_blank" rel="noopener noreferrer">Mobile Device Workshop</a>.</li>
-                            <li><a href="https://www.icracked.com/" target="_blank" rel="noopener noreferrer">iCracked.com</a> is perhaps the most convenient option - they come out to you.</li>
-                        </ul>
-                        <p>It’s a good idea to ask your friends and family for recommendations. Perhaps whack something up on Facebook and see if anyone can recommend a local outfit that’s helped them in the past.</p>
-                        <h2>Get a case</h2>
-                        <p>Hate to say we told you so, but your best option to avoid another crack screen episode - once your screen is fixed, of course - is to invest in a decent case. As more phone manufacturers incorporate glass into their designs, cracking is going to become a bigger issue. iPhone 8 and iPhone X, for example, both use glass front and back, and are <a href="https://www.theguardian.com/technology/2017/sep/25/iphone-8-glass-back-apple-repair-cost-screen-replace-accident" target="_blank" rel="noopener noreferrer">notoriously expensive to repair</a>.</p>
-                        <p>Amazon stock literally thousands of affordable options. You can <a href="https://www.amazon.co.uk/Best-Sellers-Electronics-Mobile-Phone-Cases-Covers/zgbs/electronics/340321031" target="_blank" rel="noopener noreferrer">check out their bestsellers here</a>.</p>
-                        <hr>
-                        <p>Here at <a href="{{ path('homepage') }}">so-sure</a> we know that breaking your screen is really rubbish. So, if your screen is broken, smashed or cracked and you can’t use it any more, we’ll replace or repair it within 24-72 hours.</p>
-                        <p>We believe in a different kind of insurance. We protect you when you need to claim and reward you when you don't. You can <a href="{{ path('homepage') }}">find out more here</a>.</p>
-                        <footer></footer>
-                    </article>
-                    <nav><a href="{{ path('blog_index') }}">Back</a></nav>
-                </div>
-            </div>
-
-            {# Sub Content #}
-            <div class="blog__sub__container d-none d-lg-flex justify-content-lg-start">
-                {# Curve Desktop #}
-                <div class="blog__curve">
-                    <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 69 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <desc>Created with Sketch.</desc>
-                        <defs></defs>
-                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <g id="3.0-so-sure-(Price-&amp;-Payment)">
-                                <path d="M0,0 L69,0 C31,140 12,280.666667 12,422 C12,563.333333 31,704.666667 69,846 L0,846 L0,0 Z" id="Rectangle-2" fill="#FFFFFF"></path>
-                                <path d="M69,0 L69,846 L68,846 C30.6666667,705 12,564 12,423 C12,282 31,141 69,0 Z" id="Rectangle-3" fill="#E5F4FF"></path>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-                <div class="blog__sub px-4 pb-4 pt-5 p-lg-5">
-                    <div class="blog__nav">
-{#                         <div id="blog-nav" class="list-group mb-5">
-                            <a class="list-group-item list-group-item-action" href="#top-questions"><i class="far fa-angle-right fa-lg mr-2"></i> Top Questions</a>
-                            <a class="list-group-item list-group-item-action" href="#the-so-sure-app-and-pic-sure"><i class="far fa-angle-right fa-lg  mr-2"></i> The so-sure app</a>
-                            <a class="list-group-item list-group-item-action" href="#social-insurance-and-reward-pot"><i class="far fa-angle-right fa-lg  mr-2"></i> Social Insurance &amp; Reward Pot</a>
-                            <a class="list-group-item list-group-item-action" href="#the-insurance-policy"><i class="far fa-angle-right fa-lg  mr-2"></i> The Insurance Policy</a>
-                            <a class="list-group-item list-group-item-action" href="#claims"><i class="far fa-angle-right fa-lg  mr-2"></i> Claims</a>
-                            <a class="list-group-item list-group-item-action" href="#payments-and-cancellations"><i class="far fa-angle-right fa-lg  mr-2"></i> Payments &amp; Cancellations</a>
-                            <a class="list-group-item list-group-item-action" href="#about-us"><i class="far fa-angle-right fa-lg  mr-2"></i> About us</a>
-                        </div> #}
-                        {# <a id="back-to-top-blog" href="#" class="btn btn-outline-dodger-blue"><i class="far fa-arrow-up mr-2"></i> Back to top</a> #}
+                                <p>It’s a good idea to ask your friends and family for recommendations. Perhaps whack something up on Facebook and see if anyone can recommend a local outfit that’s helped them in the past.</p>
+                                <h2>Get a case</h2>
+                                <p>Hate to say we told you so, but your best option to avoid another crack screen episode - once your screen is fixed, of course - is to invest in a decent case. As more phone manufacturers incorporate glass into their designs, cracking is going to become a bigger issue. iPhone 8 and iPhone X, for example, both use glass front and back, and are <a href="https://www.theguardian.com/technology/2017/sep/25/iphone-8-glass-back-apple-repair-cost-screen-replace-accident" target="_blank" rel="noopener noreferrer">notoriously expensive to repair</a>.</p>
+                                <p>Amazon stock literally thousands of affordable options. You can <a href="https://www.amazon.co.uk/Best-Sellers-Electronics-Mobile-Phone-Cases-Covers/zgbs/electronics/340321031" target="_blank" rel="noopener noreferrer">check out their bestsellers here</a>.</p>
+                                <hr>
+                                <p>Here at <a href="{{ path('homepage') }}">so-sure</a> we know that breaking your screen is really rubbish. So, if your screen is broken, smashed or cracked and you can’t use it any more, we’ll replace or repair it within 24-72 hours.</p>
+                                <p>We believe in a different kind of insurance. We protect you when you need to claim and reward you when you don't. You can <a href="{{ path('homepage') }}">find out more here</a>.</p>
+                            </div>
+                            <footer></footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
-
                 </div>
             </div>
-
         </div>
     </section>
 
 {% endblock %}
 
-{% block footer %}
-    {# TODO: Fix footer #}
-{% endblock %}
-
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/blog.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

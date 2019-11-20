@@ -61,10 +61,16 @@ class Oauth2LoginEntryPoint implements AuthenticationEntryPointInterface
     {
         static $loginRoutesForOauthScopes = [
             Oauth2Scopes::USER_STARLING_SUMMARY => 'starling_bank',
+            Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY => 'starling_business',
         ];
         static $extraParameters = [
             Oauth2Scopes::USER_STARLING_SUMMARY => [
                 'utm_source' => 'starling',
+                'utm_medium' => 'app',
+                'utm_campaign' => 'partner'
+            ],
+            Oauth2Scopes::USER_STARLING_BUSINESS_SUMMARY => [
+                'utm_source' => 'starling-business',
                 'utm_medium' => 'app',
                 'utm_campaign' => 'partner'
             ],

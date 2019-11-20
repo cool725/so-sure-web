@@ -32,6 +32,7 @@ class PolicyRepository extends BaseDocumentRepository
         return $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
+                Policy::STATUS_PICSURE_REQUIRED,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
@@ -53,7 +54,8 @@ class PolicyRepository extends BaseDocumentRepository
         return $this->createQueryBuilder()
             ->field("status")->in([
                 Policy::STATUS_ACTIVE,
-                Policy::STATUS_UNPAID
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
             ])
             ->getQuery()
             ->execute();
@@ -68,7 +70,8 @@ class PolicyRepository extends BaseDocumentRepository
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
-                Policy::STATUS_UNPAID
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)));
 
@@ -233,7 +236,8 @@ class PolicyRepository extends BaseDocumentRepository
         $qb = $this->createQueryBuilder();
         $qb->addAnd($qb->expr()->field('status')->in([
                 Policy::STATUS_ACTIVE,
-                Policy::STATUS_UNPAID
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
         ]));
         $qb->addAnd($qb->expr()->field('start')->gt($sixtyDays));
         $qb->addAnd(
