@@ -113,33 +113,21 @@ class SalvaExportServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
-
-        $issueDate = \DateTime::createFromFormat('U', time());
-        $issueDate->setTimezone(new \DateTimeZone('Europe/London'));
         static::$policyService->create($policy);
-        $issueDate2 = clone $issueDate;
-        $issueDate2->add(new \DateInterval('PT1S'));
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
         $this->assertGreaterThan(0, mb_stripos($xml, $user->getId()));
 
-        $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate));
-        $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
-        $this->assertTrue(
-            mb_stripos($xml, $tariff) !== false || mb_stripos($xml, $tariff2) !== false,
-            sprintf('%s or %s not found in %s', $tariff, $tariff2, $xml)
-        );
+        $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($policy->getIssueDate()));
+        $this->assertTrue(mb_stripos($xml, $tariff) !== false, sprintf('%s not found in %s', $tariff, $xml));
 
         $startDate = sprintf(
             '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
-            static::$salva->adjustDate($issueDate)
+            static::$salva->adjustDate($policy->getLatestSalvaStartDate())
         );
-        $startDate2 = sprintf(
-            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
-            static::$salva->adjustDate($issueDate2)
-        );
-        $this->assertTrue(mb_stripos($xml, $startDate) !== false || mb_stripos($xml, $startDate2) !== false);
+
+        $this->assertTrue(mb_stripos($xml, $startDate) !== false);
     }
 
     public function testCreateXmlRenewal()
@@ -832,7 +820,7 @@ class SalvaExportServiceTest extends WebTestCase
         $refundCommissionAmount = $policy->getRefundCommissionAmount();
 
         $this->assertGreaterThanOrEqual(0, $refundAmount);
-        $this->assertGreaterThanOrEqual(0, $refundCommissionAmount);
+        $this->assertLessThanOrEqual(0, $refundCommissionAmount);
 
         // Refund is a negative payment
         $refund = new JudoPayment();
@@ -915,7 +903,7 @@ class SalvaExportServiceTest extends WebTestCase
         $this->cancelPolicy($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'), true);
         $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'))['xml'];
         $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">0</n1:usedFinalPremium>', $xml);
-        $this->assertContains('<n1:terminationTime>2015-12-31T23:59:00</n1:terminationTime>', $xml);
+        $this->assertContains('<n1:terminationTime>2016-01-01T02:59:00</n1:terminationTime>', $xml);
     }
 
     public function testBasicCooloffExportYearlyPolicies()

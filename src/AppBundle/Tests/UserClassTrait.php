@@ -161,8 +161,6 @@ trait UserClassTrait
                 if ($premium instanceof PhonePremium) {
                     $premium->clearPicSureExcess();
                 }
-
-                usleep(10 * $infiniteLoopPrevention);
                 $policy->setPhone(self::getRandomPhone(self::$dm, null, $date), $date);
                 $infiniteLoopPrevention++;
                 if ($infiniteLoopPrevention > 50) {
@@ -927,8 +925,6 @@ trait UserClassTrait
         static::$policyService->create($policyB, clone $dateB, true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
-        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
 
         if ($connect) {
             list($connectionA, $connectionB) = $this->createLinkedConnections(
@@ -954,11 +950,6 @@ trait UserClassTrait
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
-        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($policyA->getEnd()), $renewalPolicyA->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($policyB->getEnd()), $renewalPolicyB->getPremium()->getIptRate());
-
         if ($additional) {
             for ($i = 0; $i < $additional; $i++) {
                 $user = static::createUser(
