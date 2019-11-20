@@ -373,7 +373,7 @@ class BICommand extends ContainerAwareCommand
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
+        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START));
         $lines = [];
         $lines[] = $this->makeLine(
             'Policy Number',
