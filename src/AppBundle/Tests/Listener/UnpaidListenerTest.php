@@ -25,6 +25,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Tests that the unpaid listener sends out the right emails at the right times.
  * @group functional-net
+ * @group fixed
  * AppBundle\\Tests\\Listener\\UnpaidListenerTest
  */
 class UnpaidListenerTest extends WebTestCase
@@ -103,8 +104,6 @@ class UnpaidListenerTest extends WebTestCase
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
     }
 
-    // TODO: testCheckoutUnpaid()
-
     /**
      * Tests the judo unpaid comms with no claims and a card.
      */
@@ -115,7 +114,7 @@ class UnpaidListenerTest extends WebTestCase
         $paymentMethod->addCardToken('token', json_encode(['endDate' => "0150"]));
         $policy = $this->payingPolicy($paymentMethod);
         $scheduledPayment = $this->payment($policy, new \DateTime(), ScheduledPayment::STATUS_FAILED);
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:card/failedPayment-1.html.twig");
+        $listener = $this->mockedListener(1, 1, "AppBundle:Email:card/failedPayment-1.html.twig");
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
@@ -158,7 +157,7 @@ class UnpaidListenerTest extends WebTestCase
         self::$dm->persist($claim);
         self::$dm->flush();
         $scheduledPayment = $this->payment($policy, new \DateTime(), ScheduledPayment::STATUS_FAILED);
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:card/failedPaymentWithClaim-1.html.twig");
+        $listener = $this->mockedListener(1, 1, "AppBundle:Email:card/failedPaymentWithClaim-1.html.twig");
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
@@ -190,7 +189,7 @@ class UnpaidListenerTest extends WebTestCase
     {
         $policy = $this->payingPolicy(new JudoPaymentMethod());
         $scheduledPayment = $this->payment($policy, new \DateTime(), ScheduledPayment::STATUS_FAILED);
-        $listener = $this->mockedListener(1, 0, "AppBundle:Email:card/cardMissing-1.html.twig");
+        $listener = $this->mockedListener(1, 1, "AppBundle:Email:card/cardMissing-1.html.twig");
         $listener->onUnpaidEvent(new ScheduledPaymentEvent($scheduledPayment));
         $scheduledPayment = self::$scheduledPaymentRepo->mostRecentWithStatuses($policy);
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_REVERTED);
@@ -241,7 +240,7 @@ class UnpaidListenerTest extends WebTestCase
         $feature = $feature;
         $logger = $this->getMockBuilder(LoggerInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(["error"])
+            ->setMethods(["log", "debug", "info", "warning", "notice", "error", "alert", "critical", "emergency"])
             ->getMock();
         /** @var LoggerInterface $logger */
         $logger = $logger;
