@@ -288,4 +288,12 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $policy->getPolicyExpirationDate($date)
         );
     }
+
+    /**
+     * Tests to make sure that the refund commission is calculated rightly.
+     */
+    public function testGetRefundCommissionAmount()
+    {
+
+    }
 }
