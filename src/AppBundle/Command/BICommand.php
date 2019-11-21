@@ -373,7 +373,7 @@ class BICommand extends ContainerAwareCommand
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START));
+        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = $this->makeLine(
             'Policy Number',
@@ -529,7 +529,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findAllUsersBatched();
+        $users = $repo->findAllBiUsersBatched(1000);
         $lines = [];
         $lines[] = implode(',', [
             '"Age of User"',
@@ -545,9 +545,6 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($users as $user) {
             /** @var User $user */
-            if (!$user->getBillingAddress()) {
-                continue;
-            }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
