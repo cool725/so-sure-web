@@ -75,6 +75,7 @@ class Create
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
+        $policy->setStaticEnd($policy->getEnd());
         $premium = new PhonePremium();
         $premium->setGwp(rand(20, 100) / 8);
         $policy->setPremium($premium);

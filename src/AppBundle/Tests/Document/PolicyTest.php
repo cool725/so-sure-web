@@ -11,6 +11,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\DateTrait;
+use AppBundle\Tests\Create;
 use AppBundle\Classes\SoSure;
 
 /**
@@ -294,6 +295,12 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRefundCommissionAmount()
     {
-
+        $user = Create::user();
+        $policy = Create::policy($user, "2019-03-13", Policy::STATUS_CANCELLED, 12);
+        $policy->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        Create::standardPayment($policy, "2019-03-13", true);
+        Create::standardPayment($policy, "2019-04-13", true);
+        var_dump($policy->getRefundCommissionAmount());
+        $this->assertTrue($policy->getRefundCommissionAmount() < 0);
     }
 }
