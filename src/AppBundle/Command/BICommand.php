@@ -529,7 +529,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findAll();
+        $users = $repo->findAllUsersBatched();
         $lines = [];
         $lines[] = implode(',', [
             '"Age of User"',
