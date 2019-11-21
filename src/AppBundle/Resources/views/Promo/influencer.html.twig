@@ -1,0 +1,236 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'invite' %}
+{% set robots_noindex = true %}
+
+{% block title %}
+    {% if scode is defined and scode and scode.user and not custom %}
+        Connect with {{ scode.reward.user.firstName }} &amp; get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
+    {% else %}
+        Promo code {{ use_code }} not found! | so-sure
+    {% endif %}
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/invite.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-columbia-blue-e fit">
+                            {% if scode is defined and scode %}
+                                Connect with {{ scode.reward.user.firstName }} <br class="d-none d-lg-inline"> on so-sure 🤗
+                            {% else %}
+                                Wow, so-sure has the <br class="d-none d-lg-inline"> best insurance 🥰
+                            {% endif %}
+                        </h1>
+                        <div class="text-white h5 mb-5">
+                            <span class="sub">...get premium cover for your mobile phone and get up to 80% of the price back!</span>
+                        </div>
+                    </div>
+                    <div class="hero__controls mb-4">
+                        <div class="mb-4">
+                            <a href="#"
+                               class="btn btn-success btn-block-xs mr-md-2 track-data get-a-quote disabled"
+                               data-event="
+                                {% if scode is defined and scode and scode.reward %}
+                                    scode-hero-quote-btn-{{ scode.code }}
+                                {% else %}
+                                    scode-hero-quote-btn
+                                {% endif %}
+                               ">
+                               Get a Quote</a>
+                            <a id="user_login_btn"
+                               href="{{ path('user_home') }}"
+                               class="btn btn-outline-white btn-block-xs">
+                                Login to connect 💰</a>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <a id="user_feedback_btn"
+                                   href="#user_feedback"
+                                   class="btn-simple-link text-white">
+                                   No thank you</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero__illustration">
+
+                        {# Overlays #}
+                        <img id="hero_img_overlay_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
+                             alt="Likes hearts stars smileys"
+                             class="img-fluid lozad hero__illustration__img">
+
+                        {# 1st images #}
+                        <img id="hero_img_1_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_eve_step_shadow.png"
+                             alt="Happy couple mobile"
+                             class="img-fluid lozad hero__illustration__img">
+                        <img id="hero_img_1_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png"
+                             alt="Happy so-sure phone"
+                             class="img-fluid lozad hero__illustration__img">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <svg class="d-lg-none"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 750 586"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="V1-Virality-LP-(Mobile)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -1144.000000)" fill="#FFFFFF">
+                    <path d="M0,1464 C146.638193,1458.82104 282.638193,1429.4877 408,1376 C533.361807,1322.5123 647.361807,1245.17896 750,1144 L750,1737 L0,1737 L0,1464 Z" id="Rectangle"></path>
+                </g>
+            </g>
+        </svg>
+        <svg class="d-none d-lg-block d-fl-none"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1440 596"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -113.000000)" fill="#FFFFFF">
+                    <path d="M1440,113.053995 L1440,709 L0,709 L0,609.415089 C115.626287,635.690524 240.187163,650 370,650 C889.293087,650 1324.54128,421.011571 1440,113.053995 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </svg>
+        <svg class="d-none d-fl-block"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1440 313"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="V1-Virality-LP-(Desktop)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -396.000000)" fill="#FFFFFF">
+                    <path d="M1703,114.218143 L1703,709 L0,709 L0,609.339943 C136.864514,635.66324 284.320516,650 438,650 C1051.40793,650 1565.66411,421.588479 1703,114.218143 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    <section class="usps pb-5 pt-md-5">
+        <div class="container-large">
+            <ul class="list-unstyled icn-fa-list d-lg-flex justify-content-lg-between">
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    You get 24-72 hour replace or repair
+                </li>
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    Enjoy low excess from just &pound;50
+                </li>
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    Earn up to 80% money back
+                </li>
+                <li class="h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    New, secondhand &amp; refurbished phones
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="video d-flex align-items-center justify-content-center">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_note_left.png"
+             alt="Bank note"
+             class="lozad video__money-left">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_note_right.png"
+             alt="Bank note"
+             class="lozad video__money-right">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_pot.png"
+             alt="Pot of money"
+             class="lozad video__pot">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_male_avatar.png"
+             alt="Male avatar"
+             class="lozad video__avatar-male">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_female_avatar.png"
+             alt="Female avatar"
+             class="lozad video__avatar-female">
+        <a href="#"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/QEskwqsNgrQ"
+           class="watch-video video__play">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                 alt="Play buttonn"
+                 class="lozad"
+                 width="120px">
+        </a>
+    </section>
+
+    <section class="knowledge-base pb-lg-5">
+        <div class="container pb-5">
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+
+            <div class="end-cta end-cta__mobile d-md-none">
+                <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                <a href="#"
+                   class="btn btn-success btn-block-xs track-data get-a-quote"
+                   data-event="
+                   {% if scode is defined and scode and scode.policy %}
+                       scode-bottom-lets-start-btn-{{ user_code }}
+                   {% else %}
+                       scode-bottom-lets-start-btn
+                   {% endif %}">Let's start!</a>
+            </div>
+            <div class="end-cta end-cta__desktop d-none d-md-block">
+                <div class="cardbox cardbox-100">
+                    <div class="cardbox__body d-flex align-items-center justify-content-start">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png"
+                             alt="Happy so-sure phone"
+                             width="180px"
+                             class="lozad">
+                        <div class="ml-5">
+                            <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode %}{{ scode.reward.user.firstName }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                            <a href="#"
+                               class="btn btn-success btn-block-xs track-data get-a-quote"
+                               data-event="
+                                {% if scode is defined and scode and scode.policy %}
+                                    scode-bottom-lets-start-btn-{{ user_code }}
+                                {% else %}
+                                    scode-bottom-lets-start-btn
+                                {% endif %}
+                               ">Let's start!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="user_feedback" class="feedback py-lg-5">
+        <div class="container-large py-5">
+            {% include 'AppBundle::Components/_feedback.html.twig' %}
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Components/_knowledgeBaseModals.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/invite.js') }}"></script>
+{% endblock %}

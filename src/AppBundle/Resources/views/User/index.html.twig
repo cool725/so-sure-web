@@ -53,7 +53,7 @@
             <div class="container-large">
                 <div class="row">
                     <div class="col-12 col-lg-4 mb-4">
-                        <h1 class="h2 mb-4">Welcome back, {{ app.user.firstname }}</h1>
+                        <h1 class="h2 mb-4">Welcome back, <span class="text-nowrap">{{ app.user.firstname }}</span></h1>
                         {% if policy is defined and policy %}
                             {% if policy.user.getValidPolicies(true) | length == 1 %}
                                 <div class="h6">Policy: <u>{{ policy.policyNumber }}</u></div>
@@ -110,31 +110,50 @@
                                                  ">
                                         </span>
                                     {% endfor %}
-                                    {% if policy.standardConnections|length < 1 %}
-                                        <p>No connections</p>
-                                    {% endif %}
+                                    {% for connection in policy.rewardConnections %}
+                                        {% if connection.linkedUser.isInfluencer == true %}
+                                            <span>
+                                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
+                                                     alt="{{ connection.linkedUser.name }}"
+                                                     width="50px"
+                                                     data-toggle="tooltip"
+                                                     data-placement="top"
+                                                     data-test=""
+                                                     title="
+                                                        {{ connection.linkedUser.name }} -
+                                                        Connected on {{ connection.date|date('dS M') }}
+                                                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                                            (£{{ connection.totalValue|number_format(2, '.', ',')  }})
+                                                        {% endif %}
+                                                     ">
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                                 <h5 class="mb-4">My rewards</h5>
-                               <div class="d-md-flex flex-wrap align-self-center justify-content-start">
+                                <div class="d-md-flex flex-wrap align-self-center justify-content-start">
                                     {% for connection in policy.rewardConnections %}
-                                        <span>
-                                            <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
-                                                 alt="{{ connection.linkedUser.name }}"
-                                                 width="50px"
-                                                 data-toggle="tooltip"
-                                                 data-placement="top"
-                                                 title="
-                                                    {{ connection.linkedUser.name }} -
-                                                    Reward on {{ connection.date|date('dS M') }}
-                                                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                                        (£{{ connection.totalValue|number_format(2, '.', ',')  }})
-                                                    {% endif %}
-                                                 ">
-                                        </span>
+                                        {% if connection.linkedUser.isInfluencer == false %}
+                                            <span>
+                                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
+                                                     alt="{{ connection.linkedUser.name }}"
+                                                     width="50px"
+                                                     data-toggle="tooltip"
+                                                     data-placement="top"
+                                                     data-test=""
+                                                     title="
+                                                        {{ connection.linkedUser.name }} -
+                                                        Reward on {{ connection.date|date('dS M') }}
+                                                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                                                            (£{{ connection.totalValue|number_format(2, '.', ',')  }})
+                                                        {% endif %}
+                                                     ">
+                                            </span>
+                                        {% endif %}
+                                        {% if loop.length < 1 %}
+                                            <p>asdasdas</p>
+                                        {% endif %}
                                     {% endfor %}
-                                    {% if policy.rewardConnections|length < 1 %}
-                                        <p>No rewards</p>
-                                    {% endif %}
                                 </div>
                             </div>
                         {% endif %}

@@ -6,11 +6,11 @@
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
-        so-sure - Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot
+        Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
     {% elseif scode is defined and scode and scode.user and custom %}
-        so-sure - Mobile Insurance that's simply better
+        Mobile Insurance that's simply better | so-sure
     {% else %}
-        so-sure - Promo code {{ use_code }} not found!
+        Promo code {{ use_code }} not found! | so-sure
     {% endif %}
 {% endblock %}
 

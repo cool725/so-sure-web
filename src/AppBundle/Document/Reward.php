@@ -310,7 +310,7 @@ class Reward
         $this->isSignUpBonus = $isSignUpBonus;
         return $this;
     }
-    
+
     /**
      * Gives whether or not this reward is a connection bonus.
      * @return boolean|null whether or not it's a connection bonus or null if unset.
