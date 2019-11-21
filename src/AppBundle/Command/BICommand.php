@@ -529,7 +529,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findAllUsersBatched();
+        $users = $repo->findAllBiUsersBatched(1000);
         $lines = [];
         $lines[] = implode(',', [
             '"Age of User"',
@@ -545,9 +545,6 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($users as $user) {
             /** @var User $user */
-            if (!$user->getBillingAddress()) {
-                continue;
-            }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
