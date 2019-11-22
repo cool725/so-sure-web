@@ -50,6 +50,18 @@ class BICommand extends ContainerAwareCommand
 {
     use DateTrait;
 
+    const EXPORT_OPTIONS = [
+        'policies',
+        'claims',
+        'users',
+        'invitations',
+        'connections',
+        'phones',
+        'scodes',
+        'rewards',
+        'rewardsBudget'
+    ];
+
     /** @var S3Client */
     protected $s3;
 
@@ -93,18 +105,7 @@ class BICommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $onlyOptions = [
-            "policies",
-            "claims",
-            "users",
-            "invitations",
-            "connections",
-            "phones",
-            "scodes",
-            "rewards",
-            "rewardsBudget"
-        ];
-        $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
+        $onlyMessage = 'Only run one export [' . implode(', ', self::EXPORT_OPTIONS) . ']';
         $this
             ->setName('sosure:bi')
             ->setDescription('Run a bi export')
@@ -127,22 +128,28 @@ class BICommand extends ContainerAwareCommand
                 $onlyMessage
             )
             ->addOption(
+                'exclude',
+                'E',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Datasets to exclude'
+            )
+            ->addOption(
                 'skip-s3',
                 null,
                 InputOption::VALUE_NONE,
                 'Skip s3 upload'
             )
             ->addOption(
-                "timezone",
+                'timezone',
                 null,
                 InputOption::VALUE_REQUIRED,
-                "Choose a timezone to use for policies report"
+                'Choose a timezone to use for policies report'
             )
             ->addOption(
-                "date",
+                'date',
                 null,
                 InputOption::VALUE_REQUIRED,
-                "Set the date you want to query transactions for - MM/YY."
+                'Set the date you want to query transactions for - MM/YY.'
             )
         ;
     }
@@ -152,42 +159,57 @@ class BICommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Get arguments.
+        $only = $input->getOption('only');
+        $exclude = $input->getOption('exclude');
+        $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
         $prefix = $input->getOption('prefix');
-        $only = $input->getOption('only');
-        $skipS3 = true === $input->getOption('skip-s3');
         $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
-        $lines = [];
-        if (!$only || $only == 'policies') {
-            $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
+        // Figure out exports to run.
+        $exports = [];
+        foreach (self::EXPORT_OPTIONS as $export) {
+            if ((!$only || $only == $export) && !in_array($export, $exclude)) {
+                $exports[] = $export;
+            }
         }
-        if (!$only || $only == 'claims') {
-            $lines = $this->exportClaims($skipS3, $timezone);
-        }
-        if (!$only || $only == 'invitations') {
-            $lines = $this->exportInvitations($skipS3, $timezone);
-        }
-        if (!$only || $only == 'connections') {
-            $lines = $this->exportConnections($skipS3, $timezone);
-        }
-        if (!$only || $only == 'phones') {
-            $lines = $this->exportPhones($skipS3, $timezone);
-        }
-        if (!$only || $only == 'scodes') {
-            $lines = $this->exportScodes($skipS3, $timezone);
-        }
-        if (!$only || $only == 'rewards') {
-            $lines = $this->exportRewards($skipS3);
-        }
-        if (!$only || $only == 'rewardsBudget') {
-            $lines = $this->exportRewardsBudget($skipS3);
-        }
-        if (!$only || $only == 'users') {
-            $lines = $this->exportUsers($skipS3, $timezone);
-        }
-        if ($debug) {
-            foreach ($lines as $line) {
-                $output->writeln($line);
+        // Run exports.
+        foreach ($exports as $export) {
+            $output->writeln($export);
+            $lines = [];
+            switch ($export) {
+                case 'policies':
+                    $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
+                    break;
+                case 'claims':
+                    $lines = $this->exportClaims($skipS3, $timezone);
+                    break;
+                case 'invitations':
+                    $lines = $this->exportInvitations($skipS3, $timezone);
+                    break;
+                case 'connections':
+                    $lines = $this->exportConnections($skipS3, $timezone);
+                    break;
+                case 'phones':
+                    $lines = $this->exportPhones($skipS3, $timezone);
+                    break;
+                case 'scodes':
+                    $lines = $this->exportScodes($skipS3, $timezone);
+                    break;
+                case 'rewards':
+                    $lines = $this->exportRewards($skipS3);
+                    break;
+                case 'rewardsBudget':
+                    $lines = $this->exportRewardsBudget($skipS3);
+                    break;
+                case 'users':
+                    $lines = $this->exportUsers($skipS3, $timezone);
+                    break;
+            }
+            if ($debug) {
+                foreach ($lines as $line) {
+                    $output->writeln($line);
+                }
             }
         }
     }
@@ -215,12 +237,14 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($phones as $phone) {
             /** @var Phone $phone */
+            $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
+            $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
             $lines[] = implode(',', [
                 sprintf('"%s"', $phone->getMake()),
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
-                sprintf('"%0.2f"', $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice()),
-                sprintf('"%0.2f"', $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()),
+                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : ''),
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice())
             ]);
