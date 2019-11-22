@@ -65,7 +65,7 @@
                                 <small>Not the phone you're looking for?</small>
                             </a>
                         </div>
-                        <div class="qpw__h1 h1 text-center text-lg-left text-white mb-4">
+                        <div class="qpw__h1 h1 text-center text-lg-left text-white">
                             <span class="sub">For only</span>
                             {% if not app.user or app.user.allowedMonthly %}
                                 &pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
@@ -73,6 +73,7 @@
                                 &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
                             {% endif %}
                         </div>
+                        <div class="text-white text-center text-lg-left h6 mb-4"><span class="sub">Get one month free when you pay yearly!</span></div>
                         {% if validation_required is not null %}
                             <p class="text-white text-center text-lg-left mb-lg-4">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
                         {% endif %}
