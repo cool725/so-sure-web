@@ -58,6 +58,7 @@ class BICommand extends ContainerAwareCommand
         'connections',
         'phones',
         'scodes',
+        'unpaidCalls',
         'rewards',
         'rewardsBudget'
     ];
@@ -204,6 +205,9 @@ class BICommand extends ContainerAwareCommand
                     break;
                 case 'users':
                     $lines = $this->exportUsers($skipS3, $timezone);
+                    break;
+                case 'unpaidCalls':
+                    $lines = $this->exportUnpaidCalls($skipS3, $timezone);
                     break;
             }
             if ($debug) {
@@ -736,107 +740,6 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'unpaidCalls.csv');
-        }
-        return $lines;
-    }
-
-    private function exportLeadSource($skipS3, \DateTimeZone $timezone)
-    {
-        /** @var PolicyRepository $policyRepo */
-        $policyRepo = $this->dm->getRepository(Policy::class);
-        /** @var InvitationRepository $invitationRepo */
-        $invitationRepo = $this->dm->getRepository(Invitation::class);
-        $policies = $policyRepo->createQueryBuilder()
-            ->field('leadSource')->in(['scode', 'invitation'])
-            ->getQuery()->execute();
-        $lines = [];
-        $lines[] = implode(',', [
-            '"Inviter"',
-            '"Invitee"',
-            '"Inverted"'
-        ]);
-        foreach ($policies as $policy) {
-            $inverted = false;
-            $other = null;
-            /** @var Invitation $invitation */
-            $invitation = $invitationRepo->getOwnInvitation($policy);
-            if (!$invitation) {
-                $inverted = true;
-                $invitation = $invitationRepo->getFirstMadeInvitation($policy);
-                if ($invitation) {
-                    $invitee = $invitation->getInvitee();
-                    if ($invitee) {
-                        $other = $invitee->getLatestPolicy();
-                    }
-                }
-            } else {
-                $other = $invitation->getPolicy();
-            }
-            $lines[] = implode(',', [
-                sprintf('"%s"', $other ? $other->getPolicyNumber() : 'N/A'),
-                sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%s"', $inverted ? "Yes" : "No")
-            ]);
-        }
-        if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), 'leadSource.csv');
-        }
-        return $lines;
-    }
-
-    private function exportCheckoutTransactions($skipS3, \DateTimeZone $timezone, $date)
-    {
-        /** @var PaymentRepository $repo */
-        $repo = $this->dm->getRepository(Payment::class);
-
-        if ($date === null) {
-            $date = date('Y-m');
-        }
-        $now = new \DateTime($date);
-        $nextMonth = new \DateTime($date);
-        $nextMonth->add(new \DateInterval('P1M'));
-
-        $transactions = $repo->createQueryBuilder()
-            ->field('date')->gte($now)
-            ->field('date')->lt($nextMonth)
-            ->field('type')->equals('checkout')
-            ->sort('created', 1)
-            ->getQuery()->execute();
-
-
-        $lines = [];
-        $lines[] = $this->makeLine(
-            "Date",
-            "Payment ID",
-            "Transaction ID",
-            "Result",
-            "Policy Number",
-            "Message",
-            "Details",
-            "Detailed Info",
-            "Response Code"
-        );
-
-        /** @var CheckoutPayment $transaction */
-        foreach ($transactions as $transaction) {
-            /** @var Policy $policy */
-            $policy = $transaction->getPolicy();
-
-            $lines[] = $this->makeLine(
-                $transaction->getDate()->format('jS M Y H:i'),
-                $transaction->getId(),
-                $transaction->getReceipt(),
-                $transaction->getResult(),
-                $policy->getPolicyNumber(),
-                $transaction->getMessage(),
-                $transaction->getDetails(),
-                $transaction->getInfo(),
-                $transaction->getResponseCode()
-            );
-        }
-        if (!$skipS3) {
-            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
-            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
         }
         return $lines;
     }
