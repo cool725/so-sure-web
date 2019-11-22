@@ -809,34 +809,22 @@ class SalvaExportServiceTest extends WebTestCase
 
     private function cancelPolicy($policy, $reason, $date, $fullRefund = false)
     {
-        // Prevent refund from triggering judopay as receipt is not valid
         static::$policyService->setDispatcher(null);
-
-        // finally cancel policy
         static::$policyService->cancel($policy, $reason, false, $date, false, $fullRefund);
-
-        // but as not using judopay, need to add a refund
         $refundAmount = $policy->getRefundAmount();
-        $refundCommissionAmount = $policy->getRefundCommissionAmount();
-
-        $this->assertGreaterThanOrEqual(0, $refundAmount);
-        $this->assertLessThanOrEqual(0, $refundCommissionAmount);
-
-        // Refund is a negative payment
-        $refund = new JudoPayment();
-        $refund->setAmount(0 - $refundAmount);
-        $refund->setRefundTotalCommission(0 - $refundCommissionAmount);
-        $refund->setReceipt(sprintf('R-%s', rand(1, 999999)));
-        $refund->setResult(JudoPayment::RESULT_SUCCESS);
-        //$refund->setDate($date->add(new \DateInterval('PT1S')));
-        $refund->setDate($date);
-
-        $policy->addPayment($refund);
-
-        static::$dm->persist($refund);
-        static::$dm->flush();
-
-        // reattach
+        if ($refundAmount > 0) {
+            $refundCommissionAmount = $policy->getRefundCommissionAmount();
+            $this->assertLessThanOrEqual(0, $refundCommissionAmount);
+            $refund = new JudoPayment();
+            $refund->setAmount(0 - $refundAmount);
+            $refund->setRefundTotalCommission(0 - $refundCommissionAmount);
+            $refund->setReceipt(sprintf('R-%s', rand(1, 999999)));
+            $refund->setResult(JudoPayment::RESULT_SUCCESS);
+            $refund->setDate($date);
+            $policy->addPayment($refund);
+            static::$dm->persist($refund);
+            static::$dm->flush();
+        }
         static::$policyService->setDispatcher(static::$dispatcher);
     }
 

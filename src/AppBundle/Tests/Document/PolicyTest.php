@@ -298,9 +298,9 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $user = Create::user();
         $policy = Create::policy($user, "2019-03-13", Policy::STATUS_CANCELLED, 12);
         $policy->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        $policy->setEnd(new \DateTime("2019-04-18"));
         Create::standardPayment($policy, "2019-03-13", true);
         Create::standardPayment($policy, "2019-04-13", true);
-        var_dump($policy->getRefundCommissionAmount());
         $this->assertTrue($policy->getRefundCommissionAmount() < 0);
     }
 }

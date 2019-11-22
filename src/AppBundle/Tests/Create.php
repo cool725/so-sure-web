@@ -111,11 +111,15 @@ class Create
      */
     public static function standardPayment($policy, $date, $success)
     {
+        $properDate = is_string($date) ? new \DateTime($date) : $date;
         $payment = new CheckoutPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $payment->setSuccess($success);
-        $payment->setDate(is_string($date) ? new \DateTime($date) : $date);
+        $payment->setDate($properDate);
         $policy->addPayment($payment);
+        if ($success) {
+            $payment->setCommission(false, $properDate);
+        }
         return $payment;
     }
 
