@@ -170,9 +170,6 @@ class BICommand extends ContainerAwareCommand
         if (!$only || $only == 'connections') {
             $lines = $this->exportConnections($skipS3, $timezone);
         }
-        if (!$only || $only == 'users') {
-            $lines = $this->exportUsers($skipS3, $timezone);
-        }
         if (!$only || $only == 'phones') {
             $lines = $this->exportPhones($skipS3, $timezone);
         }
@@ -184,6 +181,9 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$only || $only == 'rewardsBudget') {
             $lines = $this->exportRewardsBudget($skipS3);
+        }
+        if (!$only || $only == 'users') {
+            $lines = $this->exportUsers($skipS3, $timezone);
         }
         if ($debug) {
             foreach ($lines as $line) {
