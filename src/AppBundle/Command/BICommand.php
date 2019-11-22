@@ -100,9 +100,6 @@ class BICommand extends ContainerAwareCommand
             "invitations",
             "connections",
             "phones",
-            "unpaidCalls",
-            "leadSource",
-            "checkoutTransactions",
             "scodes",
             "rewards",
             "rewardsBudget"
@@ -167,27 +164,17 @@ class BICommand extends ContainerAwareCommand
         if (!$only || $only == 'claims') {
             $lines = $this->exportClaims($skipS3, $timezone);
         }
-        if (!$only || $only == 'users') {
-            $lines = $this->exportUsers($skipS3, $timezone);
-        }
         if (!$only || $only == 'invitations') {
             $lines = $this->exportInvitations($skipS3, $timezone);
         }
         if (!$only || $only == 'connections') {
             $lines = $this->exportConnections($skipS3, $timezone);
         }
+        if (!$only || $only == 'users') {
+            $lines = $this->exportUsers($skipS3, $timezone);
+        }
         if (!$only || $only == 'phones') {
             $lines = $this->exportPhones($skipS3, $timezone);
-        }
-        if (!$only || $only == 'unpaidCalls') {
-            $lines = $this->exportUnpaidCalls($skipS3, $timezone);
-        }
-        if (!$only || $only == 'leadSource') {
-            $lines = $this->exportLeadSource($skipS3, $timezone);
-        }
-        if (!$only || $only == 'checkoutTransactions') {
-            $date = $input->getOption('date');
-            $lines = $this->exportCheckoutTransactions($skipS3, $timezone, $date);
         }
         if (!$only || $only == 'scodes') {
             $lines = $this->exportScodes($skipS3, $timezone);
