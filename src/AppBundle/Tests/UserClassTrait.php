@@ -161,21 +161,19 @@ trait UserClassTrait
                 if ($premium instanceof PhonePremium) {
                     $premium->clearPicSureExcess();
                 }
-                $policy->setPhone(self::getRandomPhone(self::$dm, null, $date), $date);
+                $phone = self::getRandomPhone(self::$dm, null, $date);
+                $policy->setPhone($phone, $date);
+                $price = $phone->getOldestCurrentPhonePrice();
+                $policy->setPremium($price->createPremium());
                 $infiniteLoopPrevention++;
-                if ($infiniteLoopPrevention > 50) {
+                if ($infiniteLoopPrevention > 100) {
                     throw new \Exception(sprintf(
                         'Infitine loop prevention in createUserPolicy (%s)',
                         $user->getEmail()
                     ));
                 }
             }
-
-            if (!$policy->getCurrentExcess()) {
-                throw new \Exception(sprintf('Missing current policy excess (%s)', $user->getEmail()));
-            }
         }
-
         return $policy;
     }
 
