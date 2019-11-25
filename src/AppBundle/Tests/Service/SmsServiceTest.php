@@ -14,6 +14,7 @@ use AppBundle\Document\PhonePolicy;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class SmsServiceTest extends WebTestCase
 {
