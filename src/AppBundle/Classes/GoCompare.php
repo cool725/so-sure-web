@@ -93,6 +93,9 @@ class GoCompare
         1424 => ['make' => 'Huawei', 'model' => 'Honor 10', 'memory' => 64],
         1475 => ['make' => 'Huawei', 'model' => 'Honor 8', 'memory' => 32],
         1483 => ['make' => 'Huawei', 'model' => 'Honor 10', 'memory' => 128],
+        1528 => ['make' => 'Huawei', 'model' => 'P Smart 2019', 'memory' => 64],
+        1624 => ['make' => 'Huawei', 'model' => 'P30', 'memory' => 128],
+        1625 => ['make' => 'Huawei', 'model' => 'P30 Pro', 'memory' => 128],
         1739 => ['make' => 'Huawei', 'model' => 'Mate 20 X 5G', 'memory' => 128],
         1740 => ['make' => 'Huawei', 'model' => 'Mate 20 X 5G', 'memory' => 256],
 

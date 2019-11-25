@@ -250,11 +250,35 @@ class UserRepository extends DocumentRepository
      * them individually while using less memory.
      * @return \Generator which gives you individual users.
      */
-    public function findAllUsersBatched()
+    public function findAllUsersBatched($size = 500)
     {
-        foreach ($this->findAllUsersGrouped() as $group) {
+        foreach ($this->findAllUsersGrouped($size) as $group) {
             foreach ($group as $user) {
                 yield $user;
+            }
+        }
+    }
+
+    /**
+     * Loads all users that are eligible to be put into the bi export in batches. This means users without a billing
+     * date are not included.
+     * @param int $size is the size of each batch.
+     * @return \Generator which gives you each individual user.
+     */
+    public function findAllBiUsersBatched($size = 500)
+    {
+        $count = 0;
+        while (true) {
+            $users = $this->createQueryBuilder()->find()
+                ->field("billingAddress")->exists(true)
+                ->skip($count)->limit($size)->getQuery()->execute();
+            if (!$users->dead()) {
+                foreach ($users->toArray() as $user) {
+                    yield $user;
+                }
+                $count += $size;
+            } else {
+                return;
             }
         }
     }

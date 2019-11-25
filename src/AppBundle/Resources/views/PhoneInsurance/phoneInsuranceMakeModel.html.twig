@@ -40,13 +40,13 @@
 
 {% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
 
-{% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance From &pound;{{ phone_price.monthlyPremiumPrice }} Monthly | so-sure{% endblock %}
+{% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance From &pound;{{ phone_price|number_format(2) }} Monthly | so-sure{% endblock %}
 
 {% block meta %}
     <meta name="description" content="{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ make_desc }} {{ with_phone }} Insurance that's simply better."/>
     <link rel="canonical" href="{{ canonical|url_decode }}" />
 {% endblock %}
-{% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance From £' ~ phone_price.monthlyPremiumPrice ~ ' Monthly | so-sure' %}
+{% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance From £' ~ phone_price|number_format(2) ~ ' Monthly | so-sure' %}
 {% set og_url = canonical|url_decode %}
 {% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
@@ -118,7 +118,7 @@
                         </div>
                         <h1 class="text-white h1m mb-0">
                             {% if phone.active %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price.monthlyPremiumPrice }} per month
+                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price|number_format(2) }} per month
                             {% else %}
                                 {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance
                             {% endif %}

@@ -144,12 +144,12 @@ class PhoneInsuranceController extends BaseController
 
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'from_price' => $fromPrice,
@@ -245,17 +245,17 @@ class PhoneInsuranceController extends BaseController
         ]);
 
         $fromPhones = array_filter($phones, function ($phone) {
-            return $phone->getCurrentMonthlyPhonePrice();
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         });
 
         // Sort by cheapest
         usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
         });
 
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'phone' => $phone,
@@ -338,9 +338,11 @@ class PhoneInsuranceController extends BaseController
             $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
         }
 
+        $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
         $data = [
             'phone' => $phone,
-            'phone_price' => $phone->getCurrentMonthlyPhonePrice(),
+            'phone_price' => $fromPrice,
             'img_url' => $modelHyph,
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
@@ -500,9 +502,9 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
-        // A/B Tagline Test
-        // To Test use url param ?force=current-tagline / ?force=new-tagline
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE);
+        // A/B USP Test
+        // To Test use url param ?force=current-usps / ?force=pricing-usps
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_USP);
 
         $data = [
             'phone' => $phone,

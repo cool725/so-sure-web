@@ -36,9 +36,9 @@ class SixpackService
     // Exp 5
     // const EXPERIMENT_UK_FLAG = 'UK flag';
     // Exp 6
-    const EXPERIMENT_HOMEPAGE_TAGLINE = 'Homepage Tagline';
+    // const EXPERIMENT_HOMEPAGE_TAGLINE = 'Homepage Tagline';
     // Exp 7
-    //
+    const EXPERIMENT_PRICING_USP = 'Pricing USP';
     // Exp 8
     //
     // Exp 9
@@ -118,7 +118,8 @@ class SixpackService
         'app-link-sms',
         'New Funnel',
         'New Funnel V2',
-        'UK flag'
+        'UK flag',
+        'Homepage Tagline'
     ];
 
     public static $unauthExperiments = [
@@ -129,9 +130,9 @@ class SixpackService
         // Exp 3
         // self::EXPERIMENT_UK_FLAG,
         // Exp 4
-        self::EXPERIMENT_HOMEPAGE_TAGLINE,
+        // self::EXPERIMENT_HOMEPAGE_TAGLINE,
         // Exp 5
-        //
+        self::EXPERIMENT_PRICING_USP,
         // Exp 6
         //
         // Exp 7
@@ -244,9 +245,9 @@ class SixpackService
         // Exp 2
         // self::EXPERIMENT_UK_FLAG,
         // Exp 3
-        self::EXPERIMENT_HOMEPAGE_TAGLINE,
+        // self::EXPERIMENT_HOMEPAGE_TAGLINE,
         // Exp 4
-        //
+        self::EXPERIMENT_PRICING_USP,
         // Exp 5
         //
         // Exp 6

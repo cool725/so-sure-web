@@ -6,17 +6,17 @@
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
-        so-sure - Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot
+        Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
     {% elseif scode is defined and scode and scode.user and custom %}
-        so-sure - Mobile Insurance that's simply better
+        Mobile Insurance that's simply better | so-sure
     {% else %}
-        so-sure - Promo code {{ use_code }} not found!
+        Promo code {{ use_code }} not found! | so-sure
     {% endif %}
 {% endblock %}
 
 {# Set Meta #}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 
 {% if scode is defined and scode and scode.user and scode.reward and not custom %}
@@ -144,7 +144,7 @@
                             </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
-                                New, secondhand &amp; refurbished phones
+                                New, second hand &amp; refurbished phones
                             </li>
                         </ul>
                         <p><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a></p>
