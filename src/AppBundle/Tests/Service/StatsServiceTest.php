@@ -7,6 +7,7 @@ use AppBundle\Service\StatsService;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class StatsServiceTest extends WebTestCase
 {
