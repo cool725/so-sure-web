@@ -9,6 +9,7 @@ use AppBundle\Document\Phone;
 
 /**
  * @group functional-nonet
+ * @group fixed
  *
  * AppBundle\\Tests\\Service\\QuoteServiceTest
  */
