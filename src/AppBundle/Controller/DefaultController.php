@@ -98,12 +98,12 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // A/B Tagline Test
-        // To Test use url param ?force=current-tagline / ?force=new-tagline
-        $homepageTaglineTest = $this->sixpack(
+        // A/B USP Test
+        // To Test use url param ?force=current-usps / ?force=pricing-usps
+        $homepageUspPricingTest = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE,
-            ['current-tagline', 'new-tagline'],
+            SixpackService::EXPERIMENT_PRICING_USP,
+            ['current-usps', 'pricing-usps'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
@@ -116,7 +116,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'tagline_exp' => $homepageTaglineTest,
+            'usp_exp' => $homepageUspPricingTest,
         );
 
         return $this->render($template, $data);
