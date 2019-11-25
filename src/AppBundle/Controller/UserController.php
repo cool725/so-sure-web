@@ -1235,9 +1235,9 @@ class UserController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B Tagline Test
-        // To Test use url param ?force=current-tagline / ?force=new-tagline
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TAGLINE);
+        // A/B USP Test
+        // To Test use url param ?force=current-usps / ?force=pricing-usps
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_USP);
 
         $template = 'AppBundle:User:onboarding.html.twig';
 
