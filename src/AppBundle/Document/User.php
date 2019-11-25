@@ -1456,7 +1456,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 }
             }
 
-            if ($policy->getPolicyTerms()->isPicSureEnabled() && in_array($policy->getPicSureStatus(), [
+            if ($policy->getPolicyTerms() && $policy->getPolicyTerms()->isPicSureEnabled() &&
+                in_array($policy->getPicSureStatus(), [
                 PhonePolicy::PICSURE_STATUS_INVALID,
                 PhonePolicy::PICSURE_STATUS_MANUAL,
                 null,
@@ -1496,7 +1497,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             }
             $data['numberPolicies']++;
             if ($policy instanceof PhonePolicy) {
-                $data['devices'][] = $policy->getPhone()->__toString();
+                if ($policy->getPhone()) {
+                    $data['devices'][] = $policy->getPhone()->__toString();
+                }
                 $data['maxPot'] += $policy->getMaxPot();
             }
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
