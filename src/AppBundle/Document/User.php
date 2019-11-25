@@ -472,6 +472,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $isBlacklisted = false;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $isInfluencer = false;
+
+    /**
      * Contains references to all the offers that are offered to this user.
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
      */
@@ -1809,6 +1816,24 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setIsBlacklisted($isBlacklisted)
     {
         $this->isBlacklisted = $isBlacklisted;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsInfluencer()
+    {
+        return $this->isInfluencer;
+    }
+
+    /**
+     * @param mixed $isInfluencer
+     * @return User
+     */
+    public function setIsInfluencer($isInfluencer)
+    {
+        $this->isInfluencer = $isInfluencer;
         return $this;
     }
 

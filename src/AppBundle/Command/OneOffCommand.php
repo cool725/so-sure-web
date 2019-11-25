@@ -346,7 +346,7 @@ class OneOffCommand extends ContainerAwareCommand
             $output->writeln("<error>Date must be provided to oneMonthFree</error>");
             return;
         }
-        $date = \DateTime::createFromFormat("Y-m-d", $dateString);
+        $date = \DateTime::createFromFormat("Y-m-d-H-i", $dateString);
         // Begin adding the prices on the phones.
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $this->dm->getRepository(Phone::class);

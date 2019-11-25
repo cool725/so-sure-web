@@ -464,10 +464,14 @@ class UserController extends BaseController
             }
         } elseif ($scode) {
             if ($scode->isStandard()) {
-                $codeMessage = sprintf('%s has invited you to connect. Connect below', $scode->getUser()->getName());
-            } elseif ($scode->isReward()) {
+                $codeMessage = sprintf('%s has invited you to connect.', $scode->getUser()->getName());
+            } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() != true) {
                 // @codingStandardsIgnoreStart
                 $codeMessage = sprintf('Apply your £%0.2f reward bonus from %s', $scode->getReward()->getDefaultValue(), $scode->getUser()->getName());
+                // @codingStandardsIgnoreEnd
+            } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() == true) {
+                // @codingStandardsIgnoreStart
+                $codeMessage = sprintf('%s has invited you to connect.', $scode->getUser()->getName());
                 // @codingStandardsIgnoreEnd
             }
         }

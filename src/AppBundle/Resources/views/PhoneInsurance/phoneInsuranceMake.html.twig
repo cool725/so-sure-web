@@ -23,11 +23,11 @@
     {% set with_phone = 'Vodafone Mobile' %}
 {% endif %}
 
-{% block title %}{{ with_phone }} Insurance From &pound;{{ from_price }} Monthly | so-sure{% endblock %}
+{% block title %}{{ with_phone }} Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="{{ with_phone }} Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better."/>
 {% endblock %}
-{% set og_title = with_phone ~ ' Insurance From £' ~ from_price ~ ' Monthly | so-sure' %}
+{% set og_title = with_phone ~ ' Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
 {% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
@@ -82,7 +82,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <h1 class="text-white mb-4 fit">{{ with_phone }} Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price }} per month</span></h1>
+                        <h1 class="text-white mb-4 fit">{{ with_phone }} Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price|number_format(2) }} per month</span></h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
@@ -98,7 +98,7 @@
                             </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                New, secondhand &amp; refurbished phones
+                                New, second hand &amp; refurbished phones
                             </li>
                         </ul>
                     </div>
