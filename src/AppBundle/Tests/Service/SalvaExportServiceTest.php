@@ -869,10 +869,10 @@ class SalvaExportServiceTest extends WebTestCase
         $this->addPaymentForMonth($policy, 3, $date);
         $this->addPaymentForMonth($policy, 4, $date);
 
-        $this->cancelPolicy($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'));
-        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-05-01'))['xml'];
-        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.53</n1:usedFinalPremium>', $xml);
-        $this->assertContains('<n1:terminationTime>2016-05-01T01:00:00</n1:terminationTime>', $xml);
+        $this->cancelPolicy($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-04-30'));
+        $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-04-30'))['xml'];
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.54</n1:usedFinalPremium>', $xml);
+        $this->assertContains('<n1:terminationTime>2016-04-30T01:00:00</n1:terminationTime>', $xml);
     }
 
     public function testCancelFullRefundXml()
@@ -1028,8 +1028,8 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
         $xml = self::$salva->cancelXml($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'))['xml'];
-        // 6.38 gwp / 76.60 yearly gpw  * (153 - 31) / 366 = 25.53
-        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.53</n1:usedFinalPremium>', $xml);
+        // 6.38 gwp / 76.60 yearly gpw  * (153 - 31) / 366 = 25.54
+        $this->assertContains('<n1:usedFinalPremium n2:currency="GBP">25.54</n1:usedFinalPremium>', $xml);
     }
 
     public function testVersionedMonthlyFirstDueDatePoliciesXml()
