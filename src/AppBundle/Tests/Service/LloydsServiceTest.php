@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @group functional-net
+ * @group fixed
  */
 class LloydsServiceTest extends WebTestCase
 {
