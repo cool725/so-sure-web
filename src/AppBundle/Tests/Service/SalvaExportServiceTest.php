@@ -23,6 +23,7 @@ use AppBundle\Classes\Salva;
 
 /**
  * @group functional-net
+ * @group fixed
  *
  * AppBundle\\Tests\\Service\\SalvaExportServiceTest
  */
