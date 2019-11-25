@@ -8,6 +8,7 @@ use AppBundle\Document\PhonePolicy;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class PushServiceTest extends WebTestCase
 {
