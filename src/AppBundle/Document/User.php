@@ -1458,10 +1458,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
             if ($policy->getPolicyTerms() && $policy->getPolicyTerms()->isPicSureEnabled() &&
                 in_array($policy->getPicSureStatus(), [
-                PhonePolicy::PICSURE_STATUS_INVALID,
-                PhonePolicy::PICSURE_STATUS_MANUAL,
-                null,
-            ])) {
+                    PhonePolicy::PICSURE_STATUS_INVALID,
+                    PhonePolicy::PICSURE_STATUS_MANUAL,
+                    null,
+                ])) {
                 $data['hasOutstandingPicSurePolicy'] = true;
                 if ($policy->getPolicyTerms()->isPicSureRequired()) {
                     $data['picsureRequired'] = true;
