@@ -814,10 +814,9 @@ class SalvaExportServiceTest extends WebTestCase
         $refundAmount = $policy->getRefundAmount();
         if ($refundAmount > 0) {
             $refundCommissionAmount = $policy->getRefundCommissionAmount();
-            $this->assertLessThanOrEqual(0, $refundCommissionAmount);
             $refund = new JudoPayment();
             $refund->setAmount(0 - $refundAmount);
-            $refund->setRefundTotalCommission(0 - $refundCommissionAmount);
+            $refund->setRefundTotalCommission($refundCommissionAmount);
             $refund->setReceipt(sprintf('R-%s', rand(1, 999999)));
             $refund->setResult(JudoPayment::RESULT_SUCCESS);
             $refund->setDate($date);
