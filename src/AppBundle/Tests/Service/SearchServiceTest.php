@@ -14,7 +14,6 @@ use Symfony\Component\Form\FormInterface;
 
 /**
  * @group functional-nonet
- * @group fixed
  */
 class SearchServiceTest extends WebTestCase
 {
