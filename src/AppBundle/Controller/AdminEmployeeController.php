@@ -3842,7 +3842,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 'AppBundle:Email:picsure/accepted.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/accepted.txt.twig',
-                ['policy' => $policy]
+                ['policy' => $policy],
+                null,
+                'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com'
             );
 
             try {
