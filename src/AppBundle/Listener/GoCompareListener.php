@@ -95,7 +95,7 @@ class GoCompareListener
         // 0 = Not a cancellation; 1 = Cancellation; This will cancel out the sale of the same quote ID.
         $cancellationParam = $policy->isCooloffCancelled() ? 1 : 0;
         // Your Premium ID’s are as follows; Monthly – 3; Annual – 2
-        $premiumTypeParam = $policy->getPremiumPlan() == Policy::PLAN_MONTHLY ? 'GAN' : 'GMN';
+        $premiumTypeParam = $policy->getPremiumPlan() == Policy::PLAN_MONTHLY ? 'GMN' : 'GAN';
         // Was the sale completed on a mobile device 0/1
         $mobileParam = $attribution->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE ? 1 : 0;
 
