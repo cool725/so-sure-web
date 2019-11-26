@@ -47,7 +47,7 @@ use AppBundle\Annotation\DataChange;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
- * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy"})
+ * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy","helvetia"="HelvetiaPhonePolicy"})
  * @MongoDB\Index(keys={"policyNumber"="asc","end"="asc"},
  *     unique="false", sparse="true")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
@@ -2874,10 +2874,8 @@ abstract class Policy
             $prefix = $this->getPolicyNumberPrefix();
         }
 
-        // TODO: move to SalvaPhonePolicy
-        // salva needs a end time of 23:59 in local time
-        $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
-        $issueDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+        $startDate->setTimezone($this->getUnderwriterTimeZone());
+        $issueDate->setTimezone($this->getUnderwriterTimeZone());
 
         $this->setStart($startDate);
         $this->setIssueDate($issueDate);
@@ -4889,6 +4887,13 @@ abstract class Policy
             }
         }
     }
+
+
+    /**
+     * Gives you this policy's underwriter's timezone.
+     * @return \DateTimeZone the timezone the underwriter operates in.
+     */
+    abstract public function getUnderwriterTimeZone();
 
     /**
      * Get the current max connection for this policy

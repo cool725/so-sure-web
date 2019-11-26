@@ -65,6 +65,14 @@ class SalvaPhonePolicy extends PhonePolicy
     /** @MongoDB\Field(type="hash") */
     protected $salvaFirstBillingDates = array();
 
+    /**
+     * @InheritDoc
+     */
+    public function getUnderwriterTimeZone()
+    {
+        return new \DateTimeZone(Salva::SALVA_TIMEZONE)
+    }
+
     public function getSalvaStatus()
     {
         return $this->salvaStatus;
@@ -587,5 +595,13 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         return $this->getPromoPotValue();
+    }
+
+    /**
+     * @InheritDoc
+     */
+    public function underwriterCreate()
+    {
+
     }
 }
