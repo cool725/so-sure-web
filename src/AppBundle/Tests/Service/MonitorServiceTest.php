@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @group functional-nonet
+ * @group fixed
  *
  * \\AppBundle\\Tests\\Service\\MonitorServiceTest
  */
