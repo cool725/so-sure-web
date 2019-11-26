@@ -233,7 +233,8 @@ trait UserClassTrait
         $phoneRepo = $dm->getRepository(Phone::class);
         $query = [
             'active' => true,
-            'devices' => ['$nin' => ['A0001', 'iPhone 6']]
+            'devices' => ['$nin' => ['A0001', 'iPhone 6']],
+            'make' => ['$ne' => 'ALL']
         ];
         if ($make) {
             $query['make'] = $make;
@@ -244,20 +245,16 @@ trait UserClassTrait
         while ($phone == null) {
             /** @var Phone $phone */
             $phone = $phones[random_int(0, count($phones) - 1)];
-
             // Many tests rely on past dates, so ensure the date is ok for the past
-            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01')) ||
-                $phone->getMake() == "ALL"
-            ) {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01'))) {
                 $phone = null;
             } elseif (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date) ||
                 !$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date)->getExcess()
             ) {
                 $phone = null;
             }
-
             $infiniteLoopPrevention++;
-            if ($infiniteLoopPrevention > 50) {
+            if ($infiniteLoopPrevention > 1000) {
                 throw new \Exception(sprintf(
                     'Infinite loop prevention in getRandomPhone (date: %s)',
                     $date ? $date->format(\DateTime::ATOM) : 'null'
