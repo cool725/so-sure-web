@@ -156,17 +156,12 @@ trait UserClassTrait
             $infiniteLoopPrevention = 0;
             while (!$policy->getCurrentExcess()) {
                 /** @var PhonePremium $premium */
-                $premium = $policy->getPremium();
-                $premium->clearExcess();
-                if ($premium instanceof PhonePremium) {
-                    $premium->clearPicSureExcess();
-                }
                 $phone = self::getRandomPhone(self::$dm, null, $date);
                 $policy->setPhone($phone, $date);
                 $price = $phone->getOldestCurrentPhonePrice();
                 $policy->setPremium($price->createPremium());
                 $infiniteLoopPrevention++;
-                if ($infiniteLoopPrevention > 100) {
+                if ($infiniteLoopPrevention > 1000) {
                     throw new \Exception(sprintf(
                         'Infitine loop prevention in createUserPolicy (%s)',
                         $user->getEmail()

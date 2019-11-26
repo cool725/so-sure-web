@@ -12,6 +12,10 @@ use AppBundle\Service\SearchService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @group functional-nonet
+ * @group fixed
+ */
 class SearchServiceTest extends WebTestCase
 {
     protected static $container;
