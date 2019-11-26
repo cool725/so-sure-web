@@ -537,6 +537,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if ($policy->getCancelledReason() != null && $policy->getCancelledReason() != Policy::CANCELLED_COOLOFF) {
                 $refundCommission *= -1.0;
             }
+            if ($policy->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+                $refund = 0;
+            }
             $pendingBacsTotal = abs($policy->getPendingBacsPaymentsTotal(true));
             $pendingBacsTotalCommission = abs($policy->getPendingBacsPaymentsTotalCommission(true));
             $refundMismatch =  $this->greaterThanZero($refund) && $refund > $pendingBacsTotal &&
