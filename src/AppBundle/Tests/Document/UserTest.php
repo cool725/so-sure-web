@@ -885,4 +885,12 @@ class UserTest extends WebTestCase
             $user->validateDpa('foo', 'bar', '30/10/1980', $user->getMobileNumber())
         );
     }
+
+    public function testIsEligibleForTagNotInTagsArray()
+    {
+        $user = new User();
+        $this->assertFalse(
+            $user->isEligibleForTag('NotInTagsArray')
+        );
+    }
 }

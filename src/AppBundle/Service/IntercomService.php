@@ -45,6 +45,8 @@ class IntercomService
 
     const MAX_RATE_LIMIT_SLEEP_SECONDS = 15;
 
+    const MAX_TAG_USERS_BATCH_SIZE = 50;
+
 
     const TAG_DONT_CONTACT = "Don't Contact (Duplicate)";
 
@@ -575,13 +577,16 @@ class IntercomService
         $resp = $this->client->users->create($data);
         $this->storeRateLimit();
 
+        $user->setIntercomId($resp->id);
+
+        $this->updateStandardTags($user);
+
         $this->logger->debug(sprintf(
-            'Intercom create user (userid %s) %s',
+            'Intercom create/update user (userid %s) %s',
             $user->getIntercomUserIdOrId(),
             json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)
         ));
 
-        $user->setIntercomId($resp->id);
         $this->dm->flush();
 
         return $resp;
@@ -626,6 +631,181 @@ class IntercomService
         $this->dm->flush();
 
         return $resp;
+    }
+
+    /**
+     * Update all standard tags for a User
+     * @param  User $user
+     */
+    public function updateStandardTags(User $user)
+    {
+        $tags = User::TAGS;
+        if (empty($tags)) {
+            $this->logger->warning(sprintf(
+                'No Standard tags registered'
+            ));
+            return;
+        }
+        foreach ($tags as $tag) {
+            if ($user) {
+                $this->updateUserTag($user, $tag);
+            } else {
+                $this->updateAllUsersTag($tag);
+            }
+        }
+        return;
+    }
+
+    /**
+     * Update all users for a tag && cleans intercom from non eligible users
+     * @param  String $tag The tag to update
+     */
+    public function updateAllUsersTag(String $tag)
+    {
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+        $validUsers = $userRepo->findByTag($tag);
+        if ($validUsers != false) {
+            $this->updateUsersTag($validUsers, $tag, false, false, true);
+        } else {
+            $this->logger->info(sprintf(
+                'Skipping Intercom update for tag (%s) as it has no valid users',
+                $tag
+            ));
+        }
+        return;
+    }
+
+    /**
+     * Update a tag for a single user
+     * @param  User    $user  The user to update
+     * @param  String  $tag   The tag to update
+     * @param  boolean $force Force the tag to be applied/untaged
+     * @param  boolean $untag Untag the user
+     */
+    public function updateUserTag(User $user, String $tag, $force = false, $untag = false)
+    {
+        $users = [$user];
+        $response = $this->updateUsersTag($users, $tag, $force, $untag);
+        return;
+    }
+
+    /**
+     * Update a tag for an array of users
+     * @param  Array   $users   The users to update
+     * @param  String  $tag     The tag to update
+     * @param  boolean $force   Force the tag to be applied/untaged
+     * @param  boolean $untag   Untag the users
+     * @param  boolean $cleanup Delete non eligible users on intercom
+     */
+    public function updateUsersTag(array $users, String $tag, $force = false, $untag = false, $cleanup = false)
+    {
+        $taggedUsersIds = false;
+        if (mb_strlen(trim($tag)) <= 0 || !$this->isValidTag($tag, !$force)) {
+            $this->logger->warning(sprintf(
+                'Skipping Intercom update for tag (%s) as it\s not a valid Tag',
+                $tag
+            ));
+            return;
+        } else {
+            if ($cleanup) {
+                $intercomTags = [];
+                foreach ((array) $this->client->tags->getTags()->tags as $intercomTag) {
+                    $intercomTags[$intercomTag->id] = $intercomTag->name;
+                }
+                $tagKey = array_search($tag, $intercomTags);
+                if ($tagKey) {
+                    $taggedUsers = $this->client->users->getUsers(['tag_id' => $tagKey])->users;
+                    foreach ($taggedUsers as $taggedUser) {
+                        $taggedUsersIds[] = $taggedUser->id;
+                    }
+                }
+            }
+            $userIds = [];
+            foreach ($users as $user) {
+                if (!$user->getIntercomId()) {
+                    $this->logger->warning(sprintf(
+                        'No Intercom Id for User %s',
+                        $user->getId()
+                    ));
+                } else {
+                    if ($force) {
+                        $userIds[] = ['id' => $user->getIntercomId(), 'untag' => $untag ];
+                    } else {
+                        $isEligible = $user->isEligibleForTag($tag);
+                        $userIds[] = ['id' => $user->getIntercomId(), 'untag' => !$isEligible ];
+                    }
+                    if ($cleanup) {
+                        if (($key = array_search($user->getIntercomId(), $taggedUsersIds)) !== false) {
+                            unset($taggedUsersIds[$key]);
+                        }
+                    }
+                }
+            }
+            if ($cleanup && !empty($taggedUsersIds)) {
+                foreach ($taggedUsersIds as $taggedUsersId) {
+                    $userIds[] = ['id' => $taggedUsersId, 'untag' => true ];
+                }
+            }
+            $this->updateTag($tag, $userIds);
+            return;
+        }
+    }
+
+    /**
+     * Update the tag on Intercom
+     * @param  String $tag     Tag to update
+     * @param  Array  $userIds Intercom Ids of the users
+     */
+    private function updateTag(String $tag, array $userIds)
+    {
+        if (!is_array($userIds)) {
+            $this->logger->warning(sprintf(
+                'Skipping Intercom update for tag (%s) as $users is not an array',
+                $tag
+            ));
+            return;
+        } elseif (empty($userIds)) {
+            $this->logger->warning(sprintf(
+                'Skipping Intercom update for tag (%s) as $users is empty',
+                $tag
+            ));
+            return;
+        } else {
+            $count = 0;
+            $userIdsBatch = [];
+            $response = [];
+            foreach ($userIds as $user) {
+                $userIdsBatch[] = $user;
+                $count++;
+                if ($count == self::MAX_TAG_USERS_BATCH_SIZE) {
+                    $this->checkRateLimit();
+                    $response[] = $this->client->tags->tag([
+                        "name" => $tag,
+                        "users" => $userIdsBatch
+                    ]);
+                    $this->storeRateLimit();
+                    $userIdsBatch = [];
+                    $count = 0;
+                }
+            }
+            if ($count > 0) {
+                $this->checkRateLimit();
+                $response[] = $this->client->tags->tag([
+                    "name" => $tag,
+                    "users" => $userIdsBatch
+                ]);
+                $this->storeRateLimit();
+            }
+
+            $this->logger->debug(sprintf(
+                'Intercom Tag (%s) updated %s',
+                $tag,
+                json_encode($response)
+            ));
+
+            return;
+        }
     }
 
     public function sendPolicyEvent(Policy $policy, $event)
@@ -1827,5 +2007,20 @@ class IntercomService
     private function isValidMobile($mobile)
     {
         return $this->isValidUkMobile($mobile);
+    }
+
+    /**
+     * Is the tag part of the allowed Tags
+     * @param  String  $tag
+     * @param  boolean $strict
+     * @return boolean
+     */
+    private function isValidTag(String $tag, $strict = true)
+    {
+        if ($strict) {
+            return in_array($tag, User::TAGS);
+        } else {
+            return true;
+        }
     }
 }
