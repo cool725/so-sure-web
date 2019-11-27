@@ -324,4 +324,31 @@ class UserRepository extends DocumentRepository
             $start += $n;
         }
     }
+
+    /**
+     * Find Users Eligible for a Tag
+     * @param  String $tag
+     * @return mixed Eligible users array or false
+     */
+    public function findByTag(String $tag)
+    {
+        $validUsers = false;
+        if (method_exists($this, 'getUsers' . ucfirst($tag))) {
+            $getUsersFunction = array($this, 'getUsers' . ucfirst($tag));
+            $validUsers = call_user_func($getUsersFunction);
+        }
+        return $validUsers;
+    }
+
+    // /**
+    //  * @return array Array of Users
+    //  */
+    // private function getUsersTestTag()
+    // {
+    //     return array(
+    //         $this->find('5dcac0887bf2783ec449d655'),
+    //         $this->find('5dcac0887bf2783ec449d653'),
+    //         $this->find('5dcac0887bf2783ec449d651'),
+    //     );
+    // }
 }

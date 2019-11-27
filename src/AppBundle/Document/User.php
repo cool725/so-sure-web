@@ -63,6 +63,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const DPA_VALIDATION_FAIL_FIRSTNAME = 'dpa-fail-firstname';
     const DPA_VALIDATION_FAIL_MOBILE = 'dpa-fail-mobile';
 
+    const TAGS = [];
+
     /**
      * @MongoDB\Id
      */
@@ -2410,4 +2412,30 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         return self::DPA_VALIDATION_VALID;
     }
+
+    /**
+     * Is the User eligible for the Tag
+     * @param  String $tag
+     * @return boolean
+     */
+    public function isEligibleForTag(String $tag)
+    {
+        $isEligible = false;
+        if (in_array($tag, self::TAGS)) {
+            $tag = ucfirst($tag);
+            $eligibilityFunction = array($this, 'is' . $tag);
+            if (is_callable($eligibilityFunction)) {
+                $isEligible = true === call_user_func($eligibilityFunction);
+            }
+        }
+        return $isEligible;
+    }
+
+    // /**
+    //  * @return boolean
+    //  */
+    // private function isTestTag()
+    // {
+    //     return true;
+    // }
 }
