@@ -132,8 +132,10 @@ services:
             - "@logger"
             - "@app.policy"
             - "@app.mailer"
-            - "%checkout_apisecret%"
-            - "%checkout_apipublic%"
+            - "%checkout_old_apisecret%"
+            - "%checkout_old_apipublic%"
+            - "%checkout_new_apisecret%"
+            - "%checkout_new_apipublic%"
             - "%kernel.environment%"
             - "@statsd"
             - "@event_dispatcher"
@@ -1256,15 +1258,6 @@ services:
             - "@app.push"
         tags:
             -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewalEvent }
-
-    app.listener.salva:
-        class:   AppBundle\Listener\SalvaListener
-        arguments:
-            - "@app.salva"
-        tags:
-            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.salva_increment, method: onPolicySalvaIncrementEvent }
-            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.refund:
         class:   AppBundle\Listener\RefundListener

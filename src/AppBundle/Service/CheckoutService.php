@@ -107,10 +107,16 @@ class CheckoutService
     protected $priceService;
 
     /** @var ApiClient */
-    protected $client;
+    protected $oldClient;
 
     /** @var CheckoutApi */
-    protected $api;
+    protected $oldApi;
+
+    /** @var ApiClient */
+    protected $newClient;
+
+    /** @var CheckoutApi */
+    protected $newApi;
 
     public function setDispatcher($dispatcher)
     {

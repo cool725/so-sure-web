@@ -14,4 +14,28 @@ use AppBundle\Classes\Salva;
  */
 class HelvetiaPhonePolicy extends PhonePolicy
 {
+    /**
+     * @inheritDoc
+     */
+    public function getUnderwriterTimeZone()
+    {
+        return new \DateTimeZone("Europe/Zurich");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUnderwriterName()
+    {
+        return "Helvetia";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTotalCommission(Payment $payment)
+    {
+        // TODO: this.
+
+    }
 }

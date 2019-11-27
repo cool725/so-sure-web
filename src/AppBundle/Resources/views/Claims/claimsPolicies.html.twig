@@ -161,6 +161,7 @@
                     <thead>
                     <tr>
                         <th>Policy Number</th>
+                        <th>Underwriter</th>
                         <th>Policy Status</th>
                         <th>Policy Age (days)</th>
                         <th>Name</th>
@@ -189,6 +190,7 @@
                                     N/A
                                 {% endif %}
                             </a></td>
+                            <td>{{ policy.underwriterName }}</td>
                             <td>{{ policy.status }}
                                 {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
                                 {% if status == 'call' or status == 'called' %}

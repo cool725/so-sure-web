@@ -27,7 +27,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
-use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
@@ -4896,6 +4895,12 @@ abstract class Policy
     abstract public function getUnderwriterTimeZone();
 
     /**
+     * Gives you the policy's underwriter.
+     * @return string the name of the underwriter.
+     */
+    abstract public function getUnderwriterName();
+
+    /**
      * Get the current max connection for this policy
      * @return mixed
      */
@@ -5817,6 +5822,14 @@ abstract class Policy
         }
     }
 
+    /**
+     * Sets the commission of a payment belonging to this policy because the policy knows the coverholder and their
+     * commission rules.
+     * @param Payment $payment is the payment that we are setting the commission for.
+     */
+    public abstract function setTotalCommission(Payment $payment);
+
+    // TODO: make this function abstract.
     public function getExpectedCommission(\DateTime $date = null)
     {
         $salva = new Salva();

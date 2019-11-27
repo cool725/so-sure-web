@@ -65,14 +65,6 @@ class SalvaPhonePolicy extends PhonePolicy
     /** @MongoDB\Field(type="hash") */
     protected $salvaFirstBillingDates = array();
 
-    /**
-     * @InheritDoc
-     */
-    public function getUnderwriterTimeZone()
-    {
-        return new \DateTimeZone(Salva::SALVA_TIMEZONE)
-    }
-
     public function getSalvaStatus()
     {
         return $this->salvaStatus;
@@ -345,6 +337,30 @@ class SalvaPhonePolicy extends PhonePolicy
         $this->setSalvaStatus(self::SALVA_STATUS_WAIT_CANCELLED);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getUnderwriterTimeZone()
+    {
+        return new \DateTimeZone(Salva::SALVA_TIMEZONE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUnderwriterName()
+    {
+        return "Salva";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTotalCommission(Payment $payment)
+    {
+        // TODO: this.
+    }
+
     public function hasSalvaPreviousVersionPastMidnight($version = null)
     {
         if (!$this->isPolicy() || !$this->getSalvaStartDate($version)) {
@@ -595,13 +611,5 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         return $this->getPromoPotValue();
-    }
-
-    /**
-     * @InheritDoc
-     */
-    public function underwriterCreate()
-    {
-
     }
 }
