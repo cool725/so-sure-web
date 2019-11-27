@@ -82,7 +82,7 @@ class SearchService
     {
         if (empty($this->form->getNormData())) {
             return $this->policyQb->sort('created', -1)
-                ->limit(50)
+                ->limit(100)
                 ->getQuery()
                 ->execute()
                 ->toArray();
