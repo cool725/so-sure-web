@@ -8,7 +8,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\File\PicSureFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 class PicSureStatus
 {
     /**
@@ -31,7 +30,7 @@ class PicSureStatus
         if ($picSureStatus === null) {
             // remove pic-sure files
             foreach ($this->policy->getPolicyFilesByType(PicSureFile) as $file) {
-                $this->policy->removePolicyFile($file);
+                $this->policy->removePicSureFile($file);
             }
         }
         $this->picSureStatus = $picSureStatus;

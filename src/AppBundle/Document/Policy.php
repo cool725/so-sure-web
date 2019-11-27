@@ -2385,11 +2385,11 @@ abstract class Policy
     {
         $files = [];
         foreach ($this->policyFiles as $policyFile) {
-            if($policyFile != $file) {
+            if ($policyFile != $file) {
                 $files[] = $policyFile;
             }
         }
-        $this->policyFiles[] = $files;
+        $this->policyFiles = $files;
     }
 
     public function setLeadSource($source)
