@@ -361,6 +361,76 @@ class SalvaPhonePolicy extends PhonePolicy
         // TODO: this.
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getExpectedCommisision($date = null)
+    {
+
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExpectedCommission(\DateTime $date = null)
+    {
+        $salva = new Salva();
+        $premium = $this->getPremium();
+
+        $expectedCommission = null;
+        $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+        // TODO: do we need to see if cancelled and if so use policy end date?
+        $expectedPayments = $this->getTotalExpectedPaidToDate($date);
+        $isMoneyOwed = !$this->areEqualToTwoDp($totalPayments, $expectedPayments) && $totalPayments < $expectedPayments;
+
+        $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
+        if ($numPayments > 12 || $numPayments < 0) {
+            throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
+        }
+        $expectedMonthlyCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
+
+        // active/unpaid should be on a cash received based
+        // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
+        // also if a policy has been cancelled and there is money owed
+        if ($this->isCooloffCancelled()) {
+            return 0;
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
+        ])) {
+            $expectedCommission = $expectedMonthlyCommission;
+        } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
+            // if there's a refund, the number of payments won't be equal and so we need to calculate based on received
+            // funds, rather than monthly
+            if ($numPayments) {
+                $expectedCommission = $expectedMonthlyCommission;
+            } else {
+                $expectedCommission = $commissionReceived;
+            }
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM]) && $numPayments == 11) {
+            // we've had a historical issue where if a policy has had 11 payments, and the cancellation date is at the
+            // same day as the expiration date, we dont' quite cancel in time.
+            $expectedCommission = $expectedMonthlyCommission;
+        } else {
+            if (!$date) {
+                $date = \DateTime::createFromFormat('U', time());
+            }
+            // policy is not active (above if statement)
+            // so at most we should only be calculating to the end of the policy
+            if ($date > $this->getEnd()) {
+                $date = $this->getEnd();
+            }
+            $expectedCommission = $this->getProratedCommission($date);
+        }
+
+        return $expectedCommission;
+    }
+
     public function hasSalvaPreviousVersionPastMidnight($version = null)
     {
         if (!$this->isPolicy() || !$this->getSalvaStartDate($version)) {

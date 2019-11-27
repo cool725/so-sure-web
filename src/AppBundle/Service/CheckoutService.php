@@ -57,6 +57,9 @@ use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SameDayPaymentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Handles payments through checkout.com.
+ */
 class CheckoutService
 {
     use CurrencyTrait;
@@ -118,32 +121,32 @@ class CheckoutService
     /** @var CheckoutApi */
     protected $newApi;
 
-    public function setDispatcher($dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
     /**
-     * @param DocumentManager          $dm
-     * @param LoggerInterface          $logger
-     * @param PolicyService            $policyService
-     * @param MailerService            $mailer
-     * @param string                   $apiSecret
-     * @param string                   $apiPublic
-     * @param string                   $environment
-     * @param \Domnikl\Statsd\Client   $statsd
-     * @param EventDispatcherInterface $dispatcher
-     * @param SmsService               $sms
-     * @param FeatureService           $featureService
-     * @param PriceService             $priceService
+     * Injects the service's dependencies.
+     * @param DocumentManager          $dm             is used for database access.
+     * @param LoggerInterface          $logger         is used for logging.
+     * @param PolicyService            $policyService  is used to update policies in response to payment.
+     * @param MailerService            $mailer         is used to email users in response to payment status.
+     * @param string                   $oldApiSecret   is the private key for the old checkout channel.
+     * @param string                   $oldApiPublic   is the public key for the old checkout channel.
+     * @param string                   $newApiSecret   is the private key for the new checkout channel.
+     * @param string                   $newApiPublic   is the public key for the new checkout channel.
+     * @param string                   $environment    is the environment that the service is in.
+     * @param \Domnikl\Statsd\Client   $statsd         is used to record stats.
+     * @param EventDispatcherInterface $dispatcher     is used to dispatch payment events events.
+     * @param SmsService               $sms            is used to sms users in response to payment status.
+     * @param FeatureService           $featureService is used to check if features are enabled.
+     * @param PriceService             $priceService   is used to verify paid sums.
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         PolicyService $policyService,
         MailerService $mailer,
-        $apiSecret,
-        $apiPublic,
+        $oldApiSecret,
+        $oldApiPublic,
+        $newApiSecret,
+        $newApiPublic,
         $environment,
         \Domnikl\Statsd\Client $statsd,
         EventDispatcherInterface $dispatcher,
@@ -161,10 +164,59 @@ class CheckoutService
         $this->environment = $environment;
         $this->featureService = $featureService;
         $this->priceService = $priceService;
+        $isProd = $environment === 'prod';
+        $checkoutEnvironment = $isProd ? 'live' : 'sandbox';
+        $this->oldClient = new ApiClient($oldApiSecret, $checkoutEnvironment, !$isProd);
+        $this->oldApi = new CheckoutApi($oldApiSecret, -1, $oldApiPublic);
+        $this->newClient = new ApiClient($newApiSecret, $checkoutEnvironment, !$isProd);
+        $this->newApi = new CheckoutApi($newApiSecret, -1, $newApiPublic);
+    }
 
-        $isProd = $environment == 'prod';
-        $this->client = new ApiClient($apiSecret, $isProd ? 'live' : 'sandbox', !$isProd);
-        $this->api = new CheckoutApi($apiSecret, -1, $apiPublic);
+    /**
+     * Sets the service's event dispatcher.
+     * @param EventDispatcherInterface $dispatcher is the dispatcher to set it to.
+     */
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Gives the checkout client that should be used for payments regarding a given policy. If the policy has no
+     * appropriate client an exception will be thrown but that shouldn't be possible.
+     * @param Policy $policy is the policy that we are going to work on with the client.
+     * @return CheckoutClient the appropriate client.
+     */
+    public function getClientForPolicy(Policy $policy)
+    {
+        if ($policy instanceof SalvaPhonePolicy) {
+            return $this->oldClient;
+        } elseif ($policy instanceof HelvetiaPhonePolicy) {
+            return $this->newClient;
+        }
+        throw new \InvalidArgumentArgument(sprintf(
+            'policy "%s" has no checkout client',
+            $policy->getId()
+        ));
+    }
+
+    /**
+     * Gives the checkout api that should be used for payments regarding a given policy. If the policy has no
+     * appropriate api an exception will be thrown but that shouldn't be possible.
+     * @param Policy $policy is the policy that we are going to work on with the API.
+     * @return CheckoutApi the appropriate api.
+     */
+    public function getApiForPolicy(Policy $policy)
+    {
+        if ($policy instanceof SalvaPhonePolicy) {
+            return $this->oldApi;
+        } elseif ($policy instanceof HelvetiaPhonePolicy) {
+            return $this->newApi;
+        }
+        throw new \InvalidArgumentArgument(sprintf(
+            'policy "%s" has no checkout api',
+            $policy->getId()
+        ));
     }
 
     /**
@@ -180,27 +232,8 @@ class CheckoutService
         return $details;
     }
 
-    public function getTransactionWebType($chargeId)
-    {
-        try {
-            $data = $this->getTransaction($chargeId);
-            if ($data->getMetadata() && isset($data->getMetadata()['web_type'])) {
-                return $data->getMetadata()['web_type'];
-            }
-        } catch (\Exception $e) {
-            $this->logger->warning(
-                sprintf('Unable to find transaction charge %s', $chargeId),
-                ['exception' => $e]
-            );
-        }
-
-        return null;
-    }
-
     public function getTransactions($pageSize, $logMissing = true)
     {
-        NoOp::ignore([$pageSize]);
-
         $policies = [];
         $repo = $this->dm->getRepository(CheckoutPayment::class);
 
@@ -208,7 +241,7 @@ class CheckoutService
         $filter->setPageSize($pageSize);
         //$filter->setSearch()
 
-        $transactions = $this->client->reportingService()->queryTransaction($filter);
+        $transactions = $this->newClient->reportingService()->queryTransaction($filter);
         $data = [
             'validated' => 0,
             'missing' => [],
@@ -596,7 +629,8 @@ class CheckoutService
             $charge->setMetadata(['policy_id' => $policyId]);
             $charge->setBaseCardCreate($cardCreate);
 
-            $service = $this->client->chargeService();
+            $client = $this->getClientForPolicy($policy);
+            $service = $client->chargeService();
             $details = $service->chargeWithCard($charge);
             if ($details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
                 /**
@@ -625,7 +659,7 @@ class CheckoutService
                 $this->dm->flush();
             }
 
-            $service = $this->client->chargeService();
+            $service = $client->chargeService();
             $details = $service->CaptureCardCharge($capture);
         } catch (\Exception $e) {
             $this->logger->error(
@@ -796,6 +830,7 @@ class CheckoutService
         $token,
         $amount = null
     ) {
+        $client = $this->getClientForPolicy($policy);
         $user = $policy->getUser();
         $details = null;
         $payment = null;
@@ -807,7 +842,7 @@ class CheckoutService
         }
 
         try {
-            $service = $this->client->chargeService();
+            $service = $client->chargeService();
 
             $user = $policy->getUser();
 
@@ -921,7 +956,7 @@ class CheckoutService
                 $this->dm->flush();
             }
 
-            $service = $this->client->chargeService();
+            $service = $client->chargeService();
 
             $charge = new CardTokenChargeCreate();
             $charge->setEmail($user->getEmail());
@@ -1539,9 +1574,11 @@ class CheckoutService
             ));
         }
 
+
         $user = $policy->getUser();
 
-        $chargeService = $this->client->chargeService();
+        $client = $this->getClientForPolicy($policy);
+        $chargeService = $client->chargeService();
         $chargeCreate = new CardIdChargeCreate();
         if ($paymentMethod->hasPreviousChargeId()) {
             $chargeCreate->setPreviousChargeId($paymentMethod->getPreviousChargeId());
@@ -1756,7 +1793,8 @@ class CheckoutService
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        $chargeService = $this->client->chargeService();
+        $client = $this->getClientForPolicy($policy);
+        $chargeService = $client->chargeService();
         $chargeRefund = new ChargeRefund();
         $chargeRefund->setChargeId($payment->getReceipt());
         $chargeRefund->setValue($this->convertToPennies($amount));

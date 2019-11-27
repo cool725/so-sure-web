@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -36,6 +37,13 @@ class HelvetiaPhonePolicy extends PhonePolicy
     public function setTotalCommission(Payment $payment)
     {
         // TODO: this.
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function getExpectedCommission(\DateTime $date = null)
+    {
+        // TODO: this.
     }
 }
