@@ -10,6 +10,7 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Repository\PolicyTermsRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Repository\CashbackRepository;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\PhonePolicyRepository;
@@ -323,8 +324,8 @@ class PolicyService
     public function init(
         User $user,
         Phone $phone,
-        $imei,
-        $serialNumber,
+        $imei = null,
+        $serialNumber = null,
         IdentityLog $identityLog = null,
         $phoneData = null,
         $modelNumber = null,
@@ -335,7 +336,9 @@ class PolicyService
         }
         try {
             $this->validateUser($user);
-            $this->validateImei($imei);
+            if ($imei) {
+                $this->validateImei($imei);
+            }
 
             if ($identityLog && $identityLog->isSessionDataPresent()) {
                 if (!$this->rateLimit->allowedByDevice(
@@ -348,14 +351,16 @@ class PolicyService
             }
 
             $checkmend = null;
-            if (!$user->hasSoSureEmail()) {
+            if ($imei && !$user->hasSoSureEmail()) {
                 $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
             }
 
             // TODO: items in POST /policy should be moved to service and service called here
             $policy = new SalvaPhonePolicy();
             $policy->setPhone($phone);
-            $policy->setImei($imei);
+            if ($imei) {
+                $policy->setImei($imei);
+            }
             $policy->setSerialNumber($serialNumber);
             $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
@@ -688,7 +693,7 @@ class PolicyService
                     throw new \Exception(sprintf('Unknown policy in queue %s', json_encode($data)));
                 }
 
-                $this->generatePolicyFiles($policy, true, 'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com');
+                $this->generatePolicyFiles($policy, true);
 
                 $count = $count + 1;
             } catch (\Exception $e) {
@@ -2697,5 +2702,36 @@ class PolicyService
         $participation->setStatus(Participation::STATUS_ACTIVE);
         $this->dm->persist($participation);
         return $participation;
+    }
+
+    /**
+     * Calculates the amount of money owed by an unpaid policy. If it has a normal owed amount that is returned, but if
+     * it has no owed calculation but some rescheduled payments it returns the sum of them, and if there is really no
+     * source of owed money it sets the policy from unpaid to active.
+     * @param Policy    $policy is the policy to check.
+     * @param \DateTime $date   is the date at which the amount is owed.
+     * @return float the owed amount.
+     */
+    public function checkOwedPremium(Policy $policy, \DateTime $date)
+    {
+        if ($policy->getStatus() != Policy::STATUS_UNPAID) {
+            return 0;
+        }
+        $amount = $policy->getOutstandingPremiumToDate($date);
+        if ($this->greaterThanZero($amount)) {
+            return $amount;
+        }
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
+        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+        $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
+        if (!$this->greaterThanZero($rescheduledAmount)) {
+            $this->logger->error(sprintf(
+                'Policy %s has unpaid status, but paid to date. Setting to active.',
+                $policy->getId()
+            ));
+            $policy->setStatus(Policy::STATUS_ACTIVE);
+            $this->dm->flush();
+        }
+        return $rescheduledAmount;
     }
 }

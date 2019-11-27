@@ -41,9 +41,6 @@
 
     <section class="hero">
 
-        {# Toasts #}
-        {# {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %} #}
-
         <div class="container-large">
             <div class="row">
                 <div class="col-lg-6 d-none d-lg-block">
@@ -54,12 +51,15 @@
                 <div class="col-lg-5 offset-md-2 offset-lg-1">
                     <div class="hero__intro">
                         <h1 class="mb-4 text-white fit">
-                            Mobile Insurance {% if flag_exp is defined and flag_exp == 'flag' %}🇬🇧{% endif %} <br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
+                            Mobile Insurance<br><span class="sub text-deep-sky-blue-d">that's Simply Better 🇬🇧</span>
+                        </h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                24-72 hour replace or repair
-                            </li>
+                            {% if usp_exp is defined and usp_exp == 'pricing-usps' %}
+                                <li class="mb-3 h5 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Full cover from &pound;3.49/month
+                                </li>
+                            {% endif %}
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
                                 Low excess from just &pound;50
@@ -68,9 +68,13 @@
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
                                 Up to 80% money back
                             </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                24-72 hour replace or repair
+                            </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                New, secondhand &amp; refurbished phones
+                                New, second hand &amp; refurbished phones
                             </li>
                         </ul>
                     </div>

@@ -98,12 +98,12 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // A/B UK Flag Test
-        // To Test use url param ?force=flag / ?force=no-flag
-        $ukFlagTest = $this->sixpack(
+        // A/B USP Test
+        // To Test use url param ?force=current-usps / ?force=pricing-usps
+        $homepageUspPricingTest = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_UK_FLAG,
-            ['flag', 'no-flag'],
+            SixpackService::EXPERIMENT_PRICING_USP,
+            ['current-usps', 'pricing-usps'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
@@ -114,9 +114,9 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'referral' => $referral,
-            'phone' => $this->getQuerystringPhone($request),
-            'flag_exp' => $ukFlagTest,
+            'referral'  => $referral,
+            'phone'     => $this->getQuerystringPhone($request),
+            'usp_exp' => $homepageUspPricingTest,
         );
 
         return $this->render($template, $data);

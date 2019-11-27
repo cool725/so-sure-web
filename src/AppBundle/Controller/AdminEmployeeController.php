@@ -1738,6 +1738,13 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                                 $policy->getId()
                             ));
                         }
+                    } elseif (!$policy->getPremium()) {
+                        $priceService = $this->get("app.price");
+                        $priceService->phonePolicyDeterminePremium(
+                            $policy,
+                            $bacsPayment->getAmount(),
+                            new \DateTime()
+                        );
                     }
                     $policy->addPayment($bacsPayment);
 
@@ -2300,6 +2307,38 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 ->getForm();
         }
 
+        if ($user->getIsInfluencer()) {
+            $influencerForm = $this->get('form.factory')
+                ->createNamedBuilder('influencer_user_form')
+                ->add(
+                    'non-influencer',
+                    SubmitType::class,
+                    [
+                        "label" => 'Non influencer',
+                        'attr' => [
+                            "non-influencer" => true,
+                            'class' => 'btn btn-primary btn-square btn-sm mb-1'
+                        ]
+                    ]
+                )
+                ->getForm();
+        } else {
+            $influencerForm = $this->get('form.factory')
+                ->createNamedBuilder('influencer_user_form')
+                ->add(
+                    'influencer',
+                    SubmitType::class,
+                    [
+                        "label" => 'Influencer',
+                        'attr' => [
+                            "influencer" => true,
+                            'class' => 'btn btn-primary btn-square btn-sm mb-1'
+                        ]
+                    ]
+                )
+                ->getForm();
+        }
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('user_role_form')) {
                 $roleForm->handleRequest($request);
@@ -2337,7 +2376,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $policyForm->handleRequest($request);
                 if ($policyForm->isValid()) {
                     $imeiValidator = $this->get('app.imei');
-                    if (!$imeiValidator->isImei($policyData->getImei()) ||
+                    if ($policyData->getImei() && !$imeiValidator->isImei($policyData->getImei()) ||
                         $imeiValidator->isLostImei($policyData->getImei()) ||
                         $imeiValidator->isDuplicatePolicyImei($policyData->getImei())) {
                         $this->addFlash(
@@ -2553,6 +2592,28 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
 
                 return $this->redirectToRoute('admin_user', ['id' => $id]);
+            } elseif ($request->request->has('influencer_user_form')) {
+                $form = $request->request->get('influencer_user_form');
+                $influencer = isset($form['influencer']);
+                $nonInfluencer = isset($form['non-influencer']);
+                $influencerForm->handleRequest($request);
+                if ($influencer) {
+                    $user->setIsInfluencer(true);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'User is influencer!'
+                    );
+                } elseif ($nonInfluencer) {
+                    $user->setIsInfluencer(false);
+                    $dm->flush();
+                    $this->addFlash(
+                        'error',
+                        "Removed influencer"
+                    );
+                }
+
+                return $this->redirectToRoute('admin_user', ['id' => $id]);
             } elseif ($request->request->has('delete_form')) {
                 $deleteForm->handleRequest($request);
                 if ($deleteForm->isValid()) {
@@ -2584,6 +2645,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'sanctions_form' => $sanctionsForm->createView(),
             'handling_team_form' => $handlingTeamForm->createView(),
             'blacklist_user_form' => $blacklistForm->createView(),
+            'influencer_user_form' => $influencerForm->createView(),
             'delete_form' => $deleteForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
@@ -3780,7 +3842,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 'AppBundle:Email:picsure/accepted.html.twig',
                 ['policy' => $policy],
                 'AppBundle:Email:picsure/accepted.txt.twig',
-                ['policy' => $policy]
+                ['policy' => $policy],
+                null,
+                'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com'
             );
 
             try {

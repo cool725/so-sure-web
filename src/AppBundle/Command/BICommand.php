@@ -50,6 +50,19 @@ class BICommand extends ContainerAwareCommand
 {
     use DateTrait;
 
+    const EXPORT_OPTIONS = [
+        'policies',
+        'claims',
+        'users',
+        'invitations',
+        'connections',
+        'phones',
+        'scodes',
+        'unpaidCalls',
+        'rewards',
+        'rewardsBudget'
+    ];
+
     /** @var S3Client */
     protected $s3;
 
@@ -93,21 +106,7 @@ class BICommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $onlyOptions = [
-            "policies",
-            "claims",
-            "users",
-            "invitations",
-            "connections",
-            "phones",
-            "unpaidCalls",
-            "leadSource",
-            "checkoutTransactions",
-            "scodes",
-            "rewards",
-            "rewardsBudget"
-        ];
-        $onlyMessage = "Only run one export [" . implode(', ', $onlyOptions) . "]";
+        $onlyMessage = 'Only run one export [' . implode(', ', self::EXPORT_OPTIONS) . ']';
         $this
             ->setName('sosure:bi')
             ->setDescription('Run a bi export')
@@ -130,22 +129,28 @@ class BICommand extends ContainerAwareCommand
                 $onlyMessage
             )
             ->addOption(
+                'exclude',
+                'E',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Datasets to exclude'
+            )
+            ->addOption(
                 'skip-s3',
                 null,
                 InputOption::VALUE_NONE,
                 'Skip s3 upload'
             )
             ->addOption(
-                "timezone",
+                'timezone',
                 null,
                 InputOption::VALUE_REQUIRED,
-                "Choose a timezone to use for policies report"
+                'Choose a timezone to use for policies report'
             )
             ->addOption(
-                "date",
+                'date',
                 null,
                 InputOption::VALUE_REQUIRED,
-                "Set the date you want to query transactions for - MM/YY."
+                'Set the date you want to query transactions for - MM/YY.'
             )
         ;
     }
@@ -155,52 +160,60 @@ class BICommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Get arguments.
+        $only = $input->getOption('only');
+        $exclude = $input->getOption('exclude');
+        $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
         $prefix = $input->getOption('prefix');
-        $only = $input->getOption('only');
-        $skipS3 = true === $input->getOption('skip-s3');
         $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
-        $lines = [];
-        if (!$only || $only == 'policies') {
-            $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
+        // Figure out exports to run.
+        $exports = [];
+        foreach (self::EXPORT_OPTIONS as $export) {
+            if ((!$only || $only == $export) && !in_array($export, $exclude)) {
+                $exports[] = $export;
+            }
         }
-        if (!$only || $only == 'claims') {
-            $lines = $this->exportClaims($skipS3, $timezone);
-        }
-        if (!$only || $only == 'users') {
-            $lines = $this->exportUsers($skipS3, $timezone);
-        }
-        if (!$only || $only == 'invitations') {
-            $lines = $this->exportInvitations($skipS3, $timezone);
-        }
-        if (!$only || $only == 'connections') {
-            $lines = $this->exportConnections($skipS3, $timezone);
-        }
-        if (!$only || $only == 'phones') {
-            $lines = $this->exportPhones($skipS3, $timezone);
-        }
-        if (!$only || $only == 'unpaidCalls') {
-            $lines = $this->exportUnpaidCalls($skipS3, $timezone);
-        }
-        if (!$only || $only == 'leadSource') {
-            $lines = $this->exportLeadSource($skipS3, $timezone);
-        }
-        if (!$only || $only == 'checkoutTransactions') {
-            $date = $input->getOption('date');
-            $lines = $this->exportCheckoutTransactions($skipS3, $timezone, $date);
-        }
-        if (!$only || $only == 'scodes') {
-            $lines = $this->exportScodes($skipS3, $timezone);
-        }
-        if (!$only || $only == 'rewards') {
-            $lines = $this->exportRewards($skipS3);
-        }
-        if (!$only || $only == 'rewardsBudget') {
-            $lines = $this->exportRewardsBudget($skipS3);
-        }
-        if ($debug) {
-            foreach ($lines as $line) {
-                $output->writeln($line);
+        // Run exports.
+        foreach ($exports as $export) {
+            $output->writeln($export);
+            $lines = [];
+            switch ($export) {
+                case 'policies':
+                    $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
+                    break;
+                case 'claims':
+                    $lines = $this->exportClaims($skipS3, $timezone);
+                    break;
+                case 'invitations':
+                    $lines = $this->exportInvitations($skipS3, $timezone);
+                    break;
+                case 'connections':
+                    $lines = $this->exportConnections($skipS3, $timezone);
+                    break;
+                case 'phones':
+                    $lines = $this->exportPhones($skipS3, $timezone);
+                    break;
+                case 'scodes':
+                    $lines = $this->exportScodes($skipS3, $timezone);
+                    break;
+                case 'rewards':
+                    $lines = $this->exportRewards($skipS3);
+                    break;
+                case 'rewardsBudget':
+                    $lines = $this->exportRewardsBudget($skipS3);
+                    break;
+                case 'users':
+                    $lines = $this->exportUsers($skipS3, $timezone);
+                    break;
+                case 'unpaidCalls':
+                    $lines = $this->exportUnpaidCalls($skipS3, $timezone);
+                    break;
+            }
+            if ($debug) {
+                foreach ($lines as $line) {
+                    $output->writeln($line);
+                }
             }
         }
     }
@@ -228,12 +241,14 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($phones as $phone) {
             /** @var Phone $phone */
+            $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
+            $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
             $lines[] = implode(',', [
                 sprintf('"%s"', $phone->getMake()),
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
-                sprintf('"%0.2f"', $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice()),
-                sprintf('"%0.2f"', $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()),
+                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : ''),
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice())
             ]);
@@ -529,7 +544,7 @@ class BICommand extends ContainerAwareCommand
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findAll();
+        $users = $repo->findAllBiUsersBatched(1000);
         $lines = [];
         $lines[] = implode(',', [
             '"Age of User"',
@@ -545,9 +560,6 @@ class BICommand extends ContainerAwareCommand
         ]);
         foreach ($users as $user) {
             /** @var User $user */
-            if (!$user->getBillingAddress()) {
-                continue;
-            }
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
@@ -728,107 +740,6 @@ class BICommand extends ContainerAwareCommand
         }
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'unpaidCalls.csv');
-        }
-        return $lines;
-    }
-
-    private function exportLeadSource($skipS3, \DateTimeZone $timezone)
-    {
-        /** @var PolicyRepository $policyRepo */
-        $policyRepo = $this->dm->getRepository(Policy::class);
-        /** @var InvitationRepository $invitationRepo */
-        $invitationRepo = $this->dm->getRepository(Invitation::class);
-        $policies = $policyRepo->createQueryBuilder()
-            ->field('leadSource')->in(['scode', 'invitation'])
-            ->getQuery()->execute();
-        $lines = [];
-        $lines[] = implode(',', [
-            '"Inviter"',
-            '"Invitee"',
-            '"Inverted"'
-        ]);
-        foreach ($policies as $policy) {
-            $inverted = false;
-            $other = null;
-            /** @var Invitation $invitation */
-            $invitation = $invitationRepo->getOwnInvitation($policy);
-            if (!$invitation) {
-                $inverted = true;
-                $invitation = $invitationRepo->getFirstMadeInvitation($policy);
-                if ($invitation) {
-                    $invitee = $invitation->getInvitee();
-                    if ($invitee) {
-                        $other = $invitee->getLatestPolicy();
-                    }
-                }
-            } else {
-                $other = $invitation->getPolicy();
-            }
-            $lines[] = implode(',', [
-                sprintf('"%s"', $other ? $other->getPolicyNumber() : 'N/A'),
-                sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%s"', $inverted ? "Yes" : "No")
-            ]);
-        }
-        if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), 'leadSource.csv');
-        }
-        return $lines;
-    }
-
-    private function exportCheckoutTransactions($skipS3, \DateTimeZone $timezone, $date)
-    {
-        /** @var PaymentRepository $repo */
-        $repo = $this->dm->getRepository(Payment::class);
-
-        if ($date === null) {
-            $date = date('Y-m');
-        }
-        $now = new \DateTime($date);
-        $nextMonth = new \DateTime($date);
-        $nextMonth->add(new \DateInterval('P1M'));
-
-        $transactions = $repo->createQueryBuilder()
-            ->field('date')->gte($now)
-            ->field('date')->lt($nextMonth)
-            ->field('type')->equals('checkout')
-            ->sort('created', 1)
-            ->getQuery()->execute();
-
-
-        $lines = [];
-        $lines[] = $this->makeLine(
-            "Date",
-            "Payment ID",
-            "Transaction ID",
-            "Result",
-            "Policy Number",
-            "Message",
-            "Details",
-            "Detailed Info",
-            "Response Code"
-        );
-
-        /** @var CheckoutPayment $transaction */
-        foreach ($transactions as $transaction) {
-            /** @var Policy $policy */
-            $policy = $transaction->getPolicy();
-
-            $lines[] = $this->makeLine(
-                $transaction->getDate()->format('jS M Y H:i'),
-                $transaction->getId(),
-                $transaction->getReceipt(),
-                $transaction->getResult(),
-                $policy->getPolicyNumber(),
-                $transaction->getMessage(),
-                $transaction->getDetails(),
-                $transaction->getInfo(),
-                $transaction->getResponseCode()
-            );
-        }
-        if (!$skipS3) {
-            $fileName = $now->format('Y') . '/' . $now->format('m') . '/' . 'checkOutTransactions.csv';
-            $this->uploadS3(implode(PHP_EOL, $lines), $fileName);
         }
         return $lines;
     }

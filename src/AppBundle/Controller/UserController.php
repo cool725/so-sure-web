@@ -464,10 +464,14 @@ class UserController extends BaseController
             }
         } elseif ($scode) {
             if ($scode->isStandard()) {
-                $codeMessage = sprintf('%s has invited you to connect. Connect below', $scode->getUser()->getName());
-            } elseif ($scode->isReward()) {
+                $codeMessage = sprintf('%s has invited you to connect.', $scode->getUser()->getName());
+            } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() != true) {
                 // @codingStandardsIgnoreStart
                 $codeMessage = sprintf('Apply your £%0.2f reward bonus from %s', $scode->getReward()->getDefaultValue(), $scode->getUser()->getName());
+                // @codingStandardsIgnoreEnd
+            } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() == true) {
+                // @codingStandardsIgnoreStart
+                $codeMessage = sprintf('%s has invited you to connect.', $scode->getUser()->getName());
                 // @codingStandardsIgnoreEnd
             }
         }
@@ -1127,24 +1131,12 @@ class UserController extends BaseController
             $this->get('logger')->error(sprintf('Unable to locate unpaid policy for user %s.', $user->getId()));
             return new RedirectResponse($this->generateUrl('user_home'));
         }
-        $amount = $policy->getOutstandingPremiumToDate();
         // Validate unpaid policy and use rescheduled amount if no owed amount due to bacs timing or whatever.
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-        if (!$this->greaterThanZero($amount)) {
-            $dm = $this->getManager();
-            $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
-            $rescheduledAmount = $scheduledPaymentRepo->getRescheduledAmount($policy);
-            if ($this->greaterThanZero($rescheduledAmount)) {
-                $amount = $rescheduledAmount;
-            } else {
-                $this->get('logger')->warning(sprintf(
-                    'Policy %s has unpaid status, but paid to date. Setting to active.',
-                    $policy->getId()
-                ));
-                $policy->setStatus(Policy::STATUS_ACTIVE);
-                $this->getManager()->flush();
-                return new RedirectResponse($this->generateUrl('user_home'));
-            }
+        $policyService = $this->get('app.policy');
+        $amount = $policyService->checkOwedPremium($policy, new \DateTime());
+        if ($amount == 0) {
+            return new RedirectResponse($this->generateUrl('user_home'));
         }
         $unpaidReason = $policy->getUnpaidReason();
         if (in_array($unpaidReason, [
@@ -1243,9 +1235,9 @@ class UserController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B UK Flag Test
-        // To Test use url param ?force=flag / ?force=no-flag
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_UK_FLAG);
+        // A/B USP Test
+        // To Test use url param ?force=current-usps / ?force=pricing-usps
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_USP);
 
         $template = 'AppBundle:User:onboarding.html.twig';
 

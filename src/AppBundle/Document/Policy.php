@@ -1039,6 +1039,26 @@ abstract class Policy
     }
 
     /**
+     * Gives you the policy's successful scheduled payment with the greatest schedule date even if this date is greater
+     * than the current time.
+     * @return ScheduledPayment|null the latest successful scheduled payment or null if there are no successful
+     *                               scheduled payments at all.
+     */
+    public function getLatestSuccessfulScheduledPayment()
+    {
+        $latest = null;
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() != ScheduledPayment::STATUS_SUCCESS) {
+                continue;
+            }
+            if (!$latest || $latest->getScheduled() < $scheduledPayment->getScheduled()) {
+                $latest = $scheduledPayment;
+            }
+        }
+        return $latest;
+    }
+
+    /**
      * @return Payment|null
      */
     public function getLastSuccessfulUserPaymentCredit()
@@ -5098,6 +5118,27 @@ abstract class Policy
         return $expectedPaid;
     }
 
+    /**
+     * Gives you the amount of money that the user must pay for this policy if it is unpaid.
+     * @param \DateTime $date is the date at which this sum must be current.
+     * @return float the amount owed.
+     */
+    public function getOutstandingPremiumToDateWithReschedules($date)
+    {
+        $amount = $this->getOutstandingPremiumToDate($date);
+        if ($this->greaterThanZero($amount)) {
+            return $amount;
+        }
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getType() == ScheduledPayment::TYPE_RESCHEDULED &&
+                $scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED
+            ) {
+                $amount += $scheduledPayment->getAmount();
+            }
+        }
+        return $amount;
+    }
+
     public function getOutstandingPremiumToDate(
         \DateTime $date = null,
         $allowNegative = false,
@@ -6349,7 +6390,8 @@ abstract class Policy
                 null,
             'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
             'card_details' => $cardDetails,
-            'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ? $this->getOutstandingPremiumToDate() : 0
+            'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ?
+                $this->getOutstandingPremiumToDateWithReschedules(new \DateTime()) : 0
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

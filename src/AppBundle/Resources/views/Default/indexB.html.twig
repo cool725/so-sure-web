@@ -3,38 +3,101 @@
 {# Set vars #}
 {% set body_class = 'home' %}
 
-{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, secondhand & refurbished phones, Up to 80% money back"/>
+    <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure."/>
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context" : "http://schema.org",
+    "@type" : "Organization",
+    "url": "https://wearesosure.com/",
+    "legalName": "so-sure Ltd",
+    "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Tower Hamlets",
+          "addressRegion": "London",
+          "postalCode": "E1 7PT",
+          "streetAddress": "114 Whitechapel High Street"
+        },
+        "name": "Relay Building"
+    },
+    "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
+    "description": "The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure.",
+    "sameAs": ["https://twitter.com/wearesosure", "https://www.facebook.com/wearesosure"]
+}
+</script>
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepageB.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
 {% endblock %}
 
 {% block body %}
 
-
     <section class="hero">
+
+        {# Toasts #}
+        {# {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %} #}
+
         <div class="container-large">
-            <h1 class="mb-4 text-white text-md-center fit">Mobile Insurance <br class="d-md-none"> <span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
             <div class="row">
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
                     </div>
                 </div>
-                <div class="col-md-8 offset-md-2 col-lg-5 offset-lg-1">
-                    {# Phone Search Card #}
-                    {# TODO: Rework if phone in session #}
-                    {% if phone is defined and phone %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
-                    {% else %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
-                    {% endif %}
-                    {# End Phone Search #}
+                <div class="col-lg-5 offset-md-2 offset-lg-1">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-white fit">Mobile Insurance<br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
+                        <ul class="list-unstyled icn-fa-list mb-5">
+                            {% if feature_enabled('apply-sign-up-bonus') %}
+                                <li class="mb-3 h5 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                     Instant &pound;5 cashback bonus 💰
+                                </li>
+                            {% endif %}
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                24-72 hour replace or repair
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                Low excess from just &pound;50
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                Up to 80% money back
+                            </li>
+                            <li class="h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                New, second hand &amp; refurbished phones
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
+                        <a href="#cred"
+                           id="watch_tv_advert"
+                           class="btn btn-outline-white btn-block-xs">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch the Ad
+                        </a>
+                    </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="hero__illustration d-block d-lg-none mt-4">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -59,7 +122,13 @@
                 <div class="col-lg-4">
                     <div class="text-center text-lg-left">
                         <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
-                        <p class="mb-4">We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!</p>
+                        <p class="mb-4">
+                            We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!
+                            {% if feature_enabled('apply-sign-up-bonus') %}
+                                <br><br>
+                                Instant &pound;5 cashback bonus 💰 when you sign up!
+                            {% endif %}
+                        </p>
                         <a href="{{ path('social_insurance') }}" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
                     </div>
                 </div>
@@ -134,7 +203,7 @@
                 <div class="banner__text ml-lg-4">
                     <h2 class="text-white">Home Insurance Coming 2020</h2>
                     <p class="text-columbia-blue-e lead mb-0">Take our survey to be in for a chance to <strong>win a phone cover</strong></p>
-                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2018, 1 per customer.</small></p>
+                    <p class="text-columbia-blue-e mb-4"><small>*Limited time only, offer ends December 31st 2019, 1 per customer.</small></p>
                     <a href="https://sosure.typeform.com/to/CdsghS"
                        target="_blank"
                        rel="noopener noreferrer"
@@ -191,5 +260,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepageB.js') }}"></script>
+    <script src="{{ asset('css-js/homepage.js') }}"></script>
 {% endblock %}

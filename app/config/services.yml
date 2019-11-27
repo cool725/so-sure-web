@@ -1120,9 +1120,11 @@ services:
         class:   AppBundle\Listener\PolicyListener
         arguments:
             - "@app.policy"
+            - "@app.sms"
             - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
     app.listener.user:
         class:   AppBundle\Listener\UserListener
@@ -1342,6 +1344,7 @@ services:
             - "@app.mailer"
             - "@app.sms"
             - "@app.feature"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.scheduledPayment.failed, method: onUnpaidEvent }
 

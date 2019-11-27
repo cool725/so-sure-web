@@ -374,6 +374,20 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td><strong>Influencer?</strong></td>
+                                <td>
+                                    {%  if user.isInfluencer %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {%  endif %}
+                                </td>
+                                <td>
+                                    {{ form_start(influencer_user_form) }}
+                                    {{ form_end(influencer_user_form) }}
+                                </td>
+                            </tr>
+                            <tr>
                                 <td><strong>Delete</strong></td>
                                 <td></td>
                                 <td>

@@ -4,15 +4,13 @@
 {% set body_class = 'invite' %}
 {% set robots_noindex = true %}
 
-{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
-
-{# Set Meta #}
-{% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+{% block title %}
+    {% if scode is defined and scode and scode.user and not custom %}
+        Connect with {{ scode.reward.user.firstName }} &amp; get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
+    {% else %}
+        Promo code {{ use_code }} not found! | so-sure
+    {% endif %}
 {% endblock %}
-{% set og_title = 'Sign up and save' %}
-{% set og_description = "Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance." %}
-{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/invite.css') }}">
@@ -26,61 +24,28 @@
                 <div class="col-lg-6">
                     <div class="hero__intro">
                         <h1 class="mb-4 text-columbia-blue-e fit">
-                            {% if scode is defined and scode and scode.policy %}
-                                Wow, {{ scode.policy.user.firstname }}'s such a <br class="d-none d-lg-inline"> great friend 🥰
+                            {% if scode is defined and scode %}
+                                Connect with {{ scode.reward.user.firstName }} <br class="d-none d-lg-inline"> on so-sure 🤗
                             {% else %}
                                 Wow, so-sure has the <br class="d-none d-lg-inline"> best insurance 🥰
                             {% endif %}
                         </h1>
-                        <div id="invite_carousel"
-                             class="carousel slide mb-4"
-                             data-ride="carousel"
-                             data-interval="6000"
-                             data-wrap="true">
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <div class="text-white h3">
-                                        <span class="sub">...they want <strong>you to benefit</strong> from the best mobile cover and earn great rewards</span>
-                                    </div>
-                                </div>
-                                <div class="carousel-item">
-                                    <div class="text-white h3">
-                                        <span class="sub">...they want you to <strong>be rewarded</strong> and get up to 80% of your money back!</span>
-                                    </div>
-                                </div>
-                                <div class="carousel-item">
-                                    <div class="text-white h3">
-                                        <span class="sub">...they don’t want you to end up with a <strong>massive repair bill</strong> when disaster strikes!</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <ol class="carousel-indicators">
-                                <li data-target="#invite_carousel"
-                                    class="active"
-                                    data-slide-to="0"></li>
-                                <li data-target="#invite_carousel"
-                                    data-slide-to="1"></li>
-                                <li data-target="#invite_carousel"
-                                    data-slide-to="2"></li>
-                            </ol>
+                        <div class="text-white h5 mb-5">
+                            <span class="sub">...get premium cover for your mobile phone and get up to 80% of the price back!</span>
                         </div>
                     </div>
                     <div class="hero__controls mb-4">
                         <div class="mb-4">
                             <a href="#"
-                               class="btn btn-white btn-block-xs mr-md-2 track-data get-a-quote disabled"
+                               class="btn btn-success btn-block-xs mr-md-2 track-data get-a-quote disabled"
                                data-event="
-                                {% if scode is defined and scode and scode.policy %}
-                                    scode-hero-quote-btn-{{ user_code }}
+                                {% if scode is defined and scode and scode.reward %}
+                                    scode-hero-quote-btn-{{ scode.code }}
                                 {% else %}
                                     scode-hero-quote-btn
                                 {% endif %}
                                ">
-                               Get your quote</a>
-                            <a id="user_login_btn"
-                               href="{{ path('user_home') }}"
-                               class="btn btn-outline-white btn-block-xs">
-                                Login to connect 💰</a>
+                               Get a Quote</a>
                         </div>
                         <div class="row">
                             <div class="col">
@@ -92,7 +57,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-5 offset-lg-1">
+                <div class="col-lg-6">
                     <div class="hero__illustration">
 
                         {# Overlays #}
@@ -100,44 +65,16 @@
                              src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
                              alt="Likes hearts stars smileys"
                              class="img-fluid lozad hero__illustration__img">
-                        <img id="hero_img_overlay_2"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_2_overlay.png"
-                             alt="Hearts stars money"
-                             class="img-fluid hero__illustration__img">
-                        <img id="hero_img_overlay_3"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_overlay.png "
-                             alt="Unhappy warning lightning"
-                             class="img-fluid hero__illustration__img">
-
-                        {# 2nd images #}
-                        <img id="hero_img_2_1"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_2_1.png "
-                             alt="Reward pot money"
-                             class="img-fluid hero__illustration__img">
 
                         {# 1st images #}
                         <img id="hero_img_1_2"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_2.png "
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_eve_step_shadow.png"
                              alt="Happy couple mobile"
                              class="img-fluid lozad hero__illustration__img">
                         <img id="hero_img_1_1"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png "
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png"
                              alt="Happy so-sure phone"
                              class="img-fluid lozad hero__illustration__img">
-
-                        {# 3rd images #}
-                        <img id="hero_img_3_2"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_2.png "
-                             alt="Dropped mobile phone"
-                             class="img-fluid hero__illustration__img">
-                        <img id="hero_img_3_3"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_3.png "
-                             alt="Lost mobile phone"
-                             class="img-fluid hero__illustration__img">
-                        <img id="hero_img_3_1"
-                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_1.png "
-                             alt="Sad so-sure phone"
-                             class="img-fluid hero__illustration__img">
                     </div>
                 </div>
             </div>
@@ -261,7 +198,7 @@
                              width="180px"
                              class="lozad">
                         <div class="ml-5">
-                            <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                            <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode %}{{ scode.reward.user.firstName }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
                             <a href="#"
                                class="btn btn-success btn-block-xs track-data get-a-quote"
                                data-event="

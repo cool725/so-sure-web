@@ -124,7 +124,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <h1 class="text-white h1b mb-4 fit">
+                        <h1 class="text-white h1b fit">
                             <a href="#mem_sizes"
                                class="text-white"
                                data-toggle="collapse"
@@ -135,6 +135,7 @@
                                 {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ prices['monthly'].monthlyPremiumPrice }} per month</span>
                             </a>
                         </h1>
+                        <div class="text-white h5 mb-4"><span class="sub">Get one month free when you pay yearly!</span></div>
                         <div class="collapse mb-4" id="mem_sizes">
                             {% if phones | length > 1 %}
                                 <ul class="list-inline">

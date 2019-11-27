@@ -13,6 +13,8 @@
         {% set premium = 'yearly' %}
     {% endif %}
 
+    {% set withoutDiscount = phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') * 12 %}
+
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
         <h4 class="payment-options__title text-dodger-blue mb-4">How would you like to pay?</h4>
         <div class="radio-btn-original">
@@ -28,6 +30,7 @@
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Monthly</h6>
                                 <div class="radio-btn__price">&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                {# <small>(1 year = &pound;{{ withoutDiscount }})</small> #}
                             </div>
                         </div>
                     </div>
@@ -38,7 +41,8 @@
                             phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Yearly</h6>
-                                <div class="radio-btn__price">&pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                <div class="radio-btn__price discount-price">&pound;{{ withoutDiscount }}</div>
+                                <small>&pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</small>
                             </div>
                         </div>
                     </div>
@@ -54,6 +58,8 @@
             'hidden': 'hidden'
     }}) }}
 {{ form_end(purchase_form) }}
+
+<p class="text-center my-4">Get one month free when you pay yearly 🤑</p>
 
 <div class="mb-4">
     <form class="payment-form"
