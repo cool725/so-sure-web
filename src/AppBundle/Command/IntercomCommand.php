@@ -143,6 +143,18 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Update Scode for a user or all users'
             )
+            ->addOption(
+                'tag',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Update Tag for a user or all users'
+            )
+            ->addOption(
+                'tag-option',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'force: Force tag update, untag: Force to untag'
+            )
         ;
     }
 
@@ -165,8 +177,12 @@ class IntercomCommand extends ContainerAwareCommand
         $resetUserId = true === $input->getOption('reset-user-id');
         $resetIntercomId = true === $input->getOption('reset-intercom-id');
         $destroy = true === $input->getOption('destroy');
+        // Mass Scode update option
         $scode = true === $input->getOption('scode');
-
+        // Tag management options
+        $tag = $input->getOption('tag');
+        $tagForce = $input->getOption('tag-option') && in_array('force', $input->getOption('tag-option'));
+        $untag = $input->getOption('tag-option') && in_array('untag', $input->getOption('tag-option'));
         if ($email) {
             $user = $this->getUser($email);
             $lead = $this->getLead($email);
@@ -213,6 +229,17 @@ class IntercomCommand extends ContainerAwareCommand
                 if ($user) {
                     $this->intercom->updateScode($user);
                     $output->writeln(sprintf('User %s Scode was Updated', $user->getId()));
+                }
+            } elseif ($tag) {
+                if ($user) {
+                    if (count($tag) === 1 && $tag[0] === null) {
+                        $this->intercom->updateStandardTags($user);
+                    } else {
+                        foreach ($tag as $singleTag) {
+                            $this->intercom->updateUserTag($user, $singleTag, $tagForce, $untag);
+                        }
+                    }
+                    $output->writeln(sprintf('User %s Tags were Updated', $user->getId()));
                 }
             } else {
                 if (!$user) {
@@ -279,6 +306,18 @@ class IntercomCommand extends ContainerAwareCommand
                 $count++;
             }
             $output->writeln(sprintf("Updated %s scodes", $count));
+        } elseif ($tag) {
+            if (count($tag) === 1 && $tag[0] === null) {
+                foreach (User::TAGS as $singleTag) {
+                    $this->intercom->updateAllUsersTag($singleTag);
+                }
+            } else {
+                foreach ($tag as $singleTag) {
+                    $this->intercom->updateAllUsersTag($singleTag);
+                }
+            }
+
+            $output->writeln('Tags Updated');
         } else {
             $count = $this->intercom->process($process);
             $output->writeln(sprintf("Sent %s updates", $count));
