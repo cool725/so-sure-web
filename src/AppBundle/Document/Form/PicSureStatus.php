@@ -27,10 +27,10 @@ class PicSureStatus
 
     public function setPicSureStatus($picSureStatus)
     {
-        if ($picSureStatus === null) {
+        if ($picSureStatus === "") {
             // remove pic-sure files
-            foreach ($this->policy->getPolicyFilesByType(PicSureFile) as $file) {
-                $this->policy->removePicSureFile($file);
+            foreach ($this->policy->getPolicyFilesByType(PicSureFile::class) as $file) {
+                $this->policy->removePolicyFile($file);
             }
         }
         $this->picSureStatus = $picSureStatus;
