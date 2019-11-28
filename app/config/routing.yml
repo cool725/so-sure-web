@@ -847,28 +847,28 @@ redirect_blog_leakbot:
     path: /blog/Leakbot
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /blog
+        path: /blog/
         permanent: true
 
 redirect_blog_tag_technology:
     path: /blog/tag/technology
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /blog
+        path: /blog/
         permanent: true
 
 redirect_blog_tag_insurance:
     path: /blog/tag/insurance
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /blog
+        path: /blog/
         permanent: true
 
 redirect_blog_2016_06_07:
     path: /blog/2016/06/06/5-ways-careful-wins-every-time.html
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
-        path: /blog
+        path: /blog/
         permanent: true
 
 redirect_faq_faq:
