@@ -126,7 +126,7 @@
     overflow: hidden;
     z-index: 3;
 
-    @include blue-gradient-90;
+    @include video-background;
 
     &__pot {
         width: 260px;

@@ -98,16 +98,22 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // A/B USP Test
-        // To Test use url param ?force=current-usps / ?force=pricing-usps
-        $homepageUspPricingTest = $this->sixpack(
+        $template = 'AppBundle:Default:index.html.twig';
+
+        // A/B Homepage Tabs and USP Test
+        // To Test use url param ?force=standard / ?force=standard-usp
+        // ?force=tabbed / ?force=tabbed-usp
+        $homepageTabsUspTest = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_PRICING_USP,
-            ['current-usps', 'pricing-usps'],
+            SixpackService::EXPERIMENT_HOMEPAGE_TABS_AND_USP,
+            ['standard', 'standard-usp', 'tabbed', 'tabbed-usp'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
+        // If tabbed test use tabbed template
+        if ($homepageTabsUspTest == 'tabbed' or $homepageTabsUspTest == 'tabbed-usp') {
+            $template = 'AppBundle:Default:indexB.html.twig';
+        }
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -116,7 +122,8 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'usp_exp' => $homepageUspPricingTest,
+            'tabs_usp_exp' => $homepageTabsUspTest,
+            'competitor' => $this->competitorsData(),
         );
 
         return $this->render($template, $data);
