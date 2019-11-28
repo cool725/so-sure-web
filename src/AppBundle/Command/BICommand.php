@@ -809,7 +809,7 @@ class BICommand extends ContainerAwareCommand
         $lines = [];
 
         //Set total variables
-        $monthTotal = ['Total','',''];
+        $monthTotal = ['Total','','',''];
 
         //initialise time period for budget
         $end = strtotime(date("Y-m"));
@@ -818,6 +818,7 @@ class BICommand extends ContainerAwareCommand
         //Set csv header
         $headers[] = "Code";
         $headers[] = "Code Category";
+        $headers[] = "Target";
         $headers[] = "Default Value";
         while ($current <= $end) {
             $headers[] = date('F-Y', $current);
@@ -832,9 +833,10 @@ class BICommand extends ContainerAwareCommand
         foreach ($rewards as $key => $reward) {
             $data[$key][0] = $reward->getScode() ? $reward->getScode()->getCode() : $reward->getUser()->getEmail();
             $data[$key][1] = $reward->getType() ? $reward->getType() : "n/a";
-            $data[$key][2] = $reward->getDefaultValue() ? $reward->getDefaultValue() : "Custom";
+            $data[$key][2] = $reward->getTarget() ? $reward->getTarget() : "n/a";
+            $data[$key][3] = $reward->getDefaultValue() ? $reward->getDefaultValue() : "Custom";
             $connections = $reward->getConnections();
-            $cm = 3;
+            $cm = 4;
             while ($current <= $end) {
                 if (!isset($data[$key][$cm])) {
                     $data[$key][$cm]=0;
