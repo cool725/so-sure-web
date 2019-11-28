@@ -535,6 +535,8 @@ class PhoneInsuranceController extends BaseController
      * SEO Pages Redirect - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}+{model}", name="phone_insurance_make_model_old",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/phone-insurance/{make}+{model}/", name="phone_insurance_make_model_old_slash",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
     public function phoneInsuranceMakeModelRedirect($make = null, $model = null)
     {
