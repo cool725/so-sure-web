@@ -105,6 +105,8 @@
     }
 
     @include media-breakpoint-up(lg) {
+        @include blue-gradient-45;
+
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-b.svg');
         }

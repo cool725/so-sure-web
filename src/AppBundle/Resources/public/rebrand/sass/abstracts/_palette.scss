@@ -35,6 +35,7 @@ $waikawa-gray:         #6274a4;
 $salomie:              #fde589;
 $turquoise:            #2cd8C7;
 $java:                 #1ac3b2;
+$royal-blue:           #206aec;
 
 // New A/B Test colours
 $pictonblue:           #398ef0;
@@ -87,6 +88,7 @@ $theme-colors: (
     "java":                 $java,
     "athens-gray":          $athens-gray,
     "pattens-blue":         $pattens-blue,
+    "royal-blue":           $royal-blue,
 );
 
 // Bootstrap overides
@@ -107,7 +109,7 @@ $dark:          $haiti;
 }
 
 @mixin blue-gradient-45 {
-    @include linear-gradient(45deg, $deep-sky-blue-b, $crayon-blue);
+    @include linear-gradient(30deg, rgba(0,186,255,1) 0%, rgba(0,81,232,1) 40%);
 }
 
 @mixin blue-gradient-90 {
@@ -148,6 +150,10 @@ $dark:          $haiti;
 
 @mixin snapchat-gradient-180 {
     @include linear-gradient(180deg, $salomie, $bright-yellow);
+}
+
+@mixin video-background {
+    @include linear-gradient(0deg, #0A3BD6, #0262DD);
 }
 
 // Box shadow

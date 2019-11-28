@@ -34,15 +34,12 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/homepageB.css') }}">
 {% endblock %}
 
 {% block body %}
 
     <section class="hero">
-
-        {# Toasts #}
-        {# {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %} #}
 
         <div class="container-large">
             <div class="row">
@@ -53,18 +50,16 @@
                 </div>
                 <div class="col-lg-5 offset-md-2 offset-lg-1">
                     <div class="hero__intro">
-                        <h1 class="mb-4 text-white fit">Mobile Insurance<br><span class="sub text-deep-sky-blue-d">that's Simply Better</span></h1>
+                        <h1 class="mb-4 text-white fit">
+                            Mobile Insurance<br><span class="sub text-deep-sky-blue-d">that's Simply Better 🇬🇧</span>
+                        </h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
-                            {% if feature_enabled('apply-sign-up-bonus') %}
+                            {% if tabs_usp_exp is defined and tabs_usp_exp == 'tabbed-usp' %}
                                 <li class="mb-3 h5 text-white">
                                     <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                     Instant &pound;5 cashback bonus 💰
+                                    Full cover from &pound;3.49/month
                                 </li>
                             {% endif %}
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                24-72 hour replace or repair
-                            </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
                                 Low excess from just &pound;50
@@ -72,6 +67,10 @@
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
                                 Up to 80% money back
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                24-72 hour replace or repair
                             </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
@@ -104,95 +103,37 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
-    {# TV Add #}
-    {% include 'AppBundle::Default/CommonSections/_skyTVAd.html.twig' %}
+    <section class="video d-flex align-items-center justify-content-center">
+        <a href="#"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/rF6zxVRT5Fc"
+           class="watch-video video__play">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                 alt="Play buttonn"
+                 class="lozad"
+                 width="120px"></a>
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/video/so-sure_video_background_woman_swoosh.png"
+             alt="Woman polaroid swoosh"
+             class="lozad video-img">
+    </section>
 
-    {# Cover #}
-    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
+    <section class="knowledge-base">
+        <div class="container-large">
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+        </div>
+    </section>
 
     {# Top Manufacturers #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topManufacturers.html.twig' %}
 
-    {# We do things differently #}
-    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
-
-    <section class="reward py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_why-illustration.png ">
-        <div class="container-large py-5">
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="text-center text-lg-left">
-                        <h2 class="h3 mb-3 text-primary">Money back when you don't claim</h2>
-                        <p class="mb-4">
-                            We are the only mobile phone insurer to offer money back if you and your friends don't claim. What's stopping you? Join the social insurance revolution now!
-                            {% if feature_enabled('apply-sign-up-bonus') %}
-                                <br><br>
-                                Instant &pound;5 cashback bonus 💰 when you sign up!
-                            {% endif %}
-                        </p>
-                        <a href="{{ path('social_insurance') }}" class="btn btn-primary btn-block-xs mx-auto mb-5">Tell me more</a>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">How it works</h3>
-                            <div class="cardbox__text">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - how it works" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">How it works</h3>
-                        <p class="mb-5">If you and your friends take good care of your phones and don't need to claim, we’ll give you up to 80% of your premium back at the end of your policy year</p>
-                    </div>
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">Be careful</h3>
-                            <div class="cardbox__text">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">Connect</h3>
-                        <p class="mb-5">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="cardbox cardbox-400 mb-5 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure - connect" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">Connect</h3>
-                            <div class="cardbox__text">For every person you connect with, we'll add up to &pound;10 to your reward pot. If neither of you make a claim, your cash will be returned to you at the end of the policy year</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone logo" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">Be careful</h3>
-                        <p class="mb-5">Make a pact with your connections to take good care of your phones throughout the policy period and make no claims</p>
-                    </div>
-                    <div class="cardbox cardbox-400 mx-auto text-center d-none d-lg-block">
-                        <div class="cardbox__body">
-                            <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
-                            <h3 class="h5 cardbox__title text-dodger-blue">Get rewarded</h3>
-                            <div class="cardbox__text">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</div>
-                        </div>
-                    </div>
-                    <div class="d-block d-lg-none text-center">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_rewards.png" alt="so-sure - get rewarded" width="180px" class="lozad">
-                        <h3 class="h5 text-primary">Get rewarded</h3>
-                        <p class="mb-5">At the end of the policy year, when you and your connections haven’t claimed, your Reward Pot is paid out to you in full. Hooray!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {# Claims Process #}
+    {% include 'AppBundle::Default/CommonSections/_claimsProcessB.html.twig' %}
 
     {# Top Models #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}
-
-    {# Claims Process #}
-    {% include 'AppBundle::Default/CommonSections/_claimsProcess.html.twig' %}
 
     <section class="banner banner-dismissible">
         <div class="container-large py-5">
@@ -207,7 +148,7 @@
                     <a href="https://sosure.typeform.com/to/CdsghS"
                        target="_blank"
                        rel="noopener noreferrer"
-                       class="btn btn-white track-data"
+                       class="btn btn-success track-data"
                        data-event="take-survey-banner-clicked"
                        data-event-url="https://sosure.typeform.com/to/CdsghS"
                        data-event-blank="true">
@@ -227,7 +168,7 @@
     </section>
 
     {# Reviews #}
-    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %}
 
     <section class="banner py-5">
         <div class="container-large">
@@ -235,7 +176,7 @@
                 <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
                     <div class="banner__text text-center text-lg-left ml-lg-4">
-                        <h2 class="h4 text-white">Mobile insurance designed for you</h2>
+                        <h2 class="h4 text-white">Mobile insurance <br class="d-md-none"> designed for you</h2>
                         <p class="lead text-white">Cover your phone in minutes </p>
                     </div>
                 </div>
@@ -249,7 +190,7 @@
                         <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                         Watch our Video
                     </a>
-                    <a href="#" class="btn btn-white btn-block-xs get-a-quote disabled">Get a Quote</a>
+                    <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled">Get a Quote</a>
                 </div>
             </div>
         </div>
@@ -261,4 +202,5 @@
 
 {% block javascriptsPage %}
     <script src="{{ asset('css-js/homepage.js') }}"></script>
+    <script src="{{ asset('css-js/homepageB.js') }}"></script>
 {% endblock %}
