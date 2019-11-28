@@ -220,15 +220,17 @@ class CheckoutService
     }
 
     /**
-     * @param string $chargeId
+     * Gets the details of a transaction from checkout.
+     * @param CheckoutClient   $client   the client to use to get this transaction (which is the client that the
+     *                                   transaction was made with).
+     * @param string           $chargeId the id of the charge to get.
      * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge
      */
-    public function getTransaction($chargeId)
+    public function getTransaction($client, $chargeId)
     {
-        $charge = $this->client->chargeService();
+        $charge = $client->chargeService();
         /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
         $details = $charge->getCharge($chargeId);
-
         return $details;
     }
 
@@ -745,10 +747,14 @@ class CheckoutService
         return ['migrated' => $migrated, 'skipped' => $skipped];
     }
 
-    public function getCharge($chargeId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
-    {
-        $service = $this->client->chargeService();
-
+    public function getCharge(
+        $client,
+        $chargeId,
+        $enforceFullAmount = true,
+        $enforceDate = true,
+        \DateTime $date = null
+    ) {
+        $service = $client->chargeService();
         try {
             /**  @var \com\checkout\ApiServices\Charges\ResponseModels\ChargeHistory  $transactionDetails **/
             $transactionDetails = $service->getChargeHistory($chargeId);
@@ -761,7 +767,6 @@ class CheckoutService
 
             throw $e;
         }
-
         $hasRefund = false;
         $refundedAmount = 0;
         $amount = 0;
@@ -774,8 +779,6 @@ class CheckoutService
                 $amount += $charge->getValue();
             }
         }
-
-
         if ($hasRefund) {
             $msg = sprintf(
                 'Checkout receipt %s has a refund applied (refunded %s of %s).',
@@ -791,8 +794,6 @@ class CheckoutService
                 $this->logger->warning($msg);
             }
         }
-
-
         /**  @var \com\checkout\ApiServices\Charges\ResponseModels\Charge  $transactionDetails **/
         $transactionDetails = $service->verifyCharge($chargeId);
         $created = \DateTime::createFromFormat(\DateTime::ATOM, $transactionDetails->getCreated());
@@ -816,7 +817,6 @@ class CheckoutService
                 $this->logger->warning($msg);
             }
         }
-
         return $transactionDetails;
     }
 
@@ -1142,7 +1142,7 @@ class CheckoutService
      */
     public function validateCharge(Policy $policy, $chargeId, $source, \DateTime $date = null)
     {
-        $transactionDetails = $this->getCharge($chargeId);
+        $transactionDetails = $this->getCharge($this->getClientForPolicy($policy), $chargeId);
         $repo = $this->dm->getRepository(CheckoutPayment::class);
         $exists = $repo->findOneBy(['receipt' => $transactionDetails->getId()]);
         if ($exists) {

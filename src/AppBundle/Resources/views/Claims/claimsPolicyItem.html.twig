@@ -430,7 +430,7 @@
                                     <tr>
                                         <td>Policy Commission</td>
                                         <td>
-                                            Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                            Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
                                             {% if policy.isPolicy and policy.start %}
                                                 <br>
                                                 {% if policy.end < now %}
@@ -2029,7 +2029,7 @@
                                         {% endif %}
 
                                         <hr>
-                                        Policy Commission: Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                        Policy Commission: Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
                                         {% if policy.isPolicy and policy.start %}
                                             <br>
                                             {% if policy.end < now %}

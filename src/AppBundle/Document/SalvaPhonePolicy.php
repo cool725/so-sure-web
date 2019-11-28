@@ -2,11 +2,12 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
-use AppBundle\Classes\Salva;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
@@ -356,7 +357,7 @@ class SalvaPhonePolicy extends PhonePolicy
     /**
      * @inheritDoc
      */
-    public function setTotalCommission(Payment $payment)
+    public function setTotalCommission($payment)
     {
         // TODO: this.
     }
@@ -364,9 +365,25 @@ class SalvaPhonePolicy extends PhonePolicy
     /**
      * @inheritDoc
      */
-    public function getExpectedCommisision($date = null)
+    public function getYearlyTotalCommission(): float
     {
+        return Salva::YEARLY_TOTAL_COMMISSION;
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyCoverholderCommission(): float
+    {
+        return Salva::YEARLY_COVERHOLDER_COMMISSION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyBrokerCommission(): float
+    {
+        return Salva::YEARLY_BROKER_COMMISSION;
     }
 
     /**

@@ -312,11 +312,6 @@ abstract class Premium implements EqualsInterface
         return null;
     }
 
-    public function getYearlyTotalCommission()
-    {
-        return Salva::YEARLY_TOTAL_COMMISSION;
-    }
-
     public function equals($compare)
     {
         if (!$compare || !$compare instanceof Premium) {

@@ -3199,17 +3199,13 @@ abstract class Policy
 
     public function getProratedCommission(\DateTime $date = null)
     {
-        // TODO: either make abstract to get the total commission, or move to a db collection
-        $used = Salva::YEARLY_TOTAL_COMMISSION * $this->getProrataMultiplier($date);
-
+        $used = $this->getYearlyTotalCommission() * $this->getProrataMultiplier($date);
         return $this->toTwoDp($used);
     }
 
     public function getProratedCoverholderCommission(\DateTime $date = null)
     {
-        // TODO: either make abstract to get the total commission, or move to a db collection
-        $used = Salva::YEARLY_COVERHOLDER_COMMISSION * $this->getProrataMultiplier($date);
-
+        $used = $this->getYearlyCoverholderCommission() * $this->getProrataMultiplier($date);
         return $this->toTwoDp($used);
     }
 
@@ -5827,7 +5823,25 @@ abstract class Policy
      * commission rules.
      * @param Payment $payment is the payment that we are setting the commission for.
      */
-    public abstract function setTotalCommission(Payment $payment);
+    abstract public function setTotalCommission($payment);
+
+    /**
+     * Gives you the total amount of commission this policy should pay.
+     * @return float the amount.
+     */
+    abstract public function getYearlyTotalCommission(): float;
+
+    /**
+     * Gives you the yearly coverholder commission for this policy.
+     * @return float the amount.
+     */
+    abstract public function getYearlyCoverholderCommission(): float;
+
+    /**
+     * Gives you the yearly broker commission for this policy.
+     * @return float the amount.
+     */
+    abstract public function getYearlyBrokerCommission(): float;
 
     /**
      * Calculates the amount of commission that this policy should have paid currently based on their underwriter's
@@ -5835,7 +5849,7 @@ abstract class Policy
      * @param \DateTime|null date is the date at which this amount should be valid, with null meaning right now.
      * @return float the expected amount.
      */
-    public abstract function getExpectedCommission(\DateTime $date = null);
+    abstract public function getExpectedCommission(\DateTime $date = null);
 
     public function hasCorrectCommissionPayments(
         \DateTime $date = null,

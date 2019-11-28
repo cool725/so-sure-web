@@ -1259,6 +1259,15 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewalEvent }
 
+    app.listener.underwriter:
+        class:   AppBundle\Listener\UnderwriterListener
+        arguments:
+            - "@app.salva"
+        tags:
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.salva_increment, method: onPolicySalvaIncrementEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
     app.listener.refund:
         class:   AppBundle\Listener\RefundListener
         arguments:

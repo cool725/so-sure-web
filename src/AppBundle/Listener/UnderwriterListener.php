@@ -7,7 +7,6 @@ use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Service\SalvaExportService;
-use AppBundle\Service\HelvetiaExportService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
@@ -17,18 +16,14 @@ class UnderwriterListener
 {
     /** @var SalvaExportService */
     protected $salvaExportService;
-    /** @var HelvetiaExportService */
-    protected $helvetiaExportService;
 
     /**
      * Injects the dependencies.
      * @param SalvaExportService    $salvaExportService    is notified regarding salva policies.
-     * @param HelvetiaExportService $helvetiaExportService is notified regarding helvetia policies.
      */
-    public function __construct(SalvaExportService $salvaExportService, HelvetiaExportService $helvetiaExportService)
+    public function __construct(SalvaExportService $salvaExportService)
     {
         $this->salvaExportService = $salvaExportService;
-        $this->helvetiaExportService = $helvetiaExportService;
     }
 
     /**

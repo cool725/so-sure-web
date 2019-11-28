@@ -24,7 +24,7 @@ class Salva
 
     public static function getSalvaBinderEndDate()
     {
-        return new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
+        return new \DateTime('2019-01-01 00:00:00', SoSure::getSoSureTimezone());
     }
 
     public static $refundValidationExclusions = [
