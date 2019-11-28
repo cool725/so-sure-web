@@ -2381,6 +2381,17 @@ abstract class Policy
         $this->policyFiles[] = $file;
     }
 
+    public function removePolicyFile(S3File $file)
+    {
+        $files = [];
+        foreach ($this->policyFiles as $policyFile) {
+            if ($policyFile != $file) {
+                $files[] = $policyFile;
+            }
+        }
+        $this->policyFiles = $files;
+    }
+
     public function setLeadSource($source)
     {
         $this->leadSource = $source;
