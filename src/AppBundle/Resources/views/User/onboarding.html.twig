@@ -33,8 +33,8 @@
         'transactionId': '{{ policy.policyNumber }}',
         'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
         'transactionProducts': [{
-            'name': 'Policy',
-            'sku':  '{{ policy.phone.make }}-{{ policy.phone.model }}',
+            'name': '{{ policy.phone.make }}-{{ policy.phone.model }}',
+            'sku':  '{{ policy.phone.id }}',
             'category': '{{ policy.phone.make }}',
             'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}
         }]
@@ -44,19 +44,8 @@
 {% block pixel %}
     {# Pixels #}
     {% if environment == 'prod' %}
-        <img src="https://tapjoy.go2cloud.org/SL2Qs" width="1" height="1" class="position-absolute invisible" />
-
         <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" class="position-absolute invisible" />
-
-        {% if app.session.get('mobusi') %}
-            <img src="https://pixel.leadzu.com/pixel.php?hash={{ app.session.get('mobusi') }}&service=4602&type=EVENT&transaction_id={{ policy.id }}&id_event=1&fc=1" alt="">
-        {% endif %}
-
-        {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
-            <img src='https://www.tagserve.com/saleServlet?MID=357&PID=513&CRID=&ORDERID={{ policy.id }}&ORDERAMNT=10&NUMOFITEMS=1&CUR=GBP' border="0" width="1" height="1" class="position-absolute invisible">
-        {% endif %}
     {% endif %}
-
 {% endblock %}
 
 {% block body %}

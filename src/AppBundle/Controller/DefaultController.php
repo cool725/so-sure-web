@@ -73,7 +73,6 @@ class DefaultController extends BaseController
      * @Route("/", name="homepage", options={"sitemap" = true})
      * @Route("/replacement-24", name="replacement_24_landing")
      * @Route("/replacement-72", name="replacement_72_landing")
-     * @Route("/mb", name="mb")
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
      */
@@ -86,13 +85,6 @@ class DefaultController extends BaseController
         if ($referral) {
             $session->set('referral', $referral);
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
-        }
-
-        // For Mobusi tracking
-        if ($request->get('_route') == 'mb') {
-            $clickid = $request->get('clickid');
-            $session->set('mobusi', $clickid);
-            $this->get('logger')->debug(sprintf('Mobusi %s', $clickid));
         }
 
         /** @var RequestService $requestService */
