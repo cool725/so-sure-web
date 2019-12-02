@@ -11,6 +11,7 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Feature;
 use AppBundle\Document\PolicyTerms;
@@ -43,7 +44,7 @@ class ApiViewController extends BaseController
 
         $latestTerms = $this->getLatestPolicyTerms();
 
-        $tmpPolicy = new PhonePolicy();
+        $tmpPolicy = new HelvetiaPhonePolicy();
         $prefix = $tmpPolicy->getPolicyNumberPrefix();
 
         $maxPotVaue = $request->get('maxPotValue');

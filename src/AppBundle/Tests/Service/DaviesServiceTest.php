@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Address;
 use AppBundle\Document\User;
@@ -98,7 +99,7 @@ class DaviesServiceTest extends WebTestCase
         $imeiOld = self::generateRandomImei();
         $imeiNew = self::generateRandomImei();
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setId('1');
         $policy->setImei($imeiOld);
         $policy->setPhone(self::$phoneA);
@@ -133,7 +134,7 @@ class DaviesServiceTest extends WebTestCase
         $imeiOld = self::generateRandomImei();
         $imeiNew = self::generateRandomImei();
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setId('1');
         $policy->setImei($imeiOriginal);
         $policy->setPhone(self::$phoneA);
@@ -179,7 +180,7 @@ class DaviesServiceTest extends WebTestCase
         $imeiOld = self::generateRandomImei();
         $imeiNew = self::generateRandomImei();
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setId('1');
         $policy->setImei($imeiOriginal);
         $policy->setPhone(self::$phoneA);
@@ -401,7 +402,7 @@ class DaviesServiceTest extends WebTestCase
     public function testUpdateClaimNoFinalFlag()
     {
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -432,7 +433,7 @@ class DaviesServiceTest extends WebTestCase
      */
     public function testValidateClaimInvalidImei()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -455,7 +456,7 @@ class DaviesServiceTest extends WebTestCase
 
     public function testMissingLossDescription()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -487,7 +488,7 @@ class DaviesServiceTest extends WebTestCase
         $user = new User();
         $user->setFirstName('Marko');
         $user->setLastName('Marulic');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -519,7 +520,7 @@ class DaviesServiceTest extends WebTestCase
         $user = new User();
         $user->setFirstName('Marko');
         $user->setLastName('Marulic');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -551,7 +552,7 @@ class DaviesServiceTest extends WebTestCase
         $user = new User();
         $user->setFirstName('Marko');
         $user->setLastName('Marulic');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -583,7 +584,7 @@ class DaviesServiceTest extends WebTestCase
         $user = new User();
         $user->setFirstName('Marko');
         $user->setLastName('Marulic');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -615,7 +616,7 @@ class DaviesServiceTest extends WebTestCase
         $user = new User();
         $user->setFirstName('Marko');
         $user->setLastName('Marulic');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId(static::getRandomPolicyNumber('TEST'));
         $policy->setPolicyTerms(static::$policyTerms);
@@ -802,7 +803,7 @@ class DaviesServiceTest extends WebTestCase
 
     public function testValidateClaimDetailsPolicyNumber()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $claim = new Claim();
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2016/123456');
@@ -826,7 +827,7 @@ class DaviesServiceTest extends WebTestCase
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
         $user->setLastName('bar');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
@@ -857,7 +858,7 @@ class DaviesServiceTest extends WebTestCase
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
         $user->setLastName('bar');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPhone(self::getRandomPhone(self::$dm));
         $user->addPolicy($policy);
         $claim = new Claim();
@@ -903,7 +904,7 @@ class DaviesServiceTest extends WebTestCase
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
         $user->setLastName('bar');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $claim = new Claim();
         $policy->addClaim($claim);
@@ -929,7 +930,7 @@ class DaviesServiceTest extends WebTestCase
         $user = new User();
         $user->setFirstName('foo');
         $user->setLastName('bar');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $claim = new Claim();
         $policy->addClaim($claim);
@@ -956,7 +957,7 @@ class DaviesServiceTest extends WebTestCase
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
         $user->setLastName('bar');
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setPhone(self::getRandomPhone(self::$dm));
 
@@ -2123,7 +2124,7 @@ class DaviesServiceTest extends WebTestCase
         $user->setFirstName('foo');
         $user->setLastName('bar');
         $user->setEmail($email);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $claim = new Claim();
         $policy->addClaim($claim);

@@ -6,6 +6,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Document\Offer;
 use AppBundle\Exception\IncorrectPriceException;
@@ -269,7 +270,7 @@ class PriceServiceTest extends WebTestCase
         $priceB->setGwp(1.23);
         $phone->addPhonePrice($priceA);
         $phone->addPhonePrice($priceB);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPhone($phone);
         $user->addPolicy($policy);
         self::$dm->persist($user);

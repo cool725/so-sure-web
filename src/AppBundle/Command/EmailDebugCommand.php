@@ -24,6 +24,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Connection\StandardConnection;
@@ -340,7 +341,7 @@ class EmailDebugCommand extends ContainerAwareCommand
             }
 
             if ($template == 'policy/trustpilot') {
-                $policy = new PhonePolicy();
+                $policy = new HelvetiaPhonePolicy();
                 $policy->setPolicyNumber('Invalid/123');
                 $user = new User();
                 $user->setEmail('julien@so-sure.com');

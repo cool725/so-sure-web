@@ -9,6 +9,7 @@ use AppBundle\Document\PhonePremium;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Service\ReceperioService;
 use GeoJson\Geometry\Point;
 
@@ -98,7 +99,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
@@ -122,7 +123,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
@@ -142,7 +143,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
@@ -163,7 +164,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPremium(new PhonePremium());
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $policy->setImei($imeiNumber);
@@ -188,18 +189,18 @@ class BaseImeiServiceTest extends WebTestCase
         // Test case where the imei is not yet used.
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
         // Create policiies with various imeis.
-        $a = new PhonePolicy();
+        $a = new HelvetiaPhonePolicy();
         $a->setPremium(new PhonePremium());
         $a->setStatus(PhonePolicy::STATUS_ACTIVE);
         $a->setImei($imeiNumber);
         static::$dm->persist($a);
-        $b = new PhonePolicy();
+        $b = new HelvetiaPhonePolicy();
         $b->setPremium(new PhonePremium());
         $b->setStatus(PhonePolicy::STATUS_ACTIVE);
         $b->setImei(rand(1, 999999));
         static::$dm->persist($b);
         static::$dm->flush();
-        $c = new PhonePolicy();
+        $c = new HelvetiaPhonePolicy();
         $c->setPremium(new PhonePremium());
         $c->setStatus(PhonePolicy::STATUS_ACTIVE);
         $c->setImei($imeiNumber);

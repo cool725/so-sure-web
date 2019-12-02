@@ -223,8 +223,8 @@ class CheckoutService
             $apiSecret = $this->salvaApiSecret;
             $apiPublic = $this->salvaApiPublic;
         } elseif ($underwriter === Helvetia::NAME) {
-            $apiSecret = $helvetiaSecret;
-            $apiPublic = $helvetiaPublic;
+            $apiSecret = $this->helvetiaApiSecret;
+            $apiPublic = $this->helvetiaApiPublic;
         }
         if ($apiSecret && $apiPublic) {
             return new CheckoutApi($apiSecret, -1, $apiPublic);
@@ -237,9 +237,9 @@ class CheckoutService
 
     /**
      * Gets the details of a transaction from checkout.
-     * @param CheckoutClient   $client   the client to use to get this transaction (which is the client that the
-     *                                   transaction was made with).
-     * @param string           $chargeId the id of the charge to get.
+     * @param ApiClient $client   the client to use to get this transaction (which is the client that the transaction
+     *                            was made with).
+     * @param string    $chargeId the id of the charge to get.
      * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge
      */
     public function getTransaction($client, $chargeId)
@@ -259,7 +259,8 @@ class CheckoutService
         $filter->setPageSize($pageSize);
         //$filter->setSearch()
 
-        $transactions = $this->newClient->reportingService()->queryTransaction($filter);
+        $client = new ApiClient($this->helvetiaApiSecret, $this->production ? 'live' : 'sandbox', !$this->production);
+        $transactions = $client->reportingService()->queryTransaction($filter);
         $data = [
             'validated' => 0,
             'missing' => [],
@@ -272,7 +273,7 @@ class CheckoutService
             /** @var Transaction $transaction */
             $policyId = null;
             $result = $transaction->getStatus();
-            $details = $this->getTransaction($transaction->getId());
+            $details = $this->getTransaction($client, $transaction->getId());
             if ($result == CheckoutPayment::RESULT_CAPTURED &&
                 $details->getMetadata() && isset($details->getMetadata()['policy_id'])) {
                 // Non-token payments (eg. user) may be tried several times in a row
@@ -687,29 +688,6 @@ class CheckoutService
         }
 
         return $details;
-    }
-
-    public function createCardToken($cardNumber, $expiryDate, $cv2)
-    {
-        $token = null;
-        try {
-            $exp = explode('/', $expiryDate);
-
-            $cardNumber = str_replace(' ', '', $cardNumber);
-
-            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
-            //NoOp::ignore([$cv2]);
-            $card->cvv = $cv2;
-            $service = $this->api->tokens();
-            $token = $service->request($card);
-        } catch (\Exception $e) {
-            $this->logger->error(
-                sprintf('Failed creating card token. Msg: %s', $e->getMessage()),
-                ['exception' => $e]
-            );
-        }
-
-        return $token;
     }
 
     public function tokenMigration($filename)

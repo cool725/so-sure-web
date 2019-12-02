@@ -5846,7 +5846,7 @@ abstract class Policy
     /**
      * Calculates the amount of commission that this policy should have paid currently based on their underwriter's
      * rules.
-     * @param \DateTime|null date is the date at which this amount should be valid, with null meaning right now.
+     * @param \DateTime|null $date is the date at which this amount should be valid, with null meaning right now.
      * @return float the expected amount.
      */
     abstract public function getExpectedCommission(\DateTime $date = null);
