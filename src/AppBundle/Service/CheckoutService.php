@@ -188,7 +188,7 @@ class CheckoutService
      * Gives the checkout client that should be used for payments regarding a given policy. If the policy has no
      * appropriate client an exception will be thrown but that shouldn't be possible.
      * @param Policy $policy is the policy that we are going to work on with the client.
-     * @return CheckoutClient the appropriate client.
+     * @return ApiClient the appropriate client.
      */
     public function getClientForPolicy(Policy $policy)
     {

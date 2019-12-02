@@ -1662,7 +1662,7 @@ class PolicyService
     public function getPoliciesPendingCancellation($includeFuture = false, $prefix = null, \DateTime $date = null)
     {
         if (!$prefix) {
-            $policy = new PhonePolicy();
+            $policy = new HelvetiaPhonePolicy();
             $prefix = $policy->getPolicyPrefix($this->environment);
             if (!$prefix) {
                 $prefix = $policy->getPolicyNumberPrefix();
@@ -1670,7 +1670,6 @@ class PolicyService
         }
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
-
         return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
     }
 

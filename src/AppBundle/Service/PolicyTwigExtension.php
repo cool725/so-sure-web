@@ -59,7 +59,9 @@ class PolicyTwigExtension extends \Twig_Extension
     public function getPolicy($id)
     {
         $repo = $this->dm->getRepository(Policy::class);
-        return $repo->find($id);
+        /** @var Policy $policy */
+        $policy = $repo->find($id);
+        return $policy;
     }
 
     /**
