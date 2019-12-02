@@ -25,14 +25,6 @@
             <div class="navbar-brand__logo"></div>
             <span class="sr-only">so-sure</span>
         </a>
-    {% elseif funnel_mode is defined and funnel_mode == true %}
-        <div class="container-large d-flex justify-content-between align-items-center">
-            {# Logo #}
-            <a href="/" class="navbar-brand show-in-nav show-in-quote">
-                <div class="navbar-brand__logo"></div>
-                <span class="sr-only">so-sure</span>
-            </a>
-        </div>
     {% elseif instore_mode is defined and instore_mode == true %}
         <div class="container-large d-flex justify-content-between align-items-center">
             {# Logo #}
@@ -48,6 +40,15 @@
             <span class="sr-only">so-sure</span>
         </a>
         {% include '::navigation/onboarding.html.twig' %}
+    {% elseif share_mode is defined and share_mode == true %}
+        <div class="container-large d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="/" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+            {% include '::navigation/share.html.twig' %}
+        </div>
     {% else %}
         <div class="container-large d-flex justify-content-between align-items-center">
             {# Logo #}
