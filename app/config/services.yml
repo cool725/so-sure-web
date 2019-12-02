@@ -533,6 +533,8 @@ services:
         class: AppBundle\Service\PolicyTwigExtension
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "%checkout_old_apipublic%"
+            - "%checkout_new_apipublic%"
         public: false
         tags:
             - { name: twig.extension }

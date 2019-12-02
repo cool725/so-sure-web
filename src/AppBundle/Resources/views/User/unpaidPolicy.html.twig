@@ -246,7 +246,7 @@
                       {% endif %}
                     {% else %}
                         <form class="payment-form" method="POST"
-                              data-public-key="{{ checkout_public_key }}"
+                              data-public-key="{{ checkoutApiKey(policy) }}"
                               data-customer-email="{{ app.user.email }}"
                               data-value="{{ convert_to_pennies(amount) }}"
                               data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"

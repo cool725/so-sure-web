@@ -65,8 +65,9 @@
                     </form>
                     {% endif %}
                 {% else %}
+                    <p>{{ checkoutApiKey(policy) }}</p>
                     <form class="payment-form" method="POST"
-                          data-public-key="{{ checkout_public_key }}"
+                          data-public-key="{{ checkoutApiKey(policy) }}"
                           data-customer-email="{{ app.user.email }}"
                           data-value="1"
                           data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"

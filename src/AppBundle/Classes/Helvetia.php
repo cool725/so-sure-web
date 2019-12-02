@@ -12,5 +12,6 @@ class Helvetia
 {
     const YEARLY_BROKER_COMMISSION = 0.72;
     const MONTHLY_BROKER_COMMISSION = 0.06;
-    const TIMEZONE = "Europe/Zurich";
+    const TIMEZONE = 'Europe/Zurich';
+    const NAME = 'Helvetia';
 }

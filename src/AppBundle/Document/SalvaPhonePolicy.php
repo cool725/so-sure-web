@@ -351,7 +351,7 @@ class SalvaPhonePolicy extends PhonePolicy
      */
     public function getUnderwriterName()
     {
-        return "Salva";
+        return Salva::NAME;
     }
 
     /**

@@ -29,7 +29,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getUnderwriterName()
     {
-        return "Helvetia";
+        return Helvetia::NAME;
     }
 
     /**

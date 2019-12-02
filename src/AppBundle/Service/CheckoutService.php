@@ -1,8 +1,11 @@
 <?php
+
 namespace AppBundle\Service;
 
 use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\Helvetia;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\CheckoutFile;
@@ -33,8 +36,6 @@ use com\checkout\ApiServices\SharedModels\Transaction;
 use com\checkout\ApiServices\Tokens\RequestModels\PaymentTokenCreate;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
-
-use AppBundle\Classes\Salva;
 
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Phone;
@@ -109,44 +110,47 @@ class CheckoutService
     /** @var PriceService */
     protected $priceService;
 
-    /** @var ApiClient */
-    protected $oldClient;
+    /** @var string */
+    protected $salvaApiSecret;
 
-    /** @var CheckoutApi */
-    protected $oldApi;
+    /** @var string */
+    protected $salvaApiPublic;
 
-    /** @var ApiClient */
-    protected $newClient;
+    /** @var string */
+    protected $helvetiaApiSecret;
 
-    /** @var CheckoutApi */
-    protected $newApi;
+    /** @var string */
+    protected $helvetiaApiPublic;
+
+    /** @var boolean */
+    protected $production;
 
     /**
      * Injects the service's dependencies.
-     * @param DocumentManager          $dm             is used for database access.
-     * @param LoggerInterface          $logger         is used for logging.
-     * @param PolicyService            $policyService  is used to update policies in response to payment.
-     * @param MailerService            $mailer         is used to email users in response to payment status.
-     * @param string                   $oldApiSecret   is the private key for the old checkout channel.
-     * @param string                   $oldApiPublic   is the public key for the old checkout channel.
-     * @param string                   $newApiSecret   is the private key for the new checkout channel.
-     * @param string                   $newApiPublic   is the public key for the new checkout channel.
-     * @param string                   $environment    is the environment that the service is in.
-     * @param \Domnikl\Statsd\Client   $statsd         is used to record stats.
-     * @param EventDispatcherInterface $dispatcher     is used to dispatch payment events events.
-     * @param SmsService               $sms            is used to sms users in response to payment status.
-     * @param FeatureService           $featureService is used to check if features are enabled.
-     * @param PriceService             $priceService   is used to verify paid sums.
+     * @param DocumentManager          $dm                is used for database access.
+     * @param LoggerInterface          $logger            is used for logging.
+     * @param PolicyService            $policyService     is used to update policies in response to payment.
+     * @param MailerService            $mailer            is used to email users in response to payment status.
+     * @param string                   $salvaApiSecret    is the private key for the old checkout channel.
+     * @param string                   $salvaApiPublic    is the public key for the old checkout channel.
+     * @param string                   $helvetiaApiSecret is the private key for the new checkout channel.
+     * @param string                   $helvetiaApiPublic is the public key for the new checkout channel.
+     * @param string                   $environment       is the environment that the service is in.
+     * @param \Domnikl\Statsd\Client   $statsd            is used to record stats.
+     * @param EventDispatcherInterface $dispatcher        is used to dispatch payment events events.
+     * @param SmsService               $sms               is used to sms users in response to payment status.
+     * @param FeatureService           $featureService    is used to check if features are enabled.
+     * @param PriceService             $priceService      is used to verify paid sums.
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         PolicyService $policyService,
         MailerService $mailer,
-        $oldApiSecret,
-        $oldApiPublic,
-        $newApiSecret,
-        $newApiPublic,
+        $salvaApiSecret,
+        $salvaApiPublic,
+        $helvetiaApiSecret,
+        $helvetiaApiPublic,
         $environment,
         \Domnikl\Statsd\Client $statsd,
         EventDispatcherInterface $dispatcher,
@@ -164,12 +168,11 @@ class CheckoutService
         $this->environment = $environment;
         $this->featureService = $featureService;
         $this->priceService = $priceService;
-        $isProd = $environment === 'prod';
-        $checkoutEnvironment = $isProd ? 'live' : 'sandbox';
-        $this->oldClient = new ApiClient($oldApiSecret, $checkoutEnvironment, !$isProd);
-        $this->oldApi = new CheckoutApi($oldApiSecret, -1, $oldApiPublic);
-        $this->newClient = new ApiClient($newApiSecret, $checkoutEnvironment, !$isProd);
-        $this->newApi = new CheckoutApi($newApiSecret, -1, $newApiPublic);
+        $this->salvaApiSecret = $salvaApiSecret;
+        $this->salvaApiPublic = $salvaApiPublic;
+        $this->helvetiaApiSecret = $helvetiaApiSecret;
+        $this->helvetiaApiPublic = $helvetiaApiPublic;
+        $this->production = $environment === 'prod';
     }
 
     /**
@@ -189,12 +192,17 @@ class CheckoutService
      */
     public function getClientForPolicy(Policy $policy)
     {
-        if ($policy instanceof SalvaPhonePolicy) {
-            return $this->oldClient;
-        } elseif ($policy instanceof HelvetiaPhonePolicy) {
-            return $this->newClient;
+        $underwriter = $policy->getUnderwriterName();
+        $apiSecret = null;
+        if ($underwriter === Salva::NAME) {
+            $apiSecret = $this->salvaApiSecret;
+        } elseif ($underwriter === Helvetia::NAME) {
+            $apiSecret = $this->helvetiaApiSecret;
         }
-        throw new \InvalidArgumentArgument(sprintf(
+        if ($apiSecret) {
+            return new ApiClient($apiSecret, $this->production ? 'live' : 'sandbox', !$this->production);
+        }
+        throw new \InvalidArgumentException(sprintf(
             'policy "%s" has no checkout client',
             $policy->getId()
         ));
@@ -208,12 +216,20 @@ class CheckoutService
      */
     public function getApiForPolicy(Policy $policy)
     {
-        if ($policy instanceof SalvaPhonePolicy) {
-            return $this->oldApi;
-        } elseif ($policy instanceof HelvetiaPhonePolicy) {
-            return $this->newApi;
+        $underwriter = $policy->getUnderwriterName();
+        $apiSecret = null;
+        $apiPublic = null;
+        if ($underwriter === Salva::NAME) {
+            $apiSecret = $this->salvaApiSecret;
+            $apiPublic = $this->salvaApiPublic;
+        } elseif ($underwriter === Helvetia::NAME) {
+            $apiSecret = $helvetiaSecret;
+            $apiPublic = $helvetiaPublic;
         }
-        throw new \InvalidArgumentArgument(sprintf(
+        if ($apiSecret && $apiPublic) {
+            return new CheckoutApi($apiSecret, -1, $apiPublic);
+        }
+        throw new \InvalidArgumentException(sprintf(
             'policy "%s" has no checkout api',
             $policy->getId()
         ));
@@ -955,7 +971,7 @@ class CheckoutService
                 $paymentMethod->setPreviousChargeId('none');
                 $this->dm->flush();
             }
-
+            $client = $this->getClientForPolicy($policy);
             $service = $client->chargeService();
 
             $charge = new CardTokenChargeCreate();

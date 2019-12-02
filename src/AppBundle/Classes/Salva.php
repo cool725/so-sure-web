@@ -20,11 +20,12 @@ class Salva
     const FINAL_MONTHLY_COVERHOLDER_COMMISSION = 0.87; // 0.87 broker fee + 0.06 afl
     const FINAL_MONTHLY_BROKER_COMMISSION = 0.06; // 0.87 broker fee + 0.06 afl
 
-    const SALVA_TIMEZONE = "Europe/London";
+    const NAME = 'Salva';
+    const SALVA_TIMEZONE = 'Europe/London';
 
     public static function getSalvaBinderEndDate()
     {
-        return new \DateTime('2019-01-01 00:00:00', SoSure::getSoSureTimezone());
+        return new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
     }
 
     public static $refundValidationExclusions = [
