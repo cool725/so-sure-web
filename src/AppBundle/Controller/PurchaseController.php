@@ -1463,6 +1463,7 @@ class PurchaseController extends BaseController
                 $logger->info(sprintf('Failed csrf'));
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid CSRF token.");
             } elseif ($type == 'redirect' && $publicKey != $this->getParameter('checkout_new_apipublic')) {
+                // TODO: this is broken but also it is not used currently
                 $logger->info(sprintf('Failed public key'));
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, "Invalid public key.");
             }
