@@ -181,8 +181,8 @@ class ApiViewControllerTest extends BaseApiControllerTest
         // Add version name and chunk into bits
         $data = sprintf('%s%s', $data, $versionName);
         $pdf = sprintf('%s%s', $pdf, $versionName);
-        //$data = chunk_split($data, 200);
-        //$pdf = chunk_split($pdf, 200);
+        $data = chunk_split($data, 200);
+        $pdf = chunk_split($pdf, 200);
         if ($debug) {
             /* If changes do occur, useful for running a diff */
             file_put_contents('/vagrant/terms-api.txt', $data);

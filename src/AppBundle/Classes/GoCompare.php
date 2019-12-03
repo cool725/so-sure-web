@@ -49,6 +49,7 @@ class GoCompare
         1723 => ['make' => 'Apple', 'model' => 'iPhone 8', 'memory' => 128],
         1724 => ['make' => 'Apple', 'model' => 'iPhone 8 Plus', 'memory' => 128],
 
+        // no longer supported by gocompare.
         // 215 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 128],
         // 216 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 32],
         // 217 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 64],
