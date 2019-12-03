@@ -29,6 +29,22 @@
           </batchtest>
         </phpunit>
     </target>
+
+    <target name="test:fixed" description="Run fixed functional tests">
+        <phpunit configuration="${dir.app}/phpunit.xml.dist"
+        haltonfailure="true" haltonerror="true" groups="fixed">
+          <formatter type="plain" usefile="false"/>
+          <batchtest>
+              <fileset dir="${dir.src}">
+                 <include name="**/Tests/**/*Test*.php"/>
+              </fileset>
+              <fileset dir="${dir.tests}">
+                  <include name="tests/**/*Test.php"/>
+                  <include name="tests/*Test.php"/>
+              </fileset>
+          </batchtest>
+       </phpunit>
+    </target>
                 
     <target name="test:functional" description="Run functional tests">
         <phpunit configuration="${dir.app}/phpunit.xml.dist"

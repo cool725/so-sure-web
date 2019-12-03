@@ -140,39 +140,55 @@ class ApiViewControllerTest extends BaseApiControllerTest
         // remove tags
         $data = strip_tags($data);
         $pdf = strip_tags($pdf);
-
         // adjust for differences in files
+        // @codingStandardsIgnoreStart
+        $data = trim(preg_replace('/\s+/', ' ', $data));
+        $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
         $pdf = str_replace('p {display: block;}', '', $pdf);
         $pdf = str_replace('•', '', $pdf);
         $pdf = str_replace('&nbsp;', '', $pdf);
-
         $data = str_replace('£60.00', '£60', $data);
+        $pdf = str_replace(' (contact details on page 6)', '', $pdf);
+        $data = str_replace(' (contact details on page 6)', '', $data);
+        $pdf = str_replace('for ?', 'for?', $pdf);
+        $data = str_replace('for ?', 'for?', $data);
+        $pdf = str_replace('Please note that replacement mobile phones may be from refurbished stock.', '', $pdf);
+        $data = str_replace('Please note that replacement mobile phones may be from refurbished stock.', '', $data);
+        $pdf = str_replace('Basic definitions', 'Basic definition', $pdf);
+        $data = str_replace('Basic definitions', 'Basic definition', $data);
+        $pdf = str_replace('body { font-family: "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; font-size: 8pt; } ', '', $pdf);
+        $pdf = str_replace('Loss Up to', 'Up to', $pdf);
+        $data = str_replace('Loss Up to', 'Up to', $data);
+        $pdf = str_replace('.SALVA', '. SALVA', $pdf);
+        $data = str_replace('.SALVA', '. SALVA', $data);
+        $pdf = str_replace('knowled If', 'knowledge. Failure to do so may affect the validity of your policy or the payment of your claim. If', $pdf);
+        $data = str_replace('knowled If', 'knowledge. Failure to do so may affect the validity of your policy or the payment of your claim. If', $data);
+        $pdf = str_replace('”', '"', $pdf);
+        $pdf = str_replace('“', '"', $pdf);
+        $data = str_replace('”', '"', $data);
+        $data = str_replace('“', '"', $data);
+        $data = trim(preg_replace('/\s+/', ' ', $data));
+        $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
 
         // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
-        $pdf = sprintf('so-sure Policy Document%s', $pdf);
-        // @codingStandardsIgnoreStart
+        $pdf = sprintf('so-sure Policy Document %s', $pdf);
         if ($version >= 11) {
             $pdf = sprintf('%s Contact details Address: so-sure Limited, 5 Martin Lane, London EC4R 0DP Email: support@wearesosure.com', $pdf);
         } else {
             $pdf = sprintf('%s Contact details Address: so-sure Limited, 10 Finsbury Square, London EC2A 1AF Email: support@wearesosure.com', $pdf);
         }
         // @codingStandardsIgnoreEnd
-
-        // delete extra spaces, and chunk into 200 chars to make comparision easier
-        $data = trim(preg_replace('/\s+/', ' ', $data));
-        $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
+        // Add version name and chunk into bits
         $data = sprintf('%s%s', $data, $versionName);
         $pdf = sprintf('%s%s', $pdf, $versionName);
         $data = chunk_split($data, 200);
         $pdf = chunk_split($pdf, 200);
-
         if ($debug) {
             /* If changes do occur, useful for running a diff */
             file_put_contents('/vagrant/terms-api.txt', $data);
             file_put_contents('/vagrant/terms-pdf.txt', $pdf);
             //print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
         }
-
         $this->assertEquals($data, $pdf);
     }
 

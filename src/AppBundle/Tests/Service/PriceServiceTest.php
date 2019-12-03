@@ -16,8 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @group functional-nonet
- *
- * AppBundle\\Tests\\Service\\PriceServiceTest
+ * @group fixed
  */
 class PriceServiceTest extends WebTestCase
 {

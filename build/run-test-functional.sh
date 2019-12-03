@@ -17,7 +17,7 @@ SKIP_FLUSH_REDIS=0
 COVER=0
 GROUP=""
 FAIL_RULE=""
-FUNCTIONAL_TEST="test:functional"
+FUNCTIONAL_TEST="test:fixed"
 DEBUG=""
 while getopts ":snpdDhcClrfg:" opt; do
   case $opt in

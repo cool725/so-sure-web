@@ -33,6 +33,7 @@ use AppBundle\Exception\ConnectedInvitationException;
 
 /**
  * @group functional-net
+ * @group fixed
  */
 class BranchServiceTest extends WebTestCase
 {

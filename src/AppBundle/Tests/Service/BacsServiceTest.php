@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @group functional-nonet
+ * @group fixed
  * AppBundle\\Tests\\Service\\BacsServiceTest
  */
 class BacsServiceTest extends WebTestCase
@@ -288,54 +289,5 @@ class BacsServiceTest extends WebTestCase
         $credits = self::$bacsService->exportPaymentsCredits('TEST', $now, '1', $metaData);
         $this->assertEquals(1, count($credits));
 
-    }
-
-    public function testExportPaymentsDebitsPreventExpirationAfter()
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        $oneYear = clone $now;
-        $oneYear = $oneYear->add(new \DateInterval('P1Y'));
-        self::$bacsService->exportPaymentsDebits('TEST', $oneYear, '1', $metaData);
-
-        $now = \DateTime::createFromFormat('U', time());
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testExportPaymentsDebitsPreventExpirationAfter', $this),
-            'bar',
-            null,
-            static::$dm
-        );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            $now,
-            true
-        );
-        static::$policyService->setDispatcher(null);
-        static::$policyService->create($policy, $now);
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-
-        $bacs = $this->setValidBacsPaymentMethodForPolicy($policy, rand(111111, 999999), $now);
-        $bacs->getBankAccount()->setInitialPaymentSubmissionDate($now);
-        self::$paymentService->confirmBacs($policy, $bacs);
-
-        static::$dm->flush();
-
-        $expire = clone $policy->getPolicyExpirationDate();
-        $afterExpire = clone $expire;
-        $afterExpire = $this->subBusinessDays($afterExpire, 4);
-        $metaData = [];
-
-        $scheduledPayment = $policy->getNextScheduledPayment();
-
-        $scheduledPayment->setScheduled($afterExpire);
-        static::$dm->flush();
-        $scheduledPayment = $policy->getNextScheduledPayment();
-        $scheduledPayment->setScheduled($afterExpire);
-        static::$dm->flush();
-
-        $debits = self::$bacsService->exportPaymentsDebits('TEST', $afterExpire, '1', $metaData);
-        $this->assertEquals(0, count($debits));
     }
 }

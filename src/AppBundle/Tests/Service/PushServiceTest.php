@@ -9,6 +9,7 @@ use AppBundle\Document\HelvetiaPhonePolicy;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class PushServiceTest extends WebTestCase
 {

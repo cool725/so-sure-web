@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * @group functional-nonet
+ * @group fixed
  *
  * \\AppBundle\\Tests\\Service\\MonitorServiceTest
  */
@@ -168,26 +169,25 @@ class MonitorServiceTest extends WebTestCase
         $this->assertTrue(true, 'monitoring old submitted claims with no results succeeds');
     }
 
+    /**
+     * Checks that the monitor service will detect claims that were submitted more than two business days ago and never
+     * moved past that point.
+     */
     public function testExpectedFailOldSubmittedClaimsFunctional()
     {
         $daysAgo = $this->subBusinessDays(\DateTime::createFromFormat('U', time()), 3);
-
-        // add a record that will make the monitor fail
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_SUBMITTED);
         $claim->setStatusLastUpdated($daysAgo);
         $claim->setType(Claim::TYPE_LOSS);
         self::$dm->persist($claim);
         self::$dm->flush();
-
         $this->assertSame($claim->getStatusLastUpdated(), $daysAgo);
-
+        // Make sure that the monitor will now throw an appropriate exception.
         $this->expectException(MonitorException::class);
         $this->expectExceptionMessage('At least one Claim (eg: ');
-        $this->expectExceptionMessage(") is still marked as 'Submitted' after 2 business days");
-
+        $this->expectExceptionMessage("still marked as 'submitted' after 2 business days");
         self::$monitor->outstandingSubmittedClaims();
-
         // try to clean up, and remove the record
         self::$dm->remove($claim);
         self::$dm->flush();
@@ -209,26 +209,24 @@ class MonitorServiceTest extends WebTestCase
         self::$monitor->salvaPolicy();
     }
 
-    /*
-      @expectedException \AppBundle\Exception\MonitorException
+    /**
+     * @expectedException \AppBundle\Exception\MonitorException
+     */
     public function testInvalidPolicy()
     {
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('invalid', $this));
         $policy->setPolicyNumber(self::getRandomPolicyNumber('INVALID'));
         $policy->addSalvaPolicyResults('0', SalvaPhonePolicy::RESULT_TYPE_CREATE, []);
-
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
-
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        self::$monitor->setDm($dm);
+        // Make sure that the exception occurs
         self::$monitor->invalidPolicy();
     }
-    */
 
     /**
+     * Makes sure the salvaStatus monitor alerts in situations in which it should.
      * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testSalvaStatus()
@@ -237,15 +235,16 @@ class MonitorServiceTest extends WebTestCase
         $policy->getUser()->setEmail(static::generateEmail('salvastatus', $this));
         $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
         $policy->setSalvaStatus('pending');
-
+        $policy->setStatusUpdated((new \DateTime())->sub(new \DateInterval("PT11M")));
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
-
+        // Make sure the exception occurs.
         self::$monitor->salvaStatus();
     }
 
     /**
+     * Makes sure that the policyFiles monitor alerts in situations in which it should.
      * @expectedException \AppBundle\Exception\MonitorException
      */
     public function testPolicyFiles()
@@ -253,11 +252,11 @@ class MonitorServiceTest extends WebTestCase
         $policy = self::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('policy', $this));
         $policy->setPolicyNumber(self::getRandomPolicyNumber('Mob'));
-
+        $policy->setStatusUpdated((new \DateTime())->sub(new \DateInterval("PT11M")));
         self::$dm->persist($policy->getUser());
         self::$dm->persist($policy);
         self::$dm->flush();
-
+        // Make sure the exception occurs.
         self::$monitor->policyFiles();
     }
 

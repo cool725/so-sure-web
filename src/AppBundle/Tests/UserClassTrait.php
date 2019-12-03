@@ -156,28 +156,19 @@ trait UserClassTrait
             $infiniteLoopPrevention = 0;
             while (!$policy->getCurrentExcess()) {
                 /** @var PhonePremium $premium */
-                $premium = $policy->getPremium();
-                $premium->clearExcess();
-                if ($premium instanceof PhonePremium) {
-                    $premium->clearPicSureExcess();
-                }
-
-                usleep(10 * $infiniteLoopPrevention);
-                $policy->setPhone(self::getRandomPhone(self::$dm, null, $date), $date);
+                $phone = self::getRandomPhone(self::$dm, null, $date);
+                $policy->setPhone($phone, $date);
+                $price = $phone->getOldestCurrentPhonePrice();
+                $policy->setPremium($price->createPremium());
                 $infiniteLoopPrevention++;
-                if ($infiniteLoopPrevention > 50) {
+                if ($infiniteLoopPrevention > 1000) {
                     throw new \Exception(sprintf(
                         'Infitine loop prevention in createUserPolicy (%s)',
                         $user->getEmail()
                     ));
                 }
             }
-
-            if (!$policy->getCurrentExcess()) {
-                throw new \Exception(sprintf('Missing current policy excess (%s)', $user->getEmail()));
-            }
         }
-
         return $policy;
     }
 
@@ -242,7 +233,8 @@ trait UserClassTrait
         $phoneRepo = $dm->getRepository(Phone::class);
         $query = [
             'active' => true,
-            'devices' => ['$nin' => ['A0001', 'iPhone 6']]
+            'devices' => ['$nin' => ['A0001', 'iPhone 6']],
+            'make' => ['$ne' => 'ALL']
         ];
         if ($make) {
             $query['make'] = $make;
@@ -253,20 +245,16 @@ trait UserClassTrait
         while ($phone == null) {
             /** @var Phone $phone */
             $phone = $phones[random_int(0, count($phones) - 1)];
-
             // Many tests rely on past dates, so ensure the date is ok for the past
-            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01')) ||
-                $phone->getMake() == "ALL"
-            ) {
+            if (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, new \DateTime('2016-01-01'))) {
                 $phone = null;
             } elseif (!$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date) ||
                 !$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date)->getExcess()
             ) {
                 $phone = null;
             }
-
             $infiniteLoopPrevention++;
-            if ($infiniteLoopPrevention > 50) {
+            if ($infiniteLoopPrevention > 1000) {
                 throw new \Exception(sprintf(
                     'Infinite loop prevention in getRandomPhone (date: %s)',
                     $date ? $date->format(\DateTime::ATOM) : 'null'
@@ -676,6 +664,18 @@ trait UserClassTrait
     }
 
     /**
+     * Gets the policy terms with the given version number.
+     * @param DocumentManager $dm      is the document manager to get them with.
+     * @param string          $version is the name of the version to get.
+     * @return PolicyTerms|null the policy terms or null if there are not any.
+     */
+    public static function getPolicyTermsVersion($dm, $version)
+    {
+        $policyTermsRepository = $dm->getRepository(PolicyTerms::class);
+        return $policyTermsRepository->findOneBy(['version' => $version]);
+    }
+
+    /**
      * @param DocumentManager $dm
      * @return PolicyTerms
      */
@@ -915,8 +915,6 @@ trait UserClassTrait
         static::$policyService->create($policyB, clone $dateB, true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
-        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
 
         if ($connect) {
             list($connectionA, $connectionB) = $this->createLinkedConnections(
@@ -942,11 +940,6 @@ trait UserClassTrait
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
-        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($policyA->getEnd()), $renewalPolicyA->getPremium()->getIptRate());
-        $this->assertEquals($this->getCurrentIptRate($policyB->getEnd()), $renewalPolicyB->getPremium()->getIptRate());
-
         if ($additional) {
             for ($i = 0; $i < $additional; $i++) {
                 $user = static::createUser(

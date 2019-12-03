@@ -18,6 +18,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class ClaimsServiceTest extends WebTestCase
 {
