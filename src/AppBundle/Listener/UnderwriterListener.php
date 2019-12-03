@@ -22,7 +22,7 @@ class UnderwriterListener
 
     /**
      * Injects the dependencies.
-     * @param SalvaExportService    $salvaExportService    is notified regarding salva policies.
+     * @param SalvaExportService $salvaExportService is notified regarding salva policies.
      */
     public function __construct(SalvaExportService $salvaExportService)
     {

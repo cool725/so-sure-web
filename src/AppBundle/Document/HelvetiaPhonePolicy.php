@@ -54,7 +54,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         }
         // 20% of premium price.
         // TODO: Make sure this is the right proportion and it was not meant to be before tax.
-        return $premium->getYearlyPremiumPrice() / 5; 
+        return $premium->getYearlyPremiumPrice() / 5;
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 
-namespace AppBundle\Tests; 
+namespace AppBundle\Tests;
+
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
