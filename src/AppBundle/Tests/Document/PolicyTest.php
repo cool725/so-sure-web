@@ -243,7 +243,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $payment->setDate((clone $date)->add(new \DateInterval("P{$i}M")));
             $policy->addPayment($payment);
         }
-        // make sure the date is indeed 30 days after the missing payment.
+        // Make sure the date is indeed 30 days after the missing payment.
         $this->assertEquals(
             (clone $date)->add(new \DateInterval("P3M30D"))->format("YMd"),
             $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))->format("YMd")
