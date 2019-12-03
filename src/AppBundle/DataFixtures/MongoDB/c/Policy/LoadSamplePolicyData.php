@@ -633,7 +633,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * @param integer|null  $paidMonths
      * @param string        $picSure
      * @param boolean       $isPaymentMethodBacs
-     * @return SalvaPhonePolicy
+     * @return PhonePolicy
      * @throws \AppBundle\Exception\InvalidPremiumException
      */
     private function newPolicy(

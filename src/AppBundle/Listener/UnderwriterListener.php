@@ -4,6 +4,9 @@ namespace AppBundle\Listener;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Service\SalvaExportService;

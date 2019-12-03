@@ -2022,7 +2022,7 @@ class CheckoutService
      * @param string $cardNumber is the number on the card the token is being created for.
      * @param string $expiryDate is the expiry date written on the card.
      * @param string $cv2        is the cv2 number on the card.
-     * @return CardToken the token which checkout sends back.
+     * @return \Checkout\Models\Tokens\Card the token which checkout sends back.
      */
     public function createCardToken($policy, $cardNumber, $expiryDate, $cv2)
     {

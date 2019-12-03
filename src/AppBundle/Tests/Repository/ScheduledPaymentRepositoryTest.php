@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Repository;
 
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\DateTrait;
 use AppBundle\Repository\ScheduledPaymentRepository;
@@ -81,7 +82,7 @@ class ScheduledPaymentRepositoryTest extends KernelTestCase
     private static function eligiblePolicy($dateString)
     {
         $start = new \DateTime($dateString);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStart($start);
         $policy->setEnd((clone $start)->add(new \DateInterval("P1Y")));
         $policy->setPolicyNumber("VAGRANT/2019/".rand());
