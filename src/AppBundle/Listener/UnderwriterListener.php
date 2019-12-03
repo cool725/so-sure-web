@@ -3,6 +3,7 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -40,6 +41,7 @@ class UnderwriterListener
             $this->salvaExportService->queue($policy, SalvaExportService::QUEUE_CREATED);
         } elseif ($policy instanceof HelvetiaPhonePolicy) {
             // TODO: some kinda helvetia stuff.
+            NoOp::ignore([]);
         }
     }
 
@@ -53,6 +55,7 @@ class UnderwriterListener
             $this->salvaExportService->queue($policy, SalvaExportService::QUEUE_UPDATED);
         } elseif ($policy instanceof HelvetiaPhonePolicy) {
             // TODO: some kinda helvetia stuff.
+            NoOp::ignore([]);
         }
     }
 
@@ -67,6 +70,7 @@ class UnderwriterListener
             $this->salvaExportService->queue($policy, SalvaExportService::QUEUE_CANCELLED);
         } elseif ($policy instanceof HelvetiaPhonePolicy) {
             // TODO: some kinda helvetia stuff.
+            NoOp::ignore([]);
         }
     }
 }
