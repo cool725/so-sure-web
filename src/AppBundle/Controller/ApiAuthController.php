@@ -129,7 +129,7 @@ class ApiAuthController extends BaseController
 
             $lookup = $this->get('app.address');
             if (!$address = $lookup->getAddress($postcode, $number, $this->getUser())) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_INVALID_ADDRESS, 'Invalid Address', 422);
             }
 
             return new JsonResponse($address->toApiArray());

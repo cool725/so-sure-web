@@ -8,6 +8,7 @@ use AppBundle\Service\PCAService;
 
 /**
  * @group functional-nonet
+ * @group fixed
  * AppBundle\\Tests\\Service\\PCAServiceTest
  */
 class PCAServiceTest extends WebTestCase

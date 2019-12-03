@@ -7,6 +7,7 @@ use AppBundle\Classes\DaviesHandlerClaim;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class ExcelServiceTest extends WebTestCase
 {

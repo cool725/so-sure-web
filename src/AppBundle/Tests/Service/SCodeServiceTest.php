@@ -38,6 +38,7 @@ use AppBundle\Exception\DuplicateInvitationException;
 
 /**
  * @group functional-nonet
+ * @group fixed
  *
  * AppBundle\\Tests\\Service\\SCodeServiceTest
  */
