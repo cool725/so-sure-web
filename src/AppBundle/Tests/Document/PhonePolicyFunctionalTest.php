@@ -380,6 +380,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $files = $policy->getPolicyFiles();
         $this->assertEquals(1, count($files));
         $this->assertEquals("ImeiFile", $files[0]->getFileType());
+        $this->assertFalse($policy->getPicSureApprovedDate());
     }
 
     public function testEmptyPolicyReturnsCorrectApiData()
