@@ -3,7 +3,7 @@
 .cardbox {
     max-width: 300px;
     background-color: $white;
-    border: 2px solid rgba(37,147,243, 0.4);
+    border: 1px solid rgba(0, 146, 255, 1);
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
     @include border-radius($g-border-radius);
@@ -44,7 +44,7 @@
 
 // Only using px here for consistency
 .expanding-cardbox {
-    border: 2px solid rgba(37,147,243, 0.4);
+    border: 1px solid rgba(0, 146, 255, 1);
     @include border-radius($g-border-radius);
 
     &__body {
@@ -119,7 +119,7 @@
 
 .expanding-cardbox__open {
     background-color: $white;
-    border: 2px solid rgba(37,147,243, 0.8);
+    // border: 2px solid rgba(37,147,243, 0.5);
     cursor: default;
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
@@ -140,7 +140,7 @@
     display: flex;
     flex-direction: column;
     text-align: left;
-    border: 2px solid $selago;
+    border: 1px solid rgba(0, 146, 255, 1);
     @include border-radius($g-border-radius);
 
     &__header {
@@ -239,12 +239,13 @@
     // Using BS tabs
     .nav-tabs {
         border: none;
+        display: flex;
+        justify-content: space-between;
 
         // Modify - use .justify-content-between on element
         .nav-item {
             width: 22%;
-            margin-bottom: -2px;
-            margin-right: 3%;
+            margin-bottom: -1px;
         }
 
         .nav-link {
@@ -257,16 +258,22 @@
 
             line-height: 1.46;
             font-family: $g-bold;
-            color: $dodger-blue;
-            background-color: $selago;
-            border: 2px solid rgba(37,147,243, 0.2);
+            color: $white;
+            background-color: rgba(255, 255, 255, 0.1);
+            // background-color: rgba(32, 106, 236, 0.8);
+            // background-color: $royal-blue;
+            border: 1px solid rgba(37, 147, 243, 0.2);
             border-bottom: none;
             @include border-top-radius($g-border-radius);
 
-            transition: all 0.1s linear;
+            transition: all 0.2s linear;
+
+            img {
+                filter: brightness(0) invert(1);
+                opacity: 0.5;
+            }
 
             .fas {
-                color: lighten($dodger-blue, 30%);
                 position: absolute;
                 right: 1rem; top: 1.8rem;
             }
@@ -274,10 +281,15 @@
             &.active,
             &:hover {
                 background-color: $white;
-                // border: 2px solid rgba(37,147,243, 0.8);
+                border: 1px solid rgba(37, 147, 243, 1);
                 border-bottom: none;
                 color: $zaffre;
                 z-index: 5;
+
+                img {
+                    filter: brightness(1) invert(0);
+                    opacity: 1;
+                }
 
                 .fas {
                     color: $dodger-blue;
@@ -290,13 +302,32 @@
         position: relative;
         z-index: 4;
         background-color: $white;
-        border: 2px solid rgba(37,147,243, 0.2);
+        border: 1px solid rgba(0, 146, 255, 1);
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
         @include border-bottom-radius($g-border-radius);
-        @include border-top-right-radius($g-border-radius);
 
         // Pad the content
         padding: 2rem;
+    }
+}
+
+.card {
+    &-number {
+        width: 2.8rem; height: 2.8rem;
+        position: absolute;
+        top: -1rem; left: -1rem;
+        background-color: $white;
+        border: 2px solid $dodger-blue;
+        font-family: $g-bold;
+        color: $dodger-blue;
+        @include border-radius(50%);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.18),
+                    0 5px 15px 0 rgba(8,27,154,0.18);
+
+        // Align the number
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }

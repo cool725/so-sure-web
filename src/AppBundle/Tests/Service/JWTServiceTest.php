@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class JWTServiceTest extends WebTestCase
 {

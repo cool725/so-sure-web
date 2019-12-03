@@ -8,7 +8,8 @@
 
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
-    @include blue-gradient;
+    @include blue-gradient-45;
+    // background-color: $crayon-blue;
 
     .navbar-nav {
         transition: none;
@@ -19,11 +20,11 @@
             transition: all 0.5s linear;
 
             &:hover {
-                color: $columbia-blue-f;
+                color: $deep-sky-blue-d;
             }
 
             &.user-link {
-                color: $columbia-blue-f;
+                color: $deep-sky-blue-d;
 
                 &:hover {
                     color: $white;
@@ -114,7 +115,8 @@
 
 // Scroll effects
 .navbar-scrolled:not(.devbar) {
-    @include blue-gradient;
+    background-image: none;
+    background-color: $crayon-blue;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
 }
 

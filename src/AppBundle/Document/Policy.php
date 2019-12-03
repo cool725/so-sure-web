@@ -702,7 +702,6 @@ abstract class Policy
             $payment->calculateSplit();
         }
 
-        // For some reason, payment was being added twice for ::testNewPolicyJudopayUnpaidRepayOk
         // perhaps an issue with cascade persist
         // seems to have no ill effects and resolves the issue
         if ($this->payments->contains($payment)) {
@@ -894,12 +893,11 @@ abstract class Policy
             return null;
         }
         $invoiceDates = [];
-        $invoiceDates[] = clone $this->getStartForBilling();
-        $date = clone $this->getBilling();
-        for ($i = 1; $i < $this->getPremiumInstallments(); $i++) {
-            if ($date <= $this->getEnd()) {
-                $date->add(new \DateInterval('P1M'));
-                $invoiceDates[] = clone $date;
+        $invoiceDate = clone $this->billing;
+        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
+            if ($invoiceDate <= $this->getEnd()) {
+                $invoiceDates[] = clone $invoiceDate;
+                $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
             }
         }
         return $invoiceDates;
@@ -1650,6 +1648,17 @@ abstract class Policy
         return $connections;
     }
 
+    public function getNonRewardConnections()
+    {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            if (!($connection instanceof RewardConnection) || $connection->getLinkedUser()->getIsInfluencer()) {
+                $connections[] = $connection;
+            }
+        }
+        return $connections;
+    }
+
     public function isConnected(Policy $policy)
     {
         foreach ($this->getStandardConnections() as $connection) {
@@ -2176,7 +2185,8 @@ abstract class Policy
     }
 
     /**
-     * @return ScheduledPayment|null
+     * Gets the scheduled payment with status scheduled that has the lowest date.
+     * @return ScheduledPayment|null the first scheduled payment or null if there are none.
      */
     public function getNextScheduledPayment()
     {
@@ -2188,7 +2198,6 @@ abstract class Policy
                 }
             }
         }
-
         return $next;
     }
 
@@ -6397,7 +6406,7 @@ abstract class Policy
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             $data['connections'] = $this->eachApiArray($this->getRenewalConnections(), $this->getNetworkClaims());
         } else {
-            $data['connections'] = $this->eachApiArray($this->getConnections(), $this->getNetworkClaims());
+            $data['connections'] = $this->eachApiArray($this->getNonRewardConnections(), $this->getNetworkClaims());
         }
 
         return $data;

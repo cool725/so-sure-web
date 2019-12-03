@@ -116,24 +116,20 @@ $nav-pills-link-active-bg:       $dodger-blue;
 
 // Toasts
 
-// $toast-max-width:                   350px !default;
-$toast-padding-x:                   2rem;
-$toast-padding-y:                   .8rem;
-$toast-font-size:                   .7rem;
-// $toast-color:                       null !default;
-$toast-background-color:            $white;
-$toast-border-width:                0;
-// $toast-border-color:                rgba(0, 0, 0, .1) !default;
-$toast-border-radius:               10px;
-$toast-box-shadow:                  0 15px 30px 0 rgba(8,27,154,0.2),
+$toast-padding-x:                2rem;
+$toast-padding-y:                .8rem;
+$toast-font-size:                .7rem;
+$toast-background-color:         $white;
+$toast-border-width:             0;
+$toast-border-radius:            10px;
+$toast-box-shadow:               0 15px 30px 0 rgba(8,27,154,0.2),
                                     0 5px 15px 0 rgba(8,27,154,0.2);
 
 // Modal
-$modal-content-box-shadow-xs:       0 15px 30px 0 rgba(8,27,154,0.2),
+$modal-content-box-shadow-xs:    0 15px 30px 0 rgba(8,27,154,0.2),
                                     0 5px 15px 0 rgba(8,27,154,0.2);
-$modal-content-box-shadow-sm-up:    0 15px 30px 0 rgba(8,27,154,0.2),
+$modal-content-box-shadow-sm-up: 0 15px 30px 0 rgba(8,27,154,0.2),
                                     0 5px 15px 0 rgba(8,27,154,0.2);
 
-// $toast-header-color:                $gray-600 !default;
-// $toast-header-background-color:     rgba($white, .85) !default;
-// $toast-header-border-color:         rgba(0, 0, 0, .05) !default;
+// Cards
+$card-border-radius:             0.5rem;

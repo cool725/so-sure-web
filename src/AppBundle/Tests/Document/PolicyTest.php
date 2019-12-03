@@ -11,6 +11,10 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Connection\RewardConnection;
+use AppBundle\Document\Connection\RenewalConnection;
+use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Tests\Create;
 use AppBundle\Classes\SoSure;
 
 /**
@@ -243,10 +247,10 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $payment->setDate((clone $date)->add(new \DateInterval("P{$i}M")));
             $policy->addPayment($payment);
         }
-        // make sure the date is indeed 30 days after the missing payment.
+        // Make sure the date is indeed 30 days after the missing payment.
         $this->assertEquals(
-            $this->startOfDay((clone $date)->add(new \DateInterval("P3M30D"))),
-            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))
+            (clone $date)->add(new \DateInterval("P3M30D"))->format("YMd"),
+            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))->format("YMd")
         );
         // Add a refund and it should be a month sooner.
         $refund = new CheckoutPayment();
@@ -254,8 +258,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $refund->setSuccess(true);
         $policy->addPayment($refund);
         $this->assertEquals(
-            $this->startOfDay((clone $date)->add(new \DateInterval("P2M30D"))),
-            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))
+            (clone $date)->add(new \DateInterval("P2M30D"))->format("YMd"),
+            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))->format("YMd")
         );
     }
 
@@ -285,7 +289,70 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // make sure the date is indeed 30 days after the missing payment.
         $this->assertEquals(
             $this->startOfDay((clone $date)->add(new \DateInterval("P30D"))),
-            $policy->getPolicyExpirationDate($date)
+            $this->startOfDay($policy->getPolicyExpirationDate($date))
         );
+    }
+
+
+    public function testGetNonRewardConnections()
+    {
+        //Create Policy
+        $policy = new PhonePolicy();
+        $user = new User();
+        $policy->setUser($user);
+
+        //Create Connections
+        $rewardConnection = new RewardConnection();
+        $rewardConnection->setLinkedUser($user);
+        $standardConnection = new StandardConnection();
+        $standardConnection->setLinkedUser($user);
+        $renewalConnection = new RenewalConnection();
+        $renewalConnection->setLinkedUser($user);
+
+        //Influencer Connection
+        $influencerConnection = new RewardConnection();
+        $influencer = new User();
+        $influencer->setIsInfluencer(true);
+        $influencerConnection->setLinkedUser($influencer);
+
+        $policy->addConnection($rewardConnection);
+        $policy->addConnection($standardConnection);
+        $policy->addConnection($renewalConnection);
+        $policy->addConnection($influencerConnection);
+
+        //Get Connections
+        $connections = $policy->getConnections();
+        $this->assertEquals(count($connections), 4);
+
+        //Get Standard Connections
+        $connections = $policy->getStandardConnections();
+        $this->assertEquals(count($connections), 1);
+
+        //Get Non Reward Connections, incuding influencers
+        $connections = $policy->getNonRewardConnections();
+        $this->assertEquals(count($connections), 3);
+        foreach ($connections as $connection) {
+            $this->assertTrue(
+                $connection instanceof StandardConnection ||
+                $connection instanceof RenewalConnection ||
+                ($connection instanceof RewardConnection && $connection->getLinkedUser()->getIsInfluencer())
+            );
+        }
+    }
+
+    /**
+     * Tests to make sure that the refund commission is calculated rightly.
+     */
+    public function testGetRefundCommissionAmount()
+    {
+        $user = Create::user();
+        $policy = Create::policy($user, "2019-03-13", Policy::STATUS_CANCELLED, 12);
+        $policy->setEnd(new \DateTime("2019-04-18"));
+        Create::standardPayment($policy, "2019-03-13", true);
+        Create::standardPayment($policy, "2019-04-13", true);
+        $policy->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        $this->assertTrue($policy->getRefundCommissionAmount() < 0);
+        $policy->setCancelledReason(Policy::CANCELLED_COOLOFF);
+        $this->assertTrue($policy->getRefundCommissionAmount() > 0);
     }
 }

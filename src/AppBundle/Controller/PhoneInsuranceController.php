@@ -502,9 +502,10 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
-        // A/B USP Test
-        // To Test use url param ?force=current-usps / ?force=pricing-usps
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_USP);
+        // A/B Tagline Test
+        // To Test use url param ?force=standard / ?force=standard-usp
+        // ?force=tabbed / ?force=tabbed-usp
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TABS_AND_USP);
 
         $data = [
             'phone' => $phone,
@@ -533,6 +534,8 @@ class PhoneInsuranceController extends BaseController
     /**
      * SEO Pages Redirect - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}+{model}", name="phone_insurance_make_model_old",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/phone-insurance/{make}+{model}/", name="phone_insurance_make_model_old_slash",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
     public function phoneInsuranceMakeModelRedirect($make = null, $model = null)

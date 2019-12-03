@@ -343,64 +343,6 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         }
 
         $data = ['request' => ['gadgets' => $gadgets]];
-        /*
-        $data = '{"request": {
-  "gadgets" : [
-    {"gadget": {"gadget_id": 20, "loss_cover": true}},
-    {"gadget": {"gadget_id": 21, "loss_cover": true}},
-    {"gadget": {"gadget_id": 22, "loss_cover": true}},
-    {"gadget": {"gadget_id": 23, "loss_cover": true}},
-    {"gadget": {"gadget_id": 24, "loss_cover": true}},
-    {"gadget": {"gadget_id": 25, "loss_cover": true}},
-    {"gadget": {"gadget_id": 26, "loss_cover": true}},
-    {"gadget": {"gadget_id": 27, "loss_cover": true}},
-    {"gadget": {"gadget_id": 28, "loss_cover": true}},
-    {"gadget": {"gadget_id": 29, "loss_cover": true}},
-    {"gadget": {"gadget_id": 30, "loss_cover": true}},
-    {"gadget": {"gadget_id": 31, "loss_cover": true}},
-    {"gadget": {"gadget_id": 32, "loss_cover": true}},
-    {"gadget": {"gadget_id": 33, "loss_cover": true}},
-    {"gadget": {"gadget_id": 34, "loss_cover": true}},
-    {"gadget": {"gadget_id": 35, "loss_cover": true}},
-    {"gadget": {"gadget_id": 36, "loss_cover": true}},
-    {"gadget": {"gadget_id": 37, "loss_cover": true}},
-    {"gadget": {"gadget_id": 38, "loss_cover": true}},
-    {"gadget": {"gadget_id": 39, "loss_cover": true}},
-    {"gadget": {"gadget_id": 40, "loss_cover": true}},
-    {"gadget": {"gadget_id": 41, "loss_cover": true}},
-
-    {"gadget": {"gadget_id": 215, "loss_cover": true}},
-    {"gadget": {"gadget_id": 216, "loss_cover": true}},
-    {"gadget": {"gadget_id": 217, "loss_cover": true}},
-    {"gadget": {"gadget_id": 218, "loss_cover": true}},
-    {"gadget": {"gadget_id": 219, "loss_cover": true}},
-    {"gadget": {"gadget_id": 220, "loss_cover": true}},
-    {"gadget": {"gadget_id": 221, "loss_cover": true}},
-    {"gadget": {"gadget_id": 222, "loss_cover": true}},
-    {"gadget": {"gadget_id": 223, "loss_cover": true}},
-    {"gadget": {"gadget_id": 224, "loss_cover": true}},
-
-    {"gadget": {"gadget_id": 806, "loss_cover": true}},
-    {"gadget": {"gadget_id": 807, "loss_cover": true}},
-    {"gadget": {"gadget_id": 808, "loss_cover": true}},
-    {"gadget": {"gadget_id": 809, "loss_cover": true}},
-
-    {"gadget": {"gadget_id": 814, "loss_cover": true}},
-    {"gadget": {"gadget_id": 815, "loss_cover": true}},
-    {"gadget": {"gadget_id": 816, "loss_cover": true}},
-    {"gadget": {"gadget_id": 817, "loss_cover": true}},
-    {"gadget": {"gadget_id": 818, "loss_cover": true}},
-    {"gadget": {"gadget_id": 819, "loss_cover": true}},
-    {"gadget": {"gadget_id": 820, "loss_cover": true}},
-
-    {"gadget": {"gadget_id": 835, "loss_cover": true}},
-    {"gadget": {"gadget_id": 836, "loss_cover": true}},
-
-    {"gadget": {"gadget_id": 1239, "loss_cover": true}},
-    {"gadget": {"gadget_id": 1240, "loss_cover": true}}
-  ]
-}}'; */
-
         $url = sprintf(
             '/external/gocompare/feed?gocompare_key=%s',
             static::$container->getParameter('gocompare_key')

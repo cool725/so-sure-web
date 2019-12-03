@@ -45,6 +45,7 @@ use AppBundle\Exception\DuplicateInvitationException;
 
 /**
  * @group cover-nonet
+ * @group fixed
  *
  * AppBundle\\Tests\\Service\\AffiliateServiceTest
  */
