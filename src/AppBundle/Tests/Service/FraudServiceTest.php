@@ -12,6 +12,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * @group functional-nonet
+ * @group fixed
  */
 class FraudServiceTest extends WebTestCase
 {

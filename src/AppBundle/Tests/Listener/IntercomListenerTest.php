@@ -173,8 +173,8 @@ class IntercomListenerTest extends WebTestCase
 
         static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
 
-        // Expect a policy start event + policy created event + user update
-        $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // Expect a policy start event + policy created event + 2 user updates
+        $this->assertEquals(4, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
     }

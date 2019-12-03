@@ -26,10 +26,22 @@ class ImeiTraitTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Make sure that the random imei generator is not generating the same values.
+     * Makes sure that the generate random imei code produces imei numbers that are random and do not collide.
+     * NOTE: there is an extremely small chance that this test will fail but as long as it does not fail repeatedly
+     *       that is ok.
      */
-    public function testRandomImeiCollision()
+    public function testImeiCollision()
     {
-        $this->assertNotEquals($this->generateRandomImei(), $this->generateRandomImei());
+        for ($r = 0; $r < 10; $r++) {
+            $imeis = [];
+            for ($i = 0; $i < 10; $i++) {
+                $imeis[] = $this->generateRandomImei();
+            }
+            for ($a = 0; $a < count($imeis); $a++) {
+                for ($b = $a + 1; $b < count($imeis); $b++) {
+                    $this->assertNotEquals($imeis[$a], $imeis[$b]);
+                }
+            }
+        }
     }
 }

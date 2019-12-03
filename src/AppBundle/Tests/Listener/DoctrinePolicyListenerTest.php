@@ -70,12 +70,8 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-
-        $this->assertTrue($policy->isValidPolicy());
 
         // policy updated
         $this->runPreUpdate($policy, $this->once(), ['potValue' => [null, 20]]);
@@ -90,13 +86,8 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-
-        $this->assertTrue($policy->isValidPolicy());
-
         $premium = new PhonePremium();
         $premium->setGwp(5);
         $premium->setIpt(1);
@@ -117,13 +108,8 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-
-        $this->assertTrue($policy->isValidPolicy());
-
         $address = new Address();
         $address->setLine1('123');
         $address->setPostcode('BX1 1LT');
@@ -144,18 +130,14 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-
-        $this->assertTrue($policy->isValidPolicy());
-
         $this->runPreUpdateStatus(
             $policy,
-            $this->once(),
+            $this->exactly(2),
             ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_UNPAID]],
-            PhonePolicy::STATUS_ACTIVE
+            PhonePolicy::STATUS_ACTIVE,
+            'event.policy.updated.hubspot'
         );
         $this->runPreUpdateStatus(
             $policy,
@@ -173,9 +155,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $exception = false;
@@ -217,19 +197,15 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         self::setPaymentMethodForPolicy($policy);
-
-        $this->assertTrue($policy->isValidPolicy());
-
         $this->runPreUpdateStatus(
             $policy,
-            $this->once(),
+            $this->exactly(2),
             ['status' => [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_UNPAID]],
-            PhonePolicy::STATUS_ACTIVE
+            PhonePolicy::STATUS_ACTIVE,
+            'event.policy.updated.hubspot'
         );
         $this->runPreUpdateStatus(
             $policy,
@@ -267,15 +243,10 @@ class DoctrinePolicyListenerTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
-        static::$policyService->setEnvironment('test');
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
         /** @var BacsPaymentMethod $bacs */
         $bacs = self::setBacsPaymentMethodForPolicy($policy);
-
-        $this->assertTrue($policy->isValidPolicy());
-
         $listener = $this->createBacsEventListener(
             $policy,
             $bacs->getBankAccount(),
@@ -301,10 +272,8 @@ class DoctrinePolicyListenerTest extends WebTestCase
         );
         $judoPolicy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $bacsPolicy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
-        static::$policyService->setEnvironment('prod');
         static::$policyService->create($judoPolicy);
         static::$policyService->create($bacsPolicy);
-        static::$policyService->setEnvironment('test');
         $judoPolicy->setStatus(PhonePolicy::STATUS_ACTIVE);
         $bacsPolicy->setStatus(PhonePolicy::STATUS_ACTIVE);
         /** @var JudoPaymentMethod $judo */
@@ -364,32 +333,36 @@ class DoctrinePolicyListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
-    private function runPreUpdateStatus($policy, $count, $changeSet, $previousStatus)
+    private function runPreUpdateStatus($policy, $count, $changeSet, $previousStatus, $extra = null)
     {
-        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_STATUS, $previousStatus);
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_STATUS, $previousStatus, $extra);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }
 
-    private function createListener($policy, $count, $eventType, $previousStatus = null)
+    private function createListener($policy, $count, $eventType, $previousStatus = null, $extra = null)
     {
         $event = new PolicyEvent($policy);
         if ($previousStatus) {
             $event->setPreviousStatus($previousStatus);
         }
-
-        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
-                         ->setMethods(array('dispatch'))
-                         ->getMock();
-        $dispatcher->expects($count)
-                     ->method('dispatch')
-                     ->with($eventType, $event);
-
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')->setMethods(array('dispatch'))->getMock();
+        if ($extra) {
+            $weakEvent = clone $event;
+            $weakEvent->setPreviousStatus(null);
+            $dispatcher->expects($count)
+                ->method('dispatch')
+                ->withConsecutive(
+                    [$eventType, $event],
+                    [$extra, $weakEvent]
+                );
+        } else {
+            $dispatcher->expects($count)->method('dispatch')->with($eventType, $event);
+        }
         $listener = new DoctrinePolicyListener($dispatcher, "test");
         /** @var Reader $reader */
         $reader = static::$container->get('annotations.reader');
         $listener->setReader($reader);
-
         return $listener;
     }
 

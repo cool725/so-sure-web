@@ -1735,6 +1735,7 @@ services:
     AppBundle\Service\SearchService:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "%kernel.environment%"
 
     app.postcode:
         alias: AppBundle\Service\PostcodeService

@@ -6,6 +6,7 @@ use AppBundle\DataFixtures\MongoDB\d\Oauth2\LoadOauth2Data;
 use AppBundle\Document\Feature;
 use AppBundle\Document\LostPhone;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\PolicyService;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\PCAService;
@@ -80,6 +81,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertFalse(self::$featureService->isEnabled(Feature::FEATURE_CHECKOUT));
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseOkNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -87,7 +91,8 @@ class PurchaseControllerTest extends BaseControllerTest
         $email = self::generateEmail('testPurchaseNew', $this);
         $crawler = $this->createPurchase(
             $email,
-            'foo bar',
+            'john',
+            'fogel',
             new \DateTime('1980-01-01')
         );
 
@@ -95,6 +100,7 @@ class PurchaseControllerTest extends BaseControllerTest
         //$this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-missing-phone'));
 
         $dm = $this->getDocumentManager();
+        $dm->flush();
         $userRepo = $dm->getRepository(User::class);
         /** @var User $user */
         $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
@@ -109,13 +115,17 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($diff->days == 0 && $diff->h == 0 && $diff->i == 0);
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseUserPhoneSpaceNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseUserPhoneSpaceNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01'),
             implode(' ', str_split(self::generateRandomMobile(), 1))
         );
@@ -124,6 +134,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseExistingUserDiffDetailsNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -134,7 +147,7 @@ class PurchaseControllerTest extends BaseControllerTest
             'foo'
         );
 
-        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+        $crawler = $this->createPurchaseUserNew($user, 'not', 'me', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
@@ -142,6 +155,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     /**
      * Tests if user can progress through the purchase flow with personal details unset.
+     * @group flow
      */
     public function testPurchaseMissingPersonalDetailsPledge()
     {
@@ -152,7 +166,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $email,
             'foo'
         );
-        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+        $crawler = $this->createPurchaseUserNew($user, 'not', 'me', new \DateTime('1980-01-01'));
         self::verifyResponse(302);
         $crawler = $this->setPhone($phone);
         self::verifyResponse(302);
@@ -168,6 +182,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     /**
      * Tests if user can progress through the purchase flow with personal details unset.
+     * @group flow
      */
     public function testPurchaseMissingPersonalDetailsPayment()
     {
@@ -178,7 +193,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $email,
             'foo'
         );
-        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+        $crawler = $this->createPurchaseUserNew($user, 'not', 'me', new \DateTime('1980-01-01'));
         self::verifyResponse(302);
         self::$client->followRedirect();
         $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
@@ -199,6 +214,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('step-personal', self::$client->getHistory()->current()->getUri());
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseExistingUserWithPolicyDiffDetailsNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -223,12 +241,15 @@ class PurchaseControllerTest extends BaseControllerTest
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
 
-        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+        $crawler = $this->createPurchaseUserNew($user, 'not', 'me', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect('/login'));
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseExistingUserSameDetailsNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -240,11 +261,14 @@ class PurchaseControllerTest extends BaseControllerTest
             self::getRandomPhone(self::$dm)
         );
 
-        $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
+        $crawler = $this->createPurchaseUserNew($user, 'foo', 'bar', new \DateTime('1980-01-01'));
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseExistingUserSameDetailsWithPartialPolicyNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -257,12 +281,15 @@ class PurchaseControllerTest extends BaseControllerTest
         );
         self::initPolicy($user, self::$dm, $phone);
 
-        $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
+        $crawler = $this->createPurchaseUserNew($user, 'foo', 'bar', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
         $this->assertTrue($this->isClientResponseRedirect('/purchase/step-phone'));
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -285,6 +312,10 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertRedirectionPathPartial('/purchase/step-pledge');
     }
 
+    /**
+     * @group flow
+     * TODO: this test seems to fail intermittently, should figure out why.
+     */
     public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyExisting()
     {
         $phone = $this->getRandomPhoneAndSetSession();
@@ -319,6 +350,9 @@ class PurchaseControllerTest extends BaseControllerTest
         ), $crawler->html());
     }
 
+    /**
+     * @lead
+     */
     public function testStarlingLead()
     {
         $phone = self::getRandomPhone(self::$dm);
@@ -333,7 +367,8 @@ class PurchaseControllerTest extends BaseControllerTest
         $email = self::generateEmail('testStarling', $this);
         $crawler = $this->createPurchase(
             self::generateEmail('testStarling', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
@@ -350,13 +385,17 @@ class PurchaseControllerTest extends BaseControllerTest
         }
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseAddressNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseAddressNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -370,7 +409,8 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
@@ -414,13 +454,17 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->verifyPurchaseReady($crawler);
     }
 
+    /**
+     * @group payment
+     */
     public function testPurchasePhoneCheckout()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneCheckout', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
@@ -489,13 +533,17 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    /**
+     * @group payment
+     */
     public function testPurchasePhoneCheckoutFailed()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneCheckoutFailed', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
@@ -580,196 +628,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertRedirectionPathPartial('/purchase/step-phone');
     }
 
-    public function testPurchasePhoneBacs()
-    {
-        /** @var FeatureService $feature */
-        $feature = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
-
-        $phone = $this->getRandomPhoneAndSetSession();
-
-        $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhoneBacs', $this),
-            'foo bar',
-            new \DateTime('1980-01-01')
-        );
-        self::verifyResponse(302, null, $crawler);
-        $this->assertTrue($this->isClientResponseRedirect());
-        self::$client->followRedirect();
-        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
-
-        $crawler = $this->setPhone($phone);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
-
-        //print $crawler->html();
-        $crawler = $this->agreePledge($crawler);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-
-        $policy = $this->getPolicyFromPaymentUrl();
-        $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
-        $crawler = self::$client->request('GET', $url);
-        $this->assertNotContains(
-            'judo',
-            $crawler->html(),
-            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
-        );
-        //print $crawler->html();
-        //print $url;
-
-        $crawler = $this->setPayment($crawler, $phone);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
-        $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
-
-        $crawler = $this->setBacs($crawler, $policy);
-        self::verifyResponse(200);
-        $crawler = $this->setBacsConfirm($crawler);
-        // print $crawler->html();
-
-        self::verifyResponse(302, null, $crawler);
-        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
-        //print $crawler->html();
-        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), 'Redirect to user welcome page');
-        $crawler = self::$client->followRedirect();
-        self::verifyResponse(200);
-    }
-
-    public function testPurchasePhonePartial()
-    {
-        /** @var FeatureService $feature */
-        $feature = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
-
-        $email = static::generateEmail('testPurchasePhonePartial', $this);
-        $phone = $this->getRandomPhone(static::$dm);
-        $user = static::createUser(
-            static::$userManager,
-            $email,
-            'bar',
-            $phone,
-            static::$dm
-        );
-        self::addAddress($user);
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $phone
-        );
-
-        $url = sprintf('/purchase/step-pledge/%s', $policy->getId());
-        $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(302, null, $crawler);
-        $this->login($email, 'bar');
-
-        $crawler = self::$client->request('GET', $url);
-
-        // print $crawler->html();
-        $crawler = $this->agreePledge($crawler);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-
-        $policy = $this->getPolicyFromPaymentUrl();
-        $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
-        $crawler = self::$client->request('GET', $url);
-        $this->assertNotContains(
-            'judo',
-            $crawler->html(),
-            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
-        );
-        //print $crawler->html();
-        //print $url;
-
-        $crawler = $this->setPayment($crawler, $policy->getPhone());
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
-        $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
-
-        $crawler = $this->setBacs($crawler, $policy);
-        self::verifyResponse(200);
-        $crawler = $this->setBacsConfirm($crawler);
-        // print $crawler->html();
-
-        self::verifyResponse(302, null, $crawler);
-        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
-        //print $crawler->html();
-        $this->assertTrue($this->isClientResponseRedirect($redirectUrl), 'Redirect to user welcome page');
-        $crawler = self::$client->followRedirect();
-        self::verifyResponse(200);
-    }
-
-    public function testPurchasePhoneBacsInvalidAccountNumber()
-    {
-        /** @var FeatureService $feature */
-        $feature = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($feature->isEnabled(Feature::FEATURE_BACS), 'Bacs feature disabled');
-
-        $phone = $this->getRandomPhoneAndSetSession();
-
-        $crawler = $this->createPurchase(
-            self::generateEmail('testPurchasePhoneBacsInvalidAccountNumber', $this),
-            'foo bar',
-            new \DateTime('1980-01-01')
-        );
-        self::verifyResponse(302, null, $crawler);
-        $this->assertTrue($this->isClientResponseRedirect());
-        self::$client->followRedirect();
-        $this->assertContains('/purchase/step-phone', self::$client->getHistory()->current()->getUri());
-
-        $crawler = $this->setPhone($phone);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-pledge', self::$client->getHistory()->current()->getUri());
-
-        //print $crawler->html();
-        $crawler = $this->agreePledge($crawler);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-
-        $policy = $this->getPolicyFromPaymentUrl();
-        $url = sprintf('%s?force=bacs', self::$client->getHistory()->current()->getUri());
-        $crawler = self::$client->request('GET', $url);
-        $this->assertNotContains(
-            'judo',
-            $crawler->html(),
-            sprintf('%s Payment page is referencing judopay', self::$client->getHistory()->current()->getUri())
-        );
-        //print $crawler->html();
-        //print $url;
-
-        $crawler = $this->setPayment($crawler, $phone);
-        //print $crawler->html();
-        self::verifyResponse(302, null, $crawler);
-        $crawler = self::$client->followRedirect();
-        $this->assertContains('/purchase/step-payment/', self::$client->getHistory()->current()->getUri());
-        $this->assertContains('/monthly', self::$client->getHistory()->current()->getUri());
-
-        $crawler = $this->setBacs($crawler, $policy, PCAService::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER);
-        self::verifyResponse(200);
-        //print $crawler->html();
-
-        $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() > 0);
-        $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() == 0);
-
-        $crawler = $this->setBacs($crawler, $policy, PCAService::TEST_ACCOUNT_NUMBER_OK);
-        self::verifyResponse(200);
-        //print $crawler->html();
-
-        $this->assertTrue($crawler->selectButton('bacs_form[save]')->count() == 0);
-        $this->assertTrue($crawler->selectButton('bacs_confirm_form[save]')->count() > 0);
-    }
-
+    /**
+     * Gets policy from payment url
+     */
     private function getPolicyFromPaymentUrl()
     {
         $urlData = explode('/', self::$client->getHistory()->current()->getUri());
@@ -785,13 +646,17 @@ class PurchaseControllerTest extends BaseControllerTest
         return $policy;
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchasePhoneNoPledge()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneNoPledge', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
@@ -833,12 +698,13 @@ class PurchaseControllerTest extends BaseControllerTest
     */
 
     /**
+     * @group flow
      *
-     */
     public function testPurchasePhoneImeiSpaceNineSixtyEightNew()
     {
         $phoneRepo = static::$dm->getRepository(Phone::class);
         /** @var Phone $phone */
+        /*
         $phone = $phoneRepo->findOneBy(['devices' => 'zeroflte', 'memory' => 128]);
         //$phone = self::getRandomPhone(static::$dm);
 
@@ -847,7 +713,8 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNineSixtyEightNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -878,14 +745,19 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
+     */
 
+    /**
+     * @group flow
+     *
     public function testPurchasePhoneImeiSpaceNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpaceNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -916,7 +788,11 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
+     */
 
+    /**
+     * @group flow
+     */
     public function testPurchasePhoneLostImei()
     {
         $lostPhone = new LostPhone();
@@ -928,7 +804,8 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneLostImei', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -941,13 +818,17 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->expectFlashError($crawler, 'Sorry, it looks this phone is already insured');
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseChangePhone()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseChangePhone', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -976,6 +857,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains($phone2->getModel(), $crawler->html());
     }
 
+    /**
+     * @group flow
+     */
     public function testRePurchase()
     {
         $user = static::createUser(
@@ -1016,13 +900,17 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertNotEquals('readonly', $crawler->filter('#purchase_form__token')->attr('readonly'));
     }
 
+    /**
+     * @group flow
+     *
     public function testPurchasePhoneImeiDashNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiDashNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -1053,14 +941,19 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
+     */
 
+    /**
+     * @group flow
+     *
     public function testPurchasePhoneImeiSlashNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSlashNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -1091,14 +984,19 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
+     */
 
+    /**
+     * @group flow
+     *
     public function testPurchasePhoneImeiS7New()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiS7New', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -1129,21 +1027,19 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
     }
+     */
 
-    public function testPurchaseReviewToJudopay()
-    {
-        // unable to implement test
-        // form post needs to be direct to judopay
-        // symfony tests are unable to perform client side events
-    }
-
+    /**
+     * @group flow
+     *
     public function testPurchaseReviewWithAcceptNew()
     {
         $phone = $this->getRandomPhoneAndSetSession();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewRequiresAcceptNew', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -1173,14 +1069,19 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200, null, $crawler, 'card');
         $this->verifyPurchaseReady($crawler);
     }
+     */
 
+    /**
+     * @group flow
+     */
     public function testPurchaseReviewWithInvalidSerial()
     {
         $phone = $this->getRandomPhoneAndSetSession('Apple');
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchaseReviewWithInvalidSerial', $this),
-            'foo bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
 
@@ -1197,9 +1098,12 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->setPhone($phone, null, null, ReceperioService::TEST_INVALID_SERIAL);
 
         self::verifyResponse(200);
-        $this->expectFlashError($crawler, 'we are unable to insure you');
+        $this->expectFlashError($crawler, 'model you selected isn\'t quite right');
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseReviewNotIOSWithNoPhoneSession()
     {
         $phone = self::getRandomPhone(static::$dm, 'Apple');
@@ -1227,6 +1131,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('Get a Quote', $crawler->html());
     }
 
+    /**
+     * @group flow
+     */
     public function testPurchaseReviewIOSWithNoPhoneSession()
     {
         $phone = self::getRandomPhone(static::$dm, 'Apple');
@@ -1259,6 +1166,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertContains('Get a Quote', $crawler->html());
     }
 
+    /**
+     * @group payment
+     */
     public function testPayCC()
     {
         $dm = $this->getDocumentManager();
@@ -1304,6 +1214,9 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    /**
+     * @group payment
+     */
     public function testPayCCRetry()
     {
         $dm = $this->getDocumentManager();
@@ -1362,6 +1275,9 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    /**
+     * @group lead
+     */
     public function testLeadSource()
     {
         $email = self::generateEmail('testLeadSource', $this);
@@ -1395,6 +1311,9 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertEquals('foo bar', $lead->getName());
     }
 
+    /**
+     * @group lead
+     */
     public function testLeadSourceMissingParam()
     {
         $email = self::generateEmail('testLeadSourceMissingParam', $this);
@@ -1420,6 +1339,9 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
     }
 
+    /**
+     * @group lead
+     */
     public function testLeadSourceInvalidCsrf()
     {
         $email = self::generateEmail('testLeadSourceInvalidCsrf', $this);
@@ -1445,6 +1367,9 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    /**
+     * @group lead
+     */
     public function testLeadSourceBadName()
     {
         $email = self::generateEmail('testLeadSourceBadName', $this);
@@ -1478,14 +1403,14 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertNull($lead->getName());
     }
 
-    private function createPurchaseUser($user, $name, $birthday)
+    private function createPurchaseUser($user, $firstName, $lastName, $birthday)
     {
-        return $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
+        return $this->createPurchase($user->getEmail(), $firstName, $lastName, $birthday, $user->getMobileNumber());
     }
 
-    private function createPurchaseUserNew($user, $name, $birthday)
+    private function createPurchaseUserNew($user, $firstName, $lastName, $birthday)
     {
-        return $this->createPurchase($user->getEmail(), $name, $birthday, $user->getMobileNumber());
+        return $this->createPurchase($user->getEmail(), $firstName, $lastName, $birthday, $user->getMobileNumber());
     }
 
     private function verifyPurchaseReady($crawler)
@@ -1615,7 +1540,7 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function createPurchase($email, $name, $birthday, $mobile = null)
+    private function createPurchase($email, $firstName, $lastName, $birthday, $mobile = null)
     {
         if (!$mobile) {
             $mobile = self::generateRandomMobile();
@@ -1625,17 +1550,20 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertNotContains('no phone selected', $crawler->html());
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
-        $form['purchase_form[name]'] = $name;
+        $form['purchase_form[firstName]'] = $firstName;
+        $form['purchase_form[lastName]'] = $lastName;
         $form['purchase_form[birthday]'] = sprintf("%s", $birthday->format('d/m/Y'));
         $form['purchase_form[mobileNumber]'] = $mobile;
         $form['purchase_form[addressLine1]'] = '123 Foo St';
         $form['purchase_form[city]'] = 'Unknown';
         $form['purchase_form[postcode]'] = 'BX1 1LT';
         $crawler = self::$client->submit($form);
-
         return $crawler;
     }
 
+    /**
+     * @group lead
+     */
     public function testLeadInvalidEmail()
     {
         $this->getRandomPhoneAndSetSession();
@@ -1661,6 +1589,9 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    /**
+     * @group lead
+     */
     public function testLeadInvalidName()
     {
         $email = self::generateEmail('testLeadInvalidName', $this);
@@ -1686,81 +1617,13 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
+    /**
+     * @group flow
+     */
     public function testPhoneSearchPurchasePage()
     {
         $crawler = self::$client->request('GET', '/purchase/');
         $this->assertEquals(200, $this->getClientResponseStatusCode());
         $this->assertHasFormAction($crawler, '/phone-search-dropdown');
-    }
-
-    /**
-     * Tests to make sure that you can request cancellation of your policy, and that in cooloff it will automatically
-     * action it.
-     */
-    public function testCancelPolicy()
-    {
-        $a = $this->createUserPolicy(true, new \DateTime("-5 months"));
-        $b = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
-        $c = $this->createUserPolicy(true, new \DateTime("-1 weeks"));
-        $a->setStatus(Policy::STATUS_ACTIVE);
-        $b->setStatus(Policy::STATUS_ACTIVE);
-        $c->setStatus(Policy::STATUS_ACTIVE);
-        $a->getUser()->setEmail(self::generateEmailClass("aaa", "testCancelPolicy"));
-        $b->getUser()->setEmail(self::generateEmailClass("bbb", "testCancelPolicy"));
-        $c->getUser()->setEmail(self::generateEmailClass("ccc", "testCancelPolicy"));
-        self::$dm->persist($a);
-        self::$dm->persist($b);
-        self::$dm->persist($c);
-        self::$dm->persist($a->getUser());
-        self::$dm->persist($b->getUser());
-        self::$dm->persist($c->getUser());
-        self::$dm->flush();
-        // Normal cancellation request.
-        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_EXISTING);
-        $this->expectFlashSuccess($crawler, "We have passed your request to our policy team.");
-        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
-        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
-        // Cooloff cancellation.
-        $crawler = $this->cancelForm($b, Policy::COOLOFF_REASON_PICSURE);
-        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
-        $this->assertEquals(Policy::COOLOFF_REASON_PICSURE, $b->getRequestedCancellationReason());
-        $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
-        $this->assertEquals(Policy::CANCELLED_COOLOFF, $b->getCancelledReason());
-        // Cooloff cancellation with custom reason.
-        $crawler = $this->cancelForm($c, Policy::COOLOFF_REASON_UNKNOWN, "my phone is cursed.");
-        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
-        $this->assertEquals(Policy::COOLOFF_REASON_UNKNOWN, $c->getRequestedCancellationReason());
-        $this->assertEquals("my phone is cursed.", $c->getRequestedCancellationReasonOther());
-        $this->assertEquals(Policy::STATUS_CANCELLED, $c->getStatus());
-        $this->assertEquals(Policy::CANCELLED_COOLOFF, $c->getCancelledReason());
-        // Duplicate cancellation.
-        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_DAMAGED);
-        $this->expectFlashWarning($crawler, "Cancellation has already been requested and is currently processing.");
-        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
-        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
-    }
-
-    /**
-     * logs in opens the cancellation form and submits it with given parameters.
-     * @param Policy $policy is the policy that we are logging in for.
-     * @param String $reason is the reason under Policy::COOLOFF_REASON_*.
-     * @return Crawler the web crawler for the page coming after cancellation occurs.
-     */
-    private function cancelForm($policy, $reason, $other = null)
-    {
-        $user = $policy->getUser();
-        $this->login($user->getEmail(), 'foo');
-        $crawler = self::$client->request('GET', '/purchase/cancel/'.$policy->getId());
-        $form = $crawler->selectButton('cancel_form[cancel]')->form();
-        $form['cancel_form[reason]'] = $reason;
-        if ($other) {
-            $form['cancel_form[othertxt]'] = $other;
-        }
-        self::$client->submit($form);
-        self::$dm->refresh($policy);
-        $this->verifyResponse(302);
-        $crawler = self::$client->followRedirect();
-        $this->verifyResponse(200);
-        return $crawler;
     }
 }

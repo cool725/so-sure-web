@@ -20,6 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @group functional-nonet
+ * @group fixed
  *
  * AppBundle\\Tests\\Service\\SCodeServiceTest
  */

@@ -119,8 +119,9 @@ class DoctrineUserListenerTest extends WebTestCase
 
         $listener = $this->createUserEventListener(
             $user,
-            $this->exactly(2),
+            $this->exactly(3),
             UserEvent::EVENT_NAME_UPDATED,
+            UserEvent::EVENT_UPDATED_HUBSPOT,
             UserEvent::EVENT_UPDATED_INTERCOM
         );
 
@@ -136,8 +137,9 @@ class DoctrineUserListenerTest extends WebTestCase
 
         $listener = $this->createUserEventListener(
             $user,
-            $this->exactly(2),
+            $this->exactly(3),
             UserEvent::EVENT_NAME_UPDATED,
+            UserEvent::EVENT_UPDATED_HUBSPOT,
             UserEvent::EVENT_UPDATED_INTERCOM
         );
 
@@ -156,11 +158,13 @@ class DoctrineUserListenerTest extends WebTestCase
 
         $listener = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_UPDATED_INTERCOM);
         $listenerLink = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_UPDATED_INVITATION_LINK);
+        $listenerHubspot = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_UPDATED_HUBSPOT);
 
         $changeSet = ['email' => [$email, $email]];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
         $listenerLink->preUpdate($events);
+        $listenerHubspot->preUpdate($events);
 
         $listener = $this->createUserEmailEventListeners($user, $email);
 
@@ -289,10 +293,11 @@ class DoctrineUserListenerTest extends WebTestCase
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
             ->setMethods(array('dispatch'))
             ->getMock();
-        $dispatcher->expects($this->exactly(3))
+        $dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->withConsecutive(
                 [UserEmailEvent::EVENT_CHANGED, new UserEmailEvent($user, $oldEmail)],
+                [UserEvent::EVENT_UPDATED_HUBSPOT, $event],
                 [UserEvent::EVENT_UPDATED_INTERCOM, $event],
                 [UserEvent::EVENT_UPDATED_INVITATION_LINK, $event]
             );

@@ -379,6 +379,7 @@ class ScheduledPayment
         if (!$this->policy->getBillingDay()) {
             return true;
         }
+
         if ($this->getType() == self::TYPE_RESCHEDULED || !$this->getScheduled()) {
             return null;
         }
@@ -387,9 +388,12 @@ class ScheduledPayment
             return true;
         }
 
+
         $diff = $this->getScheduled()->diff($this->policy->getBilling());
-        $adjustedBilling = clone $this->policy->getBilling();
-        $adjustedBilling = $adjustedBilling->add(new \DateInterval(sprintf('P%dM', $diff->m)));
+        $adjustedBilling = $this->setDayOfMonth(
+            $this->getScheduled(),
+            $this->policy->getBillingDay()
+        );
 
         // Hack for a off by one hour timezone issue between billing & scheduled
         // TODO: Fix scheduled times

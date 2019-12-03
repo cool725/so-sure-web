@@ -15,6 +15,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\CheckoutService;
+use AppBundle\Service\PolicyService;
 use AppBundle\Service\FeatureService;
 use AppBundle\Tests\Service\CheckoutServiceTest;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -41,15 +42,30 @@ class UserControllerTest extends BaseControllerTest
     use CurrencyTrait;
     use DateTrait;
 
+    protected static $container;
+    protected static $dm;
+
     /** @var FeatureService */
     protected static $featureService;
 
     /** @var CheckoutService */
     protected static $checkoutService;
 
+    /** @var PolicyService $policyService */
+    protected static $policyService;
+
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+        // set up kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
+        self::$container = $kernel->getContainer();
+
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$userManager = self::$container->get('fos_user.user_manager');
+
+
         /** @var FeatureService $featureService */
         $featureService = self::$container->get('app.feature');
         self::$featureService = $featureService;
@@ -57,6 +73,10 @@ class UserControllerTest extends BaseControllerTest
         /** @var  CheckoutService $checkoutService */
         $checkoutService = self::$container->get('app.checkout');
         self::$checkoutService = $checkoutService;
+
+        /** @var PolicyService $policyService */
+        $policyService = self::$container->get('app.policy');
+        self::$policyService = $policyService;
     }
 
     public function setUp()
@@ -72,6 +92,9 @@ class UserControllerTest extends BaseControllerTest
     {
     }
 
+    /**
+     * @group general
+     */
     public function testUserOk()
     {
         $email = self::generateEmail('testUserOk', $this);
@@ -101,6 +124,9 @@ class UserControllerTest extends BaseControllerTest
         $this->validateInviteAllowed($crawler, true);
     }
 
+    /**
+     * @group general
+     */
     public function testUserOk2ndCliff()
     {
         $email = self::generateEmail('testUserOk2ndCliff', $this);
@@ -131,6 +157,10 @@ class UserControllerTest extends BaseControllerTest
         $this->validateInviteAllowed($crawler, true);
     }
 
+
+    /**
+     * @group general
+     */
     public function testUserOkFinal()
     {
         $email = self::generateEmail('testUserOkFinal', $this);
@@ -156,8 +186,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/user');
 
-        // todo - will fail during leap year
-        $this->validateBonus($crawler, [304, 305], [304, 305]);
+        $this->validateBonus($crawler, [304, 305, 306], [304, 305, 306]);
         $this->validateRewardPot($crawler, 0);
         $this->validateInviteAllowed($crawler, true);
     }
@@ -199,6 +228,9 @@ class UserControllerTest extends BaseControllerTest
         $this->validateInviteAllowed($crawler, false);
     }
 
+    /**
+     * @group general
+     */
     public function testUserInvite()
     {
         $email = self::generateEmail('testUserInvite-inviter', $this);
@@ -253,6 +285,9 @@ class UserControllerTest extends BaseControllerTest
         $this->validateRewardPot($crawler, 10);
     }
 
+    /**
+     * @group general
+     */
     public function testUserInviteOptOut()
     {
         $email = self::generateEmail('testUserInviteOptOut', $this);
@@ -370,6 +405,9 @@ class UserControllerTest extends BaseControllerTest
         $this->expectFlashWarning($crawler, 'have a claim');
     }
 
+    /**
+     * @group general
+     */
     public function testUserSCode()
     {
         $email = self::generateEmail('testUserSCode-inviter', $this);
@@ -423,6 +461,9 @@ class UserControllerTest extends BaseControllerTest
         $this->validateRewardPot($crawler, 10);
     }
 
+    /**
+     * @group general
+     */
     public function testUserChangeEmailDuplicate()
     {
         $email = self::generateEmail('testUserChangeEmailDuplicate', $this);
@@ -462,6 +503,9 @@ class UserControllerTest extends BaseControllerTest
         $this->expectFlashError($crawler, 'email already exists in our system');
     }
 
+    /**
+     * @group general
+     */
     public function testUserChangeEmailActual()
     {
         $email = self::generateEmail('testUserChangeEmailActual', $this);
@@ -496,6 +540,9 @@ class UserControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'email address is updated');
     }
 
+    /**
+     * @group general
+     */
     public function testUserChangeEmailInvalidEmail()
     {
         $email = self::generateEmail('testUserChangeEmailInvalidEmail', $this);
@@ -528,6 +575,9 @@ class UserControllerTest extends BaseControllerTest
         //print_r($crawler->html());
     }
 
+    /**
+     * @group checkout
+     */
     public function testUserPaymentDetails()
     {
         $email = self::generateEmail('testUserPaymentDetails', $this);
@@ -554,10 +604,12 @@ class UserControllerTest extends BaseControllerTest
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', '/user/payment-details');
 
-        $this->validateCheckoutForm($crawler, false);
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
     }
 
+    /**
+     * @group checkout
+     */
     public function testUserPaymentDetailsCheckout()
     {
         $email = self::generateEmail('testUserPaymentDetailsCheckout', $this);
@@ -587,7 +639,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/payment-details');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
 
         $cardDetails = $crawler->filter('#payment_card');
         $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
@@ -620,6 +671,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
     }
 
+    /**
+     * @group checkout
+     */
     public function testUserPaymentDetailsCheckoutOtherUser()
     {
         $email = self::generateEmail('testUserPaymentDetailsCheckoutOtherUser', $this);
@@ -657,7 +711,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/payment-details');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
 
         $cardDetails = $crawler->filter('#payment_card');
         $this->assertNotContains(CheckoutServiceTest::$CHECKOUT_TEST_CARD_LAST_FOUR, $cardDetails->html());
@@ -731,12 +784,12 @@ class UserControllerTest extends BaseControllerTest
         $actualRemaining = $chart->attr('data-bonus-days-remaining');
         $actualTotal = $chart->attr('data-bonus-days-total');
         if (is_array($daysRemaining)) {
-            $this->assertTrue(in_array($actualRemaining, $daysRemaining));
+            $this->assertContains($actualRemaining, $daysRemaining);
         } else {
             $this->assertEquals($daysRemaining, $actualRemaining);
         }
         if (is_array($daysTotal)) {
-            $this->assertTrue(in_array($actualTotal, $daysTotal));
+            $this->assertContains($actualTotal, $daysTotal);
         } else {
             $this->assertEquals($daysTotal, $actualTotal);
         }
@@ -744,12 +797,7 @@ class UserControllerTest extends BaseControllerTest
 
     private function validateRenewalAllowed($crawler, $exists)
     {
-        $this->validateXPathCount($crawler, '//a[@id="user-homepage--nav-renew"]', $exists);
-    }
-
-    private function validateJudoForm($crawler, $exists)
-    {
-        $this->validateXPathCount($crawler, '//form[@id="webpay-form"]', $exists);
+        $this->validateXPathCount($crawler, '//i[@class="fal fa-star-exclamation fa-fw"]', $exists);
     }
 
     private function validateCheckoutForm($crawler, $exists)
@@ -782,6 +830,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals($count, $crawler->evaluate(sprintf('count(%s)', $xpath))[0], $xpath);
     }
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyPaid()
     {
         $email = self::generateEmail('testUserUnpaidPolicyPaid', $this);
@@ -804,7 +855,6 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -813,7 +863,11 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(500);
     }
+     */
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyBacsMandatePending()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsMandatePending', $this);
@@ -842,13 +896,17 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Pending Direct Debit Setup', $crawler->html());
     }
+     */
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyBacsMandateInvalid()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsMandateInvalid', $this);
@@ -883,7 +941,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -898,13 +956,17 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
         $this->assertContains('Invalid Direct Debit', $crawler->html());
     }
+     */
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyBacsPaymentPending()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentPending', $this);
@@ -933,13 +995,17 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
         $this->assertContains('Payment is processing', $crawler->html());
     }
+     */
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyBacsPaymentFailed()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentFailed', $this);
@@ -973,7 +1039,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -986,13 +1052,14 @@ class UserControllerTest extends BaseControllerTest
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var Policy $updatedPolicy */
+        /*
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_FAILED, $updatedPolicy->getUnpaidReason());
         $this->logout();
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1016,7 +1083,11 @@ class UserControllerTest extends BaseControllerTest
             $this->assertNotNull($scheduledPayment->getIdentityLog()->getIp());
         }
     }
+    */
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyBacsPaymentMissing()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsPaymentMissing', $this);
@@ -1050,7 +1121,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1063,6 +1134,7 @@ class UserControllerTest extends BaseControllerTest
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var Policy $updatedPolicy */
+        /*
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
@@ -1074,7 +1146,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -1089,11 +1161,16 @@ class UserControllerTest extends BaseControllerTest
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var Policy $updatedPolicy */
+        /*
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
     }
+     */
 
+    /**
+     * @group bacs
+     *
     public function testUserUnpaidPolicyBacsPendingNoPaymentDetailsUpdate()
     {
         $email = self::generateEmail('testUserUnpaidPolicyBacsPendingNoPaymentDetailsUpdate', $this);
@@ -1127,7 +1204,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, true);
+        $this->validateCheckoutForm($crawler, true);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1140,6 +1217,7 @@ class UserControllerTest extends BaseControllerTest
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var Policy $updatedPolicy */
+        /*
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_MISSING, $updatedPolicy->getUnpaidReason());
@@ -1151,7 +1229,7 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = $this->login($email, $password, 'user/unpaid');
 
-        $this->validateJudoForm($crawler, false);
+        $this->validateCheckoutForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, true);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, true);
@@ -1163,9 +1241,11 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->followRedirect();
 
         /** @var Policy $updatedPolicy */
+        /*
         $dm = $this->getDocumentManager(true);
         $repo = $dm->getRepository(Policy::class);
         /** @var Policy $updatedPolicy */
+        /*
         $updatedPolicy = $repo->find($policy->getId());
         $this->assertEquals(Policy::UNPAID_BACS_PAYMENT_PENDING, $updatedPolicy->getUnpaidReason());
 
@@ -1181,43 +1261,12 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/payment-details');
         $this->assertNotContains('Change to Credit/Debit Card', $crawler->html());
     }
+     */
 
-    public function testUserUnpaidPolicyJudoPaymentMissingNoBacsLink()
-    {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentMissingNoBacsLink', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $oneMonthAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
-        self::setPaymentMethodForPolicy($policy);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, $twoMonthsAgo);
-        static::$policyService->setEnvironment('test');
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        self::$dm->flush();
-
-        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_MISSING, $policy->getUnpaidReason());
-        $this->assertFalse($policy->getUser()->hasActivePolicy());
-
-        $crawler = $this->login($email, $password, 'user/unpaid');
-
-        $this->validateJudoForm($crawler, true);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Unpaid Policy', $crawler->html());
-    }
-
+    /**
+     * @group bacs
+     * @group checkout
+     *
     public function testUserUnpaidPolicyCheckoutPaymentMissingNoBacsLink()
     {
         $email = self::generateEmail('testUserUnpaidPolicyCheckoutPaymentMissingNoBacsLink', $this);
@@ -1250,7 +1299,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1276,92 +1324,12 @@ class UserControllerTest extends BaseControllerTest
          $this->expectFlashSuccess($crawler, 'successfully completed');
          $this->assertContains('paid up to date', $crawler->html());
     }
+     */
 
-    public function testUserUnpaidPolicyJudoPaymentMissingBacsLink()
-    {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentMissingBacsLink', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
-        self::setPaymentMethodForPolicy($policy);
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        self::$dm->flush();
-
-        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_MISSING, $policy->getUnpaidReason());
-        $this->assertFalse($policy->getUser()->hasActivePolicy());
-
-        // bacs feature flag conditions
-        $this->assertFalse(count($policy->getUser()->getValidPolicies(true)) > 1);
-        $this->assertTrue($policy->getPremiumPlan() == Policy::PLAN_MONTHLY);
-        /** @var FeatureService $featureService */
-        $featureService = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
-
-        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
-
-        $crawler = $this->login($email, $password, 'user/unpaid');
-
-        $this->validateJudoForm($crawler, true);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, true);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Unpaid Policy', $crawler->html());
-    }
-
-    public function testUserUnpaidPolicyJudoPaymentFailedNoBacsLink()
-    {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentFailedNoBacsLink', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $oneMonthAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
-        self::setPaymentMethodForPolicy($policy);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, $twoMonthsAgo);
-        static::$policyService->setEnvironment('test');
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        static::addPayment(
-            $policy,
-            $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
-            null,
-            $oneMonthAgo,
-            JudoPayment::RESULT_DECLINED
-        );
-        self::$dm->flush();
-
-        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
-        $this->assertFalse($policy->getUser()->hasActivePolicy());
-        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
-
-        $crawler = $this->login($email, $password, 'user/unpaid');
-
-        $this->validateJudoForm($crawler, true);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Unpaid Policy', $crawler->html());
-    }
-
+    /**
+     * @group bacs
+     * @group checkout
+     *
     public function testUserUnpaidPolicyCheckoutPaymentFailedNoBacsLink()
     {
         $email = self::generateEmail('testUserUnpaidPolicyCheckoutPaymentFailedNoBacsLink', $this);
@@ -1403,7 +1371,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1429,95 +1396,12 @@ class UserControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'successfully completed');
         $this->assertContains('paid up to date', $crawler->html());
     }
+     */
 
-    public function testUserUnpaidPolicyJudoPaymentFailedBacsLink()
-    {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoPaymentFailedBacsLink', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $oneMonthAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
-        self::setPaymentMethodForPolicy($policy);
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        static::addPayment(
-            $policy,
-            $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
-            null,
-            $oneMonthAgo,
-            JudoPayment::RESULT_DECLINED
-        );
-        self::$dm->flush();
-
-        $this->assertEquals(Policy::UNPAID_CARD_PAYMENT_FAILED, $policy->getUnpaidReason());
-        $this->assertFalse($policy->getUser()->hasActivePolicy());
-
-        // bacs feature flag conditions
-        $this->assertFalse(count($policy->getUser()->getValidPolicies(true)) > 1);
-        $this->assertTrue($policy->getPremiumPlan() == Policy::PLAN_MONTHLY);
-        /** @var FeatureService $featureService */
-        $featureService = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
-
-        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
-
-        $crawler = $this->login($email, $password, 'user/unpaid');
-
-        $this->validateJudoForm($crawler, true);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, true);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Unpaid Policy', $crawler->html());
-    }
-
-    public function testUserUnpaidPolicyJudoCardExpiredNoBacsLink()
-    {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoCardExpiredNoBacsLink', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $oneMonthAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthAgo = $oneMonthAgo->sub(new \DateInterval('P1M'));
-        $twoMonthsAgo = \DateTime::createFromFormat('U', time());
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $twoMonthsAgo, true, false);
-
-        self::setPaymentMethodForPolicy($policy, '0101');
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, $twoMonthsAgo);
-        static::$policyService->setEnvironment('test');
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        self::$dm->flush();
-
-        $this->assertEquals(Policy::UNPAID_CARD_EXPIRED, $policy->getUnpaidReason());
-        $this->assertFalse($policy->getUser()->hasActivePolicy());
-        $this->assertFalse($policy->canBacsPaymentBeMadeInTime());
-
-        $crawler = $this->login($email, $password, 'user/unpaid');
-
-        $this->validateJudoForm($crawler, true);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, false);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Card Expired', $crawler->html());
-    }
-
+    /**
+     * @group bacs
+     * @group checkout
+     *
     public function testUserUnpaidPolicyCheckoutCardExpiredNoBacsLink()
     {
         $email = self::generateEmail('testUserUnpaidPolicyCheckoutCardExpiredNoBacsLink', $this);
@@ -1552,7 +1436,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, false);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1578,54 +1461,12 @@ class UserControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'successfully completed');
         $this->assertContains('paid up to date', $crawler->html());
     }
+     */
 
-    public function testUserUnpaidPolicyJudoCardExpiredBacsLink()
-    {
-        $email = self::generateEmail('testUserUnpaidPolicyJudoCardExpiredBacsLink', $this);
-        $password = 'foo';
-        $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $oneMonthTwoWeeksAgo = \DateTime::createFromFormat('U', time());
-        $oneMonthTwoWeeksAgo = $oneMonthTwoWeeksAgo->sub(new \DateInterval('P40D'));
-        $policy = self::initPolicy($user, self::$dm, $phone, $oneMonthTwoWeeksAgo, true, true);
-        self::setPaymentMethodForPolicy($policy, '0101');
-        $policy->setStatus(Policy::STATUS_UNPAID);
-        self::$dm->flush();
-
-        $this->assertEquals(Policy::UNPAID_CARD_EXPIRED, $policy->getUnpaidReason());
-        $this->assertFalse($policy->getUser()->hasActivePolicy());
-
-        // bacs feature flag conditions
-        $this->assertFalse(count($policy->getUser()->getValidPolicies(true)) > 1);
-        $this->assertTrue($policy->getPremiumPlan() == Policy::PLAN_MONTHLY);
-        /** @var FeatureService $featureService */
-        $featureService = $this->getContainer(true)->get('app.feature');
-        $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
-
-        $this->assertTrue($policy->canBacsPaymentBeMadeInTime());
-
-        $crawler = $this->login($email, $password, 'user/unpaid');
-
-        /*
-        print $crawler->html();
-        print $policy->getPolicyExpirationDate()->format(\DateTime::ATOM) . PHP_EOL;
-        print $policy->getOutstandingPremiumToDate() . PHP_EOL;
-        print $policy->getTotalSuccessfulPayments() . PHP_EOL;
-        */
-
-        $this->validateJudoForm($crawler, true);
-        $this->validateUnpaidRescheduleBacsForm($crawler, false);
-        $this->validateUnpaidBacsSetupLink($crawler, true);
-        $this->validateUnpaidBacsUpdateLink($crawler, false);
-        $this->assertContains('Card Expired', $crawler->html());
-    }
-
+    /**
+     * @group bacs
+     * @group checkout
+     *
     public function testUserUnpaidPolicyCheckoutCardExpiredBacsLink()
     {
         $email = self::generateEmail('testUserUnpaidPolicyCheckoutCardExpiredBacsLink', $this);
@@ -1652,6 +1493,7 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse(count($policy->getUser()->getValidPolicies(true)) > 1);
         $this->assertTrue($policy->getPremiumPlan() == Policy::PLAN_MONTHLY);
         /** @var FeatureService $featureService */
+        /*
         $featureService = $this->getContainer(true)->get('app.feature');
         $this->assertTrue($featureService->isEnabled(Feature::FEATURE_BACS));
 
@@ -1662,7 +1504,6 @@ class UserControllerTest extends BaseControllerTest
         $crawler = $this->login($email, $password, 'user/unpaid');
 
         $this->validateCheckoutForm($crawler, true);
-        $this->validateJudoForm($crawler, false);
         $this->validateUnpaidRescheduleBacsForm($crawler, false);
         $this->validateUnpaidBacsSetupLink($crawler, true);
         $this->validateUnpaidBacsUpdateLink($crawler, false);
@@ -1688,7 +1529,11 @@ class UserControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'successfully completed');
         $this->assertContains('paid up to date', $crawler->html());
     }
+     */
 
+    /**
+     * @group general
+     */
     public function testUserUnpaidPolicyPaymentDetails()
     {
         $this->logout();
@@ -1702,10 +1547,9 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy = self::initPolicy($user, self::$dm, $phone, new \DateTime("-2 month"), true, true);
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
-        //print_r($policy->getClaimsWarnings());
         $this->assertFalse($policy->getUser()->hasActivePolicy());
         $this->login($email, $password, 'user/unpaid', '/user/payment-details');
 
@@ -1721,6 +1565,7 @@ class UserControllerTest extends BaseControllerTest
     /**
      * Tests to make sure that when a user pays their policy up to date with a manual web payment, it automatically
      * cancels any rescheduled scheduled payments that were trying to take out this amount.
+     * @group checkout
      */
     public function testUserUnpaidRescheduledPaymentScheduled()
     {
@@ -1789,8 +1634,8 @@ class UserControllerTest extends BaseControllerTest
         ]);
         $data = self::verifyResponse(200);
         $crawler = self::$client->request('GET', '/user/unpaid');
+        $crawler = self::$client->followRedirect();
         $this->expectFlashSuccess($crawler, 'successfully completed');
-        $this->assertContains('paid up to date', $crawler->html());
         self::$dm->flush();
         self::$dm->clear();
         // check that the scheduled payment has been cancelled.
@@ -1799,7 +1644,7 @@ class UserControllerTest extends BaseControllerTest
         /** @var ScheduledPayment */
         $cancelledPayment = $scheduledPaymentRepo->find($rescheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $cancelledPayment->getStatus());
-        $this->assertEquals("cancelled as web payment made.", $cancelledPayment->getNotes());
+        $this->assertEquals(". Cancelled rescheduled payment as web payment made", $cancelledPayment->getNotes());
         /** @var ScheduledPayment */
         $scheduledPayment = $scheduledPaymentRepo->find($scheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
@@ -1808,6 +1653,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(ScheduledPayment::STATUS_SCHEDULED, $scheduledPayment->getStatus());
     }
 
+    /**
+     * @group general
+     */
     public function testUserInvalidPolicy()
     {
         $email = self::generateEmail('testUserInvalid', $this);
@@ -1827,6 +1675,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    /**
+     * @group checkout
+     */
     public function testUserPolicyCancelledAndPaymentOwed()
     {
         $email = self::generateEmail('testUserPolicyCancelledAndPaymentOwed', $this);
@@ -1848,11 +1699,13 @@ class UserControllerTest extends BaseControllerTest
         self::$dm->flush();
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->isCancelledAndPaymentOwed());
-        $crawler = $this->login($email, $password, sprintf('purchase/remainder/%s', $policy->getId()));
-        $this->validateJudoForm($crawler, true);
-        $this->validateCheckoutForm($crawler, false);
+        $crawler = $this->login($email, $password, sprintf('user/remainder/%s', $policy->getId()));
+        $this->validateCheckoutForm($crawler, true);
     }
 
+    /**
+     * @group checkout
+     */
     public function testUserPolicyCancelledAndPaymentOwedCheckout()
     {
         $email = self::generateEmail('testUserPolicyCancelledAndPaymentOwedCheckout', $this);
@@ -1877,10 +1730,9 @@ class UserControllerTest extends BaseControllerTest
 
         self::$featureService->setEnabled(Feature::FEATURE_CHECKOUT, true);
 
-        $remainderPath = sprintf('purchase/remainder/%s', $policy->getId());
+        $remainderPath = sprintf('user/remainder/%s', $policy->getId());
         $crawler = $this->login($email, $password, $remainderPath);
 
-        $this->validateJudoForm($crawler, false);
         $this->validateCheckoutForm($crawler, true);
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
@@ -1904,6 +1756,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertContains('fully paid', $crawler->html());
     }
 
+    /**
+     * @group general
+     */
     public function testUserAccessDenied()
     {
         $emailA = self::generateEmail('testUserAccessDenied-A', $this);
@@ -1944,20 +1799,16 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(403);
     }
 
+    /**
+     * @group renewal
+     */
     public function testUserRenewSimple()
     {
         $email = self::generateEmail('testUserRenewSimple', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
-        $user = self::createUser(
-            self::$userManager,
-            $email,
-            $password,
-            $phone,
-            self::$dm
-        );
-        $date = \DateTime::createFromFormat('U', time());
-        $date = $date->sub(new \DateInterval('P350D'));
+        $user = self::createUser(self::$userManager, $email, $password, $phone, self::$dm);
+        $date = new \DateTime("-350 day");
         $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         static::$dm->flush();
@@ -1987,6 +1838,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicy->getStatus());
     }
 
+    /**
+     * @group renewal
+     */
     public function testUserRenewCustomMonthly()
     {
         $email = self::generateEmail('testUserRenewCustomMonthly', $this);
@@ -2030,6 +1884,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicy->getStatus());
     }
 
+    /**
+     * @group renewal
+     */
     public function testUserRenewCustomMonthlyDecline()
     {
         $email = self::generateEmail('testUserRenewCustomMonthlyDecline', $this);
@@ -2074,6 +1931,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertNull($updatedRenewalPolicy->getPreviousPolicy()->getCashback());
     }
 
+    /**
+     * @group renewal
+     */
     public function testUserRenewCashbackCustomMonthly()
     {
         $emailA = self::generateEmail('testUserRenewCashbackCustomMonthlyA', $this);
@@ -2141,6 +2001,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
     }
 
+    /**
+     * @group renewal
+     */
     public function testUserRenewCashbackCustomDeclined()
     {
         $emailA = self::generateEmail('testUserRenewCashbackCustomDeclinedA', $this);
@@ -2205,6 +2068,9 @@ class UserControllerTest extends BaseControllerTest
         $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
     }
 
+    /**
+     * @group general
+     */
     public function testUserFormRateLimit()
     {
         $this->clearRateLimit();
@@ -2244,6 +2110,9 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email, 'bar', 'login', null, 503);
     }
 
+    /**
+     * @group general
+     */
     public function testUserWelcomePage()
     {
         $email = self::generateEmail('testUserWelcomePage', $this);
@@ -2284,6 +2153,9 @@ class UserControllerTest extends BaseControllerTest
         );
     }
 
+    /**
+     * @group general
+     */
     public function testUserWelcomePageMultiPolicyShowLatest()
     {
         $email = self::generateEmail('testUserWelcomePageMultiPolicyShowLatest', $this);
@@ -2371,6 +2243,9 @@ class UserControllerTest extends BaseControllerTest
 
     }
 
+    /**
+     * @group general
+     */
     public function testUserWelcomePageNotOwnedPolicy()
     {
         $email = self::generateEmail('testUserWelcomePageNotOwnedPolicy1', $this);
@@ -2412,6 +2287,9 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(403);
     }
 
+    /**
+     * @group general
+     */
     public function testUserWelcomePageInvalidPolicy()
     {
         $email = self::generateEmail('testUserWelcomePageInvalidPolicy', $this);
@@ -3139,18 +3017,91 @@ class UserControllerTest extends BaseControllerTest
         $this->updateDamageForm($policy, $now, false, false, false, 1);
     }
 
+    /**
+     * Tests to make sure that you can request cancellation of your policy, and that in cooloff it will automatically
+     * action it.
+     * @group general
+     */
+    public function testCancelPolicy()
+    {
+        $userA = $this->createUser(self::$userManager, "a@gmail.com", "foo", null, self::$dm);
+        $userB = $this->createUser(self::$userManager, "b@gmail.com", "foo", null, self::$dm);
+        $userC = $this->createUser(self::$userManager, "c@gmail.com", "foo", null, self::$dm);
+        $phoneA = self::getRandomPhone(self::$dm);
+        $phoneB = self::getRandomPhone(self::$dm);
+        $phoneC = self::getRandomPhone(self::$dm);
+        $a = self::initPolicy($userA, self::$dm, $phoneA, new \DateTime("-5 months"), true, true);
+        $b = self::initPolicy($userB, self::$dm, $phoneB, new \DateTime("-1 weeks"), true, true);
+        $c = self::initPolicy($userC, self::$dm, $phoneC, new \DateTime("-1 weeks"), true, true);
+        $a->setStatus(Policy::STATUS_ACTIVE);
+        $b->setStatus(Policy::STATUS_ACTIVE);
+        $c->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->persist($a);
+        self::$dm->persist($b);
+        self::$dm->persist($c);
+        self::$dm->flush();
+        // Normal cancellation request.
+        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_EXISTING);
+        $this->expectFlashSuccess($crawler, "We have passed your request to our policy team.");
+        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
+        // Cooloff cancellation.
+        $crawler = $this->cancelForm($b, Policy::COOLOFF_REASON_PICSURE);
+        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
+        $this->assertEquals(Policy::COOLOFF_REASON_PICSURE, $b->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $b->getStatus());
+        $this->assertEquals(Policy::CANCELLED_COOLOFF, $b->getCancelledReason());
+        // Cooloff cancellation with custom reason.
+        $crawler = $this->cancelForm($c, Policy::COOLOFF_REASON_UNKNOWN, "my phone is cursed.");
+        $this->expectFlashSuccess($crawler, "You should receive an email confirming that your policy is now cancelled");
+        $this->assertEquals(Policy::COOLOFF_REASON_UNKNOWN, $c->getRequestedCancellationReason());
+        $this->assertEquals("my phone is cursed.", $c->getRequestedCancellationReasonOther());
+        $this->assertEquals(Policy::STATUS_CANCELLED, $c->getStatus());
+        $this->assertEquals(Policy::CANCELLED_COOLOFF, $c->getCancelledReason());
+        // Duplicate cancellation.
+        $crawler = $this->cancelForm($a, Policy::COOLOFF_REASON_DAMAGED);
+        $this->expectFlashWarning($crawler, "Cancellation has already been requested and is currently processing.");
+        $this->assertEquals(Policy::COOLOFF_REASON_EXISTING, $a->getRequestedCancellationReason());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $a->getStatus());
+    }
+
+    /**
+     * logs in opens the cancellation form and submits it with given parameters.
+     * @param Policy $policy is the policy that we are logging in for.
+     * @param string $reason is the reason under Policy::COOLOFF_REASON_*.
+     * @param string $other  is the explanation text if reason other is chosen.
+     * @return Crawler the web crawler for the page coming after cancellation occurs.
+     */
+    private function cancelForm($policy, $reason, $other = null)
+    {
+        $user = $policy->getUser();
+        $crawler = $this->login($user->getEmail(), 'foo');
+        $crawler = self::$client->request('GET', '/user/cancel/'.$policy->getId());
+        $form = $crawler->selectButton('cancel_form[cancel]')->form();
+        $form['cancel_form[reason]'] = $reason;
+        if ($other) {
+            $form['cancel_form[othertxt]'] = $other;
+        }
+        self::$client->submit($form);
+        self::$dm->refresh($policy);
+        $this->verifyResponse(302);
+        $crawler = self::$client->followRedirect();
+        $this->verifyResponse(200);
+        return $crawler;
+    }
+
     private function createClaim(Policy $policy, $type, \DateTime $date, $status = Claim::STATUS_FNOL)
     {
         $claim = new Claim();
         $claim->setIncidentDate($date);
         $claim->setIncidentTime('2 am');
-        $claim->setLocation('so-sure offices');
+        $claim->setLocation('camel farm');
         $claim->setTimeToReach('2 pm');
         $claim->setPhoneToReach(self::generateRandomMobile());
         $claim->setSignature('foo bar');
         $claim->setType($type);
         $claim->setNetwork(Claim::NETWORK_O2);
-        $claim->setDescription('bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla');
+        $claim->setDescription('I put my camera inside the mouth of the camel and then uhh... camera attach to phone');
         $claim->setStatus($status);
         $claim->setPolicy($policy);
         $policy->addClaim($claim);
