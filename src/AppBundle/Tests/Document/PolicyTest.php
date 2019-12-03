@@ -245,8 +245,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         }
         // make sure the date is indeed 30 days after the missing payment.
         $this->assertEquals(
-            $this->startOfDay((clone $date)->add(new \DateInterval("P3M30D"))),
-            $this->startOfDay($policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M"))))
+            (clone $date)->add(new \DateInterval("P3M30D"))->format("YMd"),
+            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))->format("YMd")
         );
         // Add a refund and it should be a month sooner.
         $refund = new CheckoutPayment();
@@ -254,8 +254,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $refund->setSuccess(true);
         $policy->addPayment($refund);
         $this->assertEquals(
-            $this->startOfDay((clone $date)->add(new \DateInterval("P2M30D"))),
-            $this->startOfDay($policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M"))))
+            (clone $date)->add(new \DateInterval("P2M30D"))->format("YMd"),
+            $policy->getPolicyExpirationDate((clone $date)->add(new \DateInterval("P3M")))->format("YMd")
         );
     }
 
