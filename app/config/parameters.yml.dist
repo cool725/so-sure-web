@@ -78,10 +78,10 @@ parameters:
     judopay_websecret:
     judopay_id:
 
-    checkout_old_apisecret:
-    checkout_old_apipublic:
-    checkout_new_apisecret:
-    checkout_new_apipublic:
+    checkout_salva_apisecret:
+    checkout_salva_apipublic:
+    checkout_helvetia_apisecret:
+    checkout_helvetia_apipublic:
 
     mongodb_db: so-sure
     mongodb_url: mongodb://root:root@localhost

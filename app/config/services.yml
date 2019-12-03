@@ -132,10 +132,10 @@ services:
             - "@logger"
             - "@app.policy"
             - "@app.mailer"
-            - "%checkout_old_apisecret%"
-            - "%checkout_old_apipublic%"
-            - "%checkout_new_apisecret%"
-            - "%checkout_new_apipublic%"
+            - "%checkout_salva_apisecret%"
+            - "%checkout_salva_apipublic%"
+            - "%checkout_helvetia_apisecret%"
+            - "%checkout_helvetia_apipublic%"
             - "%kernel.environment%"
             - "@statsd"
             - "@event_dispatcher"
@@ -533,8 +533,8 @@ services:
         class: AppBundle\Service\PolicyTwigExtension
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
-            - "%checkout_old_apipublic%"
-            - "%checkout_new_apipublic%"
+            - "%checkout_salva_apipublic%"
+            - "%checkout_helvetia_apipublic%"
         public: false
         tags:
             - { name: twig.extension }
