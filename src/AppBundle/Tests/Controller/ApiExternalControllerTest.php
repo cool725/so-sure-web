@@ -782,6 +782,68 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $this->assertEquals(new \DateTime('2018-01-01'), $updatedUser->getBirthday());
     }
 
+    public function testGoCompareDeeplinkWithGoCompareReferenceId()
+    {
+        $email = static::generateEmail('testGoCompareDeeplink', $this);
+        $userRepo = static::$dm->getRepository(User::class);
+        $phoneRepo = static::$dm->getRepository(Phone::class);
+        $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNull($user);
+
+        $url = sprintf(
+            '/external/gocompare/deeplink?aggregator=true'
+        );
+
+        $goCompare = new GoCompare();
+        $data  = [
+            'first_name' => 'foo',
+            'surname' => 'bar',
+            'email_address' => $email,
+            'dob' => '2018-01-01',
+            'reference' => array_keys($goCompare::$models)[2],
+            'aggragator' => 'true'
+        ];
+
+        /** @var Phone $phone */
+        $phone = $phoneRepo->findOneBy([
+            'active' => true,
+            'makeCanonical' => mb_strtolower($goCompare::$models[
+                array_keys($goCompare::$models)[2]]['make']),
+            'modelCanonical' => mb_strtolower($goCompare::$models[
+                array_keys($goCompare::$models)[2]]['model']),
+            'memory' => (int) $goCompare::$models[
+                array_keys($goCompare::$models)[2]]['memory']
+        ]);
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            $data
+        );
+
+        $data = $this->verifyResponse(
+            302,
+            null,
+            null,
+            sprintf("%s %s", $phone->__toString(), $phone->getId())
+        );
+        $redirectUrl = self::$router->generate('quote_phone', [
+            'id' => $phone->getId(),
+            'aggregator' => 'true'
+        ]);
+        $this->assertTrue($this->isClientResponseRedirect($redirectUrl));
+
+        $dm = $this->getDocumentManager(true);
+        $userRepo = $dm->getRepository(User::class);
+        /** @var User $updatedUser */
+        $updatedUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $this->assertNotNull($updatedUser);
+
+        $this->assertEquals('foo', $updatedUser->getFirstName());
+        $this->assertEquals('bar', $updatedUser->getLastName());
+        $this->assertEquals(new \DateTime('2018-01-01'), $updatedUser->getBirthday());
+    }
+
     private function getDpaAppSignature($data)
     {
         return hash_hmac('sha256', json_encode($data), self::$container->getParameter('intercom_dpa_app_secret'));
