@@ -540,7 +540,8 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneCheckoutFailed', $this),
-            'foo', 'bar',
+            'foo',
+            'bar',
             new \DateTime('1980-01-01')
         );
         self::verifyResponse(302);
