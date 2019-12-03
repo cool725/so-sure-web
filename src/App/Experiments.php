@@ -7,7 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        SixpackService::EXPERIMENT_PRICING_USP, ['current-usps', 'pricing-usps'],
+        SixpackService::EXPERIMENT_HOMEPAGE_TABS_AND_USP, ['standard', 'standard-usp', 'tabbed', 'tabbed-usp'],
     ];
 
     private static $authExperiments = [];

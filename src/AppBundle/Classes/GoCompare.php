@@ -70,6 +70,7 @@ class GoCompare
         1463 => ['make' => 'Samsung', 'model' => 'Galaxy A6', 'memory' => 32],
         1479 => ['make' => 'Samsung', 'model' => 'Galaxy A7 (2018)', 'memory' => 64],
         1480 => ['make' => 'Samsung', 'model' => 'Galaxy A9 (2018)', 'memory' => 128],
+        1533 => ['make' => 'Samsung', 'model' => 'Galaxy S10', 'memory' => 128],
         1628 => ['make' => 'Samsung', 'model' => 'Galaxy 50', 'memory' => 64],
         1629 => ['make' => 'Samsung', 'model' => 'Galaxy 50', 'memory' => 128],
         1699 => ['make' => 'Samsung', 'model' => 'Galaxy Note 10', 'memory' => 256],

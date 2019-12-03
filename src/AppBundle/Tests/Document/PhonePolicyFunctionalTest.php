@@ -31,6 +31,8 @@ use AppBundle\Document\CurrencyTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Tests\UserClassTrait;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\File\ImeiFile;
+use AppBundle\Document\File\PicSureFile;
 
 /**
  * @group functional-nonet
@@ -345,6 +347,39 @@ class PhonePolicyFunctionalTest extends WebTestCase
                 $policy->getPicSureStatusWithClaims()
             );
         }
+    }
+
+    public function testPicSureStatusNotStartedRemovesPicSureFiles()
+    {
+        $imei = new ImeiFile();
+        $imei->setBucket("testbucket");
+        $imei->setKey("imei.png");
+
+        $picsure = new PicSureFile();
+        $picsure->setBucket("testbucket");
+        $picsure->setKey("picsure.png");
+
+        $policy = static::createUserPolicy(true);
+        $policy->addPolicyFile($imei);
+        $policy->addPolicyFile($picsure);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $files = $policy->getPolicyFiles();
+        $this->assertEquals(2, count($files));
+        $this->assertEquals("ImeiFile", $files[0]->getFileType());
+        $this->assertEquals("PicSureFile", $files[1]->getFileType());
+
+        $policy->setPicSureStatus("");
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $files = $policy->getPolicyFiles();
+        $this->assertEquals(1, count($files));
+        $this->assertEquals("ImeiFile", $files[0]->getFileType());
     }
 
     public function testEmptyPolicyReturnsCorrectApiData()

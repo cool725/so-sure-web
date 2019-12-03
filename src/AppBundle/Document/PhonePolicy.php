@@ -803,6 +803,14 @@ class PhonePolicy extends Policy
     public function setPicSureStatus($picSureStatus, User $user = null)
     {
         $this->picSureStatus = $picSureStatus;
+
+        if ($picSureStatus == "") {
+            // remove pic-sure files when changing pic-sure to 'Not started'
+            foreach ($this->getPolicyPicSureFiles() as $file) {
+                $this->removePolicyFile($file);
+            }
+        }
+
         if ($picSureStatus == self::PICSURE_STATUS_APPROVED) {
             if (!$this->getPicSureApprovedDate()) {
                 $this->setPicSureApprovedDate(\DateTime::createFromFormat('U', time()));
@@ -812,7 +820,7 @@ class PhonePolicy extends Policy
             }
         }
 
-        $picsureFiles = $this->getPolicyFilesByType(PicSureFile::class);
+        $picsureFiles = $this->getPolicyPicSureFiles();
         if (count($picsureFiles) > 0) {
             $picsureFiles[0]->addMetadata('picsure-status', $picSureStatus);
             $now = \DateTime::createFromFormat('U', time());

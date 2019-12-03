@@ -25,14 +25,6 @@
             <div class="navbar-brand__logo"></div>
             <span class="sr-only">so-sure</span>
         </a>
-    {% elseif funnel_mode is defined and funnel_mode == true %}
-        <div class="container-large d-flex justify-content-between align-items-center">
-            {# Logo #}
-            <a href="/" class="navbar-brand show-in-nav show-in-quote">
-                <div class="navbar-brand__logo"></div>
-                <span class="sr-only">so-sure</span>
-            </a>
-        </div>
     {% elseif instore_mode is defined and instore_mode == true %}
         <div class="container-large d-flex justify-content-between align-items-center">
             {# Logo #}
@@ -48,6 +40,15 @@
             <span class="sr-only">so-sure</span>
         </a>
         {% include '::navigation/onboarding.html.twig' %}
+    {% elseif share_mode is defined and share_mode == true %}
+        <div class="container-large d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="/" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+            {% include '::navigation/share.html.twig' %}
+        </div>
     {% else %}
         <div class="container-large d-flex justify-content-between align-items-center">
             {# Logo #}
@@ -216,10 +217,10 @@
                                         </a>
                                     {% endif %}
                                 {% else %}
-                                    <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                                    <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-outline-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
                                 {% endif %}
                             {% else %}
-                                <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
+                                <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-outline-white get-a-quote disabled btn-shadow btn-swap">Get a Quote</a>
                             {% endif %}
                         </li>
                     {% endif %}
@@ -272,7 +273,7 @@
                             {% endif %}
                         {% else %}
                                 <a href="{{ path('fos_user_security_login') }}"
-                                   class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+                                   class="nav-link user-link">Customer login <i class="far fa-arrow-right fa-fw"></i></a>
                         {% endif %}
                     </li>
                 {% endif %}

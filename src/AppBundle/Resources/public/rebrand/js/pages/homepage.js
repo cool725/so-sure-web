@@ -6,6 +6,7 @@ require('../../sass/pages/homepage.scss');
 require('bootstrap/js/dist/carousel');
 require('bootstrap/js/dist/toast');
 require('bootstrap/js/dist/util');
+require('bootstrap/js/dist/tab');
 
 // Require components
 require('../components/banner.js');
