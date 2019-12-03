@@ -1648,6 +1648,17 @@ abstract class Policy
         return $connections;
     }
 
+    public function getNonRewardConnections()
+    {
+        $connections = [];
+        foreach ($this->getConnections() as $connection) {
+            if (!($connection instanceof RewardConnection) || $connection->getLinkedUser()->getIsInfluencer()) {
+                $connections[] = $connection;
+            }
+        }
+        return $connections;
+    }
+
     public function isConnected(Policy $policy)
     {
         foreach ($this->getStandardConnections() as $connection) {
@@ -6395,7 +6406,7 @@ abstract class Policy
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             $data['connections'] = $this->eachApiArray($this->getRenewalConnections(), $this->getNetworkClaims());
         } else {
-            $data['connections'] = $this->eachApiArray($this->getConnections(), $this->getNetworkClaims());
+            $data['connections'] = $this->eachApiArray($this->getNonRewardConnections(), $this->getNetworkClaims());
         }
 
         return $data;
