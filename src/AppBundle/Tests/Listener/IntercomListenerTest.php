@@ -29,6 +29,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Connection\StandardConnection;
 
@@ -185,7 +186,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('intercom-queue-policy-pot', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -207,7 +208,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomQueuePolicyUnpaid', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -229,7 +230,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomQueuePolicyReactivated', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -251,7 +252,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('intercom-queue-created', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -272,7 +273,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('intercom-queue-cancelled', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -330,7 +331,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomInvitationReceived-A', $this),
             'bar'
         );
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setUser($userA);
         $policyA->setId(rand(1, 99999));
 
@@ -339,7 +340,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomInvitationReceived-B', $this),
             'bar'
         );
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $policyB->setUser($userB);
         $policyB->setId(rand(1, 99999));
 
@@ -378,7 +379,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomConnection-A', $this),
             'bar'
         );
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setUser($userA);
         $policyA->setId(rand(1, 99999));
 
@@ -387,7 +388,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomConnection-B', $this),
             'bar'
         );
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $policyB->setUser($userB);
         $policyB->setId(rand(1, 99999));
 
@@ -416,7 +417,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomQueuePaymentSuccess', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -449,7 +450,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomQueuePaymentFailed', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -482,7 +483,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomQueuePaymentFirstProblem', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -588,7 +589,7 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('testIntercomQueuePicSure', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $s3File = new PicSureFile();

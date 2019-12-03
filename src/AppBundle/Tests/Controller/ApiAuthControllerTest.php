@@ -20,6 +20,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -2725,6 +2726,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         /** @var CheckoutService $checkout */
         $checkout = $this->getContainer(true)->get('app.checkout');
         $token = $checkout->createCardToken(
+            $updatedPolicy,
             self::$CHECKOUT_TEST_CARD_NUM,
             self::$CHECKOUT_TEST_CARD_EXP,
             self::$CHECKOUT_TEST_CARD_PIN
@@ -3494,6 +3496,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         /** @var CheckoutService $checkout */
         $checkout = $this->getContainer(true)->get('app.checkout');
         $token = $checkout->createCardToken(
+            $updatedPolicy,
             self::$CHECKOUT_TEST_CARD_NUM,
             self::$CHECKOUT_TEST_CARD_EXP,
             self::$CHECKOUT_TEST_CARD_PIN
@@ -3515,6 +3518,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(self::$CHECKOUT_TEST_CARD_LAST_FOUR, $data['card_details']['last_four']);
 
         $token = $checkout->createCardToken(
+            $updatedPolicy,
             self::$CHECKOUT_TEST_CARD2_NUM,
             self::$CHECKOUT_TEST_CARD2_EXP,
             self::$CHECKOUT_TEST_CARD2_PIN
@@ -3536,6 +3540,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(self::$CHECKOUT_TEST_CARD2_LAST_FOUR, $data['card_details']['last_four']);
 
         $token = $checkout->createCardToken(
+            $updatedPolicy,
             self::$CHECKOUT_TEST_CARD_NUM,
             self::$CHECKOUT_TEST_CARD_EXP,
             self::$CHECKOUT_TEST_CARD_PIN
@@ -3942,6 +3947,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         /** @var CheckoutService $checkout */
         $checkout = $this->getContainer(true)->get('app.checkout');
         $token = $checkout->createCardToken(
+            $updatedPolicy,
             self::$CHECKOUT_TEST_CARD_NUM,
             self::$CHECKOUT_TEST_CARD_EXP,
             self::$CHECKOUT_TEST_CARD_PIN
@@ -6646,7 +6652,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_EXPIRED);
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPhone(static::$expiredPhone);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $user->addPolicy($policy);

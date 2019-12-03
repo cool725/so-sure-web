@@ -10,6 +10,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -60,7 +61,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2018-02-05'), $bacs->getBacsCreditDate());
         $this->assertEquals(new \DateTime('2018-02-08'), $bacs->getBacsReversedDate());
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(PhonePolicy::STATUS_UNPAID);
         $bacs = new BacsPayment();
         $bacs->setPolicy($policy);
@@ -112,7 +113,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacsPaymentMethod = new BacsPaymentMethod();
         $bacsPaymentMethod->setBankAccount($bankAccount);
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
 
         $bacs = new BacsPayment();
@@ -153,7 +154,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacs->submit(new \DateTime('2018-01-01'));
         $bacs->setStatus(BacsPayment::STATUS_SUCCESS);
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -177,7 +178,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacs->setScheduledPayment($scheduledPayment);
         $scheduledPayment->setPayment($bacs);
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -206,7 +207,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacs->submit(new \DateTime('2018-01-01'));
         $bacs->setStatus(BacsPayment::STATUS_FAILURE);
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -227,7 +228,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $premium = new PhonePremium();
         $premium->setGwp(100);
         $premium->setIpt(1);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(PhonePolicy::STATUS_UNPAID);
         $policy->setPremium($premium);
         $policy->setPremiumInstallments(12);
@@ -259,7 +260,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $bacsPaymentMethod = new BacsPaymentMethod();
         $bacsPaymentMethod->setBankAccount($bankAccount);
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
 
         $premium = new PhonePremium();

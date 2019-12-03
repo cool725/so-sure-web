@@ -6,6 +6,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\Connection;
 
@@ -181,7 +182,7 @@ class RewardTest extends \PHPUnit\Framework\TestCase
      */
     private function addPolicyToUser($user, $policyStart)
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStart($policyStart);
         $user->addPolicy($policy);
         return $policy;

@@ -8,6 +8,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 
 /**
@@ -46,7 +47,7 @@ class InvitationTest extends WebTestCase
     public function testInviteSetsReinvite()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
@@ -61,7 +62,7 @@ class InvitationTest extends WebTestCase
     public function testInviteCannotImmediatelyReinvite()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
@@ -73,7 +74,7 @@ class InvitationTest extends WebTestCase
     public function testReinvite()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
@@ -100,7 +101,7 @@ class InvitationTest extends WebTestCase
     public function testTooManyReinvite()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
@@ -116,7 +117,7 @@ class InvitationTest extends WebTestCase
     public function testReinviteCancelledPolicy()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $invitation = new EmailInvitation();
@@ -214,7 +215,7 @@ class InvitationTest extends WebTestCase
     {
         $userA = new User();
         $userA->setEmail('testNonDuplicateEmailA@InvitationTest.com');
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $userA->addPolicy($policyA);
 
         $invitationA = new EmailInvitation();
@@ -228,7 +229,7 @@ class InvitationTest extends WebTestCase
 
         $userB = new User();
         $userB->setEmail('testNonDuplicateEmailB@InvitationTest.com');
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $userB->addPolicy($policyB);
 
         $invitationB = new EmailInvitation();
@@ -255,7 +256,7 @@ class InvitationTest extends WebTestCase
     {
         $userA = new User();
         $userA->setEmail('testNonDuplicateSmsA@InvitationTest.com');
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $userA->addPolicy($policyA);
 
         $invitationA = new SmsInvitation();
@@ -268,7 +269,7 @@ class InvitationTest extends WebTestCase
 
         $userB = new User();
         $userB->setEmail('testNonDuplicateSmsB@InvitationTest.com');
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $userB->addPolicy($policyB);
 
         $invitationB = new SmsInvitation();

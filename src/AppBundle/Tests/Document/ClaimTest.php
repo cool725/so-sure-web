@@ -6,6 +6,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
@@ -52,7 +53,7 @@ class ClaimTest extends \PHPUnit\Framework\TestCase
     public function testNeedProofOfPurchase()
     {
         $claim = new Claim();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setExcess(PolicyTerms::getLowExcess());
         $premium->setPicSureExcess(PolicyTerms::getLowExcess());

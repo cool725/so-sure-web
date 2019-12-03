@@ -743,7 +743,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         $user = new User();
         $user->setEmail(static::generateEmail('testInitWithPremiumNonPicSure', $this));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPremium($premium);
         $policy->init($user, $terms);
         $this->assertTrue(true);
@@ -760,7 +760,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         $user = new User();
         $user->setEmail(static::generateEmail('testInitWithPremiumAllowed', $this));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPremium($premium);
         $policy->init($user, $terms);
         $this->assertTrue(true);
@@ -780,7 +780,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         $user = new User();
         $user->setEmail(static::generateEmail('testInitWithPremiumException', $this));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPremium($premium);
         $policy->init($user, $terms);
     }

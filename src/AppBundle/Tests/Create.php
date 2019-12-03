@@ -1,16 +1,19 @@
 <?php
 
-namespace AppBundle\Tests;
-
+namespace AppBundle\Tests; 
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\LogEntry;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
@@ -70,9 +73,9 @@ class Create
      */
     public static function policy($user, $start, $status, $installments)
     {
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
         $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = ($startDate < Salva::getSalvaBinderEndDate()) ? new SalvaPhonePolicy() : new HelvetiaPhonePolicy();
+        $policy->setUser($user);
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $premium = new PhonePremium();

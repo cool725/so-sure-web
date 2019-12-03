@@ -29,6 +29,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
 
 use AppBundle\Service\MixpanelService;
@@ -119,7 +120,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelQueuePaymentSuccess', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -157,7 +158,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelQueueCancelled', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -189,7 +190,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelQueueCashback', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -221,7 +222,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelQueueRenew', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -253,7 +254,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelQueueDeclineRenew', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
@@ -285,7 +286,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelOnPolicyStatusEvent', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -320,7 +321,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelOnCardUpdatedEventUser', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -355,7 +356,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelOnCardUpdatedEventPolicy', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -390,7 +391,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelOnBacsUpdatedEventUser', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -425,7 +426,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelOnBacsUpdatedEventPolicy', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -460,7 +461,7 @@ class MixpanelListenerTest extends WebTestCase
             static::generateEmail('testMixpanelOnPolicyPaymentMethodChangedEvent', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
         $policy->setStatus(Policy::STATUS_ACTIVE);

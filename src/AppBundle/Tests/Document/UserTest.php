@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -441,7 +442,7 @@ class UserTest extends WebTestCase
 
     public function testCanRenewPolicy()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user = new User();
         $user->setLocked(true);
         $this->assertFalse($user->canRenewPolicy($policy));
@@ -453,7 +454,7 @@ class UserTest extends WebTestCase
         $user->setEnabled(true);
         $this->assertTrue($user->canRenewPolicy($policy));
 
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $user = new User();
         $user->setLocked(false);
         $user->setEnabled(true);
@@ -463,7 +464,7 @@ class UserTest extends WebTestCase
         $policyB->setCancelledReason(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
         $this->assertFalse($user->canRenewPolicy($policyB));
 
-        $policyC = new PhonePolicy();
+        $policyC = new HelvetiaPhonePolicy();
         $user = new User();
         $user->setLocked(false);
         $user->setEnabled(true);
@@ -473,7 +474,7 @@ class UserTest extends WebTestCase
         $policyC->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
         $this->assertFalse($user->canRenewPolicy($policyC));
 
-        $policyD = new PhonePolicy();
+        $policyD = new HelvetiaPhonePolicy();
         $user = new User();
         $user->setLocked(false);
         $user->setEnabled(true);
@@ -483,7 +484,7 @@ class UserTest extends WebTestCase
         $policyD->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
         $this->assertTrue($user->canRenewPolicy($policyD));
 
-        $policyE = new PhonePolicy();
+        $policyE = new HelvetiaPhonePolicy();
         $user = new User();
         $user->setLocked(false);
         $user->setEnabled(true);
@@ -508,7 +509,7 @@ class UserTest extends WebTestCase
         $user = new User();
         $this->assertEquals(0, $user->getAvgPolicyClaims());
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
         $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
         $claim = new Claim();
@@ -517,14 +518,14 @@ class UserTest extends WebTestCase
         $user->addPolicy($policy);
         $this->assertEquals(0, $user->getAvgPolicyClaims());
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
         $user->addPolicy($policy);
         $this->assertEquals(1, $user->getAvgPolicyClaims());
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
@@ -541,12 +542,12 @@ class UserTest extends WebTestCase
         $premium->setGwp(5);
         $premium->setIpt(1);
         $userA = new User();
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setStatus(Policy::STATUS_ACTIVE);
         $policyA->setPremium($premium);
         $userA->addPolicy($policyA);
         $userB = new User();
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $policyB->setPremium($premium);
         $policyB->setStatus(Policy::STATUS_ACTIVE);
         $userB->addPolicy($policyB);
@@ -555,12 +556,12 @@ class UserTest extends WebTestCase
         $policyB->addClaim($claimB);
 
         $userC = new User();
-        $policyC1 = new PhonePolicy();
+        $policyC1 = new HelvetiaPhonePolicy();
         $policyC1->setId(rand(1, 9999999));
         $policyC1->setPremium($premium);
         $policyC1->setStatus(Policy::STATUS_ACTIVE);
         $userC->addPolicy($policyC1);
-        $policyC2 = new PhonePolicy();
+        $policyC2 = new HelvetiaPhonePolicy();
         $policyC2->setId(rand(1, 9999999));
         $policyC2->setPremium($premium);
         $policyC2->setStatus(Policy::STATUS_ACTIVE);
@@ -631,7 +632,7 @@ class UserTest extends WebTestCase
     public function testCanDeletePartialPolicy()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $this->assertTrue($user->canDelete());
     }
@@ -640,7 +641,7 @@ class UserTest extends WebTestCase
     {
         $user = new User();
         $user->setCreated(new \DateTime('2016-01-01'));
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd(new \DateTime('2017-01-01'));
         $user->addPolicy($policy);
@@ -715,7 +716,7 @@ class UserTest extends WebTestCase
     public function testShouldDeletePartialPolicy()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $user->setCreated(new \DateTime('2016-01-01'));
         $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
@@ -738,7 +739,7 @@ class UserTest extends WebTestCase
     {
         $user = new User();
         $user->setCreated(new \DateTime('2016-01-01'));
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd(new \DateTime('2017-01-01'));
         $user->addPolicy($policy);

@@ -34,6 +34,7 @@ use com\checkout\ApiServices\Reporting\RequestModels\TransactionFilter;
 use com\checkout\ApiServices\SharedModels\Address;
 use com\checkout\ApiServices\SharedModels\Transaction;
 use com\checkout\ApiServices\Tokens\RequestModels\PaymentTokenCreate;
+use com\checkout\ApiServices\Tokens\ResponseModels\CardToken;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -185,14 +186,13 @@ class CheckoutService
     }
 
     /**
-     * Gives the checkout client that should be used for payments regarding a given policy. If the policy has no
-     * appropriate client an exception will be thrown but that shouldn't be possible.
-     * @param Policy $policy is the policy that we are going to work on with the client.
-     * @return ApiClient the appropriate client.
+     * Gives the checkout client to the channel that should be used for payments regarding named underwriter.
+     * @param string $underwriter is the name of the underwriter that we are getting the checkout client for.
+     * @return ApiClient the client for the named underwriter. If none can be found then an illegal argument exception
+     *                   will be thrown.
      */
-    public function getClientForPolicy(Policy $policy)
+    public function getClientForUnderwriter($underwriter)
     {
-        $underwriter = $policy->getUnderwriterName();
         $apiSecret = null;
         if ($underwriter === Salva::NAME) {
             $apiSecret = $this->salvaApiSecret;
@@ -202,21 +202,17 @@ class CheckoutService
         if ($apiSecret) {
             return new ApiClient($apiSecret, $this->production ? 'live' : 'sandbox', !$this->production);
         }
-        throw new \InvalidArgumentException(sprintf(
-            'policy "%s" has no checkout client',
-            $policy->getId()
-        ));
+        throw new \InvalidArgumentException("{$underwriter} is not the name of a valid underwriter");
     }
 
     /**
-     * Gives the checkout api that should be used for payments regarding a given policy. If the policy has no
-     * appropriate api an exception will be thrown but that shouldn't be possible.
-     * @param Policy $policy is the policy that we are going to work on with the API.
-     * @return CheckoutApi the appropriate api.
+     * Gives the checkout api that should be used for payments regarding named underwriter.
+     * @param string $underwriter is the name of the underwriter that we are getting the checkout api for.
+     * @return CheckoutApi the correct api if there is one. An illegal argument exception will be thrown if there is
+     *                     not appropriate api.
      */
-    public function getApiForPolicy(Policy $policy)
+    public function getApiForUnderwriter($underwriter)
     {
-        $underwriter = $policy->getUnderwriterName();
         $apiSecret = null;
         $apiPublic = null;
         if ($underwriter === Salva::NAME) {
@@ -229,10 +225,28 @@ class CheckoutService
         if ($apiSecret && $apiPublic) {
             return new CheckoutApi($apiSecret, -1, $apiPublic);
         }
-        throw new \InvalidArgumentException(sprintf(
-            'policy "%s" has no checkout api',
-            $policy->getId()
-        ));
+        throw new \InvalidArgumentException("{$underwriter} is not the name of a valid underwriter");
+    }
+    /**
+     * Gives the checkout client that should be used for payments regarding a given policy. If the policy has no
+     * appropriate client an exception will be thrown but that shouldn't be possible.
+     * @param Policy $policy is the policy that we are going to work on with the client.
+     * @return ApiClient the appropriate client.
+     */
+    public function getClientForPolicy(Policy $policy)
+    {
+        return $this->getClientForUnderwriter($policy->getUnderwriterName());
+    }
+
+    /**
+     * Gives the checkout api that should be used for payments regarding a given policy. If the policy has no
+     * appropriate api an exception will be thrown but that shouldn't be possible.
+     * @param Policy $policy is the policy that we are going to work on with the API.
+     * @return CheckoutApi the appropriate api.
+     */
+    public function getApiForPolicy(Policy $policy)
+    {
+        return $this->getApiForUnderwriter($policy->getUnderwriterName());
     }
 
     /**
@@ -259,7 +273,7 @@ class CheckoutService
         $filter->setPageSize($pageSize);
         //$filter->setSearch()
 
-        $client = new ApiClient($this->helvetiaApiSecret, $this->production ? 'live' : 'sandbox', !$this->production);
+        $client = $this->getClientForUnderwriter(Helvetia::NAME);
         $transactions = $client->reportingService()->queryTransaction($filter);
         $data = [
             'validated' => 0,
@@ -2000,5 +2014,33 @@ class CheckoutService
         $this->statsd->endTiming("judopay.existing");
 
         return true;
+    }
+
+    /**
+     * Creates a card token on checkout.
+     * @param Policy $policy     is the policy that the card belongs on.
+     * @param string $cardNumber is the number on the card the token is being created for.
+     * @param string $expiryDate is the expiry date written on the card.
+     * @param string $cv2        is the cv2 number on the card.
+     * @return CardToken the token which checkout sends back.
+     */
+    public function createCardToken($policy, $cardNumber, $expiryDate, $cv2)
+    {
+        $token = null;
+        try {
+            $exp = explode('/', $expiryDate);
+            $cardNumber = str_replace(' ', '', $cardNumber);
+            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
+            $card->cvv = $cv2;
+            $api = $this->getApiForPolicy($policy);
+            $service = $api->tokens();
+            $token = $service->request($card);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed creating card token. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+        }
+        return $token;
     }
 }

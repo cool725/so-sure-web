@@ -9,6 +9,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -81,7 +82,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testSetCommissionMonthly()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -112,7 +113,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testSetCommissionYearly()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -135,7 +136,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetCommissionUnknown()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -175,7 +176,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     public function testSetLastCommissionRealistic($start, $gwp, $iptRate, $nJudo)
     {
         $date = new \DateTime($start);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp($gwp);
         $premium->setIptRate($iptRate);
@@ -220,7 +221,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     public function testSetLastCommissionNotYetSuccessful()
     {
         $date = new \DateTime();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(12);
         $premium->setIptRate(0.2);
@@ -332,7 +333,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $coverholderCommission,
         $brokerCommission
     ) {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(1);
         $premium->setIpt(1);
@@ -459,7 +460,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $nextYear = $nextYear->modify('+1 year');
         $nextYear->modify("-1 day");
         $nextYear->setTime(23, 59, 59);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart($startDate);
         $policy->setEnd($nextYear);

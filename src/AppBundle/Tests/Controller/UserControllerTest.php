@@ -601,6 +601,7 @@ class UserControllerTest extends BaseControllerTest
             $pennies = $paymentForm->getAttribute('data-value');
         }
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -670,6 +671,7 @@ class UserControllerTest extends BaseControllerTest
             $pennies = $paymentForm->getAttribute('data-value');
         }
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -691,6 +693,7 @@ class UserControllerTest extends BaseControllerTest
         $this->login($email2, $password);
 
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -1256,6 +1259,7 @@ class UserControllerTest extends BaseControllerTest
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -1408,6 +1412,7 @@ class UserControllerTest extends BaseControllerTest
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -1556,6 +1561,7 @@ class UserControllerTest extends BaseControllerTest
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -1665,6 +1671,7 @@ class UserControllerTest extends BaseControllerTest
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -1769,6 +1776,7 @@ class UserControllerTest extends BaseControllerTest
         $csrf = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-csrf');
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -1878,6 +1886,7 @@ class UserControllerTest extends BaseControllerTest
         $pennies = $crawler->filter('.payment-form')->getNode(0)->getAttribute('data-value');
 
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
