@@ -90,6 +90,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/xiaomi' => 'Xiaomi Insurance',
             '/phone-insurance/blackberry' => 'Blackberry Insurance',
             '/phone-insurance/vodafone' => 'Vodafone Insurance',
+            '/phone-insurance/cat' => 'Cat Insurance',
             '/claim' => 'Make a claim',
             '/faq' => 'FAQ'
         ];

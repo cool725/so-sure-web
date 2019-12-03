@@ -10,6 +10,7 @@ require('bootstrap/js/dist/collapse');
 require('../components/banner.js');
 require('../components/phone-search-dropdown-card.js');
 let textFit = require('textfit');
+require('../components/table.js');
 
 let jQueryBridget = require('jquery-bridget');
 let Flickity = require('flickity');
