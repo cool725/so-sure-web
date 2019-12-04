@@ -9,14 +9,6 @@ use AppBundle\Document\PhonePremium;
  */
 class PhonePremiumTest extends \PHPUnit\Framework\TestCase
 {
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
-
     public function testMonthlyPremium()
     {
         $phonePremium = new PhonePremium();
@@ -77,11 +69,8 @@ class PhonePremiumTest extends \PHPUnit\Framework\TestCase
         $phonePremium->setIpt(0.5);
         $phonePremium->setAnnualDiscount(10);
         $this->assertEquals(56, $phonePremium->getAdjustedYearlyPremiumPrice());
-
         $this->assertTrue($phonePremium->isEvenlyDivisible(56, true));
-
         $this->assertEquals(12, $phonePremium->getNumberOfMonthlyPayments(56));
-
         $this->assertEquals(1, $phonePremium->getNumberOfScheduledMonthlyPayments(56));
     }
 
@@ -95,13 +84,19 @@ class PhonePremiumTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests to see if the yearly gwp calculation yields the same value as does the stored gwp.
+     * Shows that the value actual gwp calculates is basically the same thing as the gwp x 12, it's just that they
+     * differ due to rounding errors to the tune of a few pennies, a phenomenon also seen in
+     * OneOffCommand::oneFreeMonth.
      */
-    public function testPointlessYearlyGwpCalculation()
+    public function testYearlyGwpCalculationPurpose()
     {
+        $gwp = 10.123768;
+        $ipt = 1.3469872;
         $premium = new PhonePremium();
-        $premium->setGwp(10.2);
-        $premium->setIpt(0.9);
-
+        $premium->setGwp($gwp);
+        $premium->setIpt($ipt);
+        $premium->setIptRate($ipt / $gwp);
+        $this->assertEquals($premium->getYearlyGwpActual(), $premium->getGwp() * 12, "Should be close", 0.05);
+        $this->assertNotEquals($premium->getYearlyGwpActual(), $premium->getGwp() * 12, "But not too close", 0.01);
     }
 }
