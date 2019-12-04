@@ -1,0 +1,60 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'invite' %}
+{% set robots_noindex = true %}
+{% set share_mode = true %}
+
+{% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
+
+{# Set Meta #}
+{% set og_title = 'Sign up and save' %}
+{% set og_description = "Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance." %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/invite.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            WORDS
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container-large">
+            HOW IT WORKS
+        </div>
+    </section>
+
+    <section class="why-insure">
+        <div class="container-large">
+            WHY INSURE
+        </div>
+    </section>
+
+    <section class="banner py-5">
+        <div class="container-large">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h2 class="h4 text-white">Want to know more about so-sure mobile insurance</h2>
+                        <p class="lead text-white">Visit our website to find out more</p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="{{ path('homepage') }}" class="btn btn-success btn-block-xs">Visit our website</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/invite.js') }}"></script>
+{% endblock %}
