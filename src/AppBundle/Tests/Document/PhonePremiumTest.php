@@ -93,4 +93,15 @@ class PhonePremiumTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(56, $phonePremium->getAdjustedYearlyPremiumPrice(10));
         $this->assertEquals(66, $phonePremium->getAdjustedYearlyPremiumPrice());
     }
+
+    /**
+     * Tests to see if the yearly gwp calculation yields the same value as does the stored gwp.
+     */
+    public function testPointlessYearlyGwpCalculation()
+    {
+        $premium = new PhonePremium();
+        $premium->setGwp(10.2);
+        $premium->setIpt(0.9);
+
+    }
 }

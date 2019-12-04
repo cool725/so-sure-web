@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
@@ -212,10 +213,10 @@ class SalvaPhonePolicyTest extends WebTestCase
     {
         $date = new \DateTime('2016-01-01');
         $policy = static::createUserPolicy(true, $date);
-        static::addPayment($policy, 83.88, Salva::YEARLY_TOTAL_COMMISSION);
+        static::addPayment($policy, $policy->getPremium()->getYearlyPremiumPrice(), Salva::YEARLY_TOTAL_COMMISSION);
         $this->assertEquals(1, $policy->getSalvaProrataMultiplier());
-        $this->assertEquals(76.60, $policy->getTotalGwp());
-        $this->assertEquals(76.60, $policy->getUsedGwp());
+        $this->assertEquals(76.56, $policy->getTotalGwp());
+        $this->assertEquals(76.56, $policy->getUsedGwp());
     }
 
     /**
@@ -339,22 +340,24 @@ class SalvaPhonePolicyTest extends WebTestCase
         $policy = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policy->setId(rand(1, 999999));
         $policy->setPhone(self::$phone, new \DateTime('2016-01-01'));
+        $premium = self::$phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY)->createPremium();
+        $policy->setPremium($premium);
         if ($annual) {
             $policy->setPremiumInstallments(1);
-            static::addPayment($policy, 83.88, Salva::YEARLY_TOTAL_COMMISSION);
+            static::addPayment($policy, $premium->getYearlyPremiumPrice(), Salva::YEARLY_TOTAL_COMMISSION);
         } else {
             $policy->setPremiumInstallments(12);
-            static::addPayment($policy, 6.99, Salva::MONTHLY_TOTAL_COMMISSION);
+            static::addPayment($policy, $premium->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
         }
 
         // ss_tariff
-        $this->assertEquals(76.60, $policy->getTotalGwp());
+        $this->assertEquals($premium->getYearlyGwpActual(), $policy->getTotalGwp(), "", 0.01);
 
         if ($versioned) {
             $partialPolicyAmount = 0.42;
             $version = $policy->incrementSalvaPolicyNumber(new \DateTime('2016-01-02'));
             // usedFinalPremium
-            $this->assertEquals($partialPolicyAmount, $policy->getUsedGwp($version, true));
+            $this->assertEquals($partialPolicyAmount, $policy->getUsedGwp($version, true), "", 0.01);
             // ss_tariff
             $this->assertEquals(76.60 - $partialPolicyAmount, $policy->getTotalGwp());
         }
@@ -467,7 +470,6 @@ class SalvaPhonePolicyTest extends WebTestCase
         $this->assertEquals(0.69, $policy->getTotalPremiumPrice($version));
         // 10.72 * 2/365 = 0.09
         $this->assertEquals(0.09, $policy->getTotalBrokerFee($version));
-
         $version = $policy->incrementSalvaPolicyNumber(new \DateTime('2016-10-05 17:00', $tz));
         $this->assertEquals(2, $policy->getSalvaDaysInPolicy($version));
         $this->assertEquals(5, $policy->getDaysInPolicy(new \DateTime('2016-10-05 17:00', $tz)));
