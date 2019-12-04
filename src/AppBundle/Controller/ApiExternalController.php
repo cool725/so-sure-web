@@ -289,6 +289,18 @@ class ApiExternalController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = $phoneRepo->find($reference);
         if (!$phone) {
+            $goCompare = new GoCompare();
+            if (array_key_exists($reference, $goCompare::$models)) {
+                /** @var Phone $phone */
+                $phone = $phoneRepo->findOneBy([
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($goCompare::$models[$reference]['make']),
+                    'modelCanonical' => mb_strtolower($goCompare::$models[$reference]['model']),
+                    'memory' => (int) $goCompare::$models[$reference]['memory']
+                ]);
+            }
+        }
+        if (!$phone) {
             throw $this->createNotFoundException('Phone reference not found');
         }
 
@@ -324,7 +336,6 @@ class ApiExternalController extends BaseController
         $user->setFirstName($alphaValidator->conform($this->getRequestString($request, 'first_name')));
         $user->setLastName($alphaValidator->conform($this->getRequestString($request, 'surname')));
         $user->setEmail($email);
-
 
         $dob = $this->getRequestString($request, 'dob');
         $birthday = null;
