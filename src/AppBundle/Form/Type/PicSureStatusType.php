@@ -47,6 +47,7 @@ class PicSureStatusType extends BaseType
             if (in_array($policy->getPicSureStatus(), [
                 PhonePolicy::PICSURE_STATUS_MANUAL,
                 PhonePolicy::PICSURE_STATUS_INVALID,
+                PhonePolicy::PICSURE_STATUS_PREAPPROVED,
                 null
             ])) {
                 $choices = [
