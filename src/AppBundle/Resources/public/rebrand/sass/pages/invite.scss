@@ -8,15 +8,80 @@
 @import "../abstracts/variables";
 
 .hero {
+    padding: 8rem 0 1rem;
     position: relative;
-    padding-top: 8rem;
-    padding-bottom: 4rem;
+    overflow: hidden;
 
-    @include blue-gradient-45;
+    @include blue-gradient;
 
     .container-large {
         position: relative;
         z-index: 4;
+    }
+
+    svg {
+        position: absolute;
+        bottom: -2px; left: 0; right: 0;
+        z-index: 3;
+    }
+
+    &__intro {
+        text-align: center;
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 4rem;
+            text-align: left;
+        }
+    }
+
+    &__illustration {
+        width: 300px; height: 270px;
+        margin: 0 auto;
+        position: relative;
+
+        @include media-breakpoint-up(sm) {
+            width: 500px; height: 400px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: auto; height: auto;
+        }
+    }
+
+    &__illustration__img {
+        display: none;
+        position: absolute;
+        top: 0; left: 0;
+    }
+
+    &__controls {
+        text-align: center;
+
+        @include media-breakpoint-up(lg) {
+            text-align: left;
+        }
+    }
+
+    .carousel {
+
+    }
+
+    .carousel-indicators {
+        position: static;
+        margin: 0;
+
+        > li {
+            background-color: $white;
+            @include border-radius(50%);
+        }
+
+        @include media-breakpoint-up(lg) {
+            justify-content: start;
+        }
+    }
+
+    .carousel-item {
+        min-height: 120px;
     }
 
     &:before {
@@ -28,320 +93,205 @@
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
-        transform: scaleX(-1);
+    }
+
+    @include media-breakpoint-up(md) {
+        padding: 8rem 0 6rem;
     }
 
     @include media-breakpoint-up(lg) {
+        padding: 8rem 0;
 
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
-            transform: scaleX(-1);
+        }
+    }
+}
+
+.usps {
+    background-color: $white;
+
+    @include media-breakpoint-up(lg) {
+        ul {
+            > li {
+                width: 25%;
+            }
+        }
+    }
+}
+
+.video {
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    z-index: 3;
+
+    @include video-background;
+
+    &__pot {
+        width: 260px;
+        position: absolute;
+        top: 20px; left: 50%;
+        margin-left: -130px;
+
+        @include media-breakpoint-up(lg) {
+            width:360px;
+            margin-left: -180px;
         }
     }
 
-}
-
-.banner {
-    position: relative;
-    text-align: center;
-
-    @include blue-gradient-45;
-
-    &__close {
+    &__money-left {
+        width: 200px;
         position: absolute;
-        top: 2rem; right: 2rem;
+        top: 5px; left: -70px;
+
+        @include media-breakpoint-up(sm) {
+            width: 240px;
+            top: -15px; left: 30px;
+        }
+
+        @include media-breakpoint-up(sm) {
+            width: 300px;
+            top: -30px;
+        }
+    }
+
+    &__money-right {
+        width: 150px;
+        position: absolute;
+        top: 200px; left: 80%;
+
+        @include media-breakpoint-up(sm) {
+            width: 200px;
+            top: 170px;
+        }
+    }
+
+    &__avatar-male {
+        width: 150px;
+        position: absolute;
+        top: 180px; left: -50px;
+
+        @include media-breakpoint-up(sm) {
+            left: 100px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 180px;
+            top: 140px; left: 240px;
+        }
+    }
+
+    &__avatar-female {
+        width: 150px;
+        position: absolute;
+        top: 20px; right: -50px;
+
+        @include media-breakpoint-up(sm) {
+            right: 100px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 170px;
+            top: 50px; right: 240px;
+        }
+    }
+
+    &__play {
+        width: 120px; height: 120px;
+        display: block;
+        position: relative;
+        z-index: 100;
+
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
     }
 
     @include media-breakpoint-up(lg) {
+        min-height: 450px;
+    }
+}
+
+.knowledge-base {
+    background-color: $selago;
+    position: relative;
+    z-index: 4;
+
+    &__mobile {
+        position: relative;
+    }
+
+    &__desktop {
+        position: relative;
+    }
+}
+
+.end-cta {
+    text-align: center;
+    background-color: $selago;
+
+    @include media-breakpoint-up(md) {
         text-align: left;
     }
 }
 
-// .hero {
-//     padding: 8rem 0 1rem;
-//     position: relative;
-//     overflow: hidden;
 
-//     @include blue-gradient;
+.feedback {
+    @include dark-blue-gradient;
 
-//     .container-large {
-//         position: relative;
-//         z-index: 4;
-//     }
+    .carousel-item {
+        height: 250px;
 
-//     svg {
-//         position: absolute;
-//         bottom: -2px; left: 0; right: 0;
-//         z-index: 3;
-//     }
+        @include media-breakpoint-up(lg) {
+            height: 380px;
+        }
+    }
 
-//     &__intro {
-//         text-align: center;
+    &-item {
+        text-align: center;
+        padding: 0 1rem;
 
-//         @include media-breakpoint-up(lg) {
-//             padding-top: 4rem;
-//             text-align: left;
-//         }
-//     }
+        img {
+            // display: block;
+            margin: 0 auto;
+        }
 
-//     &__illustration {
-//         width: 300px; height: 270px;
-//         margin: 0 auto;
-//         position: relative;
+        .btn {
+            position: relative;
 
-//         @include media-breakpoint-up(sm) {
-//             width: 500px; height: 400px;
-//         }
+            @include media-breakpoint-up(lg) {
+                top: -20px;
+            }
+        }
 
-//         @include media-breakpoint-up(lg) {
-//             width: auto; height: auto;
-//         }
-//     }
+        @include media-breakpoint-up(lg) {
+            padding: 0;
+        }
+    }
 
-//     &__illustration__img {
-//         display: none;
-//         position: absolute;
-//         top: 0; left: 0;
-//     }
+    &-answer {
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        color: $white;
 
-//     &__controls {
-//         text-align: center;
+        form {
+            width: 100%;
+        }
 
-//         @include media-breakpoint-up(lg) {
-//             text-align: left;
-//         }
-//     }
+        @include media-breakpoint-up(lg) {
+            height: 380px;
 
-//     .carousel {
-
-//     }
-
-//     .carousel-indicators {
-//         position: static;
-//         margin: 0;
-
-//         > li {
-//             background-color: $white;
-//             @include border-radius(50%);
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             justify-content: start;
-//         }
-//     }
-
-//     .carousel-item {
-//         min-height: 120px;
-//     }
-
-//     &:before {
-//         width: 100%; height: 100%;
-//         position: absolute;
-//         top: 0; left: 0; right: 0; bottom: 0;
-//         content: '';
-//         z-index: 1;
-//         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
-//         background-size: cover;
-//         opacity: 0.44;
-//     }
-
-//     @include media-breakpoint-up(md) {
-//         padding: 8rem 0 6rem;
-//     }
-
-//     @include media-breakpoint-up(lg) {
-//         padding: 8rem 0;
-
-//         &:before {
-//             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
-//         }
-//     }
-// }
-
-// .usps {
-//     background-color: $white;
-
-//     @include media-breakpoint-up(lg) {
-//         ul {
-//             > li {
-//                 width: 25%;
-//             }
-//         }
-//     }
-// }
-
-// .video {
-//     min-height: 400px;
-//     position: relative;
-//     overflow: hidden;
-//     z-index: 3;
-
-//     @include video-background;
-
-//     &__pot {
-//         width: 260px;
-//         position: absolute;
-//         top: 20px; left: 50%;
-//         margin-left: -130px;
-
-//         @include media-breakpoint-up(lg) {
-//             width:360px;
-//             margin-left: -180px;
-//         }
-//     }
-
-//     &__money-left {
-//         width: 200px;
-//         position: absolute;
-//         top: 5px; left: -70px;
-
-//         @include media-breakpoint-up(sm) {
-//             width: 240px;
-//             top: -15px; left: 30px;
-//         }
-
-//         @include media-breakpoint-up(sm) {
-//             width: 300px;
-//             top: -30px;
-//         }
-//     }
-
-//     &__money-right {
-//         width: 150px;
-//         position: absolute;
-//         top: 200px; left: 80%;
-
-//         @include media-breakpoint-up(sm) {
-//             width: 200px;
-//             top: 170px;
-//         }
-//     }
-
-//     &__avatar-male {
-//         width: 150px;
-//         position: absolute;
-//         top: 180px; left: -50px;
-
-//         @include media-breakpoint-up(sm) {
-//             left: 100px;
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             width: 180px;
-//             top: 140px; left: 240px;
-//         }
-//     }
-
-//     &__avatar-female {
-//         width: 150px;
-//         position: absolute;
-//         top: 20px; right: -50px;
-
-//         @include media-breakpoint-up(sm) {
-//             right: 100px;
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             width: 170px;
-//             top: 50px; right: 240px;
-//         }
-//     }
-
-//     &__play {
-//         width: 120px; height: 120px;
-//         display: block;
-//         position: relative;
-//         z-index: 100;
-
-//         transition: all .2s ease-in-out;
-//         cursor: pointer;
-
-//         &:hover {
-//             transform: scale(1.1);
-//         }
-//     }
-
-//     @include media-breakpoint-up(lg) {
-//         min-height: 450px;
-//     }
-// }
-
-// .knowledge-base {
-//     background-color: $selago;
-//     position: relative;
-//     z-index: 4;
-
-//     &__mobile {
-//         position: relative;
-//     }
-
-//     &__desktop {
-//         position: relative;
-//     }
-// }
-
-// .end-cta {
-//     text-align: center;
-//     background-color: $selago;
-
-//     @include media-breakpoint-up(md) {
-//         text-align: left;
-//     }
-// }
-
-
-// .feedback {
-//     @include dark-blue-gradient;
-
-//     .carousel-item {
-//         height: 250px;
-
-//         @include media-breakpoint-up(lg) {
-//             height: 380px;
-//         }
-//     }
-
-//     &-item {
-//         text-align: center;
-//         padding: 0 1rem;
-
-//         img {
-//             // display: block;
-//             margin: 0 auto;
-//         }
-
-//         .btn {
-//             position: relative;
-
-//             @include media-breakpoint-up(lg) {
-//                 top: -20px;
-//             }
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             padding: 0;
-//         }
-//     }
-
-//     &-answer {
-//         height: 250px;
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-//         flex-direction: column;
-//         text-align: center;
-//         color: $white;
-
-//         form {
-//             width: 100%;
-//         }
-
-//         @include media-breakpoint-up(lg) {
-//             height: 380px;
-
-//             form {
-//                 width: auto;
-//             }
-//         }
-//     }
-// }
+            form {
+                width: auto;
+            }
+        }
+    }
+}
