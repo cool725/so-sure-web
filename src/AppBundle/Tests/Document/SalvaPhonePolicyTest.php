@@ -162,7 +162,7 @@ class SalvaPhonePolicyTest extends WebTestCase
         $date = new \DateTime('2016-01-01');
         $policy = static::createUserPolicy(true, $date);
         $policy->setPremiumInstallments(12);
-        static::addPayment($policy, 83.88, Salva::YEARLY_TOTAL_COMMISSION);
+        static::addPayment($policy, $policy->getPremium()->getYearlyPremiumPrice(), Salva::YEARLY_TOTAL_COMMISSION);
         $this->assertEquals(1, $policy->getPaymentsPerYearCode());
     }
 
