@@ -14,7 +14,7 @@
         "php": ">=7.0",
         "ext-json": "*",
         "ext-zip": "*",
-        "symfony/symfony": "3.4.26",
+        "symfony/symfony": "3.4.35",
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.4",
         "symfony/swiftmailer-bundle": "^3.2",
