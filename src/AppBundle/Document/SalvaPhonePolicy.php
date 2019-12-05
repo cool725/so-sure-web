@@ -499,7 +499,6 @@ class SalvaPhonePolicy extends PhonePolicy
             }
 
             $endDate = $this->getSalvaTerminationDate($version);
-            //print_r($endDate);
         } elseif ($this->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED) {
             if ($this->isRefundAllowed()) {
                 $endDate = clone $this->getEnd();
@@ -516,6 +515,7 @@ class SalvaPhonePolicy extends PhonePolicy
                 }
             }
         }
+        var_dump($endDate);
 
         if (!$endDate) {
             $endDate = clone $this->getStaticEnd();
