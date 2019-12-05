@@ -29,6 +29,25 @@
     <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
 {% endblock %}
 
+{% block gtm_data %}
+    ,
+    'event': 'addToCart',
+    'ecommerce': {
+    'currencyCode': 'GBP',
+    'add': {
+            'products': [{
+                'id': '{{ phone.id }}',
+                'name': '{{ phone.make }} {{ phone.model }}',
+                'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
+                'brand': '{{ phone.make }}',
+                'category': '{{ phone.make }}',
+                'variant': '{{ phone.memory }}GB',
+                'quantity': 1
+            }]
+        }
+    }
+{% endblock %}
+
 {% block body %}
 
     <section class="qpw">

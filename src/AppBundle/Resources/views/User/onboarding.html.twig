@@ -33,10 +33,11 @@
         'transactionId': '{{ policy.policyNumber }}',
         'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
         'transactionProducts': [{
-            'name': '{{ policy.phone.make }}-{{ policy.phone.model }}',
+            'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
             'sku':  '{{ policy.phone.id }}',
             'category': '{{ policy.phone.make }}',
-            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}
+            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+            'quantity': 1
         }]
     {% endif %}
 {% endblock %}
