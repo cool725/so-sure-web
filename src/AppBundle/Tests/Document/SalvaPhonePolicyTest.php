@@ -492,8 +492,6 @@ class SalvaPhonePolicyTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2016-09-21 17:12', $tz));
         self::$dm->flush();
 
-        //\Doctrine\Common\Util\Debug::dump($policy);
-
         // ss_tariff
         $this->assertEquals(365, $policy->getDaysInPolicyYear());
         $this->assertEquals(365, $policy->getSalvaDaysInPolicy(null));
@@ -513,21 +511,14 @@ class SalvaPhonePolicyTest extends WebTestCase
             new PolicyEvent($policy, new \DateTime('2016-10-19 12:10', $tz))
         );
 
-        // Invalid values that we originally present
-        /*
-        $this->assertEquals(8.24, $policy->getTotalPremiumPrice());
-        $this->assertEquals(7.95, $policy->getRemainingPremiumPaid([]));
-        $this->assertEquals(0.85, $policy->getTotalBrokerFee());
-        $this->assertEquals(0.82, $policy->getRemainingTotalCommissionPaid([]));
-        */
-
-        // Expected
+        // Expected for the total ones, but not the remaining ones because user requested cancellation now means no
+        // refund.
         // 103.68 * 31 / 365 = 8.81
         $this->assertEquals(8.81, $policy->getTotalPremiumPrice());
-        $this->assertEquals(8.81, $policy->getRemainingPremiumPaid([]));
+        $this->assertEquals(8.64, $policy->getRemainingPremiumPaid([]));
 
-        // 10.72 * 29 / 365 = 0.85
-        $this->assertEquals(0.85, $policy->getTotalBrokerFee());
-        $this->assertEquals(0.85, $policy->getRemainingTotalCommissionPaid([]));
+        // 10.72 * 31 / 365 = 0.85
+        $this->assertEquals(0.91, $policy->getTotalBrokerFee());
+        $this->assertEquals(0.89, $policy->getRemainingTotalCommissionPaid([]));
     }
 }
