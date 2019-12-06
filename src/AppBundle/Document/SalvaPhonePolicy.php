@@ -515,7 +515,6 @@ class SalvaPhonePolicy extends PhonePolicy
                 }
             }
         }
-        var_dump($endDate);
 
         if (!$endDate) {
             $endDate = clone $this->getStaticEnd();
@@ -573,7 +572,6 @@ class SalvaPhonePolicy extends PhonePolicy
             ));
             */
         }
-        var_dump($days);
         return $days;
     }
 
@@ -627,6 +625,7 @@ class SalvaPhonePolicy extends PhonePolicy
             // previously sent
             return $this->toTwoDp(0 - $previousGwp);
         }
+
 
         return $this->toTwoDp($totalGwp);
     }

@@ -388,7 +388,7 @@ class SalvaPhonePolicyTest extends WebTestCase
         $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $policy->cancel(SalvaPhonePolicy::CANCELLED_UNPAID, new \DateTime('2016-04-01'));
         // usedFinalPremium (premium is completed taken & policy cancelled)
-        $this->assertEquals(6.24, $policy->getUsedGwp());
+        $this->assertEquals(6.38, $policy->getUsedGwp());
     }
 
     public function testHasSalvaPreviousVersionPastMidnight()
@@ -522,9 +522,9 @@ class SalvaPhonePolicyTest extends WebTestCase
         */
 
         // Expected
-        // 103.68 * 29 / 365 = 8.24
-        $this->assertEquals(8.24, $policy->getTotalPremiumPrice());
-        $this->assertEquals(8.24, $policy->getRemainingPremiumPaid([]));
+        // 103.68 * 31 / 365 = 8.81
+        $this->assertEquals(8.81, $policy->getTotalPremiumPrice());
+        $this->assertEquals(8.81, $policy->getRemainingPremiumPaid([]));
 
         // 10.72 * 29 / 365 = 0.85
         $this->assertEquals(0.85, $policy->getTotalBrokerFee());
