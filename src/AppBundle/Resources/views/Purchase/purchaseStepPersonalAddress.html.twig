@@ -31,10 +31,10 @@
 
 {% block gtm_data %}
     ,
-    'event': 'addToCart',
+    'event': 'checkout',
     'ecommerce': {
-    'currencyCode': 'GBP',
-    'add': {
+        'checkout': {
+            'actionField': {'step': 'Personal Details'},
             'products': [{
                 'id': '{{ phone.id }}',
                 'name': '{{ phone.make }} {{ phone.model }}',
