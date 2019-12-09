@@ -860,7 +860,7 @@ class BacsService
                     // refund requires commission to be set, but probably isn't at this point in time
                     if (!$submittedPayment->getTotalCommission()) {
                         try {
-                            $submittedPayment->setCommission(true);
+                            $submittedPayment->getPolicy()->setCommission($submittedPayment, true);
                         } catch (\Exception $e) {
                             $this->logger->error(sprintf(
                                 'Unable to set refund commission for policy %s',
@@ -868,7 +868,11 @@ class BacsService
                             ), ['exception' => $e]);
                         }
                     }
-                    $debitPayment->setRefundTotalCommission($submittedPayment->getTotalCommission());
+                    $debitPayment->setCommission(
+                        0 - $submittedPayment->getCoverholderCommission(),
+                        0 - $submittedPayment->getBrokerCommission()
+
+                    );
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);
                     $submittedPayment->approve($currentProcessingDate, true, false);
@@ -1091,7 +1095,7 @@ class BacsService
 
                 $numPayments = $referencePolicy->getPremium()->getNumberOfMonthlyPayments($amount);
                 if ($numPayments >= 1) {
-                    $indemnityPayment->setRefundTotalCommission($numPayments * Salva::MONTHLY_TOTAL_COMMISSION);
+                    $indemnityPayment->getPolicy()->setCommissionInverted($indemnityPayment);
                 }
                 $indemnityPayment->calculateSplit();
 

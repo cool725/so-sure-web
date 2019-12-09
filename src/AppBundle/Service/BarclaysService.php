@@ -214,8 +214,7 @@ class BarclaysService
                             $chargeback->setAmount($amount);
                             $chargeback->setDate($date);
                             // set commission as a positive value and then invert it.
-                            $chargeback->setCommission();
-                            $chargeback->setRefundTotalCommission($chargeback->getTotalCommission());
+                            // this stuff is not used so I am taking the commission bits out and leaving it.
                             $this->dm->persist($chargeback);
                             $this->dm->flush();
                             $this->logger->warning(sprintf(

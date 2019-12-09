@@ -443,7 +443,8 @@ class SalvaPhonePolicy extends PhonePolicy
         if ($numPayments > 12 || $numPayments < 0) {
             throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
         }
-        $expectedMonthlyCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+        $expectedMonthlyCommission = $salva->sumCoverholderCommission($numPayments, $numPayments == 12) +
+            Salva::MONTHLY_BROKER_COMMISSION * $numPayments;
         $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
 
         // active/unpaid should be on a cash received based

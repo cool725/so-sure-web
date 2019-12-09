@@ -3202,6 +3202,16 @@ abstract class Policy
     }
 
     /**
+     * Gives you the total amount of commission that the policy should have paid up so far on a pro rata basis.
+     * @param \DateTime|null is the date at which this should be correct with null meaning right now.
+     * @return float the total amount of pro rata commission.
+     */
+    public function getProratedCommission(\DateTime $date = null)
+    {
+        return $this->toTwoDp($this->getYearlyTotalCommission() * $this->getProrataMultiplier($date));
+    }
+
+    /**
      * Calculates the amount of coverholder commission that should have been paid so far on a pro rata basis.
      * @param \DateTime|null $date is the date at which this calculation should be accurate, with null meaning now.
      * @return float the pro rata amount of coverholder commission.
@@ -5843,6 +5853,20 @@ abstract class Policy
         } else {
             return null;
         }
+    }
+
+    /**
+     * Sets commission the normal way and then subtracts it from 0.
+     * @param Payment $payment is the payment that is going to get refund commission.
+     * @param boolean $allowFraction is whether to allow fractional payments to calculate their commission.
+     * @param \DateTime|null $date is the date at which the calculation should be accurate, null meaning now.
+     */
+    public function setCommissionInverted($payment, $allowFraction = false, \DateTime $date = null)
+    {
+        $this->setCommission($payment, $allowFraction, $date);
+        $payment->setCoverholderCommission(0 - $payment->getCoverholderCommission());
+        $payment->setBrokerCommission(0 - $payment->getBrokerCommission());
+        $payment->setTotalCommission(0 - $payment->getTotalCommission());
     }
 
     /**

@@ -1755,7 +1755,7 @@ class CheckoutService
     public function setCommission($payment, $allowFraction = false)
     {
         try {
-            $payment->setCommission($allowFraction);
+            $payment->getPolicy()->setCommission($payment, $allowFraction);
         } catch (CommissionException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -1764,31 +1764,27 @@ class CheckoutService
     }
 
     /**
-     * Refund a payment
-     *
+     * Refund a payment.
      * @param CheckoutPayment $payment
-     * @param float           $amount         Amount to refund (or null for entire initial amount)
-     * @param float           $totalCommision Total commission amount to refund (or null for entire amount from payment)
-     * @param string          $notes
-     * @param string          $source
-     *
-     * @return CheckoutPayment
+     * @param float           $amount                Amount to refund (or null for entire initial amount)
+     * @param float           $coverholderCommission total commission amount to refund or null to refund it all.
+     * @param float           $brokerCommission      is the amount of broker commission to refund or null for all of it.
+     * @param string          $notes                 the notes to put on the refund.
+     * @param string          $source                is the source to say on the payment.
+     * @return CheckoutPayment the new refund.
      */
     public function refund(
         CheckoutPayment $payment,
         $amount = null,
-        $totalCommision = null,
+        $coverholderCommission = null,
+        $brokerCommission = null,
         $notes = null,
         $source = null
     ) {
-        if (!$amount) {
-            $amount = $payment->getAmount();
-        }
-        if (!$totalCommision) {
-            $totalCommision = $payment->getTotalCommission();
-        }
+        $amount = $amount ?: $payment->getAmount();
+        $coverholderCommission = $coverholderCommission ?: $payment->getCoverholderCommission();
+        $brokerCommission = $brokerCommission ?: $payment->getBrokerCommission();
         $policy = $payment->getPolicy();
-
         // Refund is a negative payment
         $refund = new CheckoutPayment();
         $refund->setAmount(0 - $amount);
@@ -1836,9 +1832,10 @@ class CheckoutService
         $refundAmount = $this->convertFromPennies($refundDetails->getValue());
         $refund->setAmount(0 - $refundAmount);
         //$refund->setReference($refundModelDetails["yourPaymentReference"]);
-
-        $refund->setRefundTotalCommission($totalCommision);
-
+        $refund->setCommission(
+            0 - $coverholderCommission,
+            0 - $brokerCommission
+        );
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return $refund;
