@@ -409,20 +409,6 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setCommission(true);
     }
 
-    /**
-     * Makes sure that calling setCommission on a payment with no policy throws and invalid payment exception.
-     */
-    public function testSetComissionWithoutPolicyFails()
-    {
-        $payment = new CheckoutPayment();
-        $payment->setAmount(4.3);
-        // make sure an exception is thrown for all inputs in this case.
-        $this->expectException(InvalidPaymentException::class);
-        $payment->setCommission(false);
-        $this->expectException(InvalidPaymentException::class);
-        $payment->setCommission(true);
-    }
-
     public function testFinalCommissionHigher()
     {
         $payments = [];

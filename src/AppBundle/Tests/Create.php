@@ -7,6 +7,8 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\ScheduledPayment;
@@ -90,6 +92,24 @@ class Create
     }
 
     /**
+     * Create a policy and give it a bacs payment method.
+     * @param User $user is the user that the policy belongs to.
+     * @param \DateTime|string $start is the start date either as a date string or as a date.
+     * @param string $status is the status that the policy should be given.
+     * @param int $installments is the number of premium installments the policy is meant to pay.
+     * @return Policy the policy.
+     */
+    public static function bacsPolicy($user, $start, $status, $installments)
+    {
+        $policy = Create::policy($user, $start, $status, $installments);
+        $bankAccount = new BankAccount();
+        $paymentMethod = new BacsPaymentMethod();
+        $paymentMethod->setBankAccount($bankAccount);
+        $policy->setPaymentMethod($paymentMethod);
+        return $policy;
+    }
+
+    /**
      * Creates a log entry with it's date being a given number of days ago.
      * @param Policy $policy  is the policy the entry should be for.
      * @param string $status  is the status the policy is having set in the entry.
@@ -125,6 +145,18 @@ class Create
             $payment->setCommission(false, $properDate);
         }
         return $payment;
+    }
+
+    /**
+     * Create a bacs payment of one installments's premium and add it to the policy.
+     * @param Policy $policy is the policy to add the payment to.
+     * @param \DateTime $date is the date of the payment.
+     * @param boolean $success is the success of the payment.
+     * @return BacsPayment the created payment.
+     */
+    public static function standardBacsPayment($policy, $date, $success)
+    {
+
     }
 
     /**

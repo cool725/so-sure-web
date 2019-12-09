@@ -3206,43 +3206,66 @@ abstract class Policy
         return $commissionToRefund;
     }
 
-    public function getProratedCommission(\DateTime $date = null)
-    {
-        $used = $this->getYearlyTotalCommission() * $this->getProrataMultiplier($date);
-        return $this->toTwoDp($used);
-    }
-
+    /**
+     * Calculates the amount of coverholder commission that should have been paid so far on a pro rata basis.
+     * @param \DateTime|null $date is the date at which this calculation should be accurate, with null meaning now.
+     * @return float the pro rata amount of coverholder commission.
+     */
     public function getProratedCoverholderCommission(\DateTime $date = null)
     {
-        $used = $this->getYearlyCoverholderCommission() * $this->getProrataMultiplier($date);
-        return $this->toTwoDp($used);
+        return $this->toTwoDp($this->getYearlyCoverholderCommission() * $this->getProrataMultiplier($date));
     }
 
+    /**
+     * Calculates the amount of broker commission that should have been paid so far on a pro rata basis.
+     * @param \DateTime|null $date is the date at which this calculation should be accurate, with null meaning now.
+     * @return float the pro rata amount of broker commission.
+     */
     public function getProratedBrokerCommission(\DateTime $date = null)
     {
-        return $this->toTwoDp(
-            $this->getProratedCommission($date) - $this->getProratedCoverholderCommission($date)
-        );
+        return $this->toTwoDp($this->getYearlyCoverholderCommission() * $this->getProrataMultiplier($date));
     }
 
     /**
-     * Get the commission that is owed at a given time.
+     * Get the coverholder commission that is outstanding at the given time on a pro rata basis.
      * @param \DateTime $date is the time at which the calculation is accurate.
-     * @return float the amount of commission due.
+     * @return float the amount of coverholder commission due.
      */
-    public function getProratedCommissionPayment(\DateTime $date)
+    public function getProratedCoverholderCommissionPayment(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+        return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
+            $this->getCoverholderCommissionPaid());
     }
 
     /**
-     * Gets the commission beyond a given point in time to refund.
-     * @param \DateTime $date is the date up to which commission is valid.
-     * @return float the amount of commission due on a refund for payments past the given date.
+     * Gives the amount of outstanding broker commission at the current time on a pro rata basis.
+     * @param \DateTime $date is the time at which the calculation is accurate.
+     * @return float the amount of broker commission due.
      */
-    public function getProratedCommissionRefund(\DateTime $date)
+    public function getProratedBrokerCommissionPayment(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getBrokerCommissionPaid());
+    }
+
+    /**
+     * Gives you the amount of coverholder commission that should be refunded on a pro rata basis.
+     * @param \DateTime $date is the date at which this calculation should be accurate.
+     * @return float the amount of coverholder commission in the refund.
+     */
+    public function getProratedCoverholderCommissionRefund(\DateTime $date)
+    {
+        return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
+            $this->getTotalCoverholderCommissionPaid());
+    }
+
+    /**
+     * Gives you the amount of broker commission that should be refunded on a pro rata basis.
+     * @param \DateTime $date is the date at which this calculation should be accurate.
+     * @return float the amount of broker commission in the refund.
+     */
+    public function getProratedBrokerCommissionRefund(\DateTime $date)
+    {
+        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getTotalBrokerCommissionPaid());
     }
 
     public function getDaysInPolicyYear()
@@ -5830,9 +5853,11 @@ abstract class Policy
     /**
      * Sets the commission of a payment belonging to this policy because the policy knows the coverholder and their
      * commission rules.
-     * @param Payment $payment is the payment that we are setting the commission for.
+     * @param Payment $payment       is the payment that we are setting the commission for.
+     * @param boolean $allowFraction is whether to allow fractional payments and calculate fractional commission for
+     *                               them.
      */
-    abstract public function setTotalCommission($payment);
+    abstract public function setCommission($payment, $allowFraction = false);
 
     /**
      * Gives you the total amount of commission this policy should pay.

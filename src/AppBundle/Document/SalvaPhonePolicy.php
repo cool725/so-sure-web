@@ -39,10 +39,10 @@ class SalvaPhonePolicy extends PhonePolicy
     // Policy needs to be replaced (cancelled/created) at salva - will replacement-create to active after acceptance
     const SALVA_STATUS_PENDING_REPLACEMENT_CANCEL = 'replacement-cancel';
 
-        // Policy needs to be replaced (cancelled/created) at salva - will change to active after acceptance
+    // Policy needs to be replaced (cancelled/created) at salva - will change to active after acceptance
     const SALVA_STATUS_PENDING_REPLACEMENT_CREATE = 'replacement-create';
 
-        // Policy needs to be updated (direct update) at salva - will change to active after acceptance
+    // Policy needs to be updated (direct update) at salva - will change to active after acceptance
     const SALVA_STATUS_PENDING_UPDATE = 'pending-update';
 
     const RESULT_TYPE_CREATE = 'create';
@@ -357,9 +357,47 @@ class SalvaPhonePolicy extends PhonePolicy
     /**
      * @inheritDoc
      */
-    public function setTotalCommission($payment)
+    public function setCommission($payment, $allowFraction = false)
     {
-        // TODO: this.
+        $salva = new Salva();
+        $amount = $payment->getAmount();
+        // Only set broker fees if we know the amount
+        if ($this->areEqualToFourDp($amount, $this->getPremium()->getYearlyPremiumPrice())) {
+            $payment->setCommission( Salva::YEARLY_COVERHOLDER_COMMISSION, Salva::YEARLY_BROKER_COMMISSION);
+        } elseif ($amount >= 0 && ($this->getPremium()->isEvenlyDivisible($payment->getAmount()) ||
+            $this->getPremium()->isEvenlyDivisible($payment->getAmount(), true))
+        ) {
+            $comparison = $payment->hasSuccess() ? 0 : $payment->getAmount();
+            $includeFinal = $this->areEqualToTwoDp($comparison, $this->getOutstandingPremium());
+            $numPayments = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
+            $payment->setCommission(
+                $salva->sumCoverholderCommission($numPayments, $includeFinal),
+                $numPayments * Salva::MONTHLY_BROKER_COMMISSION
+            );
+        } elseif ($allowFraction && $amount >= 0) {
+            $payment->setCommission(
+                $this->getProratedCoverholderCommissionPayment($payment->getDate()),
+                $this->getProratedBrokerCommissionPayment($payment->getDate())
+            );
+        } elseif ($amount < 0) {
+            if ($date === null) {
+                $date = new \DateTime();
+            }
+            $brokerCommission = $this->getBrokerCommissionPaid();
+            $coverholderCommission = $this->getCoverholderCommissionPaid();
+            $dueBrokerCommission = $this->getProratedBrokerCommission($date);
+            $dueCoverholderCommission = $this->getProratedCoverholderCommission($date);
+            $payment->setCommission(
+                $dueBrokerCommission - $brokerCommission,
+                $dueCoverholderCommission - $coverholderCommission
+            );
+        } else {
+            throw new CommissionException(sprintf(
+                'Failed to set correct commission for %f (policy %s)',
+                $this->getAmount(),
+                $this->getId()
+            ));
+        }
     }
 
     /**
@@ -444,9 +482,9 @@ class SalvaPhonePolicy extends PhonePolicy
             }
             $expectedCommission = $this->getProratedCommission($date);
         }
-
         return $expectedCommission;
     }
+
 
     public function hasSalvaPreviousVersionPastMidnight($version = null)
     {

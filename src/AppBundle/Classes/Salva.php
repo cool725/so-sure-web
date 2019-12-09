@@ -77,16 +77,23 @@ class Salva
         '5ae7a1271eae627ff4735599', // kitti requested full payment
     ];
 
-    public function sumBrokerFee($months, $includeFinalCommission)
+    /**
+     * Calculates teh amount of coverholder commission that the given number of months should contain.
+     * @param int     $months                 is the number of months of commission to calculate.
+     * @param boolean $includeFinalCommission is whether or not the final month's bonus commission should be included
+     *                                        in this calculation.
+     * @return float the amount of coverholder commission.
+     */
+    public function sumCoverholderCommission($months, $includeFinalCommission)
     {
         if ($months == 12) {
-            return self::YEARLY_TOTAL_COMMISSION;
+            return self::YEARLY_COVERHOLDER_COMMISSION;
         } elseif ($months >= 1) {
             if ($includeFinalCommission) {
-                return $this->toTwoDp(self::MONTHLY_TOTAL_COMMISSION * ($months - 1)
-                    + self::FINAL_MONTHLY_TOTAL_COMMISSION);
+                return $this->toTwoDp(self::MONTHLY_COVERHOLDER_COMMISSION * ($months - 1)
+                    + self::FINAL_MONTHLY_COVERHOLDER_COMMISSION);
             } else {
-                return $this->toTwoDp(self::MONTHLY_TOTAL_COMMISSION * $months);
+                return $this->toTwoDp(self::MONTHLY_COVERHOLDER_COMMISSION * $months);
             }
         } elseif ($months == 0) {
             return 0;

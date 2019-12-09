@@ -35,9 +35,28 @@ class HelvetiaPhonePolicy extends PhonePolicy
     /**
      * @inheritDoc
      */
-    public function setTotalCommission($payment)
+    public function setCommission($payment, $allowFraction = false)
     {
-        // TODO: this.
+        // TODO: make sure this is right before it starts getting relied on.
+        if ($this->getPremium()->isEvenlyDivisible($payment->getAmount())) {
+            $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
+            $payment->setCommission(
+                $this->getPremium()->getMonthlyPremiumPrice() * Helvetia::COVERHOLDER_COMMISSION_PROPORTION * $n,
+                Helvetia::MONTHLY_BROKER_COMMISSION * $n
+            );
+        } elseif ($allowFraction) {
+            if ($payment->getAmount() >= 0) {
+                $payment->setCommission(
+                    $this->getProratedCoverholderCommissionPayment(),
+                    $this->getProratedBrokerCommissionPayment()
+                );
+            } else {
+                $payment->setCommission(
+                    $this->getProratedCoverholderCommissionRefund(),
+                    $this->getProratedBrokerCommissionRefund()
+                );
+            }
+        }
     }
 
     /**
@@ -54,7 +73,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         }
         // 20% of premium price.
         // TODO: Make sure this is the right proportion and it was not meant to be before tax.
-        return $premium->getYearlyPremiumPrice() / 5;
+        return $premium->getYearlyPremiumPrice() * Helvetia::COVERHOLDER_COMMISSION_PROPORTION;
     }
 
     /**
@@ -78,7 +97,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getExpectedCommission(\DateTime $date = null): float
     {
-        // TODO: this.
+        // TODO: this. Just needs to step it by a fixed amount for each month so should be easy.
         return 0;
     }
 }

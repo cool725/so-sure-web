@@ -432,46 +432,17 @@ abstract class Payment
         );
     }
 
-    public function calculateSplit()
+    /**
+     * Sets all of the commission values for this payment. Calculates total commission as actually being the total of
+     * coverholderCommission and brokerCommission.
+     * @param float $coverholderCommission is the coverholder commission on this payment.
+     * @param float $brokerCommission      is the broker commission on this payment.
+     */
+    public function setCommission($coverholderCommission, $brokerCommission)
     {
-        // If this is the first payment the policy will not yet have a premium.
-        $policyPremium = $this->getPolicy()->getPremium();
-        $iptRate = $policyPremium ? $policyPremium->getIptRate() : $this->getCurrentIptRate(new \DateTime());
-        $gwp = $this->getAmount() / (1 + $iptRate);
-        $ipt = $this->getAmount() - $gwp;
-        // We do not want to set to 2 dp here as we need to total the gwp across all months
-        // and compare to yearly figure.  We would be off by several cent if rounded
-        $this->setGwp($gwp);
-        $this->setIpt($ipt);
-    }
-
-    public function setTotalCommission($totalCommission)
-    {
-        $this->totalCommission = $totalCommission;
-        if ($this->areEqualToFourDp($totalCommission, Salva::YEARLY_TOTAL_COMMISSION)) {
-            $this->coverholderCommission = Salva::YEARLY_COVERHOLDER_COMMISSION;
-            $this->brokerCommission = Salva::YEARLY_BROKER_COMMISSION;
-        } elseif ($this->areEqualToFourDp($totalCommission, Salva::MONTHLY_TOTAL_COMMISSION)) {
-            $this->coverholderCommission = Salva::MONTHLY_COVERHOLDER_COMMISSION;
-            $this->brokerCommission = Salva::MONTHLY_BROKER_COMMISSION;
-        } elseif ($this->areEqualToFourDp($totalCommission, Salva::FINAL_MONTHLY_TOTAL_COMMISSION)) {
-            $this->coverholderCommission = Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION;
-            $this->brokerCommission = Salva::FINAL_MONTHLY_BROKER_COMMISSION;
-        } else {
-            // Partial refund
-            $salva = new Salva();
-            $split = $salva->getProrataSplit($totalCommission);
-            $this->coverholderCommission = $split['coverholder'];
-            $this->brokerCommission = $split['broker'];
-        }
-    }
-
-    public function setRefundTotalCommission($totalCommission)
-    {
-        $this->setTotalCommission(abs($totalCommission));
-        $this->totalCommission = 0 - $this->totalCommission;
-        $this->coverholderCommission = 0 - $this->coverholderCommission;
-        $this->brokerCommission = 0 - $this->brokerCommission;
+        $this->coverholderCommission = $coverholderCommission;
+        $this->brokerCommission = $brokerCommission;
+        $this->totalCommission = $coverholderCommission + $brokerCommission;
     }
 
     /**
@@ -555,56 +526,6 @@ abstract class Payment
     public function setScheduledPayment(ScheduledPayment $scheduledPayment = null)
     {
         $this->scheduledPayment = $scheduledPayment;
-    }
-
-    /**
-     * Sets the commission for this payment.
-     * @param boolean   $allowFraction is whether it will allow the commission to be a fraction of monthly commission.
-     * @param \DateTime $date          is the date and time pro rata values should be calculated for.
-     */
-    public function setCommission($allowFraction = false, $date = null)
-    {
-        $policy = $this->getPolicy();
-        if (!$this->getPolicy()) {
-            throw new InvalidPaymentException(sprintf(
-                'Attempting to set commission for %f (payment %s) without a policy',
-                $this->getAmount(),
-                $this->getId()
-            ));
-        }
-        $salva = new Salva();
-        $premium = $policy->getPremium();
-        $amount = $this->getAmount();
-        // Only set broker fees if we know the amount
-        if ($this->areEqualToFourDp($this->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
-            $commission = $salva->sumBrokerFee(12, true);
-            $this->setTotalCommission($commission);
-        } elseif ($amount >= 0 && ($premium->isEvenlyDivisible($this->getAmount()) ||
-            $premium->isEvenlyDivisible($this->getAmount(), true))) {
-            $comparison = $this->hasSuccess() ? 0 : $this->getAmount();
-            $includeFinal = $this->areEqualToTwoDp($comparison, $policy->getOutstandingPremium());
-            $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
-            $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
-            $this->setTotalCommission($commission);
-        } elseif ($allowFraction && $amount >= 0) {
-            $this->setTotalCommission($policy->getProratedCommissionPayment($this->getDate()));
-        } elseif ($amount < 0) {
-            if ($date === null) {
-                $date = new \DateTime();
-            }
-            $brokerCommission = $policy->getBrokerCommissionPaid();
-            $coverholderCommission = $policy->getCoverholderCommissionPaid();
-            $dueBrokerCommission = $policy->getProratedBrokerCommission($date);
-            $dueCoverholderCommission = $policy->getProratedCoverholderCommission($date);
-            $this->brokerCommission = $dueBrokerCommission - $brokerCommission;
-            $this->coverholderCommission = $dueCoverholderCommission - $coverholderCommission;
-        } else {
-            throw new CommissionException(sprintf(
-                'Failed to set correct commission for %f (policy %s)',
-                $this->getAmount(),
-                $policy->getId()
-            ));
-        }
     }
 
     /**
