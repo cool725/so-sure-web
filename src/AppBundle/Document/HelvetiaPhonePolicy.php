@@ -35,9 +35,8 @@ class HelvetiaPhonePolicy extends PhonePolicy
     /**
      * @inheritDoc
      */
-    public function setCommission($payment, $allowFraction = false)
+    public function setCommission($payment, $allowFraction = false, \DateTime $date = null)
     {
-        // TODO: make sure this is right before it starts getting relied on.
         if ($this->getPremium()->isEvenlyDivisible($payment->getAmount())) {
             $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
             $payment->setCommission(
@@ -47,13 +46,13 @@ class HelvetiaPhonePolicy extends PhonePolicy
         } elseif ($allowFraction) {
             if ($payment->getAmount() >= 0) {
                 $payment->setCommission(
-                    $this->getProratedCoverholderCommissionPayment(),
-                    $this->getProratedBrokerCommissionPayment()
+                    $this->getProratedCoverholderCommissionPayment($date),
+                    $this->getProratedBrokerCommissionPayment($date)
                 );
             } else {
                 $payment->setCommission(
-                    $this->getProratedCoverholderCommissionRefund(),
-                    $this->getProratedBrokerCommissionRefund()
+                    $this->getProratedCoverholderCommissionRefund($date),
+                    $this->getProratedBrokerCommissionRefund($date)
                 );
             }
         }

@@ -42,31 +42,6 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0.43, $this->toTwoDp($payment->getIpt()));
     }
 
-    public function testTotalCommission()
-    {
-        $payment = new CheckoutPayment();
-
-        // yearly
-        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-        $this->assertEquals(Salva::YEARLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
-        $this->assertEquals(Salva::YEARLY_BROKER_COMMISSION, $payment->getBrokerCommission());
-
-        // monthly
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $this->assertEquals(Salva::MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
-        $this->assertEquals(Salva::MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
-
-        // final month
-        $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
-        $this->assertEquals(Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
-        $this->assertEquals(Salva::FINAL_MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
-
-        // partial
-        $payment->setTotalCommission(0.94);
-        $this->assertEquals(0.88, $payment->getCoverholderCommission());
-        $this->assertEquals(0.06, $payment->getBrokerCommission());
-    }
-
     /**
      * @expectedException \Exception
      */
@@ -93,7 +68,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $payment = new CheckoutPayment();
             $payment->setAmount(6);
             $policy->addPayment($payment);
-            $payment->setCommission();
+            $policy->setCommission($payment);
             $payment->setSuccess(true);
 
             // monthly
@@ -105,7 +80,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment = new CheckoutPayment();
         $payment->setAmount(6);
         $policy->addPayment($payment);
-        $payment->setCommission();
+        $policy->setCommission($payment);
         $this->assertEquals(Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
         $this->assertEquals(Salva::FINAL_MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
     }
@@ -123,7 +98,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment = new CheckoutPayment();
         $payment->setAmount(6 * 12);
         $policy->addPayment($payment);
-        $payment->setCommission();
+        $policy->setCommission($payment);
 
         // yearly
         $this->assertEquals(Salva::YEARLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
@@ -146,7 +121,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment = new CheckoutPayment();
         $payment->setAmount(2);
         $policy->addPayment($payment);
-        $payment->setCommission();
+        $policy->setCommission($payment);
     }
 
     /**
@@ -188,7 +163,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $date = (clone $date)->add(new \DateInterval("P1M"));
             $payment->setDate($date);
             $policy->addPayment($payment);
-            $payment->setCommission();
+            $policy->setCommission($payment);
             $payment->setSuccess(true);
             $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
         }
@@ -199,7 +174,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $payment->setAmount($premium->getMonthlyPremiumPrice());
             $policy->addPayment($payment);
             $payment->setSuccess(true);
-            $payment->setCommission();
+            $policy->setCommission($payment);
             $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
         }
         $this->assertEquals($premium->getMonthlyPremiumPrice(), $policy->getOutstandingPremium());
@@ -209,7 +184,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setAmount($premium->getMonthlyPremiumPrice());
         $policy->addPayment($payment);
         $payment->setSuccess(true);
-        $payment->setCommission();
+        $policy->setCommission($payment);
         $this->assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $payment->getTotalCommission());
     }
 
@@ -233,7 +208,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $payment->setDate($date);
             $payment->setAmount($premium->getMonthlyPremiumPrice());
             $policy->addPayment($payment);
-            $payment->setCommission();
+            $policy->setCommission($payment);
             $payment->setSuccess(true);
             $comparison = $i == 11 ? Salva::FINAL_MONTHLY_TOTAL_COMMISSION : Salva::MONTHLY_TOTAL_COMMISSION;
             $this->assertEquals($comparison, $payment->getTotalCommission());
@@ -300,9 +275,16 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $policy->addPayment($payment);
         // Make sure that the fractional commission is correct.
         // Should be equal to pro rata commission due.
-        $payment->setCommission(true);
+        $policy->setCommission($payment, true);
         $payment->setSuccess(true);
-        $this->assertEquals($policy->getProratedCommission($paymentDate), $policy->getTotalCommissionPaid());
+        $this->assertEquals(
+            $policy->getProratedCoverholderCommission($paymentDate),
+            $policy->getCoverholderCommissionPaid()
+        );
+        $this->assertEquals(
+            $policy->getProratedBrokerCommission($paymentDate),
+            $policy->getBrokerCommissionPaid()
+        );
     }
 
     /**
@@ -349,13 +331,13 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $payment->setAmount($premium->getMonthlyPremiumPrice());
             $payment->setSuccess(true);
             $policy->addPayment($payment);
-            $payment->setCommission(true);
+            $policy->setCommission($payment, true);
         }
         $payment = new BacsPayment();
         $payment->setAmount($amount);
         $payment->setDate($end);
         $policy->addPayment($payment);
-        $payment->setCommission(true, $end);
+        $policy->setCommission($payment, true, $end);
         // Perform the check.
         $this->assertEquals($coverholderCommission, $payment->getCoverholderCommission());
         $this->assertEquals($brokerCommission, $payment->getBrokerCommission());
@@ -369,44 +351,23 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     {
         $startDate = new \DateTime();
         $policy = $this->createEligiblePolicy($startDate, 5, 1, 0.12);
-
         $payment = new CheckoutPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 0.5);
-
         $policy->addPayment($payment);
-
-        $payment->setCommission(false);
+        $policy->setCommission($payment, false);
     }
 
     public function testSetCommissionRemainderDoesNotFailWithTrue()
     {
         $startDate = new \DateTime();
         $policy = $this->createEligiblePolicy($startDate, 5, 1, 0.12);
-
         $payment = new CheckoutPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 0.5);
-
         $policy->addPayment($payment);
-
-        $payment->setCommission(true);
-
+        $policy->setCommission($payment, true);
         $commission = $payment->getTotalCommission();
         $this->assertGreaterThan(0, $commission);
         static::assertLessThan(Salva::MONTHLY_TOTAL_COMMISSION, $commission);
-    }
-
-    /**
-     * Makes sure that if you try to calculate the commission on a partial refund directly it will throw a commission
-     * exception.
-     */
-    public function testSetCommissionFailsWithPartialRefund()
-    {
-        $policy = $this->createEligiblePolicy(new \DateTime(), 5, 6, 1);
-        $payment = new CheckoutPayment();
-        $payment->setAmount(-4.3);
-        // Make sure this payment throws an exception when calculating commission is attempted.
-        $this->expectException(InvalidPaymentException::class);
-        $payment->setCommission(true);
     }
 
     public function testFinalCommissionHigher()
@@ -421,7 +382,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
             $policy->addPayment($payment);
             // Make sure that the fractional commission is correct.
             // Should be equal to pro rata commission due.
-            $payment->setCommission(true);
+            $policy->setCommission($payment, true);
             $payment->setSuccess(true);
             $payments[$i] = $payment;
         }
@@ -470,7 +431,7 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
         $payment->setDate($date);
         $policy->addPayment($payment);
-        $payment->setCommission();
+        $policy->setCommission($payment);
         $payment->setSuccess(true);
     }
 }

@@ -3101,18 +3101,15 @@ abstract class Policy
         if (!$this->isCancelled()) {
             return 0;
         }
-
         if (!$skipAllowedCheck) {
             if (!$this->isRefundAllowed()) {
                 return 0;
             }
         }
-
         $offset = 0;
         if ($countScheduled) {
             $offset = $this->getScheduledPaymentRefundAmount();
         }
-
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
         $reason = $this->getCancelledReason();
@@ -3129,20 +3126,18 @@ abstract class Policy
         if (!$this->isCancelled()) {
             return 0;
         }
-
         if (!$skipAllowedCheck) {
             if (!$this->isRefundAllowed()) {
                 return 0;
             }
         }
-
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
-
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return $this->getCooloffCommissionRefund($skipValidate);
         } else {
-            return $this->getProratedCommissionRefund($this->getEnd());
+            return $this->getProratedCoverholderCommissionRefund($this->getEnd()) +
+                $this->getProratedBrokerCommissionRefund($this->getEnd());
         }
     }
 
@@ -3223,7 +3218,7 @@ abstract class Policy
      */
     public function getProratedBrokerCommission(\DateTime $date = null)
     {
-        return $this->toTwoDp($this->getYearlyCoverholderCommission() * $this->getProrataMultiplier($date));
+        return $this->toTwoDp($this->getYearlyBrokerCommission() * $this->getProrataMultiplier($date));
     }
 
     /**
@@ -3255,7 +3250,7 @@ abstract class Policy
     public function getProratedCoverholderCommissionRefund(\DateTime $date)
     {
         return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
-            $this->getTotalCoverholderCommissionPaid());
+            $this->getCoverholderCommissionPaid());
     }
 
     /**
@@ -3265,7 +3260,7 @@ abstract class Policy
      */
     public function getProratedBrokerCommissionRefund(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getTotalBrokerCommissionPaid());
+        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getBrokerCommissionPaid());
     }
 
     public function getDaysInPolicyYear()
@@ -5853,11 +5848,12 @@ abstract class Policy
     /**
      * Sets the commission of a payment belonging to this policy because the policy knows the coverholder and their
      * commission rules.
-     * @param Payment $payment       is the payment that we are setting the commission for.
-     * @param boolean $allowFraction is whether to allow fractional payments and calculate fractional commission for
-     *                               them.
+     * @param Payment        $payment       is the payment that we are setting the commission for.
+     * @param boolean        $allowFraction is whether to allow fractional payments and calculate fractional commission
+     *                                      for them.
+     * @param \DateTime|null $date          is the date at which pro rata things will be calculated.
      */
-    abstract public function setCommission($payment, $allowFraction = false);
+    abstract public function setCommission($payment, $allowFraction = false, \DateTime $date = null);
 
     /**
      * Gives you the total amount of commission this policy should pay.

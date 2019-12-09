@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Classes\Salva;
+use AppBundle\Exception\CommissionException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -357,19 +358,19 @@ class SalvaPhonePolicy extends PhonePolicy
     /**
      * @inheritDoc
      */
-    public function setCommission($payment, $allowFraction = false)
+    public function setCommission($payment, $allowFraction = false, \DateTime $date = null)
     {
         $salva = new Salva();
         $amount = $payment->getAmount();
         // Only set broker fees if we know the amount
         if ($this->areEqualToFourDp($amount, $this->getPremium()->getYearlyPremiumPrice())) {
-            $payment->setCommission( Salva::YEARLY_COVERHOLDER_COMMISSION, Salva::YEARLY_BROKER_COMMISSION);
-        } elseif ($amount >= 0 && ($this->getPremium()->isEvenlyDivisible($payment->getAmount()) ||
-            $this->getPremium()->isEvenlyDivisible($payment->getAmount(), true))
+            $payment->setCommission(Salva::YEARLY_COVERHOLDER_COMMISSION, Salva::YEARLY_BROKER_COMMISSION);
+        } elseif ($amount >= 0 && ($this->getPremium()->isEvenlyDivisible($amount) ||
+            $this->getPremium()->isEvenlyDivisible($amount, true))
         ) {
-            $comparison = $payment->hasSuccess() ? 0 : $payment->getAmount();
+            $comparison = $payment->hasSuccess() ? 0 : $amount;
             $includeFinal = $this->areEqualToTwoDp($comparison, $this->getOutstandingPremium());
-            $numPayments = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
+            $numPayments = $this->getPremium()->getNumberOfMonthlyPayments($amount);
             $payment->setCommission(
                 $salva->sumCoverholderCommission($numPayments, $includeFinal),
                 $numPayments * Salva::MONTHLY_BROKER_COMMISSION
@@ -388,13 +389,13 @@ class SalvaPhonePolicy extends PhonePolicy
             $dueBrokerCommission = $this->getProratedBrokerCommission($date);
             $dueCoverholderCommission = $this->getProratedCoverholderCommission($date);
             $payment->setCommission(
-                $dueBrokerCommission - $brokerCommission,
-                $dueCoverholderCommission - $coverholderCommission
+                $dueCoverholderCommission - $coverholderCommission,
+                $dueBrokerCommission - $brokerCommission
             );
         } else {
             throw new CommissionException(sprintf(
                 'Failed to set correct commission for %f (policy %s)',
-                $this->getAmount(),
+                $amount,
                 $this->getId()
             ));
         }

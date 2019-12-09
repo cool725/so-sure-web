@@ -142,7 +142,7 @@ class Create
         $payment->setDate($properDate);
         $policy->addPayment($payment);
         if ($success) {
-            $payment->setCommission(false, $properDate);
+            $policy->setCommission($payment, false, $properDate);
         }
         return $payment;
     }

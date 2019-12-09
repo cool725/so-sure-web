@@ -499,7 +499,7 @@ trait UserClassTrait
         }
         $payment = new JudoPayment();
         $payment->setAmount($amount);
-        $payment->setTotalCommission($commission);
+        $policy->setCommission($payment);
         $payment->setResult($result);
         $payment->setReceipt($receiptId);
         if ($date) {
