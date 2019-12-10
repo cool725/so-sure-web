@@ -36,7 +36,6 @@ class DoctrinePolicyListener extends BaseDoctrineListener
         $policy = $eventArgs->getDocument();
         if ($policy instanceof Policy) {
             if (!$policy->isValidPolicy(mb_strtoupper($this->environment))) {
-                die("bongo");
                 return;
             }
         }

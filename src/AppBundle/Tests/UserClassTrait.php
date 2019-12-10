@@ -438,11 +438,9 @@ trait UserClassTrait
         if ($monthly) {
             $policy->setPremiumInstallments(12);
             $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
-            $commission = Salva::MONTHLY_TOTAL_COMMISSION;
         } else {
             $policy->setPremiumInstallments(1);
             $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
-            $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
         if ($adjustment) {
             $premium = $premium - $adjustment;
@@ -456,7 +454,7 @@ trait UserClassTrait
         } else {
             $receiptId = random_int(1, 999999);
         }
-        self::addPayment($policy, $premium, $commission, $receiptId, $date);
+        self::addPayment($policy, $premium, $receiptId, $date);
     }
 
     public static function addBacsPayPayment($policy, $date = null, $monthly = true, $manual = true)

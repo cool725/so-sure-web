@@ -298,7 +298,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
     public function testGetNonRewardConnections()
     {
         //Create Policy
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user = new User();
         $policy->setUser($user);
 
