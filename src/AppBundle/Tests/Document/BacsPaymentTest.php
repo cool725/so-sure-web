@@ -297,6 +297,8 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         }
         self::assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $bacs->getTotalCommission());
         $now = \DateTime::createFromFormat('U', time());
-        $this->assertEquals($now, $policy->getPaymentMethod()->getBankAccount()->getLastSuccessfulPaymentDate(), '', 1);
+        /** @var BacsPaymentMethod $paymentMethod */
+        $paymentMethod = $policy->getPaymentMethod();
+        $this->assertEquals($now, $paymentMethod->getBankAccount()->getLastSuccessfulPaymentDate(), '', 1);
     }
 }

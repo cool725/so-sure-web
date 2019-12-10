@@ -471,14 +471,29 @@ abstract class Payment
         return $this->totalCommission;
     }
 
+    public function setTotalCommission($totalCommission)
+    {
+        $this->totalCommission = $totalCommission;
+    }
+
     public function getCoverholderCommission()
     {
         return $this->coverholderCommission;
     }
 
+    public function setCoverholderCommission($coverholderCommission)
+    {
+        $this->coverholderCommission = $coverholderCommission;
+    }
+
     public function getBrokerCommission()
     {
         return $this->brokerCommission;
+    }
+
+    public function setBrokerCommission($brokerCommission)
+    {
+        $this->brokerCommission = $brokerCommission;
     }
 
     public function setReference($reference)

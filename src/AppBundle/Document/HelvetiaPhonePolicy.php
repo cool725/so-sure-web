@@ -37,6 +37,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function setCommission($payment, $allowFraction = false, \DateTime $date = null)
     {
+        $date = $date ?: new \DateTime();
         if ($this->getPremium()->isEvenlyDivisible($payment->getAmount())) {
             $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
             $payment->setCommission(

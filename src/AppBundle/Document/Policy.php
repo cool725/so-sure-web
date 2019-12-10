@@ -3203,7 +3203,7 @@ abstract class Policy
 
     /**
      * Gives you the total amount of commission that the policy should have paid up so far on a pro rata basis.
-     * @param \DateTime|null is the date at which this should be correct with null meaning right now.
+     * @param \DateTime|null $date is the date at which this should be correct with null meaning right now.
      * @return float the total amount of pro rata commission.
      */
     public function getProratedCommission(\DateTime $date = null)

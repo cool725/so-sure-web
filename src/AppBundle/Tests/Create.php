@@ -148,18 +148,6 @@ class Create
     }
 
     /**
-     * Create a bacs payment of one installments's premium and add it to the policy.
-     * @param Policy $policy is the policy to add the payment to.
-     * @param \DateTime $date is the date of the payment.
-     * @param boolean $success is the success of the payment.
-     * @return BacsPayment the created payment.
-     */
-    public static function standardBacsPayment($policy, $date, $success)
-    {
-
-    }
-
-    /**
      * Create a scheduled payment of one month's premium and put it on the given policy.
      * @param Policy           $policy is the policy to add the scheduled payment to.
      * @param \DateTime|string $date   is the scheduled date of the scheduled payment.

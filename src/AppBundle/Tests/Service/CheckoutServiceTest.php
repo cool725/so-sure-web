@@ -2077,7 +2077,7 @@ class CheckoutServiceTest extends WebTestCase
         $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $paymentA->setSource(Payment::SOURCE_WEB);
         $policy->addPayment($paymentA);
-        $paymentA->setCommission(true);
+        $policy->setCommission($paymentA, true);
         $paymentA->setSuccess(true);
         $paymentA->setReceipt($payment);
 
@@ -2104,7 +2104,7 @@ class CheckoutServiceTest extends WebTestCase
         $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $paymentA->setSource(Payment::SOURCE_WEB);
         $policy->addPayment($paymentA);
-        $paymentA->setCommission(true);
+        $policy->setCommission($paymentA, true);
         $paymentA->setSuccess(true);
         $paymentA->setReceipt($payment);
 
