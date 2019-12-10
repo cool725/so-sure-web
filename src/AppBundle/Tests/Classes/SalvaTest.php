@@ -13,14 +13,6 @@ use AppBundle\Document\Payment\JudoPayment;
  */
 class SalvaTest extends \PHPUnit\Framework\TestCase
 {
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
-
     /**
      * Makes sure that sum coverholder commission works correctly.
      */
@@ -59,5 +51,4 @@ class SalvaTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($normal * 13, $salva->sumCoverholderCommission(13, false));
         $this->assertEquals($normal * 12 + $last, $salva->sumCoverholderCommission(13, true));
     }
-
 }

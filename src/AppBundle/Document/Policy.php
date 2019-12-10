@@ -5857,9 +5857,9 @@ abstract class Policy
 
     /**
      * Sets commission the normal way and then subtracts it from 0.
-     * @param Payment $payment is the payment that is going to get refund commission.
-     * @param boolean $allowFraction is whether to allow fractional payments to calculate their commission.
-     * @param \DateTime|null $date is the date at which the calculation should be accurate, null meaning now.
+     * @param Payment        $payment       is the payment that is going to get refund commission.
+     * @param boolean        $allowFraction is whether to allow fractional payments to calculate their commission.
+     * @param \DateTime|null $date          is the date at which the calculation should be accurate, null meaning now.
      */
     public function setCommissionInverted($payment, $allowFraction = false, \DateTime $date = null)
     {

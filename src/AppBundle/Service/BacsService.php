@@ -871,7 +871,6 @@ class BacsService
                     $debitPayment->setCommission(
                         0 - $submittedPayment->getCoverholderCommission(),
                         0 - $submittedPayment->getBrokerCommission()
-
                     );
                     $debitPayment->calculateSplit();
                     $submittedPayment->addReverse($debitPayment);

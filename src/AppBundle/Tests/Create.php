@@ -93,10 +93,10 @@ class Create
 
     /**
      * Create a policy and give it a bacs payment method.
-     * @param User $user is the user that the policy belongs to.
-     * @param \DateTime|string $start is the start date either as a date string or as a date.
-     * @param string $status is the status that the policy should be given.
-     * @param int $installments is the number of premium installments the policy is meant to pay.
+     * @param User             $user         is the user that the policy belongs to.
+     * @param \DateTime|string $start        is the start date either as a date string or as a date.
+     * @param string           $status       is the status that the policy should be given.
+     * @param int              $installments is the number of premium installments the policy is meant to pay.
      * @return Policy the policy.
      */
     public static function bacsPolicy($user, $start, $status, $installments)
