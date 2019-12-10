@@ -3,11 +3,13 @@
 {# Set vars #}
 {% set body_class = 'invite' %}
 {% set robots_noindex = true %}
-{% set share_mode = true %}
 
-{% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 
 {# Set Meta #}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+{% endblock %}
 {% set og_title = 'Sign up and save' %}
 {% set og_description = "Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance." %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
@@ -20,38 +22,271 @@
 
     <section class="hero">
         <div class="container-large">
-            WORDS
-        </div>
-    </section>
-
-    <section class="how-it-works">
-        <div class="container-large">
-            HOW IT WORKS
-        </div>
-    </section>
-
-    <section class="why-insure">
-        <div class="container-large">
-            WHY INSURE
-        </div>
-    </section>
-
-    <section class="banner py-5">
-        <div class="container-large">
-            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
-                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
-                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
-                    <div class="banner__text text-center text-lg-left ml-lg-4">
-                        <h2 class="h4 text-white">Want to know more about so-sure mobile insurance</h2>
-                        <p class="lead text-white">Visit our website to find out more</p>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="hero__intro">
+                        <h1 class="mb-4 text-columbia-blue-e fit">
+                            {% if scode is defined and scode and scode.policy %}
+                                Wow, {{ scode.policy.user.firstname }}'s such a <br class="d-none d-lg-inline"> great friend 🥰
+                            {% else %}
+                                Wow, so-sure has the <br class="d-none d-lg-inline"> best insurance 🥰
+                            {% endif %}
+                        </h1>
+                        <div id="invite_carousel"
+                             class="carousel slide mb-4"
+                             data-ride="carousel"
+                             data-interval="6000"
+                             data-wrap="true">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active">
+                                    <div class="text-white h3">
+                                        <span class="sub">...they want <strong>you to benefit</strong> from the best mobile cover and earn great rewards</span>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <div class="text-white h3">
+                                        <span class="sub">...they want you to <strong>be rewarded</strong> and get up to 80% of your money back!</span>
+                                    </div>
+                                </div>
+                                <div class="carousel-item">
+                                    <div class="text-white h3">
+                                        <span class="sub">...they don’t want you to end up with a <strong>massive repair bill</strong> when disaster strikes!</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ol class="carousel-indicators">
+                                <li data-target="#invite_carousel"
+                                    class="active"
+                                    data-slide-to="0"></li>
+                                <li data-target="#invite_carousel"
+                                    data-slide-to="1"></li>
+                                <li data-target="#invite_carousel"
+                                    data-slide-to="2"></li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="hero__controls mb-4">
+                        <div class="mb-4">
+                            <a href="#"
+                               class="btn btn-white btn-block-xs mr-md-2 track-data get-a-quote disabled"
+                               data-event="
+                                {% if scode is defined and scode and scode.policy %}
+                                    scode-hero-quote-btn-{{ user_code }}
+                                {% else %}
+                                    scode-hero-quote-btn
+                                {% endif %}
+                               ">
+                               Get your quote</a>
+                            <a id="user_login_btn"
+                               href="{{ path('user_home') }}"
+                               class="btn btn-outline-white btn-block-xs">
+                                Login to connect 💰</a>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <a id="user_feedback_btn"
+                                   href="#user_feedback"
+                                   class="btn-simple-link text-white">
+                                   No thank you</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="banner__controls text-center text-lg-left">
-                    <a href="{{ path('homepage') }}" class="btn btn-success btn-block-xs">Visit our website</a>
+                <div class="col-lg-5 offset-lg-1">
+                    <div class="hero__illustration">
+
+                        {# Overlays #}
+                        <img id="hero_img_overlay_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
+                             alt="Likes hearts stars smileys"
+                             class="img-fluid lozad hero__illustration__img">
+                        <img id="hero_img_overlay_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_2_overlay.png"
+                             alt="Hearts stars money"
+                             class="img-fluid hero__illustration__img">
+                        <img id="hero_img_overlay_3"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_overlay.png "
+                             alt="Unhappy warning lightning"
+                             class="img-fluid hero__illustration__img">
+
+                        {# 2nd images #}
+                        <img id="hero_img_2_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_2_1.png "
+                             alt="Reward pot money"
+                             class="img-fluid hero__illustration__img">
+
+                        {# 1st images #}
+                        <img id="hero_img_1_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_2.png "
+                             alt="Happy couple mobile"
+                             class="img-fluid lozad hero__illustration__img">
+                        <img id="hero_img_1_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png "
+                             alt="Happy so-sure phone"
+                             class="img-fluid lozad hero__illustration__img">
+
+                        {# 3rd images #}
+                        <img id="hero_img_3_2"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_2.png "
+                             alt="Dropped mobile phone"
+                             class="img-fluid hero__illustration__img">
+                        <img id="hero_img_3_3"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_3.png "
+                             alt="Lost mobile phone"
+                             class="img-fluid hero__illustration__img">
+                        <img id="hero_img_3_1"
+                             src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_3_1.png "
+                             alt="Sad so-sure phone"
+                             class="img-fluid hero__illustration__img">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <svg class="d-lg-none"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 750 586"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="V1-Virality-LP-(Mobile)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -1144.000000)" fill="#FFFFFF">
+                    <path d="M0,1464 C146.638193,1458.82104 282.638193,1429.4877 408,1376 C533.361807,1322.5123 647.361807,1245.17896 750,1144 L750,1737 L0,1737 L0,1464 Z" id="Rectangle"></path>
+                </g>
+            </g>
+        </svg>
+        <svg class="d-none d-lg-block d-fl-none"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1440 596"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -113.000000)" fill="#FFFFFF">
+                    <path d="M1440,113.053995 L1440,709 L0,709 L0,609.415089 C115.626287,635.690524 240.187163,650 370,650 C889.293087,650 1324.54128,421.011571 1440,113.053995 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </svg>
+        <svg class="d-none d-fl-block"
+             preserveAspectRatio="xMinYMin meet"
+             viewBox="0 0 1440 313"
+             version="1.1"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="V1-Virality-LP-(Desktop)" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Template" transform="translate(0.000000, -396.000000)" fill="#FFFFFF">
+                    <path d="M1703,114.218143 L1703,709 L0,709 L0,609.339943 C136.864514,635.66324 284.320516,650 438,650 C1051.40793,650 1565.66411,421.588479 1703,114.218143 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    <section class="usps pb-5 pt-md-5">
+        <div class="container-large">
+            <ul class="list-unstyled icn-fa-list d-lg-flex justify-content-lg-between">
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    You get 24-72 hour replace or repair
+                </li>
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    Enjoy low excess from just &pound;50
+                </li>
+                <li class="mb-4 mb-lg-0 h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    Earn up to 80% money back
+                </li>
+                <li class="h5">
+                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                    New, second hand &amp; refurbished phones
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="video d-flex align-items-center justify-content-center">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_note_left.png"
+             alt="Bank note"
+             class="lozad video__money-left">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_note_right.png"
+             alt="Bank note"
+             class="lozad video__money-right">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_pot.png"
+             alt="Pot of money"
+             class="lozad video__pot">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_male_avatar.png"
+             alt="Male avatar"
+             class="lozad video__avatar-male">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_female_avatar.png"
+             alt="Female avatar"
+             class="lozad video__avatar-female">
+        <a href="#"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/QEskwqsNgrQ"
+           class="watch-video video__play">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                 alt="Play buttonn"
+                 class="lozad"
+                 width="120px">
+        </a>
+    </section>
+
+    <section class="knowledge-base pb-lg-5">
+        <div class="container pb-5">
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+
+            <div class="end-cta end-cta__mobile d-md-none">
+                <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                <a href="#"
+                   class="btn btn-success btn-block-xs track-data get-a-quote"
+                   data-event="
+                   {% if scode is defined and scode and scode.policy %}
+                       scode-bottom-lets-start-btn-{{ user_code }}
+                   {% else %}
+                       scode-bottom-lets-start-btn
+                   {% endif %}">Let's start!</a>
+            </div>
+            <div class="end-cta end-cta__desktop d-none d-md-block">
+                <div class="cardbox cardbox-100">
+                    <div class="cardbox__body d-flex align-items-center justify-content-start">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png"
+                             alt="Happy so-sure phone"
+                             width="180px"
+                             class="lozad">
+                        <div class="ml-5">
+                            <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                            <a href="#"
+                               class="btn btn-success btn-block-xs track-data get-a-quote"
+                               data-event="
+                                {% if scode is defined and scode and scode.policy %}
+                                    scode-bottom-lets-start-btn-{{ user_code }}
+                                {% else %}
+                                    scode-bottom-lets-start-btn
+                                {% endif %}
+                               ">Let's start!</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <section id="user_feedback" class="feedback py-lg-5">
+        <div class="container-large py-5">
+            {% include 'AppBundle::Components/_feedback.html.twig' %}
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Components/_knowledgeBaseModals.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

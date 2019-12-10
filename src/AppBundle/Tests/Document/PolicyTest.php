@@ -12,6 +12,9 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Connection\RewardConnection;
+use AppBundle\Document\Connection\RenewalConnection;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Tests\Create;
 use AppBundle\Classes\SoSure;
 
@@ -289,6 +292,53 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $this->startOfDay((clone $date)->add(new \DateInterval("P30D"))),
             $this->startOfDay($policy->getPolicyExpirationDate($date))
         );
+    }
+
+
+    public function testGetNonRewardConnections()
+    {
+        //Create Policy
+        $policy = new PhonePolicy();
+        $user = new User();
+        $policy->setUser($user);
+
+        //Create Connections
+        $rewardConnection = new RewardConnection();
+        $rewardConnection->setLinkedUser($user);
+        $standardConnection = new StandardConnection();
+        $standardConnection->setLinkedUser($user);
+        $renewalConnection = new RenewalConnection();
+        $renewalConnection->setLinkedUser($user);
+
+        //Influencer Connection
+        $influencerConnection = new RewardConnection();
+        $influencer = new User();
+        $influencer->setIsInfluencer(true);
+        $influencerConnection->setLinkedUser($influencer);
+
+        $policy->addConnection($rewardConnection);
+        $policy->addConnection($standardConnection);
+        $policy->addConnection($renewalConnection);
+        $policy->addConnection($influencerConnection);
+
+        //Get Connections
+        $connections = $policy->getConnections();
+        $this->assertEquals(count($connections), 4);
+
+        //Get Standard Connections
+        $connections = $policy->getStandardConnections();
+        $this->assertEquals(count($connections), 1);
+
+        //Get Non Reward Connections, incuding influencers
+        $connections = $policy->getNonRewardConnections();
+        $this->assertEquals(count($connections), 3);
+        foreach ($connections as $connection) {
+            $this->assertTrue(
+                $connection instanceof StandardConnection ||
+                $connection instanceof RenewalConnection ||
+                ($connection instanceof RewardConnection && $connection->getLinkedUser()->getIsInfluencer())
+            );
+        }
     }
 
     /**

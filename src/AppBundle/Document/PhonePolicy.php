@@ -364,6 +364,11 @@ abstract class PhonePolicy extends Policy
         $this->picSureApprovedDate = $picSureApprovedDate;
     }
 
+    public function removePicSureApprovedDate()
+    {
+        $this->picSureApprovedDate = null;
+    }
+
     public function getSerialNumber()
     {
         return $this->serialNumber;
@@ -809,6 +814,7 @@ abstract class PhonePolicy extends Policy
             foreach ($this->getPolicyPicSureFiles() as $file) {
                 $this->removePolicyFile($file);
             }
+            $this->removePicSureApprovedDate();
         }
 
         if ($picSureStatus == self::PICSURE_STATUS_APPROVED) {
