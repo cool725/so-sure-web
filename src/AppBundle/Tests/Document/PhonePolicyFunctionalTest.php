@@ -5522,7 +5522,6 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $payment = self::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2016-02-28 15:00'),
             JudoPayment::RESULT_DECLINED

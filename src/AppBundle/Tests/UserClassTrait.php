@@ -489,7 +489,6 @@ trait UserClassTrait
     public static function addPayment(
         Policy $policy,
         $amount,
-        $commission,
         $receiptId = null,
         $date = null,
         $result = JudoPayment::RESULT_SUCCESS
@@ -513,7 +512,6 @@ trait UserClassTrait
     public static function addCheckoutPayment(
         Policy $policy,
         $amount,
-        $commission,
         $receiptId = null,
         $date = null,
         $result = CheckoutPayment::RESULT_CAPTURED
@@ -523,7 +521,7 @@ trait UserClassTrait
         }
         $payment = new CheckoutPayment();
         $payment->setAmount($amount);
-        $payment->setTotalCommission($commission);
+        $policy->setCommission($payment);
         $payment->setResult($result);
         $payment->setReceipt($receiptId);
         if ($date) {

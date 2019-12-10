@@ -1586,7 +1586,6 @@ class UserControllerTest extends BaseControllerTest
         static::addCheckoutPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             $failDate,
             CheckoutPayment::RESULT_DECLINED
