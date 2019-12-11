@@ -23,7 +23,7 @@ class DoctrineLeadListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof Lead) {
-            $this->triggerEvent($document, LeadEvent::EVENT_CREATED);
+            $this->triggerEvent($document, LeadEvent::EVENT_UPDATED);
         }
     }
 

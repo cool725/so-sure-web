@@ -1183,10 +1183,9 @@ services:
         arguments:
             - "@app.intercom"
         tags:
-            -  { name: kernel.event_listener, event: event.lead.created, method: onLeadUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.lead.updated, method: onLeadUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated.intercom, method: onUserUpdatedEvent }
-            -  { name: kernel.event_listener, event: event.policy.init, method: onPolicyInitEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
