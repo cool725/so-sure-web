@@ -77,10 +77,6 @@ $(function() {
                 "lead_form[message]": {
                     required: true,
                 },
-                recaptcha_response_field: {
-                    required: true,
-                    checkCaptcha: true
-                },
             },
             messages: {
                 "lead_form[name]": {
@@ -107,7 +103,11 @@ $(function() {
                 }
             },
             submitHandler: function(form) {
-                form.submit();
+                if (grecaptcha.getResponse()) {
+                    form.submit();
+                } else {
+                    alert('Please confirm captcha to proceed')
+                }
             },
             showErrors: function(errorMap, errorList) {
                 this.defaultShowErrors();

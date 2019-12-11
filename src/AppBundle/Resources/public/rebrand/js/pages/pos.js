@@ -26,7 +26,7 @@ sosure.pos = (function() {
 
     self.addValidation = () => {
         self.form.validate({
-            debug: true,
+            debug: false,
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
