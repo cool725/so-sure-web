@@ -234,8 +234,8 @@ class SalvaExportService
         /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
+        /** @var SalvaPhonePolicy $policy */
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
-            /** @var SalvaPhonePolicy $policy */
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $data = $this->transformPolicy($policy, $version);
                 $paidPremium += $data[16];
@@ -388,6 +388,7 @@ class SalvaExportService
         /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $lines[] =  sprintf('%s', $this->formatLine($this->transformRenewal(null)));
+        /** @var SalvaPhonePolicy $policy */
         foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
@@ -757,7 +758,7 @@ class SalvaExportService
                 if (!isset($data['policyId']) || !$data['policyId'] || !isset($data['action']) || !$data['action']) {
                     throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
-                /** @var PhonePolicyRepository $repo */
+                /** @var SalvaPhonePolicyRepository $repo */
                 $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
                 /** @var SalvaPhonePolicy $policy */
                 $policy = $repo->find($data['policyId']);
