@@ -20,7 +20,6 @@ class PaymentRepository extends DocumentRepository
             $startMonth = $this->startOfMonth($date->sub(new \DateInterval('P1D')));
             $nextMonth = $this->endOfMonth($nextMonth);
         }
-
         $qb = $this->createQueryBuilder()
             ->field('success')->equals(true)
             ->field('date')->gte($startMonth)
@@ -38,12 +37,10 @@ class PaymentRepository extends DocumentRepository
                 'debtCollection',
                 'policyDiscountRefund',
             ])
+            ->field('policy.policy_type')->equal('salva-phone')
             ->sort('date')
             ->sort('id')
             ->getQuery();
-
-        //print_r($qb->getQuery());
-
         return $qb->execute();
     }
 

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\SalvaPhonePolicyRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class SalvaPhonePolicy extends PhonePolicy

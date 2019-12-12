@@ -6,7 +6,6 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\MongoDB\Aggregation\Builder;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\DateTrait;
 
 class PhonePolicyRepository extends PolicyRepository
@@ -79,7 +78,7 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate = \DateTime::createFromFormat('U', time());
         }
 
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
@@ -110,7 +109,7 @@ class PhonePolicyRepository extends PolicyRepository
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder();
         $qb->addAnd(
@@ -151,7 +150,7 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate = \DateTime::createFromFormat('U', time());
         }
 
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
@@ -192,7 +191,7 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate = \DateTime::createFromFormat('U', time());
         }
         if (!$prefix) {
-            $policy = new HelvetiaPhonePolicy();
+            $policy = new PhonePolicy();
             $prefix = $policy->getPolicyNumberPrefix();
         }
 
@@ -231,7 +230,7 @@ class PhonePolicyRepository extends PolicyRepository
         }
 
         if (!$prefix) {
-            $policy = new HelvetiaPhonePolicy();
+            $policy = new PhonePolicy();
             $prefix = $policy->getPolicyNumberPrefix();
         }
 
@@ -273,7 +272,7 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate = \DateTime::createFromFormat('U', time());
         }
 
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
@@ -297,7 +296,7 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate = \DateTime::createFromFormat('U', time());
         }
 
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
@@ -350,7 +349,7 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate = \DateTime::createFromFormat('U', time());
         }
 
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
@@ -395,60 +394,11 @@ class PhonePolicyRepository extends PolicyRepository
         });
     }
 
-    public function getAllPoliciesForExport(\DateTime $date, $environment)
-    {
-        \AppBundle\Classes\NoOp::ignore([$date]);
 
-        $policy = new HelvetiaPhonePolicy();
-
-        $qb = $this->createQueryBuilder()
-            ->field('status')->in([
-                Policy::STATUS_ACTIVE,
-                Policy::STATUS_PICSURE_REQUIRED,
-                Policy::STATUS_CANCELLED,
-                Policy::STATUS_EXPIRED,
-                Policy::STATUS_EXPIRED_CLAIMABLE,
-                Policy::STATUS_EXPIRED_WAIT_CLAIM,
-                Policy::STATUS_UNPAID
-            ])
-            ->field('premiumInstallments')->gt(0);
-
-        if ($environment == "prod") {
-            $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
-        } else {
-            $qb->field('policyNumber')->notEqual(null);
-        }
-
-        return $qb->getQuery()
-            ->execute();
-    }
-
-    public function getAllExpiredPoliciesForExport(\DateTime $date, $environment)
-    {
-        \AppBundle\Classes\NoOp::ignore([$date]);
-
-        $policy = new HelvetiaPhonePolicy();
-
-        $qb = $this->createQueryBuilder()
-            ->field('status')->in([
-                Policy::STATUS_EXPIRED,
-                Policy::STATUS_EXPIRED_CLAIMABLE,
-                Policy::STATUS_EXPIRED_WAIT_CLAIM,
-            ]);
-
-        if ($environment == "prod") {
-            $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
-        } else {
-            $qb->field('policyNumber')->notEqual(null);
-        }
-
-        return $qb->getQuery()
-            ->execute();
-    }
 
     public function getPotValues()
     {
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         return $this->getDocumentManager()->getDocumentCollection($this->getClassName())->createAggregationBuilder()
                 ->match()
@@ -474,7 +424,7 @@ class PhonePolicyRepository extends PolicyRepository
 
     public function getUnpaidPolicies()
     {
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
@@ -487,7 +437,7 @@ class PhonePolicyRepository extends PolicyRepository
 
     public function findAllPolicies($environment)
     {
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
         $qb = $this->createQueryBuilder();
         if ($environment == "prod") {
             $prodPolicyRegEx = new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()));
@@ -509,7 +459,7 @@ class PhonePolicyRepository extends PolicyRepository
      */
     public function countPicSurePolicies($picSureStatus, array $allTerms, $activeUnpaidOnly = false)
     {
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
         $picsureTermsIds = [];
         foreach ($allTerms as $term) {
             if ($term->isPicSureEnabled()) {
@@ -545,7 +495,7 @@ class PhonePolicyRepository extends PolicyRepository
      */
     public function findEndingByStatus($status = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $policy = new HelvetiaPhonePolicy();
+        $policy = new PhonePolicy();
         $qb = $this->createQueryBuilder()
             ->field("policyNumber")->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
         if (is_array($status)) {

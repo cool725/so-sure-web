@@ -4,7 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
-use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\SalvaPhonePolicyRepository;
 use Aws\S3\S3Client;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
@@ -231,7 +231,7 @@ class SalvaExportService
         $lines = [];
         $paidPremium = 0;
         $paidBrokerFee = 0;
-        /** @var PhonePolicyRepository $repo */
+        /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
@@ -342,7 +342,7 @@ class SalvaExportService
         $lines = [];
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
-        $lines[] =  sprintf("%s", $this->formatLine($this->transformClaim(null)));
+        $lines[] =  sprintf('%s', $this->formatLine($this->transformClaim(null)));
         foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
             /** @var Claim $claim */
             // For prod, skip invalid policies
@@ -360,7 +360,7 @@ class SalvaExportService
             }
 
             $data = $this->transformClaim($claim);
-            $lines[] = sprintf("%s", $this->formatLine($data));
+            $lines[] = sprintf('%s', $this->formatLine($data));
         }
 
         if ($s3) {
@@ -385,9 +385,9 @@ class SalvaExportService
         }
 
         $lines = [];
-        /** @var PhonePolicyRepository $repo */
+        /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $lines[] =  sprintf("%s", $this->formatLine($this->transformRenewal(null)));
+        $lines[] =  sprintf('%s', $this->formatLine($this->transformRenewal(null)));
         foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
