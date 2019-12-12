@@ -37,7 +37,7 @@ class PaymentRepository extends DocumentRepository
                 'debtCollection',
                 'policyDiscountRefund',
             ])
-            ->field('policy.policy_type')->equal('salva-phone')
+            ->field('policy.policy_type')->equals('salva-phone')
             ->sort('date')
             ->sort('id')
             ->getQuery();

@@ -26,7 +26,7 @@ class ClaimRepository extends DocumentRepository
         $qb->field('notificationDate')->notEqual(null);
         $qb->field('status')->notIn([Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED, null]);
         $qb->field('number')->notEqual(null);
-        $qb->field('policy.policy_type')->equal('salva-phone');
+        $qb->field('policy.policy_type')->equals('salva-phone');
         $qb->sort('underwriterLastUpdated', 'desc');
 
         /*

@@ -29,7 +29,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
     public function getAllPoliciesForExport(\DateTime $date, $environment)
     {
         NoOp::ignore([$date]);
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
@@ -59,7 +59,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
     public function getAllExpiredPoliciesForExport(\DateTime $date, $environment)
     {
         NoOp::ignore([$date]);
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_EXPIRED,
