@@ -9,30 +9,20 @@ require('../../sass/pages/contact.scss');
 require('jquery-validation');
 require('../common/validationMethods.js');
 
-const sosure = sosure || {};
+$(function() {
 
-sosure.contactUs = (function() {
-    let self = {};
-    self.form = null;
-    self.isIE = null;
+    let validateForm = $('.validate-form'),
+        isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
 
-    self.init = () => {
-        self.form = $('.validate-form');
-        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
-        if (self.form.data('client-validation') && !self.isIE) {
-            self.addValidation();
-        }
-    }
-
-    self.addValidation = () => {
-        self.form.validate({
+    const addValidation = () => {
+        validateForm.validate({
             debug: false,
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
-            focusCleanup: true,
+            onfocusout: false,
             onkeyup: false,
-            onclick: false,
+            focusCleanup: true,
             rules: {
                 "contact_form[name]": {
                     required: true
@@ -75,16 +65,18 @@ sosure.contactUs = (function() {
             },
 
             submitHandler: function(form) {
-                form.submit();
+                if (grecaptcha.getResponse()) {
+                    form.submit();
+                } else {
+                    alert('Please confirm captcha to proceed')
+                }
             }
         });
     }
 
-    return self;
-})();
-
-$(function() {
-
-    sosure.contactUs.init();
+    // Add validation
+    if (validateForm.data('client-validation') && !isIE) {
+        addValidation();
+    }
 
 });

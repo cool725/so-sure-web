@@ -20,7 +20,7 @@ $(function(){
 
     const addValidation = () => {
         validateForm.validate({
-            debug: true,
+            debug: false,
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
