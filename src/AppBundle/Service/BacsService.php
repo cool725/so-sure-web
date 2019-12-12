@@ -253,7 +253,7 @@ class BacsService
         if ($debit) {
             $sftp->chdir('Inbound/DD_Collections');
         } else {
-            $sftp->chdir('Inbound/Poly_DC_Refunds');
+            $sftp->chdir('Inbound/DC_Refunds');
         }
         $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
         $files = $sftp->nlist('.', false);
@@ -468,9 +468,9 @@ class BacsService
         $fileData = file_get_contents($tmpFile);
         $fileDataArray = explode(PHP_EOL, $fileData);
 
-        //if (!$this->checkSubmissionFile($fileDataArray)) {
-        //    throw new \Exception('Invalid submission file, number of parameter is invalid');
-        //}
+        if (!$this->checkSubmissionFile($fileDataArray)) {
+            throw new \Exception('Invalid submission file, number of parameter is invalid');
+        }
 
         $this->uploadSftp($fileData, $sftpFilename, $debit);
 
