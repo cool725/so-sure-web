@@ -51,7 +51,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
 
     /**
      * Gives you all the expired policies for export.
-     * @param \DateTime $date is not used but must be present for whatever reason.
+     * @param \DateTime $date        is not used but must be present for whatever reason.
      * @param string    $environment is the environment that the query is being run in which determines whether to use
      *                               the real policy number prefix or the test one.
      * @return Cursor to the set of found policies for export.
