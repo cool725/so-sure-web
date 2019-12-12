@@ -253,7 +253,7 @@ class BacsService
         if ($debit) {
             $sftp->chdir('Inbound/DD_Collections');
         } else {
-            $sftp->chdir('Inbound/DC_Refunds');
+            $sftp->chdir('Inbound/Poly_DC_Refunds');
         }
         $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
         $files = $sftp->nlist('.', false);
