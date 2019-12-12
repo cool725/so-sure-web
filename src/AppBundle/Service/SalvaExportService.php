@@ -386,7 +386,7 @@ class SalvaExportService
 
         $lines = [];
         /** @var SalvaPhonePolicyRepository $repo */
-        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] =  sprintf('%s', $this->formatLine($this->transformRenewal(null)));
         /** @var SalvaPhonePolicy $policy */
         foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
