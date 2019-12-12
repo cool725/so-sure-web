@@ -46,7 +46,10 @@ use AppBundle\Annotation\DataChange;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
- * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy","helvetia"="HelvetiaPhonePolicy"})
+ * @MongoDB\DiscriminatorMap({
+ *      Policy::TYPE_SALVA_PHONE=SalvaPhonePolicy::class,
+ *      Policy::TYPE_HELVETIA_PHONE=HelvetiaPhonePolicy::class
+ * })
  * @MongoDB\Index(keys={"policyNumber"="asc","end"="asc"},
  *     unique="false", sparse="true")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
@@ -56,6 +59,9 @@ abstract class Policy
     use ArrayToApiArrayTrait;
     use CurrencyTrait;
     use DateTrait;
+
+    const TYPE_SALVA_PHONE = 'salva-phone';
+    const TYPE_HELVETIA_PHONE = 'helvetia-phone';
 
     const ADJUST_TIMEZONE = false;
     const RENEWAL_DAYS = 21;
