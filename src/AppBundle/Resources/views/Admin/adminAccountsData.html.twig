@@ -335,7 +335,7 @@
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}">AFL Broker Fee</td>
+                <td width="{{ text_width }}">{{ broker_name }} Broker Fee</td>
                 <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.all.brokerCommissionPercent |number_format(1, '.', ',')}}% )</td>
             </tr>
             <tr>
@@ -427,18 +427,18 @@
         </tbody>
         <thead class="table-info">
             <tr>
-                <th colspan="3">AFL Transfer</th>
+                <th colspan="3">{{ broker_name }} Transfer</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}">AFL Broker Fee</td>
+                <td width="{{ text_width }}">{{ broker_name }} Broker Fee</td>
                 <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }}</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}"><strong>Net transfer to AFL</strong></td>
+                <td width="{{ text_width }}"><strong>Net transfer to {{ broker_name }}</strong></td>
                 <td><strong>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }}</strong></td>
             </tr>
         </tbody>
