@@ -468,9 +468,9 @@ class BacsService
         $fileData = file_get_contents($tmpFile);
         $fileDataArray = explode(PHP_EOL, $fileData);
 
-        if (!$this->checkSubmissionFile($fileDataArray)) {
-            throw new \Exception('Invalid submission file, number of parameter is invalid');
-        }
+        //if (!$this->checkSubmissionFile($fileDataArray)) {
+        //    throw new \Exception('Invalid submission file, number of parameter is invalid');
+        //}
 
         $this->uploadSftp($fileData, $sftpFilename, $debit);
 
