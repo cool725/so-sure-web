@@ -502,10 +502,9 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
-        // A/B Tagline Test
-        // To Test use url param ?force=standard / ?force=standard-usp
-        // ?force=tabbed / ?force=tabbed-usp
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_TABS_AND_USP);
+        // A/B Homepage USP Price Test
+        // To Test use url param ?force=standard-usps / ?force=price-usps
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USP_VARIATIONS);
 
         $data = [
             'phone' => $phone,
