@@ -464,7 +464,7 @@ class DirectGroupService extends ExcelSftpService
             $claim->setTotalIncurred($directGroupClaim->totalIncurred);
         }
 
-        if ($claim->getyAccessories() != $directGroupClaim->accessories) {
+        if ($claim->getAccessories() != $directGroupClaim->accessories) {
             $claim->setAccessories($directGroupClaim->accessories);
         }
 
