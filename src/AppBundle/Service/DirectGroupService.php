@@ -438,8 +438,10 @@ class DirectGroupService extends ExcelSftpService
         }
 
         if ($directGroupClaim->getClaimStatus()) {
-            $claim->setStatus($directGroupClaim->getClaimStatus());
-            $update = true;
+            if ($claim->getStatus() != $directGroupClaim->getClaimStatus()) {
+                $claim->setStatus($directGroupClaim->getClaimStatus());
+                $update = true;
+            }
         } elseif ($directGroupClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             $claim->setStatus(Claim::STATUS_APPROVED);
             $update = true;
