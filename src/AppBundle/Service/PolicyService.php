@@ -2305,11 +2305,17 @@ class PolicyService
      */
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
+        $date = $date ?: new \DateTime();
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
-
+        $this->priceService->policySetPhonePremium(
+            $newPolicy,
+            PhonePrice::installmentsStream($newPolicy->getPremiumInstallments()),
+            $policy->getUser()->getAdditionalPremium(),
+            $date
+        );
         $this->dm->persist($newPolicy);
         $this->dm->flush();
 
