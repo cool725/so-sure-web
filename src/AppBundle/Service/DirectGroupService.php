@@ -433,7 +433,7 @@ class DirectGroupService extends ExcelSftpService
         if ($claim->getType() != $directGroupClaim->getClaimType()) {
             $claim->setType($directGroupClaim->getClaimType());
         }
-        
+
         if ($directGroupClaim->getClaimStatus()) {
             $claim->setStatus($directGroupClaim->getClaimStatus());
         } elseif ($directGroupClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
@@ -528,7 +528,7 @@ class DirectGroupService extends ExcelSftpService
             $claim->setShippingAddress($directGroupClaim->shippingAddress);
         }
 
-        if ($claim->getInitialSuspicion != $directGroupClaim->initialSuspicion) {
+        if ($claim->getInitialSuspicion() != $directGroupClaim->initialSuspicion) {
             $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
         }
 
