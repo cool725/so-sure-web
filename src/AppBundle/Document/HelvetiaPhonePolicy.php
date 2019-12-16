@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\HelvetiaPhonePolicyRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class HelvetiaPhonePolicy extends PhonePolicy
@@ -40,10 +40,9 @@ class HelvetiaPhonePolicy extends PhonePolicy
         $date = $date ?: new \DateTime();
         if ($this->getPremium()->isEvenlyDivisible($payment->getAmount())) {
             $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
-            $payment->setCommission(
-                $this->getPremium()->getMonthlyPremiumPrice() * Helvetia::COVERHOLDER_COMMISSION_PROPORTION * $n,
-                Helvetia::MONTHLY_BROKER_COMMISSION * $n
-            );
+            $coverholderCommission = ($this->getPremium()->getMonthlyPremiumPrice() *
+                Helvetia::COVERHOLDER_COMMISSION_PROPORTION - Helvetia::MONTHLY_BROKER_COMMISSION) * $n;
+            $payment->setCommission($coverholderCommission, Helvetia::MONTHLY_BROKER_COMMISSION * $n);
         } elseif ($allowFraction) {
             if ($payment->getAmount() >= 0) {
                 $payment->setCommission(
@@ -99,5 +98,62 @@ class HelvetiaPhonePolicy extends PhonePolicy
     {
         // TODO: this. Just needs to step it by a fixed amount for each month so should be easy.
         return 0;
+    }
+
+    /**
+     * Gives you the proportionate amount of premium owed given the end date.
+     * @return float the amount of premium due on this policy.
+     */
+    public function getProRataPremium()
+    {
+        if ($this->isRefundAllowed() && $this->isCooloffCancelled()) {
+            return 0;
+        }
+        return $this->getPremium()->getYearlyPremiumPrice() * $this->proRataMultiplier();
+    }
+
+    /**
+     * Gives you the proportionate amount of ipt owed given the end date.
+     * @return float the amount of ipt due on this policy.
+     */
+    public function getProRataIpt()
+    {
+        if ($this->isRefundAllowed() && $this->isCooloffCancelled()) {
+            return 0;
+        }
+        return $this->getPremium()->getYearlyIptActual() * $this->proRataMultiplier();
+    }
+
+    /**
+     * Gives you the proportionat4e amount of broker fee owed given the policy start and end.
+     * @return float the amount of broker fee due on this policy.
+     */
+    public function getProRataBrokerFee()
+    {
+        if ($this->isRefundAllowed() && $this->isCooloffCancelled()) {
+            return 0;
+        }
+        return Helvetia::YEARLY_BROKER_COMMISSION * $this->proRataMultiplier();
+    }
+
+    /**
+     * Gives you a number by which you can multiply a yearly value to give a value proportional to the amount of the
+     * policy that actually got run.
+     * @return float the multiplier.
+     */
+    public function proRataMultiplier()
+    {
+        $actualDays = $this->getStart()->diff($this->getEnd())->days;
+        $fullDays = $this->policyDays();
+        return $actualDays / $fullDays;
+    }
+
+    /**
+     * Gives you the number of days in the full policy from start date to the final end date.
+     * @return int the number of days from the policy start to the policy expiration date.
+     */
+    public function policyDays()
+    {
+        return $this->getStart()->diff($this->getStaticEnd())->days;
     }
 }

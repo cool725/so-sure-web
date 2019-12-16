@@ -1,6 +1,6 @@
 <?php
 
-namespace Helper;
+namespace AppBundle\Helpers;
 
 /**
  * Provides static functions for making csvs.

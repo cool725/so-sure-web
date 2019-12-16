@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Command;
+namespace AppBundle\Command;
 
-use AppBundle\Document\AffiliateCompany;
-use AppBundle\Service\AffiliateService;
-use AppBundle\Document\DateTrait;
+use AppBundle\Service\HelvetiaExportService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,7 +15,6 @@ use Doctrine\ODM\MongoDB\DocumentManager;
  */
 class HelvetiaExportCommand extends ContainerAwareCommand
 {
-    use DateTrait;
     const SERVICE_NAME = 'sosure:helvetia:export';
 
     protected static $defaultName = self::SERVICE_NAME;
@@ -40,17 +37,18 @@ class HelvetiaExportCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setDescription('Commit policies and costs that originate from an affiliate and have matured.')
-            ->addArgument(
-                "date",
-                InputArgument::OPTIONAL,
-                "date to confirm charges up to. Format: d/m/Y"
+        $this->setDescription('Export reports to helvetia')
+            ->addOption(
+                'date',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'date to confirm charges up to. Format: d/m/Y',
+                null
             )
-            ->setHelp(
-                "Used to create charges for affiliate companies based on users attributed to those companies.\n".
-                "If a date parameter is provided in the format d/m/Y then only charges due up to the start of\n".
-                "that date are created, and charges are never created twice.\n".
-                "If not date parameter is provided then the date is considered to be the current day."
+            ->addArgument(
+                'report',
+                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
+                'reports to generate (policy|claim|payment|renewal)'
             );
     }
 
@@ -59,18 +57,29 @@ class HelvetiaExportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dateString = $input->getArgument('date');
-        $date = null;
-        if ($dateString) {
-            $date = \DateTime::createFromFormat("d/m/Y", $dateString);
-            if (!$date) {
-                $output->writeln("<error>Invalid date format.</error>");
-                return;
+        $actions = $input->getArgument('report');
+        $dateString = $input->getOption('date');
+        $date = $dateString ? \DateTime::createFromFormat($dateString) : new \DateTime();
+        foreach ($actions as $action) {
+            switch ($action) {
+                case 'policy':
+                    $this->helvetiaExportService->uploadPolicies();
+                    break;
+                case 'claim':
+                    $this->helvetiaExportService->uploadClaims();
+                    break;
+                case 'payment':
+                    $this->helvetiaExportService->uploadPayments($date);
+                    break;
+                case 'renewal':
+                    $this->helvetiaExportService->uploadRenewals();
+                    break;
+                default:
+                    throw new \InvalidArgumentException(sprintf(
+                        "%s is not a valid report",
+                        $action
+                    ));
             }
-        } else {
-            $date = $this->startOfDay();
         }
-        $charges = count($this->affiliateService->generate(null, $date));
-        $output->writeln("{$charges} charges made.");
     }
 }

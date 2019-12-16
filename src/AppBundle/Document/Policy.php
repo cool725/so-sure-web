@@ -47,8 +47,8 @@ use AppBundle\Annotation\DataChange;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
  * @MongoDB\DiscriminatorMap({
- *      Policy::TYPE_SALVA_PHONE=SalvaPhonePolicy::class,
- *      Policy::TYPE_HELVETIA_PHONE=HelvetiaPhonePolicy::class
+ *      Policy::TYPE_SALVA_PHONE="SalvaPhonePolicy",
+ *      Policy::TYPE_HELVETIA_PHONE="HelvetiaPhonePolicy"
  * })
  * @MongoDB\Index(keys={"policyNumber"="asc","end"="asc"},
  *     unique="false", sparse="true")

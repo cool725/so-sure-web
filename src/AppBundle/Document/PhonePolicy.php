@@ -692,35 +692,6 @@ abstract class PhonePolicy extends Policy
         $phonePolicy->validatePremium(true, $startDate);
     }
 
-    /**
-     * If the premium is initialized prior to an ipt rate change
-     * and then created after, the IPT would be incorrect
-     */
-    public function validatePremium($adjust, \DateTime $date = null)
-    {
-        $phonePrice = $this->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
-        if (!$phonePrice) {
-            throw new \UnexpectedValueException(sprintf('Missing phone price'));
-        }
-        $additionalPremium = null;
-        if ($this->getUser()) {
-            $additionalPremium = $this->getUser()->getAdditionalPremium();
-        }
-        $expectedPremium = $phonePrice->createPremium($additionalPremium, $date);
-
-        if ($this->getPremium()!= $expectedPremium) {
-            if ($adjust) {
-                $this->setPremium($expectedPremium);
-            } else {
-                throw new InvalidPremiumException(sprintf(
-                    'Ipt rate %f is not valid (should be %f)',
-                    $this->getPremium()->getIptRate(),
-                    $this->getCurrentIptRate($date)
-                ));
-            }
-        }
-    }
-
     public function getPolicyNumberPrefix()
     {
         return 'Mob';

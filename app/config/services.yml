@@ -556,6 +556,17 @@ services:
         arguments:
             - "@logger"
 
+    app.helvetia:
+        alias: AppBundle\Service\HelvetiaExportService
+        public: true
+
+    AppBundle\Service\HelvetiaExportService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@aws.s3"
+            - "%kernel.environment%"
+
     app.salva:
         alias: AppBundle\Service\SalvaExportService
         public: true

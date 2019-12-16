@@ -2,12 +2,10 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
-use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use \AppBundle\Classes\NoOp;

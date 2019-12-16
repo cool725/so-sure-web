@@ -2,7 +2,9 @@
 
 namespace AppBundle\Service;
 
+use AppBundle\Helpers\CsvHelper;
 use AppBundle\Document\Payment\PotRewardPayment;
+use AppBundle\Document\File\HelvetiaPolicyFile;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\HelvetiaPhonePolicyRepository;
@@ -12,7 +14,7 @@ use GuzzleHttp\Client;
 use DOMDocument;
 use DOMXPath;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
@@ -28,6 +30,8 @@ use AppBundle\Document\Feature;
  */
 class HelvetiaExportService
 {
+    use CurrencyTrait;
+
     const S3_BUCKET = 'helvetia.so-sure.com';
 
     /** @var DocumentManager */
@@ -62,11 +66,10 @@ class HelvetiaExportService
      */
     public function generatePolicies()
     {
-        $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
         /** @var HelvetiaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
         $lines = [];
-        $lines = CsvHelper::line(
+        $lines[] = CsvHelper::line(
             'PolicyNumber',
             'Status',
             'StartDate',
@@ -87,7 +90,6 @@ class HelvetiaExportService
             'TotalIpt',
             'TotalBrokerFee',
             'PaidBrokerFee',
-            'NumberConnections',
             'PotValue',
             'MarketingPotValue'
         );
@@ -95,10 +97,10 @@ class HelvetiaExportService
         foreach ($repo->getAllPoliciesForExport($this->environment) as $policy) {
             $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
-                $status,
-                $policy->getStartDate(),
-                $policy->getStaticEnd(),
-                $terminationDate ? $this->adjustDate($terminationDate) : '',
+                $policy->getStatus(),
+                $policy->getStart()->format("Ymd H:i"),
+                $policy->getStaticEnd()->format("Ymd H:i"),
+                $policy->getEnd()->format("Ymd H:i"),
                 $policy->getCompany() ? $policy->getCompany()->getId() : $policy->getUser()->getId(),
                 $policy->getCompany() ? '' : $policy->getUser()->getFirstName(),
                 $policy->getCompany() ? $policy->getCompany()->getName() : $policy->getUser()->getLastName(),
@@ -109,13 +111,13 @@ class HelvetiaExportService
                 $policy->getPhone()->getInitialPrice(),
                 $policy->getPremiumInstallmentCount(),
                 $policy->getPremiumInstallmentPrice(),
-                $policy->getTotalPremiumPrice(),
+                $policy->getProRataPremium(),
                 $policy->getPremiumPaid(),
-                $policy->getTotalIpt(),
-                $policy->getTotalBrokerFee(),
-                $policy->getBrokerFeePaid(),
-                $policy->getSalvaPotValue(),
-                $policy->getSalvaPromoPotValue()
+                $policy->getProrataIpt(),
+                $policy->getProRataBrokerFee(),
+                $policy->getBrokerCommissionPaid(),
+                $policy->getPotValue(),
+                $policy->getPromoPotValue()
             );
         }
         return $lines;
@@ -132,7 +134,7 @@ class HelvetiaExportService
         $repo = $this->dm->getRepository(Payment::class);
         $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_HELVETIA_PHONE);
         $lines = [];
-        $lines = CsvHelper::line(
+        $lines[] = CsvHelper::line(
             'PolicyNumber',
             'Date',
             'Amount',
@@ -143,7 +145,7 @@ class HelvetiaExportService
         foreach ($payments as $payment) {
             $lines[] = CsvHelper::line(
                 $payment->getPolicy()->getPolicyNumber(),
-                $payment->getDate(),
+                $payment->getDate()->format("Ymd H:i"),
                 $payment->getAmount(),
                 $payment->getNotes(),
                 $payment->getTotalCommission()
@@ -191,11 +193,11 @@ class HelvetiaExportService
                 continue;
             }
             $lines[] = CsvHelper::line(
-                $policy->getPolicyNumber(),
+                $claim->getPolicy()->getPolicyNumber(),
                 $claim->getNumber(),
                 $claim->getStatus(),
-                $claim->getNotificationDate(),
-                $claim->getLossDate(),
+                $claim->getNotificationDate()->format("Ymd H:i"),
+                $claim->getLossDate()->format("Ymd H:i"),
                 $claim->getType(),
                 $claim->getDescription(),
                 $claim->getExcess(),
@@ -207,7 +209,7 @@ class HelvetiaExportService
                 $claim->getReplacementPhone() ? $claim->getReplacementPhone()->getModel() : '',
                 $claim->getReplacementImei(),
                 $claim->getHandlingTeam(),
-                $claim->getUnderwriterLastUpdated()
+                $claim->getUnderwriterLastUpdated() ? $claim->getUnderwriterLastUpdated()->format("Ymd H:i") : ''
             );
         }
         return $lines;
@@ -220,9 +222,9 @@ class HelvetiaExportService
     public function generateRenewals()
     {
         /** @var SalvaPhonePolicyRepository $repo */
-        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        $repo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
         $lines = [];
-        $lines = CsvHelper::line(
+        $lines[] = CsvHelper::line(
             'InitialPolicyNumber',
             'RewardPot',
             'RewardPotSalva',
@@ -233,7 +235,7 @@ class HelvetiaExportService
             'RenewalPolicyMonthlyPremiumExDiscount',
             'RenewalPolicyDiscount',
             'RenewalPolicyDiscountPerMonth',
-            'RenewalPolicyMonthlyPremiumIncDiscount',
+            'RenewalPolicyMonthlyPremiumIncDiscount'
         );
         /** @var SalvaPhonePolicy $policy */
         foreach ($repo->getAllExpiredPoliciesForExport($this->environment) as $policy) {
@@ -244,16 +246,16 @@ class HelvetiaExportService
                 $policy->getPolicyNumber(),
                 $policy->getPotValue(),
                 $policy->getStandardPotValue(),
-                $incurredDate,
+                $incurredDate->format("Ymd H:i"),
                 $policy->getCashback() ?
                     sprintf('cashback - %s', $policy->getCashback()->getDisplayableStatus()) : 'discount',
                 ($policy->getCashback() && $policy->getCashback()->getStatus() == Cashback::STATUS_PAID) ?
-                    $policy->getCashback()->getDate(), false : '',
+                    $policy->getCashback()->getDate() : '',
                 $policy->isRenewed() ? $nextPolicy->getPolicyNumber() : '',
                 $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyPremiumPrice() : '',
                 $policy->isRenewed() ? $nextPolicy->getPremium()->getAnnualDiscount() : '',
                 $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyDiscount() : '',
-                $policy->isRenewed() ? $nextPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() : '',
+                $policy->isRenewed() ? $nextPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() : ''
             );
         }
         return $lines;
@@ -274,7 +276,7 @@ class HelvetiaExportService
             $date->format('m'),
             $date->format('U')
         );
-        $this->uploadS3($data, $filename, 'policies', $date->format('Y'));
+        $this->uploadS3($data, $filename, 'policies', $date);
     }
 
     /**
@@ -291,7 +293,7 @@ class HelvetiaExportService
             $date->format('m'),
             $date->format('U')
         );
-        $this->uploadS3($data, $filename, 'payments', $date->format('Y'));
+        $this->uploadS3($data, $filename, 'payments', $date);
     }
 
     /**
@@ -309,7 +311,7 @@ class HelvetiaExportService
             $date->format('m'),
             $date->format('U')
         );
-        $this->uploadS3($data, $filename, 'policies', $date->format('Y'));
+        $this->uploadS3($data, $filename, 'claims', $date);
     }
 
     /**
@@ -327,7 +329,7 @@ class HelvetiaExportService
             $date->format('m'),
             $date->format('U')
         );
-        $this->uploadS3($data, $filename, 'policies', $date->format('Y'));
+        $this->uploadS3($data, $filename, 'renewals', $date);
     }
 
     /**
@@ -342,13 +344,13 @@ class HelvetiaExportService
     private function uploadS3($data, $filename, $type, $date)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
-        file_put_contents($tmpFile, implode('\n', $data));
+        file_put_contents($tmpFile, implode("\r\n", $data));
         $s3Key = sprintf('%s/%s/%s/%s', $this->environment, $type, $date->format('Y'), $filename);
         $result = $this->s3->putObject(['Bucket' => self::S3_BUCKET, 'Key' => $s3Key, 'SourceFile' => $tmpFile]);
         unlink($tmpFile);
-        $file = new SalvaPolicyFile();
+        $file = new HelvetiaPolicyFile();
         $file->setBucket(self::S3_BUCKET);
-        $file->setKey($key);
+        $file->setKey($s3Key);
         $file->setDate($date);
         $this->dm->persist($file);
         $this->dm->flush();

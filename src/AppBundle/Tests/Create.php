@@ -77,7 +77,47 @@ class Create
     public static function policy($user, $start, $status, $installments)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
-        $policy = ($startDate < Salva::getSalvaBinderEndDate()) ? new SalvaPhonePolicy() : new HelvetiaPhonePolicy();
+        if ($startDate < Salva::getSalvaBinderEndDate()) {
+            return self::salvaPhonePolicy($user, $startDate, $status, $installments);
+        }
+        return self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
+    }
+
+    /**
+     * Creates a salva phone policy.
+     * @param User $user is the user who owns the policy.
+     * @param string $status is the status of the policy.
+     * @param int $installments is the number of premium installments the policy is to pay.
+     * @return SalvaPhonePolicy the new phone policy.
+     */
+    public static function salvaPhonePolicy($user, $start, $status, $installments)
+    {
+        $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = new SalvaPhonePolicy();
+        $policy->setUser($user);
+        $policy->setStart($startDate);
+        $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
+        $policy->setStaticEnd($policy->getEnd());
+        $premium = new PhonePremium();
+        $premium->setGwp(rand(20, 100) / 8);
+        $policy->setPremium($premium);
+        $policy->setStatus($status);
+        $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
+        $policy->setPremiumInstallments($installments);
+        return $policy;
+    }
+
+    /**
+     * Creates a helvetia phone policy.
+     * @param User $user is the user who owns the policy.
+     * @param string $status is the status of the policy.
+     * @param int $installments is the number of premium installments the policy is to pay.
+     * @return HelvetiaPhonePolicy the new phone policy.
+     */
+    public static function helvetiaPhonePolicy($user, $start, $status, $installments)
+    {
+        $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
