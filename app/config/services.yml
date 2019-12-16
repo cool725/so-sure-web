@@ -1121,6 +1121,7 @@ services:
         arguments:
             - "@app.policy"
             - "@app.sms"
+            - "@app.branch"
             - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
