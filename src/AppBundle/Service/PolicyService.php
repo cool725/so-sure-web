@@ -2311,7 +2311,7 @@ class PolicyService
         /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
-        $this->priceService->policySetPhonePremium(
+        $this->priceService->setPhonePolicyPremium(
             $newPolicy,
             PhonePrice::installmentsStream($newPolicy->getPremiumInstallments()),
             $policy->getUser()->getAdditionalPremium(),

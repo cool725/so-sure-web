@@ -1426,7 +1426,7 @@ class PurchaseController extends BaseController
                 $additionalPremium = $policy->getUser()->getAdditionalPremium();
                 if ($freq == Policy::PLAN_MONTHLY) {
                     $policy->setPremiumInstallments(12);
-                    $priceService->policySetPhonePremium(
+                    $priceService->setPhonePolicyPremium(
                         $policy,
                         PhonePrice::STREAM_MONTHLY,
                         $additionalPremium,
@@ -1434,7 +1434,7 @@ class PurchaseController extends BaseController
                     );
                 } elseif ($freq == Policy::PLAN_YEARLY) {
                     $policy->setPremiumInstallments(1);
-                    $priceService->policySetPhonePremium(
+                    $priceService->setPhonePolicyPremium(
                         $policy,
                         PhonePrice::STREAM_YEARLY,
                         $additionalPremium,
