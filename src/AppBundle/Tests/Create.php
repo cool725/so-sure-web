@@ -7,6 +7,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -56,6 +57,7 @@ class Create
         $user->setFirstName("John");
         $user->setLastName("Fogle");
         $user->setEmail(uniqid()."@hotmail.com");
+        $user->setEnabled(true);
         return $user;
     }
 
@@ -66,7 +68,7 @@ class Create
      *                                       policy end will be a year after this date.
      * @param string           $status       is the status that the policy will have.
      * @param int              $installments is the number of premium installments.
-     * @return Policy the newly created policy.
+     * @return PhonePolicy the newly created policy.
      */
     public static function policy($user, $start, $status, $installments)
     {
@@ -83,6 +85,39 @@ class Create
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
         $policy->setPremiumInstallments($installments);
         return $policy;
+    }
+
+    /**
+     * Creates a policy and sets a phone on it.
+     * @param User             $user         is the user that the policy will have.
+     * @param \DateTime|string $date         is the date at which the policy is to start.
+     * @param string           $status       is the status for the policy to have.
+     * @param int              $installments is the premium installments the policy is to have.
+     * @param Phone            $phone        is the phone to give the policy.
+     * @return PhonePolicy the created policy.
+     */
+    public static function phonePolicy($user, $start, $status, $installments, $phone)
+    {
+        $policy = self::policy($user, $start, $status, $installments);
+        $policy->setPhone($phone);
+        return $policy;
+    }
+
+    /**
+     * Creates a phone price with random gwp.
+     * @param \DateTime|string $validFrom is the date from which the price is valid as either a date object or string.
+     * @param string           $stream    is the stream that this price is in.
+     * @return the new phone price.
+     */
+    public static function phonePrice($validFrom, $stream)
+    {
+        $date = is_string($validFrom) ? new \DateTime($validFrom) : $validFrom;
+        $gwp = rand(100, 600) / 90;
+        $price = new PhonePrice();
+        $price->setGwp($gwp);
+        $price->setValidFrom($date);
+        $price->setStream($stream);
+        return $price;
     }
 
     /**
