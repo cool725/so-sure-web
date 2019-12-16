@@ -6242,7 +6242,7 @@ class PolicyServiceTest extends WebTestCase
     public function testRenewalCorrectPrice()
     {
         $priceA = Create::phonePrice('2019-02-02', PhonePrice::STREAM_MONTHLY);
-        $priceB = Create::phonePrice('2019-02-30', PhonePrice::STREAM_YEARLY);
+        $priceB = Create::phonePrice('2019-02-28', PhonePrice::STREAM_YEARLY);
         $priceC = Create::phonePrice('2019-01-20', PhonePrice::STREAM_MONTHLY);
         $priceD = Create::phonePrice('2019-02-05', PhonePrice::STREAM_YEARLY);
         $priceE = Create::phonePrice('2019-05-19', PhonePrice::STREAM_ALL);
