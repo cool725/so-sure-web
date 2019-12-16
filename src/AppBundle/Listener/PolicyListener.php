@@ -79,26 +79,25 @@ class PolicyListener
         if ($policy != null) {
             $policyTerms = $policy->getPolicyTerms();
             if ($policyTerms != null) {
+                $smsTemplate = "AppBundle:Sms:picsure-required/app-download.txt.twig";
+                $medium = 'onboarding-sms';
+                if ($policy->getPhone()->isITunes()) {
+                    $branchUrl = $this->branchService->linkToAppleDownload($medium);
+                } elseif ($policy->getPhone()->isGooglePlay()) {
+                    $branchUrl = $this->branchService->linkToGoogleDownload($medium);
+                }
+                $this->smsService->sendUser(
+                    $policy,
+                    $smsTemplate,
+                    ["branch_url" => $branchUrl],
+                    Charge::TYPE_SMS_PAYMENT
+                );
                 if ($policyTerms->isPicSureRequired()) {
                     $smsTemplate = "AppBundle:Sms:picsure-required/picsureReminderOne.txt.twig";
                     $this->smsService->sendUser(
                         $policy,
                         $smsTemplate,
                         ["policy" => $policy],
-                        Charge::TYPE_SMS_PAYMENT
-                    );
-                } else {
-                    $smsTemplate = "AppBundle:Sms:picsure-required/app-download.txt.twig";
-                    $medium = 'onboarding-sms';
-                    if ($policy->getPhone()->isITunes()) {
-                        $branchUrl = $this->branchService->linkToAppleDownload($medium);
-                    } elseif ($policy->getPhone()->isGooglePlay()) {
-                        $branchUrl = $this->branchService->linkToGoogleDownload($medium);
-                    }
-                    $this->smsService->sendUser(
-                        $policy,
-                        $smsTemplate,
-                        ["branch_url" => $branchUrl],
                         Charge::TYPE_SMS_PAYMENT
                     );
                 }
