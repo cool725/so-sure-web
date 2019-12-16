@@ -32,7 +32,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
