@@ -423,21 +423,17 @@ class DirectGroupService extends ExcelSftpService
         if (!$claim) {
             throw new \Exception(sprintf('Unable to locate claim %s in db', $directGroupClaim->claimNumber));
         } elseif ($claim->getHandlingTeam() != Claim::TEAM_DIRECT_GROUP) {
-            $msg = sprintf(
-                'Claim %s is being processed by %s, not direct group. Skipping direct group import.',
-                $directGroupClaim->claimNumber,
-                $claim->getHandlingTeam()
-            );
-            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
-
-            return false;
+            // If we're updating a claim here, it's come from the Direct Group
+            // claims spreadsheet so update handling team to Direct Group
+            $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
         }
 
         $this->validateClaimDetails($claim, $directGroupClaim);
 
         if ($claim->getType() != $directGroupClaim->getClaimType()) {
-            throw new \Exception(sprintf('Claims type does not match for claim %s', $directGroupClaim->claimNumber));
+            $claim->setType($directGroupClaim->getClaimType());
         }
+        
         if ($directGroupClaim->getClaimStatus()) {
             $claim->setStatus($directGroupClaim->getClaimStatus());
         } elseif ($directGroupClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
