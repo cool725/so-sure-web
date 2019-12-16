@@ -667,6 +667,7 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate, PolicyTerms $terms)
     {
+        NoOp::ignore($startDate);
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $policy;
         $phonePolicy->setPhone($this->getPhone());
@@ -681,6 +682,7 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
     {
+        NoOp::ignore($startDate);
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $policy;
         $phonePolicy->setPhone($this->getPhone());
