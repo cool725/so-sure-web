@@ -444,15 +444,37 @@ class DirectGroupService extends ExcelSftpService
             $claim->setStatus(Claim::STATUS_APPROVED);
         }
 
-        $claim->setExcess($directGroupClaim->excess);
-        $claim->setIncurred($directGroupClaim->getIncurred());
-        $claim->setClaimHandlingFees($directGroupClaim->handlingFees);
-        $claim->setReservedValue($directGroupClaim->reserved);
-        $claim->setTotalIncurred($directGroupClaim->totalIncurred);
+        if ($claim->getExcess() != $directGroupClaim->excess) {
+            $claim->setExcess($directGroupClaim->excess);
+        }
 
-        $claim->setAccessories($directGroupClaim->accessories);
-        $claim->setUnauthorizedCalls($directGroupClaim->unauthorizedCalls);
-        $claim->setPhoneReplacementCost($directGroupClaim->phoneReplacementCost);
+        if ($claim->getIncurred() != $directGroupClaim->getIncurred()) {
+            $claim->setIncurred($directGroupClaim->getIncurred());
+        }
+
+        if ($claim->getClaimHandlingFees() != $directGroupClaim->handlingFees) {
+            $claim->setClaimHandlingFees($directGroupClaim->handlingFees);
+        }
+
+        if ($claim->getReservedValue() != $directGroupClaim->reserved) {
+            $claim->setReservedValue($directGroupClaim->reserved);
+        }
+
+        if ($claim->getTotalIncurred() != $directGroupClaim->totalIncurred) {
+            $claim->setTotalIncurred($directGroupClaim->totalIncurred);
+        }
+
+        if ($claim->getAccessories() != $directGroupClaim->accessories) {
+            $claim->setAccessories($directGroupClaim->accessories);
+        }
+
+        if ($claim->getUnauthorizedCalls() != $directGroupClaim->unauthorizedCalls) {
+            $claim->setUnauthorizedCalls($directGroupClaim->unauthorizedCalls);
+        }
+
+        if ($claim->getPhoneReplacementCost() != $directGroupClaim->phoneReplacementCost) {
+            $claim->setPhoneReplacementCost($directGroupClaim->phoneReplacementCost);
+        }
 
         if (in_array($claim->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED])
             && !$claim->getApprovedDate()) {
@@ -467,29 +489,66 @@ class DirectGroupService extends ExcelSftpService
             $claim->setApprovedDate($yesterday);
         }
 
-        $claim->setReplacementImei($directGroupClaim->replacementImei);
-        $claim->setReplacementReceivedDate($directGroupClaim->replacementReceivedDate);
-        $claim->setReplacementPhoneDetails($directGroupClaim->getReplacementPhoneDetails());
+
+        if ($claim->getReplacementImei() != $directGroupClaim->replacementImei) {
+            $claim->setReplacementImei($directGroupClaim->replacementImei);
+        }
+
+        if ($claim->getReplacementReceivedDate() != $directGroupClaim->replacementReceivedDate) {
+            $claim->setReplacementReceivedDate($directGroupClaim->replacementReceivedDate);
+        }
+
+        if ($claim->getReplacementPhoneDetails() != $directGroupClaim->getReplacementPhoneDetails()) {
+            $claim->setReplacementPhoneDetails($directGroupClaim->getReplacementPhoneDetails());
+        }
 
         $validator = new AlphanumericSpaceDotValidator();
-        $claim->setDescription($validator->conform($directGroupClaim->lossDescription));
-        $claim->setLocation($directGroupClaim->location);
 
-        $claim->setClosedDate($directGroupClaim->dateClosed);
-        $claim->setCreatedDate($directGroupClaim->dateCreated);
-        $claim->setNotificationDate($directGroupClaim->notificationDate);
-        $claim->setLossDate($directGroupClaim->lossDate);
+        if ($claim->getDescription() != $validator->conform($directGroupClaim->lossDescription)) {
+            $claim->setDescription($validator->conform($directGroupClaim->lossDescription));
+        }
 
-        $claim->setShippingAddress($directGroupClaim->shippingAddress);
+        if ($claim->getLocation() != $directGroupClaim->location) {
+            $claim->setLocation($directGroupClaim->location);
+        }
 
-        $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
-        $claim->setFinalSuspicion($directGroupClaim->finalSuspicion);
+        if ($claim->getClosedDate() != $directGroupClaim->dateClosed) {
+            $claim->setClosedDate($directGroupClaim->dateClosed);
+        }
 
-        $claim->setSupplier(
-            $directGroupClaim->isReplacementRepaired() ?
-            $directGroupClaim->repairSupplier : $directGroupClaim->replacementSupplier
-        );
-        $claim->setSupplierStatus($directGroupClaim->supplierStatus);
+        if ($claim->getCreatedDate() != $directGroupClaim->dateCreated) {
+            $claim->setCreatedDate($directGroupClaim->dateCreated);
+        }
+
+        if ($claim->getNotificationDate() != $directGroupClaim->notificationDate) {
+            $claim->setNotificationDate($directGroupClaim->notificationDate);
+        }
+
+        if ($claim->getLossDate() != $directGroupClaim->lossDate) {
+            $claim->setLossDate($directGroupClaim->lossDate);
+        }
+
+        if ($claim->getShippingAddress() != $directGroupClaim->shippingAddress) {
+            $claim->setShippingAddress($directGroupClaim->shippingAddress);
+        }
+
+        if ($claim->getInitialSuspicion != $directGroupClaim->initialSuspicion) {
+            $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
+        }
+
+        if ($claim->getFinalSuspicion() != $directGroupClaim->finalSuspicion) {
+            $claim->setFinalSuspicion($directGroupClaim->finalSuspicion);
+        }
+
+        $supplier = $directGroupClaim->isReplacementRepaired() ?
+            $directGroupClaim->repairSupplier : $directGroupClaim->replacementSupplier;
+        if ($claim->getSupplier() != $supplier) {
+            $claim->setSupplier($supplier);
+        }
+
+        if ($claim->getSupplierStatus() != $directGroupClaim->supplierStatus) {
+            $claim->setSupplierStatus($directGroupClaim->supplierStatus);
+        }
 
         $this->updatePolicy($claim, $directGroupClaim, $skipImeiUpdate);
 
