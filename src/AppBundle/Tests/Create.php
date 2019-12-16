@@ -90,7 +90,7 @@ class Create
     /**
      * Creates a policy and sets a phone on it.
      * @param User             $user         is the user that the policy will have.
-     * @param \DateTime|string $date         is the date at which the policy is to start.
+     * @param \DateTime|string $start        is the date at which the policy is to start.
      * @param string           $status       is the status for the policy to have.
      * @param int              $installments is the premium installments the policy is to have.
      * @param Phone            $phone        is the phone to give the policy.
