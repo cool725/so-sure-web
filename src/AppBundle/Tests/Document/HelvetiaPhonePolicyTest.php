@@ -35,6 +35,9 @@ class HelvetiaPhonePolicyTest extends TestCase
         $this->assertEquals(31 / 365, $policy->prorataMultiplier());
     }
 
+    /**
+     * Makes sure commission is correctly calculated.
+     */
     public function testSetCommission()
     {
         $user = Create::user();
@@ -47,6 +50,4 @@ class HelvetiaPhonePolicyTest extends TestCase
         );
         $this->assertEquals($payment->getAmount() * 0.2, $payment->getTotalCommission());
     }
-
-
 }

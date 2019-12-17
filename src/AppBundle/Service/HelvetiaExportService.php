@@ -53,7 +53,8 @@ class HelvetiaExportService
      * @param S3Client        $s3          is used to upload the created exports to s3.
      * @param string          $environment is the environment that the service is operating in.
      */
-    public function __construct(DocumentManager  $dm, LoggerInterface $logger, S3Client $s3, $environment) {
+    public function __construct(DocumentManager  $dm, LoggerInterface $logger, S3Client $s3, $environment)
+    {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->s3 = $s3;
