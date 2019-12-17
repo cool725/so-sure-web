@@ -76,7 +76,7 @@
                             <td align="right">&pound;{{ data.coverholderCommission|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
-                            <td>AFL Brokerage Fee</td>
+                            <td>{{ broker_name }} Brokerage Fee</td>
                             <td align="right">&pound;{{ data.brokerCommission|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
@@ -182,7 +182,7 @@
                             <td align="right">&pound;{{ data.underwriterPreferredReturn|number_format(2, '.', ',') }} <br><small>8% Net Written Premium</small></td>
                         </tr>
                         <tr>
-                            <td>AFL Brokerage Fee</td>
+                            <td>{{ broker_name }} Brokerage Fee</td>
                             <td align="right">&pound;{{ data.brokerCommission|number_format(2, '.', ',') }} <br><small>72p per policy</small></td>
                         </tr>
                         <tr>
