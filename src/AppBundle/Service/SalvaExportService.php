@@ -285,6 +285,7 @@ class SalvaExportService
         $repo = $this->dm->getRepository(Payment::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
         $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_SALVA_PHONE);
+        /** @var Payment $payment */
         foreach ($payments as $payment) {
             if (!$payment->getPolicy()) {
                 throw new \Exception(sprintf('Payment %s is missing policy', $payment->getId()));
@@ -343,8 +344,8 @@ class SalvaExportService
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $lines[] =  sprintf('%s', $this->formatLine($this->transformClaim(null)));
+        /** @var Claim $claim */
         foreach ($repo->getAllClaimsForExport(Policy::TYPE_SALVA_PHONE) as $claim) {
-            /** @var Claim $claim */
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$claim->getPolicy()->isValidPolicy()) {
                 continue;

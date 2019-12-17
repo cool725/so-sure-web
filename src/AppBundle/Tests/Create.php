@@ -85,9 +85,10 @@ class Create
 
     /**
      * Creates a salva phone policy.
-     * @param User   $user         is the user who owns the policy.
-     * @param string $status       is the status of the policy.
-     * @param int    $installments is the number of premium installments the policy is to pay.
+     * @param User             $user         is the user who owns the policy.
+     * @param \DateTime|string $start        is the start date of the policy.
+     * @param string           $status       is the status of the policy.
+     * @param int              $installments is the number of premium installments the policy is to pay.
      * @return SalvaPhonePolicy the new phone policy.
      */
     public static function salvaPhonePolicy($user, $start, $status, $installments)
@@ -109,9 +110,10 @@ class Create
 
     /**
      * Creates a helvetia phone policy.
-     * @param User   $user         is the user who owns the policy.
-     * @param string $status       is the status of the policy.
-     * @param int    $installments is the number of premium installments the policy is to pay.
+     * @param User             $user         is the user who owns the policy.
+     * @param \DateTime|string $start        is the start date of the policy.
+     * @param string           $status       is the status of the policy.
+     * @param int              $installments is the number of premium installments the policy is to pay.
      * @return HelvetiaPhonePolicy the new phone policy.
      */
     public static function helvetiaPhonePolicy($user, $start, $status, $installments)

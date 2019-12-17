@@ -114,7 +114,7 @@ class HelvetiaExportService
                 $policy->getPremiumInstallmentPrice(),
                 $policy->getProRataPremium(),
                 $policy->getPremiumPaid(),
-                $policy->getProrataIpt(),
+                $policy->getProRataIpt(),
                 $policy->getProRataBrokerFee(),
                 $policy->getBrokerCommissionPaid(),
                 $policy->getPotValue(),
@@ -222,13 +222,13 @@ class HelvetiaExportService
      */
     public function generateRenewals()
     {
-        /** @var SalvaPhonePolicyRepository $repo */
+        /** @var HelvetiaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
         $lines = [];
         $lines[] = CsvHelper::line(
             'InitialPolicyNumber',
             'RewardPot',
-            'RewardPotSalva',
+            'RewardPotHelvetia',
             'RewardPotIncurredDate',
             'RewardPotType',
             'CashbackPaidDate',
@@ -238,25 +238,25 @@ class HelvetiaExportService
             'RenewalPolicyDiscountPerMonth',
             'RenewalPolicyMonthlyPremiumIncDiscount'
         );
-        /** @var SalvaPhonePolicy $policy */
+        /** @var HelvetiaPhonePolicy $policy */
         foreach ($repo->getAllExpiredPoliciesForExport($this->environment) as $policy) {
             if (!$this->greaterThanZero($policy->getPotValue())) {
                 continue;
             }
+            $nextPolicy = $policy->getNextPolicy();
             $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
                 $policy->getPotValue(),
                 $policy->getStandardPotValue(),
-                $incurredDate->format("Ymd H:i"),
                 $policy->getCashback() ?
                     sprintf('cashback - %s', $policy->getCashback()->getDisplayableStatus()) : 'discount',
                 ($policy->getCashback() && $policy->getCashback()->getStatus() == Cashback::STATUS_PAID) ?
                     $policy->getCashback()->getDate() : '',
-                $policy->isRenewed() ? $nextPolicy->getPolicyNumber() : '',
-                $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyPremiumPrice() : '',
-                $policy->isRenewed() ? $nextPolicy->getPremium()->getAnnualDiscount() : '',
-                $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyDiscount() : '',
-                $policy->isRenewed() ? $nextPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() : ''
+                $nextPolicy ? $nextPolicy->getPolicyNumber() : '',
+                $nextPolicy ? $nextPolicy->getPremium()->getMonthlyPremiumPrice() : '',
+                $nextPolicy ? $nextPolicy->getPremium()->getAnnualDiscount() : '',
+                $nextPolicy ? $nextPolicy->getPremium()->getMonthlyDiscount() : '',
+                $nextPolicy ? $nextPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() : ''
             );
         }
         return $lines;
@@ -335,10 +335,10 @@ class HelvetiaExportService
 
     /**
      * Uploads an array of csv lines onto s3 as a file.
-     * @param array  $data     is the data to upload.
-     * @param string $filename is the file name the file should have on s3.
-     * @param string $type     determines the export type subfolder to place the file in.
-     * @param int    $date     determines what yearly subfolder the file will be placed in, and the date it is marked
+     * @param array     $data     is the data to upload.
+     * @param string    $filename is the file name the file should have on s3.
+     * @param string    $type     determines the export type subfolder to place the file in.
+     * @param \DateTime $date     determines what yearly subfolder the file will be placed in, and the date it is marked
      *                         with in our database.
      * @return string the key to the file on s3.
      */

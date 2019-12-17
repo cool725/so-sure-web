@@ -15,24 +15,24 @@ use PHPUnit\Framework\TestCase;
 class HelvetiaPhonePolicyTest extends TestCase
 {
     /**
-     * Makes sure that the prorata multiplier is correctly calculated.
+     * Makes sure that the proRata multiplier is correctly calculated.
      */
-    public function testProrataMultiplier()
+    public function testproRataMultiplier()
     {
         $user = Create::user();
         $policy = Create::helvetiaPhonePolicy($user, '2020-01-01', Policy::STATUS_ACTIVE, 12);
         $policy->setEnd(new \DateTime('2020-01-02'));
-        $this->assertEquals(1 / 366, $policy->prorataMultiplier());
+        $this->assertEquals(1 / 366, $policy->proRataMultiplier());
         $policy->setEnd(new \DateTime('2020-04-12'));
-        $this->assertEquals(102 / 366, $policy->prorataMultiplier());
+        $this->assertEquals(102 / 366, $policy->proRataMultiplier());
         $policy->setEnd($policy->getStaticEnd());
-        $this->assertEquals(1, $policy->prorataMultiplier());
+        $this->assertEquals(1, $policy->proRataMultiplier());
         $policy->setStart(new \DateTime('2019-01-01'));
         $policy->setStaticEnd(new \DateTime('2020-01-01'));
         $policy->setEnd(new \DateTime('2019-01-02'));
-        $this->assertEquals(1 / 365, $policy->prorataMultiplier());
+        $this->assertEquals(1 / 365, $policy->proRataMultiplier());
         $policy->setEnd(new \DateTime('2019-02-01'));
-        $this->assertEquals(31 / 365, $policy->prorataMultiplier());
+        $this->assertEquals(31 / 365, $policy->proRataMultiplier());
     }
 
     /**

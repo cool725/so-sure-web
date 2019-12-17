@@ -42,7 +42,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\SoSure;
-use AppBundle\Helper\CsvHelper;
+use AppBundle\Helpers\CsvHelper;
 
 /**
  * Command for exporting CSV reports on various collections of company data.

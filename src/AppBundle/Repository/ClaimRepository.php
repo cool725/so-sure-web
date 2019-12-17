@@ -3,6 +3,7 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 
@@ -10,7 +11,7 @@ class ClaimRepository extends DocumentRepository
 {
     /**
      * Gives you all claims for underwriter export.
-     * @param string|null is the underwriter to find claims for. null to ignore.
+     * @param string|null $underwriter is the underwriter to find claims for. null to ignore.
      * @return Cursor over the claims.
      */
     public function getAllClaimsForExport($underwriter = null)

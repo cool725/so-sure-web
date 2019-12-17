@@ -4,9 +4,10 @@ namespace AppBundle\Repository;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\BacsPayment;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class PaymentRepository extends DocumentRepository
 {

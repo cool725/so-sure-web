@@ -42,7 +42,7 @@ class HelvetiaExportCommand extends ContainerAwareCommand
                 'date',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'date to confirm charges up to. Format: d/m/Y',
+                'date of week for payments report. Format: Y-m-d',
                 null
             )
             ->addArgument(
@@ -59,7 +59,7 @@ class HelvetiaExportCommand extends ContainerAwareCommand
     {
         $actions = $input->getArgument('report');
         $dateString = $input->getOption('date');
-        $date = $dateString ? \DateTime::createFromFormat($dateString) : new \DateTime();
+        $date = $dateString ? \DateTime::createFromFormat('Y-m-d', $dateString) : new \DateTime();
         foreach ($actions as $action) {
             switch ($action) {
                 case 'policies':
