@@ -4970,7 +4970,6 @@ abstract class Policy
     abstract public function getAllowedPromoConnectionValue(\DateTime $date = null);
     abstract public function getTotalConnectionValue(\DateTime $date = null);
     abstract public function isSameInsurable(Policy $policy);
-    abstract public function validatePremium($adjust, \DateTime $date);
     abstract public function setPolicyDetailsForPendingRenewal(
         Policy $policy,
         \DateTime $startDate,

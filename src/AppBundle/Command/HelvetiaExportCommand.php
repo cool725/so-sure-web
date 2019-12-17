@@ -48,7 +48,7 @@ class HelvetiaExportCommand extends ContainerAwareCommand
             ->addArgument(
                 'report',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                'reports to generate (policy|claim|payment|renewal)'
+                'reports to generate (policies|claims|payments|renewals)'
             );
     }
 
@@ -62,16 +62,16 @@ class HelvetiaExportCommand extends ContainerAwareCommand
         $date = $dateString ? \DateTime::createFromFormat($dateString) : new \DateTime();
         foreach ($actions as $action) {
             switch ($action) {
-                case 'policy':
+                case 'policies':
                     $this->helvetiaExportService->uploadPolicies();
                     break;
-                case 'claim':
+                case 'claims':
                     $this->helvetiaExportService->uploadClaims();
                     break;
-                case 'payment':
+                case 'payments':
                     $this->helvetiaExportService->uploadPayments($date);
                     break;
-                case 'renewal':
+                case 'renewals':
                     $this->helvetiaExportService->uploadRenewals();
                     break;
                 default:
