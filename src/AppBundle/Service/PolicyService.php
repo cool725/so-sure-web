@@ -376,6 +376,16 @@ class PolicyService
                 // saving final finaly checkmendcert based status
                 $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
             }
+
+            try {
+                $this->dispatchEvent(PolicyEvent::EVENT_INIT, new PolicyEvent($policy));
+            } catch (\Exception $e) {
+                $this->logger->warning(
+                    sprintf('Failed to dispatch init event for user %s', $user->getId()),
+                    ['exception' => $e]
+                );
+            }
+
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->logger->warning(

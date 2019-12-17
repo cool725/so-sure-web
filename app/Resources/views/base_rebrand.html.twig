@@ -81,15 +81,27 @@
                     'user': {
                         'id': '{{ app.user.id }}'
                     },
-                    'intercom': {
-                        'user_id': '{{ app.user.id }}',
-                        'user_hash': '{{ intercom(app.user) }}',
-                        'email': '{{ app.user.email }}',
-                        'name': '{{ app.user.name }}',
-                        'created_at': '{{ app.user.created|date('U') }}',
-                        'quote_url': '{{ session_quote_url }}',
-                        'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
-                    }
+                    {% if not app.user.getCreatedPolicies() %}
+                        'intercom': {
+                            'user_id': null,
+                            'user_hash': null,
+                            'email': null,
+                            'name': null,
+                            'created_at': null,
+                            'quote_url': '{{ session_quote_url }}',
+                            'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
+                        }
+                    {% else %}
+                        'intercom': {
+                            'user_id': '{{ app.user.id }}',
+                            'user_hash': '{{ intercom(app.user) }}',
+                            'email': '{{ app.user.email }}',
+                            'name': '{{ app.user.name }}',
+                            'created_at': '{{ app.user.created|date('U') }}',
+                            'quote_url': '{{ session_quote_url }}',
+                            'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
+                        }
+                    {% endif %}
                 {% endif %}
                 ,'has_visited_welcome_page': {% if has_visited_welcome_page is not defined or not has_visited_welcome_page %}false{% else %}true{% endif %}
                 {% block gtm_data %}{% endblock %}
