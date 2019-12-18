@@ -413,6 +413,7 @@ class DirectGroupService extends ExcelSftpService
      */
     public function saveClaim(DirectGroupHandlerClaim $directGroupClaim, $skipImeiUpdate)
     {
+        $update = false;
         if ($directGroupClaim->hasError()) {
             throw new \Exception(sprintf(
                 'Claim %s has error status. Skipping, but claim should not be in the export most likely.',
@@ -423,57 +424,67 @@ class DirectGroupService extends ExcelSftpService
         if (!$claim) {
             throw new \Exception(sprintf('Unable to locate claim %s in db', $directGroupClaim->claimNumber));
         } elseif ($claim->getHandlingTeam() != Claim::TEAM_DIRECT_GROUP) {
-            $msg = sprintf(
-                'Claim %s is being processed by %s, not direct group. Skipping direct group import.',
-                $directGroupClaim->claimNumber,
-                $claim->getHandlingTeam()
-            );
-            $this->sosureActions[$directGroupClaim->claimNumber][] = $msg;
-
-            return false;
+            // If we're updating a claim here, it's come from the Direct Group
+            // claims spreadsheet so update handling team to Direct Group
+            $claim->setHandlingTeam(Claim::TEAM_DIRECT_GROUP);
+            $update = true;
         }
 
         $this->validateClaimDetails($claim, $directGroupClaim);
 
         if ($claim->getType() != $directGroupClaim->getClaimType()) {
-            throw new \Exception(sprintf('Claims type does not match for claim %s', $directGroupClaim->claimNumber));
+            $claim->setType($directGroupClaim->getClaimType());
+            $update = true;
         }
+
         if ($directGroupClaim->getClaimStatus()) {
-            $claim->setStatus($directGroupClaim->getClaimStatus());
+            if ($claim->getStatus() != $directGroupClaim->getClaimStatus()) {
+                $claim->setStatus($directGroupClaim->getClaimStatus());
+                $update = true;
+            }
         } elseif ($directGroupClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             $claim->setStatus(Claim::STATUS_APPROVED);
+            $update = true;
         }
 
         if ($claim->getExcess() != $directGroupClaim->excess) {
             $claim->setExcess($directGroupClaim->excess);
+            $update = true;
         }
 
         if ($claim->getIncurred() != $directGroupClaim->getIncurred()) {
             $claim->setIncurred($directGroupClaim->getIncurred());
+            $update = true;
         }
 
         if ($claim->getClaimHandlingFees() != $directGroupClaim->handlingFees) {
             $claim->setClaimHandlingFees($directGroupClaim->handlingFees);
+            $update = true;
         }
 
         if ($claim->getReservedValue() != $directGroupClaim->reserved) {
             $claim->setReservedValue($directGroupClaim->reserved);
+            $update = true;
         }
 
         if ($claim->getTotalIncurred() != $directGroupClaim->totalIncurred) {
             $claim->setTotalIncurred($directGroupClaim->totalIncurred);
+            $update = true;
         }
 
         if ($claim->getAccessories() != $directGroupClaim->accessories) {
             $claim->setAccessories($directGroupClaim->accessories);
+            $update = true;
         }
 
         if ($claim->getUnauthorizedCalls() != $directGroupClaim->unauthorizedCalls) {
             $claim->setUnauthorizedCalls($directGroupClaim->unauthorizedCalls);
+            $update = true;
         }
 
         if ($claim->getPhoneReplacementCost() != $directGroupClaim->phoneReplacementCost) {
             $claim->setPhoneReplacementCost($directGroupClaim->phoneReplacementCost);
+            $update = true;
         }
 
         if (in_array($claim->getStatus(), [Claim::STATUS_APPROVED, Claim::STATUS_SETTLED])
@@ -487,67 +498,82 @@ class DirectGroupService extends ExcelSftpService
             $yesterday = $this->subBusinessDays($yesterday, 1);
 
             $claim->setApprovedDate($yesterday);
+            $update = true;
         }
 
 
         if ($claim->getReplacementImei() != $directGroupClaim->replacementImei) {
             $claim->setReplacementImei($directGroupClaim->replacementImei);
+            $update = true;
         }
 
         if ($claim->getReplacementReceivedDate() != $directGroupClaim->replacementReceivedDate) {
             $claim->setReplacementReceivedDate($directGroupClaim->replacementReceivedDate);
+            $update = true;
         }
 
         if ($claim->getReplacementPhoneDetails() != $directGroupClaim->getReplacementPhoneDetails()) {
             $claim->setReplacementPhoneDetails($directGroupClaim->getReplacementPhoneDetails());
+            $update = true;
         }
 
         $validator = new AlphanumericSpaceDotValidator();
 
         if ($claim->getDescription() != $validator->conform($directGroupClaim->lossDescription)) {
             $claim->setDescription($validator->conform($directGroupClaim->lossDescription));
+            $update = true;
         }
 
         if ($claim->getLocation() != $directGroupClaim->location) {
             $claim->setLocation($directGroupClaim->location);
+            $update = true;
         }
 
         if ($claim->getClosedDate() != $directGroupClaim->dateClosed) {
             $claim->setClosedDate($directGroupClaim->dateClosed);
+            $update = true;
         }
 
         if ($claim->getCreatedDate() != $directGroupClaim->dateCreated) {
             $claim->setCreatedDate($directGroupClaim->dateCreated);
+            $update = true;
         }
 
         if ($claim->getNotificationDate() != $directGroupClaim->notificationDate) {
             $claim->setNotificationDate($directGroupClaim->notificationDate);
+            $update = true;
         }
 
         if ($claim->getLossDate() != $directGroupClaim->lossDate) {
             $claim->setLossDate($directGroupClaim->lossDate);
+            $update = true;
         }
 
         if ($claim->getShippingAddress() != $directGroupClaim->shippingAddress) {
             $claim->setShippingAddress($directGroupClaim->shippingAddress);
+            $update = true;
         }
 
-        if ($claim->getInitialSuspicion != $directGroupClaim->initialSuspicion) {
+        if ($claim->getInitialSuspicion() != $directGroupClaim->initialSuspicion) {
             $claim->setInitialSuspicion($directGroupClaim->initialSuspicion);
+            $update = true;
         }
 
         if ($claim->getFinalSuspicion() != $directGroupClaim->finalSuspicion) {
             $claim->setFinalSuspicion($directGroupClaim->finalSuspicion);
+            $update = true;
         }
 
         $supplier = $directGroupClaim->isReplacementRepaired() ?
             $directGroupClaim->repairSupplier : $directGroupClaim->replacementSupplier;
         if ($claim->getSupplier() != $supplier) {
             $claim->setSupplier($supplier);
+            $update = true;
         }
 
         if ($claim->getSupplierStatus() != $directGroupClaim->supplierStatus) {
             $claim->setSupplierStatus($directGroupClaim->supplierStatus);
+            $update = true;
         }
 
         $this->updatePolicy($claim, $directGroupClaim, $skipImeiUpdate);
@@ -565,7 +591,9 @@ class DirectGroupService extends ExcelSftpService
             $this->dm->clear();
         }
 
-        $this->dm->flush();
+        if ($update) {
+            $this->dm->flush();
+        }
 
         $this->postValidateClaimDetails($claim, $directGroupClaim);
 

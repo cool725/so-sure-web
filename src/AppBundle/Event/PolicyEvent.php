@@ -8,6 +8,7 @@ use AppBundle\Document\PhonePolicy;
 
 class PolicyEvent extends Event
 {
+    const EVENT_INIT = 'event.policy.init';
     const EVENT_CREATED = 'event.policy.created';
     const EVENT_CANCELLED = 'event.policy.cancelled';
     const EVENT_EXPIRED = 'event.policy.expired';

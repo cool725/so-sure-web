@@ -218,6 +218,7 @@ sosure.purchaseStepAddress = (function() {
                     let data = {
                         name: $('#purchase_form_lastName').val(),
                         email: $('#purchase_form_email').val(),
+                        visitorID: Intercom('getVisitorId'),
                         csrf: $('#step--validate').data('csrf')
                     };
                     let url = $('#step--validate').data('lead');
