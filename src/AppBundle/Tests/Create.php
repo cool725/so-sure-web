@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
@@ -107,7 +108,7 @@ class Create
      * Creates a phone price with random gwp.
      * @param \DateTime|string $validFrom is the date from which the price is valid as either a date object or string.
      * @param string           $stream    is the stream that this price is in.
-     * @return the new phone price.
+     * @return PhonePrice the new phone price.
      */
     public static function phonePrice($validFrom, $stream)
     {

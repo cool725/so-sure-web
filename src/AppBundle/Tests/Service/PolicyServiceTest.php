@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Phone;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Form\Bacs;
@@ -25,7 +26,6 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Payment\JudoPayment;
