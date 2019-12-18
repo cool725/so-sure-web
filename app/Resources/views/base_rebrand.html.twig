@@ -147,7 +147,11 @@
 
         {% block footer %}
             {% if hide_footer is not defined or not hide_footer %}
-                {% include '::footer_rebrand.html.twig' %}
+                {% if share_mode is defined and share_mode or onboarding_competition_mode is defined and onboarding_competition_mode %}
+                    {% include '::footer_slim.html.twig' %}
+                {% else %}
+                    {% include '::footer_rebrand.html.twig' %}
+                {% endif %}
             {% endif %}
         {% endblock %}
 

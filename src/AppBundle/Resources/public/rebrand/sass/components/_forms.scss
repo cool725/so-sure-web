@@ -163,6 +163,10 @@ label {
         color: $lust;
     }
 
+    .h1 {
+        color: $dodger-blue;
+    }
+
     &:hover {
         -webkit-transform: scale(1.05);
         transform: scale(1.05);
@@ -180,6 +184,10 @@ label {
         .discount-price {
             color: $white;
         }
+
+        .h1 {
+            color: $white;
+        }
     }
 
     &.radio-btn-active {
@@ -187,6 +195,38 @@ label {
             -webkit-transform: none;
             transform: none;
         }
+    }
+}
+
+.radio-btn-nh {
+    height: auto;
+    margin-bottom: 2rem;
+    justify-content: start;
+    text-align: left;
+
+    .radio-btn__content {
+        display: flex;
+
+        > div {
+            &:first-of-type {
+                margin-right: 1rem;
+            }
+        }
+
+        @include media-breakpoint-up(md) {
+            display: block;
+
+            > div {
+                &:first-of-type {
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        justify-content: center;
+        text-align: center;
     }
 }
 
@@ -207,8 +247,7 @@ label {
         position: absolute;
         top: 8px; right: 8px;
         padding: 0.60rem;
-        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                    0 5px 15px 0 rgba(8,27,154,0.08);
+        box-shadow: none;
 
     }
 }

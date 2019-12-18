@@ -1,1 +1,1 @@
-Hey, {{ invitation.inviter.name }}, just got covered with so-sure - better & up to 80% cheaper phone insurance. Learn more: {{ invitation.link }}
+{% if feature_enabled('invite-competition') %}Hey, we could win £200 with {{ invitation.inviter.name }} and mobile phone insurer so-sure. It's super easy to enter! Check it out here: {{ invitation.link }}{% else %}Hey, {{ invitation.inviter.name }}, just got covered with so-sure - better & up to 80% cheaper phone insurance. Learn more: {{ invitation.link }}{% endif %}

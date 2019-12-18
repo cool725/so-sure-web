@@ -11,6 +11,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Feature;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
 use AppBundle\Service\MailerService;
@@ -127,14 +128,24 @@ class InvitationController extends BaseController
             // @codingStandardsIgnoreEnd
         }
 
-        return array(
+        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+
+        $template = 'AppBundle:Invitation:invitation.html.twig';
+
+        if ($competitionFeature) {
+            $template = 'AppBundle:Invitation:invitationCompetition.html.twig';
+        }
+
+        $data = [
             'invitation' => $invitation,
             'lead_form' => $leadForm->createView(),
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'LICI',
-        );
+        ];
+
+        return $this->render($template, $data);
     }
 
     private function competitorsData()

@@ -1,0 +1,52 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'enter-draw' %}
+{% set robots_noindex = true %}
+{% set share_mode = true %}
+{% set hide_devbar = true %}
+
+{% block title %}Enter Draw | so-sure{% endblock %}
+
+{# Set Meta #}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/competition.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="competition">
+        <div class="container-large">
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_email.png" alt="Email open happy" width="180px" class="lozad mb-2">
+            <div class="h3 fit mb-5">
+                <span class="sub text-primary">It takes 30 seconds to enter</span><br>
+                Simply enter your email to start and take our short quiz
+            </div>
+            {{ form_start(lead_form, {'attr': {
+                'data-toggle': 'validator',
+                'class': 'validate-form',
+                'data-client-validation': form_client_validation,
+                'autocomplete': 'off',
+            }}) }}
+                <div class="custom-input-with-btn">
+                    {{ form_widget(lead_form.email, {
+                        'attr':{
+                            'class': 'form-control',
+                            'placeholder': 'Enter your email'
+                    }}) }}
+                    {{ form_widget(lead_form.save, {
+                    'label': 'Continue',
+                        'attr': {
+                            'class':'btn btn-success btn-sm'
+                    }}) }}
+                </div>
+                <div class="with-errors">{{ form_errors(lead_form.email) }}</div>
+            {{ form_end(lead_form) }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/competition.js') }}"></script>
+{% endblock %}

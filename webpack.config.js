@@ -49,6 +49,10 @@ Encore
     .addEntry('usa', './src/AppBundle/Resources/public/rebrand/js/pages/usa.js')
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
     .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')
+    .addEntry('invite-competition', './src/AppBundle/Resources/public/rebrand/js/pages/invite-competition.js')
+    .addEntry('competition', './src/AppBundle/Resources/public/rebrand/js/pages/competition.js')
+    .addEntry('competition-questions', './src/AppBundle/Resources/public/rebrand/js/pages/competition-questions.js')
+    .addEntry('competition-confirm', './src/AppBundle/Resources/public/rebrand/js/pages/competition-confirm.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')
@@ -86,6 +90,7 @@ Encore
     .addEntry('user-claim-theft-loss', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-theft-loss.js')
     .addEntry('user-claim-submitted', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-submitted.js')
     .addEntry('user-cancel', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-cancel.js')
+    .addEntry('user-competition', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-competition.js')
 
     // Claim
      .addEntry('make-a-claim', './src/AppBundle/Resources/public/rebrand/js/pages/make-a-claim.js')
