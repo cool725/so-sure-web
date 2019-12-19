@@ -16,13 +16,14 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
 use AppBundle\Document\Feature;
 use AppBundle\Document\File\SalvaPolicyFile;
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 
 class SalvaExportService
 {

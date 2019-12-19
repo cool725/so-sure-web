@@ -2,6 +2,8 @@
 
 namespace AppBundle\Helpers;
 
+use AppBundle\Classes\NoOp;
+
 /**
  * Provides static functions for making csvs.
  */
