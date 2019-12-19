@@ -218,7 +218,7 @@ class IntercomCommand extends ContainerAwareCommand
                 }
             } elseif ($destroy) {
                 if ($user) {
-                    $this->intercom->destroy($user);
+                    $this->intercom->destroyUser($user);
                     $output->writeln(sprintf('User %s was deleted & has a new intercom user id.', $user->getId()));
                 }
                 if ($lead) {

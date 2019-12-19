@@ -40,7 +40,6 @@
     }
 
     @include media-breakpoint-up(lg) {
-
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
             transform: scaleX(-1);

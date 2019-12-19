@@ -128,72 +128,16 @@
 
     @include video-background;
 
-    &__pot {
-        width: 260px;
+    &-img {
+        width: 580px;
+        margin-left: -360px;
         position: absolute;
-        top: 20px; left: 50%;
-        margin-left: -130px;
+        top: 0; left: 50%;
 
         @include media-breakpoint-up(lg) {
-            width:360px;
-            margin-left: -180px;
-        }
-    }
-
-    &__money-left {
-        width: 200px;
-        position: absolute;
-        top: 5px; left: -70px;
-
-        @include media-breakpoint-up(sm) {
-            width: 240px;
-            top: -15px; left: 30px;
-        }
-
-        @include media-breakpoint-up(sm) {
-            width: 300px;
-            top: -30px;
-        }
-    }
-
-    &__money-right {
-        width: 150px;
-        position: absolute;
-        top: 200px; left: 80%;
-
-        @include media-breakpoint-up(sm) {
-            width: 200px;
-            top: 170px;
-        }
-    }
-
-    &__avatar-male {
-        width: 150px;
-        position: absolute;
-        top: 180px; left: -50px;
-
-        @include media-breakpoint-up(sm) {
-            left: 100px;
-        }
-
-        @include media-breakpoint-up(lg) {
-            width: 180px;
-            top: 140px; left: 240px;
-        }
-    }
-
-    &__avatar-female {
-        width: 150px;
-        position: absolute;
-        top: 20px; right: -50px;
-
-        @include media-breakpoint-up(sm) {
-            right: 100px;
-        }
-
-        @include media-breakpoint-up(lg) {
-            width: 170px;
-            top: 50px; right: 240px;
+            top: -20px;
+            position: absolute;
+            margin-left: -440px;
         }
     }
 

@@ -12,6 +12,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Feature;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
 use AppBundle\Service\MailerService;
@@ -125,7 +126,15 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        return array(
+        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+
+        $template = 'AppBundle:SCode:scode.html.twig';
+
+        if ($competitionFeature) {
+            $template = 'AppBundle:SCode:scodeCompetition.html.twig';
+        }
+
+        $data = [
             'scode'     => $scode,
             'user_code' => $code,
             'lead_form' => $leadForm->createView(),
@@ -133,7 +142,9 @@ class SCodeController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'O2',
-        );
+        ];
+
+        return $this->render($template, $data);
     }
 
     private function competitorsData()

@@ -1,0 +1,173 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'enter-draw' %}
+{% set robots_noindex = true %}
+{% set share_mode = true %}
+{% set hide_devbar = true %}
+
+{% block title %}Questions | so-sure{% endblock %}
+
+{# Set Meta #}
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/competition.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="competition">
+        <div class="container-large">
+            {{ form_start(questions_form, {'attr': {
+                'data-toggle': 'validator',
+                'class': 'validate-form',
+                'data-client-validation': form_client_validation,
+                'autocomplete': 'off',
+            }}) }}
+                <div class="question question-show">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_theft.png" alt="Hand stealing phone" width="180px" class="lozad mb-2">
+                    <div class="h3 fit mb-5">
+                        <span class="sub text-primary">Question 1/3</span><br>
+                        How many mobile handsets are stolen every day in the UK? 👮‍♀️
+                    </div>
+                    <div class="radio-btn-original">
+                        {{ form_label(questions_form.questionOne, 'How many mobile handsets are stolen every day in the UK? 👮‍♀️') }}
+                        {{ form_widget(questions_form.questionOne) }}
+                    </div>
+                    <div class="radio-btn-group mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionOne.vars.id }}_0">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">120</div>
+                                        <div class="h1">🤨</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionOne.vars.id }}_1">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">568</div>
+                                        <div class="h1">😮</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionOne.vars.id }}_2">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">1,222</div>
+                                        <div class="h1">🤬</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-cta">
+                        <a href="#" data-target="{{ questions_form.questionOne.vars.name }}" class="btn btn-success btn-block-xs question-continue">Continue</a>
+                    </div>
+                </div>
+                <div class="question">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="Broken phone screen" width="180px" class="lozad mb-2">
+                    <div class="h3 fit mb-5">
+                        <span class="sub text-primary">Question 2/3</span><br>
+                        How many UK owners have broken their screen in the last 2 yrs? 😱
+                    </div>
+                    <div class="radio-btn-original">
+                        {{ form_label(questions_form.questionTwo, 'How many UK owners have broken their screen in the last 2 yrs? 😱') }}
+                        {{ form_widget(questions_form.questionTwo) }}
+                    </div>
+                    <div class="radio-btn-group mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionTwo.vars.id }}_0">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">1 in 100</div>
+                                        <div class="h1">🤨</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionTwo.vars.id }}_1">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">1 in 50</div>
+                                        <div class="h1">😮</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionTwo.vars.id }}_2">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">1 in 4</div>
+                                        <div class="h1">🤬</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-cta">
+                        <a href="#" data-target="{{ questions_form.questionTwo.vars.name }}" class="btn btn-success btn-block-xs question-continue">Continue</a>
+                    </div>
+                </div>
+                <div class="question">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="Customer service woman" width="180px" class="lozad mb-2">
+                    <div class="h3 fit mb-5">
+                        <span class="sub text-primary">Question 3/3</span><br>
+                        On average how much does it cost to repair a top end phone?
+                    </div>
+                    <div class="radio-btn-original">
+                        {{ form_label(questions_form.questionThree, 'How much on average does it cost to properly repair a top end phone?') }}
+                        {{ form_widget(questions_form.questionThree) }}
+                    </div>
+                    <div class="radio-btn-group mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionThree.vars.id }}_0">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">&pound;50+</div>
+                                        <div class="h1">🤨</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionThree.vars.id }}_1">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">&pound;100+</div>
+                                        <div class="h1">😩</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="radio-btn radio-btn-nh"
+                                    data-value="{{ questions_form.questionThree.vars.id }}_2">
+                                    <div class="radio-btn__content p-4">
+                                        <div class="h1">&pound;250+</div>
+                                        <div class="h1">🤬</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-cta">
+                        {{ form_widget(questions_form.submit, {
+                            'label': 'Continue',
+                            'attr': {
+                                'class': 'btn btn-success btn-block-xs'
+                        }}) }}
+                    </div>
+                </div>
+            {{ form_end(questions_form) }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/competition-questions.js') }}"></script>
+{% endblock %}

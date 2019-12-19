@@ -1,0 +1,207 @@
+// invite-influencer.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+
+.hero {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+
+    @include blue-gradient-45;
+
+    .container-large {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__intro {
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 2rem;
+        }
+
+    }
+
+    &__illustration {
+        height: 270px;
+        margin: 0 auto;
+        position: relative;
+
+        @include media-breakpoint-up(sm) {
+            width: 500px; height: 400px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: auto; height: auto;
+        }
+    }
+
+    &__illustration__img {
+        display: none;
+        position: absolute;
+        top: 0; left: 0;
+    }
+
+    &__illustration__img-mb {
+        // display: none;
+        position: absolute;
+        top: 0; left: 0;
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+        transform: scaleX(-1);
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
+        }
+    }
+
+}
+
+.usps {
+    background-color: $white;
+
+    @include media-breakpoint-up(lg) {
+        ul {
+            > li {
+                width: 25%;
+            }
+        }
+    }
+}
+
+.video {
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    z-index: 3;
+
+    @include video-background;
+
+    &-img {
+        width: 580px;
+        margin-left: -360px;
+        position: absolute;
+        top: 0; left: 50%;
+
+        @include media-breakpoint-up(lg) {
+            top: -20px;
+            position: absolute;
+            margin-left: -440px;
+        }
+    }
+
+    &__play {
+        width: 120px; height: 120px;
+        display: block;
+        position: relative;
+        z-index: 100;
+
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        min-height: 450px;
+    }
+}
+
+.knowledge-base {
+    background-color: $selago;
+    position: relative;
+    z-index: 4;
+
+    &__mobile {
+        position: relative;
+    }
+
+    &__desktop {
+        position: relative;
+    }
+}
+
+.end-cta {
+    text-align: center;
+    background-color: $selago;
+
+    @include media-breakpoint-up(md) {
+        text-align: left;
+    }
+}
+
+
+.feedback {
+    @include dark-blue-gradient;
+
+    .carousel-item {
+        height: 250px;
+
+        @include media-breakpoint-up(lg) {
+            height: 380px;
+        }
+    }
+
+    &-item {
+        text-align: center;
+        padding: 0 1rem;
+
+        img {
+            // display: block;
+            margin: 0 auto;
+        }
+
+        .btn {
+            position: relative;
+
+            @include media-breakpoint-up(lg) {
+                top: -20px;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+            padding: 0;
+        }
+    }
+
+    &-answer {
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        color: $white;
+
+        form {
+            width: 100%;
+        }
+
+        @include media-breakpoint-up(lg) {
+            height: 380px;
+
+            form {
+                width: auto;
+            }
+        }
+    }
+}

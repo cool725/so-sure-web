@@ -1,0 +1,14 @@
+{% import "::macros.html.twig" as macros %}
+
+<footer class="footer-slim fixed-bottom">
+    <div class="container-large">
+        <div class="d-md-flex align-items-md-center justify-content-md-between">
+            <small class="text-white">&copy; so-sure. All rights reserved</small>
+            <ul class="list-inline footer-slim-links">
+                <li class="list-inline-item mr-md-4"><small><a href="{{ path('privacy') }}" class="text-white">Privacy policy</a></small></li>
+                <li class="list-inline-item mr-md-4"><small><a href="{{ path('terms') }}" class="text-white">Terms &amp; Conditions</a></small></li>
+                <li class="list-inline-item"><small><a href="{{ cookie_url }}" target="_blank" rel="noopener noreferrer" class="text-white">Cookie Policy</a></small></li>
+            </ul>
+        </div>
+    </div>
+</footer>
