@@ -13,6 +13,8 @@ class CsvHelper
      */
     public static function line(...$item)
     {
+        // Item is used kind of since it is the varargs, phpstan is just foolish.
+        NoOp::ignore($item);
         return '"'.implode('","', func_get_args()).'"';
     }
 }

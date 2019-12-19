@@ -335,6 +335,7 @@ class SalvaExportService
 
     public function exportClaims($s3, \DateTime $date = null, $days = null)
     {
+        NoOp::ignore($days);
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
