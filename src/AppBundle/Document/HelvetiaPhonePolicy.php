@@ -99,7 +99,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
         $expectedPayments = $this->getTotalExpectedPaidToDate($date);
         $isMoneyOwed = !$this->areEqualToTwoDp($totalPayments, $expectedPayments) && $totalPayments < $expectedPayments;
-        $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
+        $numPayments = $this->getPremium()->getNumberOfMonthlyPayments($totalPayments);
         if ($numPayments > 12 || $numPayments < 0) {
             throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
         }
