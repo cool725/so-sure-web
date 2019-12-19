@@ -41,7 +41,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         if ($this->getPremium()->isEvenlyDivisible($payment->getAmount())) {
             $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
             $coverholderCommission = ($this->getPremium()->getMonthlyPremiumPrice() *
-                Helvetia::COVERHOLDER_COMMISSION_PROPORTION - Helvetia::MONTHLY_BROKER_COMMISSION) * $n;
+                Helvetia::COMMISSION_PROPORTION - Helvetia::MONTHLY_BROKER_COMMISSION) * $n;
             $payment->setCommission($coverholderCommission, Helvetia::MONTHLY_BROKER_COMMISSION * $n);
         } elseif ($allowFraction) {
             if ($payment->getAmount() >= 0) {
@@ -70,9 +70,8 @@ class HelvetiaPhonePolicy extends PhonePolicy
                 $this->getId()
             ));
         }
-        // 20% of premium price.
-        // TODO: Make sure this is the right proportion and it was not meant to be before tax.
-        return $premium->getYearlyPremiumPrice() * Helvetia::COVERHOLDER_COMMISSION_PROPORTION;
+        // 20% of premium price. Alex said after tax.
+        return $premium->getYearlyPremiumPrice() * Helvetia::COMMISSION_PROPORTION;
     }
 
     /**
@@ -96,8 +95,46 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getExpectedCommission(\DateTime $date = null): float
     {
-        // TODO: this. Just needs to step it by a fixed amount for each month so should be easy.
-        return 0;
+        $expectedCommission = null;
+        $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+        $expectedPayments = $this->getTotalExpectedPaidToDate($date);
+        $isMoneyOwed = !$this->areEqualToTwoDp($totalPayments, $expectedPayments) && $totalPayments < $expectedPayments;
+        $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
+        if ($numPayments > 12 || $numPayments < 0) {
+            throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
+        }
+        $expectedMonthlyCommission = $numPayments * $this->getPremium()->getMonthlyPremiumPrice() *
+            Helvetia::COMMISSION_PROPORTION;
+        $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
+        if ($this->isCooloffCancelled()) {
+            return 0;
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
+        ])) {
+            $expectedCommission = $expectedMonthlyCommission;
+        } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
+            if ($numPayments) {
+                $expectedCommission = $expectedMonthlyCommission;
+            } else {
+                $expectedCommission = $commissionReceived;
+            }
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM]) && $numPayments == 11) {
+            $expectedCommission = $expectedMonthlyCommission;
+        } else {
+            if (!$date) {
+                $date = \DateTime::createFromFormat('U', time());
+            }
+            if ($date > $this->getEnd()) {
+                $date = $this->getEnd();
+            }
+            $expectedCommission = $this->getProratedCommission($date);
+        }
+        return $expectedCommission;
     }
 
     /**
