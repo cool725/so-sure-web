@@ -1,4 +1,4 @@
-// invite.scss
+// invite-influencer.scss
 
 @import "../vendor/bs4/functions";
 @import "../vendor/bs4/variables";
@@ -8,34 +8,27 @@
 @import "../abstracts/variables";
 
 .hero {
-    padding: 8rem 0 1rem;
     position: relative;
-    overflow: hidden;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
 
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     .container-large {
         position: relative;
         z-index: 4;
     }
 
-    svg {
-        position: absolute;
-        bottom: -2px; left: 0; right: 0;
-        z-index: 3;
-    }
-
     &__intro {
-        text-align: center;
 
         @include media-breakpoint-up(lg) {
-            padding-top: 4rem;
-            text-align: left;
+            padding-top: 2rem;
         }
+
     }
 
     &__illustration {
-        width: 300px; height: 270px;
+        height: 270px;
         margin: 0 auto;
         position: relative;
 
@@ -54,34 +47,10 @@
         top: 0; left: 0;
     }
 
-    &__controls {
-        text-align: center;
-
-        @include media-breakpoint-up(lg) {
-            text-align: left;
-        }
-    }
-
-    .carousel {
-
-    }
-
-    .carousel-indicators {
-        position: static;
-        margin: 0;
-
-        > li {
-            background-color: $white;
-            @include border-radius(50%);
-        }
-
-        @include media-breakpoint-up(lg) {
-            justify-content: start;
-        }
-    }
-
-    .carousel-item {
-        min-height: 120px;
+    &__illustration__img-mb {
+        // display: none;
+        position: absolute;
+        top: 0; left: 0;
     }
 
     &:before {
@@ -93,19 +62,16 @@
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
-    }
-
-    @include media-breakpoint-up(md) {
-        padding: 8rem 0 6rem;
+        transform: scaleX(-1);
     }
 
     @include media-breakpoint-up(lg) {
-        padding: 8rem 0;
-
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
         }
     }
+
 }
 
 .usps {

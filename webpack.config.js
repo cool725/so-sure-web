@@ -53,6 +53,7 @@ Encore
     .addEntry('competition', './src/AppBundle/Resources/public/rebrand/js/pages/competition.js')
     .addEntry('competition-questions', './src/AppBundle/Resources/public/rebrand/js/pages/competition-questions.js')
     .addEntry('competition-confirm', './src/AppBundle/Resources/public/rebrand/js/pages/competition-confirm.js')
+    .addEntry('invite-influencer', './src/AppBundle/Resources/public/rebrand/js/pages/invite-influencer.js')
 
     // Admin files
     .addEntry('admin', './src/AppBundle/Resources/public/rebrand/js/pages/admin/admin.js')

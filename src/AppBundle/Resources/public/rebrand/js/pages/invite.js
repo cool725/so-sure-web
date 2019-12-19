@@ -1,4 +1,4 @@
-// homepage.js
+// invite.js
 
 require('../../sass/pages/invite.scss');
 
