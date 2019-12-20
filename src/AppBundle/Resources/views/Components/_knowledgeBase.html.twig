@@ -1,7 +1,10 @@
 <div class="knowledge-base__mobile d-xl-none">
     <div class="expanding-cardbox expanding-cardbox-white mb-3">
         <div class="expanding-cardbox__body">
-            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0">
+            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0 track-data"
+                data-event="what-is-covered-tab-mb"
+                data-event-location="{{ app.request.uri }}"
+                data-event-once="">
                 <img src="{{ cdn_url }}/images/onexone.png"
                      data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_clip_tab.svg"
                      alt="Clipboard"
@@ -68,7 +71,10 @@
     </div>
     <div class="expanding-cardbox expanding-cardbox-white mb-3">
         <div class="expanding-cardbox__body">
-            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0">
+            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0 track-data"
+                data-event="why-insure-tab-mb"
+                data-event-location="{{ app.request.uri }}"
+                data-event-once="">
                 <img src="{{ cdn_url }}/images/onexone.png"
                      data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_device_tab.svg"
                      alt="Mobile phone"
@@ -121,7 +127,10 @@
     </div>
     <div class="expanding-cardbox expanding-cardbox-white mb-3">
         <div class="expanding-cardbox__body">
-            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0">
+            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0 track-data"
+                data-event="reduce-excess-tab-mb"
+                data-event-location="{{ app.request.uri }}"
+                data-event-once="">
                 <img src="{{ cdn_url }}/images/onexone.png"
                      data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_reduce_excess_tab.svg"
                      alt="Phone excess"
@@ -184,7 +193,10 @@
     </div>
     <div class="expanding-cardbox expanding-cardbox-white">
         <div class="expanding-cardbox__body">
-            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0">
+            <h2 class="h5 expanding-cardbox__title text-primary d-flex align-items-center mb-0 track-data"
+                data-event="earn-cashback-tab-mb"
+                data-event-location="{{ app.request.uri }}"
+                data-event-once="">
                 <img src="{{ cdn_url }}/images/onexone.png"
                      data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_pound_tab.svg"
                      alt="Pound coin"
@@ -298,13 +310,16 @@
             id="knowledge_tabs"
             role="tablist">
             <li class="nav-item">
-                <a class="nav-link tab-link active"
+                <a class="nav-link tab-link active track-data"
                    id="cover_tab"
                    data-toggle="tab"
                    href="#cover"
                    role="tab"
                    aria-controls="home"
-                   aria-selected="true">
+                   aria-selected="true"
+                   data-event="what-is-covered-tab-dt"
+                   data-event-location="{{ app.request.uri }}"
+                   data-event-once="">
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_clip_tab.svg"
                          alt="Clipboard"
@@ -315,13 +330,16 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link tab-link"
+                <a class="nav-link tab-link track-data"
                    id="why_tab"
                    data-toggle="tab"
                    href="#why"
                    role="tab"
                    aria-controls="why"
-                   aria-selected="false">
+                   aria-selected="false"
+                   data-event="why-insure-tab-dt"
+                   data-event-location="{{ app.request.uri }}"
+                   data-event-once="">
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_device_tab.svg"
                          alt="Mobile phone"
@@ -332,13 +350,16 @@
                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link tab-link"
+                <a class="nav-link tab-link track-data"
                    id="excess_tab"
                    data-toggle="tab"
                    href="#excess"
                    role="tab"
                    aria-controls="excess"
-                   aria-selected="false">
+                   aria-selected="false"
+                   data-event="reduce-excess-tab-dt"
+                   data-event-location="{{ app.request.uri }}"
+                   data-event-once="">
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_reduce_excess_tab.svg"
                          alt="Phone excess"
@@ -349,13 +370,16 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link tab-link"
+                <a class="nav-link tab-link track-data"
                    id="cashback_tab"
                    data-toggle="tab"
                    href="#cashback"
                    role="tab"
                    aria-controls="cashback"
-                   aria-selected="false">
+                   aria-selected="false"
+                   data-event="earn-cashback-tab-dt"
+                   data-event-location="{{ app.request.uri }}"
+                   data-event-once="">
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_pound_tab.svg"
                          alt="Pound coin"
