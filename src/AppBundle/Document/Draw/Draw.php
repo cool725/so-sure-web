@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @MongoDB\Document
@@ -56,7 +57,7 @@ class Draw
     /**
      * @MongoDB\EmbedMany(targetDocument="Entry")
      */
-    protected $entries = array();
+    protected $entries;
 
     /**
      * @Assert\Type("bool")
@@ -75,6 +76,7 @@ class Draw
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
+        $this->entries = new ArrayCollection();
     }
 
     public function getId()
