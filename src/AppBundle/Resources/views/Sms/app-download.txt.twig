@@ -1,1 +1,1 @@
-Don't forget to verify your phone with the so-sure app {% if policy.phone.isITunes %}{{ url('download_apple', {'medium': 'sms-policy-purchase'}) }}{% elseif policy.phone.isGooglePlay %}{{ url('download_google', {'medium': 'sms-policy-purchase'}) }}{% endif %}.
+Don't forget to verify your phone with the so-sure app {{ branch_pot_url }}.
