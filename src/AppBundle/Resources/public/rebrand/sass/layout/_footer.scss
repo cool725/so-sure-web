@@ -29,3 +29,32 @@ body {
         }
     }
 }
+
+.footer-slim {
+    position: relative;
+    z-index: 1010;
+    text-align: center;
+
+    padding: {
+        top: 1.5rem;
+        bottom: 1.5rem;
+    }
+
+    @include dark-blue-gradient;
+
+    &-links {
+        margin: 0;
+
+        a {
+            text-decoration: underline;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        text-align: left;
+    }
+}

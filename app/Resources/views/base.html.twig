@@ -142,14 +142,7 @@
         {# End Page Content #}
 
         {# Footer #}
-        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
-        {% block footer %}
-            {% if new_footer is defined and new_footer == 1 %}
-                {% include '::footer_new.html.twig' %}
-            {% else %}
-                {% include '::footer.html.twig' %}
-            {% endif %}
-        {% endblock %}
+        {% include '::footer.html.twig' %}
 
         {# If using CDN else load locally #}
         {% if use_cdn %}

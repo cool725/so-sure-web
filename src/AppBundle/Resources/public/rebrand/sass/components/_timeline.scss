@@ -1,0 +1,85 @@
+// timeline.scss
+
+.timeline {
+    position: relative;
+    text-align: left;
+
+    &-block {
+        height: 100%;
+        position: relative;
+        padding-bottom: 2rem;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 2px; left: 20px;
+            width: 2px; height: 100%;
+            background-color: $link-water;
+        }
+
+        // Stop the last line
+        &:last-of-type {
+            &:before {
+                content: none;
+            }
+        }
+    }
+
+    &-point {
+        position: absolute;
+        top: 0; left: 0;
+        width: 40px; height: 40px;
+        @include border-radius(50%);
+        background-color: $athens-gray;
+        border: 2px solid $link-water;
+        font-family: $g-bold;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &-large {
+            width: 58px; height: 58px;
+            left: -8px;
+
+            // Temp
+            text-align: center;
+            line-height: 1;
+        }
+    }
+
+    &-block-complete {
+        &:before {
+            background-color: $dodger-blue;
+        }
+
+        .timeline-point {
+            background-color: $dodger-blue;
+            border-color: $dodger-blue;
+        }
+
+        .timeline-point-large {
+            background-color: $white;
+        }
+    }
+
+    &-block-complete-green {
+        &:before {
+            background-color: $ufo-green;
+        }
+
+        .timeline-point {
+            background-color: $ufo-green;
+            border-color: $ufo-green;
+        }
+
+        .timeline-point-large {
+            background-color: $ufo-green;
+        }
+    }
+
+    &-content {
+        position: relative;
+        margin-left: 80px;
+    }
+}

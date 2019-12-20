@@ -1,16 +1,19 @@
-// homepage.scss
+// user-competition.scss
 
-@import "../vendor/bs4/functions";
-@import "../vendor/bs4/variables";
-@import "../vendor/bs4/mixins/breakpoints";
-@import "../abstracts/mixins";
-@import "../abstracts/palette";
-@import "../abstracts/variables";
+@import "../../vendor/bs4/functions";
+@import "../../vendor/bs4/variables";
+@import "../../vendor/bs4/mixins/breakpoints";
+@import "../../abstracts/mixins";
+@import "../../abstracts/palette";
+@import "../../abstracts/variables";
+
+// * {
+//     border: 1px dotted red;
+// }
 
 .hero {
     position: relative;
-    padding-top: 8rem;
-    padding-bottom: 4rem;
+    padding-top: 6rem;
 
     @include blue-gradient-45;
 
@@ -19,12 +22,33 @@
         z-index: 4;
     }
 
-    &__intro {
+    &__illustration-mobile {
+        max-width: 400px;
+        text-align: center;
+        margin: 0 auto;
+    }
 
-        @include media-breakpoint-up(lg) {
-            padding-top: 2rem;
+    &__illustration-desktop {
+        width: 532px;
+        position: absolute;
+        z-index: 2;
+        bottom: 0; left: 50px;
+
+        img {
+            width: 532px;
         }
 
+        @include media-breakpoint-up(md) {
+            left: 100px;
+        }
+
+        @include media-breakpoint-up(fl) {
+            left: 100px;
+        }
+
+        @include media-breakpoint-up(fk) {
+            left: 400px;
+        }
     }
 
     &:before {
@@ -39,13 +63,47 @@
         transform: scaleX(-1);
     }
 
-    @include media-breakpoint-up(lg) {
+    @include media-breakpoint-up(xl) {
+        padding-top: 9rem;
+        padding-bottom: 5rem;
+
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
             transform: scaleX(-1);
         }
     }
 
+}
+
+.how-it-works {
+    position: relative;
+    text-align: center;
+    background-color: $athens-gray;
+    z-index: 4;
+
+    .step {
+        position: relative;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 110px; left: 50%;
+            width: 100%; height: 2px;
+            background-color: $tropical-blue;
+            z-index: -1;
+        }
+
+        // Stop the last line
+        &:last-of-type {
+            &:before {
+                content: none;
+            }
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        background-color: $white;
+    }
 }
 
 .video {
@@ -88,68 +146,8 @@
     }
 }
 
-.knowledge-base {
+.cashback {
     background-color: $athens-gray;
-    position: relative;
-    z-index: 4;
-
-    &__mobile {
-        position: relative;
-    }
-
-    &__desktop {
-        position: relative;
-    }
-}
-
-.fact-center {
-    background-color: $athens-gray;
-}
-
-.other-phones {
-    text-align: center;
-    // background-color: $athens-gray;
-
-    a img {
-
-        &:hover {
-            transform: translateY(-5px);
-        }
-    }
-}
-
-.claims {
-    background-color: $athens-gray;
-    text-align: center;
-
-    &__step {
-        width: 180px;
-        margin: 0 auto;
-        position: relative;
-
-        img {
-            display: none;
-
-            @include media-breakpoint-up(sm) {
-                display: inline;
-            }
-        }
-    }
-
-    &__number {
-        width: 55px; height: 55px;
-        background-color: $white;
-        margin: 0 auto 1.2rem;
-
-        @include border-radius(50%);
-        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                    0 5px 15px 0 rgba(8,27,154,0.08);
-
-        @include media-breakpoint-up(sm) {
-            position: absolute;
-            top: 20%; left: -20px;
-        }
-    }
 }
 
 .banner {
@@ -165,16 +163,5 @@
 
     @include media-breakpoint-up(lg) {
         text-align: left;
-    }
-}
-
-.our-reviews {
-    // background-color: $pattens-blue;
-    text-align: center;
-    position: relative;
-
-    .reviews {
-        position: relative;
-        z-index: 4;
     }
 }

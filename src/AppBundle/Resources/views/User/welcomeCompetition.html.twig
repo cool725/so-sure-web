@@ -1,0 +1,203 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user-competition' %}
+{% set robots_noindex = true %}
+{% set onboarding_competition_mode = true %}
+{% set hide_devbar = true %}
+
+{% block title %}Welcome to so-sure, {{ policy.user.firstname }} 🎉{% endblock %}
+
+{# Set Meta #}
+{# TODO: Win copy and new image #}
+{% set og_title = 'Win a £200 Amazon voucher' %}
+{% set og_description = 'Hey, you can win a £200 Amazon voucher and get a month free phone insurance, check it out! It\'s free to enter the competition' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-competition.css') }}">
+{% endblock %}
+
+{% block gtm_data %}
+    ,
+    'policy': {
+        'id': '{{ policy.id }}'
+    },
+    'affilinet': {
+        'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
+        'gwp': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %}
+    },
+    {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
+        'ecommerce': {
+            'purchase': {
+                'products': [{
+                    'id': '{{ policy.phone.id }}',
+                    'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
+                    'price': '{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}',
+                    'brand': '{{ policy.phone.make }}',
+                    'category': '{{ policy.phone.make }}',
+                    'variant': '{{ policy.phone.memory }}GB',
+                    'quantity': 1
+                }]
+            }
+        },
+        'transactionId': '{{ policy.policyNumber }}',
+        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+        'transactionProducts': [{
+            'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
+            'sku':  '{{ policy.phone.id }}',
+            'category': '{{ policy.phone.make }}',
+            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+            'quantity': 1
+        }]
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="hero__illustration-desktop d-none d-xl-block">
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large.png" alt="Hand holding amazon voucher" class="lozad">
+        </div>
+        <div class="container-large">
+            <div class="row">
+                <div class="col-xl-6 offset-xl-6 text-center text-xl-left">
+                    <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Invite friends to<br class="d-md-none"> so-sure and</span><br> win a &pound;200 amazon voucher</h1>
+                    <p class="text-white mb-4"><strong>{{ policy.user.firstname }}, you're all covered!</strong> Shortly you will receive a confirmation email and a link to download our app to validate your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong>. You can now invite friends to join <span class="text-nowrap">so-sure</span> and for every invite we add another entry in this months draw.</p>
+                    <a href="#"
+                       class="btn btn-success btn-block-xs native-share track-data d-md-none"
+                       data-native-title="{{ og_title }}"
+                       data-native-url="{{ og_url }}"
+                       data-native-text="{{ og_description }}"
+                       data-event="invite-competition-welcome-page-native">
+                       Invite Friends</a>
+                    <div class="d-none d-md-block non-native-share">
+                        <div class="h6 text-deep-sky-blue-d">📨 Invite via email</div>
+                        <form id="invite_form" autocomplete="nope">
+                            <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                            <div class="custom-input-with-btn mb-4">
+                                <input type="text" class="form-control form-control-white input-invite" placeholder="Enter email address" name="email_invite" />
+                                <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                    Invite</button>
+                            </div>
+                        </form>
+                        <div class="h6 text-deep-sky-blue-d">🔗 Share this link</div>
+                        <div class="custom-input-with-btn mb-4">
+                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                            <div id="scode_share" class="sr-only">{{ og_description }}: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
+                            <button class="btn btn-primary btn-copy btn-sm track-data"
+                                data-clipboard-target="#scode_share"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                data-event="user-welcome-copy-scode">
+                                copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration-mobile d-block d-xl-none pt-5">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_small.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-3 text-primary">How it works</h2>
+            <p class="mb-5 lead">It’s so easy to invite friends! we’ll add another entry to this months draw for every invite 💌</p>
+            <div class="timeline d-lg-none mb-3">
+                <div class="timeline-block timeline-block-complete-green">
+                    <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
+                    <div class="timeline-content">
+                        <h3 class="h5 text-primary">Invite a friend via email or share link</h3>
+                    </div>
+                </div>
+                <div class="timeline-block timeline-block-complete-green">
+                    <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
+                    <div class="timeline-content">
+                        <h3 class="h5 text-primary">You can both enter the draw <br><span class="sub">(more invites = better chance)</span></h3>
+                    </div>
+                </div>
+                <div class="timeline-block timeline-block-complete-green">
+                    <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
+                    <div class="timeline-content">
+                        <h3 class="h5 text-primary">Winners announced on 31st of January</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="d-none d-lg-block mb-5">
+                <div class="row">
+                    <div class="col-4 step">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_email.png" alt="Email open" width="180px" class="lozad mb-3">
+                        <h3 class="h5 text-primary mb-2">Invite a friend <br> via email or share link</h3>
+                    </div>
+                    <div class="col-4 step">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="Friends having fun" width="180px" class="lozad mb-3">
+                        <h3 class="h5 text-primary mb-2">You can both enter the draw <br>(more invites = better chance)</h3>
+                    </div>
+                    <div class="col-4 step">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_amazon-voucher.png" alt="Hand holding amazon voucher" width="180px" class="lozad mb-3">
+                        <h3 class="h5 text-primary mb-2">Winners announced <br> on 31st of January</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="d-none d-md-flex justify-content-md-center">
+                <a href="#"
+                   class="btn btn-success btn-block-xs scroll-top">
+                   Let’s get inviting ☝️</a>
+            </div>
+        </div>
+    </section>
+
+{#     <div class="row no-gutters">
+        <div class="col-lg-6">
+            <section class="video d-flex align-items-center justify-content-center">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#sosure-video-modal"
+                   data-src="https://www.youtube.com/embed/rF6zxVRT5Fc"
+                   class="watch-video video__play">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                         alt="Play buttonn"
+                         class="lozad"
+                         width="120px"></a>
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/video/so-sure_video_background_woman_swoosh.png"
+                     alt="Woman polaroid swoosh"
+                     class="lozad video-img">
+            </section>
+        </div>
+        <div class="col-lg-6 cashback">
+            <div class="p-5">
+                <h2 class="h3 text-primary mb-3">{{ policy.user.firstname }}, you could also earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback and reduce your excess 🤑</h2>
+                <p class="mb-5">If friend's you've invited decide to get covered you can use our app or choose your most careful friends to connect with. <strong>For every connection we add &pound;10</strong> to your reward pot!</p>
+            </div>
+        </div>
+    </div> #}
+
+    <section class="banner py-5">
+        <div class="container-large">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline mt-lg-2 lozad" alt="so-sure App Icon">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h2 class="h4 text-white">Login online or download the app</h2>
+                        <p class="lead text-white">To earn cashback and rewards every month</p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="{{ path('user_home') }}" class="btn btn-success btn-block-xs">Login to your dashboard</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-competition.js') }}"></script>
+{% endblock %}

@@ -15,6 +15,10 @@ const tracking = (name, type, location, callback) => {
     } else if (type == 'onboarding') {
         url = '/ops/track/onboarding/' + location;
 
+    // Track by competition & name
+    } else if (type == 'competition') {
+        url = '/ops/track/onboarding/' + location;
+
     // Track name
     } else {
         // Default

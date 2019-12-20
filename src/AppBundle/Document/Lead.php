@@ -25,6 +25,9 @@ class Lead
     const SOURCE_PURCHASE_FLOW = 'purchase-flow';
     const SOURCE_CONTACT_US = 'contact-us';
 
+    // Competition/Cold leads
+    const SOURCE_COMPETITION = 'competition';
+
     // POS affiliate sources
     const SOURCE_DETAILS_POS_HELLOZ = 'helloz';
 
@@ -33,10 +36,11 @@ class Lead
     const LEAD_SOURCE_SCODE = 'scode';
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
+
     public static $leadSources = [
         self::LEAD_SOURCE_AFFILIATE,
         self::LEAD_SOURCE_INVITATION,
-        self::LEAD_SOURCE_SCODE,
+        self::LEAD_SOURCE_SCODE
     ];
 
     /**
@@ -85,7 +89,7 @@ class Lead
 
     /**
      * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us",
-     *                 "invitation", "scode", "affiliate", "invite-not-ready"}, strict=true)
+     *                 "invitation", "scode", "affiliate", "invite-not-ready", "competition"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

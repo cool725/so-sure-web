@@ -1,0 +1,36 @@
+// competition.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+
+body {
+    background-color: $athens-gray;
+}
+
+main {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.competition {
+    text-align: center;
+    padding: {
+        top: 4rem;
+        bottom: 4rem;
+    }
+}
+
+.question {
+    display: none;
+
+    &-show {
+        display: block;
+    }
+}
