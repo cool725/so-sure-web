@@ -1,4 +1,4 @@
-// homepage.js
+// invite.js
 
 require('../../sass/pages/invite.scss');
 
@@ -21,7 +21,7 @@ observer.observe();
 $(function() {
 
     // Use textfit plugin for h1 tag
-    textFit($('.fit')[0], {detectMultiLine: true});
+    textFit($('.fit'), {detectMultiLine: true});
 
     // Adjust top position of knowledge base as true value differs between browser
     let knowledgeBaseD = $('.knowledge-base__desktop'),

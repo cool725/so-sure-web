@@ -38,7 +38,11 @@ class IntercomListener
 
     public function onUserCreatedEvent(UserEvent $event)
     {
-        $this->intercom->queue($event->getUser());
+        $this->intercom->queueUser(
+            $event->getUser(),
+            IntercomService::QUEUE_USER,
+            ['purchase-step' => 'IMEI']
+        );
     }
 
     public function onUserUpdatedEvent(UserEvent $event)
@@ -46,20 +50,24 @@ class IntercomListener
         $this->intercom->queue($event->getUser());
     }
 
+    public function onPolicyInitEvent(PolicyEvent $event)
+    {
+        $this->intercom->queueUser(
+            $event->getPolicy()->getUser(),
+            IntercomService::QUEUE_USER,
+            ['purchase-step' => 'Payment']
+        );
+    }
+
     public function onPolicyCreatedEvent(PolicyEvent $event)
     {
-        // move event to onPolicyStartEvent
-        return;
-        /*
         $this->intercom->queue($event->getPolicy()->getUser());
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CREATED);
-        */
     }
 
     public function onPolicyPotEvent(PolicyEvent $event)
     {
         $this->intercom->queue($event->getPolicy()->getUser());
-        // TODO: Trigger intercom event
     }
 
     public function onPolicyCancelledEvent(PolicyEvent $event)
@@ -84,11 +92,6 @@ class IntercomListener
     {
         $this->intercom->queue($event->getPolicy()->getUser());
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_START);
-
-        // Eventually we want to migrate users to the policy started event
-        // However, this will impact on users in the connection campaign, and so
-        // send both created & started events for now until we can migrate over
-        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CREATED);
     }
 
     public function onPolicyUnpaidEvent(PolicyEvent $event)

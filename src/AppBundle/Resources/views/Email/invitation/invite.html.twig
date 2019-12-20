@@ -67,7 +67,7 @@
       table td { border-collapse: collapse; }
       </style>
       <![endif]-->
-    <title>👉 {{ invitation.inviterName }} invited you to connect</title>
+    <title>Chance to win &pound;200 thanks to {{ invitation.inviterName }} and so-sure</title>
     <style>
       @media only screen and (min-width:641px) {
         .text-left-res {
@@ -116,8 +116,52 @@
                                   </tr>
                                 </table> <!--[if mso | IE]> </td>
                             </tr>
-                          </table> <![endif]--> </div>
-                        <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                          </table> <![endif]--> </div> {% if feature_enabled('invite-competition') %} <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                            <tr>
+                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr class="container__row">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; border-radius: 15px; box-shadow: 0 15px 30px 0 rgba(8,27,154,.08),0 5px 15px 0 rgba(8,27,154,.08); padding: 40px;" bgcolor="#FFFFFF">
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
+                                              <img src="https://cdn.so-sure.com/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure" width="200px" class="img-center img__block" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Your friend {{ invitation.inviterName }} invited you to enter this month’s competition from so-sure to win a &pound;200 Amazon voucher ☺️</p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">It’s super easy - you don’t even need to buy a policy with us! Just answer 3 quick quiz questions and share with your friends for more entries into our prize draw.</p>
+                                              <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">If you do need to insure your phone, there’s also loads of info about our comprehensive cover from just &pound;3.49pm. Plus you can see how you can get up to 80% of your cash back with us!</p>
+                                              <div class="text-center block" style="width: 100%; text-align: center;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
+                                                  <tr>
+                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr class="block__row">
+                                                          <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
+                                                            <div class="green spacer button" style="margin-bottom: 30px;">
+                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                                                                <tr>
+                                                                  <td>
+                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
+                                                                      <tr>
+                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ invitation.link }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Enter</span></a></td>
+                                                                      </tr>
+                                                                    </table>
+                                                                  </td>
+                                                                </tr>
+                                                              </table>
+                                                            </div>
+                                                          </td>
+                                                        </tr>
+                                                      </table> <!--[if mso | IE]> </td>
+                                                  </tr>
+                                                </table> <![endif]--> </div>
+                                              <p class="text-center text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center;"><em>Have a question or issue? <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">Contact us</span></a></em></p>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table> <!--[if mso | IE]> </td>
+                            </tr>
+                          </table> <![endif]--> </div> {% else %} <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">
@@ -161,8 +205,7 @@
                                   </tr>
                                 </table> <!--[if mso | IE]> </td>
                             </tr>
-                          </table> <![endif]--> </div>
-                        <div class="footer container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                          </table> <![endif]--> </div> {% endif %} <div class="footer container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">

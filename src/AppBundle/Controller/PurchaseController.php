@@ -1306,6 +1306,10 @@ class PurchaseController extends BaseController
 
         $email = $this->getDataString($data, 'email');
         $name = $this->getDataString($data, 'name');
+        $visitorId = false;
+        if ($this->getDataString($data, 'visitorID')) {
+            $visitorId = $this->getDataString($data, 'visitorID');
+        }
 
         $dm = $this->getManager();
         $userRepo = $dm->getRepository(User::class);
@@ -1318,6 +1322,9 @@ class PurchaseController extends BaseController
             $lead->setSource($source);
             $lead->setEmail($email);
             $lead->setName($name);
+            if ($visitorId) {
+                $lead->setIntercomUserId($visitorId);
+            }
 
             // Having some validation exceptions for Lead Names - check if its going to fail
             // validation and remove name if its not working. Hopefully the name will be updated later on
@@ -1426,7 +1433,7 @@ class PurchaseController extends BaseController
                 $additionalPremium = $policy->getUser()->getAdditionalPremium();
                 if ($freq == Policy::PLAN_MONTHLY) {
                     $policy->setPremiumInstallments(12);
-                    $priceService->policySetPhonePremium(
+                    $priceService->setPhonePolicyPremium(
                         $policy,
                         PhonePrice::STREAM_MONTHLY,
                         $additionalPremium,
@@ -1434,7 +1441,7 @@ class PurchaseController extends BaseController
                     );
                 } elseif ($freq == Policy::PLAN_YEARLY) {
                     $policy->setPremiumInstallments(1);
-                    $priceService->policySetPhonePremium(
+                    $priceService->setPhonePolicyPremium(
                         $policy,
                         PhonePrice::STREAM_YEARLY,
                         $additionalPremium,

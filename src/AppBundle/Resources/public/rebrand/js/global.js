@@ -21,4 +21,5 @@ require('./components/custom-select.js');
 require('./components/cardbox.js');
 require('./components/modalVideo.js');
 require('./components/get-quote.js');
+require('./common/native-share.js');
 

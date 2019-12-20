@@ -40,6 +40,15 @@
             <span class="sr-only">so-sure</span>
         </a>
         {% include '::navigation/onboarding.html.twig' %}
+    {% elseif onboarding_competition_mode is defined and onboarding_competition_mode == true %}
+        <div class="container-large d-flex justify-content-between align-items-center">
+            {# Logo #}
+            <a href="/" class="navbar-brand show-in-nav show-in-quote">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+            {% include '::navigation/onboardingCompetition.html.twig' %}
+        </div>
     {% elseif share_mode is defined and share_mode == true %}
         <div class="container-large d-flex justify-content-between align-items-center">
             {# Logo #}

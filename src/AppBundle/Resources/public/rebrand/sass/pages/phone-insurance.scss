@@ -368,3 +368,57 @@
         }
     }
 }
+
+.video {
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    z-index: 3;
+
+    @include video-background;
+
+    &-img {
+        width: 580px;
+        margin-left: -360px;
+        position: absolute;
+        top: 0; left: 50%;
+
+        @include media-breakpoint-up(lg) {
+            top: -20px;
+            position: absolute;
+            margin-left: -440px;
+        }
+    }
+
+    &__play {
+        width: 120px; height: 120px;
+        display: block;
+        position: relative;
+        z-index: 100;
+
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        min-height: 450px;
+    }
+}
+
+.knowledge-base {
+    background-color: $athens-gray;
+    position: relative;
+    z-index: 4;
+
+    &__mobile {
+        position: relative;
+    }
+
+    &__desktop {
+        position: relative;
+    }
+}

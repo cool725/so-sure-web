@@ -2,7 +2,7 @@
 
 // Add shadow to solid buttons
 .btn {
-    font-family: $g-medium;
+    font-family: $g-bold;
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
                 0 5px 15px 0 rgba(8,27,154,0.2);
 
@@ -48,6 +48,18 @@ input[type="button"][class*="btn-outline-"],
     &:hover {
         color: darken($zaffre, 5%);
     }
+}
+
+.btn-outline-deep-sky-blue-d {
+    color: $white;
+
+    &:hover {
+        color: $zaffre;
+    }
+}
+
+.btn-outline-primary {
+    color: $zaffre;
 }
 
 .btn-blue-gradient {

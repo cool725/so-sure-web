@@ -44,6 +44,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -376,6 +377,16 @@ class PolicyService
                 // saving final finaly checkmendcert based status
                 $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
             }
+
+            try {
+                $this->dispatchEvent(PolicyEvent::EVENT_INIT, new PolicyEvent($policy));
+            } catch (\Exception $e) {
+                $this->logger->warning(
+                    sprintf('Failed to dispatch init event for user %s', $user->getId()),
+                    ['exception' => $e]
+                );
+            }
+
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->logger->warning(
@@ -2305,11 +2316,17 @@ class PolicyService
      */
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
+        $date = $date ?: new \DateTime();
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
-
+        $this->priceService->setPhonePolicyPremium(
+            $newPolicy,
+            PhonePrice::installmentsStream($newPolicy->getPremiumInstallments()),
+            $policy->getUser()->getAdditionalPremium(),
+            $date
+        );
         $this->dm->persist($newPolicy);
         $this->dm->flush();
 

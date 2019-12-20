@@ -15,6 +15,10 @@ const tracking = (name, type, location, callback) => {
     } else if (type == 'onboarding') {
         url = '/ops/track/onboarding/' + location;
 
+    // Track by competition & name
+    } else if (type == 'competition') {
+        url = '/ops/track/onboarding/' + location;
+
     // Track name
     } else {
         // Default
@@ -34,19 +38,26 @@ $(function() {
             url      = $(this).data('event-url'),
             blank    = $(this).data('event-blank'),
             location = $(this).data('event-location'),
-            type     = $(this).data('event-type');
+            type     = $(this).data('event-type'),
+            once     = $(this).data('event-once');
 
         if (!blank) {
             // if not true prevent default behavior
             e.preventDefault();
         }
 
-        tracking(name, type, location, function() {
+        if (once != true) {
+            tracking(name, type, location, function() {
 
-            if (url && !blank) {
-                window.location = url;
-            }
-        });
+                if (url && !blank) {
+                    window.location = url;
+                }
+            });
+        }
+
+        if (typeof once) {
+            $(this).data('event-once', '1');
+        }
 
     });
 });

@@ -1241,6 +1241,12 @@ class UserController extends BaseController
 
         $template = 'AppBundle:User:onboarding.html.twig';
 
+        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+
+        if ($competitionFeature) {
+            $template = 'AppBundle:User:welcomeCompetition.html.twig';
+        }
+
         if ($request->get('_route') == 'user_instore') {
             $template = 'AppBundle:User:complete.html.twig';
         } elseif ($request->get('_route') == 'user_validation_required') {
