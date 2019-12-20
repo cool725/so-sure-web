@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Phone;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CustomerCompany;
 use AppBundle\Document\Form\Bacs;
@@ -25,7 +26,6 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Payment\JudoPayment;
@@ -6233,6 +6233,42 @@ class PolicyServiceTest extends WebTestCase
             $d->getPremium()->getMonthlyPremiumPrice() * 5,
             $d->getOutstandingPremiumToDateWithReschedules(new \DateTime("2019-05-12"))
         );
+    }
+
+    /**
+     * There was a bug where prices were not being queried from the price service on renewal, and instead random
+     * prices were being gotten from the phone so this test is to make sure that is not happening anymore.
+     */
+    public function testRenewalCorrectPrice()
+    {
+        $priceA = Create::phonePrice('2019-02-02', PhonePrice::STREAM_MONTHLY);
+        $priceB = Create::phonePrice('2019-02-28', PhonePrice::STREAM_YEARLY);
+        $priceC = Create::phonePrice('2019-01-20', PhonePrice::STREAM_MONTHLY);
+        $priceD = Create::phonePrice('2019-02-05', PhonePrice::STREAM_YEARLY);
+        $priceE = Create::phonePrice('2019-05-19', PhonePrice::STREAM_ALL);
+        $phoneA = new Phone();
+        $phoneB = new Phone();
+        $phoneA->addPhonePrice($priceB);
+        $phoneA->addPhonePrice($priceA);
+        $phoneB->addPhonePrice($priceD);
+        $phoneB->addPhonePrice($priceC);
+        $phoneB->addPhonePrice($priceE);
+        $user = Create::user();
+        $oldA = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneA);
+        $oldB = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneA);
+        $oldC = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneB);
+        $oldD = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneB);
+        Create::save(static::$dm, $phoneA, $phoneB, $user, $oldA, $oldB, $oldC, $oldD);
+        static::$policyService->createPendingRenewalPolicies('TEST', false, new \DateTime('2019-03-01'));
+        Create::refresh(static::$dm, $oldA, $oldB, $oldC, $oldD);
+        $newA = $oldA->getNextPolicy();
+        $newB = $oldB->getNextPolicy();
+        $newC = $oldC->getNextPolicy();
+        $newD = $oldD->getNextPolicy();
+        $this->assertEquals($priceA->getGwp(), $newA->getPremium()->getGwp());
+        $this->assertEquals($priceB->getGwp(), $newB->getPremium()->getGwp());
+        $this->assertEquals($priceD->getGwp(), $newC->getPremium()->getGwp());
+        $this->assertEquals($priceC->getGwp(), $newD->getPremium()->getGwp());
     }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)

@@ -125,7 +125,7 @@ class PriceService
      * @param float|null  $additionalPremium is an additional amount of cost to add to the overall price.
      * @param \DateTime   $date              is the date at which the price should be correct.
      */
-    public function policySetPhonePremium($policy, $stream, $additionalPremium, $date)
+    public function setPhonePolicyPremium($policy, $stream, $additionalPremium, $date)
     {
         $priceSource = $this->userPhonePriceSource($policy->getUser(), $policy->getPhone(), $stream, $date);
         $premium = $priceSource["price"]->createPremium($additionalPremium);

@@ -667,14 +667,14 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate, PolicyTerms $terms)
     {
+        NoOp::ignore($startDate);
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $policy;
         $phonePolicy->setPhone($this->getPhone());
         $phonePolicy->setImei($this->getImei());
         $phonePolicy->setSerialNumber($this->getSerialNumber());
-
+        $phonePolicy->setPremiumInstallments($this->getPremiumInstallments());
         // make sure ipt rate is set to ipt rate at the start of the policy
-        $phonePolicy->validatePremium(true, $startDate);
         if ($terms->isPicSureEnabled()) {
             $phonePolicy->setPicSureStatus(self::PICSURE_STATUS_PREAPPROVED);
         }
@@ -682,43 +682,12 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
     {
+        NoOp::ignore($startDate);
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $policy;
         $phonePolicy->setPhone($this->getPhone());
         $phonePolicy->setImei($this->getImei());
         $phonePolicy->setSerialNumber($this->getSerialNumber());
-
-        // make sure ipt rate is set to ipt rate at the start of the policy
-        $phonePolicy->validatePremium(true, $startDate);
-    }
-
-    /**
-     * If the premium is initialized prior to an ipt rate change
-     * and then created after, the IPT would be incorrect
-     */
-    public function validatePremium($adjust, \DateTime $date = null)
-    {
-        $phonePrice = $this->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY, $date);
-        if (!$phonePrice) {
-            throw new \UnexpectedValueException(sprintf('Missing phone price'));
-        }
-        $additionalPremium = null;
-        if ($this->getUser()) {
-            $additionalPremium = $this->getUser()->getAdditionalPremium();
-        }
-        $expectedPremium = $phonePrice->createPremium($additionalPremium, $date);
-
-        if ($this->getPremium()!= $expectedPremium) {
-            if ($adjust) {
-                $this->setPremium($expectedPremium);
-            } else {
-                throw new InvalidPremiumException(sprintf(
-                    'Ipt rate %f is not valid (should be %f)',
-                    $this->getPremium()->getIptRate(),
-                    $this->getCurrentIptRate($date)
-                ));
-            }
-        }
     }
 
     public function getPolicyNumberPrefix()
