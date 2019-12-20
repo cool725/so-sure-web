@@ -5,6 +5,7 @@ require('../../sass/pages/phone-insurance.scss');
 // Require BS component(s)
 require('bootstrap/js/dist/carousel');
 require('bootstrap/js/dist/collapse');
+require('bootstrap/js/dist/tab');
 
 // Require components
 require('../components/banner.js');
@@ -47,6 +48,15 @@ $(function() {
     $('.review__controls-next').on('click', function(e) {
         $carousel.flickity('next');
     });
+
+    // Adjust top position of knowledge base as true value differs between browser
+    let knowledgeBaseD = $('.knowledge-base__desktop'),
+        tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 2;
+        knowledgeBaseD.css('top', -tabsHeight);
+
+    let knowledgeBaseM = $('.knowledge-base__mobile'),
+        cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
+        knowledgeBaseM.css('top', -cardboxHeight);
 
 });
 
