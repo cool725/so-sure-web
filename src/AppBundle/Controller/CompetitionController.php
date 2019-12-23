@@ -110,6 +110,7 @@ class CompetitionController extends BaseController
                         if ($draw) {
                             $entry = new Entry;
                             $entry->setLead($lead);
+                            $dm->persist($entry);
                             $draw->addEntry($entry);
                         } else {
                             $this->get('logger')->error('Entry failed, No active virality draw found');
@@ -199,6 +200,7 @@ class CompetitionController extends BaseController
                             if ($lead) {
                                 $entry = new Entry;
                                 $entry->setLead($lead);
+                                $dm->persist($entry);
                                 $draw->addEntry($entry);
                                 $dm->flush();
                             }

@@ -76,7 +76,6 @@ class Draw
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
-        $this->entries = new ArrayCollection();
     }
 
     public function getId()
