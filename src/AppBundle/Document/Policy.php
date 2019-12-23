@@ -6385,7 +6385,8 @@ abstract class Policy
         $data = [
             'id' => $this->getId(),
             'status' => $this->getApiStatus(),
-            'type' => 'phone',
+            //TODO - change this to fetch the actual policy_type
+            'type' => 'salva-phone',
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),

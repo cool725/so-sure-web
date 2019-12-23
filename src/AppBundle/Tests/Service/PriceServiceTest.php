@@ -143,7 +143,7 @@ class PriceServiceTest extends WebTestCase
         $data["user"]->addOffer($offer);
         self::$dm->persist($offer);
         self::$dm->flush();
-        self::$priceService->policySetPhonePremium(
+        self::$priceService->setPhonePolicyPremium(
             $data["policy"],
             PhonePrice::STREAM_YEARLY,
             0,
@@ -151,7 +151,7 @@ class PriceServiceTest extends WebTestCase
         );
         $this->assertEquals("phone", $data["policy"]->getPremium()->getSource());
         $this->assertEquals(1.23, $data["policy"]->getPremium()->getGwp());
-        self::$priceService->policySetPhonePremium(
+        self::$priceService->setPhonePolicyPremium(
             $data["policy"],
             PhonePrice::STREAM_YEARLY,
             0,
@@ -159,7 +159,7 @@ class PriceServiceTest extends WebTestCase
         );
         $this->assertEquals("offer", $data["policy"]->getPremium()->getSource());
         $this->assertEquals(41, $data["policy"]->getPremium()->getGwp());
-        self::$priceService->policySetPhonePremium(
+        self::$priceService->setPhonePolicyPremium(
             $data["policy"],
             PhonePrice::STREAM_MONTHLY,
             0,

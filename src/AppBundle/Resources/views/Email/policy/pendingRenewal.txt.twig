@@ -5,21 +5,22 @@ Dear Dear {{ policy.user.name }},
 
 We're just emailing to let you know that your so-sure policy {{ policy.policyNumber }} is due to expire on {{ policy.end | date('d M Y', 'Europe/London') }}.
 
-{% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
+Your renewal premium will be £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
 
-The good news is that your new monthly premium will only be £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} 🎉
+For comparison the premium paid last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
 
-{% elseif equal_to_two_dp(policy.nextPolicy.premium.monthlyPremiumPrice, policy.premium.monthlyPremiumPrice) %}
-
-The good news is that your monthly premium will remain at £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} 🎉
-
+The excess for your policy is
+{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus == 'approved' %}
+Damage claims: &pound;{{ policy.premium.picSureExcess.damage }}
+Warranty claims: &pound;{{ policy.premium.picSureExcess.warranty }}
+Loss and Theft Claims: &pound;{{ policy.premium.picSureExcess.loss }}
 {% else %}
-
-Your monthly premium has increased slightly over last year and will now be £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month 👍
-
-By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
-
+Damage claims: &pound;{{ policy.premium.excess.damage }}
+Warranty claims: &pound;{{ policy.premium.excess.warranty }}
+Loss and Theft Claims: &pound;{{ policy.premium.excess.loss }}
 {% endif %}
+
+You should check that the level of cover is appropriate for your needs and, if you wish, compare prices and over offered by other providers.
 
 {% if policy.potValue > 0 %}
 

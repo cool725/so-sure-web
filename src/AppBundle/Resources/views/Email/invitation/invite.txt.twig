@@ -1,4 +1,17 @@
 
+{% if feature_enabled('invite-competition') %}
+Chance to win £200 thanks to {{ invitation.inviterName }} and so-sure
+
+Your friend {{ invitation.inviterName }} invited you to enter this month’s competition from so-sure to win a £200 Amazon voucher ☺️
+
+It’s super easy - you don’t even need to buy a policy with us! Just answer 3 quick quiz questions and share with your friends for more entries into our prize draw.
+
+If you do need to insure your phone, there’s also loads of info about our comprehensive cover from just £3.49pm. Plus you can see how you can get up to 80% of your cash back with us!
+
+Click here to enter {{ invitation.link }}
+
+Have a question or issue? Contact us: {{ contact_us_url }}
+{% else %}
 👉 {{ invitation.inviterName }} invited you to connect
 
 Your friend, {{ invitation.inviterName }}, just got their phone covered with so-sure – better &amp; up to 80% cheaper phone insurance designed for friends ☺️
@@ -8,7 +21,7 @@ Connect today and we'll reward both of you!
 Accept Invitation: {{ invitation.link }}
 
 Have a question or issue? Contact us: {{ contact_us_url }}
-
+{% endif %}
 
 ============================================================
 ** (http://www.twitter.com/wearesosure)

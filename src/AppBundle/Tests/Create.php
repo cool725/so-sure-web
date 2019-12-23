@@ -10,7 +10,9 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Premium;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -62,6 +64,7 @@ class Create
         $user->setFirstName("John");
         $user->setLastName("Fogle");
         $user->setEmail(uniqid()."@hotmail.com");
+        $user->setEnabled(true);
         return $user;
     }
 
@@ -72,7 +75,7 @@ class Create
      *                                       policy end will be a year after this date.
      * @param string           $status       is the status that the policy will have.
      * @param int              $installments is the number of premium installments.
-     * @return Policy the newly created policy.
+     * @return PhonePolicy the newly created policy.
      */
     public static function policy($user, $start, $status, $installments)
     {
