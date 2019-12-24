@@ -118,6 +118,20 @@ class Lead
     protected $intercomUserId;
 
     /**
+     * @Assert\Length(min="0", max="20")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $shareCode;
+
+    /**
+    * @Assert\Ip()
+    * @MongoDB\Field(type="string")
+    * @Gedmo\Versioned
+    */
+    protected $ip;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="lead", cascade={"persist"})
      */
     protected $opts = array();
@@ -237,6 +251,26 @@ class Lead
     public function getIntercomUserIdOrId()
     {
         return $this->getIntercomUserId() ?: $this->getId();
+    }
+
+    public function getShareCode()
+    {
+        return $this->shareCode;
+    }
+
+    public function setShareCode($shareCode)
+    {
+        $this->shareCode = $shareCode;
+    }
+
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    public function setIp($ip)
+    {
+        $this->ip = $ip;
     }
 
     public function addOpt(Opt $opt)

@@ -11,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 use AppBundle\Document\Lead;
+use AppBundle\Document\User;
+use AppBundle\Document\Draw\Draw;
+use AppBundle\Document\Draw\Entry;
 
 use AppBundle\Exception\InvalidEmailException;
 
@@ -33,9 +36,8 @@ class CompetitionController extends BaseController
      */
     public function enterDrawAction(Request $request)
     {
-        $dm = $this->getManager();
+        $ip = $request->getClientIp();
         $lead = new Lead();
-        $lead->setSource(Lead::SOURCE_COMPETITION);
         $leadForm = $this->get('form.factory')
             ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
             ->getForm();
@@ -45,43 +47,99 @@ class CompetitionController extends BaseController
                 try {
                     $leadForm->handleRequest($request);
                     if ($leadForm->isValid()) {
-                        // TODO: Probably want to check if they've already entered
+                        $dm = $this->getManager();
                         $leadRepo = $dm->getRepository(Lead::class);
-                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
-                        if (!$existingLead) {
-                            $dm->persist($lead);
-                            $dm->flush();
-                            $days = \DateTime::createFromFormat('U', time());
-                            $days = $days->add(new \DateInterval(sprintf('P%dD', 14)));
+                        if ($ip) {
+                            $existingIps = $leadRepo->findBy(['ip' => $ip]);
+                            if ($existingIps && count($existingIps) > 2) {
+                                // @codingStandardsIgnoreStart
+                                $err = 'It looks like you\'ve already entered the draw, not to worry you can share to get more entries 🤗';
+                                // @codingStandardsIgnoreEnd
+                                $this->addFlash('error', $err);
+                                return $this->redirectToRoute('enter_draw');
+                            }
+                        }
+                        $existingLead = $leadRepo->findOneBy(['emailCanonical' => mb_strtolower($lead->getEmail())]);
+                        $userRepo = $dm->getRepository(User::class);
+                        $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($lead->getEmail())]);
+                        if ($existingUser) {
+                            // @codingStandardsIgnoreStart
+                            $err = 'It looks like you already have an account. Log in and share your scode page to enter';
+                            // @codingStandardsIgnoreEnd
+                            $this->addFlash('error', $err);
+                            return $this->redirectToRoute('fos_user_security_login');
+                        } elseif ($existingLead) {
+                            if ($existingLead->getShareCode()) {
+                                // @codingStandardsIgnoreStart
+                                $err = 'It looks like you\'ve already entered the draw, check your emails to get your unique link and share to get more entries 🏆';
+                                // @codingStandardsIgnoreEnd
+                                $this->addFlash('warning', $err);
+                                return $this->redirectToRoute('enter_draw');
+                            } else {
+                                $lead = $existingLead;
+                            }
+                        } else {
+                            $lead->setSource(Lead::SOURCE_COMPETITION);
 
                             // Add to Mixpanel
                             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
                             $this->get('app.mixpanel')->queuePersonProperties([
                                 '$email' => $lead->getEmail()
                             ], true);
-                            // TODO: Create unique link and email the user
-                            // We want to check for existing links too
-                            // We don't want these guys falling in warm leads need to be cold 🧊
-                            // Emails > competition
-
-                            // Just for making a random link for testing
-                            $randy = mb_substr(md5(uniqid(mt_rand(), true)), 0, 8);
-                            $session = $this->get('session');
-                            $session->set('randy', $randy);
-
-                            return $this->redirectToRoute('enter_draw_questions');
-                        } else {
-                            // TODO: If Exisiting lead functionality
-                            // TODO: Create unique link and email the user
-                            // We want to check for existing links too
-                            // Emails > competition
-                            // Just for making a random link for testing
-                            $randy = mb_substr(md5(uniqid(mt_rand(), true)), 0, 8);
-                            $session = $this->get('session');
-                            $session->set('randy', $randy);
-
-                            return $this->redirectToRoute('enter_draw_questions');
                         }
+
+                        $emailcode = explode("@", mb_strtolower($lead->getEmail()))[0];
+                        if (mb_strlen($emailcode)>5) {
+                            $emailcode = mb_substr($emailcode, 0, 6);
+                        }
+                        $code = uniqid($emailcode);
+
+                        $lead->setShareCode($code);
+                        $lead->setIp($ip);
+
+                        $drawRepo = $dm->getRepository(Draw::class);
+
+                        $draw = $drawRepo->findOneBy(
+                            [
+                                'active' => true,
+                                'current' => true,
+                                'type' => 'virality'
+                            ]
+                        );
+
+                        if ($draw) {
+                            $entry = new Entry;
+                            $entry->setLead($lead);
+                            $dm->persist($entry);
+                            $draw->addEntry($entry);
+                        } else {
+                            $this->get('logger')->error('Entry failed, No active virality draw found');
+                            // @codingStandardsIgnoreStart
+                            $err = 'Oops, something went wrong, please try again later';
+                            // @codingStandardsIgnoreEnd
+                            $this->addFlash('error', $err);
+                            $dm->clear();
+                            return $this->redirectToRoute('enter_draw');
+                        }
+
+                        $dm->persist($lead);
+                        $dm->flush();
+
+                        /** @var MailerService $mailer */
+                        $mailer = $this->get('app.mailer');
+
+                        $mailer->sendTemplate(
+                            sprintf('Thanks for entering the draw'),
+                            'no-reply@so-sure.com',
+                            'AppBundle:Email:competition/entered.html.twig',
+                            ['code' => $code]
+                        );
+
+                        $session = $this->get('session');
+                        $session->set('shareCode', $code);
+                        $session->remove('user-answers');
+
+                        return $this->redirectToRoute('enter_draw_questions');
                     }
                 } catch (InvalidEmailException $ex) {
                     $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
@@ -106,27 +164,60 @@ class CompetitionController extends BaseController
      */
     public function enterDrawQuestionsAction(Request $request)
     {
+        $session = $this->get('session');
         $questionsForm = $this->get('form.factory')
             ->createNamedBuilder('questions_form', CompetitionType::class)
             ->getForm();
+        $session = $this->get('session');
+        $shareCode = $session->get('shareCode');
+        $userAnswers = $session->get('user-answers');
+        if (!$shareCode) {
+            return $this->redirectToRoute('enter_draw');
+        } elseif ($userAnswers) {
+            return $this->redirectToRoute('enter_draw_confirm');
+        }
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('questions_form')) {
                 try {
                     $questionsForm->handleRequest($request);
                     if ($questionsForm->isValid()) {
-                        // TODO: Record answers in DB??? Against user 🤔
-                        // Send to confirm page to display
-                        $session = $this->get('session');
+                        // TODO: Record answers in DB
+                        $dm = $this->getManager();
+                        $drawRepo = $dm->getRepository(Draw::class);
+
+                        $draw = $drawRepo->findOneBy(
+                            [
+                                'active' => true,
+                                'current' => true,
+                                'type' => 'virality'
+                            ]
+                        );
+
+                        if ($draw) {
+                            $leadRepo = $dm->getRepository(Lead::class);
+                            $shareCode = $session->get('shareCode');
+                            $lead = $leadRepo->findOneBy(['shareCode' => $shareCode]);
+                            if ($lead) {
+                                $entry = new Entry;
+                                $entry->setLead($lead);
+                                $dm->persist($entry);
+                                $draw->addEntry($entry);
+                                $dm->flush();
+                            }
+                        } else {
+                            $this->get('logger')->error('Entry failed, No active virality draw found');
+                            // @codingStandardsIgnoreStart
+                            $err = 'Oops, something went wrong, please try again later';
+                            // @codingStandardsIgnoreEnd
+                            $this->addFlash('error', $err);
+                        }
+
                         $session->set('user-answers', $_POST);
                         return $this->redirectToRoute('enter_draw_confirm');
-                    } else {
-                        $this->addFlash('error', sprintf(
-                            "Error"
-                        ));
                     }
                 } catch (\Exception $e) {
                     $this->addFlash('error', sprintf(
-                        "Something is very wrong"
+                        "Oops, something went wrong, please try again later"
                     ));
                 }
             }
@@ -149,19 +240,24 @@ class CompetitionController extends BaseController
         // Grab the answers from the session
         $session = $this->get('session');
         $userAnswers = $session->get('user-answers');
+        $shareCode = $session->get('shareCode');
 
-        // TODO: Match the results to the answers - this doesn't work just looks for matches
+        if (!$userAnswers && $shareCode) {
+            return $this->redirectToRoute('enter_draw_questions');
+        } elseif (!$userAnswers) {
+            return $this->redirectToRoute('enter_draw');
+        }
+
         $answers = ['C','C','C'];
         $ans = array_intersect($userAnswers['questions_form'], $answers);
 
-        // Again for random visual testing purps - this will be the user code
-        $code = $session->get('randy');
+        $shareCode = $session->get('shareCode');
 
         $data = [
             'users_answers' => $userAnswers,
             'answers' =>  $answers,
             'ans' => $ans,
-            'code' => $code,
+            'code' => $shareCode,
         ];
 
         return $this->render('AppBundle:Competition:enterDrawConfirmed.html.twig', $data);
@@ -174,15 +270,23 @@ class CompetitionController extends BaseController
      */
     public function enterDrawCodeAction($code)
     {
-        $shareCode = null;
+        $shareCode = $code;
 
-        try {
-            // TODO: Find lead in DB via code
-            // This for test purps
-            $shareCode = $code;
-            $session = $this->get('session');
-            $session->set('referred-by', $shareCode);
-        } catch (\Exception $e) {
+        if ($shareCode) {
+            $dm = $this->getManager();
+            $leadRepo = $dm->getRepository(Lead::class);
+            $lead = $leadRepo->findOneBy(['shareCode' => $shareCode]);
+            if ($lead) {
+                $session = $this->get('session');
+                $session->set('referred-by', $shareCode);
+            } else {
+                if ($shareCode != 'enternow') {
+                    return $this->redirectToRoute('enter_draw_code', ['code' => 'enternow']);
+                } else {
+                    $shareCode = null;
+                }
+            }
+        } else {
             $shareCode = null;
         }
 
