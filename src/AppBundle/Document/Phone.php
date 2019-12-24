@@ -1536,15 +1536,15 @@ class Phone
         if (!$this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf('Unable to determine min binder'));
         }
-        $oneDay = $this->addBusinessDays($date, 1);
-        $dateDiff = $oneDay->diff($from);
-        if ($dateDiff->invert) {
-            throw new \Exception(sprintf(
-                '%s must be at least 1 business day (%s) after now',
-                $from->format(\DateTime::ATOM),
-                $oneDay->format(\DateTime::ATOM)
-            ));
-        }
+        // $oneDay = $this->addBusinessDays($date, 1);
+        // $dateDiff = $oneDay->diff($from);
+        // if ($dateDiff->invert) {
+        //     throw new \Exception(sprintf(
+        //         '%s must be at least 1 business day (%s) after now',
+        //         $from->format(\DateTime::ATOM),
+        //         $oneDay->format(\DateTime::ATOM)
+        //     ));
+        // }
         $price = new PhonePrice();
         $price->setGwp($gwp);
         $price->setValidFrom($from);
