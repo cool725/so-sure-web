@@ -31,25 +31,15 @@ $(function() {
     // Copy scode
     // NOTE: Copies from hidden div with a body of text
     let clipboard = new Clipboard('.btn-copy');
-    // let clipboardMobile = new Clipboard('.btn-copy-mb');
 
     clipboard.on('click', function(e) {
         e.preventDefault();
     });
 
     clipboard.on('success', function(e) {
-        // console.info('Action:', e.action);
-        // console.info('Text:', e.text);
-        // console.info('Trigger:', e.trigger);
-
         tracking('', 'competition', 'competition-copied-code');
 
         e.clearSelection();
     });
-
-    // clipboard.on('error', function(e) {
-    //     console.error('Action:', e.action);
-    //     console.error('Trigger:', e.trigger);
-    // });
 
 });
