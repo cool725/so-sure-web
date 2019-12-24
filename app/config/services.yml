@@ -1121,10 +1121,11 @@ services:
         arguments:
             - "@app.policy"
             - "@app.sms"
+            - "@app.branch"
             - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
-            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyCreatedEvent }
 
     app.listener.user:
         class:   AppBundle\Listener\UserListener
@@ -1751,5 +1752,3 @@ services:
     app.price:
         alias: AppBundle\Service\PriceService
         public: true
-
-
