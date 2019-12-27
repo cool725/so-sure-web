@@ -94,12 +94,12 @@ class DefaultController extends BaseController
 
         // A/B Homepage USP Price Test
         // To Test use url param ?force=standard-usps / ?force=price-usps
-        $homepageUspPriceTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
-            ['standard-usps', 'price-usps'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        // $homepageUspPriceTest = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
+        //     ['standard-usps', 'price-usps'],
+        //     SixpackService::LOG_MIXPANEL_ALL
+        // );
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -108,7 +108,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'price_usps_exp' => $homepageUspPriceTest,
+            // 'price_usps_exp' => $homepageUspPriceTest,
             'competitor' => $this->competitorsData(),
         );
 
