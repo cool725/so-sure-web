@@ -6231,10 +6231,10 @@ class PolicyServiceTest extends WebTestCase
         $phoneB->addPhonePrice($priceC);
         $phoneB->addPhonePrice($priceE);
         $user = Create::user();
-        $oldA = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneA);
-        $oldB = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneA);
-        $oldC = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneB);
-        $oldD = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneB);
+        $oldA = Create::salvaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneA);
+        $oldB = Create::salvaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneA);
+        $oldC = Create::helvetiaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneB);
+        $oldD = Create::helvetiaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneB);
         Create::save(static::$dm, $phoneA, $phoneB, $user, $oldA, $oldB, $oldC, $oldD);
         static::$policyService->createPendingRenewalPolicies('TEST', false, new \DateTime('2019-03-01'));
         Create::refresh(static::$dm, $oldA, $oldB, $oldC, $oldD);
