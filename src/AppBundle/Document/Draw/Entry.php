@@ -8,9 +8,10 @@ use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Draw\Draw;
 
 /**
- * @MongoDB\EmbeddedDocument()
+ * @MongoDB\Document
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Entry

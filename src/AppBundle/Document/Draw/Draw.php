@@ -55,7 +55,7 @@ class Draw
     protected $description;
 
     /**
-     * @MongoDB\EmbedMany(targetDocument="Entry")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Draw\Entry")
      */
     protected $entries;
 
@@ -76,7 +76,6 @@ class Draw
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
-        $this->entries = new ArrayCollection();
     }
 
     public function getId()
