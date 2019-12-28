@@ -94,7 +94,7 @@ class Create
      * @param int              $installments is the number of premium installments the policy is to pay.
      * @return SalvaPhonePolicy the new phone policy.
      */
-    public static function salvaPhonePolicy($user, $start, $status, $installments)
+    public static function salvaPhonePolicy($user, $start, $status, $installments, $phone = null)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = new SalvaPhonePolicy();
@@ -102,6 +102,9 @@ class Create
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $policy->setStaticEnd($policy->getEnd());
+        if ($phone) {
+            $policy->setPhone($phone);
+        }
         $premium = new PhonePremium();
         $premium->setGwp(rand(20, 100) / 8);
         $policy->setPremium($premium);
@@ -119,7 +122,7 @@ class Create
      * @param int              $installments is the number of premium installments the policy is to pay.
      * @return HelvetiaPhonePolicy the new phone policy.
      */
-    public static function helvetiaPhonePolicy($user, $start, $status, $installments)
+    public static function helvetiaPhonePolicy($user, $start, $status, $installments, $phone = null)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = new HelvetiaPhonePolicy();
@@ -127,6 +130,9 @@ class Create
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $policy->setStaticEnd($policy->getEnd());
+        if ($phone) {
+            $policy->setPhone($phone);
+        }
         $premium = new PhonePremium();
         $premium->setGwp(rand(20, 100) / 8);
         $policy->setPremium($premium);
