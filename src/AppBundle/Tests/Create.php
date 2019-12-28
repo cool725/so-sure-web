@@ -160,6 +160,17 @@ class Create
         return $policy;
     }
 
+    public static function phonePrice($validFrom, $stream)
+    {
+        $date = is_string($validFrom) ? new \DateTime($validFrom) : $validFrom;
+        $gwp = rand(100, 600) / 90;
+        $price = new PhonePrice();
+        $price->setGwp($gwp);
+        $price->setValidFrom($date);
+        $price->setStream($stream);
+        return $price;
+    }
+
     /**
      * Creates a log entry with it's date being a given number of days ago.
      * @param Policy $policy  is the policy the entry should be for.
