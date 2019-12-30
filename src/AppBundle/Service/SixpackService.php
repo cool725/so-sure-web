@@ -40,7 +40,7 @@ class SixpackService
     // Exp 7
     // const EXPERIMENT_HOMEPAGE_TABS_AND_USP = 'Homepage Tabs and USP';
     // Exp 8
-    const EXPERIMENT_HOMEPAGE_USP_VARIATIONS = 'Homepage Price USPs';
+    // const EXPERIMENT_HOMEPAGE_USP_VARIATIONS = 'Homepage Price USPs';
     // Exp 9
     //
     // Exp 10
@@ -121,7 +121,8 @@ class SixpackService
         'UK flag',
         'Homepage Tagline',
         'Pricing USP',
-        'Homepage Tabs and USP'
+        'Homepage Tabs and USP',
+        'Homepage Price USPs'
     ];
 
     public static $unauthExperiments = [
@@ -136,7 +137,7 @@ class SixpackService
         // Exp 5
         // self::EXPERIMENT_HOMEPAGE_TABS_AND_USP,
         // Exp 6
-        self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
+        // self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
         // Exp 7
         //
         // Exp 8
@@ -251,7 +252,7 @@ class SixpackService
         // Exp 4
         // self::EXPERIMENT_HOMEPAGE_TABS_AND_USP,
         // Exp 5
-        self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
+        // self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
         // Exp 6
         //
         // Exp 7

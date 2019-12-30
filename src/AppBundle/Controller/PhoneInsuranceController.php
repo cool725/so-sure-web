@@ -502,10 +502,6 @@ class PhoneInsuranceController extends BaseController
 
         $priceService = $this->get('app.price');
 
-        // A/B Homepage USP Price Test
-        // To Test use url param ?force=standard-usps / ?force=price-usps
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USP_VARIATIONS);
-
         $data = [
             'phone' => $phone,
             'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),

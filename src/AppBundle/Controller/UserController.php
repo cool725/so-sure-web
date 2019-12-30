@@ -1235,10 +1235,6 @@ class UserController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B Homepage USP Price Test
-        // To Test use url param ?force=standard-usps / ?force=price-usps
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_USP_VARIATIONS);
-
         $template = 'AppBundle:User:onboarding.html.twig';
 
         $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
